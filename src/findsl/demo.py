@@ -8,14 +8,17 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .compiler import Compiler
+from .diagnostics import diagnose_exception
 from .equivalence import verify_sql_equivalence
 from .evaluation import load_cases
+from .nl2dsl import suggest_dsl
 
 
 DEFAULT_DEMO_DSL = (
     'then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), '
     'rank(indicator("turnover_rate"), desc, top=100))'
 )
+DEFAULT_NL_REQUEST = "筛选A股连续3天主力净流入为正的股票，并按换手率从高到低排名前100"
 
 
 def analyze_dsl(
@@ -61,6 +64,40 @@ def demo_examples(cases_path: Path = Path("data/samples/queries.jsonl")) -> List
     return examples or [{"name": "Default", "dsl": DEFAULT_DEMO_DSL}]
 
 
+def suggest_from_text(
+    text: str,
+    data_dir: Path = Path("data/samples"),
+    enable_prefix_sum: bool = True,
+    verify: bool = True,
+) -> Dict[str, Any]:
+    suggestion = suggest_dsl(text)
+    candidates = []
+    for candidate in suggestion.candidates:
+        item = candidate.to_dict()
+        try:
+            analysis = analyze_dsl(
+                candidate.dsl,
+                data_dir=data_dir,
+                enable_prefix_sum=enable_prefix_sum,
+                verify=verify,
+            )
+            verification = analysis.get("verification") or {}
+            item["analysis"] = analysis
+            item["validated"] = bool(analysis.get("ok")) and (
+                not verify or bool(verification.get("passed"))
+            )
+        except Exception as exc:  # noqa: BLE001 - candidate validation is diagnostic evidence.
+            item["validated"] = False
+            item["error"] = _error_payload(exc)
+        candidates.append(item)
+    return {
+        "ok": True,
+        "text": text,
+        "warnings": suggestion.warnings,
+        "candidates": candidates,
+    }
+
+
 def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/queries.jsonl")):
     data_dir = Path(data_dir)
     cases_path = Path(cases_path)
@@ -78,11 +115,23 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
             self._send_json({"ok": False, "error": {"message": "Not found"}}, HTTPStatus.NOT_FOUND)
 
         def do_POST(self) -> None:  # noqa: N802 - required by BaseHTTPRequestHandler.
-            if self.path != "/api/analyze":
+            if self.path not in {"/api/analyze", "/api/suggest"}:
                 self._send_json({"ok": False, "error": {"message": "Not found"}}, HTTPStatus.NOT_FOUND)
                 return
             try:
                 request = self._read_json()
+                if self.path == "/api/suggest":
+                    text = str(request.get("text", "")).strip()
+                    if not text:
+                        raise ValueError("Natural-language request is required")
+                    result = suggest_from_text(
+                        text=text,
+                        data_dir=data_dir,
+                        enable_prefix_sum=bool(request.get("enable_prefix_sum", True)),
+                        verify=bool(request.get("verify", True)),
+                    )
+                    self._send_json(result)
+                    return
                 dsl = str(request.get("dsl", "")).strip()
                 if not dsl:
                     raise ValueError("DSL is required")
@@ -95,14 +144,7 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
                 self._send_json(result)
             except Exception as exc:  # noqa: BLE001 - demo API returns structured diagnostics.
                 self._send_json(
-                    {
-                        "ok": False,
-                        "error": {
-                            "type": type(exc).__name__,
-                            "message": str(exc),
-                            "trace": traceback.format_exc(limit=3).strip().splitlines(),
-                        },
-                    },
+                    {"ok": False, "error": _error_payload(exc)},
                     HTTPStatus.BAD_REQUEST,
                 )
 
@@ -147,8 +189,17 @@ def run_demo_server(
     server.serve_forever()
 
 
+def _error_payload(exc: Exception) -> Dict[str, Any]:
+    return {
+        "type": type(exc).__name__,
+        "message": str(exc),
+        "diagnostics": [item.to_dict() for item in diagnose_exception(exc)],
+        "trace": traceback.format_exc(limit=3).strip().splitlines(),
+    }
+
+
 def render_demo_html() -> str:
-    return """<!doctype html>
+    html = """<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -226,6 +277,10 @@ def render_demo_html() -> str:
       font-family: Consolas, "SFMono-Regular", monospace;
       line-height: 1.45;
     }
+    #nlInput {
+      min-height: 84px;
+      font-family: inherit;
+    }
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -246,7 +301,41 @@ def render_demo_html() -> str:
       font-weight: 700;
       cursor: pointer;
     }
+    .secondary {
+      background: #27323a;
+    }
     button:disabled { opacity: 0.65; cursor: default; }
+    .candidates {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .candidate {
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent-2);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 500;
+    }
+    .candidate strong {
+      display: block;
+      font-size: 13px;
+    }
+    .candidate span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+    }
+    .candidate.validated {
+      border-left-color: var(--ok);
+    }
     .metrics {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -310,6 +399,7 @@ def render_demo_html() -> str:
       color: var(--danger);
       padding: 10px 12px;
       background: #fff7f5;
+      white-space: pre-wrap;
     }
     .badge {
       display: inline-flex;
@@ -345,6 +435,13 @@ def render_demo_html() -> str:
           <span class="badge">Doris SQL</span>
         </div>
         <div class="section">
+          <label for="nlInput">Natural language</label>
+          <textarea id="nlInput" spellcheck="false"></textarea>
+          <div class="controls">
+            <span class="badge" id="suggestState">NL2DSL ready</span>
+            <button class="secondary" id="suggestButton">Suggest DSL</button>
+          </div>
+          <div class="candidates" id="candidateList"></div>
           <label for="exampleSelect">Sample</label>
           <select id="exampleSelect"></select>
           <label for="dslInput" style="margin-top:12px;">DSL</label>
@@ -383,6 +480,10 @@ def render_demo_html() -> str:
   </main>
   <script>
     const sampleSelect = document.getElementById("exampleSelect");
+    const nlInput = document.getElementById("nlInput");
+    const suggestButton = document.getElementById("suggestButton");
+    const suggestState = document.getElementById("suggestState");
+    const candidateList = document.getElementById("candidateList");
     const dslInput = document.getElementById("dslInput");
     const runButton = document.getElementById("runButton");
     const outputPane = document.getElementById("outputPane");
@@ -393,6 +494,7 @@ def render_demo_html() -> str:
     const verifyToggle = document.getElementById("verifyToggle");
     let currentResult = null;
     let currentTab = "sql";
+    const defaultNlRequest = "__DEFAULT_NL_REQUEST__";
 
     function setState(text, ok) {
       resultState.textContent = text;
@@ -428,10 +530,92 @@ def render_demo_html() -> str:
       document.getElementById("metricPrefix").textContent = applied ? "Applied" : "Skipped";
     }
 
+    function resetMetrics(status) {
+      document.getElementById("metricStatus").textContent = status;
+      document.getElementById("metricStatus").className = status === "ERROR" ? "status-fail" : "";
+      document.getElementById("metricLatency").textContent = "-";
+      document.getElementById("metricRows").textContent = "-";
+      document.getElementById("metricPrefix").textContent = "-";
+    }
+
+    function applyCandidate(candidate, runAfterApply) {
+      dslInput.value = candidate.dsl;
+      currentTab = "sql";
+      document.querySelectorAll(".tab").forEach(item => item.classList.toggle("active", item.dataset.tab === "sql"));
+      if (runAfterApply) run();
+    }
+
+    function renderCandidates(candidates) {
+      candidateList.replaceChildren();
+      candidates.forEach((candidate, idx) => {
+        const button = document.createElement("button");
+        button.className = "candidate" + (candidate.validated ? " validated" : "");
+        button.type = "button";
+        const title = document.createElement("strong");
+        title.textContent = (idx + 1) + ". " + candidate.rule + " - " + Math.round(candidate.confidence * 100) + "% - " + (candidate.validated ? "validated" : "needs review");
+        const dsl = document.createElement("span");
+        dsl.textContent = candidate.dsl;
+        button.appendChild(title);
+        button.appendChild(dsl);
+        button.addEventListener("click", () => applyCandidate(candidate, true));
+        candidateList.appendChild(button);
+      });
+    }
+
+    async function suggest() {
+      suggestButton.disabled = true;
+      suggestState.textContent = "Suggesting";
+      try {
+        const res = await fetch("/api/suggest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: nlInput.value,
+            enable_prefix_sum: prefixToggle.checked,
+            verify: verifyToggle.checked
+          })
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          throw new Error(formatError(data.error));
+        }
+        renderCandidates(data.candidates);
+        if (!data.candidates.length) {
+          suggestState.textContent = data.warnings.length ? data.warnings[0] : "No candidate";
+          currentResult = null;
+          outputPane.textContent = "";
+          resetMetrics("No candidate");
+          setState("No candidate", false);
+          return;
+        }
+        suggestState.textContent = data.candidates[0].validated ? "Validated" : "Candidate ready";
+        applyCandidate(data.candidates[0], false);
+        if (data.candidates[0].analysis) {
+          currentResult = data.candidates[0].analysis;
+          updateMetrics(currentResult);
+          setState(currentResult.verification && !currentResult.verification.passed ? "Failed" : "Passed", !(currentResult.verification && !currentResult.verification.passed));
+          render();
+        } else {
+          await run();
+        }
+      } catch (err) {
+        candidateList.replaceChildren();
+        suggestState.textContent = "Suggest error";
+        errorBox.hidden = false;
+        errorBox.textContent = err.message;
+        currentResult = null;
+        outputPane.textContent = "";
+        resetMetrics("ERROR");
+        setState("Error", false);
+      } finally {
+        suggestButton.disabled = false;
+      }
+    }
+
     async function loadExamples() {
       const res = await fetch("/api/examples");
       const data = await res.json();
-      sampleSelect.innerHTML = "";
+      sampleSelect.replaceChildren();
       data.examples.forEach((item, idx) => {
         const option = document.createElement("option");
         option.value = item.dsl;
@@ -456,7 +640,7 @@ def render_demo_html() -> str:
         });
         const data = await res.json();
         if (!data.ok) {
-          throw new Error(data.error.type + ": " + data.error.message);
+          throw new Error(formatError(data.error));
         }
         currentResult = data;
         updateMetrics(data);
@@ -467,10 +651,19 @@ def render_demo_html() -> str:
         errorBox.hidden = false;
         errorBox.textContent = err.message;
         outputPane.textContent = "";
+        resetMetrics("ERROR");
         setState("Error", false);
       } finally {
         runButton.disabled = false;
       }
+    }
+
+    function formatError(error) {
+      const diagnostics = error.diagnostics || [];
+      const suggestions = diagnostics.flatMap(item => item.suggestions || []);
+      const unique = Array.from(new Set(suggestions));
+      if (!unique.length) return error.type + ": " + error.message;
+      return error.type + ": " + error.message + "\\n\\nSuggestions:\\n- " + unique.join("\\n- ");
     }
 
     document.querySelectorAll(".tab").forEach(button => {
@@ -482,8 +675,11 @@ def render_demo_html() -> str:
       });
     });
     sampleSelect.addEventListener("change", () => { dslInput.value = sampleSelect.value; });
+    suggestButton.addEventListener("click", suggest);
     runButton.addEventListener("click", run);
-    loadExamples().then(run);
+    nlInput.value = defaultNlRequest;
+    loadExamples().then(suggest);
   </script>
 </body>
 </html>"""
+    return html.replace('"__DEFAULT_NL_REQUEST__"', json.dumps(DEFAULT_NL_REQUEST, ensure_ascii=False))

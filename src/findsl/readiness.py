@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import List, Optional
 
 from .benchmark import PrefixSumBenchmarkResult, benchmark_prefix_sum_file
-from .demo import DEFAULT_DEMO_DSL, analyze_dsl
+from .compiler import Compiler
+from .diagnostics import diagnose_exception
+from .demo import DEFAULT_DEMO_DSL, DEFAULT_NL_REQUEST, analyze_dsl, suggest_from_text
 from .doris import render_doris_assets
 from .equivalence import EquivalenceResult, verify_sql_equivalence
 from .evaluation import EvaluationResult, evaluate_file
@@ -88,6 +90,28 @@ class DemoSmokeCheck:
 
 
 @dataclass(frozen=True)
+class NL2DSLSmokeCheck:
+    text: str
+    passed: bool
+    candidate_count: int
+    top_dsl: str
+    top_validated: bool
+    verification_passed: bool
+    sql_row_count: int
+    error: str = ""
+
+
+@dataclass(frozen=True)
+class DiagnosticsSmokeCheck:
+    dsl: str
+    passed: bool
+    diagnostic_count: int
+    first_code: str
+    suggestion_count: int
+    error: str = ""
+
+
+@dataclass(frozen=True)
 class ReadinessGate:
     name: str
     level: str
@@ -113,6 +137,8 @@ class ReadinessReport:
     doris_assets: List[DorisAssetCheck]
     scale_report: EvidenceFileCheck
     demo_smoke: DemoSmokeCheck
+    nl2dsl_smoke: NL2DSLSmokeCheck
+    diagnostics_smoke: DiagnosticsSmokeCheck
     gates: List[ReadinessGate]
 
     @property
@@ -162,6 +188,8 @@ class ReadinessReport:
                 f"- Baseline window frames: {self.benchmark.baseline_window_frames}",
                 f"- Optimized prefix table references: {self.benchmark.optimized_prefix_joins}",
                 f"- Demo API smoke: {self.demo_smoke.passed}",
+                f"- NL2DSL smoke: {self.nl2dsl_smoke.passed}",
+                f"- Diagnostics smoke: {self.diagnostics_smoke.passed}",
                 "",
                 "## Evidence Artifacts",
                 "",
@@ -187,6 +215,25 @@ class ReadinessReport:
                 f"- Compile latency: {self.demo_smoke.compile_elapsed_ms:.3f} ms",
                 f"- SQL rows: {self.demo_smoke.sql_row_count}",
                 f"- Error: {self.demo_smoke.error or '<none>'}",
+                "",
+                "## NL2DSL Smoke Test",
+                "",
+                f"- Passed: {self.nl2dsl_smoke.passed}",
+                f"- Candidate count: {self.nl2dsl_smoke.candidate_count}",
+                f"- Top validated: {self.nl2dsl_smoke.top_validated}",
+                f"- Verification passed: {self.nl2dsl_smoke.verification_passed}",
+                f"- SQL rows: {self.nl2dsl_smoke.sql_row_count}",
+                f"- Top DSL: `{self.nl2dsl_smoke.top_dsl or '<none>'}`",
+                f"- Error: {self.nl2dsl_smoke.error or '<none>'}",
+                "",
+                "## Diagnostics Smoke Test",
+                "",
+                f"- Passed: {self.diagnostics_smoke.passed}",
+                f"- DSL: `{self.diagnostics_smoke.dsl}`",
+                f"- Diagnostic count: {self.diagnostics_smoke.diagnostic_count}",
+                f"- First code: {self.diagnostics_smoke.first_code or '<none>'}",
+                f"- Suggestion count: {self.diagnostics_smoke.suggestion_count}",
+                f"- Error: {self.diagnostics_smoke.error or '<none>'}",
                 "",
                 "## Doris Asset Integrity",
                 "",
@@ -249,14 +296,16 @@ class ReadinessReport:
                 "- Prefix-sum rewrite path for long rolling windows with baseline/optimized evidence.",
                 "- Structured optimizer explain records for defense and UI visualization.",
                 "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",
+                "- NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.",
+                "- Structured diagnostics convert invalid DSL into stable error codes and repair hints.",
                 "- Doris DDL, sample data, prefix-table build SQL, and smoke queries generated from the same registry.",
                 "",
                 "## Remaining High-Value Work",
                 "",
                 "- Capture Doris-cluster EXPLAIN and latency on larger synthetic or official-scale data before claiming 10x production acceleration.",
-                "- Polish the Web Demo with NL2DSL suggestions, official-question presets, and screenshot-ready presentation states.",
+                "- Polish the Web Demo with official-question presets, error-repair suggestions, and screenshot-ready presentation states.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
-                "- Add an NL2DSL assistant layer that proposes DSL while the deterministic compiler remains the correctness gate.",
+                "- Add an optional LLM adapter that calls the deterministic NL2DSL/Compiler validation loop instead of generating SQL directly.",
             ]
         )
         return "\n".join(lines)
@@ -303,6 +352,8 @@ def generate_readiness_report(
         ],
     )
     demo_smoke = _check_demo_smoke(data_dir)
+    nl2dsl_smoke = _check_nl2dsl_smoke(data_dir)
+    diagnostics_smoke = _check_diagnostics_smoke()
     report = ReadinessReport(
         generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         repo_root=repo_root,
@@ -316,6 +367,8 @@ def generate_readiness_report(
         doris_assets=doris_assets,
         scale_report=scale_report,
         demo_smoke=demo_smoke,
+        nl2dsl_smoke=nl2dsl_smoke,
+        diagnostics_smoke=diagnostics_smoke,
         gates=_build_gates(
             git,
             pytest_check,
@@ -325,6 +378,8 @@ def generate_readiness_report(
             doris_assets,
             scale_report,
             demo_smoke,
+            nl2dsl_smoke,
+            diagnostics_smoke,
             run_pytest,
         ),
     )
@@ -342,6 +397,8 @@ def _build_gates(
     doris_assets: List[DorisAssetCheck],
     scale_report: EvidenceFileCheck,
     demo_smoke: DemoSmokeCheck,
+    nl2dsl_smoke: NL2DSLSmokeCheck,
+    diagnostics_smoke: DiagnosticsSmokeCheck,
     run_pytest: bool,
 ) -> List[ReadinessGate]:
     gates = [
@@ -401,6 +458,30 @@ def _build_gates(
             )
             if demo_smoke.passed
             else demo_smoke.error,
+        ),
+        ReadinessGate(
+            "NL2DSL validated candidate",
+            "required",
+            nl2dsl_smoke.passed,
+            (
+                f"candidates {nl2dsl_smoke.candidate_count}, "
+                f"validated {nl2dsl_smoke.top_validated}, "
+                f"verification {nl2dsl_smoke.verification_passed}, rows {nl2dsl_smoke.sql_row_count}"
+            )
+            if nl2dsl_smoke.passed
+            else nl2dsl_smoke.error,
+        ),
+        ReadinessGate(
+            "Structured diagnostics repair hints",
+            "required",
+            diagnostics_smoke.passed,
+            (
+                f"diagnostics {diagnostics_smoke.diagnostic_count}, "
+                f"first code {diagnostics_smoke.first_code}, "
+                f"suggestions {diagnostics_smoke.suggestion_count}"
+            )
+            if diagnostics_smoke.passed
+            else diagnostics_smoke.error,
         ),
         ReadinessGate(
             "Doris asset integrity",
@@ -509,6 +590,69 @@ def _check_demo_smoke(data_dir: Path) -> DemoSmokeCheck:
             verification_passed=False,
             sql_row_count=0,
             error=f"{type(exc).__name__}: {exc}",
+        )
+
+
+def _check_nl2dsl_smoke(data_dir: Path) -> NL2DSLSmokeCheck:
+    try:
+        result = suggest_from_text(DEFAULT_NL_REQUEST, data_dir=data_dir, enable_prefix_sum=True, verify=True)
+        candidates = result.get("candidates", [])
+        top = candidates[0] if candidates else {}
+        analysis = top.get("analysis") or {}
+        verification = analysis.get("verification") or {}
+        top_validated = bool(top.get("validated"))
+        verification_passed = bool(verification.get("passed"))
+        sql_row_count = int(verification.get("sql_row_count", 0))
+        return NL2DSLSmokeCheck(
+            text=DEFAULT_NL_REQUEST,
+            passed=bool(result.get("ok")) and bool(candidates) and top_validated and verification_passed,
+            candidate_count=len(candidates),
+            top_dsl=str(top.get("dsl", "")),
+            top_validated=top_validated,
+            verification_passed=verification_passed,
+            sql_row_count=sql_row_count,
+        )
+    except Exception as exc:  # noqa: BLE001 - readiness should report smoke failures.
+        return NL2DSLSmokeCheck(
+            text=DEFAULT_NL_REQUEST,
+            passed=False,
+            candidate_count=0,
+            top_dsl="",
+            top_validated=False,
+            verification_passed=False,
+            sql_row_count=0,
+            error=f"{type(exc).__name__}: {exc}",
+        )
+
+
+def _check_diagnostics_smoke() -> DiagnosticsSmokeCheck:
+    dsl = 'filter(indicator("clos") > 10)'
+    try:
+        Compiler().compile(dsl)
+        return DiagnosticsSmokeCheck(
+            dsl=dsl,
+            passed=False,
+            diagnostic_count=0,
+            first_code="",
+            suggestion_count=0,
+            error="invalid DSL unexpectedly compiled",
+        )
+    except Exception as exc:  # noqa: BLE001 - readiness should report diagnostic failures.
+        diagnostics = diagnose_exception(exc)
+        suggestions = [hint for item in diagnostics for hint in item.suggestions]
+        first_code = diagnostics[0].code if diagnostics else ""
+        passed = (
+            first_code == "UNKNOWN_INDICATOR"
+            and bool(suggestions)
+            and any('indicator("close")' in hint for hint in suggestions)
+        )
+        return DiagnosticsSmokeCheck(
+            dsl=dsl,
+            passed=passed,
+            diagnostic_count=len(diagnostics),
+            first_code=first_code,
+            suggestion_count=len(suggestions),
+            error="" if passed else f"{type(exc).__name__}: {exc}",
         )
 
 

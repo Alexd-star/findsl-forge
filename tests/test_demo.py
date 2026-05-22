@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from findsl.demo import analyze_dsl, demo_examples, render_demo_html
+from findsl.demo import DEFAULT_NL_REQUEST, analyze_dsl, demo_examples, render_demo_html, suggest_from_text
 
 
 DATA_DIR = Path("data/samples")
@@ -29,6 +29,26 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
 
     assert "FinDSL Forge" in html
     assert "DSL Workbench" in html
+    assert "Natural language" in html
     assert "/api/analyze" in html
+    assert "/api/suggest" in html
+    assert "Suggest DSL" in html
+    assert DEFAULT_NL_REQUEST in html
+    assert "__DEFAULT_NL_REQUEST__" not in html
     assert "metricStatus" in html
     assert "data-tab=\"sql\"" in html
+    assert "document.createElement(\"strong\")" in html
+    assert "formatError(data.error)" in html
+    assert "resetMetrics(\"ERROR\")" in html
+
+
+def test_suggest_from_text_returns_validated_candidate_payload():
+    result = suggest_from_text("筛选A股连续三天主力净流入为正并按换手率排名前一百", DATA_DIR)
+
+    assert result["ok"]
+    assert result["warnings"] == []
+    assert result["candidates"]
+    candidate = result["candidates"][0]
+    assert candidate["validated"]
+    assert candidate["dsl"].startswith("then(")
+    assert candidate["analysis"]["verification"]["passed"]

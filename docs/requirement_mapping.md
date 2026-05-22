@@ -19,6 +19,8 @@ This document maps Topic 19 requirements to implementation modules.
 | Doris deployment assets | `findsl.doris`, `scripts/generate_doris_assets.ps1`, `deploy/doris/*.sql` | Started |
 | Output Markdown table and engineering screenshots | `findsl.readiness`, `findsl.demo`, `scripts/submission_readiness.ps1`, `scripts/serve_demo.ps1` | Started |
 | AST/SQL/explain/result visualization | `findsl.demo`, `scripts/serve_demo.ps1`, readiness demo smoke gate | Started |
+| AI-assisted natural-language entry without SQL hallucination | `findsl.nl2dsl`, `findsl.demo`, `findsl.readiness`, `suggest-dsl` CLI | Started |
+| Interactive error explainability and repair guidance | `findsl.diagnostics`, `findsl.demo`, `diagnose` CLI | Started |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Started |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Started |
 | Local SQL execution regression | `findsl.executor`, `scripts/verify_sql_sample.ps1` | Started |

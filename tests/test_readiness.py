@@ -37,12 +37,21 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert all(asset.passed for asset in report.doris_assets)
     assert report.scale_report.passed
     assert report.demo_smoke.passed
+    assert report.nl2dsl_smoke.passed
+    assert report.diagnostics_smoke.passed
+    required_gates = {gate.name: gate for gate in report.gates if gate.level == "required"}
+    assert required_gates["NL2DSL validated candidate"].passed
+    assert required_gates["Structured diagnostics repair hints"].passed
 
     content = output.read_text(encoding="utf-8")
     assert "FinDSL Forge Submission Readiness Report" in content
     assert "Compiler accuracy and latency" in content
     assert "Long-Window Scale Evidence" in content
     assert "Demo Smoke Test" in content
+    assert "NL2DSL Smoke Test" in content
+    assert "NL2DSL validated candidate" in content
+    assert "Diagnostics Smoke Test" in content
+    assert "Structured diagnostics repair hints" in content
     assert "Doris Asset Integrity" in content
     assert "Award-Readiness Differentiators" in content
 

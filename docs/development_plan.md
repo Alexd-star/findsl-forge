@@ -114,6 +114,8 @@ Deliverables:
 
 - Web UI or Streamlit UI. (Started via zero-dependency local Web Demo/API)
 - AST/IR/SQL/rewrite trace visualization. (Started)
+- Natural-language-to-DSL candidate layer with compiler/reference validation. (Started)
+- Structured compile diagnostics and repair hints for invalid demo/API requests. (Started)
 - Markdown table output for official sample questions. (Started via submission readiness reports)
 - Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
 - Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
@@ -127,6 +129,8 @@ Exit criteria:
 - `scripts/submission_readiness.ps1` completes without required-gate failures.
 - `scripts/serve_demo.ps1` opens a local demo where DSL, AST, Doris SQL, optimizer explain, and verification rows are visible in one workflow.
 - Demo API smoke check remains a required readiness gate.
+- NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
+- Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Generated reports can be attached to the technical document or used in defense.
 - Warning gates are either closed or explicitly explained in the final submission.
 

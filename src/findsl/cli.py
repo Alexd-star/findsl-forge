@@ -16,6 +16,16 @@ def main() -> None:
     compile_cmd.add_argument("dsl", help="DSL expression")
     compile_cmd.add_argument("--json", action="store_true", help="Print full JSON result")
     compile_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    diagnose_cmd = sub.add_parser("diagnose", help="Diagnose invalid DSL and print repair hints")
+    diagnose_cmd.add_argument("dsl", help="DSL expression")
+    diagnose_cmd.add_argument("--json", action="store_true", help="Print diagnostics as JSON")
+    diagnose_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    suggest_cmd = sub.add_parser("suggest-dsl", help="Suggest validated DSL candidates from natural language")
+    suggest_cmd.add_argument("text", help="Natural-language stock-screening request")
+    suggest_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    suggest_cmd.add_argument("--json", action="store_true", help="Print suggestion payload as JSON")
+    suggest_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    suggest_cmd.add_argument("--no-verify", action="store_true", help="Skip SQL/reference verification")
     eval_cmd = sub.add_parser("evaluate", help="Evaluate compiler against a JSONL case file")
     eval_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL case file")
     eval_cmd.add_argument("--output", default="reports/evaluation_report.md", help="Output Markdown report")
@@ -83,6 +93,67 @@ def main() -> None:
             for item in result.trace:
                 print(f"- {item}")
             print(f"Elapsed: {result.elapsed_ms:.3f} ms")
+    elif args.command == "diagnose":
+        from .diagnostics import diagnose_exception
+
+        try:
+            result = Compiler(enable_prefix_sum=not args.no_prefix_sum).compile(args.dsl)
+            payload = {
+                "ok": True,
+                "dsl": args.dsl,
+                "diagnostics": [],
+                "compile": {"elapsed_ms": result.elapsed_ms},
+            }
+            if args.json:
+                print(json.dumps(payload, ensure_ascii=False, indent=2))
+            else:
+                print("DSL compiled successfully.")
+                print(f"Elapsed: {result.elapsed_ms:.3f} ms")
+        except Exception as exc:  # noqa: BLE001 - CLI diagnostics should classify compiler failures.
+            diagnostics = [item.to_dict() for item in diagnose_exception(exc)]
+            payload = {
+                "ok": False,
+                "dsl": args.dsl,
+                "error": {"type": type(exc).__name__, "message": str(exc)},
+                "diagnostics": diagnostics,
+            }
+            if args.json:
+                print(json.dumps(payload, ensure_ascii=False, indent=2))
+            else:
+                print(f"{type(exc).__name__}: {exc}")
+                print()
+                print("| Code | Severity | Suggestions |")
+                print("|---|---|---|")
+                for item in diagnostics:
+                    suggestions = "<br>".join(str(hint) for hint in item["suggestions"])
+                    print(f"| {item['code']} | {item['severity']} | {suggestions} |")
+            raise SystemExit(1)
+    elif args.command == "suggest-dsl":
+        from .demo import suggest_from_text
+
+        result = suggest_from_text(
+            text=args.text,
+            data_dir=Path(args.data_dir),
+            enable_prefix_sum=not args.no_prefix_sum,
+            verify=not args.no_verify,
+        )
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            if result["warnings"]:
+                print("Warnings:")
+                for warning in result["warnings"]:
+                    print(f"- {warning}")
+            print("| Rank | Validated | Confidence | Rule | DSL |")
+            print("|---:|---:|---:|---|---|")
+            for idx, candidate in enumerate(result["candidates"], 1):
+                print(
+                    f"| {idx} | {candidate.get('validated')} | "
+                    f"{candidate.get('confidence'):.3f} | {candidate.get('rule')} | "
+                    f"`{candidate.get('dsl')}` |"
+                )
+        if not result["candidates"] or not result["candidates"][0].get("validated"):
+            raise SystemExit(1)
     elif args.command == "evaluate":
         result = evaluate_file(Path(args.input), Path(args.output))
         print(result.to_markdown())

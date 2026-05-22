@@ -4,6 +4,9 @@
 
 ```text
 findsl.cli
+  -> NL2DSL candidate layer
+    -> template/rule match over official-style Chinese requests
+    -> candidate DSL list with confidence and rationale
   -> Compiler
     -> Parser
       -> Lexer
@@ -29,13 +32,24 @@ findsl.cli
     -> compare correctness, timing, and plan shape
   -> DorisAssetGenerator
     -> emit DDL, sample inserts, prefix build SQL, smoke queries
+  -> Demo/API and ReadinessReport
+    -> validate natural-language candidates through compiler + equivalence verifier
+    -> return structured diagnostics and repair hints for invalid requests
 ```
 
 ## Design Decisions
 
 ### Deterministic Core
 
-The compiler core is deterministic. LLM support will be placed outside the core as an NL2DSL or repair assistant. This avoids schema hallucination, unstable SQL output, and weak reproducibility.
+The compiler core is deterministic. AI support stays outside the core as an NL2DSL candidate or repair assistant. This avoids schema hallucination, unstable SQL output, and weak reproducibility.
+
+### NL2DSL Candidate Layer
+
+Natural-language requests are translated into candidate DSL, not directly into SQL. A candidate is useful only after it compiles, executes against local SQL fixtures, and matches the Pandas reference evaluator. This makes the AI-facing path defensible in competition review: convenience comes from natural-language entry, while correctness still comes from the same compiler and oracle used by the deterministic DSL path.
+
+### Diagnostics Layer
+
+Compiler, API, and demo failures are converted into structured diagnostics with stable codes and repair hints. This keeps interactive use productive during demonstrations: invalid indicators, parse errors, lexical issues, and semantic type mistakes point users back to supported indicators, functions, and DSL patterns instead of exposing only a traceback.
 
 ### Typed AST Before SQL
 

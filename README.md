@@ -10,7 +10,7 @@ The project goal is not to let an LLM freely hallucinate SQL. The core path is d
 DSL -> Lexer/Parser -> Typed AST -> Semantic Validation -> SQL Plan -> Doris SQL
 ```
 
-LLM/NL2DSL can be added as an assistant layer later, while the compiler remains auditable, reproducible, and testable.
+AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Every candidate still flows through the deterministic compiler and SQL/reference equivalence check, so the core remains auditable, reproducible, and testable.
 
 ## Current MVP Scope
 
@@ -19,6 +19,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Compile `filter`, `then`, `rank`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN` into SQL.
 - Generate trace metadata explaining the selected rewrite path.
 - Emit structured optimizer explain steps for machine-readable rewrite evidence.
+- Return structured compile diagnostics and repair hints for invalid DSL/API requests.
 - Execute generated SQL against local SQLite fixtures for regression checks.
 - Compare SQL output with an independent Pandas semantic reference evaluator.
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
@@ -26,6 +27,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Generate deterministic synthetic A-share-style data for reproducible long-window scale benchmarks.
 - Generate Doris DDL, sample load, prefix-table build, and smoke-query assets.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
+- Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
@@ -39,6 +41,8 @@ python -m findsl.cli evaluate --input data/samples/queries.jsonl --output report
 python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
+python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
+python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
 python -m findsl.cli scale-benchmark --stocks 300 --days 260 --window 120 --iterations 5 --output reports/prefix_sum_scale_benchmark.md
 python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
@@ -50,6 +54,8 @@ If running from the repository root without installing the package:
 ```powershell
 $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"), 250))'
+python -m findsl.cli diagnose 'filter(indicator("clos") > 10)'
+python -m findsl.cli suggest-dsl '今日收盘价创二百五十日新高'
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
@@ -95,11 +101,12 @@ Compiler JSON output includes both human-readable `trace` text and machine-reada
 
 ## Web Demo
 
-`scripts/serve_demo.ps1` starts a local Web Demo at `http://127.0.0.1:8765`. The demo lets judges or teammates choose an official-style sample DSL, run the deterministic compiler, and inspect Doris SQL, AST, optimizer explain, and SQL/reference verification rows in one screen.
+`scripts/serve_demo.ps1` starts a local Web Demo at `http://127.0.0.1:8765`. The demo lets judges or teammates enter an official-style Chinese stock-screening request, review compiler-validated DSL candidates, choose a sample DSL, run the deterministic compiler, inspect Doris SQL, AST, optimizer explain, and SQL/reference verification rows, and receive repair hints when invalid DSL is submitted.
 
 The same server exposes JSON APIs:
 
 - `GET /api/examples`
+- `POST /api/suggest`
 - `POST /api/analyze`
 
 ## Doris Assets
@@ -117,7 +124,7 @@ These files are a smoke-test deployment path for Doris. See `docs/doris_runbook.
 
 ## Submission Readiness
 
-`scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, Doris asset integrity checks, and git rollback-state inspection.
+`scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris asset integrity checks, and git rollback-state inspection.
 
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight remaining competition risks, especially Doris-cluster scale proof and uncommitted local changes.
 
@@ -130,4 +137,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, and a local demo. Later phases will add Doris-cluster execution proof, broader DSL coverage, and NL2DSL repair loops.
+The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL candidate validation, and a local demo. Later phases will add Doris-cluster execution proof, broader DSL coverage, and LLM-backed NL2DSL repair loops.
