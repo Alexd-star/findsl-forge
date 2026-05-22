@@ -11,6 +11,7 @@ from typing import List, Optional
 
 from .benchmark import PrefixSumBenchmarkResult, benchmark_prefix_sum_file
 from .compiler import Compiler
+from .defense_package import DefensePackageResult, generate_defense_package
 from .diagnostics import diagnose_exception
 from .demo import DEFAULT_DEMO_DSL, DEFAULT_NL_REQUEST, analyze_dsl, suggest_from_text
 from .doris import render_doris_assets
@@ -142,6 +143,7 @@ class ReadinessReport:
     nl2dsl_smoke: NL2DSLSmokeCheck
     diagnostics_smoke: DiagnosticsSmokeCheck
     official_suite: OfficialSuiteResult
+    defense_package: DefensePackageResult
     gates: List[ReadinessGate]
 
     @property
@@ -195,6 +197,7 @@ class ReadinessReport:
                 f"- Diagnostics smoke: {self.diagnostics_smoke.passed}",
                 f"- Official-style positive cases: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
                 f"- Official-style negative diagnostics: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
+                f"- Defense package checks: {self.defense_package.passed_count}/{self.defense_package.total}",
                 "",
                 "## Evidence Artifacts",
                 "",
@@ -202,6 +205,7 @@ class ReadinessReport:
                 f"- Evaluation report: `{self.reports_dir / 'evaluation_report.md'}`",
                 f"- SQL equivalence report: `{self.reports_dir / 'sql_equivalence_report.md'}`",
                 f"- Official-style coverage suite report: `{self.official_suite.output_path}`",
+                f"- Defense package report: `{self.defense_package.output_path}`",
                 f"- Prefix benchmark report: `{self.reports_dir / 'prefix_sum_benchmark.md'}`",
                 f"- Long-window scale benchmark report: `{self.scale_report.path}`",
                 f"- Doris cluster evidence report: `{self.doris_cluster_report.path}`",
@@ -213,6 +217,12 @@ class ReadinessReport:
                 f"- Positive cases passed: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
                 f"- Negative diagnostic cases passed: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
                 f"- Report: `{self.official_suite.output_path}`",
+                "",
+                "## Defense Package",
+                "",
+                f"- Package passed: {self.defense_package.passed}",
+                f"- Checks passed: {self.defense_package.passed_count}/{self.defense_package.total}",
+                f"- Report: `{self.defense_package.output_path}`",
                 "",
                 "## Long-Window Scale Evidence",
                 "",
@@ -398,6 +408,14 @@ def generate_readiness_report(
         data_dir=data_dir,
         output_path=reports_dir / "official_suite_report.md",
     )
+    defense_package = generate_defense_package(
+        output_path=reports_dir / "defense_package.md",
+        data_dir=data_dir,
+        cases_path=cases_path,
+        official_positive_path=repo_root / "data" / "samples" / "official_positive_cases.jsonl",
+        official_negative_path=repo_root / "data" / "samples" / "official_negative_cases.jsonl",
+        repo_root=repo_root,
+    )
     report = ReadinessReport(
         generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         repo_root=repo_root,
@@ -415,6 +433,7 @@ def generate_readiness_report(
         nl2dsl_smoke=nl2dsl_smoke,
         diagnostics_smoke=diagnostics_smoke,
         official_suite=official_suite,
+        defense_package=defense_package,
         gates=_build_gates(
             git,
             pytest_check,
@@ -428,6 +447,7 @@ def generate_readiness_report(
             nl2dsl_smoke,
             diagnostics_smoke,
             official_suite,
+            defense_package,
             run_pytest,
         ),
     )
@@ -449,6 +469,7 @@ def _build_gates(
     nl2dsl_smoke: NL2DSLSmokeCheck,
     diagnostics_smoke: DiagnosticsSmokeCheck,
     official_suite: OfficialSuiteResult,
+    defense_package: DefensePackageResult,
     run_pytest: bool,
 ) -> List[ReadinessGate]:
     gates = [
@@ -541,6 +562,12 @@ def _build_gates(
                 f"positive {official_suite.positive_passed}/{official_suite.positive_total}, "
                 f"negative {official_suite.negative_passed}/{official_suite.negative_total}"
             ),
+        ),
+        ReadinessGate(
+            "Defense package walkthrough",
+            "required",
+            defense_package.passed,
+            f"checks {defense_package.passed_count}/{defense_package.total}, report {defense_package.output_path}",
         ),
         ReadinessGate(
             "Doris asset integrity",

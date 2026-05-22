@@ -42,6 +42,7 @@ findsl.cli
     -> validate natural-language candidates through compiler + equivalence verifier
     -> expose baseline, official-positive, and diagnostic-negative presets
     -> return structured diagnostics and repair hints for invalid requests
+    -> generate defense walkthrough and score-mapping evidence
     -> consume official-style coverage suite as a required submission gate
     -> consume Doris cluster evidence markers for submission gating
 ```
@@ -154,6 +155,16 @@ negative DSL case -> compiler failure -> structured diagnostic code -> repair su
 ```
 
 Positive cases cover staged filters, ranking, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
+
+## Defense Package Loop
+
+The defense package converts engineering evidence into a live-demonstration sequence:
+
+```text
+demo scenario -> executable check -> scoring point -> expected visible signal -> Markdown report
+```
+
+It covers NL2DSL validation, prefix-sum official positive presets, diagnostic negative presets, official-style corpus coverage, compiler accuracy/latency, and Doris deployment asset integrity. It deliberately does not claim real Doris 10x performance; that remains gated by the Doris evidence collector and a real cluster report.
 
 ## Doris Evidence Loop
 

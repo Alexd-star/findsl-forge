@@ -35,6 +35,14 @@ def main() -> None:
     official_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     official_cmd.add_argument("--output", default="reports/official_suite_report.md", help="Output Markdown report")
     official_cmd.add_argument("--json", action="store_true", help="Print suite summary as JSON")
+    defense_cmd = sub.add_parser("defense-package", help="Generate defense walkthrough and score-mapping evidence")
+    defense_cmd.add_argument("--output", default="reports/defense_package.md", help="Output Markdown report")
+    defense_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    defense_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL evaluation cases")
+    defense_cmd.add_argument("--positive-input", default="data/samples/official_positive_cases.jsonl", help="Positive official-style JSONL cases")
+    defense_cmd.add_argument("--negative-input", default="data/samples/official_negative_cases.jsonl", help="Negative diagnostic JSONL cases")
+    defense_cmd.add_argument("--repo-root", default=".", help="Repository root for asset checks")
+    defense_cmd.add_argument("--json", action="store_true", help="Print package summary as JSON")
     ref_cmd = sub.add_parser("reference", help="Evaluate DSL semantics with the Pandas reference engine")
     ref_cmd.add_argument("dsl", help="DSL expression")
     ref_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
@@ -200,6 +208,23 @@ def main() -> None:
                     indent=2,
                 )
             )
+        else:
+            print(result.to_markdown())
+        if not result.passed:
+            raise SystemExit(1)
+    elif args.command == "defense-package":
+        from .defense_package import generate_defense_package
+
+        result = generate_defense_package(
+            output_path=Path(args.output),
+            data_dir=Path(args.data_dir),
+            cases_path=Path(args.input),
+            official_positive_path=Path(args.positive_input),
+            official_negative_path=Path(args.negative_input),
+            repo_root=Path(args.repo_root),
+        )
+        if args.json:
+            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
         else:
             print(result.to_markdown())
         if not result.passed:

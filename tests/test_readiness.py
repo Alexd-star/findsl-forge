@@ -48,6 +48,7 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert (reports_dir / "evaluation_report.md").exists()
     assert (reports_dir / "sql_equivalence_report.md").exists()
     assert (reports_dir / "official_suite_report.md").exists()
+    assert (reports_dir / "defense_package.md").exists()
     assert (reports_dir / "prefix_sum_benchmark.md").exists()
     assert report.evaluation.failed == 0
     assert report.equivalence.passed
@@ -61,11 +62,14 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.official_suite.passed
     assert report.official_suite.positive_passed == 10
     assert report.official_suite.negative_passed == 7
+    assert report.defense_package.passed
+    assert report.defense_package.passed_count == report.defense_package.total
     required_gates = {gate.name: gate for gate in report.gates if gate.level == "required"}
     warning_gates = {gate.name: gate for gate in report.gates if gate.level == "warning"}
     assert required_gates["NL2DSL validated candidate"].passed
     assert required_gates["Structured diagnostics repair hints"].passed
     assert required_gates["Official-style coverage suite"].passed
+    assert required_gates["Defense package walkthrough"].passed
     assert warning_gates["Doris-scale performance proof"].passed
 
     content = output.read_text(encoding="utf-8")
@@ -80,6 +84,8 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert "Structured diagnostics repair hints" in content
     assert "Official-Style Coverage Suite" in content
     assert "Official-style coverage suite" in content
+    assert "Defense Package" in content
+    assert "Defense package walkthrough" in content
     assert "Doris Asset Integrity" in content
     assert "Award-Readiness Differentiators" in content
 

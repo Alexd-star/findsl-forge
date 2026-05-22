@@ -1,0 +1,33 @@
+from findsl.defense_package import generate_defense_package
+
+
+def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
+    output = tmp_path / "defense_package.md"
+
+    result = generate_defense_package(output_path=output)
+
+    assert result.passed
+    assert result.passed_count == result.total
+    assert result.total >= 6
+    assert output.exists()
+
+    check_names = {check.name for check in result.checks}
+    assert "NL2DSL validated candidate" in check_names
+    assert "Official prefix-sum positive preset" in check_names
+    assert "Official diagnostic negative preset" in check_names
+    assert "Official-style coverage suite" in check_names
+    assert "Compiler accuracy and latency" in check_names
+    assert "Doris deployment asset integrity" in check_names
+
+    payload = result.to_dict()
+    assert payload["passed"] is True
+    assert payload["passed_count"] == payload["total"]
+    assert payload["output"] == str(output)
+
+    content = output.read_text(encoding="utf-8")
+    assert "FinDSL Forge Defense Package" in content
+    assert "Package passed: True" in content
+    assert "real Doris 10x proof still requires a running Doris cluster" in content
+    assert "money_flow_prefix_sum" in content
+    assert "UNKNOWN_INDICATOR" in content
+    assert "dwd_stock_money_flow_prefix" in content

@@ -122,6 +122,7 @@ Deliverables:
 - Structured compile diagnostics and repair hints for invalid demo/API requests. (Started)
 - Official positive and diagnostic negative presets in the Web Demo for live defense walkthroughs. (Started)
 - Official-style positive and negative coverage suite with SQL/trace/explain/equivalence evidence. (Started)
+- Defense package report mapping live demo steps to scoring evidence. (Started)
 - Markdown table output for official sample questions. (Started via submission readiness reports)
 - Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
 - Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
@@ -136,12 +137,14 @@ Exit criteria:
 - `scripts/submission_readiness.ps1` completes without required-gate failures.
 - `scripts/serve_demo.ps1` opens a local demo where DSL, AST, Doris SQL, optimizer explain, and verification rows are visible in one workflow.
 - Demo examples include baseline cases, official-style positive cases, and diagnostic negative cases with expected/actual diagnostic codes.
+- `scripts/defense_package.ps1` produces a repeatable walkthrough that maps visible demo signals to competition scoring points.
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Official-style coverage suite remains a required readiness gate, with representative positive cases passing SQL/reference equivalence and representative negative cases producing stable diagnostic codes plus repair hints.
 - Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
 - Generated reports can be attached to the technical document or used in defense.
+- Defense package must state that real Doris 10x proof is separate cluster evidence, not local fixture timing.
 - Warning gates are either closed or explicitly explained in the final submission.
 
 ## Non-Negotiable Quality Gates
