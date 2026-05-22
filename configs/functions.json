@@ -1,0 +1,59 @@
+{
+  "filter": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "relation"
+  },
+  "then": {
+    "min_args": 2,
+    "max_args": 8,
+    "return_type": "relation"
+  },
+  "rank": {
+    "min_args": 2,
+    "max_args": 2,
+    "named_args": ["top", "bottom", "percent"],
+    "return_type": "relation"
+  },
+  "indicator": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "numeric"
+  },
+  "market": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "boolean"
+  },
+  "CONS": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "boolean"
+  },
+  "EXIST": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "boolean"
+  },
+  "MA": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "SUM": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "MAX": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "MIN": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  }
+}
+

@@ -1,0 +1,4 @@
+{"name": "连续3天主力净流入为正后按换手率排名", "dsl": "then(filter(market(\"A\") & CONS(indicator(\"main_net_inflow\") > 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))"}
+{"name": "今日收盘价创250日新高", "dsl": "filter(indicator(\"close\") >= MAX(indicator(\"close\"), 250))"}
+{"name": "近10日存在放量", "dsl": "filter(EXIST(indicator(\"volume\") > MA(indicator(\"volume\"), 20), 10))"}
+

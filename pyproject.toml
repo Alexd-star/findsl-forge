@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "findsl-forge"
+version = "0.1.0"
+description = "Deterministic compiler from financial stock-screening DSL to Doris SQL"
+requires-python = ">=3.9"
+authors = [{ name = "FinDSL Forge Team" }]
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+

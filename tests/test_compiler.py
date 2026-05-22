@@ -1,0 +1,28 @@
+from findsl import Compiler
+
+
+def test_compile_then_generates_cte_and_rank():
+    result = Compiler().compile('then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), rank(indicator("turnover_rate"), desc, top=100))')
+    assert result.sql.startswith("WITH")
+    assert "ROW_NUMBER()" in result.sql
+    assert "ROWS BETWEEN 2 PRECEDING AND CURRENT ROW" in result.sql
+    assert "rank_no <= 100" in result.sql
+    assert result.elapsed_ms < 50
+
+
+def test_compile_max_window():
+    result = Compiler().compile('filter(indicator("close") >= MAX(indicator("close"), 250))')
+    assert "MAX(close) OVER" in result.sql
+    assert "AS __win_1" in result.sql
+    assert "ROWS BETWEEN 249 PRECEDING AND CURRENT ROW" in result.sql
+    assert "WHERE close >= __win_1" in result.sql
+
+
+def test_compile_exist_and_ma():
+    result = Compiler().compile('filter(EXIST(indicator("volume") > MA(indicator("volume"), 20), 10))')
+    assert "AVG(volume) OVER" in result.sql
+    assert "AS __win_1" in result.sql
+    assert "MAX(CASE WHEN volume > __win_1 THEN 1 ELSE 0 END) OVER" in result.sql
+    assert "AS __roll_2" in result.sql
+    assert "ROWS BETWEEN 9 PRECEDING AND CURRENT ROW" in result.sql
+    assert "WHERE __roll_2 = 1" in result.sql

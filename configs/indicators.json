@@ -1,0 +1,35 @@
+{
+  "close": {
+    "type": "numeric",
+    "table": "daily_quote",
+    "column": "close",
+    "adjustment": "front",
+    "supports_prefix_sum": false
+  },
+  "turnover_rate": {
+    "type": "numeric",
+    "table": "daily_quote",
+    "column": "turnover_rate",
+    "adjustment": "none",
+    "supports_prefix_sum": false
+  },
+  "main_net_inflow": {
+    "type": "numeric",
+    "table": "money_flow",
+    "column": "main_net_inflow",
+    "adjustment": "none",
+    "supports_prefix_sum": true,
+    "prefix_table": "money_flow_prefix",
+    "prefix_column": "main_net_inflow_prefix"
+  },
+  "volume": {
+    "type": "numeric",
+    "table": "daily_quote",
+    "column": "volume",
+    "adjustment": "none",
+    "supports_prefix_sum": true,
+    "prefix_table": "daily_quote_prefix",
+    "prefix_column": "volume_prefix"
+  }
+}
+

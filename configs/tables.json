@@ -1,0 +1,24 @@
+{
+  "daily_quote": {
+    "physical": "dwd_stock_daily_quote",
+    "alias": "dq",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date"
+  },
+  "money_flow": {
+    "physical": "dwd_stock_money_flow",
+    "alias": "mf",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date"
+  },
+  "stock_universe": {
+    "physical": "dim_stock_universe",
+    "alias": "su",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date"
+  }
+}
+
