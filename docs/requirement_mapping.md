@@ -11,9 +11,10 @@ This document maps Topic 19 requirements to implementation modules.
 | Decouple business rules from compiler core | `configs/*.json`, `findsl.registry` | Started |
 | Add new indicators without core code changes | `configs/indicators.json` | Started |
 | Compile P95 < 50ms | `findsl.compiler`, `findsl.evaluation` | Started |
-| Long-range 10x acceleration using prefix sum/materialized paths | future `findsl.optimizer` | Planned |
+| Long-range 10x acceleration using prefix sum/materialized paths | `findsl.sqlgen`, `findsl.scale_benchmark`, future Doris cluster proof | Started |
 | Prefix-sum optimized rolling SUM | `findsl.sqlgen`, `configs/indicators.json`, `configs/tables.json` | Started |
 | Baseline versus optimized performance evidence | `findsl.benchmark`, `scripts/benchmark_prefix_sum.ps1` | Started |
+| Reproducible long-window scale evidence | `findsl.synthetic`, `findsl.scale_benchmark`, `scripts/scale_benchmark.ps1` | Started |
 | Explainable optimizer decisions | `findsl.explain`, `findsl.sqlgen`, `findsl.evaluation`, `findsl.benchmark` | Started |
 | Doris deployment assets | `findsl.doris`, `scripts/generate_doris_assets.ps1`, `deploy/doris/*.sql` | Started |
 | Output Markdown table and engineering screenshots | `findsl.readiness`, `scripts/submission_readiness.ps1`, future UI modules | Started |

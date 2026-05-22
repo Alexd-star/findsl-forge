@@ -91,6 +91,7 @@ Deliverables:
 - Long-range query detection.
 - Prefix-sum rewrite path. (Started for eligible rolling `SUM`)
 - Baseline-vs-optimized benchmark report. (Started for local SQLite fixtures)
+- Deterministic synthetic market data and long-window scale benchmark report. (Started)
 - Materialized-view route path.
 - Partition and column pruning hints.
 - Plan explanation JSON.
@@ -102,6 +103,7 @@ Metrics:
 - Compile P95 target: < 50ms.
 - Execution target: <= 10s for official-scale tests.
 - Optimized SQL and baseline SQL must match the independent reference result before performance claims are accepted.
+- Local scale benchmark must record dataset size, long-window plan shape, correctness gates, and the boundary between SQLite regression evidence and Doris production proof.
 - Every optimizer decision that affects SQL shape should expose a machine-readable explain step.
 
 ## Phase 5: Enterprise Demo and Submission Package
@@ -114,6 +116,7 @@ Deliverables:
 - AST/IR/SQL/rewrite trace visualization.
 - Markdown table output for official sample questions. (Started via submission readiness reports)
 - Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
+- Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
 - One-minute demo video.
 - Lean canvas.
 - Technical document.

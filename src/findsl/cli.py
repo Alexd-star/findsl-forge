@@ -34,6 +34,24 @@ def main() -> None:
     bench_cmd.add_argument("--iterations", type=int, default=20, help="Execution iterations per SQL variant")
     bench_cmd.add_argument("--output", default="reports/prefix_sum_benchmark.md", help="Output Markdown report")
     bench_cmd.add_argument("--json", action="store_true", help="Print benchmark result as JSON")
+    synth_cmd = sub.add_parser("generate-synthetic-data", help="Generate deterministic benchmark CSV fixtures")
+    synth_cmd.add_argument("--output-dir", default="data/generated/scale", help="Output directory for CSV files")
+    synth_cmd.add_argument("--stocks", type=int, default=300, help="Number of synthetic stocks")
+    synth_cmd.add_argument("--days", type=int, default=260, help="Number of synthetic trading days")
+    synth_cmd.add_argument("--start-date", default="2025-01-01", help="First synthetic trade date")
+    synth_cmd.add_argument("--seed", type=int, default=2026, help="Deterministic random seed")
+    scale_cmd = sub.add_parser("scale-benchmark", help="Generate synthetic data and run a long-window benchmark")
+    scale_cmd.add_argument("--data-dir", default="data/generated/scale", help="Synthetic data output directory")
+    scale_cmd.add_argument("--output", default="reports/prefix_sum_scale_benchmark.md", help="Output Markdown report")
+    scale_cmd.add_argument("--stocks", type=int, default=300, help="Number of synthetic stocks")
+    scale_cmd.add_argument("--days", type=int, default=260, help="Number of synthetic trading days")
+    scale_cmd.add_argument("--start-date", default="2025-01-01", help="First synthetic trade date")
+    scale_cmd.add_argument("--seed", type=int, default=2026, help="Deterministic random seed")
+    scale_cmd.add_argument("--window", type=int, default=120, help="Rolling SUM window")
+    scale_cmd.add_argument("--threshold", type=int, default=None, help="Filter threshold; defaults to window * 3500")
+    scale_cmd.add_argument("--iterations", type=int, default=5, help="Execution iterations per SQL variant")
+    scale_cmd.add_argument("--dsl", default=None, help="Custom DSL query; overrides window and threshold")
+    scale_cmd.add_argument("--json", action="store_true", help="Print benchmark summary as JSON")
     doris_cmd = sub.add_parser("emit-doris-assets", help="Generate Doris DDL and sample SQL assets")
     doris_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     doris_cmd.add_argument("--output-dir", default="deploy/doris", help="Output directory for Doris SQL assets")
@@ -103,6 +121,57 @@ def main() -> None:
         else:
             print(result.to_markdown())
         if not result.optimized_matches_reference or not result.optimized_matches_baseline:
+            raise SystemExit(1)
+    elif args.command == "generate-synthetic-data":
+        from .synthetic import write_synthetic_dataset
+
+        dataset = write_synthetic_dataset(
+            output_dir=Path(args.output_dir),
+            stock_count=args.stocks,
+            day_count=args.days,
+            start_date=args.start_date,
+            seed=args.seed,
+        )
+        print(dataset.to_markdown())
+    elif args.command == "scale-benchmark":
+        from .scale_benchmark import run_scale_benchmark
+
+        result = run_scale_benchmark(
+            output_path=Path(args.output),
+            data_dir=Path(args.data_dir),
+            stock_count=args.stocks,
+            day_count=args.days,
+            start_date=args.start_date,
+            seed=args.seed,
+            window=args.window,
+            threshold=args.threshold,
+            iterations=args.iterations,
+            dsl=args.dsl,
+        )
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "data_dir": str(result.dataset.output_dir),
+                        "stocks": result.dataset.stock_count,
+                        "days": result.dataset.day_count,
+                        "rows_per_table": result.dataset.row_count,
+                        "iterations": result.benchmark.iterations,
+                        "dsl": result.dsl,
+                        "baseline_matches_reference": result.benchmark.baseline_matches_reference,
+                        "optimized_matches_reference": result.benchmark.optimized_matches_reference,
+                        "optimized_matches_baseline": result.benchmark.optimized_matches_baseline,
+                        "local_speedup": result.benchmark.local_speedup,
+                        "estimated_feature_work_reduction": result.estimated_feature_work_reduction,
+                        "output": str(result.output_path),
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+        else:
+            print(result.to_markdown())
+        if not result.benchmark.optimized_matches_reference or not result.benchmark.optimized_matches_baseline:
             raise SystemExit(1)
     elif args.command == "emit-doris-assets":
         from .doris import write_doris_assets

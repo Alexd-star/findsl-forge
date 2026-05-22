@@ -63,6 +63,20 @@ class DorisAssetCheck:
 
 
 @dataclass(frozen=True)
+class EvidenceFileCheck:
+    name: str
+    path: Path
+    exists: bool
+    byte_count: int
+    matched_markers: List[str]
+    missing_markers: List[str]
+
+    @property
+    def passed(self) -> bool:
+        return self.exists and not self.missing_markers
+
+
+@dataclass(frozen=True)
 class ReadinessGate:
     name: str
     level: str
@@ -86,6 +100,7 @@ class ReadinessReport:
     equivalence: EquivalenceResult
     benchmark: PrefixSumBenchmarkResult
     doris_assets: List[DorisAssetCheck]
+    scale_report: EvidenceFileCheck
     gates: List[ReadinessGate]
 
     @property
@@ -141,7 +156,16 @@ class ReadinessReport:
                 f"- Evaluation report: `{self.reports_dir / 'evaluation_report.md'}`",
                 f"- SQL equivalence report: `{self.reports_dir / 'sql_equivalence_report.md'}`",
                 f"- Prefix benchmark report: `{self.reports_dir / 'prefix_sum_benchmark.md'}`",
+                f"- Long-window scale benchmark report: `{self.scale_report.path}`",
                 f"- Doris deployment directory: `{self.repo_root / 'deploy' / 'doris'}`",
+                "",
+                "## Long-Window Scale Evidence",
+                "",
+                f"- Scale report exists: {self.scale_report.exists}",
+                f"- Scale report marker check: {self.scale_report.passed}",
+                f"- Scale report bytes: {self.scale_report.byte_count}",
+                f"- Matched markers: {', '.join(self.scale_report.matched_markers) or '<none>'}",
+                f"- Missing markers: {', '.join(self.scale_report.missing_markers) or '<none>'}",
                 "",
                 "## Doris Asset Integrity",
                 "",
@@ -246,6 +270,16 @@ def generate_readiness_report(
         iterations=benchmark_iterations,
     )
     doris_assets = _check_doris_assets(repo_root, data_dir)
+    scale_report = _check_evidence_file(
+        "long-window scale benchmark",
+        reports_dir / "prefix_sum_scale_benchmark.md",
+        [
+            "Prefix-Sum Scale Benchmark",
+            "Optimized matches Pandas reference: True",
+            "Optimized matches baseline: True",
+            "Long-window feature-access reduction estimate",
+        ],
+    )
     report = ReadinessReport(
         generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         repo_root=repo_root,
@@ -257,7 +291,17 @@ def generate_readiness_report(
         equivalence=equivalence,
         benchmark=benchmark,
         doris_assets=doris_assets,
-        gates=_build_gates(git, pytest_check, evaluation, equivalence, benchmark, doris_assets, run_pytest),
+        scale_report=scale_report,
+        gates=_build_gates(
+            git,
+            pytest_check,
+            evaluation,
+            equivalence,
+            benchmark,
+            doris_assets,
+            scale_report,
+            run_pytest,
+        ),
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(report.to_markdown(), encoding="utf-8")
@@ -271,6 +315,7 @@ def _build_gates(
     equivalence: EquivalenceResult,
     benchmark: PrefixSumBenchmarkResult,
     doris_assets: List[DorisAssetCheck],
+    scale_report: EvidenceFileCheck,
     run_pytest: bool,
 ) -> List[ReadinessGate]:
     gates = [
@@ -325,6 +370,14 @@ def _build_gates(
             "required",
             all(asset.passed for asset in doris_assets),
             f"{sum(1 for asset in doris_assets if asset.passed)}/{len(doris_assets)} generated assets match",
+        ),
+        ReadinessGate(
+            "Long-window scale benchmark evidence",
+            "warning",
+            scale_report.passed,
+            "report exists with correctness markers"
+            if scale_report.passed
+            else f"missing markers: {', '.join(scale_report.missing_markers) or 'file missing'}",
         ),
         ReadinessGate(
             "Git rollback cleanliness",
@@ -395,6 +448,21 @@ def _check_doris_assets(repo_root: Path, data_dir: Path) -> List[DorisAssetCheck
             )
         )
     return checks
+
+
+def _check_evidence_file(name: str, path: Path, markers: List[str]) -> EvidenceFileCheck:
+    exists = path.exists()
+    content = path.read_text(encoding="utf-8") if exists else ""
+    matched = [marker for marker in markers if marker in content]
+    missing = [marker for marker in markers if marker not in content]
+    return EvidenceFileCheck(
+        name=name,
+        path=path,
+        exists=exists,
+        byte_count=path.stat().st_size if exists else 0,
+        matched_markers=matched,
+        missing_markers=missing,
+    )
 
 
 def _git_state(repo_root: Path) -> GitState:

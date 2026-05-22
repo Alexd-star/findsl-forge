@@ -23,6 +23,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Compare SQL output with an independent Pandas semantic reference evaluator.
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
 - Produce baseline-window versus prefix-sum benchmark reports.
+- Generate deterministic synthetic A-share-style data for reproducible long-window scale benchmarks.
 - Generate Doris DDL, sample load, prefix-table build, and smoke-query assets.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
 - Run without non-standard Python dependencies.
@@ -38,6 +39,7 @@ python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_in
 python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
+python -m findsl.cli scale-benchmark --stocks 300 --days 260 --window 120 --iterations 5 --output reports/prefix_sum_scale_benchmark.md
 python -m findsl.cli readiness-report --output reports/submission_readiness.md
 ```
 
@@ -50,6 +52,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\scale_benchmark.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 ```
@@ -80,6 +83,8 @@ window_sum = current_prefix - prefix_at_row_no_minus_window
 This is the first optimizer path aimed at the competition's long-range query acceleration requirement. Unsupported indicators still use ordinary SQL window functions, so the optimization is safe and configuration-driven.
 
 The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix-sum disabled as a baseline window query, and once with prefix-sum enabled. It then checks both SQL outputs against the Pandas reference result and writes a Markdown report with timing and plan-shape evidence. Local SQLite timings are treated as regression signals; Doris-scale acceleration must be proven later with Doris data and `EXPLAIN`.
+
+`scripts/scale_benchmark.ps1` goes one step further: it generates deterministic synthetic market data under `data/generated/scale/`, runs a 120-day rolling `SUM` query against baseline-window and prefix-sum SQL, and writes `reports/prefix_sum_scale_benchmark.md`. The report records correctness gates, local timing, plan shape, and a long-window feature-access reduction estimate. It is designed as reproducible pre-Doris evidence, not as a substitute for Doris cluster `EXPLAIN` and production latency.
 
 ## Structured Explain
 

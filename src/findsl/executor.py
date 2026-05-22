@@ -86,6 +86,7 @@ class SQLiteSampleExecutor:
                 f"INSERT INTO {_quote(physical_name)} ({column_sql}) VALUES ({placeholders})",
                 values,
             )
+            _create_table_indexes(conn, physical_name, columns)
 
     def _create_prefix_tables(self, conn: sqlite3.Connection) -> None:
         groups = {}
@@ -121,6 +122,7 @@ class SQLiteSampleExecutor:
                 f"CREATE TABLE {_quote(prefix_physical)} AS "
                 f"SELECT {select_sql} FROM {_quote(source_physical)}"
             )
+            _create_table_indexes(conn, prefix_physical, ["ts_code", "trade_date", "row_no"])
 
 
 def _read_csv(path: Path) -> List[Dict[str, str]]:
@@ -175,3 +177,20 @@ def _table_exists(conn: sqlite3.Connection, table_name: str) -> bool:
         (table_name,),
     ).fetchone()
     return row is not None
+
+
+def _create_table_indexes(conn: sqlite3.Connection, table_name: str, columns: List[str]) -> None:
+    if {"ts_code", "trade_date"}.issubset(columns):
+        conn.execute(
+            f"CREATE INDEX IF NOT EXISTS {_quote(_index_name(table_name, 'code_date'))} "
+            f"ON {_quote(table_name)} (ts_code, trade_date)"
+        )
+    if {"ts_code", "row_no"}.issubset(columns):
+        conn.execute(
+            f"CREATE INDEX IF NOT EXISTS {_quote(_index_name(table_name, 'code_row'))} "
+            f"ON {_quote(table_name)} (ts_code, row_no)"
+        )
+
+
+def _index_name(table_name: str, suffix: str) -> str:
+    return "idx_" + "".join(char if char.isalnum() else "_" for char in table_name) + "_" + suffix
