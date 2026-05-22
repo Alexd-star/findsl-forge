@@ -22,6 +22,7 @@ This document maps Topic 19 requirements to implementation modules.
 | AST/SQL/explain/result visualization | `findsl.demo`, `scripts/serve_demo.ps1`, readiness demo smoke gate | Started |
 | AI-assisted natural-language entry without SQL hallucination | `findsl.nl2dsl`, `findsl.demo`, `findsl.readiness`, `suggest-dsl` CLI | Started |
 | Interactive error explainability and repair guidance | `findsl.diagnostics`, `findsl.demo`, `diagnose` CLI | Started |
+| Official-style task coverage and negative diagnostic evidence | `findsl.official_suite`, `official-suite` CLI, `scripts/official_suite.ps1`, `data/samples/official_*_cases.jsonl`, readiness required gate | Started |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Started |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Started |
 | Local SQL execution regression | `findsl.executor`, `scripts/verify_sql_sample.ps1` | Started |

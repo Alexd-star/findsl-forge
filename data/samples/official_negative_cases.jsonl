@@ -1,0 +1,7 @@
+{"name": "未知指标名", "dsl": "filter(indicator(\"clos\") > 10)", "expected_code": "UNKNOWN_INDICATOR", "expected_suggestion_fragments": ["indicator(\"close\")"]}
+{"name": "未知函数", "dsl": "filter(UNKNOWN(indicator(\"close\")))", "expected_code": "UNKNOWN_FUNCTION", "expected_suggestion_fragments": ["configs/functions.json"]}
+{"name": "CONS参数类型错误", "dsl": "filter(CONS(indicator(\"close\"), 3))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["Wrap numeric expressions in comparisons"]}
+{"name": "窗口必须为正数", "dsl": "filter(indicator(\"close\") > MA(indicator(\"close\"), 0))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer window"]}
+{"name": "缺少右括号", "dsl": "filter(indicator(\"close\") > MA(indicator(\"close\"), 20)", "expected_code": "PARSE_ERROR", "expected_suggestion_fragments": ["missing closing parenthesis"]}
+{"name": "字符串未闭合", "dsl": "filter(indicator(\"close) > 10)", "expected_code": "LEX_ERROR", "expected_suggestion_fragments": ["missing closing double quote"]}
+{"name": "rank命名参数错误", "dsl": "rank(indicator(\"close\"), desc, limit=10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["supported named args"]}

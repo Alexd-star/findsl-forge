@@ -120,6 +120,7 @@ Deliverables:
 - AST/IR/SQL/rewrite trace visualization. (Started)
 - Natural-language-to-DSL candidate layer with compiler/reference validation. (Started)
 - Structured compile diagnostics and repair hints for invalid demo/API requests. (Started)
+- Official-style positive and negative coverage suite with SQL/trace/explain/equivalence evidence. (Started)
 - Markdown table output for official sample questions. (Started via submission readiness reports)
 - Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
 - Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
@@ -136,6 +137,7 @@ Exit criteria:
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
+- Official-style coverage suite remains a required readiness gate, with representative positive cases passing SQL/reference equivalence and representative negative cases producing stable diagnostic codes plus repair hints.
 - Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
 - Generated reports can be attached to the technical document or used in defense.
 - Warning gates are either closed or explicitly explained in the final submission.
@@ -147,3 +149,4 @@ Exit criteria:
 - Every non-trivial rewrite emits trace text.
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.
+- Official-style positive/negative corpora must grow with every newly supported DSL construct so competition coverage stays evidence-backed.

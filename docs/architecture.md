@@ -30,6 +30,9 @@ findsl.cli
   -> PrefixSumBenchmark
     -> compile baseline window SQL and optimized prefix SQL
     -> compare correctness, timing, and plan shape
+  -> OfficialSuite
+    -> run official-style positive cases across filters/rank/windows/prefix sums
+    -> run negative DSL cases through stable diagnostics and repair suggestions
   -> DorisAssetGenerator
     -> emit DDL, sample inserts, prefix build SQL, smoke queries
   -> DorisEvidenceCollector
@@ -38,6 +41,7 @@ findsl.cli
   -> Demo/API and ReadinessReport
     -> validate natural-language candidates through compiler + equivalence verifier
     -> return structured diagnostics and repair hints for invalid requests
+    -> consume official-style coverage suite as a required submission gate
     -> consume Doris cluster evidence markers for submission gating
 ```
 
@@ -136,6 +140,17 @@ DSL -> PandasReferenceEvaluator -> semantic oracle
 ```
 
 Both SQL variants must match the reference output and each other. The report includes local timing plus plan-shape signals such as window frame count and prefix table references. This separates correctness evidence from later Doris-scale performance claims.
+
+## Official-Style Coverage Loop
+
+The official-style suite is a compact regression corpus designed around the competition task shape:
+
+```text
+positive DSL case -> compiler -> SQL/trace/explain evidence -> SQL/reference equivalence
+negative DSL case -> compiler failure -> structured diagnostic code -> repair suggestions
+```
+
+Positive cases cover staged filters, ranking, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
 
 ## Doris Evidence Loop
 

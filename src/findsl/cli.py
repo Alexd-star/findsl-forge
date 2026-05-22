@@ -29,6 +29,12 @@ def main() -> None:
     eval_cmd = sub.add_parser("evaluate", help="Evaluate compiler against a JSONL case file")
     eval_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL case file")
     eval_cmd.add_argument("--output", default="reports/evaluation_report.md", help="Output Markdown report")
+    official_cmd = sub.add_parser("official-suite", help="Run official-style coverage and diagnostics suite")
+    official_cmd.add_argument("--positive-input", default="data/samples/official_positive_cases.jsonl", help="Positive official-style JSONL cases")
+    official_cmd.add_argument("--negative-input", default="data/samples/official_negative_cases.jsonl", help="Negative diagnostic JSONL cases")
+    official_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    official_cmd.add_argument("--output", default="reports/official_suite_report.md", help="Output Markdown report")
+    official_cmd.add_argument("--json", action="store_true", help="Print suite summary as JSON")
     ref_cmd = sub.add_parser("reference", help="Evaluate DSL semantics with the Pandas reference engine")
     ref_cmd.add_argument("dsl", help="DSL expression")
     ref_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
@@ -170,6 +176,34 @@ def main() -> None:
     elif args.command == "evaluate":
         result = evaluate_file(Path(args.input), Path(args.output))
         print(result.to_markdown())
+    elif args.command == "official-suite":
+        from .official_suite import run_official_suite
+
+        result = run_official_suite(
+            positive_cases_path=Path(args.positive_input),
+            negative_cases_path=Path(args.negative_input),
+            data_dir=Path(args.data_dir),
+            output_path=Path(args.output),
+        )
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "passed": result.passed,
+                        "positive_passed": result.positive_passed,
+                        "positive_total": result.positive_total,
+                        "negative_passed": result.negative_passed,
+                        "negative_total": result.negative_total,
+                        "output": str(result.output_path),
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+        else:
+            print(result.to_markdown())
+        if not result.passed:
+            raise SystemExit(1)
     elif args.command == "reference":
         from .reference import PandasReferenceEvaluator
 

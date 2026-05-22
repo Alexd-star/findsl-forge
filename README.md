@@ -29,6 +29,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Collect Doris-cluster `EXPLAIN` and latency evidence for baseline-window versus prefix-sum SQL.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
+- Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
@@ -44,6 +45,7 @@ python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_i
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
 python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
+python -m findsl.cli official-suite --output reports/official_suite_report.md --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
 python -m findsl.cli scale-benchmark --stocks 300 --days 260 --window 120 --iterations 5 --output reports/prefix_sum_scale_benchmark.md
 python -m findsl.cli collect-doris-evidence --host 127.0.0.1 --port 9030 --user root --database findsl_demo --output reports/doris_cluster_evidence.md
@@ -58,9 +60,11 @@ $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"), 250))'
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)'
 python -m findsl.cli suggest-dsl '今日收盘价创二百五十日新高'
+python -m findsl.cli official-suite --json
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\official_suite.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\scale_benchmark.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
@@ -144,6 +148,8 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 `scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
 
+The readiness report also runs `official-suite`, which covers official-style stock-screening tasks across staged filters, ranking, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
+
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight remaining competition risks, especially missing Doris-cluster scale proof and uncommitted local changes.
 
 ## Competition-Oriented Design
@@ -155,4 +161,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL candidate validation, and a local demo. Later phases will add Doris-cluster execution proof, broader DSL coverage, and LLM-backed NL2DSL repair loops.
+The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL candidate validation, official-style coverage evidence, and a local demo. Later phases will add more Doris-cluster execution proof, broader DSL coverage, and LLM-backed NL2DSL repair loops.

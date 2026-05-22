@@ -16,6 +16,7 @@ from .demo import DEFAULT_DEMO_DSL, DEFAULT_NL_REQUEST, analyze_dsl, suggest_fro
 from .doris import render_doris_assets
 from .equivalence import EquivalenceResult, verify_sql_equivalence
 from .evaluation import EvaluationResult, evaluate_file
+from .official_suite import OfficialSuiteResult, run_official_suite
 
 
 DEFAULT_EQUIVALENCE_DSL = (
@@ -140,6 +141,7 @@ class ReadinessReport:
     demo_smoke: DemoSmokeCheck
     nl2dsl_smoke: NL2DSLSmokeCheck
     diagnostics_smoke: DiagnosticsSmokeCheck
+    official_suite: OfficialSuiteResult
     gates: List[ReadinessGate]
 
     @property
@@ -191,16 +193,26 @@ class ReadinessReport:
                 f"- Demo API smoke: {self.demo_smoke.passed}",
                 f"- NL2DSL smoke: {self.nl2dsl_smoke.passed}",
                 f"- Diagnostics smoke: {self.diagnostics_smoke.passed}",
+                f"- Official-style positive cases: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
+                f"- Official-style negative diagnostics: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
                 "",
                 "## Evidence Artifacts",
                 "",
                 f"- Readiness report: `{self.output_path}`",
                 f"- Evaluation report: `{self.reports_dir / 'evaluation_report.md'}`",
                 f"- SQL equivalence report: `{self.reports_dir / 'sql_equivalence_report.md'}`",
+                f"- Official-style coverage suite report: `{self.official_suite.output_path}`",
                 f"- Prefix benchmark report: `{self.reports_dir / 'prefix_sum_benchmark.md'}`",
                 f"- Long-window scale benchmark report: `{self.scale_report.path}`",
                 f"- Doris cluster evidence report: `{self.doris_cluster_report.path}`",
                 f"- Doris deployment directory: `{self.repo_root / 'deploy' / 'doris'}`",
+                "",
+                "## Official-Style Coverage Suite",
+                "",
+                f"- Suite passed: {self.official_suite.passed}",
+                f"- Positive cases passed: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
+                f"- Negative diagnostic cases passed: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
+                f"- Report: `{self.official_suite.output_path}`",
                 "",
                 "## Long-Window Scale Evidence",
                 "",
@@ -380,6 +392,12 @@ def generate_readiness_report(
     demo_smoke = _check_demo_smoke(data_dir)
     nl2dsl_smoke = _check_nl2dsl_smoke(data_dir)
     diagnostics_smoke = _check_diagnostics_smoke()
+    official_suite = run_official_suite(
+        positive_cases_path=repo_root / "data" / "samples" / "official_positive_cases.jsonl",
+        negative_cases_path=repo_root / "data" / "samples" / "official_negative_cases.jsonl",
+        data_dir=data_dir,
+        output_path=reports_dir / "official_suite_report.md",
+    )
     report = ReadinessReport(
         generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         repo_root=repo_root,
@@ -396,6 +414,7 @@ def generate_readiness_report(
         demo_smoke=demo_smoke,
         nl2dsl_smoke=nl2dsl_smoke,
         diagnostics_smoke=diagnostics_smoke,
+        official_suite=official_suite,
         gates=_build_gates(
             git,
             pytest_check,
@@ -408,6 +427,7 @@ def generate_readiness_report(
             demo_smoke,
             nl2dsl_smoke,
             diagnostics_smoke,
+            official_suite,
             run_pytest,
         ),
     )
@@ -428,6 +448,7 @@ def _build_gates(
     demo_smoke: DemoSmokeCheck,
     nl2dsl_smoke: NL2DSLSmokeCheck,
     diagnostics_smoke: DiagnosticsSmokeCheck,
+    official_suite: OfficialSuiteResult,
     run_pytest: bool,
 ) -> List[ReadinessGate]:
     gates = [
@@ -511,6 +532,15 @@ def _build_gates(
             )
             if diagnostics_smoke.passed
             else diagnostics_smoke.error,
+        ),
+        ReadinessGate(
+            "Official-style coverage suite",
+            "required",
+            official_suite.passed,
+            (
+                f"positive {official_suite.positive_passed}/{official_suite.positive_total}, "
+                f"negative {official_suite.negative_passed}/{official_suite.negative_total}"
+            ),
         ),
         ReadinessGate(
             "Doris asset integrity",
