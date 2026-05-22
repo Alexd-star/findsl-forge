@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from .benchmark import PrefixSumBenchmarkResult, benchmark_prefix_sum_file
+from .demo import DEFAULT_DEMO_DSL, analyze_dsl
 from .doris import render_doris_assets
 from .equivalence import EquivalenceResult, verify_sql_equivalence
 from .evaluation import EvaluationResult, evaluate_file
@@ -77,6 +78,16 @@ class EvidenceFileCheck:
 
 
 @dataclass(frozen=True)
+class DemoSmokeCheck:
+    dsl: str
+    passed: bool
+    compile_elapsed_ms: float
+    verification_passed: bool
+    sql_row_count: int
+    error: str = ""
+
+
+@dataclass(frozen=True)
 class ReadinessGate:
     name: str
     level: str
@@ -101,6 +112,7 @@ class ReadinessReport:
     benchmark: PrefixSumBenchmarkResult
     doris_assets: List[DorisAssetCheck]
     scale_report: EvidenceFileCheck
+    demo_smoke: DemoSmokeCheck
     gates: List[ReadinessGate]
 
     @property
@@ -149,6 +161,7 @@ class ReadinessReport:
                 f"- Local prefix benchmark speedup: {self.benchmark.local_speedup:.2f}x",
                 f"- Baseline window frames: {self.benchmark.baseline_window_frames}",
                 f"- Optimized prefix table references: {self.benchmark.optimized_prefix_joins}",
+                f"- Demo API smoke: {self.demo_smoke.passed}",
                 "",
                 "## Evidence Artifacts",
                 "",
@@ -166,6 +179,14 @@ class ReadinessReport:
                 f"- Scale report bytes: {self.scale_report.byte_count}",
                 f"- Matched markers: {', '.join(self.scale_report.matched_markers) or '<none>'}",
                 f"- Missing markers: {', '.join(self.scale_report.missing_markers) or '<none>'}",
+                "",
+                "## Demo Smoke Test",
+                "",
+                f"- Passed: {self.demo_smoke.passed}",
+                f"- Verification passed: {self.demo_smoke.verification_passed}",
+                f"- Compile latency: {self.demo_smoke.compile_elapsed_ms:.3f} ms",
+                f"- SQL rows: {self.demo_smoke.sql_row_count}",
+                f"- Error: {self.demo_smoke.error or '<none>'}",
                 "",
                 "## Doris Asset Integrity",
                 "",
@@ -227,12 +248,13 @@ class ReadinessReport:
                 "- Config-driven indicators and functions for low-cost business expansion.",
                 "- Prefix-sum rewrite path for long rolling windows with baseline/optimized evidence.",
                 "- Structured optimizer explain records for defense and UI visualization.",
+                "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",
                 "- Doris DDL, sample data, prefix-table build SQL, and smoke queries generated from the same registry.",
                 "",
                 "## Remaining High-Value Work",
                 "",
                 "- Capture Doris-cluster EXPLAIN and latency on larger synthetic or official-scale data before claiming 10x production acceleration.",
-                "- Add a UI or API demo that visualizes DSL, AST, SQL, optimizer explain, and result tables for judges.",
+                "- Polish the Web Demo with NL2DSL suggestions, official-question presets, and screenshot-ready presentation states.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
                 "- Add an NL2DSL assistant layer that proposes DSL while the deterministic compiler remains the correctness gate.",
             ]
@@ -280,6 +302,7 @@ def generate_readiness_report(
             "Long-window feature-access reduction estimate",
         ],
     )
+    demo_smoke = _check_demo_smoke(data_dir)
     report = ReadinessReport(
         generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         repo_root=repo_root,
@@ -292,6 +315,7 @@ def generate_readiness_report(
         benchmark=benchmark,
         doris_assets=doris_assets,
         scale_report=scale_report,
+        demo_smoke=demo_smoke,
         gates=_build_gates(
             git,
             pytest_check,
@@ -300,6 +324,7 @@ def generate_readiness_report(
             benchmark,
             doris_assets,
             scale_report,
+            demo_smoke,
             run_pytest,
         ),
     )
@@ -316,6 +341,7 @@ def _build_gates(
     benchmark: PrefixSumBenchmarkResult,
     doris_assets: List[DorisAssetCheck],
     scale_report: EvidenceFileCheck,
+    demo_smoke: DemoSmokeCheck,
     run_pytest: bool,
 ) -> List[ReadinessGate]:
     gates = [
@@ -364,6 +390,17 @@ def _build_gates(
                 f"baseline window frames {benchmark.baseline_window_frames}, "
                 f"optimized prefix references {benchmark.optimized_prefix_joins}"
             ),
+        ),
+        ReadinessGate(
+            "Demo API smoke",
+            "required",
+            demo_smoke.passed,
+            (
+                f"verification {demo_smoke.verification_passed}, "
+                f"compile {demo_smoke.compile_elapsed_ms:.3f} ms, rows {demo_smoke.sql_row_count}"
+            )
+            if demo_smoke.passed
+            else demo_smoke.error,
         ),
         ReadinessGate(
             "Doris asset integrity",
@@ -448,6 +485,31 @@ def _check_doris_assets(repo_root: Path, data_dir: Path) -> List[DorisAssetCheck
             )
         )
     return checks
+
+
+def _check_demo_smoke(data_dir: Path) -> DemoSmokeCheck:
+    try:
+        result = analyze_dsl(DEFAULT_DEMO_DSL, data_dir=data_dir, enable_prefix_sum=True, verify=True)
+        verification = result["verification"] or {}
+        verification_passed = bool(verification.get("passed"))
+        compile_elapsed_ms = float(result["compile"]["elapsed_ms"])
+        sql_row_count = int(verification.get("sql_row_count", 0))
+        return DemoSmokeCheck(
+            dsl=DEFAULT_DEMO_DSL,
+            passed=bool(result.get("ok")) and verification_passed,
+            compile_elapsed_ms=compile_elapsed_ms,
+            verification_passed=verification_passed,
+            sql_row_count=sql_row_count,
+        )
+    except Exception as exc:  # noqa: BLE001 - readiness should report smoke failures.
+        return DemoSmokeCheck(
+            dsl=DEFAULT_DEMO_DSL,
+            passed=False,
+            compile_elapsed_ms=0.0,
+            verification_passed=False,
+            sql_row_count=0,
+            error=f"{type(exc).__name__}: {exc}",
+        )
 
 
 def _check_evidence_file(name: str, path: Path, markers: List[str]) -> EvidenceFileCheck:

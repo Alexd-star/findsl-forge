@@ -65,6 +65,11 @@ def main() -> None:
     ready_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     ready_cmd.add_argument("--benchmark-iterations", type=int, default=20, help="Prefix benchmark iterations")
     ready_cmd.add_argument("--skip-pytest", action="store_true", help="Skip pytest when generating the report")
+    demo_cmd = sub.add_parser("serve-demo", help="Start the local web demo and JSON API")
+    demo_cmd.add_argument("--host", default="127.0.0.1", help="Host interface for the demo server")
+    demo_cmd.add_argument("--port", type=int, default=8765, help="Port for the demo server")
+    demo_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    demo_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL examples")
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -199,6 +204,15 @@ def main() -> None:
         print(report.to_markdown())
         if not report.blocking_passed:
             raise SystemExit(1)
+    elif args.command == "serve-demo":
+        from .demo import run_demo_server
+
+        run_demo_server(
+            host=args.host,
+            port=args.port,
+            data_dir=Path(args.data_dir),
+            cases_path=Path(args.input),
+        )
 
 
 if __name__ == "__main__":

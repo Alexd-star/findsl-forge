@@ -25,6 +25,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Produce baseline-window versus prefix-sum benchmark reports.
 - Generate deterministic synthetic A-share-style data for reproducible long-window scale benchmarks.
 - Generate Doris DDL, sample load, prefix-table build, and smoke-query assets.
+- Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
@@ -40,6 +41,7 @@ python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_i
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
 python -m findsl.cli scale-benchmark --stocks 300 --days 260 --window 120 --iterations 5 --output reports/prefix_sum_scale_benchmark.md
+python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 python -m findsl.cli readiness-report --output reports/submission_readiness.md
 ```
 
@@ -54,6 +56,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\scale_benchmark.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 ```
 
@@ -90,6 +93,15 @@ The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix
 
 Compiler JSON output includes both human-readable `trace` text and machine-readable `explain` steps. Each explain step records a rule name, status, message, and evidence dictionary. This lets evaluation reports, future UI panels, and answer-defense materials show why an optimization was applied or skipped.
 
+## Web Demo
+
+`scripts/serve_demo.ps1` starts a local Web Demo at `http://127.0.0.1:8765`. The demo lets judges or teammates choose an official-style sample DSL, run the deterministic compiler, and inspect Doris SQL, AST, optimizer explain, and SQL/reference verification rows in one screen.
+
+The same server exposes JSON APIs:
+
+- `GET /api/examples`
+- `POST /api/analyze`
+
 ## Doris Assets
 
 `scripts/generate_doris_assets.ps1` creates the SQL files under `deploy/doris/`:
@@ -105,7 +117,7 @@ These files are a smoke-test deployment path for Doris. See `docs/doris_runbook.
 
 ## Submission Readiness
 
-`scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Doris asset integrity checks, and git rollback-state inspection.
+`scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, Doris asset integrity checks, and git rollback-state inspection.
 
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight remaining competition risks, especially Doris-cluster scale proof and uncommitted local changes.
 
@@ -118,4 +130,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The first commit establishes a reliable compiler kernel. Later phases will add Doris execution, prefix-sum routing, benchmark reports, a web demo, and NL2DSL repair loops.
+The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, and a local demo. Later phases will add Doris-cluster execution proof, broader DSL coverage, and NL2DSL repair loops.

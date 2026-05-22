@@ -36,11 +36,13 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.benchmark.optimized_matches_reference
     assert all(asset.passed for asset in report.doris_assets)
     assert report.scale_report.passed
+    assert report.demo_smoke.passed
 
     content = output.read_text(encoding="utf-8")
     assert "FinDSL Forge Submission Readiness Report" in content
     assert "Compiler accuracy and latency" in content
     assert "Long-Window Scale Evidence" in content
+    assert "Demo Smoke Test" in content
     assert "Doris Asset Integrity" in content
     assert "Award-Readiness Differentiators" in content
 
