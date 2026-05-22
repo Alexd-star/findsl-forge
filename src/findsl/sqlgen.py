@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set
 
 from .ast_nodes import BinaryOp, Comparison, FunctionCall, Identifier, Literal, Node
 from .errors import SemanticError
@@ -18,6 +18,7 @@ class SqlPlan:
 class Feature:
     alias: str
     expression: str
+    joins: List[str] = field(default_factory=list)
 
 
 class SqlGenerator:
@@ -100,12 +101,14 @@ class SqlGenerator:
 
             if self._numeric_features:
                 self.trace.append("materialize numeric window features before filtering")
-                layer_sql = self._feature_layer_sql(layer_sql, layer_name, self._numeric_features, "numeric_features")
-                layer_name = "numeric_features"
+                for idx, feature in enumerate(self._numeric_features, 1):
+                    layer_sql = self._feature_layer_sql(layer_sql, layer_name, [feature])
+                    layer_name = f"numeric_features_{idx}"
             if self._rolling_features:
                 self.trace.append("materialize rolling boolean features after numeric features")
-                layer_sql = self._feature_layer_sql(layer_sql, layer_name, self._rolling_features, "rolling_features")
-                layer_name = "rolling_features"
+                for idx, feature in enumerate(self._rolling_features, 1):
+                    layer_sql = self._feature_layer_sql(layer_sql, layer_name, [feature])
+                    layer_name = f"rolling_features_{idx}"
 
             self.trace.append("rewrite filter predicate into outer WHERE over materialized features")
             return f"SELECT * FROM ({layer_sql}) {layer_name} WHERE {condition}"
@@ -114,9 +117,15 @@ class SqlGenerator:
             self._numeric_features = old_numeric
             self._rolling_features = old_rolling
 
-    def _feature_layer_sql(self, inner_sql: str, inner_alias: str, features: List[Feature], output_alias: str) -> str:
-        feature_sql = ", ".join(f"{feature.expression} AS {feature.alias}" for feature in features)
-        return f"SELECT {inner_alias}.*, {feature_sql} FROM ({inner_sql}) {inner_alias}"
+    def _feature_layer_sql(self, inner_sql: str, inner_alias: str, features: List[Feature]) -> str:
+        feature_sql = ", ".join(
+            f"{feature.expression.format(source=inner_alias)} AS {feature.alias}" for feature in features
+        )
+        joins = " ".join(
+            join.format(source=inner_alias) for feature in features for join in feature.joins
+        )
+        join_sql = f" {joins}" if joins else ""
+        return f"SELECT {inner_alias}.*, {feature_sql} FROM ({inner_sql}) {inner_alias}{join_sql}"
 
     def _rank_sql(self, node: FunctionCall, base_relation: str = None) -> str:
         self.trace.append("rewrite rank() into ROW_NUMBER window")
@@ -267,6 +276,10 @@ class SqlGenerator:
 
     def _register_numeric_window(self, node: FunctionCall) -> str:
         name = node.name.upper()
+        if name == "SUM":
+            prefix_alias = self._try_register_prefix_sum(node)
+            if prefix_alias:
+                return prefix_alias
         expr = self._numeric_sql(node.args[0])
         window = self._window_value(node.args[1])
         sql_name = {"MA": "AVG", "SUM": "SUM", "MAX": "MAX", "MIN": "MIN"}[name]
@@ -277,6 +290,41 @@ class SqlGenerator:
             f"ROWS BETWEEN {window - 1} PRECEDING AND CURRENT ROW)"
         )
         self._numeric_features.append(Feature(alias=alias, expression=expression))
+        return alias
+
+    def _try_register_prefix_sum(self, node: FunctionCall) -> Optional[str]:
+        if self._current_source:
+            return None
+        indicator_call = node.args[0]
+        if not isinstance(indicator_call, FunctionCall) or indicator_call.name.upper() != "INDICATOR":
+            return None
+        indicator_name = self._symbol_arg(indicator_call.args[0], "indicator")
+        meta = self.registry.indicator(indicator_name)
+        if not meta.get("supports_prefix_sum"):
+            return None
+
+        window = self._window_value(node.args[1])
+        prefix_table = self.registry.table(meta["prefix_table"])
+        prefix_physical = prefix_table["physical"]
+        prefix_column = meta["prefix_column"]
+        row_column = prefix_table.get("row_column", "row_no")
+        alias = self._next_alias("__psum")
+        feature_no = self._feature_counter
+        curr = f"__pref_curr_{feature_no}"
+        prev = f"__pref_prev_{feature_no}"
+        self.trace.append(f"rewrite SUM() on {indicator_name} into prefix-sum feature {alias}")
+        joins = [
+            (
+                f"LEFT JOIN {prefix_physical} AS {curr} "
+                f"ON {curr}.ts_code = {{source}}.ts_code AND {curr}.trade_date = {{source}}.trade_date"
+            ),
+            (
+                f"LEFT JOIN {prefix_physical} AS {prev} "
+                f"ON {prev}.ts_code = {curr}.ts_code AND {prev}.{row_column} = {curr}.{row_column} - {window}"
+            ),
+        ]
+        expression = f"({curr}.{prefix_column} - COALESCE({prev}.{prefix_column}, 0))"
+        self._numeric_features.append(Feature(alias=alias, expression=expression, joins=joins))
         return alias
 
     def _register_rolling_feature(self, feature_name: str, expression: str) -> str:

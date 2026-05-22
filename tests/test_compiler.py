@@ -26,3 +26,19 @@ def test_compile_exist_and_ma():
     assert "AS __roll_2" in result.sql
     assert "ROWS BETWEEN 9 PRECEDING AND CURRENT ROW" in result.sql
     assert "WHERE __roll_2 = 1" in result.sql
+
+
+def test_compile_sum_uses_prefix_sum_when_indicator_supports_it():
+    result = Compiler().compile('filter(SUM(indicator("volume"), 3) > 300)')
+    assert "dwd_stock_daily_quote_prefix" in result.sql
+    assert "volume_prefix - COALESCE" in result.sql
+    assert "__pref_prev_1.row_no = __pref_curr_1.row_no - 3" in result.sql
+    assert "AS __psum_1" in result.sql
+    assert "rewrite SUM() on volume into prefix-sum feature __psum_1" in result.trace
+
+
+def test_compile_sum_falls_back_to_window_when_prefix_sum_is_not_supported():
+    result = Compiler().compile('filter(SUM(indicator("close"), 3) > 30)')
+    assert "SUM(close) OVER" in result.sql
+    assert "dwd_stock_daily_quote_prefix" not in result.sql
+    assert "rewrite SUM() into SUM window feature __win_1" in result.trace

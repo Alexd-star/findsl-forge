@@ -80,11 +80,13 @@ Metrics:
 
 ## Phase 4: Adaptive Optimizer
 
+Status: started.
+
 Deliverables:
 
 - Query feature extraction.
 - Long-range query detection.
-- Prefix-sum rewrite path.
+- Prefix-sum rewrite path. (Started for eligible rolling `SUM`)
 - Materialized-view route path.
 - Partition and column pruning hints.
 - Plan explanation JSON.

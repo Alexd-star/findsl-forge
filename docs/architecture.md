@@ -12,6 +12,7 @@ findsl.cli
       -> Registry(configs/*.json)
     -> SqlGenerator
       -> Feature materialization layers
+      -> Prefix-sum feature rewrite when configured
       -> SQL text
       -> rewrite trace
   -> SQLiteSampleExecutor
@@ -57,13 +58,23 @@ This is intentionally closer to production SQL than string-template demos.
 
 Indicators, tables, and functions live in `configs/`. The compiler should not need code changes when adding common indicators.
 
+### Prefix-Sum Optimizer
+
+Rolling `SUM` can be expensive for long financial windows. When an indicator declares `supports_prefix_sum`, `prefix_table`, and `prefix_column`, the generator rewrites:
+
+```text
+SUM(indicator(x), N)
+```
+
+into joins against the configured prefix table. The generated expression subtracts the prefix value at `row_no - N` from the current prefix value, producing the same rolling sum with a lookup-style plan that can be backed by Doris aggregate models, materialized views, or sorted duplicate-key tables.
+
 ## Planned Enterprise Extensions
 
 - Logical IR node model.
 - Doris dialect validator.
 - SQLGlot optional validation.
 - Doris execution equivalence against Pandas reference results.
-- Prefix-sum optimizer.
+- Broader prefix-sum optimizer coverage for more aggregate shapes.
 - Materialized-view routing.
 - Benchmark report generator.
 - API and UI.

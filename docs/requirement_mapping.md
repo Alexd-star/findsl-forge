@@ -12,6 +12,7 @@ This document maps Topic 19 requirements to implementation modules.
 | Add new indicators without core code changes | `configs/indicators.json` | Started |
 | Compile P95 < 50ms | `findsl.compiler`, `findsl.evaluation` | Started |
 | Long-range 10x acceleration using prefix sum/materialized paths | future `findsl.optimizer` | Planned |
+| Prefix-sum optimized rolling SUM | `findsl.sqlgen`, `configs/indicators.json`, `configs/tables.json` | Started |
 | Output Markdown table and engineering screenshots | future UI/report modules | Planned |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Started |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Started |

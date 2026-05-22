@@ -50,3 +50,14 @@ def test_sql_matches_reference_for_then_filter_rank():
         DATA_DIR,
     )
     assert result.passed
+
+
+def test_sql_matches_reference_for_prefix_sum_rewrite():
+    result = verify_sql_equivalence(
+        'filter(SUM(indicator("volume"), 3) > 300)',
+        DATA_DIR,
+    )
+    assert result.passed
+    assert result.sql_row_count == 7
+    assert result.missing_keys == []
+    assert result.extra_keys == []

@@ -20,6 +20,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Generate trace metadata explaining the selected rewrite path.
 - Execute generated SQL against local SQLite fixtures for regression checks.
 - Compare SQL output with an independent Pandas semantic reference evaluator.
+- Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
 
@@ -31,6 +32,7 @@ python -m findsl.cli compile 'then(filter(market("A") & CONS(indicator("main_net
 python -m findsl.cli evaluate --input data/samples/queries.jsonl --output reports/evaluation_report.md
 python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
+python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 ```
 
 If running from the repository root without installing the package:
@@ -57,6 +59,16 @@ compare result sets
 ```
 
 The current implementation already runs the generated SQL over in-memory SQLite tables loaded from CSV fixtures. SQLite is used as a lightweight local execution harness, while the generated SQL remains Doris-oriented and window-safe. This gives every compiler change a fast semantic regression gate before the Doris execution path is introduced.
+
+## Prefix-Sum Optimization
+
+Indicators can declare prefix-sum support in `configs/indicators.json`. When the compiler sees an eligible `SUM(indicator(...), window)` expression, it rewrites the rolling window aggregate into prefix table joins:
+
+```text
+window_sum = current_prefix - prefix_at_row_no_minus_window
+```
+
+This is the first optimizer path aimed at the competition's long-range query acceleration requirement. Unsupported indicators still use ordinary SQL window functions, so the optimization is safe and configuration-driven.
 
 ## Competition-Oriented Design
 

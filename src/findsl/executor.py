@@ -29,6 +29,7 @@ class SQLiteSampleExecutor:
         with sqlite3.connect(":memory:") as conn:
             conn.row_factory = sqlite3.Row
             self._load_tables(conn)
+            self._create_prefix_tables(conn)
             rows = [dict(row) for row in conn.execute(sql).fetchall()]
         rows.sort(key=lambda row: (str(row.get("trade_date", "")), str(row.get("ts_code", ""))))
         return SqlExecutionResult(sql=sql, rows=rows)
@@ -51,6 +52,41 @@ class SQLiteSampleExecutor:
             conn.executemany(
                 f"INSERT INTO {_quote(physical_name)} ({column_sql}) VALUES ({placeholders})",
                 values,
+            )
+
+    def _create_prefix_tables(self, conn: sqlite3.Connection) -> None:
+        groups = {}
+        for indicator_meta in self.registry.indicators.values():
+            if not indicator_meta.get("supports_prefix_sum"):
+                continue
+            key = (indicator_meta["table"], indicator_meta["prefix_table"])
+            groups.setdefault(key, []).append(indicator_meta)
+
+        for (source_logical, prefix_logical), indicators in groups.items():
+            source_physical = self.registry.table(source_logical)["physical"]
+            if not _table_exists(conn, source_physical):
+                continue
+            prefix_meta = self.registry.table(prefix_logical)
+            prefix_physical = prefix_meta["physical"]
+            conn.execute(f"DROP TABLE IF EXISTS {_quote(prefix_physical)}")
+            select_columns = [
+                "ts_code",
+                "trade_date",
+                "ROW_NUMBER() OVER (PARTITION BY ts_code ORDER BY trade_date) AS row_no",
+            ]
+            for meta in indicators:
+                column = _quote(meta["column"])
+                prefix_column = _quote(meta["prefix_column"])
+                select_columns.append(
+                    "SUM("
+                    + column
+                    + ") OVER (PARTITION BY ts_code ORDER BY trade_date "
+                    + f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS {prefix_column}"
+                )
+            select_sql = ", ".join(select_columns)
+            conn.execute(
+                f"CREATE TABLE {_quote(prefix_physical)} AS "
+                f"SELECT {select_sql} FROM {_quote(source_physical)}"
             )
 
 
@@ -98,3 +134,11 @@ def _is_number(value: str) -> bool:
 
 def _quote(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
+
+
+def _table_exists(conn: sqlite3.Connection, table_name: str) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        (table_name,),
+    ).fetchone()
+    return row is not None

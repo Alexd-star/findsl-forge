@@ -13,6 +13,22 @@
     "code_column": "ts_code",
     "partition_column": "trade_date"
   },
+  "daily_quote_prefix": {
+    "physical": "dwd_stock_daily_quote_prefix",
+    "alias": "dqp",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date",
+    "row_column": "row_no"
+  },
+  "money_flow_prefix": {
+    "physical": "dwd_stock_money_flow_prefix",
+    "alias": "mfp",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date",
+    "row_column": "row_no"
+  },
   "stock_universe": {
     "physical": "dim_stock_universe",
     "alias": "su",
@@ -21,4 +37,3 @@
     "partition_column": "trade_date"
   }
 }
-
