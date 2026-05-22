@@ -44,7 +44,7 @@ Exit criteria:
 Deliverables:
 
 - Golden DSL dataset with expected AST and behavior.
-- Pandas reference evaluator for stock screening semantics.
+- Pandas reference evaluator for stock screening semantics. (Started)
 - SQL-result equivalence tests.
 - Markdown evaluation report.
 
@@ -105,4 +105,3 @@ Deliverables:
 - Every non-trivial rewrite emits trace text.
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.
-

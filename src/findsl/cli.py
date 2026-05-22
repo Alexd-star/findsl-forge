@@ -17,6 +17,10 @@ def main() -> None:
     eval_cmd = sub.add_parser("evaluate", help="Evaluate compiler against a JSONL case file")
     eval_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL case file")
     eval_cmd.add_argument("--output", default="reports/evaluation_report.md", help="Output Markdown report")
+    ref_cmd = sub.add_parser("reference", help="Evaluate DSL semantics with the Pandas reference engine")
+    ref_cmd.add_argument("dsl", help="DSL expression")
+    ref_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    ref_cmd.add_argument("--json", action="store_true", help="Print result keys as JSON")
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -33,6 +37,18 @@ def main() -> None:
     elif args.command == "evaluate":
         result = evaluate_file(Path(args.input), Path(args.output))
         print(result.to_markdown())
+    elif args.command == "reference":
+        from .reference import PandasReferenceEvaluator
+
+        result = PandasReferenceEvaluator(Path(args.data_dir)).evaluate(args.dsl)
+        keys = result.keys()
+        if args.json:
+            print(json.dumps({"keys": keys, "row_count": len(keys)}, ensure_ascii=False, indent=2))
+        else:
+            print("| ts_code | trade_date |")
+            print("|---|---|")
+            for ts_code, trade_date in keys:
+                print(f"| {ts_code} | {trade_date} |")
 
 
 if __name__ == "__main__":

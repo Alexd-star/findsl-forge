@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from .ast_nodes import BinaryOp, Comparison, FunctionCall, Identifier, Literal, Node
+from .errors import SemanticError
+from .parser import parse
+
+
+@dataclass(frozen=True)
+class ReferenceResult:
+    rows: Any
+
+    def keys(self):
+        return list(zip(self.rows["ts_code"].tolist(), self.rows["trade_date"].astype(str).tolist()))
+
+
+class PandasReferenceEvaluator:
+    """Slow but trustworthy DSL evaluator for semantic regression tests."""
+
+    def __init__(self, data_dir: Path):
+        try:
+            import pandas as pd
+        except ImportError as exc:  # pragma: no cover - depends on runtime environment.
+            raise RuntimeError("PandasReferenceEvaluator requires pandas") from exc
+        self.pd = pd
+        self.data = self._load_data(data_dir)
+
+    def evaluate(self, dsl: str) -> ReferenceResult:
+        ast = parse(dsl)
+        rows = self._relation(ast, self.data.copy())
+        return ReferenceResult(rows=rows.sort_values(["trade_date", "ts_code"]).reset_index(drop=True))
+
+    def _load_data(self, data_dir: Path):
+        pd = self.pd
+        daily = pd.read_csv(data_dir / "daily_quote.csv", parse_dates=["trade_date"])
+        money = pd.read_csv(data_dir / "money_flow.csv", parse_dates=["trade_date"])
+        universe = pd.read_csv(data_dir / "stock_universe.csv", parse_dates=["trade_date"])
+        rows = daily.merge(money, on=["ts_code", "trade_date"], how="left")
+        rows = rows.merge(universe, on=["ts_code", "trade_date"], how="left")
+        return rows.sort_values(["ts_code", "trade_date"]).reset_index(drop=True)
+
+    def _relation(self, node: Node, rows):
+        if isinstance(node, FunctionCall) and node.name.lower() == "then":
+            current = rows
+            for stage in node.args:
+                current = self._relation(stage, current)
+            return current
+        if isinstance(node, FunctionCall) and node.name.lower() == "filter":
+            mask = self._bool(node.args[0], rows)
+            return rows[mask.fillna(False)].copy()
+        if isinstance(node, FunctionCall) and node.name.lower() == "rank":
+            return self._rank(node, rows)
+        mask = self._bool(node, rows)
+        return rows[mask.fillna(False)].copy()
+
+    def _rank(self, node: FunctionCall, rows):
+        expr = self._numeric(node.args[0], rows)
+        order_node = node.args[1]
+        if not isinstance(order_node, Identifier) or order_node.name.lower() not in {"asc", "desc"}:
+            raise SemanticError("rank() second argument must be asc or desc")
+        ascending = order_node.name.lower() == "asc"
+        ranked = rows.copy()
+        ranked["__rank_expr"] = expr
+        ranked["rank_no"] = ranked.groupby("trade_date")["__rank_expr"].rank(
+            method="first", ascending=ascending
+        )
+        limit = None
+        for named in node.named_args or []:
+            if named.name in {"top", "bottom"} and isinstance(named.value, Literal):
+                limit = int(named.value.value)
+        if limit is not None:
+            ranked = ranked[ranked["rank_no"] <= limit]
+        return ranked.drop(columns=["__rank_expr"])
+
+    def _bool(self, node: Node, rows):
+        if isinstance(node, Comparison):
+            left = self._numeric(node.left, rows)
+            right = self._numeric(node.right, rows)
+            if node.op == ">":
+                return left > right
+            if node.op == ">=":
+                return left >= right
+            if node.op == "<":
+                return left < right
+            if node.op == "<=":
+                return left <= right
+            if node.op == "==":
+                return left == right
+            if node.op == "!=":
+                return left != right
+            raise SemanticError(f"Unsupported comparison operator {node.op}")
+        if isinstance(node, BinaryOp) and node.op in {"&", "|"}:
+            left = self._bool(node.left, rows)
+            right = self._bool(node.right, rows)
+            return left & right if node.op == "&" else left | right
+        if isinstance(node, FunctionCall):
+            name = node.name.upper()
+            if name == "MARKET":
+                return rows["market"] == self._symbol_arg(node.args[0], "market")
+            if name == "CONS":
+                cond = self._bool(node.args[0], rows).astype(int)
+                window = self._window_value(node.args[1])
+                return self._rolling(cond, rows, window, "sum") == window
+            if name == "EXIST":
+                cond = self._bool(node.args[0], rows).astype(int)
+                window = self._window_value(node.args[1])
+                return self._rolling(cond, rows, window, "max") == 1
+        raise SemanticError(f"Expected boolean expression, got {node!r}")
+
+    def _numeric(self, node: Node, rows):
+        if isinstance(node, Literal):
+            return node.value
+        if isinstance(node, Identifier):
+            if node.name in rows.columns:
+                return rows[node.name]
+            return node.name
+        if isinstance(node, BinaryOp) and node.op in {"+", "-", "*", "/"}:
+            left = self._numeric(node.left, rows)
+            right = self._numeric(node.right, rows)
+            if node.op == "+":
+                return left + right
+            if node.op == "-":
+                return left - right
+            if node.op == "*":
+                return left * right
+            return left / right
+        if isinstance(node, FunctionCall):
+            name = node.name.upper()
+            if name == "INDICATOR":
+                indicator_name = self._symbol_arg(node.args[0], "indicator")
+                if indicator_name not in rows.columns:
+                    raise SemanticError(f"Unknown indicator column in sample data: {indicator_name}")
+                return rows[indicator_name]
+            if name in {"MA", "SUM", "MAX", "MIN"}:
+                series = self._numeric(node.args[0], rows)
+                window = self._window_value(node.args[1])
+                agg = {"MA": "mean", "SUM": "sum", "MAX": "max", "MIN": "min"}[name]
+                return self._rolling(series, rows, window, agg)
+        raise SemanticError(f"Expected numeric expression, got {node!r}")
+
+    def _rolling(self, series, rows, window: int, agg: str):
+        pd = self.pd
+        work = rows[["ts_code", "trade_date"]].copy()
+        work["__value"] = series
+        work["__original_index"] = rows.index
+        work = work.sort_values(["ts_code", "trade_date"])
+        rolled = (
+            work.groupby("ts_code")["__value"]
+            .rolling(window=window, min_periods=1)
+            .agg(agg)
+            .reset_index(level=0, drop=True)
+        )
+        work["__rolled"] = rolled
+        return work.sort_values("__original_index")["__rolled"].set_axis(rows.index)
+
+    def _symbol_arg(self, node: Node, function_name: str) -> str:
+        if isinstance(node, Literal) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, Identifier):
+            return node.name
+        raise SemanticError(f"{function_name}() requires a string or identifier argument")
+
+    def _window_value(self, node: Node) -> int:
+        if not isinstance(node, Literal) or not isinstance(node.value, int):
+            raise SemanticError("Window argument must be an integer literal")
+        if node.value <= 0:
+            raise SemanticError("Window argument must be positive")
+        return node.value
+

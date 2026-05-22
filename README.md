@@ -27,6 +27,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 python -m pytest
 python -m findsl.cli compile 'then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), rank(indicator("turnover_rate"), desc, top=100))'
 python -m findsl.cli evaluate --input data/samples/queries.jsonl --output reports/evaluation_report.md
+python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 ```
 
 If running from the repository root without installing the package:
@@ -35,6 +36,20 @@ If running from the repository root without installing the package:
 $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"), 250))'
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
+```
+
+## Semantic Reference Evaluation
+
+The repository includes a small sample A-share-style dataset under `data/samples/`.
+`PandasReferenceEvaluator` interprets DSL directly over those CSV tables. It is intentionally independent from the SQL generator, so it can serve as a slow but trustworthy semantic oracle.
+
+This is the foundation for later SQL equivalence tests:
+
+```text
+DSL -> Pandas reference result
+DSL -> compiler -> Doris/DuckDB SQL result
+compare result sets
 ```
 
 ## Competition-Oriented Design

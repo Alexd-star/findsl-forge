@@ -14,6 +14,9 @@ findsl.cli
       -> Feature materialization layers
       -> SQL text
       -> rewrite trace
+  -> PandasReferenceEvaluator
+    -> direct DSL interpretation over CSV sample tables
+    -> semantic oracle result set
 ```
 
 ## Design Decisions
@@ -54,8 +57,8 @@ Indicators, tables, and functions live in `configs/`. The compiler should not ne
 - Logical IR node model.
 - Doris dialect validator.
 - SQLGlot optional validation.
+- SQL execution equivalence against Pandas reference results.
 - Prefix-sum optimizer.
 - Materialized-view routing.
 - Benchmark report generator.
 - API and UI.
-
