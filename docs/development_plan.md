@@ -70,6 +70,7 @@ Deliverables:
 
 - Doris Docker deployment or remote Doris adapter.
 - DDL and import scripts for simulated A-share data.
+- Generated Doris SQL assets and runbook. (Started)
 - Doris dialect SQL compatibility tests.
 - EXPLAIN capture and analysis.
 
@@ -78,6 +79,7 @@ Metrics:
 - SQL execution success.
 - Result latency.
 - Query plan characteristics.
+- Doris assets should be regenerated from the same registry used by the compiler.
 
 ## Phase 4: Adaptive Optimizer
 

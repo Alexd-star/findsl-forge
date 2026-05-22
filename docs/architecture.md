@@ -27,6 +27,8 @@ findsl.cli
   -> PrefixSumBenchmark
     -> compile baseline window SQL and optimized prefix SQL
     -> compare correctness, timing, and plan shape
+  -> DorisAssetGenerator
+    -> emit DDL, sample inserts, prefix build SQL, smoke queries
 ```
 
 ## Design Decisions
@@ -116,3 +118,17 @@ DSL -> PandasReferenceEvaluator -> semantic oracle
 ```
 
 Both SQL variants must match the reference output and each other. The report includes local timing plus plan-shape signals such as window frame count and prefix table references. This separates correctness evidence from later Doris-scale performance claims.
+
+## Doris Deployment Assets
+
+The Doris asset generator converts configuration into executable SQL files:
+
+```text
+configs/*.json + data/samples/*.csv
+  -> 01_schema.sql
+  -> 02_sample_data.sql
+  -> 03_build_prefix_tables.sql
+  -> 04_smoke_queries.sql
+```
+
+This keeps table names, indicator columns, prefix columns, and smoke queries aligned with the compiler registry. The generated SQL is a smoke-test path; production deployment should tune replication, buckets, partitioning, and materialized-view strategy per cluster.

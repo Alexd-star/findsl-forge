@@ -23,6 +23,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Compare SQL output with an independent Pandas semantic reference evaluator.
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
 - Produce baseline-window versus prefix-sum benchmark reports.
+- Generate Doris DDL, sample load, prefix-table build, and smoke-query assets.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
 
@@ -47,6 +48,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
 ```
 
 ## Semantic Reference Evaluation
@@ -79,6 +81,19 @@ The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix
 ## Structured Explain
 
 Compiler JSON output includes both human-readable `trace` text and machine-readable `explain` steps. Each explain step records a rule name, status, message, and evidence dictionary. This lets evaluation reports, future UI panels, and answer-defense materials show why an optimization was applied or skipped.
+
+## Doris Assets
+
+`scripts/generate_doris_assets.ps1` creates the SQL files under `deploy/doris/`:
+
+```text
+01_schema.sql
+02_sample_data.sql
+03_build_prefix_tables.sql
+04_smoke_queries.sql
+```
+
+These files are a smoke-test deployment path for Doris. See `docs/doris_runbook.md` for execution order and production notes.
 
 ## Competition-Oriented Design
 

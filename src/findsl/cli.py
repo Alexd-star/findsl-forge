@@ -34,6 +34,12 @@ def main() -> None:
     bench_cmd.add_argument("--iterations", type=int, default=20, help="Execution iterations per SQL variant")
     bench_cmd.add_argument("--output", default="reports/prefix_sum_benchmark.md", help="Output Markdown report")
     bench_cmd.add_argument("--json", action="store_true", help="Print benchmark result as JSON")
+    doris_cmd = sub.add_parser("emit-doris-assets", help="Generate Doris DDL and sample SQL assets")
+    doris_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    doris_cmd.add_argument("--output-dir", default="deploy/doris", help="Output directory for Doris SQL assets")
+    doris_cmd.add_argument("--database", default="findsl_demo", help="Doris database name")
+    doris_cmd.add_argument("--buckets", type=int, default=8, help="Doris hash bucket count")
+    doris_cmd.add_argument("--replication-num", type=int, default=1, help="Doris table replication_num property")
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -91,6 +97,18 @@ def main() -> None:
             print(result.to_markdown())
         if not result.optimized_matches_reference or not result.optimized_matches_baseline:
             raise SystemExit(1)
+    elif args.command == "emit-doris-assets":
+        from .doris import write_doris_assets
+
+        assets = write_doris_assets(
+            output_dir=Path(args.output_dir),
+            data_dir=Path(args.data_dir),
+            database=args.database,
+            buckets=args.buckets,
+            replication_num=args.replication_num,
+        )
+        for filename in assets.files():
+            print(str(Path(args.output_dir) / filename))
 
 
 if __name__ == "__main__":
