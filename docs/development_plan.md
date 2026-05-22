@@ -41,11 +41,14 @@ Exit criteria:
 
 ## Phase 2: Correctness Evaluation
 
+Status: started.
+
 Deliverables:
 
 - Golden DSL dataset with expected AST and behavior.
-- Pandas reference evaluator for stock screening semantics. (Started)
-- SQL-result equivalence tests.
+- Pandas reference evaluator for stock screening semantics. (Done for MVP functions)
+- SQLite SQL execution harness for generated SQL. (Done for sample fixtures)
+- SQL-result equivalence tests. (Done for representative MVP cases)
 - Markdown evaluation report.
 
 Metrics:
@@ -53,6 +56,12 @@ Metrics:
 - Compile success rate.
 - Semantic equivalence accuracy.
 - Error classification quality.
+
+Exit criteria:
+
+- `python -m pytest` passes with SQL/reference equivalence cases.
+- `scripts/verify_sql_sample.ps1` proves compiled SQL and reference semantics agree on sample fixtures.
+- Mismatched rows are reported as missing/extra `(ts_code, trade_date)` keys.
 
 ## Phase 3: Doris Execution Path
 

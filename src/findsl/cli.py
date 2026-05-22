@@ -21,6 +21,10 @@ def main() -> None:
     ref_cmd.add_argument("dsl", help="DSL expression")
     ref_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     ref_cmd.add_argument("--json", action="store_true", help="Print result keys as JSON")
+    verify_cmd = sub.add_parser("verify-sql", help="Compare compiled SQL output with Pandas reference output")
+    verify_cmd.add_argument("dsl", help="DSL expression")
+    verify_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    verify_cmd.add_argument("--json", action="store_true", help="Print verification result as JSON")
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -49,6 +53,16 @@ def main() -> None:
             print("|---|---|")
             for ts_code, trade_date in keys:
                 print(f"| {ts_code} | {trade_date} |")
+    elif args.command == "verify-sql":
+        from .equivalence import verify_sql_equivalence
+
+        result = verify_sql_equivalence(args.dsl, Path(args.data_dir))
+        if args.json:
+            print(json.dumps(result.__dict__, ensure_ascii=False, indent=2))
+        else:
+            print(result.to_markdown())
+        if not result.passed:
+            raise SystemExit(1)
 
 
 if __name__ == "__main__":

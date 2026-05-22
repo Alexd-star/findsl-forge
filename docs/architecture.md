@@ -14,9 +14,14 @@ findsl.cli
       -> Feature materialization layers
       -> SQL text
       -> rewrite trace
+  -> SQLiteSampleExecutor
+    -> load CSV fixtures as physical tables
+    -> execute generated SQL locally
   -> PandasReferenceEvaluator
     -> direct DSL interpretation over CSV sample tables
     -> semantic oracle result set
+  -> EquivalenceVerifier
+    -> compare SQL result keys with reference result keys
 ```
 
 ## Design Decisions
@@ -57,8 +62,19 @@ Indicators, tables, and functions live in `configs/`. The compiler should not ne
 - Logical IR node model.
 - Doris dialect validator.
 - SQLGlot optional validation.
-- SQL execution equivalence against Pandas reference results.
+- Doris execution equivalence against Pandas reference results.
 - Prefix-sum optimizer.
 - Materialized-view routing.
 - Benchmark report generator.
 - API and UI.
+
+## Correctness Loop
+
+The project uses two independent execution paths for the same DSL:
+
+```text
+DSL -> compiler -> SQL -> SQLiteSampleExecutor -> result keys
+DSL -> PandasReferenceEvaluator -> result keys
+```
+
+The equivalence layer compares `(ts_code, trade_date)` keys and reports missing or extra rows. This makes correctness measurable before large-scale Doris deployment, and it gives the final submission a reproducible semantic proof instead of only screenshots or hand-picked examples.

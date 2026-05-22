@@ -18,8 +18,10 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Validate indicators, functions, named parameters, and window arguments from configuration.
 - Compile `filter`, `then`, `rank`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN` into SQL.
 - Generate trace metadata explaining the selected rewrite path.
+- Execute generated SQL against local SQLite fixtures for regression checks.
+- Compare SQL output with an independent Pandas semantic reference evaluator.
 - Run without non-standard Python dependencies.
-- Provide pytest coverage for parser, semantic validation, and SQL generation.
+- Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
 
 ## Quick Start
 
@@ -28,6 +30,7 @@ python -m pytest
 python -m findsl.cli compile 'then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), rank(indicator("turnover_rate"), desc, top=100))'
 python -m findsl.cli evaluate --input data/samples/queries.jsonl --output reports/evaluation_report.md
 python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
+python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 ```
 
 If running from the repository root without installing the package:
@@ -37,6 +40,7 @@ $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"), 250))'
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
 ```
 
 ## Semantic Reference Evaluation
@@ -48,9 +52,11 @@ This is the foundation for later SQL equivalence tests:
 
 ```text
 DSL -> Pandas reference result
-DSL -> compiler -> Doris/DuckDB SQL result
+DSL -> compiler -> SQLite/Doris SQL result
 compare result sets
 ```
+
+The current implementation already runs the generated SQL over in-memory SQLite tables loaded from CSV fixtures. SQLite is used as a lightweight local execution harness, while the generated SQL remains Doris-oriented and window-safe. This gives every compiler change a fast semantic regression gate before the Doris execution path is introduced.
 
 ## Competition-Oriented Design
 
