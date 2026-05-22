@@ -40,6 +40,13 @@ def main() -> None:
     doris_cmd.add_argument("--database", default="findsl_demo", help="Doris database name")
     doris_cmd.add_argument("--buckets", type=int, default=8, help="Doris hash bucket count")
     doris_cmd.add_argument("--replication-num", type=int, default=1, help="Doris table replication_num property")
+    ready_cmd = sub.add_parser("readiness-report", help="Generate submission readiness evidence report")
+    ready_cmd.add_argument("--output", default="reports/submission_readiness.md", help="Output Markdown report")
+    ready_cmd.add_argument("--reports-dir", default="reports", help="Directory for generated evidence artifacts")
+    ready_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL evaluation cases")
+    ready_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    ready_cmd.add_argument("--benchmark-iterations", type=int, default=20, help="Prefix benchmark iterations")
+    ready_cmd.add_argument("--skip-pytest", action="store_true", help="Skip pytest when generating the report")
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -109,6 +116,20 @@ def main() -> None:
         )
         for filename in assets.files():
             print(str(Path(args.output_dir) / filename))
+    elif args.command == "readiness-report":
+        from .readiness import generate_readiness_report
+
+        report = generate_readiness_report(
+            output_path=Path(args.output),
+            reports_dir=Path(args.reports_dir),
+            cases_path=Path(args.input),
+            data_dir=Path(args.data_dir),
+            benchmark_iterations=args.benchmark_iterations,
+            run_pytest=not args.skip_pytest,
+        )
+        print(report.to_markdown())
+        if not report.blocking_passed:
+            raise SystemExit(1)
 
 
 if __name__ == "__main__":

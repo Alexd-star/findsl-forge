@@ -106,15 +106,24 @@ Metrics:
 
 ## Phase 5: Enterprise Demo and Submission Package
 
+Status: started.
+
 Deliverables:
 
 - Web UI or Streamlit UI.
 - AST/IR/SQL/rewrite trace visualization.
-- Markdown table output for official sample questions.
+- Markdown table output for official sample questions. (Started via submission readiness reports)
+- Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
 - One-minute demo video.
 - Lean canvas.
 - Technical document.
 - Deployment and test manual.
+
+Exit criteria:
+
+- `scripts/submission_readiness.ps1` completes without required-gate failures.
+- Generated reports can be attached to the technical document or used in defense.
+- Warning gates are either closed or explicitly explained in the final submission.
 
 ## Non-Negotiable Quality Gates
 
