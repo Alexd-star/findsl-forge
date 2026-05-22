@@ -1,4 +1,4 @@
-{"name": "连续3天主力净流入为正后按换手率排名", "dsl": "then(filter(market(\"A\") & CONS(indicator(\"main_net_inflow\") > 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))"}
-{"name": "今日收盘价创250日新高", "dsl": "filter(indicator(\"close\") >= MAX(indicator(\"close\"), 250))"}
-{"name": "近10日存在放量", "dsl": "filter(EXIST(indicator(\"volume\") > MA(indicator(\"volume\"), 20), 10))"}
-
+{"name": "连续3天主力净流入为正后按换手率排名", "dsl": "then(filter(market(\"A\") & CONS(indicator(\"main_net_inflow\") > 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))", "expected_sql_fragments": ["WITH stage1 AS", "SUM(CASE WHEN main_net_inflow > 0", "ROW_NUMBER() OVER", "rank_no <= 100"], "expected_trace_fragments": ["rewrite then()", "rewrite CONS()", "rewrite rank()"]}
+{"name": "今日收盘价创250日新高", "dsl": "filter(indicator(\"close\") >= MAX(indicator(\"close\"), 250))", "expected_sql_fragments": ["MAX(close) OVER", "AS __win_1", "WHERE close >= __win_1"], "expected_trace_fragments": ["rewrite MAX()", "materialize numeric window features"]}
+{"name": "近10日存在放量", "dsl": "filter(EXIST(indicator(\"volume\") > MA(indicator(\"volume\"), 20), 10))", "expected_sql_fragments": ["AVG(volume) OVER", "MAX(CASE WHEN volume > __win_1", "WHERE __roll_2 = 1"], "expected_trace_fragments": ["rewrite MA()", "rewrite EXIST()", "materialize rolling boolean features"]}
+{"name": "无引号指标名兼容", "dsl": "filter(indicator(close) > MA(indicator(close), 20))", "expected_sql_fragments": ["AVG(close) OVER", "WHERE close > __win_1"], "expected_trace_fragments": ["rewrite MA()"]}
