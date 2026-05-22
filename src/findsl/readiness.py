@@ -325,7 +325,7 @@ class ReadinessReport:
                 "## Remaining High-Value Work",
                 "",
                 "- Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.",
-                "- Polish the Web Demo with official-question presets, error-repair suggestions, and screenshot-ready presentation states.",
+                "- Capture final Web Demo screenshots and a one-minute defense video from the official positive and diagnostic negative presets.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
                 "- Add an optional LLM adapter that calls the deterministic NL2DSL/Compiler validation loop instead of generating SQL directly.",
             ]

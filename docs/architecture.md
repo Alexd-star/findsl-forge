@@ -40,6 +40,7 @@ findsl.cli
     -> capture Doris EXPLAIN, COUNT(*) latency, row-count parity, and 10x speedup marker
   -> Demo/API and ReadinessReport
     -> validate natural-language candidates through compiler + equivalence verifier
+    -> expose baseline, official-positive, and diagnostic-negative presets
     -> return structured diagnostics and repair hints for invalid requests
     -> consume official-style coverage suite as a required submission gate
     -> consume Doris cluster evidence markers for submission gating
@@ -58,6 +59,8 @@ Natural-language requests are translated into candidate DSL, not directly into S
 ### Diagnostics Layer
 
 Compiler, API, and demo failures are converted into structured diagnostics with stable codes and repair hints. This keeps interactive use productive during demonstrations: invalid indicators, parse errors, lexical issues, and semantic type mistakes point users back to supported indicators, functions, and DSL patterns instead of exposing only a traceback.
+
+The Web Demo also exposes official negative presets from the same JSONL corpus used by the readiness gate. Selecting a negative preset runs the normal analyzer path, shows the expected diagnostic code beside the actual diagnostic code, and renders repair suggestions from the shared diagnostics layer. This makes error handling demonstrable instead of only testable.
 
 ### Typed AST Before SQL
 

@@ -12,6 +12,7 @@ from .diagnostics import diagnose_exception
 from .equivalence import verify_sql_equivalence
 from .evaluation import load_cases
 from .nl2dsl import suggest_dsl
+from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES
 
 
 DEFAULT_DEMO_DSL = (
@@ -55,13 +56,51 @@ def analyze_dsl(
     return payload
 
 
-def demo_examples(cases_path: Path = Path("data/samples/queries.jsonl")) -> List[Dict[str, str]]:
-    try:
-        cases = load_cases(Path(cases_path))
-    except FileNotFoundError:
-        return [{"name": "Default", "dsl": DEFAULT_DEMO_DSL}]
-    examples = [{"name": case.get("name", "Example"), "dsl": case["dsl"]} for case in cases if case.get("dsl")]
-    return examples or [{"name": "Default", "dsl": DEFAULT_DEMO_DSL}]
+def demo_examples(
+    cases_path: Path = Path("data/samples/queries.jsonl"),
+    official_positive_path: Path = DEFAULT_POSITIVE_CASES,
+    official_negative_path: Path = DEFAULT_NEGATIVE_CASES,
+) -> List[Dict[str, str]]:
+    examples: List[Dict[str, str]] = []
+    for case in _safe_load_cases(Path(cases_path)):
+        if case.get("dsl"):
+            examples.append(
+                {
+                    "name": str(case.get("name", "Example")),
+                    "dsl": str(case["dsl"]),
+                    "kind": "baseline",
+                    "scenario": "evaluation",
+                }
+            )
+    for case in _safe_load_cases(Path(official_positive_path)):
+        if case.get("dsl"):
+            examples.append(
+                {
+                    "name": f"Official positive: {case.get('name', 'Example')}",
+                    "dsl": str(case["dsl"]),
+                    "kind": "official_positive",
+                    "scenario": str(case.get("scenario", "")),
+                }
+            )
+    for case in _safe_load_cases(Path(official_negative_path)):
+        if case.get("dsl"):
+            examples.append(
+                {
+                    "name": f"Diagnostic negative: {case.get('name', 'Example')}",
+                    "dsl": str(case["dsl"]),
+                    "kind": "official_negative",
+                    "scenario": "diagnostic",
+                    "expected_code": str(case.get("expected_code", "")),
+                }
+            )
+    return examples or [
+        {
+            "name": "Default",
+            "dsl": DEFAULT_DEMO_DSL,
+            "kind": "baseline",
+            "scenario": "fallback",
+        }
+    ]
 
 
 def suggest_from_text(
@@ -196,6 +235,13 @@ def _error_payload(exc: Exception) -> Dict[str, Any]:
         "diagnostics": [item.to_dict() for item in diagnose_exception(exc)],
         "trace": traceback.format_exc(limit=3).strip().splitlines(),
     }
+
+
+def _safe_load_cases(path: Path) -> List[Dict[str, Any]]:
+    try:
+        return load_cases(path)
+    except FileNotFoundError:
+        return []
 
 
 def render_demo_html() -> str:
@@ -494,6 +540,7 @@ def render_demo_html() -> str:
     const verifyToggle = document.getElementById("verifyToggle");
     let currentResult = null;
     let currentTab = "sql";
+    let currentExample = null;
     const defaultNlRequest = "__DEFAULT_NL_REQUEST__";
 
     function setState(text, ok) {
@@ -538,7 +585,24 @@ def render_demo_html() -> str:
       document.getElementById("metricPrefix").textContent = "-";
     }
 
+    function selectExample(index) {
+      currentExample = sampleSelect.options[index] ? JSON.parse(sampleSelect.options[index].dataset.example) : null;
+      if (!currentExample) return;
+      dslInput.value = currentExample.dsl;
+      if (currentExample.kind === "official_negative") {
+        suggestState.textContent = "Diagnostic preset";
+        verifyToggle.checked = false;
+      } else if (currentExample.kind === "official_positive") {
+        suggestState.textContent = currentExample.scenario || "Official preset";
+        verifyToggle.checked = true;
+      } else {
+        suggestState.textContent = "Evaluation preset";
+        verifyToggle.checked = true;
+      }
+    }
+
     function applyCandidate(candidate, runAfterApply) {
+      currentExample = null;
       dslInput.value = candidate.dsl;
       currentTab = "sql";
       document.querySelectorAll(".tab").forEach(item => item.classList.toggle("active", item.dataset.tab === "sql"));
@@ -618,11 +682,13 @@ def render_demo_html() -> str:
       sampleSelect.replaceChildren();
       data.examples.forEach((item, idx) => {
         const option = document.createElement("option");
-        option.value = item.dsl;
-        option.textContent = item.name;
+        option.value = String(idx);
+        option.dataset.example = JSON.stringify(item);
+        const suffix = item.expected_code ? " [" + item.expected_code + "]" : item.scenario ? " [" + item.scenario + "]" : "";
+        option.textContent = item.name + suffix;
         sampleSelect.appendChild(option);
-        if (idx === 0) dslInput.value = item.dsl;
       });
+      selectExample(0);
     }
 
     async function run() {
@@ -652,7 +718,7 @@ def render_demo_html() -> str:
         errorBox.textContent = err.message;
         outputPane.textContent = "";
         resetMetrics("ERROR");
-        setState("Error", false);
+        setState(currentExample && currentExample.kind === "official_negative" ? "Diagnostic" : "Error", false);
       } finally {
         runButton.disabled = false;
       }
@@ -662,8 +728,11 @@ def render_demo_html() -> str:
       const diagnostics = error.diagnostics || [];
       const suggestions = diagnostics.flatMap(item => item.suggestions || []);
       const unique = Array.from(new Set(suggestions));
-      if (!unique.length) return error.type + ": " + error.message;
-      return error.type + ": " + error.message + "\\n\\nSuggestions:\\n- " + unique.join("\\n- ");
+      const codes = diagnostics.map(item => item.code).filter(Boolean);
+      const expected = currentExample && currentExample.expected_code ? "\\nExpected diagnostic: " + currentExample.expected_code : "";
+      const actual = codes.length ? "\\nActual diagnostic: " + codes.join(", ") : "";
+      if (!unique.length) return error.type + ": " + error.message + expected + actual;
+      return error.type + ": " + error.message + expected + actual + "\\n\\nSuggestions:\\n- " + unique.join("\\n- ");
     }
 
     document.querySelectorAll(".tab").forEach(button => {
@@ -674,7 +743,7 @@ def render_demo_html() -> str:
         render();
       });
     });
-    sampleSelect.addEventListener("change", () => { dslInput.value = sampleSelect.value; });
+    sampleSelect.addEventListener("change", () => { selectExample(Number(sampleSelect.value)); });
     suggestButton.addEventListener("click", suggest);
     runButton.addEventListener("click", run);
     nlInput.value = defaultNlRequest;

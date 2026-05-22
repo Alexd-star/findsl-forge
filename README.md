@@ -110,7 +110,7 @@ Compiler JSON output includes both human-readable `trace` text and machine-reada
 
 ## Web Demo
 
-`scripts/serve_demo.ps1` starts a local Web Demo at `http://127.0.0.1:8765`. The demo lets judges or teammates enter an official-style Chinese stock-screening request, review compiler-validated DSL candidates, choose a sample DSL, run the deterministic compiler, inspect Doris SQL, AST, optimizer explain, and SQL/reference verification rows, and receive repair hints when invalid DSL is submitted.
+`scripts/serve_demo.ps1` starts a local Web Demo at `http://127.0.0.1:8765`. The demo lets judges or teammates enter an official-style Chinese stock-screening request, review compiler-validated DSL candidates, choose baseline cases or official-style positive/negative presets, run the deterministic compiler, inspect Doris SQL, AST, optimizer explain, and SQL/reference verification rows, and receive repair hints when invalid DSL is submitted. Negative presets show the expected and actual diagnostic code, making error recovery a live demonstration instead of a hidden test report.
 
 The same server exposes JSON APIs:
 

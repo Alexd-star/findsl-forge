@@ -19,9 +19,13 @@ def test_analyze_dsl_returns_compile_and_verification_payload():
 def test_demo_examples_loads_sample_queries():
     examples = demo_examples(Path("data/samples/queries.jsonl"))
 
-    assert len(examples) >= 5
+    assert len(examples) >= 22
     assert examples[0]["name"]
     assert examples[0]["dsl"].startswith("then(")
+    kinds = {example["kind"] for example in examples}
+    assert {"baseline", "official_positive", "official_negative"} <= kinds
+    assert any(example["scenario"] == "money_flow_prefix_sum" for example in examples)
+    assert any(example.get("expected_code") == "UNKNOWN_INDICATOR" for example in examples)
 
 
 def test_render_demo_html_contains_workbench_and_api_hooks():
@@ -40,6 +44,10 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "document.createElement(\"strong\")" in html
     assert "formatError(data.error)" in html
     assert "resetMetrics(\"ERROR\")" in html
+    assert "selectExample(index)" in html
+    assert "Diagnostic preset" in html
+    assert "Expected diagnostic:" in html
+    assert "Actual diagnostic:" in html
 
 
 def test_suggest_from_text_returns_validated_candidate_payload():
