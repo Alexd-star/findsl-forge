@@ -14,6 +14,7 @@ The national-award target is to satisfy every explicit task while adding high-co
 
 - Deterministic compiler instead of LLM-only SQL generation.
 - Traceable AST and SQL rewrite process.
+- Structured optimizer explain for auditable rewrite decisions.
 - Config-driven indicator and function extension.
 - Window-safe SQL generation using feature materialization layers.
 - Future Doris optimizer with prefix-sum and materialized-view routing.
@@ -91,6 +92,7 @@ Deliverables:
 - Materialized-view route path.
 - Partition and column pruning hints.
 - Plan explanation JSON.
+- Structured optimizer explain. (Started for compiler, evaluation, and benchmark reports)
 
 Metrics:
 
@@ -98,6 +100,7 @@ Metrics:
 - Compile P95 target: < 50ms.
 - Execution target: <= 10s for official-scale tests.
 - Optimized SQL and baseline SQL must match the independent reference result before performance claims are accepted.
+- Every optimizer decision that affects SQL shape should expose a machine-readable explain step.
 
 ## Phase 5: Enterprise Demo and Submission Package
 

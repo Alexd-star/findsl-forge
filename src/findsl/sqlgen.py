@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 from .ast_nodes import BinaryOp, Comparison, FunctionCall, Identifier, Literal, Node
 from .errors import SemanticError
+from .explain import ExplainStep
 from .registry import Registry
 
 
@@ -12,6 +13,7 @@ from .registry import Registry
 class SqlPlan:
     sql: str
     trace: List[str] = field(default_factory=list)
+    explain: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -27,6 +29,7 @@ class SqlGenerator:
         self.enable_prefix_sum = enable_prefix_sum
         self.required_tables: Set[str] = set()
         self.trace: List[str] = []
+        self.explain: List[ExplainStep] = []
         self._feature_counter = 0
         self._current_source: Optional[str] = None
         self._numeric_features: List[Feature] = []
@@ -35,9 +38,10 @@ class SqlGenerator:
     def generate(self, node: Node) -> SqlPlan:
         self.required_tables = self._collect_tables(node)
         self.trace = []
+        self.explain = []
         self._feature_counter = 0
         sql = self._relation_sql(node)
-        return SqlPlan(sql=_format_sql(sql), trace=list(self.trace))
+        return SqlPlan(sql=_format_sql(sql), trace=list(self.trace), explain=[step.to_dict() for step in self.explain])
 
     def _collect_tables(self, node: Node) -> Set[str]:
         tables: Set[str] = set()
@@ -74,6 +78,12 @@ class SqlGenerator:
 
     def _then_sql(self, node: FunctionCall) -> str:
         self.trace.append("rewrite then() into staged CTE pipeline")
+        self._explain(
+            "THEN_PIPELINE",
+            "applied",
+            "Rewrite then() into staged CTE pipeline",
+            stage_count=len(node.args),
+        )
         ctes = []
         current_name = None
         for idx, stage in enumerate(node.args, 1):
@@ -102,16 +112,34 @@ class SqlGenerator:
 
             if self._numeric_features:
                 self.trace.append("materialize numeric window features before filtering")
+                self._explain(
+                    "FEATURE_LAYER",
+                    "applied",
+                    "Materialize numeric features before filtering",
+                    feature_count=len(self._numeric_features),
+                )
                 for idx, feature in enumerate(self._numeric_features, 1):
                     layer_sql = self._feature_layer_sql(layer_sql, layer_name, [feature])
                     layer_name = f"numeric_features_{idx}"
             if self._rolling_features:
                 self.trace.append("materialize rolling boolean features after numeric features")
+                self._explain(
+                    "FEATURE_LAYER",
+                    "applied",
+                    "Materialize rolling boolean features after numeric features",
+                    feature_count=len(self._rolling_features),
+                )
                 for idx, feature in enumerate(self._rolling_features, 1):
                     layer_sql = self._feature_layer_sql(layer_sql, layer_name, [feature])
                     layer_name = f"rolling_features_{idx}"
 
             self.trace.append("rewrite filter predicate into outer WHERE over materialized features")
+            self._explain(
+                "FILTER_OUTER_WHERE",
+                "applied",
+                "Rewrite filter predicate into outer WHERE over materialized features",
+                condition=condition,
+            )
             return f"SELECT * FROM ({layer_sql}) {layer_name} WHERE {condition}"
         finally:
             self._current_source = old_source
@@ -130,6 +158,12 @@ class SqlGenerator:
 
     def _rank_sql(self, node: FunctionCall, base_relation: str = None) -> str:
         self.trace.append("rewrite rank() into ROW_NUMBER window")
+        self._explain(
+            "RANK_ROW_NUMBER",
+            "applied",
+            "Rewrite rank() into ROW_NUMBER window",
+            source=base_relation or "base_relation",
+        )
         old_source = self._current_source
         self._current_source = base_relation
         try:
@@ -286,6 +320,15 @@ class SqlGenerator:
         sql_name = {"MA": "AVG", "SUM": "SUM", "MAX": "MAX", "MIN": "MIN"}[name]
         alias = self._next_alias("__win")
         self.trace.append(f"rewrite {name}() into {sql_name} window feature {alias}")
+        self._explain(
+            "WINDOW_FEATURE",
+            "applied",
+            f"Rewrite {name}() into {sql_name} window feature",
+            alias=alias,
+            function=name,
+            sql_function=sql_name,
+            window=window,
+        )
         expression = (
             f"{sql_name}({expr}) OVER (PARTITION BY ts_code ORDER BY trade_date "
             f"ROWS BETWEEN {window - 1} PRECEDING AND CURRENT ROW)"
@@ -295,15 +338,41 @@ class SqlGenerator:
 
     def _try_register_prefix_sum(self, node: FunctionCall) -> Optional[str]:
         if not self.enable_prefix_sum:
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Prefix-sum optimizer is disabled",
+                reason="disabled",
+            )
             return None
         if self._current_source:
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Prefix-sum optimizer currently applies only to base relations",
+                reason="staged_relation",
+                source=self._current_source,
+            )
             return None
         indicator_call = node.args[0]
         if not isinstance(indicator_call, FunctionCall) or indicator_call.name.upper() != "INDICATOR":
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Prefix-sum optimizer requires SUM(indicator(...), window)",
+                reason="non_indicator_expression",
+            )
             return None
         indicator_name = self._symbol_arg(indicator_call.args[0], "indicator")
         meta = self.registry.indicator(indicator_name)
         if not meta.get("supports_prefix_sum"):
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Indicator does not declare prefix-sum support",
+                reason="unsupported_indicator",
+                indicator=indicator_name,
+            )
             return None
 
         window = self._window_value(node.args[1])
@@ -316,6 +385,16 @@ class SqlGenerator:
         curr = f"__pref_curr_{feature_no}"
         prev = f"__pref_prev_{feature_no}"
         self.trace.append(f"rewrite SUM() on {indicator_name} into prefix-sum feature {alias}")
+        self._explain(
+            "PREFIX_SUM",
+            "applied",
+            "Rewrite rolling SUM into prefix table subtraction",
+            alias=alias,
+            indicator=indicator_name,
+            window=window,
+            prefix_table=prefix_physical,
+            prefix_column=prefix_column,
+        )
         joins = [
             (
                 f"LEFT JOIN {prefix_physical} AS {curr} "
@@ -333,8 +412,18 @@ class SqlGenerator:
     def _register_rolling_feature(self, feature_name: str, expression: str) -> str:
         alias = self._next_alias("__roll")
         self.trace.append(f"rewrite {feature_name}() into rolling window feature {alias}")
+        self._explain(
+            "ROLLING_BOOLEAN",
+            "applied",
+            f"Rewrite {feature_name}() into rolling boolean window feature",
+            alias=alias,
+            function=feature_name,
+        )
         self._rolling_features.append(Feature(alias=alias, expression=expression))
         return alias
+
+    def _explain(self, rule: str, status: str, message: str, **evidence: Any) -> None:
+        self.explain.append(ExplainStep(rule=rule, status=status, message=message, evidence=evidence))
 
     def _next_alias(self, prefix: str) -> str:
         self._feature_counter += 1

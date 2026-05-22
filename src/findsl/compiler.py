@@ -16,6 +16,7 @@ class CompileResult:
     ast: Dict[str, Any]
     sql: str
     trace: List[str]
+    explain: List[Dict[str, Any]]
     elapsed_ms: float
 
 
@@ -36,5 +37,6 @@ class Compiler:
             ast=ast.to_dict(),
             sql=plan.sql,
             trace=plan.trace,
+            explain=plan.explain,
             elapsed_ms=elapsed_ms,
         )

@@ -15,6 +15,7 @@ findsl.cli
       -> Prefix-sum feature rewrite when configured
       -> SQL text
       -> rewrite trace
+      -> structured optimizer explain
   -> SQLiteSampleExecutor
     -> load CSV fixtures as physical tables
     -> execute generated SQL locally
@@ -70,6 +71,17 @@ SUM(indicator(x), N)
 ```
 
 into joins against the configured prefix table. The generated expression subtracts the prefix value at `row_no - N` from the current prefix value, producing the same rolling sum with a lookup-style plan that can be backed by Doris aggregate models, materialized views, or sorted duplicate-key tables.
+
+### Structured Explain
+
+The compiler emits two explanation layers:
+
+```text
+trace: human-readable rewrite log
+explain: machine-readable rule/status/evidence records
+```
+
+`explain` records applied and skipped rules, such as `PREFIX_SUM`, `WINDOW_FEATURE`, `ROLLING_BOOLEAN`, `FEATURE_LAYER`, and `FILTER_OUTER_WHERE`. This makes optimizer behavior auditable and gives downstream reports or UI components stable fields to render.
 
 ## Planned Enterprise Extensions
 

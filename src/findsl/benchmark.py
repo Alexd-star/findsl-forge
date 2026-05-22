@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean, median
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from .compiler import Compiler
 from .evaluation import _percentile
@@ -19,6 +19,7 @@ class BenchmarkVariant:
     name: str
     sql: str
     trace: List[str]
+    explain: List[Dict[str, Any]]
     compile_ms: float
     execute_ms: List[float]
     keys: List[ResultKey]
@@ -122,6 +123,14 @@ class PrefixSumBenchmarkResult:
             )
             lines.extend(f"- {item}" for item in variant.trace)
             lines.append("")
+            lines.append("Explain:")
+            if variant.explain:
+                lines.extend(
+                    f"- `{step['rule']}` {step['status']}: {step['message']}" for step in variant.explain
+                )
+            else:
+                lines.append("- <none>")
+            lines.append("")
         return "\n".join(lines)
 
 
@@ -173,6 +182,7 @@ def _measure_variant(
         name=name,
         sql=compiled.sql,
         trace=compiled.trace,
+        explain=compiled.explain,
         compile_ms=compiled.elapsed_ms,
         execute_ms=execute_ms,
         keys=keys,

@@ -14,6 +14,7 @@ This document maps Topic 19 requirements to implementation modules.
 | Long-range 10x acceleration using prefix sum/materialized paths | future `findsl.optimizer` | Planned |
 | Prefix-sum optimized rolling SUM | `findsl.sqlgen`, `configs/indicators.json`, `configs/tables.json` | Started |
 | Baseline versus optimized performance evidence | `findsl.benchmark`, `scripts/benchmark_prefix_sum.ps1` | Started |
+| Explainable optimizer decisions | `findsl.explain`, `findsl.sqlgen`, `findsl.evaluation`, `findsl.benchmark` | Started |
 | Output Markdown table and engineering screenshots | future UI/report modules | Planned |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Started |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Started |

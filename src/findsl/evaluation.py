@@ -17,6 +17,7 @@ class CaseResult:
     elapsed_ms: float
     sql: str
     trace: List[str]
+    explain: List[Dict[str, Any]]
     errors: List[str]
 
 
@@ -70,6 +71,14 @@ class EvaluationResult:
             )
             lines.extend(f"- {item}" for item in case.trace)
             lines.append("")
+            lines.append("Explain:")
+            if case.explain:
+                lines.extend(
+                    f"- `{step['rule']}` {step['status']}: {step['message']}" for step in case.explain
+                )
+            else:
+                lines.append("- <none>")
+            lines.append("")
         return "\n".join(lines)
 
 
@@ -96,12 +105,14 @@ def evaluate(cases: Iterable[Dict[str, Any]], compiler: Compiler = None) -> Eval
         errors: List[str] = []
         sql = ""
         trace: List[str] = []
+        explain: List[Dict[str, Any]] = []
         elapsed_ms = 0.0
         try:
             compiled = compiler.compile(case["dsl"])
             compile_success += 1
             sql = compiled.sql
             trace = compiled.trace
+            explain = compiled.explain
             elapsed_ms = compiled.elapsed_ms
             trace_blob = "\n".join(trace)
             for fragment in case.get("expected_sql_fragments", []):
@@ -126,6 +137,7 @@ def evaluate(cases: Iterable[Dict[str, Any]], compiler: Compiler = None) -> Eval
                 elapsed_ms=elapsed_ms,
                 sql=sql,
                 trace=trace,
+                explain=explain,
                 errors=errors,
             )
         )
@@ -164,4 +176,3 @@ def _percentile(values: List[float], percentile: float) -> float:
     high = min(low + 1, len(ordered) - 1)
     weight = rank - low
     return ordered[low] * (1 - weight) + ordered[high] * weight
-
