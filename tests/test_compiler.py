@@ -42,3 +42,10 @@ def test_compile_sum_falls_back_to_window_when_prefix_sum_is_not_supported():
     assert "SUM(close) OVER" in result.sql
     assert "dwd_stock_daily_quote_prefix" not in result.sql
     assert "rewrite SUM() into SUM window feature __win_1" in result.trace
+
+
+def test_compile_can_disable_prefix_sum_optimizer():
+    result = Compiler(enable_prefix_sum=False).compile('filter(SUM(indicator("volume"), 3) > 300)')
+    assert "SUM(volume) OVER" in result.sql
+    assert "dwd_stock_daily_quote_prefix" not in result.sql
+    assert "rewrite SUM() into SUM window feature __win_1" in result.trace

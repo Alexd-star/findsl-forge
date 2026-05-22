@@ -87,6 +87,7 @@ Deliverables:
 - Query feature extraction.
 - Long-range query detection.
 - Prefix-sum rewrite path. (Started for eligible rolling `SUM`)
+- Baseline-vs-optimized benchmark report. (Started for local SQLite fixtures)
 - Materialized-view route path.
 - Partition and column pruning hints.
 - Plan explanation JSON.
@@ -96,6 +97,7 @@ Metrics:
 - Long-range acceleration target: 10x+ versus baseline full-scan SQL.
 - Compile P95 target: < 50ms.
 - Execution target: <= 10s for official-scale tests.
+- Optimized SQL and baseline SQL must match the independent reference result before performance claims are accepted.
 
 ## Phase 5: Enterprise Demo and Submission Package
 

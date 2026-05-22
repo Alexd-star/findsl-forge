@@ -20,14 +20,16 @@ class CompileResult:
 
 
 class Compiler:
-    def __init__(self, registry: Registry = None):
+    def __init__(self, registry: Registry = None, enable_prefix_sum: bool = True):
         self.registry = registry or default_registry()
+        self.enable_prefix_sum = enable_prefix_sum
 
-    def compile(self, dsl: str) -> CompileResult:
+    def compile(self, dsl: str, enable_prefix_sum: bool = None) -> CompileResult:
         started = time.perf_counter()
         ast = parse(dsl)
         SemanticAnalyzer(self.registry).validate(ast)
-        plan = SqlGenerator(self.registry).generate(ast)
+        use_prefix_sum = self.enable_prefix_sum if enable_prefix_sum is None else enable_prefix_sum
+        plan = SqlGenerator(self.registry, enable_prefix_sum=use_prefix_sum).generate(ast)
         elapsed_ms = (time.perf_counter() - started) * 1000
         return CompileResult(
             dsl=dsl,
@@ -36,4 +38,3 @@ class Compiler:
             trace=plan.trace,
             elapsed_ms=elapsed_ms,
         )
-

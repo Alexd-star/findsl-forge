@@ -22,8 +22,9 @@ class Feature:
 
 
 class SqlGenerator:
-    def __init__(self, registry: Registry):
+    def __init__(self, registry: Registry, enable_prefix_sum: bool = True):
         self.registry = registry
+        self.enable_prefix_sum = enable_prefix_sum
         self.required_tables: Set[str] = set()
         self.trace: List[str] = []
         self._feature_counter = 0
@@ -293,6 +294,8 @@ class SqlGenerator:
         return alias
 
     def _try_register_prefix_sum(self, node: FunctionCall) -> Optional[str]:
+        if not self.enable_prefix_sum:
+            return None
         if self._current_source:
             return None
         indicator_call = node.args[0]

@@ -4,7 +4,7 @@ import csv
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 from .registry import Registry, default_registry
 
@@ -24,13 +24,46 @@ class SQLiteSampleExecutor:
     def __init__(self, data_dir: Path, registry: Registry = None):
         self.data_dir = Path(data_dir)
         self.registry = registry or default_registry()
+        self._conn: Optional[sqlite3.Connection] = None
+
+    def __enter__(self) -> "SQLiteSampleExecutor":
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
+
+    def open(self) -> None:
+        if self._conn is None:
+            self._conn = self._new_connection()
+
+    def close(self) -> None:
+        if self._conn is not None:
+            self._conn.close()
+            self._conn = None
 
     def execute(self, sql: str) -> SqlExecutionResult:
-        with sqlite3.connect(":memory:") as conn:
+        if self._conn is not None:
+            return self._execute_on_connection(self._conn, sql)
+        conn = self._new_connection()
+        try:
+            return self._execute_on_connection(conn, sql)
+        finally:
+            conn.close()
+
+    def _new_connection(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(":memory:")
+        try:
             conn.row_factory = sqlite3.Row
             self._load_tables(conn)
             self._create_prefix_tables(conn)
-            rows = [dict(row) for row in conn.execute(sql).fetchall()]
+            return conn
+        except Exception:
+            conn.close()
+            raise
+
+    def _execute_on_connection(self, conn: sqlite3.Connection, sql: str) -> SqlExecutionResult:
+        rows = [dict(row) for row in conn.execute(sql).fetchall()]
         rows.sort(key=lambda row: (str(row.get("trade_date", "")), str(row.get("ts_code", ""))))
         return SqlExecutionResult(sql=sql, rows=rows)
 

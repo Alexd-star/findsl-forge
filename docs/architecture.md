@@ -23,6 +23,9 @@ findsl.cli
     -> semantic oracle result set
   -> EquivalenceVerifier
     -> compare SQL result keys with reference result keys
+  -> PrefixSumBenchmark
+    -> compile baseline window SQL and optimized prefix SQL
+    -> compare correctness, timing, and plan shape
 ```
 
 ## Design Decisions
@@ -89,3 +92,15 @@ DSL -> PandasReferenceEvaluator -> result keys
 ```
 
 The equivalence layer compares `(ts_code, trade_date)` keys and reports missing or extra rows. This makes correctness measurable before large-scale Doris deployment, and it gives the final submission a reproducible semantic proof instead of only screenshots or hand-picked examples.
+
+## Benchmark Loop
+
+The prefix-sum benchmark deliberately compares two compiler modes for the same DSL:
+
+```text
+DSL -> compiler(prefix off) -> baseline window SQL -> SQLite fixture
+DSL -> compiler(prefix on)  -> prefix-sum SQL       -> SQLite fixture
+DSL -> PandasReferenceEvaluator -> semantic oracle
+```
+
+Both SQL variants must match the reference output and each other. The report includes local timing plus plan-shape signals such as window frame count and prefix table references. This separates correctness evidence from later Doris-scale performance claims.

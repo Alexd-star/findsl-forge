@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import asdict
 from pathlib import Path
 
 from .compiler import Compiler
@@ -14,6 +15,7 @@ def main() -> None:
     compile_cmd = sub.add_parser("compile", help="Compile a DSL expression")
     compile_cmd.add_argument("dsl", help="DSL expression")
     compile_cmd.add_argument("--json", action="store_true", help="Print full JSON result")
+    compile_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
     eval_cmd = sub.add_parser("evaluate", help="Evaluate compiler against a JSONL case file")
     eval_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL case file")
     eval_cmd.add_argument("--output", default="reports/evaluation_report.md", help="Output Markdown report")
@@ -25,10 +27,17 @@ def main() -> None:
     verify_cmd.add_argument("dsl", help="DSL expression")
     verify_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     verify_cmd.add_argument("--json", action="store_true", help="Print verification result as JSON")
+    verify_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    bench_cmd = sub.add_parser("benchmark-prefix-sum", help="Compare baseline window SQL with prefix-sum SQL")
+    bench_cmd.add_argument("dsl", help="DSL expression")
+    bench_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    bench_cmd.add_argument("--iterations", type=int, default=20, help="Execution iterations per SQL variant")
+    bench_cmd.add_argument("--output", default="reports/prefix_sum_benchmark.md", help="Output Markdown report")
+    bench_cmd.add_argument("--json", action="store_true", help="Print benchmark result as JSON")
     args = parser.parse_args()
 
     if args.command == "compile":
-        result = Compiler().compile(args.dsl)
+        result = Compiler(enable_prefix_sum=not args.no_prefix_sum).compile(args.dsl)
         if args.json:
             print(json.dumps(result.__dict__, ensure_ascii=False, indent=2))
         else:
@@ -56,12 +65,31 @@ def main() -> None:
     elif args.command == "verify-sql":
         from .equivalence import verify_sql_equivalence
 
-        result = verify_sql_equivalence(args.dsl, Path(args.data_dir))
+        result = verify_sql_equivalence(
+            args.dsl,
+            Path(args.data_dir),
+            compiler=Compiler(enable_prefix_sum=not args.no_prefix_sum),
+        )
         if args.json:
             print(json.dumps(result.__dict__, ensure_ascii=False, indent=2))
         else:
             print(result.to_markdown())
         if not result.passed:
+            raise SystemExit(1)
+    elif args.command == "benchmark-prefix-sum":
+        from .benchmark import benchmark_prefix_sum_file
+
+        result = benchmark_prefix_sum_file(
+            args.dsl,
+            Path(args.data_dir),
+            Path(args.output),
+            iterations=args.iterations,
+        )
+        if args.json:
+            print(json.dumps(asdict(result), ensure_ascii=False, indent=2))
+        else:
+            print(result.to_markdown())
+        if not result.optimized_matches_reference or not result.optimized_matches_baseline:
             raise SystemExit(1)
 
 

@@ -21,6 +21,7 @@ LLM/NL2DSL can be added as an assistant layer later, while the compiler remains 
 - Execute generated SQL against local SQLite fixtures for regression checks.
 - Compare SQL output with an independent Pandas semantic reference evaluator.
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
+- Produce baseline-window versus prefix-sum benchmark reports.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
 
@@ -33,6 +34,7 @@ python -m findsl.cli evaluate --input data/samples/queries.jsonl --output report
 python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
+python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
 ```
 
 If running from the repository root without installing the package:
@@ -43,6 +45,7 @@ python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
 ```
 
 ## Semantic Reference Evaluation
@@ -69,6 +72,8 @@ window_sum = current_prefix - prefix_at_row_no_minus_window
 ```
 
 This is the first optimizer path aimed at the competition's long-range query acceleration requirement. Unsupported indicators still use ordinary SQL window functions, so the optimization is safe and configuration-driven.
+
+The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix-sum disabled as a baseline window query, and once with prefix-sum enabled. It then checks both SQL outputs against the Pandas reference result and writes a Markdown report with timing and plan-shape evidence. Local SQLite timings are treated as regression signals; Doris-scale acceleration must be proven later with Doris data and `EXPLAIN`.
 
 ## Competition-Oriented Design
 

@@ -17,6 +17,15 @@ def test_sqlite_executor_runs_generated_cons_sql():
     ]
 
 
+def test_sqlite_executor_can_reuse_loaded_fixture_database():
+    compiled = Compiler().compile('filter(SUM(indicator("volume"), 3) > 300)')
+    with SQLiteSampleExecutor(DATA_DIR) as executor:
+        first = executor.execute(compiled.sql)
+        second = executor.execute(compiled.sql)
+    assert first.keys() == second.keys()
+    assert len(first.keys()) == 7
+
+
 def test_sql_matches_reference_for_cons_main_net_inflow():
     result = verify_sql_equivalence(
         'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))',
