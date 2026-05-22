@@ -71,6 +71,7 @@ Deliverables:
 - Doris Docker deployment or remote Doris adapter.
 - DDL and import scripts for simulated A-share data.
 - Generated Doris SQL assets and runbook. (Started)
+- Doris-cluster evidence collector for baseline-window versus prefix-sum `EXPLAIN`, latency, and row-count parity. (Started)
 - Doris dialect SQL compatibility tests.
 - EXPLAIN capture and analysis.
 
@@ -80,6 +81,7 @@ Metrics:
 - Result latency.
 - Query plan characteristics.
 - Doris assets should be regenerated from the same registry used by the compiler.
+- Readiness should consume `reports/doris_cluster_evidence.md` and close the Doris-scale proof warning only when row counts match, Doris speedup reaches the default 10x target, and both plan-shape markers are present.
 
 ## Phase 4: Adaptive Optimizer
 
@@ -92,6 +94,7 @@ Deliverables:
 - Prefix-sum rewrite path. (Started for eligible rolling `SUM`)
 - Baseline-vs-optimized benchmark report. (Started for local SQLite fixtures)
 - Deterministic synthetic market data and long-window scale benchmark report. (Started)
+- Real Doris evidence path for long-window optimizer proof. (Started)
 - Materialized-view route path.
 - Partition and column pruning hints.
 - Plan explanation JSON.
@@ -104,6 +107,7 @@ Metrics:
 - Execution target: <= 10s for official-scale tests.
 - Optimized SQL and baseline SQL must match the independent reference result before performance claims are accepted.
 - Local scale benchmark must record dataset size, long-window plan shape, correctness gates, and the boundary between SQLite regression evidence and Doris production proof.
+- Doris cluster evidence must record baseline-window and optimized-prefix plan shape plus measured 10x speedup before any production acceleration claim is accepted.
 - Every optimizer decision that affects SQL shape should expose a machine-readable explain step.
 
 ## Phase 5: Enterprise Demo and Submission Package
@@ -119,6 +123,7 @@ Deliverables:
 - Markdown table output for official sample questions. (Started via submission readiness reports)
 - Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
 - Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
+- Doris cluster evidence report linked from readiness when generated. (Started)
 - One-minute demo video.
 - Lean canvas.
 - Technical document.
@@ -131,6 +136,7 @@ Exit criteria:
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
+- Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
 - Generated reports can be attached to the technical document or used in defense.
 - Warning gates are either closed or explicitly explained in the final submission.
 

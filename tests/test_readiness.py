@@ -18,6 +18,23 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
         ),
         encoding="utf-8",
     )
+    (reports_dir / "doris_cluster_evidence.md").write_text(
+        "\n".join(
+            [
+                "# Doris Cluster Evidence",
+                "- Evidence source: Apache Doris MySQL-compatible query port",
+                "- Evidence passed: True",
+                "- Baseline success: True",
+                "- Optimized success: True",
+                "- Row counts match: True",
+                "- Minimum Doris speedup target: 10.00x",
+                "- Doris speedup target met: True",
+                "- Optimized plan contains prefix table: True",
+                "- Baseline plan contains window: True",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
     report = generate_readiness_report(
         output_path=output,
@@ -36,17 +53,21 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.benchmark.optimized_matches_reference
     assert all(asset.passed for asset in report.doris_assets)
     assert report.scale_report.passed
+    assert report.doris_cluster_report.passed
     assert report.demo_smoke.passed
     assert report.nl2dsl_smoke.passed
     assert report.diagnostics_smoke.passed
     required_gates = {gate.name: gate for gate in report.gates if gate.level == "required"}
+    warning_gates = {gate.name: gate for gate in report.gates if gate.level == "warning"}
     assert required_gates["NL2DSL validated candidate"].passed
     assert required_gates["Structured diagnostics repair hints"].passed
+    assert warning_gates["Doris-scale performance proof"].passed
 
     content = output.read_text(encoding="utf-8")
     assert "FinDSL Forge Submission Readiness Report" in content
     assert "Compiler accuracy and latency" in content
     assert "Long-Window Scale Evidence" in content
+    assert "Doris Cluster Evidence" in content
     assert "Demo Smoke Test" in content
     assert "NL2DSL Smoke Test" in content
     assert "NL2DSL validated candidate" in content
@@ -69,4 +90,36 @@ def test_readiness_report_keeps_doris_scale_proof_as_warning(tmp_path):
     assert not warnings["Long-window scale benchmark evidence"].passed
     assert "Doris-scale performance proof" in warnings
     assert not warnings["Doris-scale performance proof"].passed
+    assert not report.doris_cluster_report.passed
     assert report.blocking_passed
+
+
+def test_readiness_report_requires_real_doris_evidence_markers(tmp_path):
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir(parents=True)
+    (reports_dir / "doris_cluster_evidence.md").write_text(
+        "\n".join(
+            [
+                "# Doris Cluster Evidence",
+                "- Evidence source: Apache Doris MySQL-compatible query port",
+                "- Evidence passed: True",
+                "- Baseline success: True",
+                "- Optimized success: True",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    report = generate_readiness_report(
+        output_path=tmp_path / "submission_readiness.md",
+        reports_dir=reports_dir,
+        benchmark_iterations=1,
+        run_pytest=False,
+    )
+
+    warnings = {gate.name: gate for gate in report.gates if gate.level == "warning"}
+    assert not report.doris_cluster_report.passed
+    assert "Row counts match: True" in report.doris_cluster_report.missing_markers
+    assert "Doris speedup target met: True" in report.doris_cluster_report.missing_markers
+    assert "Optimized plan contains prefix table: True" in report.doris_cluster_report.missing_markers
+    assert not warnings["Doris-scale performance proof"].passed

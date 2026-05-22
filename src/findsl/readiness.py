@@ -136,6 +136,7 @@ class ReadinessReport:
     benchmark: PrefixSumBenchmarkResult
     doris_assets: List[DorisAssetCheck]
     scale_report: EvidenceFileCheck
+    doris_cluster_report: EvidenceFileCheck
     demo_smoke: DemoSmokeCheck
     nl2dsl_smoke: NL2DSLSmokeCheck
     diagnostics_smoke: DiagnosticsSmokeCheck
@@ -198,6 +199,7 @@ class ReadinessReport:
                 f"- SQL equivalence report: `{self.reports_dir / 'sql_equivalence_report.md'}`",
                 f"- Prefix benchmark report: `{self.reports_dir / 'prefix_sum_benchmark.md'}`",
                 f"- Long-window scale benchmark report: `{self.scale_report.path}`",
+                f"- Doris cluster evidence report: `{self.doris_cluster_report.path}`",
                 f"- Doris deployment directory: `{self.repo_root / 'deploy' / 'doris'}`",
                 "",
                 "## Long-Window Scale Evidence",
@@ -207,6 +209,14 @@ class ReadinessReport:
                 f"- Scale report bytes: {self.scale_report.byte_count}",
                 f"- Matched markers: {', '.join(self.scale_report.matched_markers) or '<none>'}",
                 f"- Missing markers: {', '.join(self.scale_report.missing_markers) or '<none>'}",
+                "",
+                "## Doris Cluster Evidence",
+                "",
+                f"- Doris cluster report exists: {self.doris_cluster_report.exists}",
+                f"- Doris cluster marker check: {self.doris_cluster_report.passed}",
+                f"- Doris cluster report bytes: {self.doris_cluster_report.byte_count}",
+                f"- Matched markers: {', '.join(self.doris_cluster_report.matched_markers) or '<none>'}",
+                f"- Missing markers: {', '.join(self.doris_cluster_report.missing_markers) or '<none>'}",
                 "",
                 "## Demo Smoke Test",
                 "",
@@ -302,7 +312,7 @@ class ReadinessReport:
                 "",
                 "## Remaining High-Value Work",
                 "",
-                "- Capture Doris-cluster EXPLAIN and latency on larger synthetic or official-scale data before claiming 10x production acceleration.",
+                "- Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.",
                 "- Polish the Web Demo with official-question presets, error-repair suggestions, and screenshot-ready presentation states.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
                 "- Add an optional LLM adapter that calls the deterministic NL2DSL/Compiler validation loop instead of generating SQL directly.",
@@ -351,6 +361,22 @@ def generate_readiness_report(
             "Long-window feature-access reduction estimate",
         ],
     )
+    doris_cluster_report = _check_evidence_file(
+        "Doris cluster evidence",
+        reports_dir / "doris_cluster_evidence.md",
+        [
+            "Doris Cluster Evidence",
+            "Evidence source: Apache Doris MySQL-compatible query port",
+            "Evidence passed: True",
+            "Baseline success: True",
+            "Optimized success: True",
+            "Row counts match: True",
+            "Minimum Doris speedup target: 10.00x",
+            "Doris speedup target met: True",
+            "Optimized plan contains prefix table: True",
+            "Baseline plan contains window: True",
+        ],
+    )
     demo_smoke = _check_demo_smoke(data_dir)
     nl2dsl_smoke = _check_nl2dsl_smoke(data_dir)
     diagnostics_smoke = _check_diagnostics_smoke()
@@ -366,6 +392,7 @@ def generate_readiness_report(
         benchmark=benchmark,
         doris_assets=doris_assets,
         scale_report=scale_report,
+        doris_cluster_report=doris_cluster_report,
         demo_smoke=demo_smoke,
         nl2dsl_smoke=nl2dsl_smoke,
         diagnostics_smoke=diagnostics_smoke,
@@ -377,6 +404,7 @@ def generate_readiness_report(
             benchmark,
             doris_assets,
             scale_report,
+            doris_cluster_report,
             demo_smoke,
             nl2dsl_smoke,
             diagnostics_smoke,
@@ -396,6 +424,7 @@ def _build_gates(
     benchmark: PrefixSumBenchmarkResult,
     doris_assets: List[DorisAssetCheck],
     scale_report: EvidenceFileCheck,
+    doris_cluster_report: EvidenceFileCheck,
     demo_smoke: DemoSmokeCheck,
     nl2dsl_smoke: NL2DSLSmokeCheck,
     diagnostics_smoke: DiagnosticsSmokeCheck,
@@ -506,8 +535,10 @@ def _build_gates(
         ReadinessGate(
             "Doris-scale performance proof",
             "warning",
-            False,
-            "local SQLite benchmark exists; cluster EXPLAIN/latency evidence still needed",
+            doris_cluster_report.passed,
+            "cluster EXPLAIN/latency and 10x speedup evidence captured"
+            if doris_cluster_report.passed
+            else f"missing markers: {', '.join(doris_cluster_report.missing_markers) or 'file missing'}",
         ),
     ]
     return gates

@@ -32,9 +32,13 @@ findsl.cli
     -> compare correctness, timing, and plan shape
   -> DorisAssetGenerator
     -> emit DDL, sample inserts, prefix build SQL, smoke queries
+  -> DorisEvidenceCollector
+    -> compile baseline-window and optimized-prefix SQL
+    -> capture Doris EXPLAIN, COUNT(*) latency, row-count parity, and 10x speedup marker
   -> Demo/API and ReadinessReport
     -> validate natural-language candidates through compiler + equivalence verifier
     -> return structured diagnostics and repair hints for invalid requests
+    -> consume Doris cluster evidence markers for submission gating
 ```
 
 ## Design Decisions
@@ -132,6 +136,17 @@ DSL -> PandasReferenceEvaluator -> semantic oracle
 ```
 
 Both SQL variants must match the reference output and each other. The report includes local timing plus plan-shape signals such as window frame count and prefix table references. This separates correctness evidence from later Doris-scale performance claims.
+
+## Doris Evidence Loop
+
+The Doris evidence collector uses the same compiler modes on a real Apache Doris query port:
+
+```text
+DSL -> compiler(prefix off) -> baseline window SQL -> Doris EXPLAIN + COUNT(*)
+DSL -> compiler(prefix on)  -> prefix-sum SQL       -> Doris EXPLAIN + COUNT(*)
+```
+
+The generated `reports/doris_cluster_evidence.md` records connection metadata with passwords redacted, the DSL, both SQL variants, EXPLAIN text, repeated query latency, row-count parity, plan-shape markers, and the minimum speedup target. Readiness closes the `Doris-scale performance proof` warning only when baseline and optimized variants both execute, row counts match, the measured Doris speedup reaches the default 10x target, the baseline path contains a window plan, and the optimized path contains the prefix table.
 
 ## Doris Deployment Assets
 

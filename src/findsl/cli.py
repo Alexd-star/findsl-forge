@@ -68,6 +68,19 @@ def main() -> None:
     doris_cmd.add_argument("--database", default="findsl_demo", help="Doris database name")
     doris_cmd.add_argument("--buckets", type=int, default=8, help="Doris hash bucket count")
     doris_cmd.add_argument("--replication-num", type=int, default=1, help="Doris table replication_num property")
+    doris_evidence_cmd = sub.add_parser("collect-doris-evidence", help="Collect Doris EXPLAIN and latency evidence")
+    doris_evidence_cmd.add_argument("--host", required=True, help="Doris FE host")
+    doris_evidence_cmd.add_argument("--port", type=int, default=9030, help="Doris MySQL query port")
+    doris_evidence_cmd.add_argument("--user", default="root", help="Doris user")
+    doris_evidence_cmd.add_argument("--password", default="", help="Doris password; prefer environment variables in scripts")
+    doris_evidence_cmd.add_argument("--database", default="findsl_demo", help="Doris database name")
+    doris_evidence_cmd.add_argument("--client", default="mysql", help="MySQL-compatible client executable")
+    doris_evidence_cmd.add_argument("--dsl", default=None, help="DSL to benchmark on Doris")
+    doris_evidence_cmd.add_argument("--iterations", type=int, default=3, help="Execution iterations per SQL variant")
+    doris_evidence_cmd.add_argument("--output", default="reports/doris_cluster_evidence.md", help="Output Markdown report")
+    doris_evidence_cmd.add_argument("--password-mode", choices=["none", "inline", "prompt"], default="none", help="How to pass password to the client")
+    doris_evidence_cmd.add_argument("--min-speedup", type=float, default=10.0, help="Minimum Doris speedup required for evidence to pass")
+    doris_evidence_cmd.add_argument("--json", action="store_true", help="Print evidence summary as JSON")
     ready_cmd = sub.add_parser("readiness-report", help="Generate submission readiness evidence report")
     ready_cmd.add_argument("--output", default="reports/submission_readiness.md", help="Output Markdown report")
     ready_cmd.add_argument("--reports-dir", default="reports", help="Directory for generated evidence artifacts")
@@ -261,6 +274,30 @@ def main() -> None:
         )
         for filename in assets.files():
             print(str(Path(args.output_dir) / filename))
+    elif args.command == "collect-doris-evidence":
+        from .doris_evidence import DEFAULT_DORIS_EVIDENCE_DSL, DorisClientConfig, collect_doris_evidence
+
+        result = collect_doris_evidence(
+            config=DorisClientConfig(
+                host=args.host,
+                port=args.port,
+                user=args.user,
+                password=args.password,
+                database=args.database,
+                client=args.client,
+            ),
+            output_path=Path(args.output),
+            dsl=args.dsl or DEFAULT_DORIS_EVIDENCE_DSL,
+            iterations=args.iterations,
+            password_mode=args.password_mode,
+            min_speedup=args.min_speedup,
+        )
+        if args.json:
+            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(result.to_markdown())
+        if not result.passed:
+            raise SystemExit(1)
     elif args.command == "readiness-report":
         from .readiness import generate_readiness_report
 
