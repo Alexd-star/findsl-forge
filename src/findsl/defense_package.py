@@ -91,7 +91,7 @@ class DefensePackageResult:
                 "- The LLM adapter rejects direct SQL and invalid DSL with stable diagnostic evidence before any SQL reaches Doris.",
                 "- Prefix-sum optimization is visible in SQL, structured explain records, and benchmark/readiness evidence.",
                 "- Negative cases demonstrate controlled, repairable failure rather than uncaught exceptions.",
-                "- Generated Doris assets and runbooks keep deployment aligned with the same registry used by the compiler.",
+                "- Generated Doris assets include trade-date auto partitions and colocated stock-code distribution from the same compiler registry.",
             ]
         )
         return "\n".join(lines)
@@ -372,16 +372,27 @@ def _check_doris_assets(repo_root: Path, data_dir: Path) -> DefenseCheck:
                 matched.append(filename)
             else:
                 missing.append(filename)
-        passed = not missing and len(matched) == len(expected_assets)
+        schema_path = asset_dir / "01_schema.sql"
+        schema_sql = schema_path.read_text(encoding="utf-8") if schema_path.exists() else ""
+        has_auto_partitions = "AUTO PARTITION BY RANGE (date_trunc(`trade_date`, 'month'))" in schema_sql
+        has_colocated_distribution = '"colocate_with" = "findsl_stock_by_ts"' in schema_sql
+        passed = (
+            not missing
+            and len(matched) == len(expected_assets)
+            and has_auto_partitions
+            and has_colocated_distribution
+        )
         return DefenseCheck(
             name="Doris deployment asset integrity",
-            scoring_point="Reproducible Doris deployment path",
+            scoring_point="Reproducible partitioned and colocated Doris deployment path",
             demo_action="Run scripts\\generate_doris_assets.ps1, then inspect deploy\\doris.",
-            expected_signal="All generated Doris SQL assets match the registry-driven generator.",
+            expected_signal="All generated Doris SQL assets match, with auto partitions and colocated distribution visible in schema SQL.",
             passed=passed,
             evidence=[
                 f"matched={len(matched)}/{len(expected_assets)}",
                 f"missing={', '.join(missing) or '<none>'}",
+                f"auto_partitions={has_auto_partitions}",
+                f"colocated_distribution={has_colocated_distribution}",
                 f"asset_dir={asset_dir}",
             ],
         )

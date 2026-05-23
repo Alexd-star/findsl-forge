@@ -38,7 +38,7 @@ findsl.cli
     -> run official-style positive cases across filters/rank/windows/prefix sums
     -> run negative DSL cases through stable diagnostics and repair suggestions
   -> DorisAssetGenerator
-    -> emit DDL, sample inserts, prefix build SQL, smoke queries
+    -> emit partitioned/colocated DDL, sample inserts, prefix build SQL, smoke queries
   -> DorisEvidenceCollector
     -> compile baseline-window and optimized-prefix SQL
     -> capture Doris EXPLAIN, COUNT(*) latency, row-count parity, and 10x speedup marker
@@ -208,4 +208,4 @@ configs/*.json + data/samples/*.csv
   -> 04_smoke_queries.sql
 ```
 
-This keeps table names, indicator columns, prefix columns, and smoke queries aligned with the compiler registry. The generated SQL is a smoke-test path; production deployment should tune replication, buckets, partitioning, and materialized-view strategy per cluster.
+This keeps table names, indicator columns, prefix columns, and smoke queries aligned with the compiler registry. The generated schema also gives the optimizer story a physical counterpart: all base and prefix tables use monthly `trade_date` auto partitions for pruning and a shared `ts_code` colocate group for local prefix joins. Production deployment should still tune replication, buckets, partition retention, and materialized-view strategy per cluster.

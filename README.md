@@ -26,7 +26,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
 - Produce baseline-window versus prefix-sum benchmark reports.
 - Generate deterministic synthetic A-share-style data for reproducible long-window scale benchmarks.
-- Generate Doris DDL, sample load, prefix-table build, and smoke-query assets.
+- Generate Doris DDL with trade-date auto partitions, colocated stock-code distribution, sample load, prefix-table build, and smoke-query assets.
 - Collect Doris-cluster `EXPLAIN` and latency evidence for baseline-window versus prefix-sum SQL.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
@@ -144,7 +144,7 @@ The bundled `data/samples/llm_candidate_response.json` intentionally contains on
 04_smoke_queries.sql
 ```
 
-These files are a smoke-test deployment path for Doris. See `docs/doris_runbook.md` for execution order and production notes.
+These files are a smoke-test deployment path for Doris. The schema generator emits monthly `trade_date` auto partitions plus a shared `colocate_with` group on `ts_code`, so the date-range pushdown and prefix-table joins have visible physical-design support. See `docs/doris_runbook.md` for execution order and production notes.
 
 To capture cluster evidence for the submission gate:
 
