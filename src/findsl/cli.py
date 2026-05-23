@@ -221,6 +221,8 @@ def main() -> None:
     elif args.command == "evaluate":
         result = evaluate_file(Path(args.input), Path(args.output))
         print(result.to_markdown())
+        if result.failed:
+            raise SystemExit(1)
     elif args.command == "official-suite":
         from .official_suite import run_official_suite
 
