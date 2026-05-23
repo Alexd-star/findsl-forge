@@ -60,8 +60,9 @@ class DefensePackageResult:
             "5. Confirm the UI shows verification PASS, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.",
             "6. Select `Diagnostic negative: 未知指标名 [UNKNOWN_INDICATOR]` and run it.",
             "7. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and the `indicator(\"close\")` repair hint.",
-            "8. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
-            "9. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
+            "8. Show the semantic hardening evidence for bare identifiers, invalid windows, invalid top-level expressions, bad market arguments, and literal division by zero.",
+            "9. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
+            "10. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
             "",
             "## Score Mapping",
             "",
@@ -94,6 +95,7 @@ class DefensePackageResult:
                 "- The compiler validates Doris-safe SQL shape and escapes string literals before generated SQL is accepted.",
                 "- Prefix-sum optimization is visible in SQL, structured explain records, and benchmark/readiness evidence.",
                 "- Negative cases demonstrate controlled, repairable failure rather than uncaught exceptions.",
+                "- Semantic hardening evidence proves hidden-eval style invalid DSL fails before SQL generation.",
                 "- Generated Doris assets include trade-date auto partitions and colocated stock-code distribution from the same compiler registry.",
             ]
         )
@@ -137,6 +139,7 @@ def generate_defense_package(
         _check_llm_candidate_safety(data_dir, _resolve_repo_path(repo_root, llm_response_path)),
         _check_money_flow_prefix(data_dir, official_positive_path),
         _check_unknown_indicator_diagnostic(official_negative_path),
+        _check_semantic_hardening_diagnostics(official_negative_path),
         _check_doris_sql_validation(),
         _check_config_only_indicator_extension(),
         _check_official_suite(data_dir, official_positive_path, official_negative_path, reports_dir),
@@ -361,6 +364,59 @@ def _check_unknown_indicator_diagnostic(negative_path: Path) -> DefenseCheck:
             "Interactive error explainability and repair guidance",
             "Select the UNKNOWN_INDICATOR negative preset and run it.",
             "Expected and actual diagnostic codes match, with a close-indicator repair hint.",
+            exc,
+        )
+
+
+def _check_semantic_hardening_diagnostics(negative_path: Path) -> DefenseCheck:
+    required_cases = [
+        ("裸指标列名绕过", 'indicator("close")'),
+        ("窗口不是整数字面量", "positive integer window"),
+        ("顶层表达式不是关系或布尔", 'filter(indicator("close") > 10)'),
+        ("市场参数不是字符串或标识符", 'market("A")'),
+        ("除数为零字面量", "non-zero denominator"),
+    ]
+    try:
+        cases = load_cases(Path(negative_path))
+        evidence = []
+        passed_items = 0
+        for case_name, expected_hint in required_cases:
+            case = _find_case(cases, "name", case_name)
+            try:
+                Compiler().compile(case["dsl"])
+                diagnostics = []
+            except Exception as exc:  # noqa: BLE001 - these hardening cases should fail diagnostically.
+                diagnostics = diagnose_exception(exc)
+            actual_code = diagnostics[0].code if diagnostics else ""
+            suggestion_blob = "\n".join(
+                hint for diagnostic in diagnostics for hint in diagnostic.suggestions
+            )
+            ok = (
+                actual_code == case.get("expected_code")
+                and expected_hint in suggestion_blob
+            )
+            passed_items += int(ok)
+            evidence.append(
+                f"{case_name}: code={actual_code or '<none>'}, hint={expected_hint in suggestion_blob}"
+            )
+        passed = passed_items == len(required_cases)
+        return DefenseCheck(
+            name="Semantic hardening diagnostics",
+            scoring_point="Hidden-eval style invalid DSL fails before SQL generation with repairable diagnostics",
+            demo_action="Run the official negative corpus or select the hardening negative presets in the Web Demo.",
+            expected_signal="Bare identifiers, invalid windows, bad top-level expressions, invalid market arguments, and literal division by zero are rejected with stable hints.",
+            passed=passed,
+            evidence=[
+                f"hardened={passed_items}/{len(required_cases)}",
+                *evidence,
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "Semantic hardening diagnostics",
+            "Hidden-eval style invalid DSL fails before SQL generation with repairable diagnostics",
+            "Run the official negative corpus or select the hardening negative presets in the Web Demo.",
+            "All hardening cases are rejected with stable hints.",
             exc,
         )
 

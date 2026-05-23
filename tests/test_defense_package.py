@@ -17,6 +17,7 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "LLM candidate safety loop" in check_names
     assert "Official prefix-sum positive preset" in check_names
     assert "Official diagnostic negative preset" in check_names
+    assert "Semantic hardening diagnostics" in check_names
     assert "Doris SQL validation boundary" in check_names
     assert "Config-only indicator extension" in check_names
     assert "Official-style coverage suite" in check_names
@@ -41,5 +42,8 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "date_window_pruning" in content
     assert "signed_outflow_threshold" in content
     assert "Doris SQL validation boundary" in content
+    assert "Semantic hardening diagnostics" in content
+    assert "hardened=5/5" in content
+    assert "除数为零字面量" in content
     assert "Config-only indicator extension" in content
     assert "dwd_stock_money_flow_prefix" in content

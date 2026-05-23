@@ -50,6 +50,7 @@ Capture these screens for the technical document and one-minute video:
 - SQL tab for the official prefix-sum preset showing `dwd_stock_money_flow_prefix`.
 - Explain tab showing the `PREFIX_SUM` rule applied.
 - Diagnostic negative preset showing expected/actual `UNKNOWN_INDICATOR` and repair suggestions.
+- Semantic hardening diagnostics showing bare identifiers, non-integer windows, invalid top-level expressions, invalid `market(...)`, and literal division by zero are rejected before SQL generation.
 - CLI output for LLM candidate safety showing accepted DSL plus `UNKNOWN_INDICATOR` and `UNSAFE_DIRECT_SQL` rejections.
 - `reports/defense_package.md` summary and score-mapping table.
 - `reports/submission_readiness.md` gate matrix.
@@ -65,6 +66,7 @@ Capture these screens for the technical document and one-minute video:
 | Prefix-sum preset with prefix table SQL | Long-window optimization design |
 | Structured explain records | Auditable optimizer decisions |
 | Diagnostic negative preset | Stable error handling and repair guidance |
+| Semantic hardening diagnostics | Hidden-evaluation style invalid DSL fails before SQL generation |
 | Official suite 15/15 positive and 18/18 negative | Official-style coverage and regression proof |
 | Doris generated assets | Reproducible deployment path |
 | Git bundle backup | Rollback and delivery discipline |

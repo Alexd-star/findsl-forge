@@ -382,6 +382,7 @@ class ReadinessReport:
                 "- Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.",
                 "- SQL string literals are escaped by the compiler before they reach generated Doris SQL.",
                 "- Structured diagnostics convert invalid DSL into stable error codes and repair hints.",
+                "- Semantic hardening rejects hidden-eval style invalid DSL before SQL generation.",
                 "- Doris DDL includes trade-date auto partitions and colocated stock-code distribution for pruning and local prefix joins.",
                 "- Doris sample data, prefix-table build SQL, and smoke queries are generated from the same registry.",
                 "",
