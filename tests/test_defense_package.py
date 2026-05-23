@@ -39,11 +39,13 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "LLM candidate safety loop" in content
     assert "NL2DSL official template coverage" in content
     assert "A股每日换手率前50%" in content
+    assert "b_market_average_volume" in content
+    assert "B-market average-volume" in content
     assert "date_window_pruning" in content
     assert "signed_outflow_threshold" in content
     assert "rolling_min_threshold" in content
     assert "date_prefix_sum_pruning" in content
-    assert "covered=6/6" in content
+    assert "covered=7/7" in content
     assert "Doris SQL validation boundary" in content
     assert "Semantic hardening diagnostics" in content
     assert "hardened=6/6" in content
