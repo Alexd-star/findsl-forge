@@ -99,6 +99,8 @@ DSL is parsed into AST nodes before SQL is generated. This supports:
 
 ### Feature Materialization
 
+All generated stock-screening relations are anchored on `daily_quote`, even when the DSL only references auxiliary indicators such as `main_net_inflow`. Auxiliary tables are `LEFT JOIN`ed on `(ts_code, trade_date)` so the compiler keeps the same stock-date universe as the Pandas oracle and does not silently drop rows with missing optional data.
+
 Financial screening expressions often contain rolling windows. SQL engines generally do not allow window functions directly in `WHERE`, and nested window functions are unsafe. The generator therefore builds feature layers:
 
 ```text
@@ -129,6 +131,10 @@ SUM(indicator(x), N)
 ```
 
 into joins against the configured prefix table. The generated expression subtracts the prefix value at `row_no - N` from the current prefix value, producing the same rolling sum with a lookup-style plan that can be backed by Doris aggregate models, materialized views, or sorted duplicate-key tables.
+
+For auxiliary indicators, prefix tables are built on the `daily_quote` trading-calendar skeleton and left-join the auxiliary source values before computing `row_no` and cumulative sums. This prevents sparse auxiliary tables from shifting rolling-window boundaries or losing quote rows on dates where the auxiliary value is absent.
+
+Rank cutoffs apply a null-expression guard before `ROW_NUMBER()` so sparse auxiliary indicators do not select stocks whose ranking value is missing. Percent cutoffs still compute the partition count over the full stock-date relation, matching the reference oracle.
 
 ### Structured Explain
 
@@ -183,7 +189,7 @@ positive DSL case -> compiler -> SQL/trace/explain evidence -> SQL/reference equ
 negative DSL case -> compiler failure -> structured diagnostic code -> repair suggestions
 ```
 
-Positive cases cover staged filters, staged filter-to-filter pipelines, rank-then-filter relation preservation, repeated rank recomputation without stale `rank_no` collisions, top-N and percent-cutoff ranking with deterministic `ts_code` tie-breaking, derived-feature ranking, date-range pushdown, prefix-sum full-range pruning, window-safe date pruning, market predicates, sparse auxiliary-table `LEFT JOIN` preservation, rolling boolean functions, moving averages, rolling extrema including `MIN`, prefix-sum aggregates over quote and money-flow tables, arithmetic predicates, signed numeric thresholds, SQL-standard equality normalization, mixed-case function names, and case-insensitive indicator lookup. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, non-integer windows, invalid rank percentages, invalid rank directions, non-integer or non-positive rank cutoffs, invalid date ranges, invalid market arguments, literal/static division by zero, malformed numeric literals, bare column-name bypass attempts, invalid `filter` conditions, invalid `then` stages, top-level type mistakes, parse errors, lexical errors, unsupported rank parameters, and invalid named-argument ordering. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
+Positive cases cover staged filters, staged filter-to-filter pipelines, rank-then-filter relation preservation, repeated rank recomputation without stale `rank_no` collisions, top-N and percent-cutoff ranking with deterministic `ts_code` tie-breaking, derived-feature ranking, date-range pushdown, prefix-sum full-range pruning, window-safe date pruning, market predicates, sparse auxiliary-table `LEFT JOIN` preservation, daily-quote anchoring for auxiliary-only filters, rolling boolean functions, moving averages, rolling extrema including `MIN`, prefix-sum aggregates over quote and money-flow tables, arithmetic predicates, signed numeric thresholds, SQL-standard equality normalization, mixed-case function names, and case-insensitive indicator lookup. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, non-integer windows, invalid rank percentages, invalid rank directions, non-integer or non-positive rank cutoffs, invalid date ranges, invalid market arguments, literal/static division by zero, malformed numeric literals, bare column-name bypass attempts, invalid `filter` conditions, invalid `then` stages, top-level type mistakes, parse errors, lexical errors, unsupported rank parameters, and invalid named-argument ordering. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
 
 ## Defense Package Loop
 

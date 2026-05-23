@@ -63,8 +63,7 @@ class SqlGenerator:
                 visit(current.right)
 
         visit(node)
-        if not tables:
-            tables.add("daily_quote")
+        tables.add("daily_quote")
         return tables
 
     def _relation_sql(self, node: Node) -> str:
@@ -267,6 +266,7 @@ class SqlGenerator:
                 raise SemanticError("rank() second argument must be asc or desc")
             order = order_node.name.upper()
             limit = self._rank_limit(node)
+            rank_source = self._rank_count_source_sql(self._rank_source_sql(base_relation), limit)
             self.trace.append("rewrite rank() into ROW_NUMBER window")
             self._explain(
                 "RANK_ROW_NUMBER",
@@ -276,23 +276,35 @@ class SqlGenerator:
                 limit_kind=limit["kind"] or "none",
                 limit_value=limit["value"],
             )
-            partition_count = (
-                ", COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count"
-                if limit["kind"] == "percent"
-                else ""
-            )
+            non_null_guard = self._rank_non_null_guard(expr_sql, limit)
             where = self._rank_where(limit)
             return (
                 "SELECT * FROM ("
                 f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}, ts_code ASC) AS rank_no"
-                f"{partition_count} "
-                f"FROM {rank_source}"
+                f" FROM {rank_source}{non_null_guard}"
                 f") ranked{where}"
             )
         finally:
             self._current_source = old_source
             self._numeric_features = old_numeric
             self._rolling_features = old_rolling
+
+    def _rank_count_source_sql(self, rank_source: str, limit: Dict[str, Any]) -> str:
+        if limit["kind"] != "percent":
+            return rank_source
+        return f"(SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count FROM {rank_source}) base"
+
+    def _rank_non_null_guard(self, expr_sql: str, limit: Dict[str, Any]) -> str:
+        if not limit["kind"]:
+            return ""
+        self.trace.append("exclude null rank expressions before applying rank cutoff")
+        self._explain(
+            "RANK_NULL_GUARD",
+            "applied",
+            "Exclude null rank expressions before applying rank cutoff",
+            limit_kind=limit["kind"],
+        )
+        return f" WHERE {expr_sql} IS NOT NULL"
 
     def _rank_source_sql(self, base_relation: str = None) -> str:
         source = self._from_clause(base_relation)

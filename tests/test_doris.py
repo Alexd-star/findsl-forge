@@ -20,6 +20,9 @@ def test_render_doris_assets_contains_schema_prefix_and_smoke_sql():
     assert "INSERT INTO `dwd_stock_daily_quote`" in assets.sample_data_sql
     assert "TRUNCATE TABLE `dwd_stock_daily_quote_prefix`" in assets.prefix_sql
     assert "SUM(`volume`) OVER" in assets.prefix_sql
+    assert "FROM `dwd_stock_daily_quote` AS base" in assets.prefix_sql
+    assert "LEFT JOIN `dwd_stock_money_flow` AS src" in assets.prefix_sql
+    assert "SUM(src.`main_net_inflow`) OVER" in assets.prefix_sql
     assert "dwd_stock_daily_quote_prefix" in assets.smoke_sql
     assert "Baseline window SQL" in assets.smoke_sql
 

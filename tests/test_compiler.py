@@ -38,6 +38,20 @@ def test_compile_uses_left_joins_for_auxiliary_tables():
     assert "close > 10 OR main_net_inflow > 0" in result.sql
 
 
+def test_compile_uses_daily_quote_as_base_for_auxiliary_only_filters():
+    result = Compiler().compile('filter(indicator("main_net_inflow") > 0)')
+
+    assert "FROM dwd_stock_daily_quote AS base LEFT JOIN dwd_stock_money_flow AS mf USING" in result.sql
+    assert "WHERE main_net_inflow > 0" in result.sql
+
+
+def test_compile_excludes_null_rank_expressions_before_cutoff():
+    result = Compiler().compile('rank(indicator("main_net_inflow"), desc, top=2)')
+
+    assert "WHERE main_net_inflow IS NOT NULL" in result.sql
+    assert any(step["rule"] == "RANK_NULL_GUARD" for step in result.explain)
+
+
 def test_compile_sum_uses_prefix_sum_when_indicator_supports_it():
     result = Compiler().compile('filter(SUM(indicator("volume"), 3) > 300)')
     assert "dwd_stock_daily_quote_prefix" in result.sql

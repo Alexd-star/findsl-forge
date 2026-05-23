@@ -226,16 +226,21 @@ def _render_prefix_build(registry: Registry, database: str) -> str:
         source_table, indicators = _prefix_source(registry, prefix_table_name)
         prefix_physical = registry.table(prefix_table_name)["physical"]
         source_physical = registry.table(source_table)["physical"]
-        select_columns = [
-            "`ts_code`",
-            "`trade_date`",
-            "ROW_NUMBER() OVER (PARTITION BY `ts_code` ORDER BY `trade_date`) AS `row_no`",
-        ]
+        select_columns, from_sql, ts_expr, date_expr, value_alias = _prefix_build_context(
+            registry,
+            source_table,
+            source_physical,
+        )
         for indicator_name, meta in indicators:
+            value_expr = (
+                f"{value_alias}.`{meta['column']}`"
+                if value_alias
+                else f"`{meta['column']}`"
+            )
             select_columns.append(
-                "SUM(`"
-                + meta["column"]
-                + "`) OVER (PARTITION BY `ts_code` ORDER BY `trade_date` "
+                "SUM("
+                + value_expr
+                + f") OVER (PARTITION BY {ts_expr} ORDER BY {date_expr} "
                 + "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS `"
                 + meta["prefix_column"]
                 + "`"
@@ -246,11 +251,52 @@ def _render_prefix_build(registry: Registry, database: str) -> str:
                 f"INSERT INTO `{prefix_physical}`",
                 "SELECT",
                 "  " + ",\n  ".join(select_columns),
-                f"FROM `{source_physical}`;",
+                from_sql + ";",
                 "",
             ]
         )
     return "\n".join(sections).rstrip() + "\n"
+
+
+def _prefix_build_context(
+    registry: Registry,
+    source_table: str,
+    source_physical: str,
+) -> Tuple[List[str], str, str, str, str]:
+    if source_table == "daily_quote":
+        ts_expr = "`ts_code`"
+        date_expr = "`trade_date`"
+        return (
+            [
+                ts_expr,
+                date_expr,
+                f"ROW_NUMBER() OVER (PARTITION BY {ts_expr} ORDER BY {date_expr}) AS `row_no`",
+            ],
+            f"FROM `{source_physical}`",
+            ts_expr,
+            date_expr,
+            "",
+        )
+
+    skeleton_physical = registry.table("daily_quote")["physical"]
+    ts_expr = "base.`ts_code`"
+    date_expr = "base.`trade_date`"
+    from_sql = (
+        f"FROM `{skeleton_physical}` AS base\n"
+        f"LEFT JOIN `{source_physical}` AS src "
+        f"ON src.`ts_code` = {ts_expr} AND src.`trade_date` = {date_expr}"
+    )
+    return (
+        [
+            f"{ts_expr} AS `ts_code`",
+            f"{date_expr} AS `trade_date`",
+            f"ROW_NUMBER() OVER (PARTITION BY {ts_expr} ORDER BY {date_expr}) AS `row_no`",
+        ],
+        from_sql,
+        ts_expr,
+        date_expr,
+        "src",
+    )
 
 
 def _render_smoke_queries(registry: Registry, database: str) -> str:

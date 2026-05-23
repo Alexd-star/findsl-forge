@@ -31,6 +31,8 @@ The generated sample inserts are intentionally small smoke-test fixtures.
 
 The generated schema uses monthly `trade_date` auto partitions and a shared `colocate_with` group over the `ts_code` hash distribution. This is intentional physical evidence for two competition-critical paths: safe date-range predicates can prune partitions, and prefix-table joins can remain locally distributed when cluster colocate conditions are satisfied.
 
+Prefix tables for auxiliary sources, such as `dwd_stock_money_flow_prefix`, are rebuilt from the `dwd_stock_daily_quote` stock-date skeleton with a left join back to the auxiliary source table. This keeps `row_no` aligned with the compiler's daily-quote-anchored screening universe even when optional auxiliary rows are sparse.
+
 ## Physical Layout Preflight
 
 Before recording final evidence, capture these checks from the Doris client. They prove the generated assets were actually loaded with the intended partition and colocate design:

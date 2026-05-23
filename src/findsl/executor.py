@@ -100,27 +100,30 @@ class SQLiteSampleExecutor:
             source_physical = self.registry.table(source_logical)["physical"]
             if not _table_exists(conn, source_physical):
                 continue
+            skeleton_physical = self.registry.table("daily_quote")["physical"]
+            if not _table_exists(conn, skeleton_physical):
+                continue
             prefix_meta = self.registry.table(prefix_logical)
             prefix_physical = prefix_meta["physical"]
             conn.execute(f"DROP TABLE IF EXISTS {_quote(prefix_physical)}")
-            select_columns = [
-                "ts_code",
-                "trade_date",
-                "ROW_NUMBER() OVER (PARTITION BY ts_code ORDER BY trade_date) AS row_no",
-            ]
+            select_columns, from_sql, ts_expr, date_expr, value_alias = _prefix_select_context(
+                source_logical,
+                source_physical,
+                skeleton_physical,
+            )
             for meta in indicators:
-                column = _quote(meta["column"])
+                column = value_alias + "." + _quote(meta["column"]) if value_alias else _quote(meta["column"])
                 prefix_column = _quote(meta["prefix_column"])
                 select_columns.append(
                     "SUM("
                     + column
-                    + ") OVER (PARTITION BY ts_code ORDER BY trade_date "
+                    + f") OVER (PARTITION BY {ts_expr} ORDER BY {date_expr} "
                     + f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS {prefix_column}"
                 )
             select_sql = ", ".join(select_columns)
             conn.execute(
                 f"CREATE TABLE {_quote(prefix_physical)} AS "
-                f"SELECT {select_sql} FROM {_quote(source_physical)}"
+                f"SELECT {select_sql} {from_sql}"
             )
             _create_table_indexes(conn, prefix_physical, ["ts_code", "trade_date", "row_no"])
 
@@ -169,6 +172,49 @@ def _is_number(value: str) -> bool:
 
 def _quote(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
+
+
+def _prefix_select_context(
+    source_logical: str,
+    source_physical: str,
+    skeleton_physical: str,
+) -> tuple[List[str], str, str, str, str]:
+    if source_logical == "daily_quote":
+        ts_expr = _quote("ts_code")
+        date_expr = _quote("trade_date")
+        return (
+            [
+                ts_expr,
+                date_expr,
+                f"ROW_NUMBER() OVER (PARTITION BY {ts_expr} ORDER BY {date_expr}) AS {_quote('row_no')}",
+            ],
+            f"FROM {_quote(source_physical)}",
+            ts_expr,
+            date_expr,
+            "",
+        )
+
+    skeleton_alias = _quote("__skel")
+    source_alias = _quote("__src")
+    ts_expr = skeleton_alias + "." + _quote("ts_code")
+    date_expr = skeleton_alias + "." + _quote("trade_date")
+    from_sql = (
+        f"FROM {_quote(skeleton_physical)} AS {skeleton_alias} "
+        f"LEFT JOIN {_quote(source_physical)} AS {source_alias} "
+        f"ON {source_alias}.{_quote('ts_code')} = {ts_expr} "
+        f"AND {source_alias}.{_quote('trade_date')} = {date_expr}"
+    )
+    return (
+        [
+            f"{ts_expr} AS {_quote('ts_code')}",
+            f"{date_expr} AS {_quote('trade_date')}",
+            f"ROW_NUMBER() OVER (PARTITION BY {ts_expr} ORDER BY {date_expr}) AS {_quote('row_no')}",
+        ],
+        from_sql,
+        ts_expr,
+        date_expr,
+        source_alias,
+    )
 
 
 def _table_exists(conn: sqlite3.Connection, table_name: str) -> bool:
