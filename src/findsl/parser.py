@@ -53,7 +53,7 @@ class Parser:
 
     def _parse_comparison(self) -> Node:
         node = self._parse_additive()
-        token = self._match(">=", "<=", "==", "!=", ">", "<")
+        token = self._match(">=", "<=", "==", "!=", "=", ">", "<")
         if token:
             right = self._parse_additive()
             return Comparison(token.kind, node, right)

@@ -138,9 +138,11 @@ def test_compile_signed_numeric_threshold():
 
 
 def test_compile_normalizes_equality_operators_for_doris_sql():
+    single_equal = Compiler().compile('filter(indicator("close") = 10)')
     equal = Compiler().compile('filter(indicator("close") == 10)')
     not_equal = Compiler().compile('filter(indicator("close") != 10)')
 
+    assert "close = 10" in single_equal.sql
     assert "close = 10" in equal.sql
     assert "close == 10" not in equal.sql
     assert "close <> 10" in not_equal.sql

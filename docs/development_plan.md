@@ -168,7 +168,7 @@ Exit criteria:
 - Symbolic predicate helpers such as `market(...)` must reject non-symbol arguments before SQL generation.
 - Numeric expressions must reject literal division by zero before SQL generation.
 - Function names and `rank` limit argument names should be case-insensitive for official-style input robustness.
-- DSL equality operators must normalize to SQL-standard Doris-compatible comparison operators.
+- DSL equality operators (`=`/`==`/`!=`) must normalize to SQL-standard Doris-compatible comparison operators.
 - Every non-trivial rewrite emits trace text.
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.

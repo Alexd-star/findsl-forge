@@ -55,13 +55,13 @@ class SemanticAnalyzer:
         meta = self.registry.function(node.name)
         min_args = int(meta.get("min_args", 0))
         max_args = int(meta.get("max_args", 999))
-        if not (min_args <= len(node.args) <= max_args):
-            raise SemanticError(f"{node.name} expects {min_args}-{max_args} args, got {len(node.args)}")
         allowed_named = {str(arg).lower() for arg in meta.get("named_args", [])}
         for named in node.named_args or []:
             if named.name.lower() not in allowed_named:
                 raise SemanticError(f"{node.name} does not allow named arg {named.name}")
             self._validate_node(named.value)
+        if not (min_args <= len(node.args) <= max_args):
+            raise SemanticError(f"{node.name} expects {min_args}-{max_args} args, got {len(node.args)}")
         name = node.name.upper()
         if name == "FILTER":
             self._validate_filter(node)

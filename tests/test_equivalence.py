@@ -98,3 +98,13 @@ def test_sql_matches_reference_for_signed_numeric_threshold():
 
     assert result.passed
     assert result.sql_row_count > 0
+
+
+def test_sql_matches_reference_for_single_equal_comparison():
+    result = verify_sql_equivalence(
+        'filter(indicator("close") = 10)',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert result.sql_row_count == 1

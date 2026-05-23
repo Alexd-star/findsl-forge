@@ -595,7 +595,7 @@ def _format_number(value: float) -> str:
 
 
 def _sql_comparison_operator(op: str) -> str:
-    return {"==": "=", "!=": "<>"}.get(op, op)
+    return {"=": "=", "==": "=", "!=": "<>"}.get(op, op)
 
 
 def _sql_string_literal(value: str) -> str:

@@ -125,6 +125,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "Build pipelines as then(filter(...), rank(...)) or then(filter(...), filter(...)).")
     if "filter() condition" in lower:
         suggestions.insert(0, "filter() expects a boolean condition such as indicator(\"close\") > 10.")
+    if "indicator()" in lower and "string or identifier" in lower:
+        suggestions.insert(0, "Use indicator(\"close\") or another configured field name.")
     if "top-level dsl" in lower:
         suggestions.insert(0, "Wrap numeric expressions in filter(...), for example filter(indicator(\"close\") > 10).")
     if "bare identifier" in lower:
@@ -137,7 +139,20 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "Wrap numeric expressions in comparisons before using CONS/EXIST/filter.")
     if "numeric" in lower:
         suggestions.insert(0, "Use indicator(...), a numeric literal, or a numeric window function in numeric positions.")
-    if "named arg" in lower:
+    if "does not allow named arg" in lower:
+        named_match = re.search(
+            r"(?P<function>[A-Za-z_][A-Za-z0-9_]*) does not allow named arg (?P<name>[A-Za-z_][A-Za-z0-9_]*)",
+            message,
+        )
+        function_name = named_match.group("function").lower() if named_match else ""
+        arg_name = named_match.group("name") if named_match else "close"
+        if function_name == "filter":
+            suggestions.insert(0, f"Use a comparison expression such as filter(indicator(\"{arg_name}\") = 10).")
+        elif function_name == "rank":
+            suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
+        else:
+            suggestions.insert(0, "Remove unsupported named arguments or move them into positional expressions.")
+    if "rank()" in lower and "named arg" in lower:
         suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
     if "rank()" in lower and ("top" in lower or "bottom" in lower):
         suggestions.insert(0, "Use rank(..., desc, top=N) for high values or rank(..., asc, bottom=N) for low values.")

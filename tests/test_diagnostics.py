@@ -58,6 +58,16 @@ def test_diagnose_invalid_date_between_offers_iso_date_hint():
     assert any("YYYY-MM-DD" in hint for hint in diagnostics[0].suggestions)
 
 
+def test_diagnose_invalid_date_format_offers_iso_date_hint():
+    try:
+        Compiler().compile('filter(date_between("2026/01/01", "2026-01-02"))')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("YYYY-MM-DD" in hint for hint in diagnostics[0].suggestions)
+
+
 def test_diagnose_rank_bottom_order_mismatch_offers_direction_hint():
     try:
         Compiler().compile('rank(indicator("close"), desc, bottom=2)')
@@ -86,6 +96,16 @@ def test_diagnose_bare_identifier_suggests_indicator_wrapper():
 
     assert diagnostics[0].code == "SEMANTIC_ERROR"
     assert any('indicator("close")' in hint for hint in diagnostics[0].suggestions)
+
+
+def test_diagnose_filter_single_equal_bare_identifier_suggests_indicator_wrapper():
+    try:
+        Compiler().compile("filter(close=10)")
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any('filter(indicator("close") = 10)' in hint for hint in diagnostics[0].suggestions)
 
 
 def test_diagnose_filter_numeric_condition_offers_boolean_hint():
@@ -136,6 +156,16 @@ def test_diagnose_invalid_market_argument_offers_market_code_hint():
 
     assert diagnostics[0].code == "SEMANTIC_ERROR"
     assert any('market("A")' in hint for hint in diagnostics[0].suggestions)
+
+
+def test_diagnose_invalid_indicator_argument_offers_indicator_hint():
+    try:
+        Compiler().compile("filter(indicator(123) > 10)")
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any('indicator("close")' in hint for hint in diagnostics[0].suggestions)
 
 
 def test_diagnose_literal_division_by_zero_offers_denominator_hint():

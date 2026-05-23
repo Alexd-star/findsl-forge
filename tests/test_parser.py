@@ -18,3 +18,10 @@ def test_parse_signed_numeric_literal():
     ast = parse('filter(indicator("main_net_inflow") < -1.5)')
     data = ast.to_dict()
     assert data["args"][0]["right"]["value"] == -1.5
+
+
+def test_parse_single_equal_comparison_operator():
+    ast = parse('filter(indicator("close") = 10)')
+    data = ast.to_dict()
+
+    assert data["args"][0]["op"] == "="

@@ -97,7 +97,7 @@ class PandasReferenceEvaluator:
                 return left < right
             if node.op == "<=":
                 return left <= right
-            if node.op == "==":
+            if node.op in {"=", "=="}:
                 return left == right
             if node.op == "!=":
                 return left != right
