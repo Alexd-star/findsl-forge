@@ -65,6 +65,7 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
             _close_new_high(normalized),
             _close_rolling_min_threshold(normalized),
             _volume_breakout_exists(normalized),
+            _date_range_rolling_volume_sum(normalized),
             _rolling_volume_sum(normalized),
             _date_range_close_above_ma(normalized),
             _date_range_close_threshold(normalized),
@@ -342,6 +343,36 @@ def _rolling_volume_sum(text: str) -> Optional[DslCandidate]:
         rule="rolling_volume_sum",
         rationale="Matched rolling volume aggregation and mapped it to SUM(volume, window).",
         matched_signals=sorted(signals),
+    )
+
+
+def _date_range_rolling_volume_sum(text: str) -> Optional[DslCandidate]:
+    dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    signals = _signals(
+        text,
+        [
+            ("volume", ["成交量", "volume"]),
+            ("rolling_sum", ["累计", "合计", "总和", "求和", "sum", "前缀和"]),
+            ("threshold", ["大于", "超过", "高于", ">", ">="]),
+        ],
+    )
+    if len(dates) < 2 or not {"volume", "rolling_sum"}.issubset(signals):
+        return None
+
+    window = _window_after(text, ["近", "最近", "过去"], default=3)
+    threshold = _threshold_after(text, ["大于", "超过", "高于", ">", ">="], default=300)
+    dsl = (
+        f'filter(date_between("{dates[0]}", "{dates[1]}") '
+        f'& SUM(indicator("volume"), {window}) > {_format_number(threshold)})'
+    )
+    confidence = 0.91 if "threshold" in signals else 0.81
+    return DslCandidate(
+        title=f"Date-range {window}-day rolling volume sum",
+        dsl=dsl,
+        confidence=confidence,
+        rule="date_range_rolling_volume_sum",
+        rationale="Matched explicit date range plus rolling volume aggregation and mapped it to date_between() with SUM(volume, window).",
+        matched_signals=sorted(signals | {"date_range"}),
     )
 
 

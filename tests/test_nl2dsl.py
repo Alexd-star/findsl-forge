@@ -113,6 +113,20 @@ def test_suggests_rolling_sum_and_formats_unit_threshold_as_plain_number():
     assert "dwd_stock_daily_quote_prefix" in Compiler().compile(result.top.dsl).sql
 
 
+def test_suggests_date_range_rolling_sum_with_prefix_pruning():
+    result = suggest_dsl("2026-01-02到2026-01-04近3日成交量累计大于300")
+
+    assert result.top is not None
+    assert result.top.rule == "date_range_rolling_volume_sum"
+    assert result.top.dsl == (
+        'filter(date_between("2026-01-02", "2026-01-04") '
+        '& SUM(indicator("volume"), 3) > 300)'
+    )
+    compiled = Compiler().compile(result.top.dsl)
+    assert "dwd_stock_daily_quote_prefix" in compiled.sql
+    assert "DATE_RANGE_PREFIX_PRUNING" in {step["rule"] for step in compiled.explain}
+
+
 def test_suggests_date_range_close_threshold():
     result = suggest_dsl("2026-01-02到2026-01-04收盘价大于10")
 

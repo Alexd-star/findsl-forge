@@ -378,7 +378,7 @@ class ReadinessReport:
                 "- Structured optimizer explain records for defense and UI visualization.",
                 "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",
                 "- NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.",
-                "- Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, date-window moving-average, signed net-outflow, and rolling-min scenarios.",
+                "- Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, date-window moving-average, signed net-outflow, rolling-min, and date-prefix-sum pruning scenarios.",
                 "- Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.",
                 "- Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.",
                 "- SQL string literals are escaped by the compiler before they reach generated Doris SQL.",
