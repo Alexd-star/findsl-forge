@@ -106,3 +106,10 @@ def test_compile_date_between_prunes_window_queries_with_safe_upper_bound():
     assert any(step["rule"] == "DATE_RANGE_PUSHDOWN" for step in result.explain)
     assert any(step["rule"] == "DATE_RANGE_WINDOW_PRUNING" for step in result.explain)
     assert not any(step["rule"] == "DATE_RANGE_BASE_PRUNING" for step in result.explain)
+
+
+def test_compile_escapes_string_literals_in_generated_sql():
+    result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
+
+    assert "market = 'A'' OR 1=1 --'" in result.sql
+    assert "market = 'A' OR 1=1 --'" not in result.sql

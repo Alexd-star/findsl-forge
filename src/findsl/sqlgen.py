@@ -348,7 +348,7 @@ class SqlGenerator:
     def _numeric_sql(self, node: Node) -> str:
         if isinstance(node, Literal):
             if isinstance(node.value, str):
-                return f"'{node.value}'"
+                return _sql_string_literal(node.value)
             return str(node.value)
         if isinstance(node, Identifier):
             return node.name
@@ -373,9 +373,10 @@ class SqlGenerator:
     def _market_sql(self, node: FunctionCall) -> str:
         market_name = self._symbol_arg(node.args[0], "market")
         self.required_tables.add("stock_universe")
+        market_literal = _sql_string_literal(market_name)
         if self._current_source:
-            return f"{self._table_alias('stock_universe')}.market = '{market_name}'"
-        return f"market = '{market_name}'"
+            return f"{self._table_alias('stock_universe')}.market = {market_literal}"
+        return f"market = {market_literal}"
 
     def _date_between_sql(self, node: FunctionCall) -> str:
         predicate = self._date_between_predicate(node)
@@ -394,11 +395,11 @@ class SqlGenerator:
     def _date_between_predicate(self, node: FunctionCall) -> str:
         start = self._date_arg(node.args[0], "date_between")
         end = self._date_arg(node.args[1], "date_between")
-        return f"(trade_date >= '{start}' AND trade_date <= '{end}')"
+        return f"(trade_date >= {_sql_string_literal(start)} AND trade_date <= {_sql_string_literal(end)})"
 
     def _date_between_upper_bound_predicate(self, node: FunctionCall) -> str:
         end = self._date_arg(node.args[1], "date_between")
-        return f"trade_date <= '{end}'"
+        return f"trade_date <= {_sql_string_literal(end)}"
 
     def _symbol_arg(self, node: Node, function_name: str) -> str:
         if isinstance(node, Literal) and isinstance(node.value, str):
@@ -548,3 +549,7 @@ def _format_number(value: float) -> str:
     if float(value).is_integer():
         return str(int(value))
     return f"{value:.12f}".rstrip("0").rstrip(".")
+
+
+def _sql_string_literal(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"

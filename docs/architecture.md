@@ -78,6 +78,8 @@ Compiler, API, and demo failures are converted into structured diagnostics with 
 
 The Web Demo also exposes official negative presets from the same JSONL corpus used by the readiness gate. Selecting a negative preset runs the normal analyzer path, shows the expected diagnostic code beside the actual diagnostic code, and renders repair suggestions from the shared diagnostics layer. This makes error handling demonstrable instead of only testable.
 
+String literals are escaped inside the compiler before they are emitted into Doris SQL. This keeps the deterministic DSL path from becoming a SQL-fragment bypass when a user supplies a market value or other string literal containing quotes.
+
 ### Typed AST Before SQL
 
 DSL is parsed into AST nodes before SQL is generated. This supports:
