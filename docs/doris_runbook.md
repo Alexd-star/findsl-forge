@@ -31,6 +31,32 @@ The generated sample inserts are intentionally small smoke-test fixtures.
 
 The generated schema uses monthly `trade_date` auto partitions and a shared `colocate_with` group over the `ts_code` hash distribution. This is intentional physical evidence for two competition-critical paths: safe date-range predicates can prune partitions, and prefix-table joins can remain locally distributed when cluster colocate conditions are satisfied.
 
+## Physical Layout Preflight
+
+Before recording final evidence, capture these checks from the Doris client. They prove the generated assets were actually loaded with the intended partition and colocate design:
+
+```sql
+USE findsl_demo;
+
+SHOW CREATE TABLE dwd_stock_daily_quote;
+SHOW CREATE TABLE dwd_stock_daily_quote_prefix;
+SHOW CREATE TABLE dwd_stock_money_flow;
+SHOW CREATE TABLE dwd_stock_money_flow_prefix;
+
+SHOW PARTITIONS FROM dwd_stock_daily_quote;
+SHOW PARTITIONS FROM dwd_stock_daily_quote_prefix;
+
+SHOW PROC '/colocation_group';
+```
+
+Evidence to keep:
+
+- base and prefix tables both show `AUTO PARTITION BY RANGE (date_trunc(..., 'month'))`,
+- base and prefix tables use the same `DISTRIBUTED BY HASH(ts_code)` bucket count,
+- related base and prefix tables share `colocate_with = findsl_stock_by_ts`,
+- partition output contains the loaded trade-date months,
+- colocate status is stable before latency sampling.
+
 ## Collect Cluster Evidence
 
 After schema, sample or scale data, and prefix tables are loaded, collect the real Doris evidence consumed by the submission readiness gate:
@@ -65,6 +91,33 @@ The readiness gate treats Doris-scale evidence as valid only when all of these m
 - measured Doris speedup meets the 10x target,
 - the baseline plan contains a window path,
 - the optimized plan contains a prefix table path.
+
+## Manual Evidence Cross-Checks
+
+The collector automates the final report, but these manual checks are useful for screenshots and root-cause debugging if the readiness warning does not close:
+
+```sql
+-- Baseline SQL should contain a window frame after compiling with prefix-sum disabled.
+EXPLAIN <baseline_window_sql>;
+
+-- Optimized SQL should reference a generated prefix table.
+EXPLAIN <optimized_prefix_sql>;
+
+-- Row counts must match before timing claims are meaningful.
+SELECT COUNT(*) AS baseline_rows FROM (<baseline_window_sql>) baseline_q;
+SELECT COUNT(*) AS optimized_rows FROM (<optimized_prefix_sql>) optimized_q;
+```
+
+When the two row counts differ, treat it as a correctness failure rather than a performance issue. Check prefix-table rebuild order, row-number continuity per `ts_code`, and whether the benchmark DSL uses an indicator whose configuration declares `supports_prefix_sum = true`.
+
+For latency evidence, warm the cluster once, then run the collector with at least three measured iterations:
+
+```powershell
+$env:DORIS_EVIDENCE_ITERATIONS="5"
+powershell -ExecutionPolicy Bypass -File .\scripts\collect_doris_evidence.ps1
+```
+
+Keep the generated Markdown and JSON sidecar together. The Markdown is for the technical document and defense, while the JSON is safer for later automated comparison if table layout or optimizer rules change.
 
 For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWORD_MODE=inline`. Inline passwords are redacted in the generated report's command template. Use shell history controls appropriate for your environment before recording final evidence.
 
