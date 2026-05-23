@@ -88,6 +88,15 @@ def test_suggests_close_new_high_with_chinese_window_number():
     assert "MAX(close) OVER" in Compiler().compile(result.top.dsl).sql
 
 
+def test_suggests_close_rolling_min_threshold():
+    result = suggest_dsl("近3日最低收盘价低于10")
+
+    assert result.top is not None
+    assert result.top.rule == "close_rolling_min_threshold"
+    assert result.top.dsl == 'filter(MIN(indicator("close"), 3) < 10)'
+    assert "MIN(close) OVER" in Compiler().compile(result.top.dsl).sql
+
+
 def test_suggests_volume_breakout_exists_template():
     result = suggest_dsl("近10日存在放量")
 

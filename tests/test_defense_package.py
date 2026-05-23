@@ -41,6 +41,8 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "A股每日换手率前50%" in content
     assert "date_window_pruning" in content
     assert "signed_outflow_threshold" in content
+    assert "rolling_min_threshold" in content
+    assert "covered=5/5" in content
     assert "Doris SQL validation boundary" in content
     assert "Semantic hardening diagnostics" in content
     assert "hardened=5/5" in content

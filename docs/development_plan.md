@@ -145,7 +145,7 @@ Exit criteria:
 - `scripts/defense_package.ps1` produces a repeatable walkthrough that maps visible demo signals to competition scoring points.
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
-- Defense package must prove NL2DSL official-template coverage for low-price `bottom`, turnover `percent`, date-window MA, and signed net-outflow scenarios.
+- Defense package must prove NL2DSL official-template coverage for low-price `bottom`, turnover `percent`, date-window MA, signed net-outflow, and rolling-min scenarios.
 - LLM safety smoke check proves model-proposed output accepts only verified DSL, rejects direct SQL, and classifies invalid DSL with stable diagnostics.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Defense package proves a config-only indicator extension can compile and pass Doris SQL validation without changing compiler core.

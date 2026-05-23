@@ -63,6 +63,7 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
             _high_turnover_close_rank(normalized),
             _net_outflow_threshold(normalized),
             _close_new_high(normalized),
+            _close_rolling_min_threshold(normalized),
             _volume_breakout_exists(normalized),
             _rolling_volume_sum(normalized),
             _date_range_close_above_ma(normalized),
@@ -255,6 +256,35 @@ def _close_new_high(text: str) -> Optional[DslCandidate]:
         confidence=0.91,
         rule="close_new_high",
         rationale="Matched close-price new-high intent and rewrote it as close >= rolling MAX(close).",
+        matched_signals=sorted(signals),
+    )
+
+
+def _close_rolling_min_threshold(text: str) -> Optional[DslCandidate]:
+    signals = _signals(
+        text,
+        [
+            ("close", ["收盘价", "收盘", "close"]),
+            ("rolling_min", ["最低", "最低值", "低点", "min"]),
+            ("threshold", ["低于", "小于", "跌破", "<"]),
+        ],
+    )
+    if not {"close", "rolling_min", "threshold"}.issubset(signals):
+        return None
+
+    window = _window_after(
+        text,
+        ["近", "最近", "过去"],
+        default=_window_near(text, ["最低", "最低值", "低点", "min"], default=3),
+    )
+    threshold = _threshold_after(text, ["低于", "小于", "跌破", "<"], default=10)
+    dsl = f'filter(MIN(indicator("close"), {window}) < {_format_number(threshold)})'
+    return DslCandidate(
+        title=f"{window}-day close rolling minimum below {threshold:g}",
+        dsl=dsl,
+        confidence=0.88,
+        rule="close_rolling_min_threshold",
+        rationale="Matched rolling minimum close-price threshold and rewrote it as MIN(close, window) < threshold.",
         matched_signals=sorted(signals),
     )
 

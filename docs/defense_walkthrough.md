@@ -32,7 +32,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 2. Open `http://127.0.0.1:8765`.
 3. Keep the default Chinese request and press `Suggest DSL`.
 4. Confirm the UI shows a validated candidate, verification `PASS`, generated SQL, AST, trace, and explain records.
-5. Replace the natural-language request with `A股存在资金流入后按低价取每日2只`, `A股每日换手率前50%`, `2026-01-02到2026-01-04收盘价大于3日均线`, and `主力净流出低于-1.5` in turn; confirm each suggested DSL validates.
+5. Replace the natural-language request with `A股存在资金流入后按低价取每日2只`, `A股每日换手率前50%`, `2026-01-02到2026-01-04收盘价大于3日均线`, `主力净流出低于-1.5`, and `近3日最低收盘价低于10` in turn; confirm each suggested DSL validates.
 6. Select `Official positive: money_flow_prefix_sum` from the sample preset list and run it.
 7. Confirm the UI shows verification `PASS`, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.
 8. Select `Diagnostic negative: UNKNOWN_INDICATOR` from the sample preset list and run it.
@@ -46,7 +46,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 Capture these screens for the technical document and one-minute video:
 
 - Default NL2DSL request with validated candidate and verification `PASS`.
-- Official-style NL2DSL prompts showing `bottom=2`, `percent=50`, date-window MA validation, and signed net-outflow threshold handling.
+- Official-style NL2DSL prompts showing `bottom=2`, `percent=50`, date-window MA validation, signed net-outflow threshold handling, and rolling `MIN` threshold handling.
 - SQL tab for the official prefix-sum preset showing `dwd_stock_money_flow_prefix`.
 - Explain tab showing the `PREFIX_SUM` rule applied.
 - Diagnostic negative preset showing expected/actual `UNKNOWN_INDICATOR` and repair suggestions.
@@ -60,7 +60,7 @@ Capture these screens for the technical document and one-minute video:
 | Evidence | Scoring point |
 |---|---|
 | Validated NL2DSL candidate | AI-assisted use without SQL hallucination |
-| NL2DSL official template coverage | AI-assisted entry covers bottom-rank, percent-rank, date-window, and signed-threshold scenarios |
+| NL2DSL official template coverage | AI-assisted entry covers bottom-rank, percent-rank, date-window, signed-threshold, and rolling-min scenarios |
 | LLM candidate safety loop | Model assistance cannot bypass deterministic compiler validation |
 | SQL/reference verification PASS | Correctness proof beyond string matching |
 | Prefix-sum preset with prefix table SQL | Long-window optimization design |

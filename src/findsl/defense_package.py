@@ -55,7 +55,7 @@ class DefensePackageResult:
             "",
             "1. Start the demo with `powershell -ExecutionPolicy Bypass -File .\\scripts\\serve_demo.ps1`.",
             "2. Let the default Chinese request produce a validated DSL candidate and SQL/reference PASS.",
-            "3. Try `A股存在资金流入后按低价取每日2只`, `A股每日换手率前50%`, `2026-01-02到2026-01-04收盘价大于3日均线`, and `主力净流出低于-1.5`; confirm each suggested DSL validates.",
+            "3. Try `A股存在资金流入后按低价取每日2只`, `A股每日换手率前50%`, `2026-01-02到2026-01-04收盘价大于3日均线`, `主力净流出低于-1.5`, and `近3日最低收盘价低于10`; confirm each suggested DSL validates.",
             "4. Select `Official positive: 主力净流入3日滚动求和走资金流前缀表 [money_flow_prefix_sum]` and run it.",
             "5. Confirm the UI shows verification PASS, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.",
             "6. Select `Diagnostic negative: 未知指标名 [UNKNOWN_INDICATOR]` and run it.",
@@ -208,6 +208,12 @@ def _check_nl2dsl_official_template_coverage(data_dir: Path) -> DefenseCheck:
             "net_outflow_threshold",
             "< -1.5",
         ),
+        (
+            "rolling_min_threshold",
+            "近3日最低收盘价低于10",
+            "close_rolling_min_threshold",
+            "MIN(indicator(\"close\"), 3)",
+        ),
     ]
     try:
         evidence = []
@@ -228,8 +234,8 @@ def _check_nl2dsl_official_template_coverage(data_dir: Path) -> DefenseCheck:
         passed = passed_items == len(prompts)
         return DefenseCheck(
             name="NL2DSL official template coverage",
-            scoring_point="AI-assisted coverage for bottom-rank, percent-rank, date-window, and signed-threshold official scenarios",
-            demo_action="Enter official-style Chinese prompts for low-price bottom, turnover percent, date-window MA, and net-outflow threshold cases.",
+            scoring_point="AI-assisted coverage for bottom-rank, percent-rank, date-window, signed-threshold, and rolling-min official scenarios",
+            demo_action="Enter official-style Chinese prompts for low-price bottom, turnover percent, date-window MA, net-outflow threshold, and rolling-min cases.",
             expected_signal="Each prompt yields a compiler-validated DSL candidate whose rule matches the intended official scenario.",
             passed=passed,
             evidence=[
@@ -240,8 +246,8 @@ def _check_nl2dsl_official_template_coverage(data_dir: Path) -> DefenseCheck:
     except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
         return _failed_check(
             "NL2DSL official template coverage",
-            "AI-assisted coverage for bottom-rank, percent-rank, date-window, and signed-threshold official scenarios",
-            "Enter official-style Chinese prompts for low-price bottom, turnover percent, date-window MA, and net-outflow threshold cases.",
+            "AI-assisted coverage for bottom-rank, percent-rank, date-window, signed-threshold, and rolling-min official scenarios",
+            "Enter official-style Chinese prompts for low-price bottom, turnover percent, date-window MA, net-outflow threshold, and rolling-min cases.",
             "Each prompt yields a compiler-validated DSL candidate whose rule matches the intended official scenario.",
             exc,
         )
