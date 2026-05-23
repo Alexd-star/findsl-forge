@@ -23,3 +23,10 @@ def test_new_indicator_compiles_from_registry_metadata_only():
 
     assert "alpha_score > 0" in result.sql
     assert any(step["rule"] == "DORIS_SQL_VALIDATION" for step in result.explain)
+
+
+def test_indicator_lookup_is_case_insensitive_after_exact_match():
+    registry = default_registry()
+
+    assert registry.indicator("Close") == registry.indicator("close")
+    assert registry.indicator("MAIN_NET_INFLOW") == registry.indicator("main_net_inflow")

@@ -69,7 +69,7 @@ def verify_sql_equivalence(dsl: str, data_dir: Path, compiler: Compiler = None) 
     compiler = compiler or Compiler()
     compiled = compiler.compile(dsl)
     sql_result = SQLiteSampleExecutor(data_dir, compiler.registry).execute(compiled.sql)
-    reference_result = PandasReferenceEvaluator(data_dir).evaluate(dsl)
+    reference_result = PandasReferenceEvaluator(data_dir, registry=compiler.registry).evaluate(dsl)
 
     sql_keys = sorted(sql_result.keys())
     reference_keys = sorted(reference_result.keys())

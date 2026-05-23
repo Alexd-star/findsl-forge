@@ -23,10 +23,13 @@ class Registry:
         )
 
     def indicator(self, name: str) -> Dict[str, Any]:
-        try:
+        if name in self.indicators:
             return self.indicators[name]
-        except KeyError as exc:
-            raise ConfigError(f"Unknown indicator: {name}") from exc
+        folded = name.lower()
+        for key, value in self.indicators.items():
+            if key.lower() == folded:
+                return value
+        raise ConfigError(f"Unknown indicator: {name}")
 
     def table(self, name: str) -> Dict[str, Any]:
         try:

@@ -196,3 +196,13 @@ def test_sql_matches_reference_for_single_equal_comparison():
 
     assert result.passed
     assert result.sql_row_count == 1
+
+
+def test_sql_matches_reference_for_case_insensitive_indicator_name():
+    result = verify_sql_equivalence(
+        'filter(indicator("Close") > 10)',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert result.sql_row_count == 9

@@ -8,6 +8,7 @@ from typing import Any
 from .ast_nodes import BinaryOp, Comparison, FunctionCall, Identifier, Literal, Node
 from .errors import SemanticError
 from .parser import parse
+from .registry import Registry, default_registry
 
 
 @dataclass(frozen=True)
@@ -21,12 +22,13 @@ class ReferenceResult:
 class PandasReferenceEvaluator:
     """Slow but trustworthy DSL evaluator for semantic regression tests."""
 
-    def __init__(self, data_dir: Path):
+    def __init__(self, data_dir: Path, registry: Registry = None):
         try:
             import pandas as pd
         except ImportError as exc:  # pragma: no cover - depends on runtime environment.
             raise RuntimeError("PandasReferenceEvaluator requires pandas") from exc
         self.pd = pd
+        self.registry = registry or default_registry()
         self.data = self._load_data(data_dir)
 
     def evaluate(self, dsl: str) -> ReferenceResult:
@@ -145,9 +147,10 @@ class PandasReferenceEvaluator:
             name = node.name.upper()
             if name == "INDICATOR":
                 indicator_name = self._symbol_arg(node.args[0], "indicator")
-                if indicator_name not in rows.columns:
-                    raise SemanticError(f"Unknown indicator column in sample data: {indicator_name}")
-                return rows[indicator_name]
+                column = str(self.registry.indicator(indicator_name)["column"])
+                if column not in rows.columns:
+                    raise SemanticError(f"Unknown indicator column in sample data: {column}")
+                return rows[column]
             if name in {"MA", "SUM", "MAX", "MIN"}:
                 series = self._numeric(node.args[0], rows)
                 window = self._window_value(node.args[1])

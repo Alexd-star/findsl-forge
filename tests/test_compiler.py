@@ -201,3 +201,9 @@ def test_compile_accepts_case_insensitive_function_and_rank_limit_names():
 
     assert "WITH stage1 AS" in result.sql
     assert "rank_no <= 2" in result.sql
+
+
+def test_compile_accepts_case_insensitive_indicator_names():
+    result = Compiler().compile('filter(indicator("Close") > 10)')
+
+    assert "close > 10" in result.sql
