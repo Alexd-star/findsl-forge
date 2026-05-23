@@ -26,5 +26,6 @@ def test_run_scale_benchmark_generates_long_window_report(tmp_path):
 
     report = output.read_text(encoding="utf-8")
     assert "Prefix-Sum Scale Benchmark" in report
+    assert "Local SQLite speedup smoke" in report
     assert "Long-window feature-access reduction estimate: 4.0x" in report
     assert "must be backed by Doris EXPLAIN" in report

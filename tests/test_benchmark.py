@@ -34,4 +34,5 @@ def test_prefix_sum_benchmark_compares_baseline_and_optimized_sql(tmp_path):
     assert written.optimized_matches_baseline
     report = output.read_text(encoding="utf-8")
     assert "Prefix-Sum Benchmark Report" in report
+    assert "Local SQLite speedup smoke" in report
     assert "`PREFIX_SUM` applied" in report

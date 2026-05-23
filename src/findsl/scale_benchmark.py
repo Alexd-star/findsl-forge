@@ -59,7 +59,7 @@ class ScaleBenchmarkResult:
             "## Performance Signals",
             "",
             f"- Iterations: {self.benchmark.iterations}",
-            f"- Local SQLite speedup: {self.benchmark.local_speedup:.2f}x",
+            f"- Local SQLite speedup smoke: {self.benchmark.local_speedup:.2f}x",
             f"- Baseline avg execute ms: {self.benchmark.baseline.avg_execute_ms:.3f}",
             f"- Optimized avg execute ms: {self.benchmark.optimized.avg_execute_ms:.3f}",
             f"- Baseline P95 execute ms: {self.benchmark.baseline.p95_execute_ms:.3f}",
@@ -68,7 +68,7 @@ class ScaleBenchmarkResult:
             f"- Optimized prefix table references: {self.benchmark.optimized_prefix_joins}",
             f"- Long-window feature-access reduction estimate: {self.estimated_feature_work_reduction:.1f}x",
             "",
-            "Local SQLite timing is a regression and plan-shape signal. The reduction estimate compares a "
+            "Local SQLite timing is a smoke/regression and plan-shape signal. The reduction estimate compares a "
             "window-length rolling scan with two prefix-table lookups per row; final 10x production claims "
             "must be backed by Doris EXPLAIN and cluster latency.",
             "",

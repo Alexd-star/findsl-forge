@@ -101,6 +101,8 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert "Defense package walkthrough" in content
     assert "Doris Asset Integrity" in content
     assert "Award-Readiness Differentiators" in content
+    assert "Local SQLite prefix benchmark speedup smoke" in content
+    assert "not used as the Doris-scale performance claim" in content
 
 
 def test_readiness_report_keeps_doris_scale_proof_as_warning(tmp_path):
