@@ -145,6 +145,7 @@ Exit criteria:
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
 - LLM safety smoke check proves model-proposed output accepts only verified DSL, rejects direct SQL, and classifies invalid DSL with stable diagnostics.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
+- Defense package proves a config-only indicator extension can compile and pass Doris SQL validation without changing compiler core.
 - Official-style coverage suite remains a required readiness gate, with representative positive cases passing SQL/reference equivalence and representative negative cases producing stable diagnostic codes plus repair hints.
 - Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
 - Generated reports can be attached to the technical document or used in defense.

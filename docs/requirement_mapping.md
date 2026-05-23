@@ -11,7 +11,7 @@ This document maps Topic 19 requirements to implementation modules.
 | Support date-range partition pruning predicates | `date_between(...)`, `findsl.sqlgen`, `findsl.reference`, `DATE_RANGE_PUSHDOWN`, `DATE_RANGE_BASE_PRUNING`, and window-safe `DATE_RANGE_WINDOW_PRUNING` explain evidence | Started |
 | Support CTE and window function rewrites | `findsl.sqlgen` | Started |
 | Decouple business rules from compiler core | `configs/*.json`, `findsl.registry` | Started |
-| Add new indicators without core code changes | `configs/indicators.json` | Started |
+| Add new indicators without core code changes | `configs/indicators.json`, `Registry`, defense-package config-only `alpha_score` extension check | Started |
 | Compile P95 < 50ms | `findsl.compiler`, `findsl.evaluation` | Started |
 | Long-range 10x acceleration using prefix sum/materialized paths | `findsl.sqlgen`, `findsl.scale_benchmark`, `findsl.doris_evidence` | Started |
 | Prefix-sum optimized rolling SUM | `findsl.sqlgen`, `configs/indicators.json`, `configs/tables.json` | Started |

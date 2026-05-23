@@ -116,6 +116,8 @@ This is intentionally closer to production SQL than string-template demos.
 
 Indicators, tables, and functions live in `configs/`. The compiler should not need code changes when adding common indicators.
 
+The defense package includes a config-only extension check that injects a temporary `alpha_score` indicator into a copied registry and compiles it through the normal compiler and Doris SQL validator. This turns the "new indicator without compiler-core changes" claim into executable evidence instead of a document-only assertion.
+
 ### Prefix-Sum Optimizer
 
 Rolling `SUM` can be expensive for long financial windows. When an indicator declares `supports_prefix_sum`, `prefix_table`, and `prefix_column`, the generator rewrites:
@@ -189,7 +191,7 @@ The defense package converts engineering evidence into a live-demonstration sequ
 demo scenario -> executable check -> scoring point -> expected visible signal -> Markdown report
 ```
 
-It covers NL2DSL validation, safe LLM candidate validation, prefix-sum official positive presets, diagnostic negative presets, official-style corpus coverage, compiler accuracy/latency, and Doris deployment asset integrity. It deliberately does not claim real Doris 10x performance; that remains gated by the Doris evidence collector and a real cluster report.
+It covers NL2DSL validation, safe LLM candidate validation, prefix-sum official positive presets, diagnostic negative presets, Doris SQL validation, config-only indicator extension, official-style corpus coverage, compiler accuracy/latency, and Doris deployment asset integrity. It deliberately does not claim real Doris 10x performance; that remains gated by the Doris evidence collector and a real cluster report.
 
 ## Doris Evidence Loop
 

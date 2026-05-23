@@ -11,6 +11,7 @@ from .doris import render_doris_assets
 from .evaluation import evaluate_file, load_cases
 from .llm_adapter import DEFAULT_LLM_CANDIDATE_RESPONSE, validate_llm_candidates
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES, run_official_suite
+from .registry import Registry, default_registry
 
 
 @dataclass(frozen=True)
@@ -135,6 +136,7 @@ def generate_defense_package(
         _check_money_flow_prefix(data_dir, official_positive_path),
         _check_unknown_indicator_diagnostic(official_negative_path),
         _check_doris_sql_validation(),
+        _check_config_only_indicator_extension(),
         _check_official_suite(data_dir, official_positive_path, official_negative_path, reports_dir),
         _check_evaluation_report(cases_path, reports_dir),
         _check_doris_assets(repo_root, data_dir),
@@ -325,6 +327,53 @@ def _check_doris_sql_validation() -> DefenseCheck:
             "Generated SQL shape and literal safety",
             "Compile a market literal containing a quote and SQL-looking text.",
             "DORIS_SQL_VALIDATION appears in explain with zero issues and the SQL literal is escaped.",
+            exc,
+        )
+
+
+def _check_config_only_indicator_extension() -> DefenseCheck:
+    try:
+        base = default_registry()
+        registry = Registry(
+            indicators={
+                **base.indicators,
+                "alpha_score": {
+                    "type": "numeric",
+                    "table": "daily_quote",
+                    "column": "alpha_score",
+                    "adjustment": "none",
+                    "supports_prefix_sum": False,
+                },
+            },
+            tables=base.tables,
+            functions=base.functions,
+        )
+        result = Compiler(registry=registry).compile('filter(indicator("alpha_score") > 0)')
+        validation_ok = any(
+            step.get("rule") == "DORIS_SQL_VALIDATION"
+            and step.get("evidence", {}).get("issue_count") == 0
+            for step in result.explain
+        )
+        sql_contains_indicator = "alpha_score > 0" in result.sql
+        passed = validation_ok and sql_contains_indicator
+        return DefenseCheck(
+            name="Config-only indicator extension",
+            scoring_point="New indicator support without compiler-core changes",
+            demo_action="Compile a temporary registry extension containing indicator alpha_score.",
+            expected_signal="Generated SQL references alpha_score and still passes Doris SQL validation.",
+            passed=passed,
+            evidence=[
+                "indicator=alpha_score",
+                f"sql_contains_indicator={sql_contains_indicator}",
+                f"doris_validation={validation_ok}",
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "Config-only indicator extension",
+            "New indicator support without compiler-core changes",
+            "Compile a temporary registry extension containing indicator alpha_score.",
+            "Generated SQL references alpha_score and still passes Doris SQL validation.",
             exc,
         )
 
