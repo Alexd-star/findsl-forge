@@ -161,6 +161,6 @@ Exit criteria:
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.
 - Generated SQL must pass the Doris-safe query-shape validator before a compile result is accepted.
 - Official-style positive/negative corpora must grow with every newly supported DSL construct so competition coverage stays evidence-backed.
-- Rank semantics must keep top/bottom/percent validation aligned across compiler SQL, Pandas reference, diagnostics, and official-suite cases.
+- Rank semantics must keep top/bottom/percent validation aligned across compiler SQL, Pandas reference, diagnostics, and official-suite cases; `top` is paired with `desc`, while `bottom` is paired with `asc` to avoid ambiguous low/high picks.
 - Date predicates must validate ISO dates, reject reversed ranges, expose `DATE_RANGE_PUSHDOWN`, and push safe non-window ranges into the base scan as `DATE_RANGE_BASE_PRUNING`.
 - LLM/provider integrations may propose DSL only; they must never execute direct SQL or bypass compiler, diagnostics, optimizer explain, and equivalence checks.

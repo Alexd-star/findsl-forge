@@ -22,3 +22,9 @@ def test_date_between_rejects_reversed_range():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="start date"):
         analyzer.validate(parse('filter(date_between("2026-01-04", "2026-01-02"))'))
+
+
+def test_rank_bottom_requires_ascending_order():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="bottom must use asc"):
+        analyzer.validate(parse('rank(indicator("close"), desc, bottom=2)'))

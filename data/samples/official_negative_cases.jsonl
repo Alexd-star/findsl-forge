@@ -6,4 +6,5 @@
 {"name": "字符串未闭合", "dsl": "filter(indicator(\"close) > 10)", "expected_code": "LEX_ERROR", "expected_suggestion_fragments": ["missing closing double quote"]}
 {"name": "rank命名参数错误", "dsl": "rank(indicator(\"close\"), desc, limit=10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["supported named args"]}
 {"name": "rank百分比越界", "dsl": "rank(indicator(\"close\"), desc, percent=120)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["0 < N <= 100"]}
+{"name": "rank底部排序方向不一致", "dsl": "rank(indicator(\"close\"), desc, bottom=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["rank(..., asc, bottom=N)"]}
 {"name": "日期区间起止倒置", "dsl": "filter(date_between(\"2026-01-04\", \"2026-01-02\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["YYYY-MM-DD"]}

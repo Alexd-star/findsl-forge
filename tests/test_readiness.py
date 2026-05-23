@@ -65,7 +65,7 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.diagnostics_smoke.passed
     assert report.official_suite.passed
     assert report.official_suite.positive_passed == 13
-    assert report.official_suite.negative_passed == 9
+    assert report.official_suite.negative_passed == 10
     assert report.defense_package.passed
     assert report.defense_package.passed_count == report.defense_package.total
     required_gates = {gate.name: gate for gate in report.gates if gate.level == "required"}

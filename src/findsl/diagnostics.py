@@ -127,6 +127,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "Use indicator(...), a numeric literal, or a numeric window function in numeric positions.")
     if "named arg" in lower:
         suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
+    if "rank()" in lower and ("top" in lower or "bottom" in lower):
+        suggestions.insert(0, "Use rank(..., desc, top=N) for high values or rank(..., asc, bottom=N) for low values.")
     if "percent" in lower:
         suggestions.insert(0, "For rank(..., percent=N), use 0 < N <= 100 and do not combine it with top/bottom.")
     if "date_between" in lower or "iso date" in lower:

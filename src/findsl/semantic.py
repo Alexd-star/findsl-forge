@@ -92,10 +92,15 @@ class SemanticAnalyzer:
             raise SemanticError("rank() first argument must be numeric")
         if order_type != "order":
             raise SemanticError("rank() second argument must be asc or desc")
+        order = node.args[1].name.lower() if isinstance(node.args[1], Identifier) else ""
         limit_names = [named.name for named in node.named_args or [] if named.name in {"top", "bottom", "percent"}]
         if len(limit_names) > 1:
             raise SemanticError("rank() accepts only one of top, bottom, or percent")
         for named in node.named_args or []:
+            if named.name == "top" and order != "desc":
+                raise SemanticError("rank() top must use desc order; use bottom with asc order for low-value picks")
+            if named.name == "bottom" and order != "asc":
+                raise SemanticError("rank() bottom must use asc order; use top with desc order for high-value picks")
             if named.name in {"top", "bottom"}:
                 if not isinstance(named.value, Literal) or not isinstance(named.value.value, int):
                     raise SemanticError(f"rank() {named.name} must be an integer literal")

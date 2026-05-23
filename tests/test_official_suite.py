@@ -9,8 +9,8 @@ def test_official_suite_passes_positive_and_negative_cases(tmp_path):
     assert result.passed
     assert result.positive_passed == 13
     assert result.positive_total == 13
-    assert result.negative_passed == 9
-    assert result.negative_total == 9
+    assert result.negative_passed == 10
+    assert result.negative_total == 10
     assert output.exists()
     assert all(case.equivalence_passed for case in result.positive_cases)
     assert all(not case.missing_sql_fragments for case in result.positive_cases)
@@ -23,6 +23,6 @@ def test_official_suite_passes_positive_and_negative_cases(tmp_path):
     assert "Official-Style Coverage Suite" in content
     assert "Suite passed: True" in content
     assert "Positive cases passed: 13/13" in content
-    assert "Negative diagnostic cases passed: 9/9" in content
+    assert "Negative diagnostic cases passed: 10/10" in content
     assert "money_flow_prefix_sum" in content
     assert "UNKNOWN_INDICATOR" in content
