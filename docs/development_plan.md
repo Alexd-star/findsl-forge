@@ -119,6 +119,7 @@ Deliverables:
 - Web UI or Streamlit UI. (Started via zero-dependency local Web Demo/API)
 - AST/IR/SQL/rewrite trace visualization. (Started)
 - Natural-language-to-DSL candidate layer with compiler/reference validation. (Started)
+- Optional LLM response adapter that validates model-proposed DSL and rejects direct SQL bypasses. (Started)
 - Structured compile diagnostics and repair hints for invalid demo/API requests. (Started)
 - Official positive and diagnostic negative presets in the Web Demo for live defense walkthroughs. (Started)
 - Official-style positive and negative coverage suite with SQL/trace/explain/equivalence evidence. (Started)
@@ -140,6 +141,7 @@ Exit criteria:
 - `scripts/defense_package.ps1` produces a repeatable walkthrough that maps visible demo signals to competition scoring points.
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
+- LLM safety smoke check proves model-proposed output accepts only verified DSL, rejects direct SQL, and classifies invalid DSL with stable diagnostics.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Official-style coverage suite remains a required readiness gate, with representative positive cases passing SQL/reference equivalence and representative negative cases producing stable diagnostic codes plus repair hints.
 - Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
@@ -155,3 +157,4 @@ Exit criteria:
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.
 - Official-style positive/negative corpora must grow with every newly supported DSL construct so competition coverage stays evidence-backed.
+- LLM/provider integrations may propose DSL only; they must never execute direct SQL or bypass compiler, diagnostics, optimizer explain, and equivalence checks.

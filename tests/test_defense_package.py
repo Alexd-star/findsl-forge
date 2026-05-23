@@ -8,11 +8,12 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
 
     assert result.passed
     assert result.passed_count == result.total
-    assert result.total >= 6
+    assert result.total >= 7
     assert output.exists()
 
     check_names = {check.name for check in result.checks}
     assert "NL2DSL validated candidate" in check_names
+    assert "LLM candidate safety loop" in check_names
     assert "Official prefix-sum positive preset" in check_names
     assert "Official diagnostic negative preset" in check_names
     assert "Official-style coverage suite" in check_names
@@ -30,4 +31,6 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "real Doris 10x proof still requires a running Doris cluster" in content
     assert "money_flow_prefix_sum" in content
     assert "UNKNOWN_INDICATOR" in content
+    assert "UNSAFE_DIRECT_SQL" in content
+    assert "LLM candidate safety loop" in content
     assert "dwd_stock_money_flow_prefix" in content

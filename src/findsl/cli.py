@@ -26,6 +26,14 @@ def main() -> None:
     suggest_cmd.add_argument("--json", action="store_true", help="Print suggestion payload as JSON")
     suggest_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
     suggest_cmd.add_argument("--no-verify", action="store_true", help="Skip SQL/reference verification")
+    llm_cmd = sub.add_parser("validate-llm-candidates", help="Validate LLM-proposed DSL candidates through the safety loop")
+    llm_cmd.add_argument("--response-file", required=True, help="File containing an LLM response or mocked payload")
+    llm_cmd.add_argument("--text", default="筛选A股连续三天主力净流入为正并按换手率排名前一百", help="Original natural-language request")
+    llm_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    llm_cmd.add_argument("--max-candidates", type=int, default=5, help="Maximum candidates to extract and validate")
+    llm_cmd.add_argument("--json", action="store_true", help="Print validation payload as JSON")
+    llm_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    llm_cmd.add_argument("--no-verify", action="store_true", help="Skip SQL/reference verification")
     eval_cmd = sub.add_parser("evaluate", help="Evaluate compiler against a JSONL case file")
     eval_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL case file")
     eval_cmd.add_argument("--output", default="reports/evaluation_report.md", help="Output Markdown report")
@@ -180,6 +188,35 @@ def main() -> None:
                     f"`{candidate.get('dsl')}` |"
                 )
         if not result["candidates"] or not result["candidates"][0].get("validated"):
+            raise SystemExit(1)
+    elif args.command == "validate-llm-candidates":
+        from .llm_adapter import validate_llm_candidates
+
+        response_path = Path(args.response_file)
+        result = validate_llm_candidates(
+            text=args.text,
+            payload=response_path.read_text(encoding="utf-8"),
+            data_dir=Path(args.data_dir),
+            enable_prefix_sum=not args.no_prefix_sum,
+            verify=not args.no_verify,
+            max_candidates=args.max_candidates,
+        )
+        payload = result.to_dict()
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            if result.warnings:
+                print("Warnings:")
+                for warning in result.warnings:
+                    print(f"- {warning}")
+            print("| Rank | Accepted | Reason | Source | DSL |")
+            print("|---:|---:|---|---|---|")
+            for candidate in result.candidates:
+                print(
+                    f"| {candidate.rank} | {candidate.accepted} | "
+                    f"{candidate.reason} | {candidate.source} | `{candidate.dsl}` |"
+                )
+        if not result.passed:
             raise SystemExit(1)
     elif args.command == "evaluate":
         result = evaluate_file(Path(args.input), Path(args.output))

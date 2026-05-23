@@ -58,6 +58,10 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.doris_cluster_report.passed
     assert report.demo_smoke.passed
     assert report.nl2dsl_smoke.passed
+    assert report.llm_safety_smoke.passed
+    assert report.llm_safety_smoke.accepted_count == 1
+    assert "UNSAFE_DIRECT_SQL" in report.llm_safety_smoke.rejected_codes
+    assert "UNKNOWN_INDICATOR" in report.llm_safety_smoke.rejected_codes
     assert report.diagnostics_smoke.passed
     assert report.official_suite.passed
     assert report.official_suite.positive_passed == 10
@@ -67,6 +71,7 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     required_gates = {gate.name: gate for gate in report.gates if gate.level == "required"}
     warning_gates = {gate.name: gate for gate in report.gates if gate.level == "warning"}
     assert required_gates["NL2DSL validated candidate"].passed
+    assert required_gates["LLM candidate safety loop"].passed
     assert required_gates["Structured diagnostics repair hints"].passed
     assert required_gates["Official-style coverage suite"].passed
     assert required_gates["Defense package walkthrough"].passed
@@ -80,6 +85,9 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert "Demo Smoke Test" in content
     assert "NL2DSL Smoke Test" in content
     assert "NL2DSL validated candidate" in content
+    assert "LLM Candidate Safety Smoke Test" in content
+    assert "LLM candidate safety loop" in content
+    assert "UNSAFE_DIRECT_SQL" in content
     assert "Diagnostics Smoke Test" in content
     assert "Structured diagnostics repair hints" in content
     assert "Official-Style Coverage Suite" in content

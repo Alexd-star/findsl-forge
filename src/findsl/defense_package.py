@@ -9,6 +9,7 @@ from .demo import DEFAULT_NL_REQUEST, analyze_dsl, suggest_from_text
 from .diagnostics import diagnose_exception
 from .doris import render_doris_assets
 from .evaluation import evaluate_file, load_cases
+from .llm_adapter import DEFAULT_LLM_CANDIDATE_RESPONSE, validate_llm_candidates
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES, run_official_suite
 
 
@@ -57,7 +58,8 @@ class DefensePackageResult:
             "4. Confirm the UI shows verification PASS, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.",
             "5. Select `Diagnostic negative: 未知指标名 [UNKNOWN_INDICATOR]` and run it.",
             "6. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and the `indicator(\"close\")` repair hint.",
-            "7. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
+            "7. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
+            "8. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
             "",
             "## Score Mapping",
             "",
@@ -85,7 +87,8 @@ class DefensePackageResult:
                 "## Submission Narrative",
                 "",
                 "- Deterministic compiler path keeps correctness auditable: DSL -> AST -> semantic validation -> Doris SQL.",
-                "- AI assistance is constrained to NL2DSL candidates; every candidate must compile and match the independent reference oracle.",
+                "- AI assistance is constrained to NL2DSL/LLM DSL candidates; every candidate must compile and match the independent reference oracle.",
+                "- The LLM adapter rejects direct SQL and invalid DSL with stable diagnostic evidence before any SQL reaches Doris.",
                 "- Prefix-sum optimization is visible in SQL, structured explain records, and benchmark/readiness evidence.",
                 "- Negative cases demonstrate controlled, repairable failure rather than uncaught exceptions.",
                 "- Generated Doris assets and runbooks keep deployment aligned with the same registry used by the compiler.",
@@ -119,17 +122,20 @@ def generate_defense_package(
     cases_path: Path = Path("data/samples/queries.jsonl"),
     official_positive_path: Path = DEFAULT_POSITIVE_CASES,
     official_negative_path: Path = DEFAULT_NEGATIVE_CASES,
+    llm_response_path: Path = DEFAULT_LLM_CANDIDATE_RESPONSE,
     repo_root: Path = Path("."),
 ) -> DefensePackageResult:
     output_path = Path(output_path)
     reports_dir = output_path.parent
+    repo_root = Path(repo_root)
     checks = [
         _check_nl2dsl(data_dir),
+        _check_llm_candidate_safety(data_dir, _resolve_repo_path(repo_root, llm_response_path)),
         _check_money_flow_prefix(data_dir, official_positive_path),
         _check_unknown_indicator_diagnostic(official_negative_path),
         _check_official_suite(data_dir, official_positive_path, official_negative_path, reports_dir),
         _check_evaluation_report(cases_path, reports_dir),
-        _check_doris_assets(Path(repo_root), data_dir),
+        _check_doris_assets(repo_root, data_dir),
     ]
     result = DefensePackageResult(checks=checks, output_path=output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -163,6 +169,54 @@ def _check_nl2dsl(data_dir: Path) -> DefenseCheck:
             "AI-assisted entry without SQL hallucination",
             "Use the default Chinese request in the Web Demo.",
             "Candidate is validated and verification is PASS.",
+            exc,
+        )
+
+
+def _check_llm_candidate_safety(data_dir: Path, response_path: Path) -> DefenseCheck:
+    try:
+        result = validate_llm_candidates(
+            text="近3日成交量累计大于300",
+            payload=response_path.read_text(encoding="utf-8"),
+            data_dir=data_dir,
+            verify=True,
+        )
+        rejected_codes = [
+            str(diagnostic.get("code", ""))
+            for candidate in result.candidates
+            if not candidate.accepted
+            for diagnostic in candidate.diagnostics
+        ]
+        accepted_verified = any(
+            candidate.accepted
+            and bool((candidate.analysis or {}).get("verification", {}).get("passed"))
+            for candidate in result.candidates
+        )
+        passed = (
+            accepted_verified
+            and result.accepted_count >= 1
+            and "UNSAFE_DIRECT_SQL" in rejected_codes
+            and "UNKNOWN_INDICATOR" in rejected_codes
+        )
+        return DefenseCheck(
+            name="LLM candidate safety loop",
+            scoring_point="LLM assistance with deterministic compiler guardrails",
+            demo_action="Run validate-llm-candidates against data\\samples\\llm_candidate_response.json.",
+            expected_signal="One valid DSL is accepted, direct SQL is rejected, and misspelled indicators produce diagnostics.",
+            passed=passed,
+            evidence=[
+                f"accepted={result.accepted_count}",
+                f"rejected={result.rejected_count}",
+                f"rejected_codes={', '.join(rejected_codes) or '<none>'}",
+                f"response={response_path}",
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "LLM candidate safety loop",
+            "LLM assistance with deterministic compiler guardrails",
+            "Run validate-llm-candidates against data\\samples\\llm_candidate_response.json.",
+            "One valid DSL is accepted, direct SQL is rejected, and misspelled indicators produce diagnostics.",
             exc,
         )
 
@@ -367,3 +421,8 @@ def _failed_check(
 
 def _cell(value: str) -> str:
     return str(value).replace("|", "\\|").replace("\n", "<br>")
+
+
+def _resolve_repo_path(repo_root: Path, path: Path) -> Path:
+    path = Path(path)
+    return path if path.is_absolute() else Path(repo_root).resolve() / path

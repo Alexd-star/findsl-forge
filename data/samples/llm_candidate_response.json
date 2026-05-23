@@ -1,0 +1,21 @@
+{
+  "model": "mocked-llm-for-offline-safety-test",
+  "natural_language": "近3日成交量累计大于300，同时不要直接输出SQL",
+  "candidates": [
+    {
+      "dsl": "filter(SUM(indicator(\"volume\"), 3) > 300)",
+      "confidence": 0.91,
+      "rationale": "Rolling three-day volume sum should use the deterministic DSL SUM function."
+    },
+    {
+      "dsl": "filter(indicator(\"clos\") > 10)",
+      "confidence": 0.42,
+      "rationale": "This deliberately misspelled indicator proves diagnostic rejection."
+    },
+    {
+      "dsl": "SELECT ts_code, trade_date FROM dwd_stock_daily_quote WHERE close > 10",
+      "confidence": 0.2,
+      "rationale": "This deliberately unsafe direct SQL proves the LLM path cannot bypass the compiler."
+    }
+  ]
+}

@@ -29,6 +29,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Collect Doris-cluster `EXPLAIN` and latency evidence for baseline-window versus prefix-sum SQL.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
+- Validate optional LLM-proposed DSL candidates while rejecting direct SQL and invalid DSL before execution.
 - Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a defense package that maps live demo steps to competition scoring evidence.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
@@ -46,6 +47,7 @@ python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_i
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
 python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
+python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --text '近3日成交量累计大于300' --data-dir data/samples --json
 python -m findsl.cli official-suite --output reports/official_suite_report.md --json
 python -m findsl.cli defense-package --output reports/defense_package.md --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
@@ -62,12 +64,14 @@ $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"), 250))'
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)'
 python -m findsl.cli suggest-dsl '今日收盘价创二百五十日新高'
+python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --json
 python -m findsl.cli official-suite --json
 python -m findsl.cli defense-package --json
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\verify_sql_sample.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\official_suite.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\validate_llm_candidates.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\defense_package.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\scale_benchmark.ps1
@@ -122,6 +126,12 @@ The same server exposes JSON APIs:
 - `POST /api/suggest`
 - `POST /api/analyze`
 
+## Safe LLM Candidate Adapter
+
+`validate-llm-candidates` is an offline safety adapter for model-proposed DSL. It accepts a structured or markdown-style LLM response file, extracts candidate FinDSL expressions, rejects direct SQL-looking output, compiles remaining DSL through the deterministic compiler, and requires SQL/reference equivalence when verification is enabled.
+
+The bundled `data/samples/llm_candidate_response.json` intentionally contains one valid DSL candidate, one misspelled indicator, and one unsafe direct SQL candidate. This gives the defense package concrete evidence that LLM assistance is useful but cannot bypass parser, semantic validation, diagnostics, optimizer explain, or reference-oracle checks.
+
 ## Doris Assets
 
 `scripts/generate_doris_assets.ps1` creates the SQL files under `deploy/doris/`:
@@ -154,7 +164,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 The readiness report also runs `official-suite`, which covers official-style stock-screening tasks across staged filters, ranking, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
-It also generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
+It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
 
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight remaining competition risks, especially missing Doris-cluster scale proof and uncommitted local changes.
 
@@ -167,4 +177,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL candidate validation, official-style coverage evidence, and a local demo. Later phases will add more Doris-cluster execution proof, broader DSL coverage, and LLM-backed NL2DSL repair loops.
+The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Later phases will add more Doris-cluster execution proof, broader DSL coverage, and provider-backed LLM repair loops that preserve the same deterministic validation contract.

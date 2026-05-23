@@ -17,6 +17,7 @@ from .demo import DEFAULT_DEMO_DSL, DEFAULT_NL_REQUEST, analyze_dsl, suggest_fro
 from .doris import render_doris_assets
 from .equivalence import EquivalenceResult, verify_sql_equivalence
 from .evaluation import EvaluationResult, evaluate_file
+from .llm_adapter import DEFAULT_LLM_CANDIDATE_RESPONSE, validate_llm_candidates
 from .official_suite import OfficialSuiteResult, run_official_suite
 
 
@@ -114,6 +115,18 @@ class DiagnosticsSmokeCheck:
 
 
 @dataclass(frozen=True)
+class LLMSafetySmokeCheck:
+    response_path: Path
+    passed: bool
+    raw_candidate_count: int
+    accepted_count: int
+    rejected_count: int
+    rejected_codes: List[str]
+    accepted_verified: bool
+    error: str = ""
+
+
+@dataclass(frozen=True)
 class ReadinessGate:
     name: str
     level: str
@@ -141,6 +154,7 @@ class ReadinessReport:
     doris_cluster_report: EvidenceFileCheck
     demo_smoke: DemoSmokeCheck
     nl2dsl_smoke: NL2DSLSmokeCheck
+    llm_safety_smoke: LLMSafetySmokeCheck
     diagnostics_smoke: DiagnosticsSmokeCheck
     official_suite: OfficialSuiteResult
     defense_package: DefensePackageResult
@@ -194,6 +208,7 @@ class ReadinessReport:
                 f"- Optimized prefix table references: {self.benchmark.optimized_prefix_joins}",
                 f"- Demo API smoke: {self.demo_smoke.passed}",
                 f"- NL2DSL smoke: {self.nl2dsl_smoke.passed}",
+                f"- LLM safety smoke: {self.llm_safety_smoke.passed}",
                 f"- Diagnostics smoke: {self.diagnostics_smoke.passed}",
                 f"- Official-style positive cases: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
                 f"- Official-style negative diagnostics: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
@@ -257,6 +272,17 @@ class ReadinessReport:
                 f"- SQL rows: {self.nl2dsl_smoke.sql_row_count}",
                 f"- Top DSL: `{self.nl2dsl_smoke.top_dsl or '<none>'}`",
                 f"- Error: {self.nl2dsl_smoke.error or '<none>'}",
+                "",
+                "## LLM Candidate Safety Smoke Test",
+                "",
+                f"- Passed: {self.llm_safety_smoke.passed}",
+                f"- Response file: `{self.llm_safety_smoke.response_path}`",
+                f"- Raw candidates: {self.llm_safety_smoke.raw_candidate_count}",
+                f"- Accepted candidates: {self.llm_safety_smoke.accepted_count}",
+                f"- Rejected candidates: {self.llm_safety_smoke.rejected_count}",
+                f"- Accepted candidate verified: {self.llm_safety_smoke.accepted_verified}",
+                f"- Rejected diagnostic codes: {', '.join(self.llm_safety_smoke.rejected_codes) or '<none>'}",
+                f"- Error: {self.llm_safety_smoke.error or '<none>'}",
                 "",
                 "## Diagnostics Smoke Test",
                 "",
@@ -329,6 +355,7 @@ class ReadinessReport:
                 "- Structured optimizer explain records for defense and UI visualization.",
                 "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",
                 "- NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.",
+                "- Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.",
                 "- Structured diagnostics convert invalid DSL into stable error codes and repair hints.",
                 "- Doris DDL, sample data, prefix-table build SQL, and smoke queries generated from the same registry.",
                 "",
@@ -337,7 +364,7 @@ class ReadinessReport:
                 "- Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.",
                 "- Capture final Web Demo screenshots and a one-minute defense video from the official positive and diagnostic negative presets.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
-                "- Add an optional LLM adapter that calls the deterministic NL2DSL/Compiler validation loop instead of generating SQL directly.",
+                "- Connect the optional LLM adapter to a real provider only after preserving the same deterministic validation contract.",
             ]
         )
         return "\n".join(lines)
@@ -401,6 +428,7 @@ def generate_readiness_report(
     )
     demo_smoke = _check_demo_smoke(data_dir)
     nl2dsl_smoke = _check_nl2dsl_smoke(data_dir)
+    llm_safety_smoke = _check_llm_safety_smoke(repo_root, data_dir)
     diagnostics_smoke = _check_diagnostics_smoke()
     official_suite = run_official_suite(
         positive_cases_path=repo_root / "data" / "samples" / "official_positive_cases.jsonl",
@@ -431,6 +459,7 @@ def generate_readiness_report(
         doris_cluster_report=doris_cluster_report,
         demo_smoke=demo_smoke,
         nl2dsl_smoke=nl2dsl_smoke,
+        llm_safety_smoke=llm_safety_smoke,
         diagnostics_smoke=diagnostics_smoke,
         official_suite=official_suite,
         defense_package=defense_package,
@@ -445,6 +474,7 @@ def generate_readiness_report(
             doris_cluster_report,
             demo_smoke,
             nl2dsl_smoke,
+            llm_safety_smoke,
             diagnostics_smoke,
             official_suite,
             defense_package,
@@ -467,6 +497,7 @@ def _build_gates(
     doris_cluster_report: EvidenceFileCheck,
     demo_smoke: DemoSmokeCheck,
     nl2dsl_smoke: NL2DSLSmokeCheck,
+    llm_safety_smoke: LLMSafetySmokeCheck,
     diagnostics_smoke: DiagnosticsSmokeCheck,
     official_suite: OfficialSuiteResult,
     defense_package: DefensePackageResult,
@@ -541,6 +572,18 @@ def _build_gates(
             )
             if nl2dsl_smoke.passed
             else nl2dsl_smoke.error,
+        ),
+        ReadinessGate(
+            "LLM candidate safety loop",
+            "required",
+            llm_safety_smoke.passed,
+            (
+                f"accepted {llm_safety_smoke.accepted_count}, "
+                f"rejected {llm_safety_smoke.rejected_count}, "
+                f"codes {', '.join(llm_safety_smoke.rejected_codes) or '<none>'}"
+            )
+            if llm_safety_smoke.passed
+            else llm_safety_smoke.error,
         ),
         ReadinessGate(
             "Structured diagnostics repair hints",
@@ -709,6 +752,58 @@ def _check_nl2dsl_smoke(data_dir: Path) -> NL2DSLSmokeCheck:
             top_validated=False,
             verification_passed=False,
             sql_row_count=0,
+            error=f"{type(exc).__name__}: {exc}",
+        )
+
+
+def _check_llm_safety_smoke(repo_root: Path, data_dir: Path) -> LLMSafetySmokeCheck:
+    response_path = _resolve(repo_root, DEFAULT_LLM_CANDIDATE_RESPONSE)
+    try:
+        result = validate_llm_candidates(
+            text="近3日成交量累计大于300",
+            payload=response_path.read_text(encoding="utf-8"),
+            data_dir=data_dir,
+            enable_prefix_sum=True,
+            verify=True,
+        )
+        rejected_codes = [
+            str(diagnostic.get("code", ""))
+            for candidate in result.candidates
+            if not candidate.accepted
+            for diagnostic in candidate.diagnostics
+        ]
+        accepted_verified = any(
+            candidate.accepted
+            and bool((candidate.analysis or {}).get("verification", {}).get("passed"))
+            for candidate in result.candidates
+        )
+        passed = (
+            result.raw_candidate_count >= 3
+            and result.accepted_count >= 1
+            and result.rejected_count >= 2
+            and accepted_verified
+            and "UNSAFE_DIRECT_SQL" in rejected_codes
+            and "UNKNOWN_INDICATOR" in rejected_codes
+        )
+        return LLMSafetySmokeCheck(
+            response_path=response_path,
+            passed=passed,
+            raw_candidate_count=result.raw_candidate_count,
+            accepted_count=result.accepted_count,
+            rejected_count=result.rejected_count,
+            rejected_codes=rejected_codes,
+            accepted_verified=accepted_verified,
+            error="" if passed else "LLM safety sample did not cover accept/reject/diagnostic evidence",
+        )
+    except Exception as exc:  # noqa: BLE001 - readiness should report smoke failures.
+        return LLMSafetySmokeCheck(
+            response_path=response_path,
+            passed=False,
+            raw_candidate_count=0,
+            accepted_count=0,
+            rejected_count=0,
+            rejected_codes=[],
+            accepted_verified=False,
             error=f"{type(exc).__name__}: {exc}",
         )
 

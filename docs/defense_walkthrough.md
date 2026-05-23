@@ -7,7 +7,9 @@ This document is the repeatable live-demo path for Topic 19. It pairs each visib
 ```powershell
 $env:PYTHONPATH="src"
 python -m findsl.cli defense-package --json
+python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --json
 powershell -ExecutionPolicy Bypass -File .\scripts\defense_package.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\validate_llm_candidates.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 ```
 
@@ -34,8 +36,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 6. Confirm the UI shows verification `PASS`, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.
 7. Select `Diagnostic negative: UNKNOWN_INDICATOR` from the sample preset list and run it.
 8. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and a repair hint for `indicator("close")`.
-9. Open `reports/defense_package.md` and show the score-mapping table.
-10. Open `reports/submission_readiness.md` and show required gates passing.
+9. Run `scripts\validate_llm_candidates.ps1` and show one accepted DSL, one `UNKNOWN_INDICATOR` rejection, and one `UNSAFE_DIRECT_SQL` rejection.
+10. Open `reports/defense_package.md` and show the score-mapping table.
+11. Open `reports/submission_readiness.md` and show required gates passing.
 
 ## Screenshot Checklist
 
@@ -45,6 +48,7 @@ Capture these screens for the technical document and one-minute video:
 - SQL tab for the official prefix-sum preset showing `dwd_stock_money_flow_prefix`.
 - Explain tab showing the `PREFIX_SUM` rule applied.
 - Diagnostic negative preset showing expected/actual `UNKNOWN_INDICATOR` and repair suggestions.
+- CLI output for LLM candidate safety showing accepted DSL plus `UNKNOWN_INDICATOR` and `UNSAFE_DIRECT_SQL` rejections.
 - `reports/defense_package.md` summary and score-mapping table.
 - `reports/submission_readiness.md` gate matrix.
 
@@ -53,6 +57,7 @@ Capture these screens for the technical document and one-minute video:
 | Evidence | Scoring point |
 |---|---|
 | Validated NL2DSL candidate | AI-assisted use without SQL hallucination |
+| LLM candidate safety loop | Model assistance cannot bypass deterministic compiler validation |
 | SQL/reference verification PASS | Correctness proof beyond string matching |
 | Prefix-sum preset with prefix table SQL | Long-window optimization design |
 | Structured explain records | Auditable optimizer decisions |

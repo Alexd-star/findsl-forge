@@ -7,6 +7,10 @@ findsl.cli
   -> NL2DSL candidate layer
     -> template/rule match over official-style Chinese requests
     -> candidate DSL list with confidence and rationale
+  -> Safe LLM candidate adapter
+    -> parse structured/markdown model responses into DSL candidates
+    -> reject direct SQL-looking output before compilation
+    -> validate surviving candidates through compiler + equivalence verifier
   -> Compiler
     -> Parser
       -> Lexer
@@ -40,6 +44,7 @@ findsl.cli
     -> capture Doris EXPLAIN, COUNT(*) latency, row-count parity, and 10x speedup marker
   -> Demo/API and ReadinessReport
     -> validate natural-language candidates through compiler + equivalence verifier
+    -> validate optional LLM DSL candidates without allowing SQL bypass
     -> expose baseline, official-positive, and diagnostic-negative presets
     -> return structured diagnostics and repair hints for invalid requests
     -> generate defense walkthrough and score-mapping evidence
@@ -56,6 +61,16 @@ The compiler core is deterministic. AI support stays outside the core as an NL2D
 ### NL2DSL Candidate Layer
 
 Natural-language requests are translated into candidate DSL, not directly into SQL. A candidate is useful only after it compiles, executes against local SQL fixtures, and matches the Pandas reference evaluator. This makes the AI-facing path defensible in competition review: convenience comes from natural-language entry, while correctness still comes from the same compiler and oracle used by the deterministic DSL path.
+
+### Safe LLM Candidate Adapter
+
+The optional LLM adapter treats model output as untrusted proposal text. It extracts candidate DSL from JSON payloads, markdown fences, labeled lines, or OpenAI-style `choices[].message.content`, then applies a hard safety boundary:
+
+```text
+LLM response -> candidate extractor -> SQL bypass rejection -> compiler -> SQL/reference equivalence
+```
+
+Direct SQL-looking output is rejected with `UNSAFE_DIRECT_SQL`. Invalid DSL still enters the normal diagnostic layer, so misspelled indicators produce the same stable repair evidence as hand-written DSL. Accepted candidates are therefore useful only when they survive parser, semantic validation, SQL generation, optimizer explain, and the independent reference oracle.
 
 ### Diagnostics Layer
 
@@ -164,7 +179,7 @@ The defense package converts engineering evidence into a live-demonstration sequ
 demo scenario -> executable check -> scoring point -> expected visible signal -> Markdown report
 ```
 
-It covers NL2DSL validation, prefix-sum official positive presets, diagnostic negative presets, official-style corpus coverage, compiler accuracy/latency, and Doris deployment asset integrity. It deliberately does not claim real Doris 10x performance; that remains gated by the Doris evidence collector and a real cluster report.
+It covers NL2DSL validation, safe LLM candidate validation, prefix-sum official positive presets, diagnostic negative presets, official-style corpus coverage, compiler accuracy/latency, and Doris deployment asset integrity. It deliberately does not claim real Doris 10x performance; that remains gated by the Doris evidence collector and a real cluster report.
 
 ## Doris Evidence Loop
 
