@@ -26,7 +26,7 @@ def test_suggests_low_turnover_rank_with_bottom_limit_when_order_is_ascending():
         'then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), '
         'rank(indicator("turnover_rate"), asc, bottom=10))'
     )
-    assert "ORDER BY base.turnover_rate ASC" in Compiler().compile(result.top.dsl).sql
+    assert "ORDER BY turnover_rate ASC" in Compiler().compile(result.top.dsl).sql
 
 
 def test_suggests_money_flow_low_price_bottom_rank():
@@ -39,7 +39,7 @@ def test_suggests_money_flow_low_price_bottom_rank():
         'rank(indicator("close"), asc, bottom=2))'
     )
     compiled = Compiler().compile(result.top.dsl)
-    assert "ORDER BY base.close ASC" in compiled.sql
+    assert "ORDER BY close ASC" in compiled.sql
     assert "rank_no <= 2" in compiled.sql
 
 
@@ -61,7 +61,7 @@ def test_suggests_high_turnover_close_rank():
         'then(filter(market("A") & indicator("turnover_rate") > 1), '
         'rank(indicator("close"), desc, top=2))'
     )
-    assert "ORDER BY base.close DESC" in Compiler().compile(result.top.dsl).sql
+    assert "ORDER BY close DESC" in Compiler().compile(result.top.dsl).sql
 
 
 def test_suggests_signed_net_outflow_threshold():

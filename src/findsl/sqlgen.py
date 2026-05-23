@@ -344,14 +344,6 @@ class SqlGenerator:
                     columns.append(f"{alias}.{meta['column']} AS {meta['column']}")
         return ", ".join(dict.fromkeys(columns))
 
-    def _table_alias(self, table_name: str) -> str:
-        if self._current_source:
-            return "base"
-        ordered = self._ordered_tables()
-        if table_name == ordered[0]:
-            return "base"
-        return self.registry.table(table_name).get("alias", table_name)
-
     def _bool_sql(self, node: Node) -> str:
         if isinstance(node, Comparison):
             return f"{self._numeric_sql(node.left)} {_sql_comparison_operator(node.op)} {self._numeric_sql(node.right)}"
@@ -410,7 +402,7 @@ class SqlGenerator:
         meta = self.registry.indicator(indicator_name)
         self.required_tables.add(meta["table"])
         if self._current_source:
-            return f"{self._table_alias(meta['table'])}.{meta['column']}"
+            return meta["column"]
         return meta["column"]
 
     def _market_sql(self, node: FunctionCall) -> str:
@@ -418,7 +410,7 @@ class SqlGenerator:
         self.required_tables.add("stock_universe")
         market_literal = _sql_string_literal(market_name)
         if self._current_source:
-            return f"{self._table_alias('stock_universe')}.market = {market_literal}"
+            return f"market = {market_literal}"
         return f"market = {market_literal}"
 
     def _date_between_sql(self, node: FunctionCall) -> str:

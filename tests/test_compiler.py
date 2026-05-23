@@ -124,6 +124,23 @@ def test_compile_date_between_uses_full_pushdown_for_prefix_sum_windows():
     assert not any(step["rule"] == "DATE_RANGE_WINDOW_PRUNING" for step in result.explain)
 
 
+def test_compile_then_filter_filter_uses_stage_columns_without_inner_alias_leak():
+    result = Compiler().compile('then(filter(market("A")), filter(indicator("close") > 10))')
+
+    assert "stage2 AS" in result.sql
+    assert "WHERE close > 10" in result.sql
+    assert "WHERE base.close > 10" not in result.sql
+
+
+def test_compile_then_filter_window_filter_materializes_feature_from_stage_columns():
+    result = Compiler().compile('then(filter(market("A")), filter(MA(indicator("close"), 2) > 10))')
+
+    assert "stage2 AS" in result.sql
+    assert "AVG(close) OVER" in result.sql
+    assert "WHERE __win_1 > 10" in result.sql
+    assert "AVG(base.close) OVER" not in result.sql
+
+
 def test_compile_escapes_string_literals_in_generated_sql():
     result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
 
