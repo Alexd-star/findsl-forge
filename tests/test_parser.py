@@ -1,3 +1,6 @@
+import pytest
+
+from findsl.errors import ParseError
 from findsl.parser import parse
 
 
@@ -25,3 +28,8 @@ def test_parse_single_equal_comparison_operator():
     data = ast.to_dict()
 
     assert data["args"][0]["op"] == "="
+
+
+def test_parse_rejects_positional_args_after_named_args():
+    with pytest.raises(ParseError, match="Positional argument cannot follow named arguments"):
+        parse('rank(top=2, indicator("close"), desc)')

@@ -26,6 +26,16 @@ def test_diagnose_parse_error_points_to_missing_parenthesis():
     assert any("missing closing parenthesis" in hint for hint in diagnostics[0].suggestions)
 
 
+def test_diagnose_positional_after_named_arg_offers_argument_order_hint():
+    try:
+        Compiler().compile('rank(top=2, indicator("close"), desc)')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "PARSE_ERROR"
+    assert any("named arguments after positional arguments" in hint for hint in diagnostics[0].suggestions)
+
+
 def test_demo_error_payload_includes_structured_diagnostics():
     try:
         Compiler().compile('filter(CONS(indicator("close"), 3))')

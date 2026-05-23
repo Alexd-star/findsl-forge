@@ -89,6 +89,8 @@ def _diagnose_config_error(message: str, registry: Registry) -> Diagnostic:
 
 def _diagnose_parse_error(message: str) -> Diagnostic:
     suggestions = ["Use function-call syntax such as filter(indicator(\"close\") > 10)."]
+    if "Positional argument cannot follow named arguments" in message:
+        suggestions.insert(0, "Put named arguments after positional arguments, for example rank(indicator(\"close\"), desc, top=10).")
     if "Expected )" in message or "got EOF" in message:
         suggestions.insert(0, "Check for a missing closing parenthesis or quote near the end of the DSL.")
     if "Expected ," in message or "Expected )" in message:

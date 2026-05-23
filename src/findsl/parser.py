@@ -107,6 +107,7 @@ class Parser:
     def _parse_call(self, name: str) -> FunctionCall:
         args = []
         named_args = []
+        seen_named_arg = False
         if self._match(")"):
             return FunctionCall(name, args, named_args)
         while True:
@@ -115,7 +116,12 @@ class Parser:
                 self._expect("=")
                 value = self._parse_or()
                 named_args.append(NamedArg(arg_name, value))
+                seen_named_arg = True
             else:
+                if seen_named_arg:
+                    raise ParseError(
+                        f"Positional argument cannot follow named arguments in {name}() at {self._peek().position}"
+                    )
                 args.append(self._parse_or())
             if self._match(","):
                 continue
