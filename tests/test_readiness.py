@@ -63,6 +63,8 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert "UNSAFE_DIRECT_SQL" in report.llm_safety_smoke.rejected_codes
     assert "UNKNOWN_INDICATOR" in report.llm_safety_smoke.rejected_codes
     assert report.diagnostics_smoke.passed
+    assert report.doris_sql_smoke.passed
+    assert report.doris_sql_smoke.escaped_literal
     assert report.official_suite.passed
     assert report.official_suite.positive_passed == 13
     assert report.official_suite.negative_passed == 10
@@ -73,6 +75,7 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert required_gates["NL2DSL validated candidate"].passed
     assert required_gates["LLM candidate safety loop"].passed
     assert required_gates["Structured diagnostics repair hints"].passed
+    assert required_gates["Doris SQL validation boundary"].passed
     assert required_gates["Official-style coverage suite"].passed
     assert required_gates["Defense package walkthrough"].passed
     assert warning_gates["Doris-scale performance proof"].passed
@@ -90,6 +93,8 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert "UNSAFE_DIRECT_SQL" in content
     assert "Diagnostics Smoke Test" in content
     assert "Structured diagnostics repair hints" in content
+    assert "Doris SQL Validation Smoke Test" in content
+    assert "Doris SQL validation boundary" in content
     assert "Official-Style Coverage Suite" in content
     assert "Official-style coverage suite" in content
     assert "Defense Package" in content

@@ -115,6 +115,16 @@ class DiagnosticsSmokeCheck:
 
 
 @dataclass(frozen=True)
+class DorisSqlValidationSmokeCheck:
+    dsl: str
+    passed: bool
+    validation_steps: int
+    issue_count: int
+    escaped_literal: bool
+    error: str = ""
+
+
+@dataclass(frozen=True)
 class LLMSafetySmokeCheck:
     response_path: Path
     passed: bool
@@ -156,6 +166,7 @@ class ReadinessReport:
     nl2dsl_smoke: NL2DSLSmokeCheck
     llm_safety_smoke: LLMSafetySmokeCheck
     diagnostics_smoke: DiagnosticsSmokeCheck
+    doris_sql_smoke: DorisSqlValidationSmokeCheck
     official_suite: OfficialSuiteResult
     defense_package: DefensePackageResult
     gates: List[ReadinessGate]
@@ -210,6 +221,7 @@ class ReadinessReport:
                 f"- NL2DSL smoke: {self.nl2dsl_smoke.passed}",
                 f"- LLM safety smoke: {self.llm_safety_smoke.passed}",
                 f"- Diagnostics smoke: {self.diagnostics_smoke.passed}",
+                f"- Doris SQL validation smoke: {self.doris_sql_smoke.passed}",
                 f"- Official-style positive cases: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
                 f"- Official-style negative diagnostics: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
                 f"- Defense package checks: {self.defense_package.passed_count}/{self.defense_package.total}",
@@ -292,6 +304,15 @@ class ReadinessReport:
                 f"- First code: {self.diagnostics_smoke.first_code or '<none>'}",
                 f"- Suggestion count: {self.diagnostics_smoke.suggestion_count}",
                 f"- Error: {self.diagnostics_smoke.error or '<none>'}",
+                "",
+                "## Doris SQL Validation Smoke Test",
+                "",
+                f"- Passed: {self.doris_sql_smoke.passed}",
+                f"- DSL: `{self.doris_sql_smoke.dsl}`",
+                f"- Validation explain steps: {self.doris_sql_smoke.validation_steps}",
+                f"- Issue count: {self.doris_sql_smoke.issue_count}",
+                f"- Escaped literal: {self.doris_sql_smoke.escaped_literal}",
+                f"- Error: {self.doris_sql_smoke.error or '<none>'}",
                 "",
                 "## Doris Asset Integrity",
                 "",
@@ -435,6 +456,7 @@ def generate_readiness_report(
     nl2dsl_smoke = _check_nl2dsl_smoke(data_dir)
     llm_safety_smoke = _check_llm_safety_smoke(repo_root, data_dir)
     diagnostics_smoke = _check_diagnostics_smoke()
+    doris_sql_smoke = _check_doris_sql_validation_smoke()
     official_suite = run_official_suite(
         positive_cases_path=repo_root / "data" / "samples" / "official_positive_cases.jsonl",
         negative_cases_path=repo_root / "data" / "samples" / "official_negative_cases.jsonl",
@@ -466,6 +488,7 @@ def generate_readiness_report(
         nl2dsl_smoke=nl2dsl_smoke,
         llm_safety_smoke=llm_safety_smoke,
         diagnostics_smoke=diagnostics_smoke,
+        doris_sql_smoke=doris_sql_smoke,
         official_suite=official_suite,
         defense_package=defense_package,
         gates=_build_gates(
@@ -481,6 +504,7 @@ def generate_readiness_report(
             nl2dsl_smoke,
             llm_safety_smoke,
             diagnostics_smoke,
+            doris_sql_smoke,
             official_suite,
             defense_package,
             run_pytest,
@@ -504,6 +528,7 @@ def _build_gates(
     nl2dsl_smoke: NL2DSLSmokeCheck,
     llm_safety_smoke: LLMSafetySmokeCheck,
     diagnostics_smoke: DiagnosticsSmokeCheck,
+    doris_sql_smoke: DorisSqlValidationSmokeCheck,
     official_suite: OfficialSuiteResult,
     defense_package: DefensePackageResult,
     run_pytest: bool,
@@ -601,6 +626,17 @@ def _build_gates(
             )
             if diagnostics_smoke.passed
             else diagnostics_smoke.error,
+        ),
+        ReadinessGate(
+            "Doris SQL validation boundary",
+            "required",
+            doris_sql_smoke.passed,
+            (
+                f"validation steps {doris_sql_smoke.validation_steps}, "
+                f"issues {doris_sql_smoke.issue_count}, escaped literal {doris_sql_smoke.escaped_literal}"
+            )
+            if doris_sql_smoke.passed
+            else doris_sql_smoke.error,
         ),
         ReadinessGate(
             "Official-style coverage suite",
@@ -841,6 +877,39 @@ def _check_diagnostics_smoke() -> DiagnosticsSmokeCheck:
             first_code=first_code,
             suggestion_count=len(suggestions),
             error="" if passed else f"{type(exc).__name__}: {exc}",
+        )
+
+
+def _check_doris_sql_validation_smoke() -> DorisSqlValidationSmokeCheck:
+    dsl = 'filter(market("A\' OR 1=1 --"))'
+    try:
+        result = Compiler().compile(dsl)
+        validation_steps = [step for step in result.explain if step.get("rule") == "DORIS_SQL_VALIDATION"]
+        issue_count = (
+            int(validation_steps[0].get("evidence", {}).get("issue_count", -1))
+            if validation_steps
+            else -1
+        )
+        escaped_literal = "market = 'A'' OR 1=1 --'" in result.sql
+        passed = bool(validation_steps) and issue_count == 0 and escaped_literal
+        return DorisSqlValidationSmokeCheck(
+            dsl=dsl,
+            passed=passed,
+            validation_steps=len(validation_steps),
+            issue_count=issue_count,
+            escaped_literal=escaped_literal,
+            error=""
+            if passed
+            else "Generated SQL did not prove both zero-issue validation and literal escaping.",
+        )
+    except Exception as exc:  # noqa: BLE001 - readiness should report SQL-boundary failures.
+        return DorisSqlValidationSmokeCheck(
+            dsl=dsl,
+            passed=False,
+            validation_steps=0,
+            issue_count=-1,
+            escaped_literal=False,
+            error=f"{type(exc).__name__}: {exc}",
         )
 
 
