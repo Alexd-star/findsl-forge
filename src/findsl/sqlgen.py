@@ -297,6 +297,15 @@ class SqlGenerator:
     def _rank_source_sql(self, base_relation: str = None) -> str:
         source = self._from_clause(base_relation)
         if not self._numeric_features:
+            if base_relation is not None:
+                self.trace.append("project staged relation columns before re-ranking")
+                self._explain(
+                    "RELATION_PROJECTION",
+                    "applied",
+                    "Project staged relation columns before re-ranking",
+                    source=base_relation,
+                )
+                return f"(SELECT {self._stage_relation_projection_columns()} FROM {source}) AS base"
             if base_relation is None and len(self._ordered_tables()) > 1:
                 self.trace.append("project joined relation columns before ranking")
                 self._explain(
@@ -314,7 +323,12 @@ class SqlGenerator:
             "Materialize rank numeric features before ranking",
             feature_count=len(self._numeric_features),
         )
-        layer_sql = f"SELECT {self._project_columns()} FROM {source}"
+        projection = (
+            self._stage_relation_projection_columns()
+            if base_relation is not None
+            else self._project_columns()
+        )
+        layer_sql = f"SELECT {projection} FROM {source}"
         layer_name = "rank_base_features"
         for idx, feature in enumerate(self._numeric_features, 1):
             layer_sql = self._feature_layer_sql(layer_sql, layer_name, [feature])
@@ -375,6 +389,18 @@ class SqlGenerator:
             for indicator_name, meta in self.registry.indicators.items():
                 if meta["table"] == table_name:
                     columns.append(f"{alias}.{meta['column']} AS {meta['column']}")
+        return ", ".join(dict.fromkeys(columns))
+
+    def _stage_relation_projection_columns(self) -> str:
+        columns = ["base.ts_code AS ts_code", "base.trade_date AS trade_date"]
+        for table_name in self._ordered_tables():
+            if table_name == "stock_universe":
+                columns.append("base.market AS market")
+                continue
+            for indicator_name, meta in self.registry.indicators.items():
+                if meta["table"] == table_name:
+                    column = meta["column"]
+                    columns.append(f"base.{column} AS {column}")
         return ", ".join(dict.fromkeys(columns))
 
     def _bool_sql(self, node: Node) -> str:

@@ -158,6 +158,21 @@ def test_sql_matches_reference_for_then_rank_filter_on_joined_column():
     assert result.sql_row_count == 10
 
 
+def test_sql_matches_reference_for_then_rank_rank_recomputes_rank_no():
+    result = verify_sql_equivalence(
+        'then(rank(indicator("turnover_rate"), desc, top=2), rank(indicator("close"), asc, bottom=1))',
+        DATA_DIR,
+    )
+    assert result.passed
+    assert result.sql_keys == [
+        ("AAA", "2026-01-01"),
+        ("AAA", "2026-01-02"),
+        ("AAA", "2026-01-03"),
+        ("AAA", "2026-01-04"),
+        ("AAA", "2026-01-05"),
+    ]
+
+
 def test_sql_matches_reference_for_then_filter_rank_percent():
     result = verify_sql_equivalence(
         'then(filter(market("A")), rank(indicator("turnover_rate"), desc, percent=50))',

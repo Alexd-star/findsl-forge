@@ -175,6 +175,17 @@ def test_compile_then_rank_filter_preserves_joined_relation_columns():
     assert any(step["rule"] == "RELATION_PROJECTION" for step in result.explain)
 
 
+def test_compile_then_rank_rank_drops_previous_internal_rank_number():
+    result = Compiler().compile(
+        'then(rank(indicator("turnover_rate"), desc, top=2), rank(indicator("close"), asc, bottom=1))'
+    )
+
+    assert "project staged relation columns before re-ranking" in result.trace
+    assert "base.rank_no" not in result.sql
+    assert "base.volume AS volume FROM stage1 AS base" in result.sql
+    assert result.sql.count("AS rank_no") == 2
+
+
 def test_compile_escapes_string_literals_in_generated_sql():
     result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
 
