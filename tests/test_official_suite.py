@@ -7,8 +7,8 @@ def test_official_suite_passes_positive_and_negative_cases(tmp_path):
     result = run_official_suite(output_path=output)
 
     assert result.passed
-    assert result.positive_passed == 12
-    assert result.positive_total == 12
+    assert result.positive_passed == 13
+    assert result.positive_total == 13
     assert result.negative_passed == 9
     assert result.negative_total == 9
     assert output.exists()
@@ -22,7 +22,7 @@ def test_official_suite_passes_positive_and_negative_cases(tmp_path):
     content = output.read_text(encoding="utf-8")
     assert "Official-Style Coverage Suite" in content
     assert "Suite passed: True" in content
-    assert "Positive cases passed: 12/12" in content
+    assert "Positive cases passed: 13/13" in content
     assert "Negative diagnostic cases passed: 9/9" in content
     assert "money_flow_prefix_sum" in content
     assert "UNKNOWN_INDICATOR" in content

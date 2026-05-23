@@ -32,7 +32,7 @@ Deliverables:
 - Config-driven indicators, functions, and tables.
 - SQL generation for `filter`, `then`, `rank`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN`.
 - Cross-sectional `rank(..., percent=N)` cutoff support for percentage-based daily screening.
-- Date-range pushdown through `date_between(...)` for partition-pruning-friendly SQL.
+- Date-range pushdown through `date_between(...)`, including window-safe upper-bound pruning, for partition-pruning-friendly SQL.
 - Rewrite trace.
 - Pytest baseline.
 

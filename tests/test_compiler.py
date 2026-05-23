@@ -94,12 +94,15 @@ def test_compile_date_between_emits_trade_date_range_pushdown():
     assert base_steps[0]["status"] == "applied"
 
 
-def test_compile_date_between_does_not_base_prune_window_queries():
+def test_compile_date_between_prunes_window_queries_with_safe_upper_bound():
     result = Compiler().compile(
         'filter(date_between("2026-01-02", "2026-01-04") & indicator("close") > MA(indicator("close"), 3))'
     )
 
+    assert "FROM dwd_stock_daily_quote AS base WHERE trade_date <= '2026-01-04'" in result.sql
     assert "FROM dwd_stock_daily_quote AS base WHERE (trade_date >=" not in result.sql
     assert "trade_date >= '2026-01-02'" in result.sql
+    assert "push safe date upper bound into base scan for window context" in result.trace
     assert any(step["rule"] == "DATE_RANGE_PUSHDOWN" for step in result.explain)
+    assert any(step["rule"] == "DATE_RANGE_WINDOW_PRUNING" for step in result.explain)
     assert not any(step["rule"] == "DATE_RANGE_BASE_PRUNING" for step in result.explain)

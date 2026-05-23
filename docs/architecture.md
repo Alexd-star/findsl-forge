@@ -103,7 +103,7 @@ This is intentionally closer to production SQL than string-template demos.
 
 ### Date-Range Pushdown
 
-`date_between("YYYY-MM-DD", "YYYY-MM-DD")` compiles into a direct `trade_date` range predicate and emits a `DATE_RANGE_PUSHDOWN` explain step. When the filter does not depend on rolling windows, the generator also copies the range into the physical base scan and emits `DATE_RANGE_BASE_PRUNING`, making Doris partition pruning visible in SQL. Window-dependent filters keep the date predicate outside the feature layer so rolling semantics are not truncated at the range boundary.
+`date_between("YYYY-MM-DD", "YYYY-MM-DD")` compiles into a direct `trade_date` range predicate and emits a `DATE_RANGE_PUSHDOWN` explain step. When the filter does not depend on rolling windows, the generator also copies the full range into the physical base scan and emits `DATE_RANGE_BASE_PRUNING`, making Doris partition pruning visible in SQL. Window-dependent filters keep the lower bound outside the feature layer so rolling history is not truncated, but still push the safe upper bound into the base scan and emit `DATE_RANGE_WINDOW_PRUNING` because current-row and preceding-row windows never need future rows.
 
 ### Config-Driven Business Rules
 
@@ -173,7 +173,7 @@ positive DSL case -> compiler -> SQL/trace/explain evidence -> SQL/reference equ
 negative DSL case -> compiler failure -> structured diagnostic code -> repair suggestions
 ```
 
-Positive cases cover staged filters, top-N and percent-cutoff ranking, date-range pushdown, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, invalid rank percentages, invalid date ranges, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
+Positive cases cover staged filters, top-N and percent-cutoff ranking, date-range pushdown, window-safe date pruning, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, invalid rank percentages, invalid date ranges, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
 
 ## Defense Package Loop
 

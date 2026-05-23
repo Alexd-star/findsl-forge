@@ -110,14 +110,24 @@ class SqlGenerator:
             base_predicates = self._base_date_pushdown_predicates(condition_node)
             base_where = f" WHERE {' AND '.join(base_predicates)}" if base_predicates else ""
             if base_predicates:
-                self.trace.append("push safe date range predicate into base scan")
-                self._explain(
-                    "DATE_RANGE_BASE_PRUNING",
-                    "applied",
-                    "Push safe date range predicate into base scan",
-                    predicate_count=len(base_predicates),
-                    source=source or "physical_base",
-                )
+                if self._contains_temporal_window(condition_node):
+                    self.trace.append("push safe date upper bound into base scan for window context")
+                    self._explain(
+                        "DATE_RANGE_WINDOW_PRUNING",
+                        "applied",
+                        "Push safe date upper bound into base scan without truncating window history",
+                        predicate_count=len(base_predicates),
+                        source=source or "physical_base",
+                    )
+                else:
+                    self.trace.append("push safe date range predicate into base scan")
+                    self._explain(
+                        "DATE_RANGE_BASE_PRUNING",
+                        "applied",
+                        "Push safe date range predicate into base scan",
+                        predicate_count=len(base_predicates),
+                        source=source or "physical_base",
+                    )
             layer_sql = f"SELECT {self._project_columns()} FROM {from_clause}{base_where}"
             layer_name = "base_features"
 
@@ -169,7 +179,7 @@ class SqlGenerator:
 
     def _base_date_pushdown_predicates(self, node: Node) -> List[str]:
         if self._contains_temporal_window(node):
-            return []
+            return self._collect_and_date_upper_bound_predicates(node)
         return self._collect_and_date_predicates(node)
 
     def _contains_temporal_window(self, node: Node) -> bool:
@@ -188,6 +198,16 @@ class SqlGenerator:
             return [self._date_between_predicate(node)]
         if isinstance(node, BinaryOp) and node.op == "&":
             return self._collect_and_date_predicates(node.left) + self._collect_and_date_predicates(node.right)
+        return []
+
+    def _collect_and_date_upper_bound_predicates(self, node: Node) -> List[str]:
+        if isinstance(node, FunctionCall) and node.name.upper() == "DATE_BETWEEN":
+            return [self._date_between_upper_bound_predicate(node)]
+        if isinstance(node, BinaryOp) and node.op == "&":
+            return (
+                self._collect_and_date_upper_bound_predicates(node.left)
+                + self._collect_and_date_upper_bound_predicates(node.right)
+            )
         return []
 
     def _rank_sql(self, node: FunctionCall, base_relation: str = None) -> str:
@@ -375,6 +395,10 @@ class SqlGenerator:
         start = self._date_arg(node.args[0], "date_between")
         end = self._date_arg(node.args[1], "date_between")
         return f"(trade_date >= '{start}' AND trade_date <= '{end}')"
+
+    def _date_between_upper_bound_predicate(self, node: FunctionCall) -> str:
+        end = self._date_arg(node.args[1], "date_between")
+        return f"trade_date <= '{end}'"
 
     def _symbol_arg(self, node: Node, function_name: str) -> str:
         if isinstance(node, Literal) and isinstance(node.value, str):
