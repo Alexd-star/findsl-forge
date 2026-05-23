@@ -92,6 +92,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\benchmark_prefix_sum.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\scale_benchmark.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\collect_doris_evidence.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\prepare_doris_scale_evidence.ps1 -ProxyUrl "http://127.0.0.1:7897"
+powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 ```
@@ -126,6 +128,8 @@ The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix
 `scripts/scale_benchmark.ps1` goes one step further: it generates deterministic synthetic market data under `data/generated/scale/`, runs a 120-day rolling `SUM` query against baseline-window and prefix-sum SQL, and writes `reports/prefix_sum_scale_benchmark.md`. The report records correctness gates, local timing, plan shape, and a long-window feature-access reduction estimate. It is designed as reproducible pre-Doris evidence, not as a substitute for Doris cluster `EXPLAIN` and production latency.
 
 After the Doris schema, data, and prefix tables are loaded, `scripts/collect_doris_evidence.ps1` captures real-cluster `EXPLAIN`, repeated `COUNT(*)` latency, row-count equivalence, plan-shape markers, and the default 10x speedup target into `reports/doris_cluster_evidence.md` plus a JSON sidecar. The readiness report consumes this file and closes the `Doris-scale performance proof` warning only when baseline and optimized SQL both succeed, row counts match, the baseline contains a window plan, the optimized query uses a prefix table, and measured Doris speedup meets the 10x target.
+
+For the repeatable local 5M-row path, `scripts/prepare_doris_scale_evidence.ps1` starts the Docker Doris cluster, generates deterministic CSV data, Stream Loads the base tables, rebuilds prefix tables, collects Doris evidence, and reruns readiness. Use `-ProxyUrl "http://127.0.0.1:7897"` when Docker image pulls need the local VPN proxy.
 
 ## Structured Explain
 
@@ -177,11 +181,13 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 `scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris SQL validation evidence, config-only indicator extension evidence, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
 
-The readiness report also runs `official-suite`, which currently covers 25 positive official-style cases and 27 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, duplicate named arguments, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
+The readiness report also runs `official-suite`, which currently covers 31 positive official-style cases and 33 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, hot-window materialized columns, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, duplicate named arguments, invalid dates, invalid rank directions, invalid windows, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
-It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
+It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, Doris asset integrity, and the exported Doris proof to concrete scoring evidence.
 
-Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight remaining competition risks, especially missing Doris-cluster scale proof and uncommitted local changes.
+Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight competition risks such as missing Doris-cluster scale proof or uncommitted local changes.
+
+Because `reports/` is generated and ignored by Git, run `scripts/export_submission_artifacts.ps1` before the final commit. It copies lightweight evidence reports into `submission_artifacts/evidence_snapshots/` so the submitted repository contains a reviewable evidence snapshot without committing large CSV data.
 
 ## Competition-Oriented Design
 
@@ -192,4 +198,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Final submission should add real Doris-cluster execution proof and optional provider-backed LLM repair loops that preserve the same deterministic validation contract.
+The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, real Doris-cluster execution proof, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Final polishing can add a small real-market-data sample and optional provider-backed LLM repair loops while preserving the same deterministic validation contract.

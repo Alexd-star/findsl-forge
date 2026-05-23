@@ -22,6 +22,35 @@ DEFAULT_DEMO_DSL = (
 DEFAULT_NL_REQUEST = "筛选A股连续3天主力净流入为正的股票，并按换手率从高到低排名前100"
 
 
+def doris_evidence_summary(report_path: Path = Path("reports/doris_cluster_evidence.md")) -> Dict[str, Any]:
+    report_path = Path(report_path)
+    if not report_path.exists():
+        return {
+            "available": False,
+            "path": str(report_path),
+            "message": "Doris evidence report is not available yet.",
+        }
+    content = report_path.read_text(encoding="utf-8")
+    metrics: Dict[str, str] = {}
+    for line in content.splitlines():
+        if not line.startswith("- ") or ": " not in line:
+            continue
+        key, value = line[2:].split(": ", 1)
+        metrics[_metric_key(key)] = value.strip()
+    return {
+        "available": True,
+        "path": str(report_path),
+        "metrics": metrics,
+        "headline": {
+            "passed": metrics.get("evidence_passed", "<unknown>"),
+            "speedup": metrics.get("doris_cluster_speedup", "<unknown>"),
+            "baseline_avg_ms": metrics.get("baseline_avg_execute_ms", "<unknown>"),
+            "optimized_avg_ms": metrics.get("optimized_avg_execute_ms", "<unknown>"),
+            "row_counts_match": metrics.get("row_counts_match", "<unknown>"),
+        },
+    }
+
+
 def analyze_dsl(
     dsl: str,
     data_dir: Path = Path("data/samples"),
@@ -151,6 +180,9 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
             if self.path == "/api/examples":
                 self._send_json({"ok": True, "examples": demo_examples(cases_path)})
                 return
+            if self.path == "/api/evidence":
+                self._send_json({"ok": True, "evidence": doris_evidence_summary()})
+                return
             self._send_json({"ok": False, "error": {"message": "Not found"}}, HTTPStatus.NOT_FOUND)
 
         def do_POST(self) -> None:  # noqa: N802 - required by BaseHTTPRequestHandler.
@@ -244,6 +276,16 @@ def _safe_load_cases(path: Path) -> List[Dict[str, Any]]:
         return []
 
 
+def _metric_key(value: str) -> str:
+    return (
+        value.strip()
+        .lower()
+        .replace(" ", "_")
+        .replace("-", "_")
+        .replace("/", "_")
+    )
+
+
 def render_demo_html() -> str:
     html = """<!doctype html>
 <html lang="en">
@@ -305,6 +347,11 @@ def render_demo_html() -> str:
       border-bottom: 1px solid var(--line);
     }
     .panel-head h2 { font-size: 14px; margin: 0; }
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .section { padding: 14px; }
     label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
     select, textarea {
@@ -349,6 +396,11 @@ def render_demo_html() -> str:
     }
     .secondary {
       background: #27323a;
+    }
+    .ghost {
+      background: #eef2f6;
+      color: #172026;
+      border: 1px solid var(--line);
     }
     button:disabled { opacity: 0.65; cursor: default; }
     .candidates {
@@ -505,7 +557,10 @@ def render_demo_html() -> str:
       <section class="panel">
         <div class="panel-head">
           <h2>Result</h2>
-          <span id="resultState" class="badge">Waiting</span>
+          <div class="panel-actions">
+            <button class="ghost" id="copyButton" type="button">Copy SQL</button>
+            <span id="resultState" class="badge">Waiting</span>
+          </div>
         </div>
         <div class="section metrics">
           <div class="metric"><strong id="metricStatus">-</strong><span>verification</span></div>
@@ -518,6 +573,7 @@ def render_demo_html() -> str:
           <button class="tab" data-tab="ast">AST</button>
           <button class="tab" data-tab="explain">Explain</button>
           <button class="tab" data-tab="rows">Rows</button>
+          <button class="tab" data-tab="evidence">Evidence</button>
         </div>
         <div id="errorBox" class="error" hidden></div>
         <pre id="outputPane"></pre>
@@ -533,12 +589,14 @@ def render_demo_html() -> str:
     const dslInput = document.getElementById("dslInput");
     const runButton = document.getElementById("runButton");
     const outputPane = document.getElementById("outputPane");
+    const copyButton = document.getElementById("copyButton");
     const errorBox = document.getElementById("errorBox");
     const resultState = document.getElementById("resultState");
     const buildState = document.getElementById("buildState");
     const prefixToggle = document.getElementById("prefixToggle");
     const verifyToggle = document.getElementById("verifyToggle");
     let currentResult = null;
+    let currentEvidence = null;
     let currentTab = "sql";
     let currentExample = null;
     const defaultNlRequest = "__DEFAULT_NL_REQUEST__";
@@ -564,6 +622,7 @@ def render_demo_html() -> str:
       if (currentTab === "ast") outputPane.textContent = pretty(compiled.ast);
       if (currentTab === "explain") outputPane.textContent = pretty({ trace: compiled.trace, explain: compiled.explain });
       if (currentTab === "rows") outputPane.textContent = pretty(currentResult.verification ? currentResult.verification.result_keys : []);
+      if (currentTab === "evidence") outputPane.textContent = pretty(currentEvidence || { available: false });
     }
 
     function updateMetrics(result) {
@@ -691,6 +750,12 @@ def render_demo_html() -> str:
       selectExample(0);
     }
 
+    async function loadEvidence() {
+      const res = await fetch("/api/evidence");
+      const data = await res.json();
+      currentEvidence = data.evidence;
+    }
+
     async function run() {
       runButton.disabled = true;
       setState("Running", true);
@@ -743,11 +808,18 @@ def render_demo_html() -> str:
         render();
       });
     });
+    copyButton.addEventListener("click", async () => {
+      const sql = currentResult && currentResult.compile ? currentResult.compile.sql : "";
+      if (!sql) return;
+      await navigator.clipboard.writeText(sql);
+      copyButton.textContent = "Copied";
+      setTimeout(() => { copyButton.textContent = "Copy SQL"; }, 1200);
+    });
     sampleSelect.addEventListener("change", () => { selectExample(Number(sampleSelect.value)); });
     suggestButton.addEventListener("click", suggest);
     runButton.addEventListener("click", run);
     nlInput.value = defaultNlRequest;
-    loadExamples().then(suggest);
+    Promise.all([loadExamples(), loadEvidence()]).then(suggest);
   </script>
 </body>
 </html>"""

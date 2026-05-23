@@ -164,6 +164,33 @@ def test_suggests_date_range_close_above_ma_without_confusing_window_for_thresho
     assert "DATE_RANGE_WINDOW_PRUNING" in {step["rule"] for step in compiled.explain}
 
 
+def test_suggests_date_range_with_slash_dates():
+    result = suggest_dsl("2026/01/02到2026/01/04收盘价大于10")
+
+    assert result.top is not None
+    assert result.top.rule == "date_range_close_threshold"
+    assert result.top.dsl == 'filter(date_between("2026-01-02", "2026-01-04") & indicator("close") > 10)'
+
+
+def test_suggests_date_range_with_chinese_date_text():
+    result = suggest_dsl("2026年1月2日至2026年1月4日收盘价大于3日均线")
+
+    assert result.top is not None
+    assert result.top.rule == "date_range_close_above_ma"
+    assert result.top.dsl == (
+        'filter(date_between("2026-01-02", "2026-01-04") '
+        '& indicator("close") > MA(indicator("close"), 3))'
+    )
+
+
+def test_suggests_half_year_window_for_rolling_sum_request():
+    result = suggest_dsl("近半年成交量累计大于100万")
+
+    assert result.top is not None
+    assert result.top.rule == "rolling_volume_sum"
+    assert result.top.dsl == 'filter(SUM(indicator("volume"), 120) > 1000000)'
+
+
 def test_reports_warning_when_no_template_matches():
     result = suggest_dsl("找出形态非常好看的股票")
 

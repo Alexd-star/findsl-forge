@@ -1,6 +1,13 @@
 from pathlib import Path
 
-from findsl.demo import DEFAULT_NL_REQUEST, analyze_dsl, demo_examples, render_demo_html, suggest_from_text
+from findsl.demo import (
+    DEFAULT_NL_REQUEST,
+    analyze_dsl,
+    demo_examples,
+    doris_evidence_summary,
+    render_demo_html,
+    suggest_from_text,
+)
 
 
 DATA_DIR = Path("data/samples")
@@ -36,7 +43,10 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "Natural language" in html
     assert "/api/analyze" in html
     assert "/api/suggest" in html
+    assert "/api/evidence" in html
     assert "Suggest DSL" in html
+    assert "Copy SQL" in html
+    assert "data-tab=\"evidence\"" in html
     assert DEFAULT_NL_REQUEST in html
     assert "__DEFAULT_NL_REQUEST__" not in html
     assert "metricStatus" in html
@@ -48,6 +58,30 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "Diagnostic preset" in html
     assert "Expected diagnostic:" in html
     assert "Actual diagnostic:" in html
+
+
+def test_doris_evidence_summary_reads_cluster_report(tmp_path):
+    report = tmp_path / "doris_cluster_evidence.md"
+    report.write_text(
+        "\n".join(
+            [
+                "# Doris Cluster Evidence",
+                "- Evidence passed: True",
+                "- Row counts match: True",
+                "- Doris cluster speedup: 36.24x",
+                "- Baseline avg execute ms: 5182.042",
+                "- Optimized avg execute ms: 142.993",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    summary = doris_evidence_summary(report)
+
+    assert summary["available"]
+    assert summary["headline"]["passed"] == "True"
+    assert summary["headline"]["speedup"] == "36.24x"
+    assert summary["headline"]["row_counts_match"] == "True"
 
 
 def test_suggest_from_text_returns_validated_candidate_payload():

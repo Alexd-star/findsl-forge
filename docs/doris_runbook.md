@@ -133,6 +133,23 @@ Keep the generated Markdown and JSON sidecar together. The Markdown is for the t
 
 For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWORD_MODE=inline`. Inline passwords are redacted in the generated report's command template. Use shell history controls appropriate for your environment before recording final evidence.
 
+## One-Command Scale Evidence
+
+For the final local Docker Desktop evidence path, use the end-to-end script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\prepare_doris_scale_evidence.ps1 -ProxyUrl "http://127.0.0.1:7897"
+```
+
+The script starts the local Doris compose cluster, generates deterministic scale CSV files, applies schema, Stream Loads the base tables, rebuilds prefix tables, collects Doris evidence, and reruns readiness. Its defaults recreate the current 5,000,000-row benchmark with:
+
+- `Stocks = 2000`
+- `Days = 2500`
+- `DSL = filter(SUM(indicator("volume"), 120) > 1000000)`
+- `DORIS_EVIDENCE_MIN_SPEEDUP = 10.0`
+
+Use `-SkipDataGeneration` when the CSV files already exist and `-SkipStreamLoad` when only prefix tables/evidence need to be rebuilt. The script truncates Doris base and prefix tables before loading unless `-SkipStreamLoad` is supplied.
+
 ## Production Notes
 
 - Increase `replication_num` and bucket counts for multi-BE clusters.

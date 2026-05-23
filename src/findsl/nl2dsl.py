@@ -385,7 +385,7 @@ def _rolling_volume_sum(text: str) -> Optional[DslCandidate]:
 
 
 def _date_range_rolling_volume_sum(text: str) -> Optional[DslCandidate]:
-    dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    dates = _extract_dates(text)
     signals = _signals(
         text,
         [
@@ -415,7 +415,7 @@ def _date_range_rolling_volume_sum(text: str) -> Optional[DslCandidate]:
 
 
 def _date_range_close_threshold(text: str) -> Optional[DslCandidate]:
-    dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    dates = _extract_dates(text)
     if _contains_any(text, ["均线", "均价", "平均", "ma"]):
         return None
     signals = _signals(
@@ -444,7 +444,8 @@ def _date_range_close_threshold(text: str) -> Optional[DslCandidate]:
 
 
 def _date_range_close_above_ma(text: str) -> Optional[DslCandidate]:
-    dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    dates = _extract_dates(text)
+    window_text = _strip_date_literals(text)
     signals = _signals(
         text,
         [
@@ -456,7 +457,7 @@ def _date_range_close_above_ma(text: str) -> Optional[DslCandidate]:
     if len(dates) < 2 or not {"close", "above", "ma"}.issubset(signals):
         return None
 
-    window = _window_near(text, ["均线", "均价", "平均", "ma"], default=20)
+    window = _window_near(window_text, ["均线", "均价", "平均", "ma"], default=20)
     dsl = (
         f'filter(date_between("{dates[0]}", "{dates[1]}") '
         f'& indicator("close") > MA(indicator("close"), {window}))'
@@ -481,6 +482,21 @@ def _contains_any(text: str, needles: Sequence[str]) -> bool:
 
 def _normalize(text: str) -> str:
     return re.sub(r"\s+", "", text.strip().lower().replace("，", ",").replace("。", "."))
+
+
+def _extract_dates(text: str) -> List[str]:
+    dates: List[str] = []
+    pattern = re.compile(r"(?P<year>\d{4})[-/年](?P<month>\d{1,2})[-/月](?P<day>\d{1,2})日?")
+    for match in pattern.finditer(text):
+        year = int(match.group("year"))
+        month = int(match.group("month"))
+        day = int(match.group("day"))
+        dates.append(f"{year:04d}-{month:02d}-{day:02d}")
+    return dates
+
+
+def _strip_date_literals(text: str) -> str:
+    return re.sub(r"\d{4}[-/年]\d{1,2}[-/月]\d{1,2}日?", "", text)
 
 
 def _market_condition(text: str) -> str:
@@ -528,10 +544,28 @@ def _rank_limit_arg(order: str, limit: int) -> str:
 
 def _window_after(text: str, anchors: Sequence[str], default: int) -> int:
     for anchor in anchors:
+        period_window = _period_window_after_anchor(text, anchor)
+        if period_window is not None:
+            return period_window
         match = re.search(rf"{re.escape(anchor)}(?P<num>{NUMBER_RE})(?:日|天|个交易日)", text)
         if match:
             return int(_parse_number(match.group("num")))
     return default
+
+
+def _period_window_after_anchor(text: str, anchor: str) -> Optional[int]:
+    period_map = {
+        "半年": 120,
+        "半年度": 120,
+        "一季度": 60,
+        "季度": 60,
+        "一年": 250,
+        "年度": 250,
+    }
+    for label, window in period_map.items():
+        if f"{anchor}{label}" in text:
+            return window
+    return None
 
 
 def _window_near(text: str, anchors: Sequence[str], default: int) -> int:

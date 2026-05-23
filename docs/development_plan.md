@@ -155,7 +155,7 @@ Exit criteria:
 - Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
 - Local SQLite prefix timing is only a smoke/regression signal and must not be presented as Doris-scale acceleration proof.
 - Generated reports can be attached to the technical document or used in defense.
-- Defense package must state that real Doris 10x proof is separate cluster evidence, not local fixture timing.
+- Defense package must attach the latest real Doris 10x+ proof as separate cluster evidence, not confuse it with local fixture timing.
 - Warning gates are either closed or explicitly explained in the final submission.
 
 ## Non-Negotiable Quality Gates

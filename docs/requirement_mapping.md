@@ -18,18 +18,18 @@ This document maps Topic 19 requirements to implementation modules.
 | Prefix-sum optimized rolling SUM | `findsl.sqlgen`, `configs/indicators.json`, `configs/tables.json` | Implemented with quote and money-flow prefix cases |
 | Baseline versus optimized performance evidence | `findsl.benchmark`, `scripts/benchmark_prefix_sum.ps1` | Implemented as local regression evidence |
 | Reproducible long-window scale evidence | `findsl.synthetic`, `findsl.scale_benchmark`, `scripts/scale_benchmark.ps1` | Implemented as local scale evidence |
-| Real Doris EXPLAIN and latency proof | `findsl.doris_evidence`, `collect-doris-evidence` CLI, `scripts/collect_doris_evidence.ps1` | External cluster evidence pending |
+| Real Doris EXPLAIN and latency proof | `findsl.doris_evidence`, `collect-doris-evidence` CLI, `scripts/collect_doris_evidence.ps1`, `scripts/prepare_doris_scale_evidence.ps1` | Implemented with 5M-row local Doris evidence |
 | Explainable optimizer decisions | `findsl.explain`, `findsl.sqlgen`, `findsl.evaluation`, `findsl.benchmark` | Implemented and surfaced in reports/demo |
 | Doris deployment assets | `findsl.doris`, monthly `trade_date` auto partitions, `ts_code` colocate group, `scripts/generate_doris_assets.ps1`, `deploy/doris/*.sql` | Implemented with asset-integrity gate |
-| Output Markdown table and engineering screenshots | `findsl.readiness`, `findsl.demo`, `scripts/submission_readiness.ps1`, `scripts/serve_demo.ps1` | Reports implemented; final screenshots/video are manual capture |
+| Output Markdown table and engineering screenshots | `findsl.readiness`, `findsl.demo`, `scripts/submission_readiness.ps1`, `scripts/serve_demo.ps1`, `submission_artifacts/demo_script.md` | Reports and demo script implemented; final screenshots/video are manual capture |
 | AST/SQL/explain/result visualization | `findsl.demo`, `scripts/serve_demo.ps1`, readiness demo smoke gate | Implemented with API smoke gate |
 | AI-assisted natural-language entry without SQL hallucination | `findsl.nl2dsl`, `findsl.demo`, `findsl.readiness`, `suggest-dsl` CLI | Implemented with compiler-validated templates |
 | Optional LLM assistance with deterministic safety guardrails | `findsl.llm_adapter`, `validate-llm-candidates` CLI, `scripts/validate_llm_candidates.ps1`, `data/samples/llm_candidate_response.json`, readiness required gate | Implemented with unsafe-SQL rejection |
 | Interactive error explainability and repair guidance | `findsl.diagnostics`, `findsl.demo`, `diagnose` CLI, Web Demo diagnostic presets | Implemented with negative official suite |
-| Official-style task coverage and negative diagnostic evidence | `findsl.official_suite`, `official-suite` CLI, `scripts/official_suite.ps1`, `data/samples/official_*_cases.jsonl`, readiness required gate | Implemented: 25/25 positive and 26/26 negative |
+| Official-style task coverage and negative diagnostic evidence | `findsl.official_suite`, `official-suite` CLI, `scripts/official_suite.ps1`, `data/samples/official_*_cases.jsonl`, readiness required gate | Implemented and regression-tested |
 | Defense walkthrough and score-mapping evidence | `findsl.defense_package`, `defense-package` CLI, `scripts/defense_package.ps1`, `reports/defense_package.md`, readiness required gate | Implemented with 11/11 defense checks |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Implemented |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Implemented with required readiness gate |
 | Local SQL execution regression | `findsl.executor`, `scripts/verify_sql_sample.ps1` | Implemented |
-| Submission package evidence chain | `findsl.readiness`, `scripts/submission_readiness.ps1`, `reports/*.md`, `reports/doris_cluster_evidence.md` | Implemented except final Doris cluster proof |
+| Submission package evidence chain | `findsl.readiness`, `scripts/submission_readiness.ps1`, `reports/*.md`, `reports/doris_cluster_evidence.md`, `scripts/export_submission_artifacts.ps1`, `submission_artifacts/` | Implemented with versioned evidence snapshot export |
 | Git rollback and backup discipline | git history, `docs/git_workflow.md`, backup bundles | Implemented and continuously maintained |

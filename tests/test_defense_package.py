@@ -32,7 +32,7 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     content = output.read_text(encoding="utf-8")
     assert "FinDSL Forge Defense Package" in content
     assert "Package passed: True" in content
-    assert "real Doris 10x proof still requires a running Doris cluster" in content
+    assert "attach the latest Doris 10x+ proof from the exported evidence snapshots" in content
     assert "money_flow_prefix_sum" in content
     assert "UNKNOWN_INDICATOR" in content
     assert "UNSAFE_DIRECT_SQL" in content

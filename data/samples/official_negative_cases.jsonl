@@ -25,3 +25,9 @@
 {"name": "rank顶部数量不是整数", "dsl": "rank(indicator(\"close\"), desc, top=2.5)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer rank cutoff"]}
 {"name": "rank顶部数量必须为正", "dsl": "rank(indicator(\"close\"), desc, top=0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer rank cutoff"]}
 {"name": "重复命名参数", "dsl": "rank(indicator(\"close\"), desc, top=1, top=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["duplicate named arguments"]}
+{"name": "日期不存在", "dsl": "filter(date_between(\"2026-02-30\", \"2026-03-01\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["YYYY-MM-DD"]}
+{"name": "rank排序方向非法", "dsl": "rank(indicator(\"close\"), sideways, top=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["configs/functions.json"]}
+{"name": "EXIST窗口必须为正", "dsl": "filter(EXIST(indicator(\"volume\") > 10, -3))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer window"]}
+{"name": "窗口参数不能是字符串", "dsl": "filter(indicator(\"close\") > MA(indicator(\"close\"), \"3\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer window"]}
+{"name": "rank百分比不能为零", "dsl": "rank(indicator(\"close\"), desc, percent=0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["0 < N <= 100"]}
+{"name": "date_between参数不足", "dsl": "filter(date_between(\"2026-01-01\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["date_between(\"YYYY-MM-DD\", \"YYYY-MM-DD\")"]}

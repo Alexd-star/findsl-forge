@@ -49,7 +49,7 @@ class DefensePackageResult:
             "",
             f"- Package passed: {self.passed}",
             f"- Checks passed: {self.passed_count}/{self.total}",
-            "- Scope: local reproducible evidence for live defense; real Doris 10x proof still requires a running Doris cluster.",
+            "- Scope: local reproducible evidence for live defense; attach the latest Doris 10x+ proof from the exported evidence snapshots.",
             "",
             "## Live Walkthrough",
             "",
