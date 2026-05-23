@@ -13,6 +13,7 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
 
     check_names = {check.name for check in result.checks}
     assert "NL2DSL validated candidate" in check_names
+    assert "NL2DSL official template coverage" in check_names
     assert "LLM candidate safety loop" in check_names
     assert "Official prefix-sum positive preset" in check_names
     assert "Official diagnostic negative preset" in check_names
@@ -35,6 +36,9 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "UNKNOWN_INDICATOR" in content
     assert "UNSAFE_DIRECT_SQL" in content
     assert "LLM candidate safety loop" in content
+    assert "NL2DSL official template coverage" in content
+    assert "A股每日换手率前50%" in content
+    assert "date_window_pruning" in content
     assert "Doris SQL validation boundary" in content
     assert "Config-only indicator extension" in content
     assert "dwd_stock_money_flow_prefix" in content

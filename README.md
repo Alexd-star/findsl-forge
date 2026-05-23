@@ -32,6 +32,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Collect Doris-cluster `EXPLAIN` and latency evidence for baseline-window versus prefix-sum SQL.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
+- Cover official-style NL2DSL prompts for low-price bottom picks, turnover percent cuts, high-turnover close ranking, and date-window moving-average filters.
 - Validate optional LLM-proposed DSL candidates while rejecting direct SQL and invalid DSL before execution.
 - Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a defense package that maps live demo steps to competition scoring evidence.
@@ -50,6 +51,8 @@ python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_i
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
 python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
+python -m findsl.cli suggest-dsl 'A股存在资金流入后按低价取每日2只' --data-dir data/samples --json
+python -m findsl.cli suggest-dsl 'A股每日换手率前50%' --data-dir data/samples --json
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --text '近3日成交量累计大于300' --data-dir data/samples --json
 python -m findsl.cli official-suite --output reports/official_suite_report.md --json
 python -m findsl.cli defense-package --output reports/defense_package.md --json
@@ -167,7 +170,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 The readiness report also runs `official-suite`, which covers official-style stock-screening tasks across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
-It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
+It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
 
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight remaining competition risks, especially missing Doris-cluster scale proof and uncommitted local changes.
 

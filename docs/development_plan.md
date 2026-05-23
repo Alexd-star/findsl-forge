@@ -121,6 +121,7 @@ Deliverables:
 - Web UI or Streamlit UI. (Started via zero-dependency local Web Demo/API)
 - AST/IR/SQL/rewrite trace visualization. (Started)
 - Natural-language-to-DSL candidate layer with compiler/reference validation. (Started)
+- Official-style NL2DSL templates for bottom-rank, percent-rank, high-turnover rank, and date-window MA requests. (Started)
 - Optional LLM response adapter that validates model-proposed DSL and rejects direct SQL bypasses. (Started)
 - Structured compile diagnostics and repair hints for invalid demo/API requests. (Started)
 - Official positive and diagnostic negative presets in the Web Demo for live defense walkthroughs. (Started)
@@ -143,6 +144,7 @@ Exit criteria:
 - `scripts/defense_package.ps1` produces a repeatable walkthrough that maps visible demo signals to competition scoring points.
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
+- Defense package must prove NL2DSL official-template coverage for low-price `bottom`, turnover `percent`, and date-window MA scenarios.
 - LLM safety smoke check proves model-proposed output accepts only verified DSL, rejects direct SQL, and classifies invalid DSL with stable diagnostics.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Defense package proves a config-only indicator extension can compile and pass Doris SQL validation without changing compiler core.
@@ -162,5 +164,6 @@ Exit criteria:
 - Generated SQL must pass the Doris-safe query-shape validator before a compile result is accepted.
 - Official-style positive/negative corpora must grow with every newly supported DSL construct so competition coverage stays evidence-backed.
 - Rank semantics must keep top/bottom/percent validation aligned across compiler SQL, Pandas reference, diagnostics, and official-suite cases; `top` is paired with `desc`, while `bottom` is paired with `asc` to avoid ambiguous low/high picks.
+- NL2DSL rank templates must emit the same top/bottom/percent semantics as the compiler accepts, so AI-assisted entry cannot generate candidates that fail deterministic semantic validation.
 - Date predicates must validate ISO dates, reject reversed ranges, expose `DATE_RANGE_PUSHDOWN`, and push safe non-window ranges into the base scan as `DATE_RANGE_BASE_PRUNING`.
 - LLM/provider integrations may propose DSL only; they must never execute direct SQL or bypass compiler, diagnostics, optimizer explain, and equivalence checks.

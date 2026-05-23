@@ -65,6 +65,8 @@ The compiler core is deterministic. AI support stays outside the core as an NL2D
 
 Natural-language requests are translated into candidate DSL, not directly into SQL. A candidate is useful only after it compiles, executes against local SQL fixtures, and matches the Pandas reference evaluator. This makes the AI-facing path defensible in competition review: convenience comes from natural-language entry, while correctness still comes from the same compiler and oracle used by the deterministic DSL path.
 
+The template layer intentionally covers official-style edge cases that are easy for free-form text-to-SQL to mishandle: low-value ranking uses `rank(..., asc, bottom=N)`, high-value ranking uses `rank(..., desc, top=N)`, percentage ranking uses `percent=N`, and date-range moving-average requests preserve window history through safe upper-bound pruning instead of treating the MA window as a numeric threshold.
+
 ### Safe LLM Candidate Adapter
 
 The optional LLM adapter treats model output as untrusted proposal text. It extracts candidate DSL from JSON payloads, markdown fences, labeled lines, or OpenAI-style `choices[].message.content`, then applies a hard safety boundary:

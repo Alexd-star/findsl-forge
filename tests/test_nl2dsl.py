@@ -17,6 +17,53 @@ def test_suggests_consecutive_inflow_rank_dsl_from_chinese_request():
     assert "ROW_NUMBER()" in Compiler().compile(top.dsl).sql
 
 
+def test_suggests_low_turnover_rank_with_bottom_limit_when_order_is_ascending():
+    result = suggest_dsl("筛选A股连续三天主力净流入为正并按换手率从低到高排名前十")
+
+    assert result.top is not None
+    assert result.top.rule == "consecutive_inflow_rank"
+    assert result.top.dsl == (
+        'then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), '
+        'rank(indicator("turnover_rate"), asc, bottom=10))'
+    )
+    assert "ORDER BY base.turnover_rate ASC" in Compiler().compile(result.top.dsl).sql
+
+
+def test_suggests_money_flow_low_price_bottom_rank():
+    result = suggest_dsl("A股存在资金流入后按低价取每日2只")
+
+    assert result.top is not None
+    assert result.top.rule == "money_flow_low_price_rank"
+    assert result.top.dsl == (
+        'then(filter(market("A") & EXIST(indicator("main_net_inflow") > 0, 2)), '
+        'rank(indicator("close"), asc, bottom=2))'
+    )
+    compiled = Compiler().compile(result.top.dsl)
+    assert "ORDER BY base.close ASC" in compiled.sql
+    assert "rank_no <= 2" in compiled.sql
+
+
+def test_suggests_turnover_percent_rank():
+    result = suggest_dsl("A股每日换手率前50%")
+
+    assert result.top is not None
+    assert result.top.rule == "turnover_percent_rank"
+    assert result.top.dsl == 'then(filter(market("A")), rank(indicator("turnover_rate"), desc, percent=50))'
+    assert "__partition_count" in Compiler().compile(result.top.dsl).sql
+
+
+def test_suggests_high_turnover_close_rank():
+    result = suggest_dsl("A股高换手后按收盘价取每日前2")
+
+    assert result.top is not None
+    assert result.top.rule == "high_turnover_close_rank"
+    assert result.top.dsl == (
+        'then(filter(market("A") & indicator("turnover_rate") > 1), '
+        'rank(indicator("close"), desc, top=2))'
+    )
+    assert "ORDER BY base.close DESC" in Compiler().compile(result.top.dsl).sql
+
+
 def test_suggests_close_new_high_with_chinese_window_number():
     result = suggest_dsl("今日收盘价创二百五十日新高")
 
@@ -50,6 +97,21 @@ def test_suggests_date_range_close_threshold():
     compiled = Compiler().compile(result.top.dsl)
     assert "trade_date >= '2026-01-02'" in compiled.sql
     assert "DATE_RANGE_PUSHDOWN" in {step["rule"] for step in compiled.explain}
+
+
+def test_suggests_date_range_close_above_ma_without_confusing_window_for_threshold():
+    result = suggest_dsl("2026-01-02到2026-01-04收盘价大于3日均线")
+
+    assert result.top is not None
+    assert result.top.rule == "date_range_close_above_ma"
+    assert result.top.dsl == (
+        'filter(date_between("2026-01-02", "2026-01-04") '
+        '& indicator("close") > MA(indicator("close"), 3))'
+    )
+    compiled = Compiler().compile(result.top.dsl)
+    assert "AVG(close) OVER" in compiled.sql
+    assert "close > 3" not in compiled.sql
+    assert "DATE_RANGE_WINDOW_PRUNING" in {step["rule"] for step in compiled.explain}
 
 
 def test_reports_warning_when_no_template_matches():

@@ -55,12 +55,13 @@ class DefensePackageResult:
             "",
             "1. Start the demo with `powershell -ExecutionPolicy Bypass -File .\\scripts\\serve_demo.ps1`.",
             "2. Let the default Chinese request produce a validated DSL candidate and SQL/reference PASS.",
-            "3. Select `Official positive: 主力净流入3日滚动求和走资金流前缀表 [money_flow_prefix_sum]` and run it.",
-            "4. Confirm the UI shows verification PASS, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.",
-            "5. Select `Diagnostic negative: 未知指标名 [UNKNOWN_INDICATOR]` and run it.",
-            "6. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and the `indicator(\"close\")` repair hint.",
-            "7. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
-            "8. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
+            "3. Try `A股存在资金流入后按低价取每日2只`, `A股每日换手率前50%`, and `2026-01-02到2026-01-04收盘价大于3日均线`; confirm each suggested DSL validates.",
+            "4. Select `Official positive: 主力净流入3日滚动求和走资金流前缀表 [money_flow_prefix_sum]` and run it.",
+            "5. Confirm the UI shows verification PASS, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.",
+            "6. Select `Diagnostic negative: 未知指标名 [UNKNOWN_INDICATOR]` and run it.",
+            "7. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and the `indicator(\"close\")` repair hint.",
+            "8. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
+            "9. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
             "",
             "## Score Mapping",
             "",
@@ -132,6 +133,7 @@ def generate_defense_package(
     repo_root = Path(repo_root)
     checks = [
         _check_nl2dsl(data_dir),
+        _check_nl2dsl_official_template_coverage(data_dir),
         _check_llm_candidate_safety(data_dir, _resolve_repo_path(repo_root, llm_response_path)),
         _check_money_flow_prefix(data_dir, official_positive_path),
         _check_unknown_indicator_diagnostic(official_negative_path),
@@ -173,6 +175,65 @@ def _check_nl2dsl(data_dir: Path) -> DefenseCheck:
             "AI-assisted entry without SQL hallucination",
             "Use the default Chinese request in the Web Demo.",
             "Candidate is validated and verification is PASS.",
+            exc,
+        )
+
+
+def _check_nl2dsl_official_template_coverage(data_dir: Path) -> DefenseCheck:
+    prompts = [
+        (
+            "low_price_bottom",
+            "A股存在资金流入后按低价取每日2只",
+            "money_flow_low_price_rank",
+            "bottom=2",
+        ),
+        (
+            "turnover_percent",
+            "A股每日换手率前50%",
+            "turnover_percent_rank",
+            "percent=50",
+        ),
+        (
+            "date_window_pruning",
+            "2026-01-02到2026-01-04收盘价大于3日均线",
+            "date_range_close_above_ma",
+            "MA(indicator(\"close\"), 3)",
+        ),
+    ]
+    try:
+        evidence = []
+        passed_items = 0
+        for name, text, expected_rule, expected_fragment in prompts:
+            result = suggest_from_text(text, data_dir=data_dir, verify=True)
+            candidates = result.get("candidates", [])
+            top = candidates[0] if candidates else {}
+            ok = (
+                top.get("rule") == expected_rule
+                and expected_fragment in str(top.get("dsl", ""))
+                and bool(top.get("validated"))
+            )
+            passed_items += int(ok)
+            evidence.append(
+                f"{name}: rule={top.get('rule', '<none>')}, validated={top.get('validated', False)}"
+            )
+        passed = passed_items == len(prompts)
+        return DefenseCheck(
+            name="NL2DSL official template coverage",
+            scoring_point="AI-assisted coverage for bottom-rank, percent-rank, and date-window official scenarios",
+            demo_action="Enter official-style Chinese prompts for low-price bottom, turnover percent, and date-window MA cases.",
+            expected_signal="Each prompt yields a compiler-validated DSL candidate whose rule matches the intended official scenario.",
+            passed=passed,
+            evidence=[
+                f"covered={passed_items}/{len(prompts)}",
+                *evidence,
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "NL2DSL official template coverage",
+            "AI-assisted coverage for bottom-rank, percent-rank, and date-window official scenarios",
+            "Enter official-style Chinese prompts for low-price bottom, turnover percent, and date-window MA cases.",
+            "Each prompt yields a compiler-validated DSL candidate whose rule matches the intended official scenario.",
             exc,
         )
 

@@ -58,9 +58,13 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
         candidate
         for candidate in [
             _rank_after_consecutive_inflow(normalized),
+            _money_flow_low_price_rank(normalized),
+            _turnover_percent_rank(normalized),
+            _high_turnover_close_rank(normalized),
             _close_new_high(normalized),
             _volume_breakout_exists(normalized),
             _rolling_volume_sum(normalized),
+            _date_range_close_above_ma(normalized),
             _date_range_close_threshold(normalized),
         ]
         if candidate is not None
@@ -85,13 +89,14 @@ def _rank_after_consecutive_inflow(text: str) -> Optional[DslCandidate]:
         return None
 
     window = _window_after(text, ["连续"], default=3)
-    top = _top_n(text, default=100)
-    order = "asc" if _contains_any(text, ["升序", "从低到高"]) else "desc"
+    top = _selection_n(text, default=100)
+    order = _rank_order(text)
+    limit = _rank_limit_arg(order, top)
     condition = f'CONS(indicator("main_net_inflow") > 0, {window})'
     market = _market_condition(text)
     if market:
         condition = f"{market} & {condition}"
-    dsl = f'then(filter({condition}), rank(indicator("turnover_rate"), {order}, top={top}))'
+    dsl = f'then(filter({condition}), rank(indicator("turnover_rate"), {order}, {limit}))'
     confidence = 0.93
     if not market:
         confidence -= 0.04
@@ -103,6 +108,103 @@ def _rank_after_consecutive_inflow(text: str) -> Optional[DslCandidate]:
         rationale=(
             "Matched consecutive positive main-net-inflow screening, then ranked by turnover_rate."
         ),
+        matched_signals=sorted(signals),
+    )
+
+
+def _money_flow_low_price_rank(text: str) -> Optional[DslCandidate]:
+    signals = _signals(
+        text,
+        [
+            ("main_net_inflow", ["主力净流入", "资金净流入", "资金流入", "main_net_inflow"]),
+            ("exists", ["存在", "任一", "出现", "有"]),
+            ("low_price", ["低价", "价格低", "低收盘价", "收盘价低", "低位"]),
+            ("select", ["取", "选", "筛", "排名", "排行", "只"]),
+        ],
+    )
+    if not {"main_net_inflow", "low_price"}.issubset(signals):
+        return None
+    if "exists" not in signals and "select" not in signals:
+        return None
+
+    window = _window_after(text, ["近", "最近", "过去"], default=2)
+    limit = _selection_n(text, default=2)
+    condition = f'EXIST(indicator("main_net_inflow") > 0, {window})'
+    market = _market_condition(text)
+    if market:
+        condition = f"{market} & {condition}"
+    dsl = f'then(filter({condition}), rank(indicator("close"), asc, bottom={limit}))'
+    confidence = 0.9 if market else 0.86
+    return DslCandidate(
+        title=f"Low-price picks after {window}-day money-flow signal",
+        dsl=dsl,
+        confidence=confidence,
+        rule="money_flow_low_price_rank",
+        rationale=(
+            "Matched money-flow existence plus low-price selection and paired ascending rank with bottom=N."
+        ),
+        matched_signals=sorted(signals),
+    )
+
+
+def _turnover_percent_rank(text: str) -> Optional[DslCandidate]:
+    signals = _signals(
+        text,
+        [
+            ("turnover_rate", ["换手率", "turnover"]),
+            ("percent", ["%", "百分比", "百分之"]),
+            ("rank", ["排名", "排行", "排序", "前"]),
+        ],
+    )
+    if not {"turnover_rate", "percent"}.issubset(signals):
+        return None
+
+    percent = _percent_n(text, default=50)
+    order = _rank_order(text)
+    market = _market_condition(text)
+    rank_expr = f'rank(indicator("turnover_rate"), {order}, percent={_format_number(percent)})'
+    dsl = f"then(filter({market}), {rank_expr})" if market else rank_expr
+    confidence = 0.89 if market else 0.84
+    return DslCandidate(
+        title=f"Turnover-rate daily top {percent:g} percent",
+        dsl=dsl,
+        confidence=confidence,
+        rule="turnover_percent_rank",
+        rationale="Matched turnover-rate percentile ranking and mapped it to rank(..., percent=N).",
+        matched_signals=sorted(signals),
+    )
+
+
+def _high_turnover_close_rank(text: str) -> Optional[DslCandidate]:
+    signals = _signals(
+        text,
+        [
+            ("turnover_rate", ["高换手", "换手率", "turnover"]),
+            ("close", ["收盘价", "收盘", "close"]),
+            ("rank", ["排名", "排行", "排序", "取", "前"]),
+        ],
+    )
+    if not {"turnover_rate", "close", "rank"}.issubset(signals):
+        return None
+    if _contains_any(text, ["%", "百分比", "百分之", "低价", "低收盘价", "收盘价低"]):
+        return None
+
+    threshold = _threshold_after(text, ["大于", "超过", "高于", ">", ">="], default=1)
+    limit = _selection_n(text, default=2)
+    order = _rank_order(text)
+    rank_limit = _rank_limit_arg(order, limit)
+    condition = f'indicator("turnover_rate") > {_format_number(threshold)}'
+    market = _market_condition(text)
+    if market:
+        condition = f"{market} & {condition}"
+    dsl = f'then(filter({condition}), rank(indicator("close"), {order}, {rank_limit}))'
+    confidence = 0.88 if market else 0.83
+    return DslCandidate(
+        title=f"High-turnover close ranking top {limit}",
+        dsl=dsl,
+        confidence=confidence,
+        rule="high_turnover_close_rank",
+        rationale="Matched high-turnover prefilter followed by close-price cross-sectional ranking.",
         matched_signals=sorted(signals),
     )
 
@@ -188,6 +290,8 @@ def _rolling_volume_sum(text: str) -> Optional[DslCandidate]:
 
 def _date_range_close_threshold(text: str) -> Optional[DslCandidate]:
     dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    if _contains_any(text, ["均线", "均价", "平均", "ma"]):
+        return None
     signals = _signals(
         text,
         [
@@ -213,6 +317,34 @@ def _date_range_close_threshold(text: str) -> Optional[DslCandidate]:
     )
 
 
+def _date_range_close_above_ma(text: str) -> Optional[DslCandidate]:
+    dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    signals = _signals(
+        text,
+        [
+            ("close", ["收盘价", "收盘", "close"]),
+            ("above", ["大于", "超过", "高于", ">"]),
+            ("ma", ["均线", "均价", "平均", "ma"]),
+        ],
+    )
+    if len(dates) < 2 or not {"close", "above", "ma"}.issubset(signals):
+        return None
+
+    window = _window_near(text, ["均线", "均价", "平均", "ma"], default=20)
+    dsl = (
+        f'filter(date_between("{dates[0]}", "{dates[1]}") '
+        f'& indicator("close") > MA(indicator("close"), {window}))'
+    )
+    return DslCandidate(
+        title=f"Date-range close above {window}-day MA",
+        dsl=dsl,
+        confidence=0.9,
+        rule="date_range_close_above_ma",
+        rationale="Matched explicit date range plus close-price moving-average comparison.",
+        matched_signals=sorted(signals | {"date_range"}),
+    )
+
+
 def _signals(text: str, groups: Sequence[tuple[str, Sequence[str]]]) -> set[str]:
     return {name for name, words in groups if _contains_any(text, words)}
 
@@ -231,11 +363,39 @@ def _market_condition(text: str) -> str:
     return ""
 
 
-def _top_n(text: str, default: int) -> int:
-    match = re.search(rf"(?:前|top)(?P<num>{NUMBER_RE})", text, flags=re.IGNORECASE)
-    if match:
-        return int(_parse_number(match.group("num")))
+def _selection_n(text: str, default: int) -> int:
+    for pattern in [
+        rf"(?:前|top)(?P<num>{NUMBER_RE})",
+        rf"(?:取|选|挑)(?:每日)?(?:前)?(?P<num>{NUMBER_RE})(?:只|个|名)?",
+        rf"每日(?:前)?(?P<num>{NUMBER_RE})(?:只|个|名)",
+    ]:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            return int(_parse_number(match.group("num")))
     return default
+
+
+def _percent_n(text: str, default: float) -> float:
+    for pattern in [
+        rf"(?P<num>{NUMBER_RE})%",
+        rf"百分之(?P<num>{NUMBER_RE})",
+        rf"(?P<num>{NUMBER_RE})百分比",
+    ]:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            return _parse_number(match.group("num"))
+    return float(default)
+
+
+def _rank_order(text: str) -> str:
+    if _contains_any(text, ["升序", "从低到高", "由低到高", "低到高", "最低", "低价"]):
+        return "asc"
+    return "desc"
+
+
+def _rank_limit_arg(order: str, limit: int) -> str:
+    kind = "bottom" if order == "asc" else "top"
+    return f"{kind}={limit}"
 
 
 def _window_after(text: str, anchors: Sequence[str], default: int) -> int:
