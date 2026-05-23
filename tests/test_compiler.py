@@ -166,6 +166,15 @@ def test_compile_then_rank_by_window_feature_materializes_from_stage_columns():
     assert "AVG(base.close) OVER" not in result.sql
 
 
+def test_compile_then_rank_filter_preserves_joined_relation_columns():
+    result = Compiler().compile('then(rank(indicator("close"), desc, top=2), filter(market("A")))')
+
+    assert "SELECT base.*, su.market AS market" in result.sql
+    assert "WHERE market = 'A'" in result.sql
+    assert "project joined relation columns before ranking" in result.trace
+    assert any(step["rule"] == "RELATION_PROJECTION" for step in result.explain)
+
+
 def test_compile_escapes_string_literals_in_generated_sql():
     result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
 

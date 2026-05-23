@@ -297,6 +297,15 @@ class SqlGenerator:
     def _rank_source_sql(self, base_relation: str = None) -> str:
         source = self._from_clause(base_relation)
         if not self._numeric_features:
+            if base_relation is None and len(self._ordered_tables()) > 1:
+                self.trace.append("project joined relation columns before ranking")
+                self._explain(
+                    "RELATION_PROJECTION",
+                    "applied",
+                    "Project joined relation columns before ranking",
+                    table_count=len(self._ordered_tables()),
+                )
+                return f"(SELECT {self._project_columns()} FROM {source}) AS base"
             return source
         self.trace.append("materialize rank numeric features before ranking")
         self._explain(

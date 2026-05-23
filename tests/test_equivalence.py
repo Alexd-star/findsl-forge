@@ -149,6 +149,15 @@ def test_sql_matches_reference_for_then_rank_by_window_feature():
     assert result.sql_row_count == 5
 
 
+def test_sql_matches_reference_for_then_rank_filter_on_joined_column():
+    result = verify_sql_equivalence(
+        'then(rank(indicator("close"), desc, top=2), filter(market("A")))',
+        DATA_DIR,
+    )
+    assert result.passed
+    assert result.sql_row_count == 10
+
+
 def test_sql_matches_reference_for_then_filter_rank_percent():
     result = verify_sql_equivalence(
         'then(filter(market("A")), rank(indicator("turnover_rate"), desc, percent=50))',
