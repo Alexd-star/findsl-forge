@@ -477,7 +477,7 @@ class SqlGenerator:
         return meta["column"]
 
     def _market_sql(self, node: FunctionCall) -> str:
-        market_name = self._symbol_arg(node.args[0], "market")
+        market_name = self._symbol_arg(node.args[0], "market").upper()
         self.required_tables.add("stock_universe")
         market_literal = _sql_string_literal(market_name)
         if self._current_source:

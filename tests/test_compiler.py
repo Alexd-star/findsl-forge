@@ -52,6 +52,12 @@ def test_compile_excludes_null_rank_expressions_before_cutoff():
     assert any(step["rule"] == "RANK_NULL_GUARD" for step in result.explain)
 
 
+def test_compile_normalizes_market_codes_to_uppercase():
+    result = Compiler().compile('filter(market("a"))')
+
+    assert "market = 'A'" in result.sql
+
+
 def test_compile_sum_uses_prefix_sum_when_indicator_supports_it():
     result = Compiler().compile('filter(SUM(indicator("volume"), 3) > 300)')
     assert "dwd_stock_daily_quote_prefix" in result.sql

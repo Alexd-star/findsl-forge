@@ -347,3 +347,13 @@ def test_sql_matches_reference_for_case_insensitive_indicator_name():
 
     assert result.passed
     assert result.sql_row_count == 9
+
+
+def test_sql_matches_reference_for_case_insensitive_market_code():
+    result = verify_sql_equivalence(
+        'filter(market("a"))',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert result.sql_row_count == 10

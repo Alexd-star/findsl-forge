@@ -111,7 +111,7 @@ class PandasReferenceEvaluator:
         if isinstance(node, FunctionCall):
             name = node.name.upper()
             if name == "MARKET":
-                return rows["market"] == self._symbol_arg(node.args[0], "market")
+                return rows["market"] == self._symbol_arg(node.args[0], "market").upper()
             if name == "DATE_BETWEEN":
                 start = self.pd.Timestamp(self._symbol_arg(node.args[0], "date_between"))
                 end = self.pd.Timestamp(self._symbol_arg(node.args[1], "date_between"))
