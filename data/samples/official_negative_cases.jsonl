@@ -10,3 +10,5 @@
 {"name": "日期区间起止倒置", "dsl": "filter(date_between(\"2026-01-04\", \"2026-01-02\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["YYYY-MM-DD"]}
 {"name": "数字字面量格式错误", "dsl": "filter(indicator(\"close\") > 1.2.3)", "expected_code": "LEX_ERROR", "expected_suggestion_fragments": ["numeric literals"]}
 {"name": "裸指标列名绕过", "dsl": "close > 10", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["indicator(\"close\")"]}
+{"name": "filter条件不是布尔表达式", "dsl": "filter(indicator(\"close\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["filter() expects a boolean condition"]}
+{"name": "then阶段不是关系表达式", "dsl": "then(filter(indicator(\"close\") > 10), indicator(\"volume\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["then(filter(...), rank(...))"]}

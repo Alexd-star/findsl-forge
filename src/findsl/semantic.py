@@ -61,14 +61,18 @@ class SemanticAnalyzer:
                 raise SemanticError(f"{node.name} does not allow named arg {named.name}")
             self._validate_node(named.value)
         name = node.name.upper()
-        if name == "RANK":
+        if name == "FILTER":
+            self._validate_filter(node)
+        elif name == "THEN":
+            self._validate_then(node)
+        elif name == "RANK":
             self._validate_rank(node)
-        if name == "INDICATOR":
+        elif name == "INDICATOR":
             indicator_name = _symbol_arg(node.args[0], "indicator")
             self.registry.indicator(indicator_name)
-        if name == "DATE_BETWEEN":
+        elif name == "DATE_BETWEEN":
             self._validate_date_between(node)
-        if name in {"CONS", "EXIST"}:
+        elif name in {"CONS", "EXIST"}:
             cond_type = self._validate_node(node.args[0])
             window_type = self._validate_node(node.args[1])
             if cond_type != "boolean":
@@ -88,6 +92,22 @@ class SemanticAnalyzer:
             for arg in node.args:
                 self._validate_node(arg)
         return str(meta.get("return_type", "unknown"))
+
+    def _validate_filter(self, node: FunctionCall) -> None:
+        condition_type = self._validate_node(node.args[0])
+        if condition_type != "boolean":
+            raise SemanticError(
+                f"filter() condition must be boolean, got {condition_type}; "
+                "wrap numeric expressions in comparisons"
+            )
+
+    def _validate_then(self, node: FunctionCall) -> None:
+        for index, stage in enumerate(node.args, 1):
+            if not isinstance(stage, FunctionCall) or stage.name.lower() not in {"filter", "rank"}:
+                raise SemanticError("then() stages must be relation-producing filter() or rank() calls")
+            stage_type = self._validate_node(stage)
+            if stage_type != "relation":
+                raise SemanticError(f"then() stage {index} must produce a relation, got {stage_type}")
 
     def _validate_rank(self, node: FunctionCall) -> None:
         value_type = self._validate_node(node.args[0])

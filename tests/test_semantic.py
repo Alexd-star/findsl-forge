@@ -34,3 +34,15 @@ def test_bare_identifier_comparison_is_rejected():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match='indicator\\("close"\\)'):
         analyzer.validate(parse("close > 10"))
+
+
+def test_filter_requires_boolean_condition_in_semantic_layer():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="filter\\(\\) condition must be boolean"):
+        analyzer.validate(parse('filter(indicator("close"))'))
+
+
+def test_then_stage_must_be_relation_producing_filter_or_rank():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="then\\(\\) stages must be relation-producing"):
+        analyzer.validate(parse('then(filter(indicator("close") > 10), indicator("volume"))'))

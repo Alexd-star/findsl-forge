@@ -88,6 +88,26 @@ def test_diagnose_bare_identifier_suggests_indicator_wrapper():
     assert any('indicator("close")' in hint for hint in diagnostics[0].suggestions)
 
 
+def test_diagnose_filter_numeric_condition_offers_boolean_hint():
+    try:
+        Compiler().compile('filter(indicator("close"))')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("filter() expects a boolean condition" in hint for hint in diagnostics[0].suggestions)
+
+
+def test_diagnose_invalid_then_stage_offers_pipeline_hint():
+    try:
+        Compiler().compile('then(filter(indicator("close") > 10), indicator("volume"))')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("then(filter(...), rank(...))" in hint for hint in diagnostics[0].suggestions)
+
+
 def test_cli_diagnose_returns_json_repair_hints_for_invalid_dsl():
     env = os.environ.copy()
     env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
