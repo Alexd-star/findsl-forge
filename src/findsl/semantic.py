@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Optional
 
 from .ast_nodes import BinaryOp, Comparison, FunctionCall, Identifier, Literal, Node
 from .errors import SemanticError
@@ -44,7 +45,7 @@ class SemanticAnalyzer:
                 return "boolean"
             if left_type != "numeric" or right_type != "numeric":
                 raise SemanticError(f"Operator {node.op} requires numeric operands")
-            if node.op == "/" and _is_zero_literal(node.right):
+            if node.op == "/" and _is_static_zero(node.right):
                 raise SemanticError("Division by zero is not allowed in numeric expressions")
             return "numeric"
         if isinstance(node, FunctionCall):
@@ -168,8 +169,29 @@ def _bare_identifier_message(node: Node, side: str) -> str:
     )
 
 
-def _is_zero_literal(node: Node) -> bool:
-    return isinstance(node, Literal) and isinstance(node.value, (int, float)) and float(node.value) == 0.0
+def _is_static_zero(node: Node) -> bool:
+    value = _constant_numeric_value(node)
+    return value is not None and float(value) == 0.0
+
+
+def _constant_numeric_value(node: Node) -> Optional[float]:
+    if isinstance(node, Literal) and isinstance(node.value, (int, float)):
+        return float(node.value)
+    if isinstance(node, BinaryOp) and node.op in {"+", "-", "*", "/"}:
+        left = _constant_numeric_value(node.left)
+        right = _constant_numeric_value(node.right)
+        if left is None or right is None:
+            return None
+        if node.op == "+":
+            return left + right
+        if node.op == "-":
+            return left - right
+        if node.op == "*":
+            return left * right
+        if right == 0.0:
+            return None
+        return left / right
+    return None
 
 
 def _date_arg(node: Node, function_name: str) -> date:

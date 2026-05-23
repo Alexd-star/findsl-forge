@@ -82,3 +82,9 @@ def test_literal_division_by_zero_is_rejected_in_semantic_layer():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="Division by zero"):
         analyzer.validate(parse('filter((indicator("close") / 0) > 1)'))
+
+
+def test_static_division_by_zero_expression_is_rejected_in_semantic_layer():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="Division by zero"):
+        analyzer.validate(parse('filter((indicator("close") / (1 - 1)) > 1)'))

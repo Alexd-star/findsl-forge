@@ -51,7 +51,7 @@ Capture these screens for the technical document and one-minute video:
 - Explain tab showing the `PREFIX_SUM` rule applied.
 - Explain tab for the date-range prefix-sum preset showing `DATE_RANGE_PREFIX_PRUNING`.
 - Diagnostic negative preset showing expected/actual `UNKNOWN_INDICATOR` and repair suggestions.
-- Semantic hardening diagnostics showing bare identifiers, non-integer windows, invalid top-level expressions, invalid `market(...)`, and literal division by zero are rejected before SQL generation.
+- Semantic hardening diagnostics showing bare identifiers, non-integer windows, invalid top-level expressions, invalid `market(...)`, and literal/static division by zero are rejected before SQL generation.
 - CLI output for LLM candidate safety showing accepted DSL plus `UNKNOWN_INDICATOR` and `UNSAFE_DIRECT_SQL` rejections.
 - `reports/defense_package.md` summary and score-mapping table.
 - `reports/submission_readiness.md` gate matrix.
@@ -69,7 +69,7 @@ Capture these screens for the technical document and one-minute video:
 | Structured explain records | Auditable optimizer decisions |
 | Diagnostic negative preset | Stable error handling and repair guidance |
 | Semantic hardening diagnostics | Hidden-evaluation style invalid DSL fails before SQL generation |
-| Official suite 18/18 positive and 21/21 negative | Official-style coverage and regression proof |
+| Official suite 18/18 positive and 22/22 negative | Official-style coverage and regression proof |
 | Doris generated assets | Reproducible deployment path |
 | Git bundle backup | Rollback and delivery discipline |
 

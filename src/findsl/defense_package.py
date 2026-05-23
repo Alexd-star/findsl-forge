@@ -387,6 +387,7 @@ def _check_semantic_hardening_diagnostics(negative_path: Path) -> DefenseCheck:
         ("顶层表达式不是关系或布尔", 'filter(indicator("close") > 10)'),
         ("市场参数不是字符串或标识符", 'market("A")'),
         ("除数为零字面量", "non-zero denominator"),
+        ("除数为零常量表达式", "non-zero denominator"),
     ]
     try:
         cases = load_cases(Path(negative_path))
@@ -416,7 +417,7 @@ def _check_semantic_hardening_diagnostics(negative_path: Path) -> DefenseCheck:
             name="Semantic hardening diagnostics",
             scoring_point="Hidden-eval style invalid DSL fails before SQL generation with repairable diagnostics",
             demo_action="Run the official negative corpus or select the hardening negative presets in the Web Demo.",
-            expected_signal="Bare identifiers, invalid windows, bad top-level expressions, invalid market arguments, and literal division by zero are rejected with stable hints.",
+            expected_signal="Bare identifiers, invalid windows, bad top-level expressions, invalid market arguments, and static division by zero are rejected with stable hints.",
             passed=passed,
             evidence=[
                 f"hardened={passed_items}/{len(required_cases)}",

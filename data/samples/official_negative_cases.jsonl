@@ -19,3 +19,4 @@
 {"name": "指标参数不是字符串或标识符", "dsl": "filter(indicator(123) > 10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["indicator(\"close\")"]}
 {"name": "日期格式不是ISO", "dsl": "filter(date_between(\"2026/01/01\", \"2026-01-02\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["YYYY-MM-DD"]}
 {"name": "filter内裸字段单等号误写", "dsl": "filter(close=10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["filter(indicator(\"close\") = 10)"]}
+{"name": "除数为零常量表达式", "dsl": "filter((indicator(\"close\") / (1 - 1)) > 1)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["non-zero denominator"]}

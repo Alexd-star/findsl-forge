@@ -166,7 +166,7 @@ Exit criteria:
 - Relation-building functions must enforce typed contracts in semantic analysis: `filter` takes boolean conditions and `then` stages produce relations.
 - Window functions must reject non-integer or non-positive windows before SQL generation, and top-level DSL expressions must be relation or boolean filter conditions.
 - Symbolic predicate helpers such as `market(...)` must reject non-symbol arguments before SQL generation.
-- Numeric expressions must reject literal division by zero before SQL generation.
+- Numeric expressions must reject literal or statically-foldable division by zero before SQL generation.
 - Function names and `rank` limit argument names should be case-insensitive for official-style input robustness.
 - DSL equality operators (`=`/`==`/`!=`) must normalize to SQL-standard Doris-compatible comparison operators.
 - Every non-trivial rewrite emits trace text.
