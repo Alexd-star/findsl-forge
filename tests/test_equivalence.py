@@ -78,6 +78,24 @@ def test_sql_matches_reference_for_then_filter_window_filter():
     assert result.passed
 
 
+def test_sql_matches_reference_for_rank_by_window_feature():
+    result = verify_sql_equivalence(
+        'rank(MA(indicator("close"), 2), desc, top=1)',
+        DATA_DIR,
+    )
+    assert result.passed
+    assert result.sql_row_count == 5
+
+
+def test_sql_matches_reference_for_then_rank_by_window_feature():
+    result = verify_sql_equivalence(
+        'then(filter(market("A")), rank(MA(indicator("close"), 2), desc, top=1))',
+        DATA_DIR,
+    )
+    assert result.passed
+    assert result.sql_row_count == 5
+
+
 def test_sql_matches_reference_for_then_filter_rank_percent():
     result = verify_sql_equivalence(
         'then(filter(market("A")), rank(indicator("turnover_rate"), desc, percent=50))',

@@ -254,39 +254,63 @@ class SqlGenerator:
 
     def _rank_sql(self, node: FunctionCall, base_relation: str = None) -> str:
         old_source = self._current_source
+        old_numeric = self._numeric_features
+        old_rolling = self._rolling_features
         self._current_source = base_relation
+        self._numeric_features = []
+        self._rolling_features = []
         try:
             expr_sql = self._numeric_sql(node.args[0])
+            rank_source = self._rank_source_sql(base_relation)
+            order_node = node.args[1]
+            if not isinstance(order_node, Identifier) or order_node.name.lower() not in {"asc", "desc"}:
+                raise SemanticError("rank() second argument must be asc or desc")
+            order = order_node.name.upper()
+            limit = self._rank_limit(node)
+            self.trace.append("rewrite rank() into ROW_NUMBER window")
+            self._explain(
+                "RANK_ROW_NUMBER",
+                "applied",
+                "Rewrite rank() into ROW_NUMBER window",
+                source=base_relation or "base_relation",
+                limit_kind=limit["kind"] or "none",
+                limit_value=limit["value"],
+            )
+            partition_count = (
+                ", COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count"
+                if limit["kind"] == "percent"
+                else ""
+            )
+            where = self._rank_where(limit)
+            return (
+                "SELECT * FROM ("
+                f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}) AS rank_no"
+                f"{partition_count} "
+                f"FROM {rank_source}"
+                f") ranked{where}"
+            )
         finally:
             self._current_source = old_source
-        order_node = node.args[1]
-        if not isinstance(order_node, Identifier) or order_node.name.lower() not in {"asc", "desc"}:
-            raise SemanticError("rank() second argument must be asc or desc")
-        order = order_node.name.upper()
-        limit = self._rank_limit(node)
-        self.trace.append("rewrite rank() into ROW_NUMBER window")
-        self._explain(
-            "RANK_ROW_NUMBER",
-            "applied",
-            "Rewrite rank() into ROW_NUMBER window",
-            source=base_relation or "base_relation",
-            limit_kind=limit["kind"] or "none",
-            limit_value=limit["value"],
-        )
+            self._numeric_features = old_numeric
+            self._rolling_features = old_rolling
+
+    def _rank_source_sql(self, base_relation: str = None) -> str:
         source = self._from_clause(base_relation)
-        partition_count = (
-            ", COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count"
-            if limit["kind"] == "percent"
-            else ""
+        if not self._numeric_features:
+            return source
+        self.trace.append("materialize rank numeric features before ranking")
+        self._explain(
+            "FEATURE_LAYER",
+            "applied",
+            "Materialize rank numeric features before ranking",
+            feature_count=len(self._numeric_features),
         )
-        where = self._rank_where(limit)
-        return (
-            "SELECT * FROM ("
-            f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}) AS rank_no"
-            f"{partition_count} "
-            f"FROM {source}"
-            f") ranked{where}"
-        )
+        layer_sql = f"SELECT {self._project_columns()} FROM {source}"
+        layer_name = "rank_base_features"
+        for idx, feature in enumerate(self._numeric_features, 1):
+            layer_sql = self._feature_layer_sql(layer_sql, layer_name, [feature])
+            layer_name = f"rank_numeric_features_{idx}"
+        return f"({layer_sql}) AS base"
 
     def _rank_limit(self, node: FunctionCall) -> Dict[str, Any]:
         for named in node.named_args or []:

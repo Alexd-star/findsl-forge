@@ -141,6 +141,30 @@ def test_compile_then_filter_window_filter_materializes_feature_from_stage_colum
     assert "AVG(base.close) OVER" not in result.sql
 
 
+def test_compile_rank_by_window_feature_materializes_sort_expression():
+    result = Compiler().compile('rank(MA(indicator("close"), 2), desc, top=1)')
+
+    assert "AVG(close) OVER" in result.sql
+    assert "ORDER BY __win_1 DESC" in result.sql
+    assert "FROM (SELECT rank_base_features.*" in result.sql
+    assert "materialize rank numeric features before ranking" in result.trace
+    assert any(
+        step["rule"] == "FEATURE_LAYER"
+        and step["evidence"].get("feature_count") == 1
+        and "rank numeric features" in step["message"]
+        for step in result.explain
+    )
+
+
+def test_compile_then_rank_by_window_feature_materializes_from_stage_columns():
+    result = Compiler().compile('then(filter(market("A")), rank(MA(indicator("close"), 2), desc, top=1))')
+
+    assert "stage2 AS" in result.sql
+    assert "AVG(close) OVER" in result.sql
+    assert "ORDER BY __win_1 DESC" in result.sql
+    assert "AVG(base.close) OVER" not in result.sql
+
+
 def test_compile_escapes_string_literals_in_generated_sql():
     result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
 
