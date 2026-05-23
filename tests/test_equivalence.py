@@ -48,6 +48,42 @@ def _write_tie_fixture(data_dir: Path) -> None:
     )
 
 
+def _write_sparse_money_flow_fixture(data_dir: Path) -> None:
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (data_dir / "daily_quote.csv").write_text(
+        "\n".join(
+            [
+                "ts_code,trade_date,close,turnover_rate,volume",
+                "AAA,2026-01-01,12,1.0,100",
+                "BBB,2026-01-01,8,1.1,100",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (data_dir / "money_flow.csv").write_text(
+        "\n".join(
+            [
+                "ts_code,trade_date,main_net_inflow",
+                "BBB,2026-01-01,1",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (data_dir / "stock_universe.csv").write_text(
+        "\n".join(
+            [
+                "ts_code,trade_date,market",
+                "AAA,2026-01-01,A",
+                "BBB,2026-01-01,A",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_sqlite_executor_runs_generated_cons_sql():
     compiled = Compiler().compile('filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))')
     result = SQLiteSampleExecutor(DATA_DIR).execute(compiled.sql)
@@ -112,6 +148,21 @@ def test_sql_matches_reference_for_rank_ties_with_stable_ts_code_order(tmp_path)
     assert result.passed
     assert result.sql_keys == [("AAA", "2026-01-01")]
     assert result.reference_keys == [("AAA", "2026-01-01")]
+
+
+def test_sql_matches_reference_for_sparse_auxiliary_table_or_condition(tmp_path):
+    _write_sparse_money_flow_fixture(tmp_path)
+
+    result = verify_sql_equivalence(
+        'filter(indicator("close") > 10 | indicator("main_net_inflow") > 0)',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [
+        ("AAA", "2026-01-01"),
+        ("BBB", "2026-01-01"),
+    ]
 
 
 def test_sql_matches_reference_for_then_filter_filter():

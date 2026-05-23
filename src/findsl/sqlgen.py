@@ -368,7 +368,7 @@ class SqlGenerator:
         for table_name in ordered[1:]:
             meta = self.registry.table(table_name)
             alias = meta.get("alias", table_name)
-            joins.append(f" JOIN {meta['physical']} AS {alias} USING (ts_code, trade_date)")
+            joins.append(f" LEFT JOIN {meta['physical']} AS {alias} USING (ts_code, trade_date)")
         return base + "".join(joins)
 
     def _ordered_tables(self) -> List[str]:
