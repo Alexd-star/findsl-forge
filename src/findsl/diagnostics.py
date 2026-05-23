@@ -121,6 +121,10 @@ def _diagnose_lex_error(message: str) -> Diagnostic:
 def _diagnose_semantic_error(message: str) -> Diagnostic:
     lower = message.lower()
     suggestions = ["Check function argument types against configs/functions.json."]
+    if "bare identifier" in lower:
+        match = re.search(r"bare identifier (?P<name>[A-Za-z_][A-Za-z0-9_]*)", message)
+        name = match.group("name") if match else "close"
+        suggestions.insert(0, f"Wrap configured fields as indicator(\"{name}\") instead of using bare column names.")
     if "window" in lower:
         suggestions.insert(0, "Use a positive integer window, for example MA(indicator(\"close\"), 20).")
     if "boolean" in lower:

@@ -28,3 +28,9 @@ def test_rank_bottom_requires_ascending_order():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="bottom must use asc"):
         analyzer.validate(parse('rank(indicator("close"), desc, bottom=2)'))
+
+
+def test_bare_identifier_comparison_is_rejected():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match='indicator\\("close"\\)'):
+        analyzer.validate(parse("close > 10"))

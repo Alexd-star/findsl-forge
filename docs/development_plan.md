@@ -159,6 +159,7 @@ Exit criteria:
 
 - All tests pass before commit.
 - No hard-coded business indicators in compiler core.
+- Bare column-name comparisons must be rejected; configured fields must enter through `indicator(...)`.
 - Every non-trivial rewrite emits trace text.
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.

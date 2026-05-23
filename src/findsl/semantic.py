@@ -26,9 +26,13 @@ class SemanticAnalyzer:
         if isinstance(node, Comparison):
             left_type = self._validate_node(node.left)
             right_type = self._validate_node(node.right)
-            if left_type not in {"numeric", "identifier"}:
+            if left_type == "identifier":
+                raise SemanticError(_bare_identifier_message(node.left, "Left"))
+            if right_type == "identifier":
+                raise SemanticError(_bare_identifier_message(node.right, "Right"))
+            if left_type != "numeric":
                 raise SemanticError(f"Left side of comparison must be numeric, got {left_type}")
-            if right_type not in {"numeric", "identifier"}:
+            if right_type != "numeric":
                 raise SemanticError(f"Right side of comparison must be numeric, got {right_type}")
             return "boolean"
         if isinstance(node, BinaryOp):
@@ -125,6 +129,14 @@ def _symbol_arg(node: Node, function_name: str) -> str:
     if isinstance(node, Identifier):
         return node.name
     raise SemanticError(f"{function_name}() requires a string or identifier argument")
+
+
+def _bare_identifier_message(node: Node, side: str) -> str:
+    name = node.name if isinstance(node, Identifier) else "<unknown>"
+    return (
+        f"{side} side of comparison uses bare identifier {name}; "
+        f'wrap configured fields with indicator("{name}")'
+    )
 
 
 def _date_arg(node: Node, function_name: str) -> date:

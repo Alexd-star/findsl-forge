@@ -9,3 +9,4 @@
 {"name": "rank底部排序方向不一致", "dsl": "rank(indicator(\"close\"), desc, bottom=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["rank(..., asc, bottom=N)"]}
 {"name": "日期区间起止倒置", "dsl": "filter(date_between(\"2026-01-04\", \"2026-01-02\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["YYYY-MM-DD"]}
 {"name": "数字字面量格式错误", "dsl": "filter(indicator(\"close\") > 1.2.3)", "expected_code": "LEX_ERROR", "expected_suggestion_fragments": ["numeric literals"]}
+{"name": "裸指标列名绕过", "dsl": "close > 10", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["indicator(\"close\")"]}

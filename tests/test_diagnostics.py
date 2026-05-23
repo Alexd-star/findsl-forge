@@ -78,6 +78,16 @@ def test_diagnose_invalid_number_literal_is_lexical_not_generic():
     assert any("numeric literals" in hint for hint in diagnostics[0].suggestions)
 
 
+def test_diagnose_bare_identifier_suggests_indicator_wrapper():
+    try:
+        Compiler().compile("close > 10")
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any('indicator("close")' in hint for hint in diagnostics[0].suggestions)
+
+
 def test_cli_diagnose_returns_json_repair_hints_for_invalid_dsl():
     env = os.environ.copy()
     env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
