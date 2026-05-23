@@ -74,6 +74,7 @@ def test_compile_rank_percent_uses_partition_count_threshold():
     result = Compiler().compile('rank(indicator("turnover_rate"), desc, percent=50)')
 
     assert "ROW_NUMBER() OVER" in result.sql
+    assert "ORDER BY turnover_rate DESC, ts_code ASC" in result.sql
     assert "COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count" in result.sql
     assert "rank_no <= CAST(((__partition_count * 50) + 99.999999) / 100.0 AS INTEGER)" in result.sql
     rank_steps = [step for step in result.explain if step["rule"] == "RANK_ROW_NUMBER"]
@@ -145,7 +146,7 @@ def test_compile_rank_by_window_feature_materializes_sort_expression():
     result = Compiler().compile('rank(MA(indicator("close"), 2), desc, top=1)')
 
     assert "AVG(close) OVER" in result.sql
-    assert "ORDER BY __win_1 DESC" in result.sql
+    assert "ORDER BY __win_1 DESC, ts_code ASC" in result.sql
     assert "FROM (SELECT rank_base_features.*" in result.sql
     assert "materialize rank numeric features before ranking" in result.trace
     assert any(
@@ -161,7 +162,7 @@ def test_compile_then_rank_by_window_feature_materializes_from_stage_columns():
 
     assert "stage2 AS" in result.sql
     assert "AVG(close) OVER" in result.sql
-    assert "ORDER BY __win_1 DESC" in result.sql
+    assert "ORDER BY __win_1 DESC, ts_code ASC" in result.sql
     assert "AVG(base.close) OVER" not in result.sql
 
 

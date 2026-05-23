@@ -284,7 +284,7 @@ class SqlGenerator:
             where = self._rank_where(limit)
             return (
                 "SELECT * FROM ("
-                f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}) AS rank_no"
+                f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}, ts_code ASC) AS rank_no"
                 f"{partition_count} "
                 f"FROM {rank_source}"
                 f") ranked{where}"
