@@ -46,3 +46,9 @@ def test_then_stage_must_be_relation_producing_filter_or_rank():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="then\\(\\) stages must be relation-producing"):
         analyzer.validate(parse('then(filter(indicator("close") > 10), indicator("volume"))'))
+
+
+def test_window_argument_must_be_integer_literal_in_semantic_layer():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="MA window must be an integer literal"):
+        analyzer.validate(parse('filter(MA(indicator("close"), 2.5) > 10)'))

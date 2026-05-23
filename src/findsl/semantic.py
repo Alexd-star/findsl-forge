@@ -11,8 +11,8 @@ class SemanticAnalyzer:
     def __init__(self, registry: Registry):
         self.registry = registry
 
-    def validate(self, node: Node) -> None:
-        self._validate_node(node)
+    def validate(self, node: Node) -> str:
+        return self._validate_node(node)
 
     def _validate_node(self, node: Node) -> str:
         if isinstance(node, Literal):
@@ -74,20 +74,14 @@ class SemanticAnalyzer:
             self._validate_date_between(node)
         elif name in {"CONS", "EXIST"}:
             cond_type = self._validate_node(node.args[0])
-            window_type = self._validate_node(node.args[1])
             if cond_type != "boolean":
                 raise SemanticError(f"{node.name} first argument must be boolean")
-            if window_type != "numeric":
-                raise SemanticError(f"{node.name} window must be numeric")
-            if isinstance(node.args[1], Literal) and int(node.args[1].value) <= 0:
-                raise SemanticError(f"{node.name} window must be positive")
+            self._validate_window_arg(node.args[1], node.name)
         elif name in {"MA", "SUM", "MAX", "MIN"}:
             value_type = self._validate_node(node.args[0])
-            window_type = self._validate_node(node.args[1])
             if value_type != "numeric":
                 raise SemanticError(f"{node.name} first argument must be numeric")
-            if window_type != "numeric":
-                raise SemanticError(f"{node.name} window must be numeric")
+            self._validate_window_arg(node.args[1], node.name)
         else:
             for arg in node.args:
                 self._validate_node(arg)
@@ -108,6 +102,12 @@ class SemanticAnalyzer:
             stage_type = self._validate_node(stage)
             if stage_type != "relation":
                 raise SemanticError(f"then() stage {index} must produce a relation, got {stage_type}")
+
+    def _validate_window_arg(self, node: Node, function_name: str) -> None:
+        if not isinstance(node, Literal) or not isinstance(node.value, int):
+            raise SemanticError(f"{function_name} window must be an integer literal")
+        if node.value <= 0:
+            raise SemanticError(f"{function_name} window must be positive")
 
     def _validate_rank(self, node: FunctionCall) -> None:
         value_type = self._validate_node(node.args[0])

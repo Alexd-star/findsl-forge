@@ -31,7 +31,11 @@ class Compiler:
     def compile(self, dsl: str, enable_prefix_sum: bool = None) -> CompileResult:
         started = time.perf_counter()
         ast = parse(dsl)
-        SemanticAnalyzer(self.registry).validate(ast)
+        root_type = SemanticAnalyzer(self.registry).validate(ast)
+        if root_type not in {"relation", "boolean"}:
+            raise SemanticError(
+                f"Top-level DSL must be a relation or boolean filter condition, got {root_type}"
+            )
         use_prefix_sum = self.enable_prefix_sum if enable_prefix_sum is None else enable_prefix_sum
         plan = SqlGenerator(self.registry, enable_prefix_sum=use_prefix_sum).generate(ast)
         validation = validate_doris_select_sql(plan.sql, self.registry)

@@ -125,6 +125,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "Build pipelines as then(filter(...), rank(...)) or then(filter(...), filter(...)).")
     if "filter() condition" in lower:
         suggestions.insert(0, "filter() expects a boolean condition such as indicator(\"close\") > 10.")
+    if "top-level dsl" in lower:
+        suggestions.insert(0, "Wrap numeric expressions in filter(...), for example filter(indicator(\"close\") > 10).")
     if "bare identifier" in lower:
         match = re.search(r"bare identifier (?P<name>[A-Za-z_][A-Za-z0-9_]*)", message)
         name = match.group("name") if match else "close"

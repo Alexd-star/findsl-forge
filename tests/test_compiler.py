@@ -1,4 +1,7 @@
+import pytest
+
 from findsl import Compiler
+from findsl.errors import SemanticError
 
 
 def test_compile_then_generates_cte_and_rank():
@@ -119,3 +122,8 @@ def test_compile_signed_numeric_threshold():
     result = Compiler().compile('filter(indicator("main_net_inflow") < -1.5)')
 
     assert "main_net_inflow < -1.5" in result.sql
+
+
+def test_compile_rejects_top_level_numeric_expression_before_sql_generation():
+    with pytest.raises(SemanticError, match="Top-level DSL"):
+        Compiler().compile('indicator("close")')
