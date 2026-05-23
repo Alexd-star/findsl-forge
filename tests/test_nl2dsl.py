@@ -104,6 +104,17 @@ def test_suggests_volume_breakout_exists_template():
     assert result.top.dsl == 'filter(EXIST(indicator("volume") > MA(indicator("volume"), 20), 10))'
 
 
+def test_suggests_b_market_average_volume_threshold():
+    result = suggest_dsl("B股近2日均量不低于80")
+
+    assert result.top is not None
+    assert result.top.rule == "volume_ma_threshold"
+    assert result.top.dsl == 'filter(market("B") & MA(indicator("volume"), 2) >= 80)'
+    compiled = Compiler().compile(result.top.dsl)
+    assert "market = 'B'" in compiled.sql
+    assert "AVG(volume) OVER" in compiled.sql
+
+
 def test_suggests_rolling_sum_and_formats_unit_threshold_as_plain_number():
     result = suggest_dsl("近3日成交量累计大于300万")
 

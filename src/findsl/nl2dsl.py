@@ -64,6 +64,7 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
             _net_outflow_threshold(normalized),
             _close_new_high(normalized),
             _close_rolling_min_threshold(normalized),
+            _volume_ma_threshold(normalized),
             _volume_breakout_exists(normalized),
             _date_range_rolling_volume_sum(normalized),
             _rolling_volume_sum(normalized),
@@ -320,6 +321,43 @@ def _volume_breakout_exists(text: str) -> Optional[DslCandidate]:
     )
 
 
+def _volume_ma_threshold(text: str) -> Optional[DslCandidate]:
+    signals = _signals(
+        text,
+        [
+            ("volume", ["成交量", "均量", "volume"]),
+            ("ma", ["均量", "平均量", "平均成交量", "ma"]),
+            ("threshold", ["不低于", "至少", "大于等于", ">=", "大于", "超过", "高于", ">"]),
+        ],
+    )
+    if not {"volume", "ma", "threshold"}.issubset(signals):
+        return None
+
+    window = _window_after(
+        text,
+        ["近", "最近", "过去"],
+        default=_window_near(text, ["均量", "平均量", "平均成交量", "ma"], default=2),
+    )
+    threshold = _threshold_after(
+        text,
+        ["不低于", "至少", "大于等于", ">=", "大于", "超过", "高于", ">"],
+        default=80,
+    )
+    op = ">=" if _contains_any(text, ["不低于", "至少", "大于等于", ">="]) else ">"
+    condition = f'MA(indicator("volume"), {window}) {op} {_format_number(threshold)}'
+    market = _market_condition(text)
+    if market:
+        condition = f"{market} & {condition}"
+    return DslCandidate(
+        title=f"{window}-day average volume {op} {threshold:g}",
+        dsl=f"filter({condition})",
+        confidence=0.88 if market else 0.83,
+        rule="volume_ma_threshold",
+        rationale="Matched average-volume threshold wording and mapped it to MA(volume, window).",
+        matched_signals=sorted(signals),
+    )
+
+
 def _rolling_volume_sum(text: str) -> Optional[DslCandidate]:
     signals = _signals(
         text,
@@ -448,6 +486,8 @@ def _normalize(text: str) -> str:
 def _market_condition(text: str) -> str:
     if _contains_any(text, ["a股", "a 股", "全a", "沪深a", "市场a"]):
         return 'market("A")'
+    if _contains_any(text, ["b股", "b 股", "市场b"]):
+        return 'market("B")'
     return ""
 
 

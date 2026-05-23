@@ -75,7 +75,7 @@ The optional LLM adapter treats model output as untrusted proposal text. It extr
 LLM response -> candidate extractor -> SQL bypass rejection -> compiler -> SQL/reference equivalence
 ```
 
-Direct SQL-looking output is rejected with `UNSAFE_DIRECT_SQL`. Invalid DSL still enters the normal diagnostic layer, so misspelled indicators produce the same stable repair evidence as hand-written DSL. Accepted candidates are therefore useful only when they survive parser, semantic validation, SQL generation, optimizer explain, and the independent reference oracle.
+Direct SQL-looking output is rejected with `UNSAFE_DIRECT_SQL`. Invalid DSL still enters the normal diagnostic layer, so misspelled indicators produce the same stable repair evidence as hand-written DSL. Accepted candidates are therefore useful only when they survive parser, semantic validation, SQL generation, optimizer explain, and the independent reference oracle. The deterministic Chinese templates include A/B market constraints, rank cutoffs, rolling windows, moving-average thresholds, signed money-flow thresholds, and date-range prefix-sum requests so live demo prompts do not depend on free-form SQL generation.
 
 ### Diagnostics Layer
 
