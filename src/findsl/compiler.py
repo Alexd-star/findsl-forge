@@ -7,6 +7,9 @@ from typing import Any, Dict, List
 from .parser import parse
 from .registry import Registry, default_registry
 from .semantic import SemanticAnalyzer
+from .doris_sql import validate_doris_select_sql
+from .errors import SemanticError
+from .explain import ExplainStep
 from .sqlgen import SqlGenerator
 
 
@@ -31,12 +34,25 @@ class Compiler:
         SemanticAnalyzer(self.registry).validate(ast)
         use_prefix_sum = self.enable_prefix_sum if enable_prefix_sum is None else enable_prefix_sum
         plan = SqlGenerator(self.registry, enable_prefix_sum=use_prefix_sum).generate(ast)
+        validation = validate_doris_select_sql(plan.sql, self.registry)
+        if not validation.passed:
+            issue_summary = "; ".join(f"{issue.code}: {issue.message}" for issue in validation.issues)
+            raise SemanticError(f"Generated Doris SQL failed validation: {issue_summary}")
+        explain = list(plan.explain)
+        explain.append(
+            ExplainStep(
+                rule="DORIS_SQL_VALIDATION",
+                status="applied",
+                message="Validate generated SQL against Doris-safe query shape",
+                evidence=validation.to_explain_evidence(),
+            ).to_dict()
+        )
         elapsed_ms = (time.perf_counter() - started) * 1000
         return CompileResult(
             dsl=dsl,
             ast=ast.to_dict(),
             sql=plan.sql,
             trace=plan.trace,
-            explain=plan.explain,
+            explain=explain,
             elapsed_ms=elapsed_ms,
         )

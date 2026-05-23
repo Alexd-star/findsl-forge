@@ -16,6 +16,7 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "LLM candidate safety loop" in check_names
     assert "Official prefix-sum positive preset" in check_names
     assert "Official diagnostic negative preset" in check_names
+    assert "Doris SQL validation boundary" in check_names
     assert "Official-style coverage suite" in check_names
     assert "Compiler accuracy and latency" in check_names
     assert "Doris deployment asset integrity" in check_names
@@ -33,4 +34,5 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "UNKNOWN_INDICATOR" in content
     assert "UNSAFE_DIRECT_SQL" in content
     assert "LLM candidate safety loop" in content
+    assert "Doris SQL validation boundary" in content
     assert "dwd_stock_money_flow_prefix" in content

@@ -89,6 +89,7 @@ class DefensePackageResult:
                 "- Deterministic compiler path keeps correctness auditable: DSL -> AST -> semantic validation -> Doris SQL.",
                 "- AI assistance is constrained to NL2DSL/LLM DSL candidates; every candidate must compile and match the independent reference oracle.",
                 "- The LLM adapter rejects direct SQL and invalid DSL with stable diagnostic evidence before any SQL reaches Doris.",
+                "- The compiler validates Doris-safe SQL shape and escapes string literals before generated SQL is accepted.",
                 "- Prefix-sum optimization is visible in SQL, structured explain records, and benchmark/readiness evidence.",
                 "- Negative cases demonstrate controlled, repairable failure rather than uncaught exceptions.",
                 "- Generated Doris assets include trade-date auto partitions and colocated stock-code distribution from the same compiler registry.",
@@ -133,6 +134,7 @@ def generate_defense_package(
         _check_llm_candidate_safety(data_dir, _resolve_repo_path(repo_root, llm_response_path)),
         _check_money_flow_prefix(data_dir, official_positive_path),
         _check_unknown_indicator_diagnostic(official_negative_path),
+        _check_doris_sql_validation(),
         _check_official_suite(data_dir, official_positive_path, official_negative_path, reports_dir),
         _check_evaluation_report(cases_path, reports_dir),
         _check_doris_assets(repo_root, data_dir),
@@ -290,6 +292,39 @@ def _check_unknown_indicator_diagnostic(negative_path: Path) -> DefenseCheck:
             "Interactive error explainability and repair guidance",
             "Select the UNKNOWN_INDICATOR negative preset and run it.",
             "Expected and actual diagnostic codes match, with a close-indicator repair hint.",
+            exc,
+        )
+
+
+def _check_doris_sql_validation() -> DefenseCheck:
+    try:
+        result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
+        validation_steps = [step for step in result.explain if step.get("rule") == "DORIS_SQL_VALIDATION"]
+        issue_count = (
+            validation_steps[0].get("evidence", {}).get("issue_count", -1)
+            if validation_steps
+            else -1
+        )
+        escaped = "market = 'A'' OR 1=1 --'" in result.sql
+        passed = bool(validation_steps) and issue_count == 0 and escaped
+        return DefenseCheck(
+            name="Doris SQL validation boundary",
+            scoring_point="Generated SQL shape and literal safety",
+            demo_action="Compile a market literal containing a quote and SQL-looking text.",
+            expected_signal="DORIS_SQL_VALIDATION appears in explain with zero issues and the SQL literal is escaped.",
+            passed=passed,
+            evidence=[
+                f"validation_steps={len(validation_steps)}",
+                f"issue_count={issue_count}",
+                f"escaped_literal={escaped}",
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "Doris SQL validation boundary",
+            "Generated SQL shape and literal safety",
+            "Compile a market literal containing a quote and SQL-looking text.",
+            "DORIS_SQL_VALIDATION appears in explain with zero issues and the SQL literal is escaped.",
             exc,
         )
 

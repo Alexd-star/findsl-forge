@@ -23,6 +23,9 @@ findsl.cli
       -> SQL text
       -> rewrite trace
       -> structured optimizer explain
+    -> DorisSqlValidator
+      -> enforce single SELECT/WITH query shape
+      -> reject forbidden statement tokens, unknown tables, and window-in-WHERE SQL
   -> SQLiteSampleExecutor
     -> load CSV fixtures as physical tables
     -> execute generated SQL locally
@@ -80,6 +83,8 @@ The Web Demo also exposes official negative presets from the same JSONL corpus u
 
 String literals are escaped inside the compiler before they are emitted into Doris SQL. This keeps the deterministic DSL path from becoming a SQL-fragment bypass when a user supplies a market value or other string literal containing quotes.
 
+After SQL generation, a Doris SQL validator checks the query shape before the compile result is accepted. It requires a single `SELECT` or `WITH` query, rejects DDL/DML tokens and statement separators outside string literals, checks known table references against the registry, and catches window functions emitted directly inside `WHERE`. Successful validation is recorded as `DORIS_SQL_VALIDATION` in structured explain.
+
 ### Typed AST Before SQL
 
 DSL is parsed into AST nodes before SQL is generated. This supports:
@@ -130,12 +135,11 @@ trace: human-readable rewrite log
 explain: machine-readable rule/status/evidence records
 ```
 
-`explain` records applied and skipped rules, such as `PREFIX_SUM`, `WINDOW_FEATURE`, `ROLLING_BOOLEAN`, `FEATURE_LAYER`, and `FILTER_OUTER_WHERE`. This makes optimizer behavior auditable and gives downstream reports or UI components stable fields to render.
+`explain` records applied and skipped rules, such as `PREFIX_SUM`, `WINDOW_FEATURE`, `ROLLING_BOOLEAN`, `FEATURE_LAYER`, `FILTER_OUTER_WHERE`, and `DORIS_SQL_VALIDATION`. This makes optimizer behavior auditable and gives downstream reports or UI components stable fields to render.
 
 ## Planned Enterprise Extensions
 
 - Logical IR node model.
-- Doris dialect validator.
 - SQLGlot optional validation.
 - Doris execution equivalence against Pandas reference results.
 - Broader prefix-sum optimizer coverage for more aggregate shapes.

@@ -74,7 +74,7 @@ Deliverables:
 - DDL and import scripts for simulated A-share data.
 - Generated Doris SQL assets and runbook. (Started)
 - Doris-cluster evidence collector for baseline-window versus prefix-sum `EXPLAIN`, latency, and row-count parity. (Started)
-- Doris dialect SQL compatibility tests.
+- Doris dialect SQL compatibility tests and compiler-side safe query-shape validation. (Started)
 - EXPLAIN capture and analysis.
 
 Metrics:
@@ -158,6 +158,7 @@ Exit criteria:
 - Every non-trivial rewrite emits trace text.
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.
+- Generated SQL must pass the Doris-safe query-shape validator before a compile result is accepted.
 - Official-style positive/negative corpora must grow with every newly supported DSL construct so competition coverage stays evidence-backed.
 - Rank semantics must keep top/bottom/percent validation aligned across compiler SQL, Pandas reference, diagnostics, and official-suite cases.
 - Date predicates must validate ISO dates, reject reversed ranges, expose `DATE_RANGE_PUSHDOWN`, and push safe non-window ranges into the base scan as `DATE_RANGE_BASE_PRUNING`.

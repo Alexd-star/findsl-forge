@@ -357,6 +357,7 @@ class ReadinessReport:
                 "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",
                 "- NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.",
                 "- Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.",
+                "- Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.",
                 "- SQL string literals are escaped by the compiler before they reach generated Doris SQL.",
                 "- Structured diagnostics convert invalid DSL into stable error codes and repair hints.",
                 "- Doris DDL includes trade-date auto partitions and colocated stock-code distribution for pruning and local prefix joins.",
