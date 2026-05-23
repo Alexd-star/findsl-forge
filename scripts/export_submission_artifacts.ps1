@@ -6,9 +6,6 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location -Path (Split-Path -Parent $PSScriptRoot)
 
-$snapshotDir = Join-Path $ArtifactsDir "evidence_snapshots"
-New-Item -ItemType Directory -Force -Path $snapshotDir | Out-Null
-
 $reportFiles = @(
   "submission_readiness.md",
   "doris_cluster_evidence.md",
@@ -20,6 +17,23 @@ $reportFiles = @(
   "prefix_sum_benchmark.md",
   "prefix_sum_scale_benchmark.md"
 )
+
+$status = ""
+try {
+  $statusLines = & git status --short
+  $status = ($statusLines | Where-Object {
+      $_ -notmatch "submission_artifacts/evidence_manifest\.md" -and
+      $_ -notmatch "submission_artifacts/evidence_snapshots"
+    }) -join "`n"
+} catch {
+  $status = "<unknown>"
+}
+if (-not $status) {
+  $status = "clean"
+}
+
+$snapshotDir = Join-Path $ArtifactsDir "evidence_snapshots"
+New-Item -ItemType Directory -Force -Path $snapshotDir | Out-Null
 
 $copied = @()
 foreach ($file in $reportFiles) {
@@ -37,16 +51,6 @@ try {
   $head = "<unknown>"
 }
 
-$status = ""
-try {
-  $status = (& git status --short).Trim()
-} catch {
-  $status = "<unknown>"
-}
-if (-not $status) {
-  $status = "clean"
-}
-
 $manifest = @()
 $manifest += "# Evidence Snapshot Manifest"
 $manifest += ""
@@ -60,7 +64,7 @@ $manifest += "## Included Files"
 $manifest += ""
 foreach ($file in $copied) {
   $length = (Get-Item (Join-Path $snapshotDir $file)).Length
-  $manifest += "- `$file` ($length bytes)"
+  $manifest += "- ``$file`` ($length bytes)"
 }
 $manifest += ""
 $manifest += "## Excluded By Design"
