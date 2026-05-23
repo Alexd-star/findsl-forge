@@ -12,10 +12,10 @@ DSL -> Lexer/Parser -> Typed AST -> Semantic Validation -> SQL Plan -> Doris SQL
 
 AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Every candidate still flows through the deterministic compiler and SQL/reference equivalence check, so the core remains auditable, reproducible, and testable.
 
-## Current MVP Scope
+## Implemented Scope
 
 - Parse nested stock-screening DSL expressions.
-- Validate indicators, functions, named parameters, and window arguments from configuration.
+- Validate indicators, functions, named parameters, duplicate named arguments, and window arguments from configuration.
 - Compile `filter`, `then`, `rank` with top/bottom/percent cutoffs, `date_between`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN` into SQL.
 - Generate trace metadata explaining the selected rewrite path.
 - Emit structured optimizer explain steps for machine-readable rewrite evidence.
@@ -26,20 +26,25 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Compare SQL output with an independent Pandas semantic reference evaluator.
 - Push safe date ranges and window-safe date upper bounds into base table scans for partition-pruning-friendly Doris SQL.
 - Support signed numeric thresholds for net-flow and other negative-valued financial indicators.
+- Normalize mixed-case indicator names and market codes for official-style input robustness.
+- Preserve sparse auxiliary-table rows by anchoring stock-date semantics on `daily_quote` and left-joining optional tables.
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
+- Build auxiliary prefix tables from the daily quote trading-calendar skeleton so sparse money-flow data cannot shift rolling windows.
 - Produce baseline-window versus prefix-sum benchmark reports.
 - Generate deterministic synthetic A-share-style data for reproducible long-window scale benchmarks.
 - Generate Doris DDL with trade-date auto partitions, colocated stock-code distribution, sample load, prefix-table build, and smoke-query assets.
 - Collect Doris-cluster `EXPLAIN` and latency evidence for baseline-window versus prefix-sum SQL.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
-- Cover official-style NL2DSL prompts for low-price bottom picks, turnover percent cuts, high-turnover close ranking, date-window moving-average filters, and signed net-outflow thresholds.
+- Cover official-style NL2DSL prompts for low-price bottom picks, turnover percent cuts, B-market average-volume thresholds, high-turnover close ranking, date-window moving-average filters, rolling minimum thresholds, date-prefix-sum pruning, and signed net-outflow thresholds.
 - Validate optional LLM-proposed DSL candidates while rejecting direct SQL and invalid DSL before execution.
 - Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a defense package that maps live demo steps to competition scoring evidence.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
+
+Current local readiness passes all required gates. The only remaining warning is the external Doris-cluster 10x proof, which must be collected from a running Apache Doris query port before making the final production speedup claim.
 
 ## Quick Start
 
@@ -54,6 +59,7 @@ python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
 python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'A股存在资金流入后按低价取每日2只' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'A股每日换手率前50%' --data-dir data/samples --json
+python -m findsl.cli suggest-dsl 'B股近2日均量不低于80' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl '主力净流出低于-1.5' --data-dir data/samples --json
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --text '近3日成交量累计大于300' --data-dir data/samples --json
 python -m findsl.cli official-suite --output reports/official_suite_report.md --json
@@ -112,7 +118,7 @@ Indicators can declare prefix-sum support in `configs/indicators.json`. When the
 window_sum = current_prefix - prefix_at_row_no_minus_window
 ```
 
-This is the first optimizer path aimed at the competition's long-range query acceleration requirement. Unsupported indicators still use ordinary SQL window functions, so the optimization is safe and configuration-driven.
+This is the optimizer path aimed at the competition's long-range query acceleration requirement. Unsupported indicators still use ordinary SQL window functions, so the optimization is safe and configuration-driven. For sparse auxiliary sources, generated prefix tables are built from the daily quote trading calendar with a left join back to the auxiliary values, preserving the same stock-date universe used by the reference oracle.
 
 The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix-sum disabled as a baseline window query, and once with prefix-sum enabled. It then checks both SQL outputs against the Pandas reference result and writes a Markdown report with timing and plan-shape evidence. Local SQLite timings are treated as regression signals; Doris-scale acceleration must be proven later with Doris data and `EXPLAIN`.
 
@@ -170,7 +176,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 `scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris SQL validation evidence, config-only indicator extension evidence, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
 
-The readiness report also runs `official-suite`, which covers official-style stock-screening tasks across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, signed numeric thresholds, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
+The readiness report also runs `official-suite`, which currently covers 25 positive official-style cases and 27 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, duplicate named arguments, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
 It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
 
@@ -185,4 +191,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The first commits establish a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Later phases will add more Doris-cluster execution proof, broader DSL coverage, and provider-backed LLM repair loops that preserve the same deterministic validation contract.
+The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Final submission should add real Doris-cluster execution proof and optional provider-backed LLM repair loops that preserve the same deterministic validation contract.
