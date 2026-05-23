@@ -162,6 +162,7 @@ Exit criteria:
 - Bare column-name comparisons must be rejected; configured fields must enter through `indicator(...)`.
 - Relation-building functions must enforce typed contracts in semantic analysis: `filter` takes boolean conditions and `then` stages produce relations.
 - Window functions must reject non-integer or non-positive windows before SQL generation, and top-level DSL expressions must be relation or boolean filter conditions.
+- Symbolic predicate helpers such as `market(...)` must reject non-symbol arguments before SQL generation.
 - Every non-trivial rewrite emits trace text.
 - New indicators should require config-only changes.
 - SQL generation must avoid nested window functions and window expressions directly in `WHERE`.

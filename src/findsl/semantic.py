@@ -70,6 +70,8 @@ class SemanticAnalyzer:
         elif name == "INDICATOR":
             indicator_name = _symbol_arg(node.args[0], "indicator")
             self.registry.indicator(indicator_name)
+        elif name == "MARKET":
+            _symbol_arg(node.args[0], "market")
         elif name == "DATE_BETWEEN":
             self._validate_date_between(node)
         elif name in {"CONS", "EXIST"}:

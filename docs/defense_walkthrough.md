@@ -65,7 +65,7 @@ Capture these screens for the technical document and one-minute video:
 | Prefix-sum preset with prefix table SQL | Long-window optimization design |
 | Structured explain records | Auditable optimizer decisions |
 | Diagnostic negative preset | Stable error handling and repair guidance |
-| Official suite 14/14 positive and 16/16 negative | Official-style coverage and regression proof |
+| Official suite 14/14 positive and 17/17 negative | Official-style coverage and regression proof |
 | Doris generated assets | Reproducible deployment path |
 | Git bundle backup | Rollback and delivery discipline |
 

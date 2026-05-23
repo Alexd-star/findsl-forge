@@ -52,3 +52,9 @@ def test_window_argument_must_be_integer_literal_in_semantic_layer():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="MA window must be an integer literal"):
         analyzer.validate(parse('filter(MA(indicator("close"), 2.5) > 10)'))
+
+
+def test_market_argument_must_be_symbolic_in_semantic_layer():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="market\\(\\) requires a string or identifier argument"):
+        analyzer.validate(parse("filter(market(1))"))
