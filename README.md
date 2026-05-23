@@ -16,7 +16,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 
 - Parse nested stock-screening DSL expressions.
 - Validate indicators, functions, named parameters, and window arguments from configuration.
-- Compile `filter`, `then`, `rank` with top/bottom/percent cutoffs, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN` into SQL.
+- Compile `filter`, `then`, `rank` with top/bottom/percent cutoffs, `date_between`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN` into SQL.
 - Generate trace metadata explaining the selected rewrite path.
 - Emit structured optimizer explain steps for machine-readable rewrite evidence.
 - Return structured compile diagnostics and repair hints for invalid DSL/API requests.
@@ -162,7 +162,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 `scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
 
-The readiness report also runs `official-suite`, which covers official-style stock-screening tasks across staged filters, top-N ranking, percent-cutoff ranking, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
+The readiness report also runs `official-suite`, which covers official-style stock-screening tasks across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, market joins, arithmetic predicates, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
 It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, and Doris asset integrity to concrete scoring evidence. This report deliberately marks real Doris 10x proof as out of scope until `collect-doris-evidence` has run against a real cluster.
 

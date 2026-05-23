@@ -64,3 +64,16 @@ def test_reference_then_filter_rank_percent_by_turnover():
         ("BBB", "2026-01-04"),
         ("BBB", "2026-01-05"),
     ]
+
+
+def test_reference_date_between_filters_trade_date_range():
+    evaluator = PandasReferenceEvaluator(DATA_DIR)
+    result = evaluator.evaluate('filter(date_between("2026-01-02", "2026-01-04") & indicator("close") > 10)')
+    assert result.keys() == [
+        ("AAA", "2026-01-02"),
+        ("BBB", "2026-01-02"),
+        ("AAA", "2026-01-03"),
+        ("BBB", "2026-01-03"),
+        ("AAA", "2026-01-04"),
+        ("BBB", "2026-01-04"),
+    ]

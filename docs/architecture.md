@@ -101,6 +101,10 @@ base relation
 
 This is intentionally closer to production SQL than string-template demos.
 
+### Date-Range Pushdown
+
+`date_between("YYYY-MM-DD", "YYYY-MM-DD")` compiles into a direct `trade_date` range predicate and emits a `DATE_RANGE_PUSHDOWN` explain step. This gives official-style queries a clear path to Doris partition pruning and bounded scans while keeping date validation in the semantic layer.
+
 ### Config-Driven Business Rules
 
 Indicators, tables, and functions live in `configs/`. The compiler should not need code changes when adding common indicators.
@@ -169,7 +173,7 @@ positive DSL case -> compiler -> SQL/trace/explain evidence -> SQL/reference equ
 negative DSL case -> compiler failure -> structured diagnostic code -> repair suggestions
 ```
 
-Positive cases cover staged filters, top-N and percent-cutoff ranking, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, invalid rank percentages, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
+Positive cases cover staged filters, top-N and percent-cutoff ranking, date-range pushdown, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, invalid rank percentages, invalid date ranges, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
 
 ## Defense Package Loop
 

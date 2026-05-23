@@ -17,3 +17,8 @@ def test_cons_requires_boolean_condition():
     with pytest.raises(SemanticError):
         analyzer.validate(parse('filter(CONS(indicator("close"), 3))'))
 
+
+def test_date_between_rejects_reversed_range():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="start date"):
+        analyzer.validate(parse('filter(date_between("2026-01-04", "2026-01-02"))'))

@@ -76,3 +76,15 @@ def test_compile_rank_percent_uses_partition_count_threshold():
     rank_steps = [step for step in result.explain if step["rule"] == "RANK_ROW_NUMBER"]
     assert rank_steps[0]["evidence"]["limit_kind"] == "percent"
     assert rank_steps[0]["evidence"]["limit_value"] == 50.0
+
+
+def test_compile_date_between_emits_trade_date_range_pushdown():
+    result = Compiler().compile('filter(date_between("2026-01-02", "2026-01-04") & indicator("close") > 10)')
+
+    assert "trade_date >= '2026-01-02'" in result.sql
+    assert "trade_date <= '2026-01-04'" in result.sql
+    assert "close > 10" in result.sql
+    assert "rewrite date_between() into trade_date range predicate" in result.trace
+    date_steps = [step for step in result.explain if step["rule"] == "DATE_RANGE_PUSHDOWN"]
+    assert date_steps[0]["status"] == "applied"
+    assert date_steps[0]["evidence"]["start_date"] == "2026-01-02"

@@ -109,6 +109,10 @@ class PandasReferenceEvaluator:
             name = node.name.upper()
             if name == "MARKET":
                 return rows["market"] == self._symbol_arg(node.args[0], "market")
+            if name == "DATE_BETWEEN":
+                start = self.pd.Timestamp(self._symbol_arg(node.args[0], "date_between"))
+                end = self.pd.Timestamp(self._symbol_arg(node.args[1], "date_between"))
+                return (rows["trade_date"] >= start) & (rows["trade_date"] <= end)
             if name == "CONS":
                 cond = self._bool(node.args[0], rows).astype(int)
                 window = self._window_value(node.args[1])

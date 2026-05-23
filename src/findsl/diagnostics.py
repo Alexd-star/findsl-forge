@@ -129,6 +129,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
     if "percent" in lower:
         suggestions.insert(0, "For rank(..., percent=N), use 0 < N <= 100 and do not combine it with top/bottom.")
+    if "date_between" in lower or "iso date" in lower:
+        suggestions.insert(0, "Use date_between(\"YYYY-MM-DD\", \"YYYY-MM-DD\") with start date <= end date.")
     return Diagnostic(
         code="SEMANTIC_ERROR",
         severity="error",

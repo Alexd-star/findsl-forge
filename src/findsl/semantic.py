@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import date
+
 from .ast_nodes import BinaryOp, Comparison, FunctionCall, Identifier, Literal, Node
 from .errors import SemanticError
 from .registry import Registry
@@ -60,6 +62,8 @@ class SemanticAnalyzer:
         if name == "INDICATOR":
             indicator_name = _symbol_arg(node.args[0], "indicator")
             self.registry.indicator(indicator_name)
+        if name == "DATE_BETWEEN":
+            self._validate_date_between(node)
         if name in {"CONS", "EXIST"}:
             cond_type = self._validate_node(node.args[0])
             window_type = self._validate_node(node.args[1])
@@ -103,6 +107,12 @@ class SemanticAnalyzer:
                 if not (0 < float(named.value.value) <= 100):
                     raise SemanticError("rank() percent must satisfy 0 < percent <= 100")
 
+    def _validate_date_between(self, node: FunctionCall) -> None:
+        start = _date_arg(node.args[0], "date_between")
+        end = _date_arg(node.args[1], "date_between")
+        if start > end:
+            raise SemanticError("date_between() start date must be <= end date")
+
 
 def _symbol_arg(node: Node, function_name: str) -> str:
     if isinstance(node, Literal) and isinstance(node.value, str):
@@ -110,3 +120,12 @@ def _symbol_arg(node: Node, function_name: str) -> str:
     if isinstance(node, Identifier):
         return node.name
     raise SemanticError(f"{function_name}() requires a string or identifier argument")
+
+
+def _date_arg(node: Node, function_name: str) -> date:
+    if not isinstance(node, Literal) or not isinstance(node.value, str):
+        raise SemanticError(f"{function_name}() requires ISO date string arguments")
+    try:
+        return date.fromisoformat(node.value)
+    except ValueError as exc:
+        raise SemanticError(f"{function_name}() requires ISO date strings like 2026-01-01") from exc

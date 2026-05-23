@@ -265,6 +265,8 @@ class SqlGenerator:
             name = node.name.upper()
             if name == "MARKET":
                 return self._market_sql(node)
+            if name == "DATE_BETWEEN":
+                return self._date_between_sql(node)
             if name == "CONS":
                 cond = self._bool_sql(node.args[0])
                 window = self._window_value(node.args[1])
@@ -321,12 +323,30 @@ class SqlGenerator:
             return f"{self._table_alias('stock_universe')}.market = '{market_name}'"
         return f"market = '{market_name}'"
 
+    def _date_between_sql(self, node: FunctionCall) -> str:
+        start = self._date_arg(node.args[0], "date_between")
+        end = self._date_arg(node.args[1], "date_between")
+        self.trace.append("rewrite date_between() into trade_date range predicate")
+        self._explain(
+            "DATE_RANGE_PUSHDOWN",
+            "applied",
+            "Rewrite date_between() into trade_date range predicate",
+            start_date=start,
+            end_date=end,
+        )
+        return f"(trade_date >= '{start}' AND trade_date <= '{end}')"
+
     def _symbol_arg(self, node: Node, function_name: str) -> str:
         if isinstance(node, Literal) and isinstance(node.value, str):
             return node.value
         if isinstance(node, Identifier):
             return node.name
         raise SemanticError(f"{function_name}() requires a string or identifier argument")
+
+    def _date_arg(self, node: Node, function_name: str) -> str:
+        if isinstance(node, Literal) and isinstance(node.value, str):
+            return node.value
+        raise SemanticError(f"{function_name}() requires ISO date string arguments")
 
     def _register_numeric_window(self, node: FunctionCall) -> str:
         name = node.name.upper()

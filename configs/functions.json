@@ -25,6 +25,11 @@
     "max_args": 1,
     "return_type": "boolean"
   },
+  "date_between": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "boolean"
+  },
   "CONS": {
     "min_args": 2,
     "max_args": 2,
@@ -56,4 +61,3 @@
     "return_type": "numeric"
   }
 }
-

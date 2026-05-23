@@ -351,6 +351,7 @@ class ReadinessReport:
                 "- Deterministic typed compiler path instead of LLM-only SQL generation.",
                 "- Independent Pandas reference oracle plus SQLite SQL execution regression.",
                 "- Config-driven indicators and functions for low-cost business expansion.",
+                "- Date-range pushdown exposes partition-pruning-friendly `trade_date` predicates.",
                 "- Prefix-sum rewrite path for long rolling windows with baseline/optimized evidence.",
                 "- Structured optimizer explain records for defense and UI visualization.",
                 "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",

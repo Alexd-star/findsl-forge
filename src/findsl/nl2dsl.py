@@ -61,6 +61,7 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
             _close_new_high(normalized),
             _volume_breakout_exists(normalized),
             _rolling_volume_sum(normalized),
+            _date_range_close_threshold(normalized),
         ]
         if candidate is not None
     ]
@@ -182,6 +183,33 @@ def _rolling_volume_sum(text: str) -> Optional[DslCandidate]:
         rule="rolling_volume_sum",
         rationale="Matched rolling volume aggregation and mapped it to SUM(volume, window).",
         matched_signals=sorted(signals),
+    )
+
+
+def _date_range_close_threshold(text: str) -> Optional[DslCandidate]:
+    dates = re.findall(r"\d{4}-\d{2}-\d{2}", text)
+    signals = _signals(
+        text,
+        [
+            ("close", ["收盘价", "收盘", "close"]),
+            ("threshold", ["大于", "超过", "高于", ">", ">="]),
+        ],
+    )
+    if len(dates) < 2 or not {"close", "threshold"}.issubset(signals):
+        return None
+
+    threshold = _threshold_after(text, ["大于", "超过", "高于", ">", ">="], default=10)
+    dsl = (
+        f'filter(date_between("{dates[0]}", "{dates[1]}") '
+        f'& indicator("close") > {_format_number(threshold)})'
+    )
+    return DslCandidate(
+        title="Date-range close threshold",
+        dsl=dsl,
+        confidence=0.87,
+        rule="date_range_close_threshold",
+        rationale="Matched explicit trade-date range plus close-price threshold and mapped it to date_between().",
+        matched_signals=sorted(signals | {"date_range"}),
     )
 
 
