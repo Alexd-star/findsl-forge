@@ -24,3 +24,4 @@
 {"name": "rank顶部排序方向不一致", "dsl": "rank(indicator(\"close\"), asc, top=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["rank(..., desc, top=N)"]}
 {"name": "rank顶部数量不是整数", "dsl": "rank(indicator(\"close\"), desc, top=2.5)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer rank cutoff"]}
 {"name": "rank顶部数量必须为正", "dsl": "rank(indicator(\"close\"), desc, top=0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer rank cutoff"]}
+{"name": "重复命名参数", "dsl": "rank(indicator(\"close\"), desc, top=1, top=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["duplicate named arguments"]}

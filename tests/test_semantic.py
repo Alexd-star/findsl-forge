@@ -54,6 +54,12 @@ def test_rank_top_must_be_positive():
         analyzer.validate(parse('rank(indicator("close"), desc, top=0)'))
 
 
+def test_duplicate_named_arguments_are_rejected():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="duplicate named arg top"):
+        analyzer.validate(parse('rank(indicator("close"), desc, top=1, top=2)'))
+
+
 def test_bare_identifier_comparison_is_rejected():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match='indicator\\("close"\\)'):

@@ -154,6 +154,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
             suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
         else:
             suggestions.insert(0, "Remove unsupported named arguments or move them into positional expressions.")
+    if "duplicate named arg" in lower:
+        suggestions.insert(0, "Remove duplicate named arguments; each named argument may appear only once.")
     if "rank()" in lower and "named arg" in lower:
         suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
     if "rank()" in lower and ("integer literal" in lower or "must be positive" in lower):

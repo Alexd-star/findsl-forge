@@ -57,8 +57,13 @@ class SemanticAnalyzer:
         min_args = int(meta.get("min_args", 0))
         max_args = int(meta.get("max_args", 999))
         allowed_named = {str(arg).lower() for arg in meta.get("named_args", [])}
+        seen_named = set()
         for named in node.named_args or []:
-            if named.name.lower() not in allowed_named:
+            named_name = named.name.lower()
+            if named_name in seen_named:
+                raise SemanticError(f"{node.name} has duplicate named arg {named.name}")
+            seen_named.add(named_name)
+            if named_name not in allowed_named:
                 raise SemanticError(f"{node.name} does not allow named arg {named.name}")
             self._validate_node(named.value)
         if not (min_args <= len(node.args) <= max_args):
