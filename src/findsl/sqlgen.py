@@ -107,15 +107,25 @@ class SqlGenerator:
         try:
             condition = self._bool_sql(condition_node)
             from_clause = self._from_clause(source)
-            base_predicates = self._base_date_pushdown_predicates(condition_node)
+            pushdown_kind = self._date_pushdown_kind(condition_node)
+            base_predicates = self._base_date_pushdown_predicates(condition_node, pushdown_kind)
             base_where = f" WHERE {' AND '.join(base_predicates)}" if base_predicates else ""
             if base_predicates:
-                if self._contains_temporal_window(condition_node):
+                if pushdown_kind == "upper_bound":
                     self.trace.append("push safe date upper bound into base scan for window context")
                     self._explain(
                         "DATE_RANGE_WINDOW_PRUNING",
                         "applied",
                         "Push safe date upper bound into base scan without truncating window history",
+                        predicate_count=len(base_predicates),
+                        source=source or "physical_base",
+                    )
+                elif pushdown_kind == "prefix_full_range":
+                    self.trace.append("push full date range into prefix-sum base scan")
+                    self._explain(
+                        "DATE_RANGE_PREFIX_PRUNING",
+                        "applied",
+                        "Push full date range into prefix-sum base scan because prefix lookup preserves history",
                         predicate_count=len(base_predicates),
                         source=source or "physical_base",
                     )
@@ -177,21 +187,53 @@ class SqlGenerator:
         join_sql = f" {joins}" if joins else ""
         return f"SELECT {inner_alias}.*, {feature_sql} FROM ({inner_sql}) {inner_alias}{join_sql}"
 
-    def _base_date_pushdown_predicates(self, node: Node) -> List[str]:
-        if self._contains_temporal_window(node):
+    def _date_pushdown_kind(self, node: Node) -> str:
+        if self._requires_window_history(node):
+            return "upper_bound"
+        if self._contains_prefix_sum_window(node):
+            return "prefix_full_range"
+        return "full_range"
+
+    def _base_date_pushdown_predicates(self, node: Node, pushdown_kind: str) -> List[str]:
+        if pushdown_kind == "upper_bound":
             return self._collect_and_date_upper_bound_predicates(node)
         return self._collect_and_date_predicates(node)
 
-    def _contains_temporal_window(self, node: Node) -> bool:
+    def _requires_window_history(self, node: Node) -> bool:
         if isinstance(node, FunctionCall):
-            if node.name.upper() in {"MA", "SUM", "MAX", "MIN", "CONS", "EXIST"}:
+            name = node.name.upper()
+            if name in {"MA", "MAX", "MIN", "CONS", "EXIST"}:
                 return True
-            return any(self._contains_temporal_window(arg) for arg in node.args) or any(
-                self._contains_temporal_window(named.value) for named in node.named_args or []
+            if name == "SUM" and not self._sum_can_use_prefix_lookup(node):
+                return True
+            return any(self._requires_window_history(arg) for arg in node.args) or any(
+                self._requires_window_history(named.value) for named in node.named_args or []
             )
         if isinstance(node, (BinaryOp, Comparison)):
-            return self._contains_temporal_window(node.left) or self._contains_temporal_window(node.right)
+            return self._requires_window_history(node.left) or self._requires_window_history(node.right)
         return False
+
+    def _contains_prefix_sum_window(self, node: Node) -> bool:
+        if isinstance(node, FunctionCall):
+            if node.name.upper() == "SUM" and self._sum_can_use_prefix_lookup(node):
+                return True
+            return any(self._contains_prefix_sum_window(arg) for arg in node.args) or any(
+                self._contains_prefix_sum_window(named.value) for named in node.named_args or []
+            )
+        if isinstance(node, (BinaryOp, Comparison)):
+            return self._contains_prefix_sum_window(node.left) or self._contains_prefix_sum_window(node.right)
+        return False
+
+    def _sum_can_use_prefix_lookup(self, node: FunctionCall) -> bool:
+        if not self.enable_prefix_sum or self._current_source:
+            return False
+        if len(node.args) < 2:
+            return False
+        indicator_call = node.args[0]
+        if not isinstance(indicator_call, FunctionCall) or indicator_call.name.upper() != "INDICATOR":
+            return False
+        indicator_name = self._symbol_arg(indicator_call.args[0], "indicator")
+        return bool(self.registry.indicator(indicator_name).get("supports_prefix_sum"))
 
     def _collect_and_date_predicates(self, node: Node) -> List[str]:
         if isinstance(node, FunctionCall) and node.name.upper() == "DATE_BETWEEN":

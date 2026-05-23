@@ -49,6 +49,7 @@ Capture these screens for the technical document and one-minute video:
 - Official-style NL2DSL prompts showing `bottom=2`, `percent=50`, date-window MA validation, signed net-outflow threshold handling, and rolling `MIN` threshold handling.
 - SQL tab for the official prefix-sum preset showing `dwd_stock_money_flow_prefix`.
 - Explain tab showing the `PREFIX_SUM` rule applied.
+- Explain tab for the date-range prefix-sum preset showing `DATE_RANGE_PREFIX_PRUNING`.
 - Diagnostic negative preset showing expected/actual `UNKNOWN_INDICATOR` and repair suggestions.
 - Semantic hardening diagnostics showing bare identifiers, non-integer windows, invalid top-level expressions, invalid `market(...)`, and literal division by zero are rejected before SQL generation.
 - CLI output for LLM candidate safety showing accepted DSL plus `UNKNOWN_INDICATOR` and `UNSAFE_DIRECT_SQL` rejections.
@@ -64,10 +65,11 @@ Capture these screens for the technical document and one-minute video:
 | LLM candidate safety loop | Model assistance cannot bypass deterministic compiler validation |
 | SQL/reference verification PASS | Correctness proof beyond string matching |
 | Prefix-sum preset with prefix table SQL | Long-window optimization design |
+| Date-range prefix-sum pruning | Partition-pruning optimization without truncating rolling history |
 | Structured explain records | Auditable optimizer decisions |
 | Diagnostic negative preset | Stable error handling and repair guidance |
 | Semantic hardening diagnostics | Hidden-evaluation style invalid DSL fails before SQL generation |
-| Official suite 15/15 positive and 18/18 negative | Official-style coverage and regression proof |
+| Official suite 16/16 positive and 18/18 negative | Official-style coverage and regression proof |
 | Doris generated assets | Reproducible deployment path |
 | Git bundle backup | Rollback and delivery discipline |
 

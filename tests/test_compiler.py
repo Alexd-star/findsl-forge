@@ -111,6 +111,19 @@ def test_compile_date_between_prunes_window_queries_with_safe_upper_bound():
     assert not any(step["rule"] == "DATE_RANGE_BASE_PRUNING" for step in result.explain)
 
 
+def test_compile_date_between_uses_full_pushdown_for_prefix_sum_windows():
+    result = Compiler().compile(
+        'filter(date_between("2026-01-02", "2026-01-04") & SUM(indicator("volume"), 3) > 300)'
+    )
+
+    assert "FROM dwd_stock_daily_quote AS base WHERE (trade_date >= '2026-01-02' AND trade_date <= '2026-01-04')" in result.sql
+    assert "dwd_stock_daily_quote_prefix" in result.sql
+    assert "push full date range into prefix-sum base scan" in result.trace
+    assert any(step["rule"] == "DATE_RANGE_PREFIX_PRUNING" for step in result.explain)
+    assert any(step["rule"] == "PREFIX_SUM" and step["status"] == "applied" for step in result.explain)
+    assert not any(step["rule"] == "DATE_RANGE_WINDOW_PRUNING" for step in result.explain)
+
+
 def test_compile_escapes_string_literals_in_generated_sql():
     result = Compiler().compile('filter(market("A\' OR 1=1 --"))')
 

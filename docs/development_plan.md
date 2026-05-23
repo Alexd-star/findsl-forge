@@ -33,7 +33,7 @@ Deliverables:
 - SQL generation for `filter`, `then`, `rank`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN`.
 - Cross-sectional `rank(..., percent=N)` cutoff support for percentage-based daily screening.
 - Signed numeric thresholds for negative-valued financial indicators such as net outflow.
-- Date-range pushdown through `date_between(...)`, including window-safe upper-bound pruning, for partition-pruning-friendly SQL.
+- Date-range pushdown through `date_between(...)`, including window-safe upper-bound pruning and prefix-sum full-range pruning, for partition-pruning-friendly SQL.
 - Rewrite trace.
 - Pytest baseline.
 
@@ -112,6 +112,7 @@ Metrics:
 - Local scale benchmark must record dataset size, long-window plan shape, correctness gates, and the boundary between SQLite regression evidence and Doris production proof.
 - Doris cluster evidence must record baseline-window and optimized-prefix plan shape plus measured 10x speedup before any production acceleration claim is accepted.
 - Every optimizer decision that affects SQL shape should expose a machine-readable explain step.
+- Prefix-sum eligible date-range queries must push the full date range into the base scan while keeping correctness through prefix-table lookups.
 
 ## Phase 5: Enterprise Demo and Submission Package
 
