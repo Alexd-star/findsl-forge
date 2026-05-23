@@ -127,3 +127,10 @@ def test_compile_signed_numeric_threshold():
 def test_compile_rejects_top_level_numeric_expression_before_sql_generation():
     with pytest.raises(SemanticError, match="Top-level DSL"):
         Compiler().compile('indicator("close")')
+
+
+def test_compile_accepts_case_insensitive_function_and_rank_limit_names():
+    result = Compiler().compile('Then(Filter(market("A")), Rank(indicator("turnover_rate"), desc, TOP=2))')
+
+    assert "WITH stage1 AS" in result.sql
+    assert "rank_no <= 2" in result.sql

@@ -58,3 +58,9 @@ def test_market_argument_must_be_symbolic_in_semantic_layer():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="market\\(\\) requires a string or identifier argument"):
         analyzer.validate(parse("filter(market(1))"))
+
+
+def test_literal_division_by_zero_is_rejected_in_semantic_layer():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="Division by zero"):
+        analyzer.validate(parse('filter((indicator("close") / 0) > 1)'))

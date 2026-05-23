@@ -248,11 +248,12 @@ class SqlGenerator:
 
     def _rank_limit(self, node: FunctionCall) -> Dict[str, Any]:
         for named in node.named_args or []:
-            if named.name == "top" and isinstance(named.value, Literal):
+            arg_name = named.name.lower()
+            if arg_name == "top" and isinstance(named.value, Literal):
                 return {"kind": "top", "value": int(named.value.value)}
-            if named.name == "bottom" and isinstance(named.value, Literal):
+            if arg_name == "bottom" and isinstance(named.value, Literal):
                 return {"kind": "bottom", "value": int(named.value.value)}
-            if named.name == "percent" and isinstance(named.value, Literal):
+            if arg_name == "percent" and isinstance(named.value, Literal):
                 return {"kind": "percent", "value": float(named.value.value)}
         return {"kind": None, "value": None}
 

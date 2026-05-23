@@ -15,3 +15,4 @@
 {"name": "窗口不是整数字面量", "dsl": "filter(MA(indicator(\"close\"), 2.5) > 10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer window"]}
 {"name": "顶层表达式不是关系或布尔", "dsl": "indicator(\"close\")", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["filter(indicator(\"close\") > 10)"]}
 {"name": "市场参数不是字符串或标识符", "dsl": "filter(market(1))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["market(\"A\")"]}
+{"name": "除数为零字面量", "dsl": "filter((indicator(\"close\") / 0) > 1)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["non-zero denominator"]}

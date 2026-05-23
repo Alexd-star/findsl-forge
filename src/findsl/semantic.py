@@ -44,6 +44,8 @@ class SemanticAnalyzer:
                 return "boolean"
             if left_type != "numeric" or right_type != "numeric":
                 raise SemanticError(f"Operator {node.op} requires numeric operands")
+            if node.op == "/" and _is_zero_literal(node.right):
+                raise SemanticError("Division by zero is not allowed in numeric expressions")
             return "numeric"
         if isinstance(node, FunctionCall):
             return self._validate_call(node)
@@ -55,9 +57,9 @@ class SemanticAnalyzer:
         max_args = int(meta.get("max_args", 999))
         if not (min_args <= len(node.args) <= max_args):
             raise SemanticError(f"{node.name} expects {min_args}-{max_args} args, got {len(node.args)}")
-        allowed_named = set(meta.get("named_args", []))
+        allowed_named = {str(arg).lower() for arg in meta.get("named_args", [])}
         for named in node.named_args or []:
-            if named.name not in allowed_named:
+            if named.name.lower() not in allowed_named:
                 raise SemanticError(f"{node.name} does not allow named arg {named.name}")
             self._validate_node(named.value)
         name = node.name.upper()
@@ -119,20 +121,25 @@ class SemanticAnalyzer:
         if order_type != "order":
             raise SemanticError("rank() second argument must be asc or desc")
         order = node.args[1].name.lower() if isinstance(node.args[1], Identifier) else ""
-        limit_names = [named.name for named in node.named_args or [] if named.name in {"top", "bottom", "percent"}]
+        limit_names = [
+            named.name.lower()
+            for named in node.named_args or []
+            if named.name.lower() in {"top", "bottom", "percent"}
+        ]
         if len(limit_names) > 1:
             raise SemanticError("rank() accepts only one of top, bottom, or percent")
         for named in node.named_args or []:
-            if named.name == "top" and order != "desc":
+            arg_name = named.name.lower()
+            if arg_name == "top" and order != "desc":
                 raise SemanticError("rank() top must use desc order; use bottom with asc order for low-value picks")
-            if named.name == "bottom" and order != "asc":
+            if arg_name == "bottom" and order != "asc":
                 raise SemanticError("rank() bottom must use asc order; use top with desc order for high-value picks")
-            if named.name in {"top", "bottom"}:
+            if arg_name in {"top", "bottom"}:
                 if not isinstance(named.value, Literal) or not isinstance(named.value.value, int):
-                    raise SemanticError(f"rank() {named.name} must be an integer literal")
+                    raise SemanticError(f"rank() {arg_name} must be an integer literal")
                 if named.value.value <= 0:
-                    raise SemanticError(f"rank() {named.name} must be positive")
-            if named.name == "percent":
+                    raise SemanticError(f"rank() {arg_name} must be positive")
+            if arg_name == "percent":
                 if not isinstance(named.value, Literal) or not isinstance(named.value.value, (int, float)):
                     raise SemanticError("rank() percent must be a numeric literal")
                 if not (0 < float(named.value.value) <= 100):
@@ -159,6 +166,10 @@ def _bare_identifier_message(node: Node, side: str) -> str:
         f"{side} side of comparison uses bare identifier {name}; "
         f'wrap configured fields with indicator("{name}")'
     )
+
+
+def _is_zero_literal(node: Node) -> bool:
+    return isinstance(node, Literal) and isinstance(node.value, (int, float)) and float(node.value) == 0.0
 
 
 def _date_arg(node: Node, function_name: str) -> date:

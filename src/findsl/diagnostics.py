@@ -147,6 +147,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "Use date_between(\"YYYY-MM-DD\", \"YYYY-MM-DD\") with start date <= end date.")
     if "market()" in lower:
         suggestions.insert(0, "Use market(\"A\") or market(\"B\") with a string market code.")
+    if "division by zero" in lower:
+        suggestions.insert(0, "Use a non-zero denominator or remove the literal `/ 0` from the numeric expression.")
     return Diagnostic(
         code="SEMANTIC_ERROR",
         severity="error",

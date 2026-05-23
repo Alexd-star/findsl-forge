@@ -71,9 +71,10 @@ class PandasReferenceEvaluator:
         limit = None
         percent = None
         for named in node.named_args or []:
-            if named.name in {"top", "bottom"} and isinstance(named.value, Literal):
+            arg_name = named.name.lower()
+            if arg_name in {"top", "bottom"} and isinstance(named.value, Literal):
                 limit = int(named.value.value)
-            if named.name == "percent" and isinstance(named.value, Literal):
+            if arg_name == "percent" and isinstance(named.value, Literal):
                 percent = float(named.value.value)
         if limit is not None:
             ranked = ranked[ranked["rank_no"] <= limit]

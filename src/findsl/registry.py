@@ -35,11 +35,10 @@ class Registry:
             raise ConfigError(f"Unknown table: {name}") from exc
 
     def function(self, name: str) -> Dict[str, Any]:
-        key = name if name in self.functions else name.upper()
-        try:
-            return self.functions[key]
-        except KeyError as exc:
-            raise ConfigError(f"Unknown function: {name}") from exc
+        for key in (name, name.lower(), name.upper()):
+            if key in self.functions:
+                return self.functions[key]
+        raise ConfigError(f"Unknown function: {name}")
 
 
 def _read_json(path: Path) -> Dict[str, Any]:
@@ -52,4 +51,3 @@ def _read_json(path: Path) -> Dict[str, Any]:
 def default_registry() -> Registry:
     root = Path(__file__).resolve().parents[2]
     return Registry.load(root / "configs")
-
