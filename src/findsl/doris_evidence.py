@@ -43,6 +43,8 @@ class DorisClientConfig:
             *auth_args,
             "--connect-timeout",
             str(self.connect_timeout_seconds),
+            "--init-command",
+            "SET enable_sql_cache=false",
             "--batch",
             "--raw",
             "--skip-column-names",

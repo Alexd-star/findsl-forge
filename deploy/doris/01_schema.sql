@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS `dwd_stock_daily_quote_prefix` (
   `ts_code` VARCHAR(32) NOT NULL,
   `trade_date` DATE NOT NULL,
   `row_no` BIGINT NOT NULL,
-  `volume_prefix` BIGINT
+  `volume_prefix` BIGINT,
+  `volume_sum_120` BIGINT
 )
 DUPLICATE KEY(`ts_code`, `trade_date`, `row_no`)
 AUTO PARTITION BY RANGE (date_trunc(`trade_date`, 'month'))

@@ -71,6 +71,18 @@ def test_compile_sum_uses_prefix_sum_when_indicator_supports_it():
     assert prefix_steps[0]["evidence"]["prefix_table"] == "dwd_stock_daily_quote_prefix"
 
 
+def test_compile_sum_uses_materialized_prefix_window_when_configured():
+    result = Compiler().compile('filter(SUM(indicator("volume"), 120) > 420000)')
+
+    assert "dwd_stock_daily_quote_prefix" in result.sql
+    assert "volume_sum_120 AS __psum_1" in result.sql
+    assert "volume_prefix - COALESCE" not in result.sql
+    assert "__pref_prev_1" not in result.sql
+    prefix_steps = [step for step in result.explain if step["rule"] == "PREFIX_SUM"]
+    assert prefix_steps[0]["status"] == "applied"
+    assert prefix_steps[0]["evidence"]["materialized_window_column"] == "volume_sum_120"
+
+
 def test_compile_sum_falls_back_to_window_when_prefix_sum_is_not_supported():
     result = Compiler().compile('filter(SUM(indicator("close"), 3) > 30)')
     assert "SUM(close) OVER" in result.sql

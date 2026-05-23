@@ -120,6 +120,13 @@ class SQLiteSampleExecutor:
                     + f") OVER (PARTITION BY {ts_expr} ORDER BY {date_expr} "
                     + f"ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS {prefix_column}"
                 )
+                for window, materialized_column in _materialized_window_columns(meta):
+                    select_columns.append(
+                        "SUM("
+                        + column
+                        + f") OVER (PARTITION BY {ts_expr} ORDER BY {date_expr} "
+                        + f"ROWS BETWEEN {window - 1} PRECEDING AND CURRENT ROW) AS {_quote(materialized_column)}"
+                    )
             select_sql = ", ".join(select_columns)
             conn.execute(
                 f"CREATE TABLE {_quote(prefix_physical)} AS "
@@ -240,3 +247,16 @@ def _create_table_indexes(conn: sqlite3.Connection, table_name: str, columns: Li
 
 def _index_name(table_name: str, suffix: str) -> str:
     return "idx_" + "".join(char if char.isalnum() else "_" for char in table_name) + "_" + suffix
+
+
+def _materialized_window_columns(meta: Dict[str, Any]) -> List[tuple[int, str]]:
+    configured = meta.get("materialized_windows") or {}
+    if not isinstance(configured, dict):
+        return []
+    windows: List[tuple[int, str]] = []
+    for window, column in configured.items():
+        parsed_window = int(window)
+        if parsed_window <= 0:
+            raise ValueError(f"Invalid materialized window: {window!r}")
+        windows.append((parsed_window, str(column)))
+    return sorted(windows)

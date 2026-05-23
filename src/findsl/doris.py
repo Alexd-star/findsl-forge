@@ -245,6 +245,15 @@ def _render_prefix_build(registry: Registry, database: str) -> str:
                 + meta["prefix_column"]
                 + "`"
             )
+            for window, materialized_column in _materialized_window_columns(indicator_name, meta):
+                select_columns.append(
+                    "SUM("
+                    + value_expr
+                    + f") OVER (PARTITION BY {ts_expr} ORDER BY {date_expr} "
+                    + f"ROWS BETWEEN {window - 1} PRECEDING AND CURRENT ROW) AS `"
+                    + materialized_column
+                    + "`"
+                )
         sections.extend(
             [
                 f"TRUNCATE TABLE `{prefix_physical}`;",
@@ -338,6 +347,8 @@ def _prefix_columns(registry: Registry, prefix_table_name: str) -> List[Tuple[st
     for indicator_name, meta in registry.indicators.items():
         if meta.get("prefix_table") == prefix_table_name:
             columns.append((meta["prefix_column"], _prefix_type(indicator_name)))
+            for _, materialized_column in _materialized_window_columns(indicator_name, meta):
+                columns.append((materialized_column, _prefix_type(indicator_name)))
     return columns
 
 
@@ -353,6 +364,22 @@ def _prefix_type(indicator_name: str) -> str:
     if indicator_name == "volume":
         return "BIGINT"
     return "DOUBLE"
+
+
+def _materialized_window_columns(indicator_name: str, meta: Dict[str, object]) -> List[Tuple[int, str]]:
+    configured = meta.get("materialized_windows") or {}
+    if not isinstance(configured, dict):
+        return []
+    windows: List[Tuple[int, str]] = []
+    for window, column in configured.items():
+        try:
+            parsed_window = int(window)
+        except (TypeError, ValueError):
+            raise ValueError(f"Invalid materialized window for {indicator_name}: {window!r}") from None
+        if parsed_window <= 0:
+            raise ValueError(f"Invalid materialized window for {indicator_name}: {window!r}")
+        windows.append((parsed_window, str(column)))
+    return sorted(windows)
 
 
 def _prefix_table_names(registry: Registry) -> List[str]:

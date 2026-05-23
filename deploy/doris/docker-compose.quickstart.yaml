@@ -1,0 +1,46 @@
+name: findsl-doris
+
+networks:
+  doris_quickstart:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.80.0/24
+
+services:
+  fe:
+    image: apache/doris:fe-4.1.0
+    hostname: fe
+    entrypoint: ["/bin/bash"]
+    command:
+      - "-lc"
+      - "sed -i 's/-Xmx8192m -Xms8192m/-Xmx1536m -Xms512m/g' /opt/apache-doris/fe/conf/fe.conf && exec bash /usr/local/bin/init_fe.sh"
+    ports:
+      - "8030:8030"
+      - "9010:9010"
+      - "9030:9030"
+    environment:
+      - FE_SERVERS=fe1:172.20.80.2:9010
+      - FE_ID=1
+    networks:
+      doris_quickstart:
+        ipv4_address: 172.20.80.2
+
+  be:
+    image: apache/doris:be-4.1.0
+    hostname: be
+    entrypoint: ["/bin/bash"]
+    command:
+      - "-lc"
+      - "sed -i 's/-Xmx2048m/-Xmx512m/g' /opt/apache-doris/be/conf/be.conf && (grep -q '^mem_limit' /opt/apache-doris/be/conf/be.conf || echo 'mem_limit = 5G' >> /opt/apache-doris/be/conf/be.conf) && exec /usr/local/bin/entry_point.sh"
+    ports:
+      - "8040:8040"
+      - "9050:9050"
+    environment:
+      - FE_SERVERS=fe1:172.20.80.2:9010
+      - BE_ADDR=172.20.80.3:9050
+    depends_on:
+      - fe
+    networks:
+      doris_quickstart:
+        ipv4_address: 172.20.80.3

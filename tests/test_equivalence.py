@@ -319,6 +319,16 @@ def test_sql_matches_reference_for_prefix_sum_rewrite():
     assert result.extra_keys == []
 
 
+def test_sql_matches_reference_for_materialized_prefix_window():
+    result = verify_sql_equivalence(
+        'filter(SUM(indicator("volume"), 120) > 300)',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert "volume_sum_120" in result.sql
+
+
 def test_sql_matches_reference_for_signed_numeric_threshold():
     result = verify_sql_equivalence(
         'filter(indicator("main_net_inflow") < -1.5)',

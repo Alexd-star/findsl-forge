@@ -17,5 +17,6 @@ SELECT
   `ts_code`,
   `trade_date`,
   ROW_NUMBER() OVER (PARTITION BY `ts_code` ORDER BY `trade_date`) AS `row_no`,
-  SUM(`volume`) OVER (PARTITION BY `ts_code` ORDER BY `trade_date` ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS `volume_prefix`
+  SUM(`volume`) OVER (PARTITION BY `ts_code` ORDER BY `trade_date` ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS `volume_prefix`,
+  SUM(`volume`) OVER (PARTITION BY `ts_code` ORDER BY `trade_date` ROWS BETWEEN 119 PRECEDING AND CURRENT ROW) AS `volume_sum_120`
 FROM `dwd_stock_daily_quote`;

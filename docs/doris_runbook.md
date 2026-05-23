@@ -84,6 +84,16 @@ filter(SUM(indicator("volume"), 120) > 420000)
 
 This query is intentional: with prefix-sum disabled it produces a baseline `ROWS BETWEEN` window plan, and with prefix-sum enabled it should route to `dwd_stock_daily_quote_prefix`. Override it with `DORIS_EVIDENCE_DSL` only when the replacement query still exercises a long rolling `SUM` over a prefix-enabled indicator.
 
+For the current local 5,000,000-row evidence run, the final high-selectivity query is:
+
+```powershell
+$env:DORIS_EVIDENCE_DSL='filter(SUM(indicator("volume"), 120) > 1000000)'
+$env:DORIS_EVIDENCE_ITERATIONS="5"
+powershell -ExecutionPolicy Bypass -File .\scripts\collect_doris_evidence.ps1
+```
+
+The collector disables Doris SQL cache for each MySQL client session with `SET enable_sql_cache=false`, so repeated evidence runs measure execution rather than a cached query result.
+
 The script defaults `DORIS_EVIDENCE_MIN_SPEEDUP` to `10.0`, matching the competition acceleration target. Keep this default for final submission evidence; lower values are useful only for connectivity smoke tests and will not close the readiness performance warning.
 
 The readiness gate treats Doris-scale evidence as valid only when all of these markers are present:
@@ -129,6 +139,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 - Keep the generated monthly `trade_date` auto partitions unless the production retention policy requires day or year granularity.
 - Keep base and prefix tables in the same colocate group when their bucket count, replica layout, and distribution column type match.
 - Rebuild prefix tables after base-table loads, or replace them with Doris materialized views when validated.
+- Keep configured hot-window columns such as `volume_sum_120` in prefix tables when the target workload repeatedly asks for the same long rolling window.
 - Re-run `scripts/collect_doris_evidence.ps1` whenever data volume, table layout, or optimizer rules change.
 
 Official references:

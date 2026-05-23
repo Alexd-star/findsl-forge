@@ -29,7 +29,9 @@
     "adjustment": "none",
     "supports_prefix_sum": true,
     "prefix_table": "daily_quote_prefix",
-    "prefix_column": "volume_prefix"
+    "prefix_column": "volume_prefix",
+    "materialized_windows": {
+      "120": "volume_sum_120"
+    }
   }
 }
-

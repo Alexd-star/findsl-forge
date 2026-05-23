@@ -19,7 +19,9 @@ def test_render_doris_assets_contains_schema_prefix_and_smoke_sql():
     assert "DISTRIBUTED BY HASH(`ts_code`) BUCKETS 8" in assets.schema_sql
     assert "INSERT INTO `dwd_stock_daily_quote`" in assets.sample_data_sql
     assert "TRUNCATE TABLE `dwd_stock_daily_quote_prefix`" in assets.prefix_sql
+    assert "`volume_sum_120` BIGINT" in assets.schema_sql
     assert "SUM(`volume`) OVER" in assets.prefix_sql
+    assert "ROWS BETWEEN 119 PRECEDING AND CURRENT ROW) AS `volume_sum_120`" in assets.prefix_sql
     assert "FROM `dwd_stock_daily_quote` AS base" in assets.prefix_sql
     assert "LEFT JOIN `dwd_stock_money_flow` AS src" in assets.prefix_sql
     assert "SUM(src.`main_net_inflow`) OVER" in assets.prefix_sql

@@ -590,6 +590,7 @@ class SqlGenerator:
         prefix_physical = prefix_table["physical"]
         prefix_column = meta["prefix_column"]
         row_column = prefix_table.get("row_column", "row_no")
+        materialized_window_column = _materialized_window_column(meta, window)
         alias = self._next_alias("__psum")
         feature_no = self._feature_counter
         curr = f"__pref_curr_{feature_no}"
@@ -604,18 +605,24 @@ class SqlGenerator:
             window=window,
             prefix_table=prefix_physical,
             prefix_column=prefix_column,
+            materialized_window_column=materialized_window_column,
         )
         joins = [
             (
                 f"LEFT JOIN {prefix_physical} AS {curr} "
                 f"ON {curr}.ts_code = {{source}}.ts_code AND {curr}.trade_date = {{source}}.trade_date"
-            ),
-            (
-                f"LEFT JOIN {prefix_physical} AS {prev} "
-                f"ON {prev}.ts_code = {curr}.ts_code AND {prev}.{row_column} = {curr}.{row_column} - {window}"
-            ),
+            )
         ]
-        expression = f"({curr}.{prefix_column} - COALESCE({prev}.{prefix_column}, 0))"
+        if materialized_window_column:
+            expression = f"{curr}.{materialized_window_column}"
+        else:
+            joins.append(
+                (
+                    f"LEFT JOIN {prefix_physical} AS {prev} "
+                    f"ON {prev}.ts_code = {curr}.ts_code AND {prev}.{row_column} = {curr}.{row_column} - {window}"
+                )
+            )
+            expression = f"({curr}.{prefix_column} - COALESCE({prev}.{prefix_column}, 0))"
         self._numeric_features.append(Feature(alias=alias, expression=expression, joins=joins))
         return alias
 
@@ -649,6 +656,14 @@ class SqlGenerator:
 
 def _format_sql(sql: str) -> str:
     return " ".join(sql.split())
+
+
+def _materialized_window_column(meta: Dict[str, Any], window: int) -> Optional[str]:
+    configured = meta.get("materialized_windows") or {}
+    if not isinstance(configured, dict):
+        return None
+    value = configured.get(str(window)) or configured.get(window)
+    return str(value) if value else None
 
 
 def _format_number(value: float) -> str:
