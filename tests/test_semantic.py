@@ -36,6 +36,24 @@ def test_rank_bottom_requires_ascending_order():
         analyzer.validate(parse('rank(indicator("close"), desc, bottom=2)'))
 
 
+def test_rank_top_requires_descending_order():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="top must use desc"):
+        analyzer.validate(parse('rank(indicator("close"), asc, top=2)'))
+
+
+def test_rank_top_must_be_integer_literal():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="rank\\(\\) top must be an integer literal"):
+        analyzer.validate(parse('rank(indicator("close"), desc, top=2.5)'))
+
+
+def test_rank_top_must_be_positive():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="rank\\(\\) top must be positive"):
+        analyzer.validate(parse('rank(indicator("close"), desc, top=0)'))
+
+
 def test_bare_identifier_comparison_is_rejected():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match='indicator\\("close"\\)'):

@@ -21,3 +21,6 @@
 {"name": "filter内裸字段单等号误写", "dsl": "filter(close=10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["filter(indicator(\"close\") = 10)"]}
 {"name": "除数为零常量表达式", "dsl": "filter((indicator(\"close\") / (1 - 1)) > 1)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["non-zero denominator"]}
 {"name": "命名参数后跟位置参数", "dsl": "rank(top=2, indicator(\"close\"), desc)", "expected_code": "PARSE_ERROR", "expected_suggestion_fragments": ["named arguments after positional arguments"]}
+{"name": "rank顶部排序方向不一致", "dsl": "rank(indicator(\"close\"), asc, top=2)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["rank(..., desc, top=N)"]}
+{"name": "rank顶部数量不是整数", "dsl": "rank(indicator(\"close\"), desc, top=2.5)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer rank cutoff"]}
+{"name": "rank顶部数量必须为正", "dsl": "rank(indicator(\"close\"), desc, top=0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer rank cutoff"]}

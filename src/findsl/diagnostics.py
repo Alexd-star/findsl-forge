@@ -156,6 +156,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
             suggestions.insert(0, "Remove unsupported named arguments or move them into positional expressions.")
     if "rank()" in lower and "named arg" in lower:
         suggestions.insert(0, "For rank(), supported named args are top, bottom, and percent.")
+    if "rank()" in lower and ("integer literal" in lower or "must be positive" in lower):
+        suggestions.insert(0, "Use a positive integer rank cutoff, for example rank(indicator(\"close\"), desc, top=10).")
     if "rank()" in lower and ("top" in lower or "bottom" in lower):
         suggestions.insert(0, "Use rank(..., desc, top=N) for high values or rank(..., asc, bottom=N) for low values.")
     if "percent" in lower:

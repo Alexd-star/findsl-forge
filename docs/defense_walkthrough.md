@@ -69,7 +69,7 @@ Capture these screens for the technical document and one-minute video:
 | Structured explain records | Auditable optimizer decisions |
 | Diagnostic negative preset | Stable error handling and repair guidance |
 | Semantic hardening diagnostics | Hidden-evaluation style invalid DSL fails before SQL generation |
-| Official suite 18/18 positive and 23/23 negative | Official-style coverage and regression proof |
+| Official suite 18/18 positive and 26/26 negative | Official-style coverage and regression proof |
 | Doris generated assets | Reproducible deployment path |
 | Git bundle backup | Rollback and delivery discipline |
 

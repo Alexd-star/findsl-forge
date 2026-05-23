@@ -88,6 +88,36 @@ def test_diagnose_rank_bottom_order_mismatch_offers_direction_hint():
     assert any("rank(..., asc, bottom=N)" in hint for hint in diagnostics[0].suggestions)
 
 
+def test_diagnose_rank_top_order_mismatch_offers_direction_hint():
+    try:
+        Compiler().compile('rank(indicator("close"), asc, top=2)')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("rank(..., desc, top=N)" in hint for hint in diagnostics[0].suggestions)
+
+
+def test_diagnose_rank_top_non_integer_offers_cutoff_hint():
+    try:
+        Compiler().compile('rank(indicator("close"), desc, top=2.5)')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("positive integer rank cutoff" in hint for hint in diagnostics[0].suggestions)
+
+
+def test_diagnose_rank_top_zero_offers_cutoff_hint():
+    try:
+        Compiler().compile('rank(indicator("close"), desc, top=0)')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("positive integer rank cutoff" in hint for hint in diagnostics[0].suggestions)
+
+
 def test_diagnose_invalid_number_literal_is_lexical_not_generic():
     try:
         Compiler().compile('filter(indicator("close") > 1.2.3)')
