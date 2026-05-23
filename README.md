@@ -22,6 +22,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Return structured compile diagnostics and repair hints for invalid DSL/API requests.
 - Execute generated SQL against local SQLite fixtures for regression checks.
 - Compare SQL output with an independent Pandas semantic reference evaluator.
+- Push safe date ranges into base table scans for partition-pruning-friendly Doris SQL.
 - Rewrite eligible rolling `SUM` expressions to prefix-sum table joins for long-window acceleration.
 - Produce baseline-window versus prefix-sum benchmark reports.
 - Generate deterministic synthetic A-share-style data for reproducible long-window scale benchmarks.

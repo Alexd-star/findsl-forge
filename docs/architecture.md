@@ -103,7 +103,7 @@ This is intentionally closer to production SQL than string-template demos.
 
 ### Date-Range Pushdown
 
-`date_between("YYYY-MM-DD", "YYYY-MM-DD")` compiles into a direct `trade_date` range predicate and emits a `DATE_RANGE_PUSHDOWN` explain step. This gives official-style queries a clear path to Doris partition pruning and bounded scans while keeping date validation in the semantic layer.
+`date_between("YYYY-MM-DD", "YYYY-MM-DD")` compiles into a direct `trade_date` range predicate and emits a `DATE_RANGE_PUSHDOWN` explain step. When the filter does not depend on rolling windows, the generator also copies the range into the physical base scan and emits `DATE_RANGE_BASE_PRUNING`, making Doris partition pruning visible in SQL. Window-dependent filters keep the date predicate outside the feature layer so rolling semantics are not truncated at the range boundary.
 
 ### Config-Driven Business Rules
 

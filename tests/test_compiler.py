@@ -81,10 +81,25 @@ def test_compile_rank_percent_uses_partition_count_threshold():
 def test_compile_date_between_emits_trade_date_range_pushdown():
     result = Compiler().compile('filter(date_between("2026-01-02", "2026-01-04") & indicator("close") > 10)')
 
+    assert "FROM dwd_stock_daily_quote AS base WHERE (trade_date >= '2026-01-02' AND trade_date <= '2026-01-04')" in result.sql
     assert "trade_date >= '2026-01-02'" in result.sql
     assert "trade_date <= '2026-01-04'" in result.sql
     assert "close > 10" in result.sql
     assert "rewrite date_between() into trade_date range predicate" in result.trace
+    assert "push safe date range predicate into base scan" in result.trace
     date_steps = [step for step in result.explain if step["rule"] == "DATE_RANGE_PUSHDOWN"]
     assert date_steps[0]["status"] == "applied"
     assert date_steps[0]["evidence"]["start_date"] == "2026-01-02"
+    base_steps = [step for step in result.explain if step["rule"] == "DATE_RANGE_BASE_PRUNING"]
+    assert base_steps[0]["status"] == "applied"
+
+
+def test_compile_date_between_does_not_base_prune_window_queries():
+    result = Compiler().compile(
+        'filter(date_between("2026-01-02", "2026-01-04") & indicator("close") > MA(indicator("close"), 3))'
+    )
+
+    assert "FROM dwd_stock_daily_quote AS base WHERE (trade_date >=" not in result.sql
+    assert "trade_date >= '2026-01-02'" in result.sql
+    assert any(step["rule"] == "DATE_RANGE_PUSHDOWN" for step in result.explain)
+    assert not any(step["rule"] == "DATE_RANGE_BASE_PRUNING" for step in result.explain)

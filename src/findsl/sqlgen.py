@@ -107,7 +107,18 @@ class SqlGenerator:
         try:
             condition = self._bool_sql(condition_node)
             from_clause = self._from_clause(source)
-            layer_sql = f"SELECT {self._project_columns()} FROM {from_clause}"
+            base_predicates = self._base_date_pushdown_predicates(condition_node)
+            base_where = f" WHERE {' AND '.join(base_predicates)}" if base_predicates else ""
+            if base_predicates:
+                self.trace.append("push safe date range predicate into base scan")
+                self._explain(
+                    "DATE_RANGE_BASE_PRUNING",
+                    "applied",
+                    "Push safe date range predicate into base scan",
+                    predicate_count=len(base_predicates),
+                    source=source or "physical_base",
+                )
+            layer_sql = f"SELECT {self._project_columns()} FROM {from_clause}{base_where}"
             layer_name = "base_features"
 
             if self._numeric_features:
@@ -155,6 +166,29 @@ class SqlGenerator:
         )
         join_sql = f" {joins}" if joins else ""
         return f"SELECT {inner_alias}.*, {feature_sql} FROM ({inner_sql}) {inner_alias}{join_sql}"
+
+    def _base_date_pushdown_predicates(self, node: Node) -> List[str]:
+        if self._contains_temporal_window(node):
+            return []
+        return self._collect_and_date_predicates(node)
+
+    def _contains_temporal_window(self, node: Node) -> bool:
+        if isinstance(node, FunctionCall):
+            if node.name.upper() in {"MA", "SUM", "MAX", "MIN", "CONS", "EXIST"}:
+                return True
+            return any(self._contains_temporal_window(arg) for arg in node.args) or any(
+                self._contains_temporal_window(named.value) for named in node.named_args or []
+            )
+        if isinstance(node, (BinaryOp, Comparison)):
+            return self._contains_temporal_window(node.left) or self._contains_temporal_window(node.right)
+        return False
+
+    def _collect_and_date_predicates(self, node: Node) -> List[str]:
+        if isinstance(node, FunctionCall) and node.name.upper() == "DATE_BETWEEN":
+            return [self._date_between_predicate(node)]
+        if isinstance(node, BinaryOp) and node.op == "&":
+            return self._collect_and_date_predicates(node.left) + self._collect_and_date_predicates(node.right)
+        return []
 
     def _rank_sql(self, node: FunctionCall, base_relation: str = None) -> str:
         old_source = self._current_source
@@ -324,6 +358,7 @@ class SqlGenerator:
         return f"market = '{market_name}'"
 
     def _date_between_sql(self, node: FunctionCall) -> str:
+        predicate = self._date_between_predicate(node)
         start = self._date_arg(node.args[0], "date_between")
         end = self._date_arg(node.args[1], "date_between")
         self.trace.append("rewrite date_between() into trade_date range predicate")
@@ -334,6 +369,11 @@ class SqlGenerator:
             start_date=start,
             end_date=end,
         )
+        return predicate
+
+    def _date_between_predicate(self, node: FunctionCall) -> str:
+        start = self._date_arg(node.args[0], "date_between")
+        end = self._date_arg(node.args[1], "date_between")
         return f"(trade_date >= '{start}' AND trade_date <= '{end}')"
 
     def _symbol_arg(self, node: Node, function_name: str) -> str:
