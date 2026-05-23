@@ -13,3 +13,8 @@ def test_parse_window_comparison():
     ast = parse('filter(indicator("close") >= MAX(indicator("close"), 250))')
     assert ast.to_dict()["name"] == "filter"
 
+
+def test_parse_signed_numeric_literal():
+    ast = parse('filter(indicator("main_net_inflow") < -1.5)')
+    data = ast.to_dict()
+    assert data["args"][0]["right"]["value"] == -1.5

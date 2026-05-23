@@ -8,6 +8,7 @@ This document maps Topic 19 requirements to implementation modules.
 | Generate standard AST | `findsl.ast_nodes` | Started |
 | Compile DSL logic into Doris SQL | `findsl.sqlgen`, `findsl.doris_sql`, `DORIS_SQL_VALIDATION` explain evidence | Started |
 | Support cross-sectional ranking cutoffs | `findsl.sqlgen`, `findsl.reference`, `rank(..., top/bottom/percent)` official cases | Started |
+| Support signed financial thresholds | `findsl.lexer`, `findsl.parser`, `findsl.sqlgen`, signed net-outflow official cases | Started |
 | Support date-range partition pruning predicates | `date_between(...)`, `findsl.sqlgen`, `findsl.reference`, `DATE_RANGE_PUSHDOWN`, `DATE_RANGE_BASE_PRUNING`, and window-safe `DATE_RANGE_WINDOW_PRUNING` explain evidence | Started |
 | Support CTE and window function rewrites | `findsl.sqlgen` | Started |
 | Decouple business rules from compiler core | `configs/*.json`, `findsl.registry` | Started |

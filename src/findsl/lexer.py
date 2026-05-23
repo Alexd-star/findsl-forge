@@ -46,8 +46,16 @@ def lex(source: str) -> List[Token]:
             continue
         if ch.isdigit():
             start = i
-            while i < len(source) and (source[i].isdigit() or source[i] == "."):
+            while i < len(source) and source[i].isdigit():
                 i += 1
+            if i < len(source) and source[i] == ".":
+                i += 1
+                if i >= len(source) or not source[i].isdigit():
+                    raise LexError(f"Invalid number literal starting at {start}")
+                while i < len(source) and source[i].isdigit():
+                    i += 1
+            if i < len(source) and source[i] == ".":
+                raise LexError(f"Invalid number literal starting at {start}")
             tokens.append(Token("NUMBER", source[start:i], start))
             continue
         if ch.isalpha() or ch == "_":
@@ -68,4 +76,3 @@ def lex(source: str) -> List[Token]:
         raise LexError(f"Unexpected character {ch!r} at {i}")
     tokens.append(Token("EOF", "", len(source)))
     return tokens
-

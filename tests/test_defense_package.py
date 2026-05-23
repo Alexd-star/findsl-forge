@@ -39,6 +39,7 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "NL2DSL official template coverage" in content
     assert "A股每日换手率前50%" in content
     assert "date_window_pruning" in content
+    assert "signed_outflow_threshold" in content
     assert "Doris SQL validation boundary" in content
     assert "Config-only indicator extension" in content
     assert "dwd_stock_money_flow_prefix" in content

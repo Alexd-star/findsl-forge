@@ -113,3 +113,9 @@ def test_compile_escapes_string_literals_in_generated_sql():
 
     assert "market = 'A'' OR 1=1 --'" in result.sql
     assert "market = 'A' OR 1=1 --'" not in result.sql
+
+
+def test_compile_signed_numeric_threshold():
+    result = Compiler().compile('filter(indicator("main_net_inflow") < -1.5)')
+
+    assert "main_net_inflow < -1.5" in result.sql

@@ -64,6 +64,22 @@ def test_suggests_high_turnover_close_rank():
     assert "ORDER BY base.close DESC" in Compiler().compile(result.top.dsl).sql
 
 
+def test_suggests_signed_net_outflow_threshold():
+    result = suggest_dsl("主力净流出低于-1.5")
+
+    assert result.top is not None
+    assert result.top.rule == "net_outflow_threshold"
+    assert result.top.dsl == 'filter(indicator("main_net_inflow") < -1.5)'
+    assert "main_net_inflow < -1.5" in Compiler().compile(result.top.dsl).sql
+
+
+def test_suggests_outflow_magnitude_as_negative_threshold():
+    result = suggest_dsl("主力净流出超过2")
+
+    assert result.top is not None
+    assert result.top.dsl == 'filter(indicator("main_net_inflow") < -2)'
+
+
 def test_suggests_close_new_high_with_chinese_window_number():
     result = suggest_dsl("今日收盘价创二百五十日新高")
 

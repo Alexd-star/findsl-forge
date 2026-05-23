@@ -88,3 +88,13 @@ def test_sql_matches_reference_for_prefix_sum_rewrite():
     assert result.sql_row_count == 7
     assert result.missing_keys == []
     assert result.extra_keys == []
+
+
+def test_sql_matches_reference_for_signed_numeric_threshold():
+    result = verify_sql_equivalence(
+        'filter(indicator("main_net_inflow") < -1.5)',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert result.sql_row_count > 0

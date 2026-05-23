@@ -83,6 +83,12 @@ class Parser:
             expr = self._parse_or()
             self._expect(")")
             return expr
+        if token.kind in {"+", "-"} and self.tokens[self.index + 1].kind == "NUMBER":
+            sign = -1 if self._advance().kind == "-" else 1
+            number = self._expect("NUMBER").value
+            if "." in number:
+                return Literal(sign * float(number))
+            return Literal(sign * int(number))
         if token.kind == "STRING":
             self._advance()
             return Literal(token.value)
@@ -119,4 +125,3 @@ class Parser:
 
 def parse(source: str) -> Node:
     return Parser(source).parse()
-

@@ -108,6 +108,8 @@ def _diagnose_lex_error(message: str) -> Diagnostic:
     ]
     if "Unclosed string" in message:
         suggestions.insert(0, "Add the missing closing double quote.")
+    if "Invalid number literal" in message:
+        suggestions.insert(0, "Use plain numeric literals such as 10, -5, or 0.25.")
     return Diagnostic(
         code="LEX_ERROR",
         severity="error",

@@ -68,6 +68,16 @@ def test_diagnose_rank_bottom_order_mismatch_offers_direction_hint():
     assert any("rank(..., asc, bottom=N)" in hint for hint in diagnostics[0].suggestions)
 
 
+def test_diagnose_invalid_number_literal_is_lexical_not_generic():
+    try:
+        Compiler().compile('filter(indicator("close") > 1.2.3)')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "LEX_ERROR"
+    assert any("numeric literals" in hint for hint in diagnostics[0].suggestions)
+
+
 def test_cli_diagnose_returns_json_repair_hints_for_invalid_dsl():
     env = os.environ.copy()
     env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")

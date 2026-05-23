@@ -61,6 +61,7 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
             _money_flow_low_price_rank(normalized),
             _turnover_percent_rank(normalized),
             _high_turnover_close_rank(normalized),
+            _net_outflow_threshold(normalized),
             _close_new_high(normalized),
             _volume_breakout_exists(normalized),
             _rolling_volume_sum(normalized),
@@ -205,6 +206,32 @@ def _high_turnover_close_rank(text: str) -> Optional[DslCandidate]:
         confidence=confidence,
         rule="high_turnover_close_rank",
         rationale="Matched high-turnover prefilter followed by close-price cross-sectional ranking.",
+        matched_signals=sorted(signals),
+    )
+
+
+def _net_outflow_threshold(text: str) -> Optional[DslCandidate]:
+    signals = _signals(
+        text,
+        [
+            ("main_net_inflow", ["主力净流入", "主力净流出", "资金净流入", "资金净流出", "main_net_inflow"]),
+            ("outflow", ["净流出", "流出"]),
+            ("threshold", ["低于", "小于", "少于", "<", "超过", "大于"]),
+        ],
+    )
+    if not {"main_net_inflow", "outflow", "threshold"}.issubset(signals):
+        return None
+
+    threshold = _signed_threshold_after(text, ["低于", "小于", "少于", "<", "超过", "大于"], default=-1.5)
+    if threshold >= 0:
+        threshold = -threshold
+    dsl = f'filter(indicator("main_net_inflow") < {_format_number(threshold)})'
+    return DslCandidate(
+        title=f"Main-net-outflow below {threshold:g}",
+        dsl=dsl,
+        confidence=0.86,
+        rule="net_outflow_threshold",
+        rationale="Matched net-outflow wording and mapped it to a signed main_net_inflow threshold.",
         matched_signals=sorted(signals),
     )
 
@@ -427,6 +454,15 @@ def _threshold_after(text: str, anchors: Sequence[str], default: float) -> float
     return default
 
 
+def _signed_threshold_after(text: str, anchors: Sequence[str], default: float) -> float:
+    signed_number_re = rf"[+-]?{NUMBER_RE}"
+    for anchor in anchors:
+        match = re.search(rf"{re.escape(anchor)}(?P<num>{signed_number_re})", text)
+        if match:
+            return _parse_signed_number(match.group("num"))
+    return default
+
+
 def _parse_number(raw: str) -> float:
     match = re.fullmatch(r"(?P<number>\d+(?:\.\d+)?)(?P<unit>万|千|百)?", raw)
     if match:
@@ -435,6 +471,12 @@ def _parse_number(raw: str) -> float:
         multiplier = {"万": 10000, "千": 1000, "百": 100}.get(unit, 1)
         return number * multiplier
     return float(_parse_cn_number(raw))
+
+
+def _parse_signed_number(raw: str) -> float:
+    sign = -1 if raw.startswith("-") else 1
+    value = raw[1:] if raw[:1] in {"+", "-"} else raw
+    return sign * _parse_number(value)
 
 
 def _format_number(value: float) -> str:
