@@ -157,13 +157,6 @@ class SqlGenerator:
         return f"SELECT {inner_alias}.*, {feature_sql} FROM ({inner_sql}) {inner_alias}{join_sql}"
 
     def _rank_sql(self, node: FunctionCall, base_relation: str = None) -> str:
-        self.trace.append("rewrite rank() into ROW_NUMBER window")
-        self._explain(
-            "RANK_ROW_NUMBER",
-            "applied",
-            "Rewrite rank() into ROW_NUMBER window",
-            source=base_relation or "base_relation",
-        )
         old_source = self._current_source
         self._current_source = base_relation
         try:
@@ -175,22 +168,48 @@ class SqlGenerator:
             raise SemanticError("rank() second argument must be asc or desc")
         order = order_node.name.upper()
         limit = self._rank_limit(node)
+        self.trace.append("rewrite rank() into ROW_NUMBER window")
+        self._explain(
+            "RANK_ROW_NUMBER",
+            "applied",
+            "Rewrite rank() into ROW_NUMBER window",
+            source=base_relation or "base_relation",
+            limit_kind=limit["kind"] or "none",
+            limit_value=limit["value"],
+        )
         source = self._from_clause(base_relation)
-        where = f" WHERE rank_no <= {limit}" if limit is not None else ""
+        partition_count = (
+            ", COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count"
+            if limit["kind"] == "percent"
+            else ""
+        )
+        where = self._rank_where(limit)
         return (
             "SELECT * FROM ("
-            f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}) AS rank_no "
+            f"SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY {expr_sql} {order}) AS rank_no"
+            f"{partition_count} "
             f"FROM {source}"
             f") ranked{where}"
         )
 
-    def _rank_limit(self, node: FunctionCall):
+    def _rank_limit(self, node: FunctionCall) -> Dict[str, Any]:
         for named in node.named_args or []:
             if named.name == "top" and isinstance(named.value, Literal):
-                return int(named.value.value)
+                return {"kind": "top", "value": int(named.value.value)}
             if named.name == "bottom" and isinstance(named.value, Literal):
-                return int(named.value.value)
-        return None
+                return {"kind": "bottom", "value": int(named.value.value)}
+            if named.name == "percent" and isinstance(named.value, Literal):
+                return {"kind": "percent", "value": float(named.value.value)}
+        return {"kind": None, "value": None}
+
+    def _rank_where(self, limit: Dict[str, Any]) -> str:
+        if limit["kind"] in {"top", "bottom"}:
+            return f" WHERE rank_no <= {int(limit['value'])}"
+        if limit["kind"] == "percent":
+            value = _format_number(float(limit["value"]))
+            threshold = f"CAST(((__partition_count * {value}) + 99.999999) / 100.0 AS INTEGER)"
+            return f" WHERE rank_no <= {threshold}"
+        return ""
 
     def _from_clause(self, source: str = None) -> str:
         if source:
@@ -439,3 +458,9 @@ class SqlGenerator:
 
 def _format_sql(sql: str) -> str:
     return " ".join(sql.split())
+
+
+def _format_number(value: float) -> str:
+    if float(value).is_integer():
+        return str(int(value))
+    return f"{value:.12f}".rstrip("0").rstrip(".")

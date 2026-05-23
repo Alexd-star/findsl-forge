@@ -169,7 +169,7 @@ positive DSL case -> compiler -> SQL/trace/explain evidence -> SQL/reference equ
 negative DSL case -> compiler failure -> structured diagnostic code -> repair suggestions
 ```
 
-Positive cases cover staged filters, ranking, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
+Positive cases cover staged filters, top-N and percent-cutoff ranking, market predicates, rolling boolean functions, moving averages, rolling extrema, prefix-sum aggregates over quote and money-flow tables, and arithmetic predicates. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, invalid rank percentages, parse errors, lexical errors, and unsupported rank parameters. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
 
 ## Defense Package Loop
 

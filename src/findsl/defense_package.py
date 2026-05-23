@@ -311,7 +311,7 @@ def _check_official_suite(
             name="Official-style coverage suite",
             scoring_point="Representative task coverage and negative-case proof",
             demo_action="Run scripts\\official_suite.ps1.",
-            expected_signal="Positive 10/10 and negative 7/7 pass.",
+            expected_signal="Positive 11/11 and negative 8/8 pass.",
             passed=result.passed,
             evidence=[
                 f"positive={result.positive_passed}/{result.positive_total}",
@@ -324,7 +324,7 @@ def _check_official_suite(
             "Official-style coverage suite",
             "Representative task coverage and negative-case proof",
             "Run scripts\\official_suite.ps1.",
-            "Positive 10/10 and negative 7/7 pass.",
+            "Positive 11/11 and negative 8/8 pass.",
             exc,
         )
 

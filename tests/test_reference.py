@@ -53,3 +53,14 @@ def test_reference_then_filter_rank_top_one_by_turnover():
         ("BBB", "2026-01-05"),
     ]
 
+
+def test_reference_then_filter_rank_percent_by_turnover():
+    evaluator = PandasReferenceEvaluator(DATA_DIR)
+    result = evaluator.evaluate('then(filter(market("A")), rank(indicator("turnover_rate"), desc, percent=50))')
+    assert result.keys() == [
+        ("AAA", "2026-01-01"),
+        ("AAA", "2026-01-02"),
+        ("BBB", "2026-01-03"),
+        ("BBB", "2026-01-04"),
+        ("BBB", "2026-01-05"),
+    ]

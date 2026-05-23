@@ -7,6 +7,7 @@ This document maps Topic 19 requirements to implementation modules.
 | Parse full stock-screening DSL and compound semantics | `findsl.lexer`, `findsl.parser`, `findsl.ast_nodes` | Started |
 | Generate standard AST | `findsl.ast_nodes` | Started |
 | Compile DSL logic into Doris SQL | `findsl.sqlgen` | Started |
+| Support cross-sectional ranking cutoffs | `findsl.sqlgen`, `findsl.reference`, `rank(..., top/bottom/percent)` official cases | Started |
 | Support CTE and window function rewrites | `findsl.sqlgen` | Started |
 | Decouple business rules from compiler core | `configs/*.json`, `findsl.registry` | Started |
 | Add new indicators without core code changes | `configs/indicators.json` | Started |

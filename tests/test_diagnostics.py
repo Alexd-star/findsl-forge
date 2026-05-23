@@ -38,6 +38,16 @@ def test_demo_error_payload_includes_structured_diagnostics():
     assert payload["diagnostics"][0]["suggestions"]
 
 
+def test_diagnose_invalid_rank_percent_offers_bound_hint():
+    try:
+        Compiler().compile('rank(indicator("close"), desc, percent=120)')
+    except Exception as exc:  # noqa: BLE001 - asserting diagnostic behavior for compiler errors.
+        diagnostics = diagnose_exception(exc)
+
+    assert diagnostics[0].code == "SEMANTIC_ERROR"
+    assert any("0 < N <= 100" in hint for hint in diagnostics[0].suggestions)
+
+
 def test_cli_diagnose_returns_json_repair_hints_for_invalid_dsl():
     env = os.environ.copy()
     env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")

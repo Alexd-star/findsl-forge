@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -68,12 +69,20 @@ class PandasReferenceEvaluator:
             method="first", ascending=ascending
         )
         limit = None
+        percent = None
         for named in node.named_args or []:
             if named.name in {"top", "bottom"} and isinstance(named.value, Literal):
                 limit = int(named.value.value)
+            if named.name == "percent" and isinstance(named.value, Literal):
+                percent = float(named.value.value)
         if limit is not None:
             ranked = ranked[ranked["rank_no"] <= limit]
-        return ranked.drop(columns=["__rank_expr"])
+        if percent is not None:
+            ranked["__partition_count"] = ranked.groupby("trade_date")["ts_code"].transform("count")
+            threshold = ((ranked["__partition_count"] * percent) / 100.0).apply(math.ceil)
+            ranked = ranked[ranked["rank_no"] <= threshold]
+        drop_columns = [column for column in ["__rank_expr", "__partition_count"] if column in ranked.columns]
+        return ranked.drop(columns=drop_columns)
 
     def _bool(self, node: Node, rows):
         if isinstance(node, Comparison):
@@ -169,4 +178,3 @@ class PandasReferenceEvaluator:
         if node.value <= 0:
             raise SemanticError("Window argument must be positive")
         return node.value
-

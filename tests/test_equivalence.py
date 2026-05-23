@@ -61,6 +61,15 @@ def test_sql_matches_reference_for_then_filter_rank():
     assert result.passed
 
 
+def test_sql_matches_reference_for_then_filter_rank_percent():
+    result = verify_sql_equivalence(
+        'then(filter(market("A")), rank(indicator("turnover_rate"), desc, percent=50))',
+        DATA_DIR,
+    )
+    assert result.passed
+    assert result.sql_row_count == 5
+
+
 def test_sql_matches_reference_for_prefix_sum_rewrite():
     result = verify_sql_equivalence(
         'filter(SUM(indicator("volume"), 3) > 300)',

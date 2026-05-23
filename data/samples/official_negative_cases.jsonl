@@ -5,3 +5,4 @@
 {"name": "缺少右括号", "dsl": "filter(indicator(\"close\") > MA(indicator(\"close\"), 20)", "expected_code": "PARSE_ERROR", "expected_suggestion_fragments": ["missing closing parenthesis"]}
 {"name": "字符串未闭合", "dsl": "filter(indicator(\"close) > 10)", "expected_code": "LEX_ERROR", "expected_suggestion_fragments": ["missing closing double quote"]}
 {"name": "rank命名参数错误", "dsl": "rank(indicator(\"close\"), desc, limit=10)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["supported named args"]}
+{"name": "rank百分比越界", "dsl": "rank(indicator(\"close\"), desc, percent=120)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["0 < N <= 100"]}
