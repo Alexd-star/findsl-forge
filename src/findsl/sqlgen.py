@@ -354,7 +354,7 @@ class SqlGenerator:
 
     def _bool_sql(self, node: Node) -> str:
         if isinstance(node, Comparison):
-            return f"{self._numeric_sql(node.left)} {node.op} {self._numeric_sql(node.right)}"
+            return f"{self._numeric_sql(node.left)} {_sql_comparison_operator(node.op)} {self._numeric_sql(node.right)}"
         if isinstance(node, BinaryOp) and node.op in {"&", "|"}:
             op = "AND" if node.op == "&" else "OR"
             return f"({self._bool_sql(node.left)} {op} {self._bool_sql(node.right)})"
@@ -592,6 +592,10 @@ def _format_number(value: float) -> str:
     if float(value).is_integer():
         return str(int(value))
     return f"{value:.12f}".rstrip("0").rstrip(".")
+
+
+def _sql_comparison_operator(op: str) -> str:
+    return {"==": "=", "!=": "<>"}.get(op, op)
 
 
 def _sql_string_literal(value: str) -> str:

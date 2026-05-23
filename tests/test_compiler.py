@@ -137,6 +137,16 @@ def test_compile_signed_numeric_threshold():
     assert "main_net_inflow < -1.5" in result.sql
 
 
+def test_compile_normalizes_equality_operators_for_doris_sql():
+    equal = Compiler().compile('filter(indicator("close") == 10)')
+    not_equal = Compiler().compile('filter(indicator("close") != 10)')
+
+    assert "close = 10" in equal.sql
+    assert "close == 10" not in equal.sql
+    assert "close <> 10" in not_equal.sql
+    assert "close != 10" not in not_equal.sql
+
+
 def test_compile_rejects_top_level_numeric_expression_before_sql_generation():
     with pytest.raises(SemanticError, match="Top-level DSL"):
         Compiler().compile('indicator("close")')
