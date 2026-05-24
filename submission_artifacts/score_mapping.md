@@ -9,6 +9,7 @@
 | 结果正确性 | `reference.py`, `executor.py`, `equivalence.py` | `sql_equivalence_report.md`, readiness gate | 展示 verification PASS |
 | 长窗口性能优化 | prefix-sum rewrite, hot-window materialized column `volume_sum_120` | `doris_cluster_evidence.md` | 展示 5M Doris 36x 级加速证据 |
 | Doris 物理设计 | `deploy/doris/*.sql`, `docs/doris_runbook.md` | schema asset integrity, EXPLAIN | 展示 auto partition、hash bucket、colocate group |
+| 真实行情业务样本 | `data/real_samples/eastmoney_a_share_sample/`, `scripts/fetch_real_market_sample.py` | Eastmoney raw JSON、metadata、SQL/reference 验证 | 展示真实股票代码和交易日期下的收益率 DSL |
 | AI 大模型辅助 | `nl2dsl.py`, `llm_adapter.py` | NL2DSL smoke、LLM safety smoke | 输入中文需求，展示候选 DSL 通过验证 |
 | 防幻觉和安全边界 | LLM 只产 DSL 候选，禁止直接 SQL | `UNSAFE_DIRECT_SQL` 拒绝证据 | 展示 mock LLM 响应中直接 SQL 被拒绝 |
 | 可复现工程交付 | `scripts/*.ps1`, Git, artifact export | readiness、bundle、evidence snapshots | 运行 readiness/export 脚本 |

@@ -17,7 +17,7 @@ The national-award target is to satisfy every explicit task while adding high-co
 - Structured optimizer explain for auditable rewrite decisions.
 - Config-driven indicator and function extension.
 - Window-safe SQL generation using feature materialization layers.
-- Future Doris optimizer with prefix-sum and materialized-view routing.
+- Doris optimizer with prefix-sum rewrite, hot-window materialization, and future materialized-view routing.
 - Automated correctness, latency, and performance reports.
 
 ## Phase 1: Compiler Kernel MVP
@@ -135,6 +135,7 @@ Deliverables:
 - Doris cluster evidence report linked from readiness when generated. (Started)
 - Versioned Web Demo screenshots for the positive compile path and diagnostic negative path. (Started)
 - One-minute demo video generated from versioned screenshots. (Implemented)
+- Public real-market A-share quote sample with SQL/reference verification. (Implemented)
 - Lean canvas.
 - Technical document.
 - Deployment and test manual.
@@ -159,6 +160,7 @@ Exit criteria:
 - Local SQLite prefix timing is only a smoke/regression signal and must not be presented as Doris-scale acceleration proof.
 - Generated reports can be attached to the technical document or used in defense.
 - Defense package must attach the latest real Doris 10x+ proof as separate cluster evidence, not confuse it with local fixture timing.
+- Real-market quote samples should strengthen business credibility, while 5M Doris evidence remains the only performance-claim source.
 - Warning gates are either closed or explicitly explained in the final submission.
 
 ## Non-Negotiable Quality Gates

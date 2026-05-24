@@ -45,6 +45,8 @@ findsl.cli
   -> DorisEvidenceCollector
     -> compile baseline-window and optimized-prefix SQL
     -> capture Doris EXPLAIN, COUNT(*) latency, row-count parity, and 10x speedup marker
+  -> RealMarketSample
+    -> version cached Eastmoney quote JSON and CSV fixtures for business-demo validation
   -> Demo/API and ReadinessReport
     -> validate natural-language candidates through compiler + equivalence verifier
     -> validate optional LLM DSL candidates without allowing SQL bypass
@@ -148,15 +150,15 @@ explain: machine-readable rule/status/evidence records
 
 `explain` records applied and skipped rules, such as `PREFIX_SUM`, `WINDOW_FEATURE`, `RETURN_RATE`, `ROLLING_BOOLEAN`, `FEATURE_LAYER`, `FILTER_OUTER_WHERE`, and `DORIS_SQL_VALIDATION`. This makes optimizer behavior auditable and gives downstream reports or UI components stable fields to render.
 
-## Planned Enterprise Extensions
+## Next Enterprise Extensions
 
 - Logical IR node model.
 - SQLGlot optional validation.
-- Doris execution equivalence against Pandas reference results.
+- Broader Doris execution equivalence beyond the current evidence path.
 - Broader prefix-sum optimizer coverage for more aggregate shapes.
 - Materialized-view routing.
-- Benchmark report generator.
-- API and UI.
+- More provider-backed LLM repair loops.
+- Larger real-market data ingestion, including real money-flow feeds.
 
 ## Correctness Loop
 
@@ -179,7 +181,7 @@ DSL -> compiler(prefix on)  -> prefix-sum SQL       -> SQLite fixture
 DSL -> PandasReferenceEvaluator -> semantic oracle
 ```
 
-Both SQL variants must match the reference output and each other. The report includes local timing plus plan-shape signals such as window frame count and prefix table references. This separates correctness evidence from later Doris-scale performance claims.
+Both SQL variants must match the reference output and each other. The report includes local timing plus plan-shape signals such as window frame count and prefix table references. This separates lightweight regression timing from the Doris-scale performance claim, which is supported by the dedicated cluster evidence file.
 
 ## Official-Style Coverage Loop
 
@@ -212,6 +214,16 @@ DSL -> compiler(prefix on)  -> prefix-sum SQL       -> Doris EXPLAIN + COUNT(*)
 ```
 
 The generated `reports/doris_cluster_evidence.md` records connection metadata with passwords redacted, the DSL, both SQL variants, EXPLAIN text, repeated query latency, row-count parity, plan-shape markers, and the minimum speedup target. Readiness closes the `Doris-scale performance proof` warning only when baseline and optimized variants both execute, row counts match, the measured Doris speedup reaches the default 10x target, the baseline path contains a window plan, and the optimized path contains the prefix table.
+
+## Real-Market Sample Loop
+
+The versioned sample under `data/real_samples/eastmoney_a_share_sample/` keeps public Eastmoney raw JSON together with normalized CSV files and metadata:
+
+```text
+Eastmoney raw K-line JSON -> normalized CSV fixtures -> verify-sql -> SQL/reference parity
+```
+
+This path is intentionally small. It proves that the same DSL compiler and reference oracle can run against real stock codes, dates, closes, turnover rates, and volume fields, while the 5M Doris dataset remains the performance evidence source. The placeholder money-flow CSV is documented as neutral compatibility data and is not used as real money-flow proof.
 
 ## Doris Deployment Assets
 

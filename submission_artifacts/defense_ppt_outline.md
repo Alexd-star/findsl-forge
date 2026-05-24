@@ -49,7 +49,7 @@ FinDSL Forge：面向 Apache Doris 的可审计金融选股 DSL 编译与加速�
 
 ## 11. 工程化交付
 
-展示 Docker Doris、PowerShell 自动化脚本、Git 回溯、bundle 备份、submission artifact 快照。
+展示 Docker Doris、PowerShell 自动化脚本、真实行情小样本、Git 回溯、bundle 备份、submission artifact 快照。
 
 ## 12. 创新点总结
 
@@ -60,6 +60,6 @@ FinDSL Forge：面向 Apache Doris 的可审计金融选股 DSL 编译与加速�
 
 ## 13. 后续扩展
 
-- 接入真实行情源。
+- 扩大真实行情覆盖范围，并补充真实资金流数据。
 - 扩展更多财务、公告、新闻情绪指标。
 - 多 FE/BE Doris 集群、自动化 Stream Load 和物化视图维护。

@@ -44,11 +44,13 @@ flowchart LR
 1. 小样本 correctness：SQLite SQL 执行结果与 Pandas reference 结果一致。
 2. 官方风格覆盖：正例覆盖复杂 DSL，负例覆盖诊断和安全边界。
 3. Doris 规模证据：本地 Docker Doris 载入 5,000,000 行行情数据，比较 baseline window 与 prefix-sum 优化 SQL 的 EXPLAIN、行数和执行耗时。
+4. 真实行情小样本：使用东方财富公开 K 线数据验证真实股票代码、交易日期、收盘价、换手率和成交量字段下的 DSL 语义。
 
 ## 已验证结论
 
 - 编译、SQL/reference 等价、官方风格套件和 demo smoke 均进入 readiness gate。
 - Doris 5M 行证据证明 baseline 与 optimized 行数一致，优化路径包含 prefix table，baseline 包含 window path。
+- 真实行情小样本证明 quote-only DSL 能在公开 A 股行情字段上通过同一套 SQL/reference 验证。
 - LLM 安全环节拒绝直接 SQL 和错误 DSL，避免把不可审计 SQL 直接交给数据库。
 
 ## 竞争亮点
@@ -60,4 +62,4 @@ flowchart LR
 
 ## 局限与后续
 
-当前大规模数据主要使用确定性合成数据，适合复现实验；最终展示可追加真实行情样本以增强业务可信度。生产部署可进一步扩展为多 BE 集群、Routine Load、物化视图维护和更多财务/新闻情绪指标。
+当前大规模性能证据使用确定性合成数据，适合复现实验；业务展示已补充东方财富公开行情小样本，但不把小样本用于性能结论。生产部署可进一步扩展为多 BE 集群、Routine Load、物化视图维护、真实资金流数据和更多财务/新闻情绪指标。

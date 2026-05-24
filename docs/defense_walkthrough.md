@@ -11,6 +11,7 @@ python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_ca
 powershell -ExecutionPolicy Bypass -File .\scripts\defense_package.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\validate_llm_candidates.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
+python -m findsl.cli verify-sql 'filter(date_between("2024-01-02", "2024-01-12") & RET(indicator("close"), 2) > 0)' --data-dir data/real_samples/eastmoney_a_share_sample
 ```
 
 Expected reports:
@@ -20,6 +21,7 @@ Expected reports:
 - `reports/official_suite_report.md`
 - `reports/evaluation_report.md`
 - `reports/prefix_sum_benchmark.md`
+- `data/real_samples/eastmoney_a_share_sample/source_metadata.json`
 
 ## Live Demo Script
 
@@ -72,8 +74,9 @@ The current committed screenshot set is in `submission_artifacts/demo_screenshot
 | Semantic hardening diagnostics | Hidden-evaluation style invalid DSL fails before SQL generation |
 | Official suite 32/32 positive and 34/34 negative | Official-style coverage and regression proof, including RET return-rate scenarios |
 | Doris generated assets | Reproducible deployment path |
+| Eastmoney real-market quote sample | Business credibility without using a tiny sample as performance proof |
 | Git bundle backup | Rollback and delivery discipline |
 
 ## Boundary
 
-Local SQLite timing and synthetic scale reports are regression evidence, not final Doris production proof. The final `Doris-scale performance proof` warning should be closed only after `scripts/collect_doris_evidence.ps1` captures real Apache Doris `EXPLAIN`, row-count parity, baseline/optimized success, prefix-table plan use, window baseline plan use, and the default 10x speedup marker from a running Doris cluster.
+Local SQLite timing and synthetic scale reports are regression evidence, not final Doris production proof. The current submission closes the `Doris-scale performance proof` warning with `scripts/collect_doris_evidence.ps1`, real Apache Doris `EXPLAIN`, row-count parity, baseline/optimized success, prefix-table plan use, window baseline plan use, and the default 10x speedup marker from a running Doris cluster. The Eastmoney sample is for business realism only.

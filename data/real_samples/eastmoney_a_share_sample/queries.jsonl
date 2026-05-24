@@ -1,0 +1,3 @@
+{"name": "真实行情样本：A股换手率高于0.3", "dsl": "filter(date_between(\"2024-01-02\", \"2024-01-12\") & market(\"A\") & indicator(\"turnover_rate\") > 0.3)", "scenario": "real_quote_turnover"}
+{"name": "真实行情样本：近2日收盘收益率为正", "dsl": "filter(date_between(\"2024-01-02\", \"2024-01-12\") & RET(indicator(\"close\"), 2) > 0)", "scenario": "real_quote_return_rate"}
+{"name": "真实行情样本：近3日成交量累计超过2000000", "dsl": "filter(date_between(\"2024-01-02\", \"2024-01-12\") & SUM(indicator(\"volume\"), 3) > 2000000)", "scenario": "real_quote_volume_sum"}

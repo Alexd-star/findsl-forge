@@ -47,6 +47,8 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 
 Current readiness passes required gates and the Doris-scale performance proof. The recorded Doris evidence uses 5,000,000 synthetic daily quote rows, disables Doris SQL cache during timing, and shows a 36.24x cluster speedup for a 120-day rolling-volume prefix path.
 
+The repository also includes a versioned public A-share quote sample under `data/real_samples/eastmoney_a_share_sample/`. It uses Eastmoney historical K-line rows for 贵州茅台 and 平安银行 so the demo can show real market fields without mixing that small business sample with the 5M-row Doris performance claim.
+
 ## Comprehensive Chinese Manual
 
 The repository includes a long-form Chinese Word manual for competition submission and defense:
@@ -66,6 +68,7 @@ python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_in
 python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(RET(indicator("close"), 2) > 0.05)' --data-dir data/samples --json
+python -m findsl.cli verify-sql 'filter(date_between("2024-01-02", "2024-01-12") & RET(indicator("close"), 2) > 0)' --data-dir data/real_samples/eastmoney_a_share_sample
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
 python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'A股存在资金流入后按低价取每日2只' --data-dir data/samples --json
@@ -105,6 +108,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\scale_benchmark.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\collect_doris_evidence.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\prepare_doris_scale_evidence.ps1 -ProxyUrl "http://127.0.0.1:7897"
+python .\scripts\fetch_real_market_sample.py
 powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
@@ -125,6 +129,23 @@ compare result sets
 
 The current implementation already runs the generated SQL over in-memory SQLite tables loaded from CSV fixtures. SQLite is used as a lightweight local execution harness, while the generated SQL remains Doris-oriented and window-safe. This gives every compiler change a fast semantic regression gate before the Doris execution path is introduced.
 
+## Real Market Sample
+
+`scripts/fetch_real_market_sample.py` produces a small, versioned Eastmoney A-share sample in `data/real_samples/eastmoney_a_share_sample/`. The sample includes `daily_quote.csv`, `stock_universe.csv`, cached raw JSON payloads, metadata, and ready-to-run DSL cases for turnover, return rate, and rolling volume. `money_flow.csv` is a neutral zero-valued placeholder only so the existing three-table sample loader can run quote-only DSLs; it is not used as real money-flow evidence.
+
+Use the sample for business credibility in the demo:
+
+```powershell
+$env:PYTHONPATH="src"
+python -m findsl.cli verify-sql 'filter(date_between("2024-01-02", "2024-01-12") & RET(indicator("close"), 2) > 0)' --data-dir data/real_samples/eastmoney_a_share_sample
+```
+
+Refresh the raw Eastmoney JSON only when needed:
+
+```powershell
+python .\scripts\fetch_real_market_sample.py --refresh --proxy "http://127.0.0.1:7897"
+```
+
 ## Prefix-Sum Optimization
 
 Indicators can declare prefix-sum support in `configs/indicators.json`. When the compiler sees an eligible `SUM(indicator(...), window)` expression, it rewrites the rolling window aggregate into prefix table joins:
@@ -135,9 +156,9 @@ window_sum = current_prefix - prefix_at_row_no_minus_window
 
 This is the optimizer path aimed at the competition's long-range query acceleration requirement. Unsupported indicators still use ordinary SQL window functions, so the optimization is safe and configuration-driven. For sparse auxiliary sources, generated prefix tables are built from the daily quote trading calendar with a left join back to the auxiliary values, preserving the same stock-date universe used by the reference oracle.
 
-The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix-sum disabled as a baseline window query, and once with prefix-sum enabled. It then checks both SQL outputs against the Pandas reference result and writes a Markdown report with timing and plan-shape evidence. Local SQLite timings are treated as regression signals; Doris-scale acceleration must be proven later with Doris data and `EXPLAIN`.
+The `benchmark-prefix-sum` command compiles the same DSL twice: once with prefix-sum disabled as a baseline window query, and once with prefix-sum enabled. It then checks both SQL outputs against the Pandas reference result and writes a Markdown report with timing and plan-shape evidence. Local SQLite timings are treated as regression signals; the competition-scale acceleration claim is backed separately by Doris data, `EXPLAIN`, row-count parity, and latency evidence.
 
-`scripts/scale_benchmark.ps1` goes one step further: it generates deterministic synthetic market data under `data/generated/scale/`, runs a 120-day rolling `SUM` query against baseline-window and prefix-sum SQL, and writes `reports/prefix_sum_scale_benchmark.md`. The report records correctness gates, local timing, plan shape, and a long-window feature-access reduction estimate. It is designed as reproducible pre-Doris evidence, not as a substitute for Doris cluster `EXPLAIN` and production latency.
+`scripts/scale_benchmark.ps1` goes one step further: it generates deterministic synthetic market data under `data/generated/scale/`, runs a 120-day rolling `SUM` query against baseline-window and prefix-sum SQL, and writes `reports/prefix_sum_scale_benchmark.md`. The report records correctness gates, local timing, plan shape, and a long-window feature-access reduction estimate. It is designed as reproducible pre-Doris evidence and complements, rather than replaces, the committed Doris cluster proof.
 
 After the Doris schema, data, and prefix tables are loaded, `scripts/collect_doris_evidence.ps1` captures real-cluster `EXPLAIN`, repeated `COUNT(*)` latency, row-count equivalence, plan-shape markers, and the default 10x speedup target into `reports/doris_cluster_evidence.md` plus a JSON sidecar. The readiness report consumes this file and closes the `Doris-scale performance proof` warning only when baseline and optimized SQL both succeed, row counts match, the baseline contains a window plan, the optimized query uses a prefix table, and measured Doris speedup meets the 10x target.
 
@@ -193,7 +214,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 `scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris SQL validation evidence, config-only indicator extension evidence, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
 
-The readiness report also runs `official-suite`, which currently covers 31 positive official-style cases and 33 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, hot-window materialized columns, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, duplicate named arguments, invalid dates, invalid rank directions, invalid windows, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
+The readiness report also runs `official-suite`, which currently covers 32 positive official-style cases and 34 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, hot-window materialized columns, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, duplicate named arguments, invalid dates, invalid rank directions, invalid windows, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
 It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, Doris asset integrity, and the exported Doris proof to concrete scoring evidence.
 
@@ -210,4 +231,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, real Doris-cluster execution proof, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Final polishing can add a small real-market-data sample and optional provider-backed LLM repair loops while preserving the same deterministic validation contract.
+The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, real Doris-cluster execution proof, a public real-market quote sample, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Optional provider-backed LLM repair loops can be added later while preserving the same deterministic validation contract.
