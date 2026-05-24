@@ -5,7 +5,7 @@
 | DSL 词法、语法、AST | `src/findsl/lexer.py`, `parser.py`, `ast_nodes.py` | `official_suite_report.md`, `evaluation_report.md` | Web Demo 查看 AST 标签页 |
 | 语义检查和错误提示 | `src/findsl/semantic.py`, `diagnostics.py` | 负例套件、诊断 smoke | 选择 UNKNOWN_INDICATOR 负例，看修复建议 |
 | Doris SQL 生成 | `src/findsl/sqlgen.py`, `doris_sql.py` | SQL/reference 等价报告、Doris SQL validation | 展示 SQL 标签页和 `DORIS_SQL_VALIDATION` explain |
-| 复杂选股算子 | `CONS`, `EXIST`, `MA`, `MAX`, `MIN`, `SUM`, `rank`, `then`, `date_between` | 官方风格正例套件 | 依次演示连续资金流、窗口突破、排名、日期裁剪 |
+| 复杂选股算子 | `CONS`, `EXIST`, `MA`, `MAX`, `MIN`, `SUM`, `RET`, `rank`, `then`, `date_between` | 官方风格正例套件 | 依次演示连续资金流、窗口突破、收益率、排名、日期裁剪 |
 | 结果正确性 | `reference.py`, `executor.py`, `equivalence.py` | `sql_equivalence_report.md`, readiness gate | 展示 verification PASS |
 | 长窗口性能优化 | prefix-sum rewrite, hot-window materialized column `volume_sum_120` | `doris_cluster_evidence.md` | 展示 5M Doris 36x 级加速证据 |
 | Doris 物理设计 | `deploy/doris/*.sql`, `docs/doris_runbook.md` | schema asset integrity, EXPLAIN | 展示 auto partition、hash bucket、colocate group |

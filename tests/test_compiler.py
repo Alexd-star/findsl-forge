@@ -21,6 +21,17 @@ def test_compile_max_window():
     assert "WHERE close >= __win_1" in result.sql
 
 
+def test_compile_return_rate_uses_lag_feature():
+    result = Compiler().compile('filter(RET(indicator("close"), 2) > 0.05)')
+
+    assert "LAG(close, 2) OVER (PARTITION BY ts_code ORDER BY trade_date)" in result.sql
+    assert "NULLIF(" in result.sql
+    assert "AS __ret_1" in result.sql
+    assert "WHERE __ret_1 > 0.05" in result.sql
+    assert "rewrite RET() into lag return-rate feature __ret_1" in result.trace
+    assert any(step["rule"] == "RETURN_RATE" for step in result.explain)
+
+
 def test_compile_exist_and_ma():
     result = Compiler().compile('filter(EXIST(indicator("volume") > MA(indicator("volume"), 20), 10))')
     assert "AVG(volume) OVER" in result.sql
@@ -149,6 +160,19 @@ def test_compile_date_between_prunes_window_queries_with_safe_upper_bound():
     assert any(step["rule"] == "DATE_RANGE_PUSHDOWN" for step in result.explain)
     assert any(step["rule"] == "DATE_RANGE_WINDOW_PRUNING" for step in result.explain)
     assert not any(step["rule"] == "DATE_RANGE_BASE_PRUNING" for step in result.explain)
+
+
+def test_compile_date_between_prunes_return_rate_queries_with_safe_upper_bound():
+    result = Compiler().compile(
+        'filter(date_between("2026-01-02", "2026-01-04") & RET(indicator("close"), 2) > 0.05)'
+    )
+
+    assert "FROM dwd_stock_daily_quote AS base WHERE trade_date <= '2026-01-04'" in result.sql
+    assert "trade_date >= '2026-01-02'" in result.sql
+    assert "LAG(close, 2) OVER" in result.sql
+    assert "push safe date upper bound into base scan for window context" in result.trace
+    assert any(step["rule"] == "RETURN_RATE" for step in result.explain)
+    assert any(step["rule"] == "DATE_RANGE_WINDOW_PRUNING" for step in result.explain)
 
 
 def test_compile_date_between_uses_full_pushdown_for_prefix_sum_windows():

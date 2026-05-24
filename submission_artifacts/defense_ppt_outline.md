@@ -6,7 +6,7 @@ FinDSL Forge：面向 Apache Doris 的可审计金融选股 DSL 编译与加速�
 
 ## 2. 赛题痛点
 
-- 金融筛选条件复杂，包含窗口、连续性、排名、日期裁剪和多表指标。
+- 金融筛选条件复杂，包含窗口、收益率、连续性、排名、日期裁剪和多表指标。
 - 直接让大模型生成 SQL 不稳定，不适合金融可审计场景。
 - 长窗口滚动计算在大规模行情数据上容易成为性能瓶颈。
 
@@ -25,7 +25,7 @@ FinDSL Forge：面向 Apache Doris 的可审计金融选股 DSL 编译与加速�
 
 ## 5. DSL 能力
 
-展示 `filter`, `then`, `rank`, `CONS`, `EXIST`, `MA`, `MAX`, `MIN`, `SUM`, `date_between`，并给出一个复杂组合样例。
+展示 `filter`, `then`, `rank`, `CONS`, `EXIST`, `MA`, `MAX`, `MIN`, `SUM`, `RET`, `date_between`，并给出一个复杂组合样例。
 
 ## 6. Doris SQL 生成
 

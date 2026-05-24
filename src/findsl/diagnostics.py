@@ -170,6 +170,8 @@ def _diagnose_semantic_error(message: str) -> Diagnostic:
         suggestions.insert(0, "Use market(\"A\") or market(\"B\") with a string market code.")
     if "division by zero" in lower:
         suggestions.insert(0, "Use a non-zero denominator or remove the literal `/ 0` from the numeric expression.")
+    if "ret first argument" in lower:
+        suggestions.insert(0, "Use RET(indicator(\"close\"), N) or another non-window numeric expression as the return base.")
     return Diagnostic(
         code="SEMANTIC_ERROR",
         severity="error",

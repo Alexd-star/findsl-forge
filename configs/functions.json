@@ -59,5 +59,10 @@
     "min_args": 2,
     "max_args": 2,
     "return_type": "numeric"
+  },
+  "RET": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
   }
 }

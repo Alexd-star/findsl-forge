@@ -2,11 +2,11 @@
 
 ## 摘要
 
-FinDSL Forge 面向金融科技创新大赛赛题 19，构建了一个从金融选股 DSL 到 Apache Doris SQL 的确定性编译系统。系统支持复杂窗口函数、连续性判断、存在性判断、横截面排名、日期区间裁剪、多表指标 join 和 prefix-sum 长窗口优化，并提供自然语言到 DSL 的 AI 辅助入口。核心设计原则是：大模型可以辅助表达，但不能绕过编译器、语义检查和执行验证。
+FinDSL Forge 面向金融科技创新大赛赛题 19，构建了一个从金融选股 DSL 到 Apache Doris SQL 的确定性编译系统。系统支持复杂窗口函数、区间收益率、连续性判断、存在性判断、横截面排名、日期区间裁剪、多表指标 join 和 prefix-sum 长窗口优化，并提供自然语言到 DSL 的 AI 辅助入口。核心设计原则是：大模型可以辅助表达，但不能绕过编译器、语义检查和执行验证。
 
 ## 问题定义
 
-金融选股条件经常包含多种复合逻辑，例如“连续 3 天主力净流入为正后按换手率排名前 100”、“近 120 日成交量累计大于阈值”、“指定日期区间内收盘价高于均线”。如果直接手写 SQL，业务人员难以维护；如果直接让 LLM 生成 SQL，又存在幻觉、不可审计和安全风险。因此本项目把业务表达收敛到 DSL，再由确定性编译器生成 Doris SQL。
+金融选股条件经常包含多种复合逻辑，例如“连续 3 天主力净流入为正后按换手率排名前 100”、“近 120 日成交量累计大于阈值”、“指定日期区间内收盘价高于均线”、“近 2 日收盘价收益率超过 5%”。如果直接手写 SQL，业务人员难以维护；如果直接让 LLM 生成 SQL，又存在幻觉、不可审计和安全风险。因此本项目把业务表达收敛到 DSL，再由确定性编译器生成 Doris SQL。
 
 ## 总体架构
 
@@ -30,6 +30,8 @@ flowchart LR
 - Doris 部署：`deploy/doris/*.sql`, `deploy/doris/docker-compose.quickstart.yaml`。
 - 性能证据：`doris_evidence.py`, `scripts/collect_doris_evidence.ps1`, `scripts/prepare_doris_scale_evidence.ps1`。
 - AI 安全入口：`nl2dsl.py`, `llm_adapter.py`, `demo.py`。
+
+新增的 `RET(value, n)` 算子将区间收益率定义为 `当前值 / n 个交易日前的值 - 1`，SQL 侧生成 `LAG` 特征并通过 `NULLIF` 防止除零，reference 侧使用 Pandas `groupby().shift()` 独立解释。该能力已经进入官方风格正例、负例诊断、NL2DSL 模板和 SQL/reference 等价验证。
 
 ## 优化方法
 

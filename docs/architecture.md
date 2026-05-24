@@ -65,7 +65,7 @@ The compiler core is deterministic. AI support stays outside the core as an NL2D
 
 Natural-language requests are translated into candidate DSL, not directly into SQL. A candidate is useful only after it compiles, executes against local SQL fixtures, and matches the Pandas reference evaluator. This makes the AI-facing path defensible in competition review: convenience comes from natural-language entry, while correctness still comes from the same compiler and oracle used by the deterministic DSL path.
 
-The template layer intentionally covers official-style edge cases that are easy for free-form text-to-SQL to mishandle: low-value ranking uses `rank(..., asc, bottom=N)`, high-value ranking uses `rank(..., desc, top=N)`, percentage ranking uses `percent=N`, signed net-outflow thresholds stay negative, and date-range moving-average requests preserve window history through safe upper-bound pruning instead of treating the MA window as a numeric threshold.
+The template layer intentionally covers official-style edge cases that are easy for free-form text-to-SQL to mishandle: low-value ranking uses `rank(..., asc, bottom=N)`, high-value ranking uses `rank(..., desc, top=N)`, percentage ranking uses `percent=N`, signed net-outflow thresholds stay negative, return-rate prompts map to `RET(close, N)` instead of an ad hoc price subtraction, and date-range moving-average requests preserve window history through safe upper-bound pruning instead of treating the MA window as a numeric threshold.
 
 ### Safe LLM Candidate Adapter
 
@@ -106,6 +106,7 @@ Financial screening expressions often contain rolling windows. SQL engines gener
 ```text
 base relation
   -> numeric window features, such as MA/MAX
+  -> LAG-based return-rate features, such as RET
   -> rolling boolean features, such as CONS/EXIST
   -> outer WHERE filter
 ```
@@ -145,7 +146,7 @@ trace: human-readable rewrite log
 explain: machine-readable rule/status/evidence records
 ```
 
-`explain` records applied and skipped rules, such as `PREFIX_SUM`, `WINDOW_FEATURE`, `ROLLING_BOOLEAN`, `FEATURE_LAYER`, `FILTER_OUTER_WHERE`, and `DORIS_SQL_VALIDATION`. This makes optimizer behavior auditable and gives downstream reports or UI components stable fields to render.
+`explain` records applied and skipped rules, such as `PREFIX_SUM`, `WINDOW_FEATURE`, `RETURN_RATE`, `ROLLING_BOOLEAN`, `FEATURE_LAYER`, `FILTER_OUTER_WHERE`, and `DORIS_SQL_VALIDATION`. This makes optimizer behavior auditable and gives downstream reports or UI components stable fields to render.
 
 ## Planned Enterprise Extensions
 
@@ -189,7 +190,7 @@ positive DSL case -> compiler -> SQL/trace/explain evidence -> SQL/reference equ
 negative DSL case -> compiler failure -> structured diagnostic code -> repair suggestions
 ```
 
-Positive cases cover staged filters, staged filter-to-filter pipelines, rank-then-filter relation preservation, repeated rank recomputation without stale `rank_no` collisions, top-N and percent-cutoff ranking with deterministic `ts_code` tie-breaking, derived-feature ranking, date-range pushdown, prefix-sum full-range pruning, window-safe date pruning, market predicates, sparse auxiliary-table `LEFT JOIN` preservation, daily-quote anchoring for auxiliary-only filters, rolling boolean functions, moving averages, rolling extrema including `MIN`, prefix-sum aggregates over quote and money-flow tables, arithmetic predicates, signed numeric thresholds, SQL-standard equality normalization, mixed-case function names, case-insensitive indicator lookup, and case-insensitive market-code normalization. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, non-integer windows, invalid rank percentages, invalid rank directions, non-integer or non-positive rank cutoffs, invalid date ranges, invalid market arguments, literal/static division by zero, malformed numeric literals, bare column-name bypass attempts, invalid `filter` conditions, invalid `then` stages, top-level type mistakes, parse errors, lexical errors, unsupported rank parameters, duplicate named arguments, and invalid named-argument ordering. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
+Positive cases cover staged filters, staged filter-to-filter pipelines, rank-then-filter relation preservation, repeated rank recomputation without stale `rank_no` collisions, top-N and percent-cutoff ranking with deterministic `ts_code` tie-breaking, derived-feature ranking, date-range pushdown, prefix-sum full-range pruning, window-safe date pruning, return-rate screening, market predicates, sparse auxiliary-table `LEFT JOIN` preservation, daily-quote anchoring for auxiliary-only filters, rolling boolean functions, moving averages, rolling extrema including `MIN`, prefix-sum aggregates over quote and money-flow tables, arithmetic predicates, signed numeric thresholds, SQL-standard equality normalization, mixed-case function names, case-insensitive indicator lookup, and case-insensitive market-code normalization. Negative cases cover unknown indicators, unknown functions, semantic type errors, invalid windows, non-integer windows, invalid return-rate nesting, invalid rank percentages, invalid rank directions, non-integer or non-positive rank cutoffs, invalid date ranges, invalid market arguments, literal/static division by zero, malformed numeric literals, bare column-name bypass attempts, invalid `filter` conditions, invalid `then` stages, top-level type mistakes, parse errors, lexical errors, unsupported rank parameters, duplicate named arguments, and invalid named-argument ordering. The readiness report treats this suite as a required gate so competition-style coverage cannot regress silently.
 
 ## Defense Package Loop
 

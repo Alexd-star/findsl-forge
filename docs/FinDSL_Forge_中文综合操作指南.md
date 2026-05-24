@@ -12,7 +12,7 @@
 
 FinDSL Forge 面向中国研究生金融科技创新大赛赛题 19，解决的是金融选股表达如何稳定落到 Apache Doris 高性能查询上的问题。用户可以输入受限 DSL，也可以先用中文需求生成候选 DSL；系统随后完成 AST 构建、语义校验、Doris SQL 生成、SQL 安全检查和参考语义验证。整条链路强调可解释的工程行为，而不是把数据库执行权交给黑盒文本生成。
 
-当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo 和 submission readiness；报告侧已有 161 项 pytest 回归、31/31 官方风格正例、33/33 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的轻量证据快照。
+当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo 和 submission readiness；报告侧已有 169 项 pytest 回归、32/32 官方风格正例、34/34 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的轻量证据快照。
 
 这份手册把产品说明、赛题解读、架构设计、算法细节、部署步骤、操作指南、测试验证、答辩材料和后续规划放在一起。正文尽量采用企业技术文档的写法：先讲判断，再讲实现，再给出可复核的文件或命令；表格只承担对照和速查职责，不用来掩盖正文逻辑。
 
@@ -132,7 +132,7 @@ FinDSL Forge 面向中国研究生金融科技创新大赛赛题 19，解决的�
 
 当前版本围绕六类指标做交付验收：编译正确率、诊断可用性、长窗口性能、Doris 兼容性、AI 辅助安全性和提交可复现性。它们分别由 official positive cases、official negative cases、Doris evidence、SQL validator、LLM candidate adapter 和 submission readiness 覆盖。
 
-已有证据里，pytest 全量回归为 161 passed；官方风格正例 31/31 通过，负例 33/33 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。
+已有证据里，pytest 全量回归为 169 passed；官方风格正例 32/32 通过，负例 34/34 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。
 
 评价指标的作用不只是写在文档里好看。每次提交前运行 readiness，团队就能知道哪些证据仍然有效、哪些结果需要重采、Git 是否处在可回溯状态。竞赛后期最怕“功能看似完成但证据散落”，这套指标体系正是为了避免这种情况。
 
@@ -318,7 +318,7 @@ Doris evidence collector 则负责把本地正确性扩展到真实数据库环�
 
 语言设计决定了项目的上限。FinDSL 没有追求通用 SQL 的自由度，而是把金融筛选里高频、可验证、可优化的结构抽象出来。这样做看似收窄了表达范围，却换来更强的语义检查、更稳定的 SQL 生成和更清楚的性能优化入口。
 
-DSL 的成功标准不是语法看起来复杂，而是能自然表达赛题所需的金融筛选。filter、then、rank 对应关系流转，indicator 对应业务指标，MA、SUM、MAX、MIN、CONS、EXIST 对应时间序列计算，date_between 对应交易日期约束。
+DSL 的成功标准不是语法看起来复杂，而是能自然表达赛题所需的金融筛选。filter、then、rank 对应关系流转，indicator 对应业务指标，MA、SUM、MAX、MIN、RET、CONS、EXIST 对应时间序列计算，date_between 对应交易日期约束。
 
 受限语法让系统可以主动阻止危险输入。用户不能写 `DROP TABLE`，也不能把任意 SQL 塞进查询；指标必须通过 registry 解析，函数必须经过参数检查。这种约束使 DSL 更适合金融科技竞赛，而不是削弱能力。
 
@@ -332,7 +332,7 @@ DSL 的成功标准不是语法看起来复杂，而是能自然表达赛题所�
 
 
 
-FinDSL 的语言设计并不追求覆盖 SQL 的所有能力。它只保留金融筛选中高频且可验证的结构：filter、then、rank、market、date_between、indicator，以及 MA、SUM、MAX、MIN、CONS、EXIST 等窗口或布尔算子。范围越明确，编译器越能给出稳定诊断和可控 SQL。
+FinDSL 的语言设计并不追求覆盖 SQL 的所有能力。它只保留金融筛选中高频且可验证的结构：filter、then、rank、market、date_between、indicator，以及 MA、SUM、MAX、MIN、RET、CONS、EXIST 等窗口或布尔算子。范围越明确，编译器越能给出稳定诊断和可控 SQL。
 
 语言层刻意限制了危险自由度。用户不能写任意 SELECT，不能拼接 DDL 或 DML，不能绕过 indicator 直接访问字段。所有业务指标都必须通过 registry 解析，所有函数参数都要通过语义检查。这些限制让系统更像企业平台里的安全 DSL，而不是一个松散的 SQL 生成器。
 
@@ -360,13 +360,13 @@ FinDSL 的语言设计并不追求覆盖 SQL 的所有能力。它只保留金�
 
 
 
-MA、SUM、MAX、MIN 负责数值窗口特征，CONS 和 EXIST 负责滚动布尔判断。它们的共同点是都依赖股票维度下按交易日排序的历史序列，因此 SQL 生成时必须显式处理 partition、order 和窗口边界。
+MA、SUM、MAX、MIN 负责数值窗口特征，RET 负责相对 N 个交易日前的区间收益率，CONS 和 EXIST 负责滚动布尔判断。它们的共同点是都依赖股票维度下按交易日排序的历史序列，因此 SQL 生成时必须显式处理 partition、order 和窗口边界。
 
 编译器不会把窗口函数直接放进 WHERE。正确做法是先在特征层 SELECT 中计算窗口列，再由外层查询使用这些列进行过滤。这样既符合 Doris 和多数 SQL 引擎的执行规则，也让 reference equivalence 能稳定比较生成结果。
 
 窗口算子也是项目性能优化的入口。普通窗口函数适合泛化能力，prefix-sum 适合长窗口 SUM，热点物化列适合高频比赛场景。三种路径并存，系统就能在正确性和性能之间做可解释选择。
 
-窗口算子后续扩展要谨慎。收益率、波动率、标准差等函数都可以加入，但每个函数都要明确窗口边界、空值处理、交易日缺失和 reference 语义。没有这些定义，函数列表再长也只是表面丰富。
+窗口算子后续扩展要谨慎。RET 收益率已经补齐，波动率、标准差等函数仍可继续加入，但每个函数都要明确窗口边界、空值处理、交易日缺失和 reference 语义。没有这些定义，函数列表再长也只是表面丰富。
 
 
 
@@ -906,7 +906,7 @@ Doris 规模验证则补上真实数据库维度。小样本等价只能说明�
 
 
 
-测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、doris_sql、doris_evidence、demo 和 readiness。当前全量 pytest 为 161 passed，说明文档和近期功能增强没有破坏核心链路。
+测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、doris_sql、doris_evidence、demo 和 readiness。当前全量 pytest 为 169 passed，说明收益率算子、官方套件和文档增强没有破坏核心链路。
 
 测试设计关注高风险行为。比如窗口函数不能出现在 WHERE，未知指标要给修复建议，prefix rewrite 不能改变结果，LLM 直接 SQL 要被拒绝，Demo API 要返回稳定字段。它们不是为了凑数量，而是围绕赛题失分点布防。
 
@@ -996,7 +996,7 @@ PPT、Word 手册、Demo 和 evidence snapshots 要互相支撑。PPT 给结论�
 
 方案部分再讲四层：FinDSL 表达业务意图，确定性编译器生成 Doris SQL，reference 与 validator 保证正确和安全，prefix-sum 与热点窗口证明性能。每层都对应 Demo 或报告，听众能看到问题如何被逐步拆解。
 
-结尾用证据收束。161 passed、31/31 正例、33/33 负例、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。
+结尾用证据收束。169 passed、32/32 正例、34/34 负例、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。
 
 答辩时要减少空泛形容词，多用动作和证据。比如“系统会拒绝直接 SQL”比“系统很安全”更具体；“baseline 与 optimized 行数一致”比“优化有效”更可验证。语言越具体，越不像临时包装。
 
@@ -1026,7 +1026,7 @@ PPT 应该是讲解提纲，不是手册压缩版。推荐结构为：题目理�
 
 手册与 PPT 的关系应当明确：PPT 负责现场表达，手册负责赛后查阅。答辩时可以在页脚或备注里标注证据文件名，让评委知道完整材料并不只存在于口头讲述中。
 
-PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，161 passed 来自 pytest，31/31 和 33/33 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。
+PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，169 passed 来自 pytest，32/32 和 34/34 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。
 
 
 
@@ -1192,13 +1192,13 @@ prefix 表当前由脚本重建，适合比赛复现和确定性实验。生产�
 
 
 
-DSL 可以继续扩展收益率、波动率、成交额、行业中性、财务因子、公告事件和情绪指标。每个新增方向都要先判断是否属于筛选语义，是否能被 reference evaluator 解释，是否能编译成 Doris 友好的 SQL。
+DSL 已经新增 RET 区间收益率，后续还可以继续扩展波动率、成交额、行业中性、财务因子、公告事件和情绪指标。每个新增方向都要先判断是否属于筛选语义，是否能被 reference evaluator 解释，是否能编译成 Doris 友好的 SQL。
 
 扩展时应坚持配置优先。普通指标走 registry，复杂函数补语义检查和参考实现，性能敏感函数再考虑专门 rewrite。不要为了多展示几个算子，把核心编译器写成难以维护的样例分支集合。
 
 从比赛角度看，新增算子不是越多越好。更有竞争力的做法是选择两到三个有金融含义、有性能挑战、能形成证据的方向深入实现。项目当前的长窗口 SUM 就是这种思路的代表。
 
-算子扩展应优先选择能形成明显差异化的方向。例如行业中性和财务因子能增强金融专业性，波动率和收益率能增强量化语义，公告情绪能体现多源数据能力。每个方向都要配套证据，而不是只写在规划里。
+算子扩展应优先选择能形成明显差异化的方向。RET 已经把收益率纳入已完成能力；后续行业中性和财务因子能增强金融专业性，波动率能增强量化语义，公告情绪能体现多源数据能力。每个方向都要配套证据，而不是只写在规划里。
 
 
 
@@ -1258,7 +1258,7 @@ Readiness 指提交前总验收报告，整合测试、性能、证据和 Git �
 
 第六项检查 GitHub 与 bundle。push 成功后生成新的 bundle，文件名带时间戳，放在 `git_bundles` 目录。远端仓库和离线 bundle 同时存在，才算完成可回溯备份。提交前最好记录最新 commit hash，便于团队成员之间确认版本一致。
 
-第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：161 passed、31/31、33/33、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。
+第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：169 passed、32/32、34/34、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。
 
 第八项检查风险表述。真实 LLM provider、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。
 

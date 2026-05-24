@@ -92,6 +92,13 @@ class SemanticAnalyzer:
             if value_type != "numeric":
                 raise SemanticError(f"{node.name} first argument must be numeric")
             self._validate_window_arg(node.args[1], node.name)
+        elif name == "RET":
+            value_type = self._validate_node(node.args[0])
+            if value_type != "numeric":
+                raise SemanticError(f"{node.name} first argument must be numeric")
+            if _contains_windowed_function(node.args[0]):
+                raise SemanticError("RET first argument cannot contain window functions")
+            self._validate_window_arg(node.args[1], node.name)
         else:
             for arg in node.args:
                 self._validate_node(arg)
@@ -177,6 +184,18 @@ def _bare_identifier_message(node: Node, side: str) -> str:
 def _is_static_zero(node: Node) -> bool:
     value = _constant_numeric_value(node)
     return value is not None and float(value) == 0.0
+
+
+def _contains_windowed_function(node: Node) -> bool:
+    if isinstance(node, FunctionCall):
+        if node.name.upper() in {"MA", "SUM", "MAX", "MIN", "CONS", "EXIST", "RET"}:
+            return True
+        return any(_contains_windowed_function(arg) for arg in node.args) or any(
+            _contains_windowed_function(named.value) for named in node.named_args or []
+        )
+    if isinstance(node, (BinaryOp, Comparison)):
+        return _contains_windowed_function(node.left) or _contains_windowed_function(node.right)
+    return False
 
 
 def _constant_numeric_value(node: Node) -> Optional[float]:

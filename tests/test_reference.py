@@ -34,6 +34,20 @@ def test_reference_cons_main_net_inflow():
     ]
 
 
+def test_reference_return_rate_threshold():
+    evaluator = PandasReferenceEvaluator(DATA_DIR)
+    result = evaluator.evaluate('filter(RET(indicator("close"), 2) > 0.05)')
+    assert result.keys() == [
+        ("AAA", "2026-01-03"),
+        ("BBB", "2026-01-03"),
+        ("AAA", "2026-01-04"),
+        ("BBB", "2026-01-04"),
+        ("CCC", "2026-01-04"),
+        ("BBB", "2026-01-05"),
+        ("CCC", "2026-01-05"),
+    ]
+
+
 def test_reference_exist_volume_above_ma():
     evaluator = PandasReferenceEvaluator(DATA_DIR)
     result = evaluator.evaluate('filter(EXIST(indicator("volume") > MA(indicator("volume"), 3), 2))')

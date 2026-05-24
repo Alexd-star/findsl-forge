@@ -31,3 +31,4 @@
 {"name": "窗口参数不能是字符串", "dsl": "filter(indicator(\"close\") > MA(indicator(\"close\"), \"3\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer window"]}
 {"name": "rank百分比不能为零", "dsl": "rank(indicator(\"close\"), desc, percent=0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["0 < N <= 100"]}
 {"name": "date_between参数不足", "dsl": "filter(date_between(\"2026-01-01\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["date_between(\"YYYY-MM-DD\", \"YYYY-MM-DD\")"]}
+{"name": "RET不能嵌套窗口表达式", "dsl": "filter(RET(MA(indicator(\"close\"), 3), 2) > 0.05)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["RET(indicator(\"close\"), N)"]}

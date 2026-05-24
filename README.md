@@ -16,7 +16,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 
 - Parse nested stock-screening DSL expressions.
 - Validate indicators, functions, named parameters, duplicate named arguments, and window arguments from configuration.
-- Compile `filter`, `then`, `rank` with top/bottom/percent cutoffs, `date_between`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, and `MIN` into SQL.
+- Compile `filter`, `then`, `rank` with top/bottom/percent cutoffs, `date_between`, `CONS`, `EXIST`, `MA`, `SUM`, `MAX`, `MIN`, and `RET` into SQL.
 - Generate trace metadata explaining the selected rewrite path.
 - Emit structured optimizer explain steps for machine-readable rewrite evidence.
 - Validate generated SQL against a Doris-safe single-query shape before returning it.
@@ -37,7 +37,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Collect Doris-cluster `EXPLAIN` and latency evidence for baseline-window versus prefix-sum SQL.
 - Serve a local Web Demo/API for DSL, AST, Doris SQL, optimizer explain, and SQL/reference verification.
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
-- Cover official-style NL2DSL prompts for low-price bottom picks, turnover percent cuts, B-market average-volume thresholds, high-turnover close ranking, date-window moving-average filters, rolling minimum thresholds, date-prefix-sum pruning, and signed net-outflow thresholds.
+- Cover official-style NL2DSL prompts for low-price bottom picks, turnover percent cuts, B-market average-volume thresholds, high-turnover close ranking, date-window moving-average filters, rolling minimum thresholds, return-rate thresholds, date-prefix-sum pruning, and signed net-outflow thresholds.
 - Validate optional LLM-proposed DSL candidates while rejecting direct SQL and invalid DSL before execution.
 - Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a defense package that maps live demo steps to competition scoring evidence.
@@ -65,12 +65,14 @@ python -m findsl.cli evaluate --input data/samples/queries.jsonl --output report
 python -m findsl.cli reference 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3))' --data-dir data/samples --json
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
+python -m findsl.cli verify-sql 'filter(RET(indicator("close"), 2) > 0.05)' --data-dir data/samples --json
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)' --json
 python -m findsl.cli suggest-dsl '筛选A股连续三天主力净流入为正并按换手率排名前一百' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'A股存在资金流入后按低价取每日2只' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'A股每日换手率前50%' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'B股近2日均量不低于80' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl '主力净流出低于-1.5' --data-dir data/samples --json
+python -m findsl.cli suggest-dsl 'A股近2日收盘价涨幅超过5%' --data-dir data/samples --json
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --text '近3日成交量累计大于300' --data-dir data/samples --json
 python -m findsl.cli official-suite --output reports/official_suite_report.md --json
 python -m findsl.cli defense-package --output reports/defense_package.md --json
@@ -86,6 +88,7 @@ If running from the repository root without installing the package:
 ```powershell
 $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") >= MAX(indicator("close"), 250))'
+python -m findsl.cli compile 'filter(RET(indicator("close"), 2) > 0.05)'
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)'
 python -m findsl.cli suggest-dsl '今日收盘价创二百五十日新高'
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --json

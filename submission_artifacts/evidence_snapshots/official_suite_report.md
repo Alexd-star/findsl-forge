@@ -3,8 +3,8 @@
 ## Summary
 
 - Suite passed: True
-- Positive cases passed: 31/31
-- Negative diagnostic cases passed: 33/33
+- Positive cases passed: 32/32
+- Negative diagnostic cases passed: 34/34
 
 ## Positive Cases
 
@@ -41,6 +41,7 @@
 | 成交量相对三日均量放大 | volume_ratio_to_ma | True | True | 1 | 1 | <none> |
 | 过滤A股突破低点后按均换手率排名 | staged_min_filter_rank_by_ma | True | True | 4 | 4 | <none> |
 | 日期区间存在资金流出信号 | date_exist_outflow | True | True | 5 | 5 | <none> |
+| 日期区间近2日收益率超过5% | date_close_return_rate | True | True | 5 | 5 | <none> |
 
 ## Negative Diagnostic Cases
 
@@ -79,6 +80,7 @@
 | 窗口参数不能是字符串 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
 | rank百分比不能为零 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
 | date_between参数不足 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| RET不能嵌套窗口表达式 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
 
 ## Evidence Policy
 

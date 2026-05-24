@@ -62,6 +62,8 @@ def suggest_dsl(text: str, max_candidates: int = 5) -> NL2DSLResult:
             _turnover_percent_rank(normalized),
             _high_turnover_close_rank(normalized),
             _net_outflow_threshold(normalized),
+            _date_range_close_return_threshold(normalized),
+            _close_return_threshold(normalized),
             _close_new_high(normalized),
             _close_rolling_min_threshold(normalized),
             _volume_ma_threshold(normalized),
@@ -236,6 +238,52 @@ def _net_outflow_threshold(text: str) -> Optional[DslCandidate]:
         rule="net_outflow_threshold",
         rationale="Matched net-outflow wording and mapped it to a signed main_net_inflow threshold.",
         matched_signals=sorted(signals),
+    )
+
+
+def _close_return_threshold(text: str) -> Optional[DslCandidate]:
+    signals = _return_signals(text)
+    if "return" not in signals:
+        return None
+
+    window = _return_window(text)
+    threshold = _rate_threshold(text, default=0.05)
+    op, value = _return_comparison(text, threshold)
+    condition = f'RET(indicator("close"), {window}) {op} {_format_number(value)}'
+    market = _market_condition(text)
+    if market:
+        condition = f"{market} & {condition}"
+    return DslCandidate(
+        title=f"{window}-day close return {op} {value:g}",
+        dsl=f"filter({condition})",
+        confidence=0.9 if market else 0.86,
+        rule="close_return_threshold",
+        rationale="Matched close-return wording and mapped it to RET(close, window).",
+        matched_signals=sorted(signals),
+    )
+
+
+def _date_range_close_return_threshold(text: str) -> Optional[DslCandidate]:
+    dates = _extract_dates(text)
+    signals = _return_signals(text)
+    if len(dates) < 2 or "return" not in signals:
+        return None
+
+    window_text = _strip_date_literals(text)
+    window = _return_window(window_text)
+    threshold = _rate_threshold(text, default=0.05)
+    op, value = _return_comparison(text, threshold)
+    dsl = (
+        f'filter(date_between("{dates[0]}", "{dates[1]}") '
+        f'& RET(indicator("close"), {window}) {op} {_format_number(value)})'
+    )
+    return DslCandidate(
+        title=f"Date-range {window}-day close return {op} {value:g}",
+        dsl=dsl,
+        confidence=0.92,
+        rule="date_range_close_return_threshold",
+        rationale="Matched explicit date range plus close-return threshold and mapped it to date_between() with RET(close, window).",
+        matched_signals=sorted(signals | {"date_range"}),
     )
 
 
@@ -470,6 +518,40 @@ def _date_range_close_above_ma(text: str) -> Optional[DslCandidate]:
         rationale="Matched explicit date range plus close-price moving-average comparison.",
         matched_signals=sorted(signals | {"date_range"}),
     )
+
+
+def _return_signals(text: str) -> set[str]:
+    return _signals(
+        text,
+        [
+            ("return", ["涨幅", "收益率", "回报率", "return", "ret", "上涨", "下跌", "跌幅"]),
+            ("close", ["收盘价", "收盘", "close"]),
+            ("threshold", ["大于", "超过", "高于", "低于", "小于", "跌破", ">", "<", ">=", "<="]),
+        ],
+    )
+
+
+def _return_window(text: str) -> int:
+    return _window_after(
+        text,
+        ["近", "最近", "过去"],
+        default=_window_near(text, ["涨幅", "收益率", "回报率", "return", "ret", "上涨", "下跌", "跌幅"], default=5),
+    )
+
+
+def _rate_threshold(text: str, default: float) -> float:
+    if _contains_any(text, ["%", "百分之", "百分点"]):
+        return _percent_n(text, default=default * 100) / 100.0
+    return _threshold_after(text, ["大于", "超过", "高于", "低于", "小于", "跌破", ">", "<", ">=", "<="], default)
+
+
+def _return_comparison(text: str, threshold: float) -> tuple[str, float]:
+    value = abs(threshold)
+    if _contains_any(text, ["下跌", "跌幅", "回撤"]):
+        return "<", -value
+    if _contains_any(text, ["低于", "小于", "跌破", "<", "<="]):
+        return "<", threshold
+    return ">", value
 
 
 def _signals(text: str, groups: Sequence[tuple[str, Sequence[str]]]) -> set[str]:

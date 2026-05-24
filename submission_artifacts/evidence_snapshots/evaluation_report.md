@@ -2,28 +2,29 @@
 
 ## Summary
 
-- Total cases: 9
-- Passed cases: 9
+- Total cases: 10
+- Passed cases: 10
 - Failed cases: 0
 - Compile success rate: 100.00%
 - Fragment accuracy: 100.00%
-- Average compile latency: 0.582 ms
-- P50 compile latency: 0.541 ms
-- P95 compile latency: 1.076 ms
+- Average compile latency: 0.387 ms
+- P50 compile latency: 0.319 ms
+- P95 compile latency: 0.709 ms
 
 ## Case Details
 
 | Case | Passed | Latency ms | Errors |
 |---|---:|---:|---|
-| 连续3天主力净流入为正后按换手率排名 | True | 1.218 |  |
-| 今日收盘价创250日新高 | True | 0.407 |  |
-| 近10日存在放量 | True | 0.573 |  |
-| 无引号指标名兼容 | True | 0.389 |  |
-| 近3日成交量前缀和加速 | True | 0.550 |  |
-| A股每日换手率前50百分比 | True | 0.865 |  |
-| 日期区间内收盘价大于10 | True | 0.388 |  |
-| 窗口查询日期上界安全裁剪 | True | 0.541 |  |
-| 主力净流出负阈值 | True | 0.303 |  |
+| 连续3天主力净流入为正后按换手率排名 | True | 0.834 |  |
+| 今日收盘价创250日新高 | True | 0.279 |  |
+| 近10日存在放量 | True | 0.359 |  |
+| 无引号指标名兼容 | True | 0.242 |  |
+| 近3日成交量前缀和加速 | True | 0.361 |  |
+| A股每日换手率前50百分比 | True | 0.556 |  |
+| 日期区间内收盘价大于10 | True | 0.259 |  |
+| 窗口查询日期上界安全裁剪 | True | 0.496 |  |
+| 主力净流出负阈值 | True | 0.225 |  |
+| 近2日收盘价收益率超过5% | True | 0.261 |  |
 
 ## Generated SQL
 
@@ -197,5 +198,22 @@ Trace:
 - rewrite filter predicate into outer WHERE over materialized features
 
 Explain:
+- `FILTER_OUTER_WHERE` applied: Rewrite filter predicate into outer WHERE over materialized features
+- `DORIS_SQL_VALIDATION` applied: Validate generated SQL against Doris-safe query shape
+
+### 近2日收盘价收益率超过5%
+
+```sql
+SELECT * FROM (SELECT base_features.*, ((close) / NULLIF(LAG(close, 2) OVER (PARTITION BY ts_code ORDER BY trade_date), 0) - 1) AS __ret_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features) numeric_features_1 WHERE __ret_1 > 0.05
+```
+
+Trace:
+- rewrite RET() into lag return-rate feature __ret_1
+- materialize numeric window features before filtering
+- rewrite filter predicate into outer WHERE over materialized features
+
+Explain:
+- `RETURN_RATE` applied: Rewrite RET() into LAG-based return-rate feature
+- `FEATURE_LAYER` applied: Materialize numeric features before filtering
 - `FILTER_OUTER_WHERE` applied: Rewrite filter predicate into outer WHERE over materialized features
 - `DORIS_SQL_VALIDATION` applied: Validate generated SQL against Doris-safe query shape

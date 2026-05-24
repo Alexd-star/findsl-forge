@@ -201,7 +201,7 @@ class SqlGenerator:
     def _requires_window_history(self, node: Node) -> bool:
         if isinstance(node, FunctionCall):
             name = node.name.upper()
-            if name in {"MA", "MAX", "MIN", "CONS", "EXIST"}:
+            if name in {"MA", "MAX", "MIN", "CONS", "EXIST", "RET"}:
                 return True
             if name == "SUM" and not self._sum_can_use_prefix_lookup(node):
                 return True
@@ -466,6 +466,8 @@ class SqlGenerator:
                 return self._indicator_sql(node)
             if name in {"MA", "SUM", "MAX", "MIN"}:
                 return self._register_numeric_window(node)
+            if name == "RET":
+                return self._register_return_feature(node)
         raise SemanticError(f"Expected numeric expression, got {node!r}")
 
     def _indicator_sql(self, node: FunctionCall) -> str:
@@ -543,6 +545,23 @@ class SqlGenerator:
             f"{sql_name}({expr}) OVER (PARTITION BY ts_code ORDER BY trade_date "
             f"ROWS BETWEEN {window - 1} PRECEDING AND CURRENT ROW)"
         )
+        self._numeric_features.append(Feature(alias=alias, expression=expression))
+        return alias
+
+    def _register_return_feature(self, node: FunctionCall) -> str:
+        expr = self._numeric_sql(node.args[0])
+        window = self._window_value(node.args[1])
+        alias = self._next_alias("__ret")
+        self.trace.append(f"rewrite RET() into lag return-rate feature {alias}")
+        self._explain(
+            "RETURN_RATE",
+            "applied",
+            "Rewrite RET() into LAG-based return-rate feature",
+            alias=alias,
+            window=window,
+        )
+        previous = f"LAG({expr}, {window}) OVER (PARTITION BY ts_code ORDER BY trade_date)"
+        expression = f"(({expr}) / NULLIF({previous}, 0) - 1)"
         self._numeric_features.append(Feature(alias=alias, expression=expression))
         return alias
 

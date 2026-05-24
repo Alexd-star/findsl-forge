@@ -156,7 +156,21 @@ class PandasReferenceEvaluator:
                 window = self._window_value(node.args[1])
                 agg = {"MA": "mean", "SUM": "sum", "MAX": "max", "MIN": "min"}[name]
                 return self._rolling(series, rows, window, agg)
+            if name == "RET":
+                series = self._numeric(node.args[0], rows)
+                window = self._window_value(node.args[1])
+                previous = self._lag(series, rows, window)
+                previous = previous.mask(previous == 0)
+                return (series / previous) - 1
         raise SemanticError(f"Expected numeric expression, got {node!r}")
+
+    def _lag(self, series, rows, window: int):
+        work = rows[["ts_code", "trade_date"]].copy()
+        work["__value"] = series
+        work["__original_index"] = rows.index
+        work = work.sort_values(["ts_code", "trade_date"])
+        work["__lagged"] = work.groupby("ts_code")["__value"].shift(window)
+        return work.sort_values("__original_index")["__lagged"].set_axis(rows.index)
 
     def _rolling(self, series, rows, window: int, agg: str):
         pd = self.pd

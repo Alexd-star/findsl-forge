@@ -97,6 +97,38 @@ def test_suggests_close_rolling_min_threshold():
     assert "MIN(close) OVER" in Compiler().compile(result.top.dsl).sql
 
 
+def test_suggests_close_return_threshold():
+    result = suggest_dsl("A股近2日收盘价涨幅超过5%")
+
+    assert result.top is not None
+    assert result.top.rule == "close_return_threshold"
+    assert result.top.dsl == 'filter(market("A") & RET(indicator("close"), 2) > 0.05)'
+    compiled = Compiler().compile(result.top.dsl)
+    assert "LAG(close, 2) OVER" in compiled.sql
+    assert "RETURN_RATE" in {step["rule"] for step in compiled.explain}
+
+
+def test_suggests_date_range_close_return_threshold():
+    result = suggest_dsl("2026-01-02到2026-01-04近2日收益率大于5%")
+
+    assert result.top is not None
+    assert result.top.rule == "date_range_close_return_threshold"
+    assert result.top.dsl == (
+        'filter(date_between("2026-01-02", "2026-01-04") '
+        '& RET(indicator("close"), 2) > 0.05)'
+    )
+    compiled = Compiler().compile(result.top.dsl)
+    assert "DATE_RANGE_WINDOW_PRUNING" in {step["rule"] for step in compiled.explain}
+
+
+def test_suggests_close_downside_return_threshold():
+    result = suggest_dsl("近2日收盘价下跌超过5%")
+
+    assert result.top is not None
+    assert result.top.rule == "close_return_threshold"
+    assert result.top.dsl == 'filter(RET(indicator("close"), 2) < -0.05)'
+
+
 def test_suggests_volume_breakout_exists_template():
     result = suggest_dsl("近10日存在放量")
 

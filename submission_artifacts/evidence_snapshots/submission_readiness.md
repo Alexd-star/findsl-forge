@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-05-23T15:39:47+00:00
+- Generated at: 2026-05-24T17:31:42+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD: `f1f4cec` Fix evidence artifact manifest export
+- Git HEAD: `c280782` Add return-rate DSL operator and evidence coverage
 - Git branch: `main`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,17 +13,17 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 13764.3 ms |
-| Compiler accuracy and latency | required | PASS | 9/9 cases, fragments 100.00%, P95 1.944 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 11267.6 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 2.786 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 4.029 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 1.618 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
 | Doris SQL validation boundary | required | PASS | validation steps 1, issues 0, escaped literal True |
-| Official-style coverage suite | required | PASS | positive 31/31, negative 33/33 |
+| Official-style coverage suite | required | PASS | positive 32/32, negative 34/34 |
 | Defense package walkthrough | required | PASS | checks 11/11, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
@@ -34,14 +34,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.944 ms
-- Evaluation cases passed: 9/9
+- Compile P95 latency: 2.786 ms
+- Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.33x
+- Local SQLite prefix benchmark speedup smoke: 2.05x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -50,8 +50,8 @@
 - LLM safety smoke: True
 - Diagnostics smoke: True
 - Doris SQL validation smoke: True
-- Official-style positive cases: 31/31
-- Official-style negative diagnostics: 33/33
+- Official-style positive cases: 32/32
+- Official-style negative diagnostics: 34/34
 - Defense package checks: 11/11
 
 ## Evidence Artifacts
@@ -69,8 +69,8 @@
 ## Official-Style Coverage Suite
 
 - Suite passed: True
-- Positive cases passed: 31/31
-- Negative diagnostic cases passed: 33/33
+- Positive cases passed: 32/32
+- Negative diagnostic cases passed: 34/34
 - Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\official_suite_report.md`
 
 ## Defense Package
@@ -99,7 +99,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 4.029 ms
+- Compile latency: 1.618 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -161,13 +161,13 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 13764.3 ms
+- Elapsed: 11267.6 ms
 
 ```text
-........................................................................ [ 44%]
-........................................................................ [ 89%]
-.................                                                        [100%]
-161 passed in 12.99s
+........................................................................ [ 42%]
+........................................................................ [ 85%]
+.........................                                                [100%]
+169 passed in 10.39s
 ```
 
 ## Award-Readiness Differentiators
@@ -180,7 +180,7 @@
 - Structured optimizer explain records for defense and UI visualization.
 - Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.
 - NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.
-- Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, B-market average-volume threshold, date-window moving-average, signed net-outflow, rolling-min, and date-prefix-sum pruning scenarios.
+- Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, B-market average-volume threshold, date-window moving-average, signed net-outflow, rolling-min, return-rate, and date-prefix-sum pruning scenarios.
 - Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.
 - Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.
 - SQL string literals are escaped by the compiler before they reach generated Doris SQL.

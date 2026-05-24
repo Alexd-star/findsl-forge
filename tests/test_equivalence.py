@@ -160,6 +160,18 @@ def test_sql_matches_reference_for_max_window():
     assert result.passed
 
 
+def test_sql_matches_reference_for_return_rate():
+    result = verify_sql_equivalence(
+        'filter(RET(indicator("close"), 2) > 0.05)',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert result.sql_row_count == 7
+    assert result.missing_keys == []
+    assert result.extra_keys == []
+
+
 def test_sql_matches_reference_for_exist_and_ma():
     result = verify_sql_equivalence(
         'filter(EXIST(indicator("volume") > MA(indicator("volume"), 3), 2))',

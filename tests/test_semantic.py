@@ -112,3 +112,9 @@ def test_static_division_by_zero_expression_is_rejected_in_semantic_layer():
     analyzer = SemanticAnalyzer(default_registry())
     with pytest.raises(SemanticError, match="Division by zero"):
         analyzer.validate(parse('filter((indicator("close") / (1 - 1)) > 1)'))
+
+
+def test_return_rate_rejects_nested_window_expression():
+    analyzer = SemanticAnalyzer(default_registry())
+    with pytest.raises(SemanticError, match="RET first argument cannot contain window functions"):
+        analyzer.validate(parse('filter(RET(MA(indicator("close"), 3), 2) > 0.05)'))
