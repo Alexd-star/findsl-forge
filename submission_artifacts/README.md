@@ -14,7 +14,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 2. 如果需要重做 5M Doris 证据，运行 `scripts/prepare_doris_scale_evidence.ps1`。
 3. 运行 `scripts/export_submission_artifacts.ps1` 导出证据快照。
 4. 按 `demo_script.md` 做一次完整演练。
-5. 使用 `defense_ppt_outline.md` 制作正式 PPT 或录屏讲解稿。
+5. 结合 `demo_screenshots/` 中的截图制作正式 PPT 或录屏讲解稿。
 
 ## 交付物地图
 
@@ -26,10 +26,12 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 | `defense_ppt_outline.md` | 答辩 PPT 逐页内容 |
 | `real_data_ingestion_plan.md` | 真实行情数据接入方案 |
 | `evidence_snapshots/` | 从 `reports/` 导出的可版本化证据快照 |
+| `demo_screenshots/` | Web Demo 正例、SQL、AST、Explain、Rows、Evidence 和负例诊断截图 |
 
 ## 当前核心证据口径
 
 - 编译正确性：官方风格正例、负例、SQL/reference 等价验证。
 - 安全性：LLM 候选必须经过 DSL 编译器验证，直接 SQL 和错误 DSL 会被拒绝。
 - 性能：Doris 5,000,000 行真实集群执行证据，baseline window 与 prefix-sum 优化路径结果一致，优化加速超过 10x。
+- 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断。
 - 可回溯：代码进入 Git；报告快照进入 `submission_artifacts/`；大规模 CSV 由脚本可重建，不进入 Git。

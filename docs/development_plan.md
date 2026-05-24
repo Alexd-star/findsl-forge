@@ -133,6 +133,7 @@ Deliverables:
 - Submission readiness report covering tests, compiler metrics, SQL equivalence, optimizer evidence, Doris assets, and git rollback state. (Started)
 - Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
 - Doris cluster evidence report linked from readiness when generated. (Started)
+- Versioned Web Demo screenshots for the positive compile path and diagnostic negative path. (Started)
 - One-minute demo video.
 - Lean canvas.
 - Technical document.
@@ -143,6 +144,7 @@ Exit criteria:
 - `scripts/submission_readiness.ps1` completes without required-gate failures.
 - `scripts/serve_demo.ps1` opens a local demo where DSL, AST, Doris SQL, optimizer explain, and verification rows are visible in one workflow.
 - Demo examples include baseline cases, official-style positive cases, and diagnostic negative cases with expected/actual diagnostic codes.
+- `submission_artifacts/demo_screenshots/` contains current positive-path and negative-diagnostic screenshots for report/PPT use.
 - `scripts/defense_package.ps1` produces a repeatable walkthrough that maps visible demo signals to competition scoring points.
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.

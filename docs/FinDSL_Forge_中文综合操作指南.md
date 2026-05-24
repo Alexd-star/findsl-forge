@@ -12,7 +12,7 @@
 
 FinDSL Forge 面向中国研究生金融科技创新大赛赛题 19，解决的是金融选股表达如何稳定落到 Apache Doris 高性能查询上的问题。用户可以输入受限 DSL，也可以先用中文需求生成候选 DSL；系统随后完成 AST 构建、语义校验、Doris SQL 生成、SQL 安全检查和参考语义验证。整条链路强调可解释的工程行为，而不是把数据库执行权交给黑盒文本生成。
 
-当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo 和 submission readiness；报告侧已有 169 项 pytest 回归、32/32 官方风格正例、34/34 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的轻量证据快照。
+当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo 和 submission readiness；报告侧已有 169 项 pytest 回归、32/32 官方风格正例、34/34 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的证据快照和 Web Demo 截图。
 
 这份手册把产品说明、赛题解读、架构设计、算法细节、部署步骤、操作指南、测试验证、答辩材料和后续规划放在一起。正文尽量采用企业技术文档的写法：先讲判断，再讲实现，再给出可复核的文件或命令；表格只承担对照和速查职责，不用来掩盖正文逻辑。
 
@@ -1036,7 +1036,7 @@ PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，
 
 `score_mapping.md` 已经把赛题要求映射到模块、脚本和证据。DSL 解析对应 lexer、parser 和 AST；语义校验对应 semantic 与 diagnostics；Doris SQL 对应 sqlgen 和 validator；性能对应 prefix-sum、hot-window 和 Doris evidence；AI 对应 nl2dsl 和 llm_adapter。
 
-得分点映射的意义在于减少答辩时的随机性。评委问到某项要求时，团队可以直接回答“实现在哪、证据在哪、如何复现”，而不是临场回忆。对于多模块项目，这种映射能显著提升专业感。
+得分点映射的意义在于减少答辩时的随机性。评委问到某项要求时，团队可以直接回答“实现在哪、证据在哪、如何复现”，而不是临场回忆。对于多模块项目，这种映射会让讲解更像成熟交付。
 
 提交前应把映射表和最新 readiness 对齐。如果某个得分点已经增强，映射也要更新；如果某项仍是未来规划，不能写成已完成。诚实区分状态，比把所有方向都说成完成更可靠。
 
@@ -1092,7 +1092,7 @@ bundle 备份最好在推送成功后立即生成，并把文件名带上时间�
 
 
 
-当前剩余风险主要包括真实行情样例还可以进一步丰富、最终答辩视频和截图需要人工整理、真实 LLM provider 尚未接入、多 BE Doris 生产形态尚未实测。这些风险不会推翻核心赛题完成度，但会影响展示丰满度和企业化延展性。
+当前剩余风险主要包括真实行情样例还可以进一步丰富、最终答辩视频需要录制、真实 LLM provider 尚未接入、多 BE Doris 生产形态尚未实测。Web Demo 截图已经进入 `submission_artifacts/demo_screenshots/`，不会再依赖临场手动截屏。这些风险不会推翻核心赛题完成度，但会影响展示丰满度和企业化延展性。
 
 文档中应把这些内容写成“可选增强”或“后续规划”，不要包装成已经完成的交付。比如本地单 FE/BE Doris 已足以支撑比赛证据，但多节点 Doris 仍是下一阶段；离线 LLM adapter 已验证安全环，真实 provider 接入仍需单独测试。
 
@@ -1124,7 +1124,7 @@ bundle 备份最好在推送成功后立即生成，并把文件名带上时间�
 
 后续规划要体现优先级。真实数据样本能提升业务可信度，真实 LLM provider 能提升输入体验，多节点 Doris 能提升企业化说服力，更多 DSL 算子能扩展场景。它们都重要，但投入产出不同。
 
-如果目标是进一步冲击奖项展示，优先级建议是：先补真实数据小样本和截图，再完善答辩视频与 PPT，然后考虑真实 LLM provider，最后再推进多节点 Doris。这样能把有限时间用在最容易被评委感知的增强上。
+如果目标是进一步冲击奖项展示，优先级建议是：先补真实数据小样本，再把已采集的 Demo 截图整理进 PPT 和答辩视频，然后考虑真实 LLM provider，最后再推进多节点 Doris。这样能把有限时间用在最容易被评委感知的增强上。
 
 技术深化则可以围绕 Doris 继续做。物化视图、增量 prefix 维护、多 BE 集群、查询 profile 和资源隔离，都能让项目更接近真实数据平台。但这些工作需要明确实验环境，否则容易花费很大却难以展示。
 

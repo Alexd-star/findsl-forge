@@ -43,7 +43,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 
 ## Screenshot Checklist
 
-Capture these screens for the technical document and one-minute video:
+The current committed screenshot set is in `submission_artifacts/demo_screenshots/`. Use it directly for the technical document, then recapture only if the Web Demo UI or evidence values change. For the one-minute video, follow the same sequence and keep the terminal reports open as backup.
 
 - Default NL2DSL request with validated candidate and verification `PASS`.
 - Official-style NL2DSL prompts showing `bottom=2`, `percent=50`, B-market average-volume validation, date-window MA validation, signed net-outflow threshold handling, rolling `MIN` threshold handling, and date-prefix-sum pruning.
