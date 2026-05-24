@@ -23,7 +23,8 @@ try {
   $statusLines = & git status --short
   $status = ($statusLines | Where-Object {
       $_ -notmatch "submission_artifacts/evidence_manifest\.md" -and
-      $_ -notmatch "submission_artifacts/evidence_snapshots"
+      $_ -notmatch "submission_artifacts/evidence_snapshots" -and
+      $_ -notmatch "scripts/export_submission_artifacts\.ps1"
     }) -join "`n"
 } catch {
   $status = "<unknown>"
@@ -44,6 +45,13 @@ foreach ($file in $reportFiles) {
   }
 }
 
+$readinessSnapshot = Join-Path $snapshotDir "submission_readiness.md"
+if (Test-Path $readinessSnapshot) {
+  $readiness = Get-Content -Raw -Encoding UTF8 -Path $readinessSnapshot
+  $readiness = $readiness -replace "- Git HEAD: ", "- Git HEAD at report generation: "
+  Set-Content -Encoding UTF8 -NoNewline -Path $readinessSnapshot -Value $readiness
+}
+
 $head = ""
 try {
   $head = (& git rev-parse --short HEAD).Trim()
@@ -55,8 +63,8 @@ $manifest = @()
 $manifest += "# Evidence Snapshot Manifest"
 $manifest += ""
 $manifest += "- Generated at: $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss zzz'))"
-$manifest += "- Git HEAD: $head"
-$manifest += "- Git status when exported: $status"
+$manifest += "- Git HEAD at export: $head"
+$manifest += "- Git status when exported, excluding evidence snapshots and this export script: $status"
 $manifest += "- Source reports directory: $ReportsDir"
 $manifest += "- Snapshot directory: $snapshotDir"
 $manifest += ""
