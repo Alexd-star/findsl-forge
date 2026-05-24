@@ -28,10 +28,10 @@ This document maps Topic 19 requirements to implementation modules.
 | Optional LLM assistance with deterministic safety guardrails | `findsl.llm_adapter`, `validate-llm-candidates` CLI, `scripts/validate_llm_candidates.ps1`, `data/samples/llm_candidate_response.json`, readiness required gate | Implemented with unsafe-SQL rejection |
 | Interactive error explainability and repair guidance | `findsl.diagnostics`, `findsl.demo`, `diagnose` CLI, Web Demo diagnostic presets | Implemented with negative official suite |
 | Official-style task coverage and negative diagnostic evidence | `findsl.official_suite`, `official-suite` CLI, `scripts/official_suite.ps1`, `data/samples/official_*_cases.jsonl`, readiness required gate | Implemented and regression-tested |
-| Defense walkthrough and score-mapping evidence | `findsl.defense_package`, `defense-package` CLI, `scripts/defense_package.ps1`, `reports/defense_package.md`, readiness required gate | Implemented with 11/11 defense checks |
+| Defense walkthrough and score-mapping evidence | `findsl.defense_package`, `defense-package` CLI, `scripts/defense_package.ps1`, `reports/defense_package.md`, readiness required gate | Implemented with 12/12 defense checks |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Implemented |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Implemented with required readiness gate |
-| Public real-market quote sample | `scripts/fetch_real_market_sample.py`, `data/real_samples/eastmoney_a_share_sample/`, `tests/test_real_market_sample.py` | Implemented with SQL/reference equivalence smoke |
+| Public real-market quote sample | `scripts/fetch_real_market_sample.py`, `data/real_samples/eastmoney_a_share_sample/`, `tests/test_real_market_sample.py`, readiness real-market gate, `reports/real_market_sample_report.md` | Implemented with 3/3 SQL/reference equivalence cases and defense evidence |
 | Local SQL execution regression | `findsl.executor`, `scripts/verify_sql_sample.ps1` | Implemented |
 | Submission package evidence chain | `findsl.readiness`, `scripts/submission_readiness.ps1`, `reports/*.md`, `reports/doris_cluster_evidence.md`, `scripts/export_submission_artifacts.ps1`, `submission_artifacts/` | Implemented with versioned evidence snapshot export |
 | Git rollback and backup discipline | git history, `docs/git_workflow.md`, backup bundles | Implemented and continuously maintained |

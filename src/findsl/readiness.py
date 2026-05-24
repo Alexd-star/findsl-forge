@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
@@ -26,6 +27,7 @@ DEFAULT_EQUIVALENCE_DSL = (
     'rank(indicator("turnover_rate"), desc, top=100))'
 )
 DEFAULT_BENCHMARK_DSL = 'filter(SUM(indicator("volume"), 3) > 300)'
+DEFAULT_REAL_MARKET_SAMPLE_DIR = Path("data/real_samples/eastmoney_a_share_sample")
 
 
 @dataclass(frozen=True)
@@ -125,6 +127,32 @@ class DorisSqlValidationSmokeCheck:
 
 
 @dataclass(frozen=True)
+class RealMarketSampleCheck:
+    data_dir: Path
+    report_path: Path
+    exists: bool
+    source: str
+    raw_payload_count: int
+    total_cases: int
+    passed_cases: int
+    sql_row_total: int
+    missing_files: List[str]
+    errors: List[str]
+
+    @property
+    def passed(self) -> bool:
+        return (
+            self.exists
+            and not self.missing_files
+            and self.raw_payload_count >= 2
+            and "Eastmoney" in self.source
+            and self.total_cases > 0
+            and self.passed_cases == self.total_cases
+            and not self.errors
+        )
+
+
+@dataclass(frozen=True)
 class LLMSafetySmokeCheck:
     response_path: Path
     passed: bool
@@ -167,6 +195,7 @@ class ReadinessReport:
     llm_safety_smoke: LLMSafetySmokeCheck
     diagnostics_smoke: DiagnosticsSmokeCheck
     doris_sql_smoke: DorisSqlValidationSmokeCheck
+    real_market_sample: RealMarketSampleCheck
     official_suite: OfficialSuiteResult
     defense_package: DefensePackageResult
     gates: List[ReadinessGate]
@@ -223,6 +252,8 @@ class ReadinessReport:
                 f"- LLM safety smoke: {self.llm_safety_smoke.passed}",
                 f"- Diagnostics smoke: {self.diagnostics_smoke.passed}",
                 f"- Doris SQL validation smoke: {self.doris_sql_smoke.passed}",
+                f"- Real-market quote sample: {self.real_market_sample.passed}",
+                f"- Real-market sample cases: {self.real_market_sample.passed_cases}/{self.real_market_sample.total_cases}",
                 f"- Official-style positive cases: {self.official_suite.positive_passed}/{self.official_suite.positive_total}",
                 f"- Official-style negative diagnostics: {self.official_suite.negative_passed}/{self.official_suite.negative_total}",
                 f"- Defense package checks: {self.defense_package.passed_count}/{self.defense_package.total}",
@@ -237,6 +268,7 @@ class ReadinessReport:
                 f"- Prefix benchmark report: `{self.reports_dir / 'prefix_sum_benchmark.md'}`",
                 f"- Long-window scale benchmark report: `{self.scale_report.path}`",
                 f"- Doris cluster evidence report: `{self.doris_cluster_report.path}`",
+                f"- Real-market sample report: `{self.real_market_sample.report_path}`",
                 f"- Doris deployment directory: `{self.repo_root / 'deploy' / 'doris'}`",
                 "",
                 "## Official-Style Coverage Suite",
@@ -315,6 +347,18 @@ class ReadinessReport:
                 f"- Escaped literal: {self.doris_sql_smoke.escaped_literal}",
                 f"- Error: {self.doris_sql_smoke.error or '<none>'}",
                 "",
+                "## Real-Market Quote Sample",
+                "",
+                f"- Passed: {self.real_market_sample.passed}",
+                f"- Data directory: `{self.real_market_sample.data_dir}`",
+                f"- Source: {self.real_market_sample.source or '<unknown>'}",
+                f"- Raw payloads: {self.real_market_sample.raw_payload_count}",
+                f"- Cases passed: {self.real_market_sample.passed_cases}/{self.real_market_sample.total_cases}",
+                f"- SQL rows total: {self.real_market_sample.sql_row_total}",
+                f"- Missing files: {', '.join(self.real_market_sample.missing_files) or '<none>'}",
+                f"- Errors: {'; '.join(self.real_market_sample.errors) or '<none>'}",
+                f"- Report: `{self.real_market_sample.report_path}`",
+                "",
                 "## Doris Asset Integrity",
                 "",
                 "| File | Exists | Matches generator | Bytes |",
@@ -382,6 +426,7 @@ class ReadinessReport:
                 "- Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.",
                 "- Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.",
                 "- SQL string literals are escaped by the compiler before they reach generated Doris SQL.",
+                "- Public Eastmoney quote sample proves the same SQL/reference verifier works on real A-share codes and dates without using the tiny sample as performance evidence.",
                 "- DSL equality operators are normalized to Doris-compatible SQL comparison operators.",
                 "- Structured diagnostics convert invalid DSL into stable error codes and repair hints.",
                 "- Semantic hardening rejects hidden-eval style invalid DSL before SQL generation.",
@@ -460,6 +505,7 @@ def generate_readiness_report(
     llm_safety_smoke = _check_llm_safety_smoke(repo_root, data_dir)
     diagnostics_smoke = _check_diagnostics_smoke()
     doris_sql_smoke = _check_doris_sql_validation_smoke()
+    real_market_sample = _check_real_market_sample(repo_root, reports_dir)
     official_suite = run_official_suite(
         positive_cases_path=repo_root / "data" / "samples" / "official_positive_cases.jsonl",
         negative_cases_path=repo_root / "data" / "samples" / "official_negative_cases.jsonl",
@@ -492,6 +538,7 @@ def generate_readiness_report(
         llm_safety_smoke=llm_safety_smoke,
         diagnostics_smoke=diagnostics_smoke,
         doris_sql_smoke=doris_sql_smoke,
+        real_market_sample=real_market_sample,
         official_suite=official_suite,
         defense_package=defense_package,
         gates=_build_gates(
@@ -508,6 +555,7 @@ def generate_readiness_report(
             llm_safety_smoke,
             diagnostics_smoke,
             doris_sql_smoke,
+            real_market_sample,
             official_suite,
             defense_package,
             run_pytest,
@@ -532,6 +580,7 @@ def _build_gates(
     llm_safety_smoke: LLMSafetySmokeCheck,
     diagnostics_smoke: DiagnosticsSmokeCheck,
     doris_sql_smoke: DorisSqlValidationSmokeCheck,
+    real_market_sample: RealMarketSampleCheck,
     official_suite: OfficialSuiteResult,
     defense_package: DefensePackageResult,
     run_pytest: bool,
@@ -640,6 +689,20 @@ def _build_gates(
             )
             if doris_sql_smoke.passed
             else doris_sql_smoke.error,
+        ),
+        ReadinessGate(
+            "Real-market quote sample",
+            "required",
+            real_market_sample.passed,
+            (
+                f"cases {real_market_sample.passed_cases}/{real_market_sample.total_cases}, "
+                f"raw payloads {real_market_sample.raw_payload_count}, source {real_market_sample.source or '<unknown>'}"
+            )
+            if real_market_sample.passed
+            else (
+                f"missing {', '.join(real_market_sample.missing_files) or '<none>'}; "
+                f"errors {'; '.join(real_market_sample.errors) or '<none>'}"
+            ),
         ),
         ReadinessGate(
             "Official-style coverage suite",
@@ -914,6 +977,108 @@ def _check_doris_sql_validation_smoke() -> DorisSqlValidationSmokeCheck:
             escaped_literal=False,
             error=f"{type(exc).__name__}: {exc}",
         )
+
+
+def _check_real_market_sample(repo_root: Path, reports_dir: Path) -> RealMarketSampleCheck:
+    data_dir = repo_root / DEFAULT_REAL_MARKET_SAMPLE_DIR
+    report_path = reports_dir / "real_market_sample_report.md"
+    required_files = [
+        "README.md",
+        "source_metadata.json",
+        "daily_quote.csv",
+        "stock_universe.csv",
+        "money_flow.csv",
+        "queries.jsonl",
+    ]
+    missing_files = [name for name in required_files if not (data_dir / name).exists()]
+    source = ""
+    raw_payload_count = 0
+    rows = []
+    errors = []
+    passed_cases = 0
+    sql_row_total = 0
+
+    if data_dir.exists():
+        raw_payload_count = len(list((data_dir / "raw").glob("*.json"))) if (data_dir / "raw").exists() else 0
+    else:
+        missing_files.append(str(DEFAULT_REAL_MARKET_SAMPLE_DIR))
+
+    metadata_path = data_dir / "source_metadata.json"
+    if metadata_path.exists():
+        try:
+            source = str(json.loads(metadata_path.read_text(encoding="utf-8")).get("source", ""))
+        except json.JSONDecodeError as exc:
+            errors.append(f"metadata JSON error: {exc}")
+
+    total_cases = 0
+    queries_path = data_dir / "queries.jsonl"
+    if queries_path.exists() and not missing_files:
+        for line_number, line in enumerate(queries_path.read_text(encoding="utf-8").splitlines(), 1):
+            if not line.strip():
+                continue
+            total_cases += 1
+            try:
+                case = json.loads(line)
+                result = verify_sql_equivalence(str(case["dsl"]), data_dir)
+                passed_cases += int(result.passed)
+                sql_row_total += result.sql_row_count
+                rows.append(
+                    [
+                        str(case.get("scenario", f"line_{line_number}")),
+                        str(case.get("name", "")),
+                        str(result.passed),
+                        str(result.sql_row_count),
+                        str(result.reference_row_count),
+                        str(len(result.missing_keys)),
+                        str(len(result.extra_keys)),
+                    ]
+                )
+            except Exception as exc:  # noqa: BLE001 - readiness should collect all sample-case failures.
+                errors.append(f"line {line_number}: {type(exc).__name__}: {exc}")
+                rows.append([f"line_{line_number}", "<parse or verify failed>", "False", "0", "0", "?", "?"])
+
+    check = RealMarketSampleCheck(
+        data_dir=data_dir,
+        report_path=report_path,
+        exists=data_dir.exists(),
+        source=source,
+        raw_payload_count=raw_payload_count,
+        total_cases=total_cases,
+        passed_cases=passed_cases,
+        sql_row_total=sql_row_total,
+        missing_files=missing_files,
+        errors=errors,
+    )
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(_real_market_sample_markdown(check, rows), encoding="utf-8")
+    return check
+
+
+def _real_market_sample_markdown(check: RealMarketSampleCheck, rows: List[List[str]]) -> str:
+    lines = [
+        "# Real-Market Quote Sample Evidence",
+        "",
+        f"- Passed: {check.passed}",
+        f"- Data directory: `{check.data_dir}`",
+        f"- Source: {check.source or '<unknown>'}",
+        f"- Raw payload count: {check.raw_payload_count}",
+        f"- Cases passed: {check.passed_cases}/{check.total_cases}",
+        f"- SQL rows total: {check.sql_row_total}",
+        f"- Missing files: {', '.join(check.missing_files) or '<none>'}",
+        f"- Errors: {'; '.join(check.errors) or '<none>'}",
+        "",
+        "This evidence uses a small public Eastmoney quote sample for business realism. It is not used as the Doris-scale performance claim.",
+        "",
+        "| Scenario | Name | Passed | SQL rows | Reference rows | Missing keys | Extra keys |",
+        "|---|---|---:|---:|---:|---:|---:|",
+    ]
+    for row in rows:
+        lines.append("| " + " | ".join(_markdown_cell(cell) for cell in row) + " |")
+    return "\n".join(lines)
+
+
+def _markdown_cell(value: str) -> str:
+    return str(value).replace("|", "\\|").replace("\n", "<br>")
 
 
 def _check_evidence_file(name: str, path: Path, markers: List[str]) -> EvidenceFileCheck:

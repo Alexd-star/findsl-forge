@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-05-24T18:23:41+00:00
+- Generated at: 2026-05-24T18:36:39+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `3abb90f` Add public real-market quote sample
+- Git HEAD at report generation: `b569cef` Add real-market sample readiness gate
 - Git branch: `main`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,18 +13,19 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 6262.8 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.088 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 6517.4 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 0.926 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.699 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.788 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
 | Doris SQL validation boundary | required | PASS | validation steps 1, issues 0, escaped literal True |
+| Real-market quote sample | required | PASS | cases 3/3, raw payloads 2, source Eastmoney public historical K-line endpoint |
 | Official-style coverage suite | required | PASS | positive 32/32, negative 34/34 |
-| Defense package walkthrough | required | PASS | checks 11/11, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
+| Defense package walkthrough | required | PASS | checks 12/12, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
 | Git rollback cleanliness | warning | PASS | clean working tree |
@@ -34,14 +35,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.088 ms
+- Compile P95 latency: 0.926 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.23x
+- Local SQLite prefix benchmark speedup smoke: 1.51x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -50,9 +51,11 @@
 - LLM safety smoke: True
 - Diagnostics smoke: True
 - Doris SQL validation smoke: True
+- Real-market quote sample: True
+- Real-market sample cases: 3/3
 - Official-style positive cases: 32/32
 - Official-style negative diagnostics: 34/34
-- Defense package checks: 11/11
+- Defense package checks: 12/12
 
 ## Evidence Artifacts
 
@@ -64,6 +67,7 @@
 - Prefix benchmark report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\prefix_sum_benchmark.md`
 - Long-window scale benchmark report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\prefix_sum_scale_benchmark.md`
 - Doris cluster evidence report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\doris_cluster_evidence.md`
+- Real-market sample report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\real_market_sample_report.md`
 - Doris deployment directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\deploy\doris`
 
 ## Official-Style Coverage Suite
@@ -76,7 +80,7 @@
 ## Defense Package
 
 - Package passed: True
-- Checks passed: 11/11
+- Checks passed: 12/12
 - Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md`
 
 ## Long-Window Scale Evidence
@@ -99,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.699 ms
+- Compile latency: 0.788 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -142,6 +146,18 @@
 - Escaped literal: True
 - Error: <none>
 
+## Real-Market Quote Sample
+
+- Passed: True
+- Data directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample`
+- Source: Eastmoney public historical K-line endpoint
+- Raw payloads: 2
+- Cases passed: 3/3
+- SQL rows total: 21
+- Missing files: <none>
+- Errors: <none>
+- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\real_market_sample_report.md`
+
 ## Doris Asset Integrity
 
 | File | Exists | Matches generator | Bytes |
@@ -161,13 +177,13 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 6262.8 ms
+- Elapsed: 6517.4 ms
 
 ```text
 ........................................................................ [ 41%]
 ........................................................................ [ 82%]
 ..............................                                           [100%]
-174 passed in 5.84s
+174 passed in 6.10s
 ```
 
 ## Award-Readiness Differentiators
@@ -184,6 +200,7 @@
 - Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.
 - Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.
 - SQL string literals are escaped by the compiler before they reach generated Doris SQL.
+- Public Eastmoney quote sample proves the same SQL/reference verifier works on real A-share codes and dates without using the tiny sample as performance evidence.
 - DSL equality operators are normalized to Doris-compatible SQL comparison operators.
 - Structured diagnostics convert invalid DSL into stable error codes and repair hints.
 - Semantic hardening rejects hidden-eval style invalid DSL before SQL generation.

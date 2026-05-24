@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
@@ -9,9 +10,12 @@ from .demo import DEFAULT_NL_REQUEST, analyze_dsl, suggest_from_text
 from .diagnostics import diagnose_exception
 from .doris import render_doris_assets
 from .evaluation import evaluate_file, load_cases
+from .equivalence import verify_sql_equivalence
 from .llm_adapter import DEFAULT_LLM_CANDIDATE_RESPONSE, validate_llm_candidates
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES, run_official_suite
 from .registry import Registry, default_registry
+
+REAL_MARKET_SAMPLE_DIR = Path("data/real_samples/eastmoney_a_share_sample")
 
 
 @dataclass(frozen=True)
@@ -62,7 +66,8 @@ class DefensePackageResult:
             "7. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and the `indicator(\"close\")` repair hint.",
             "8. Show the semantic hardening evidence for bare identifiers, invalid windows, invalid top-level expressions, bad market arguments, and literal division by zero.",
             "9. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
-            "10. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
+            "10. Run the real-market quote sample verification from `data\\real_samples\\eastmoney_a_share_sample\\queries.jsonl` to show the same checker works on public A-share fields.",
+            "11. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
             "",
             "## Score Mapping",
             "",
@@ -93,6 +98,7 @@ class DefensePackageResult:
                 "- AI assistance is constrained to NL2DSL/LLM DSL candidates; every candidate must compile and match the independent reference oracle.",
                 "- The LLM adapter rejects direct SQL and invalid DSL with stable diagnostic evidence before any SQL reaches Doris.",
                 "- The compiler validates Doris-safe SQL shape and escapes string literals before generated SQL is accepted.",
+                "- Public Eastmoney quote samples show the product story on real A-share codes and dates, while performance claims remain tied to 5M Doris evidence.",
                 "- Prefix-sum optimization is visible in SQL, structured explain records, and benchmark/readiness evidence.",
                 "- Negative cases demonstrate controlled, repairable failure rather than uncaught exceptions.",
                 "- Semantic hardening evidence proves hidden-eval style invalid DSL fails before SQL generation.",
@@ -141,6 +147,7 @@ def generate_defense_package(
         _check_unknown_indicator_diagnostic(official_negative_path),
         _check_semantic_hardening_diagnostics(official_negative_path),
         _check_doris_sql_validation(),
+        _check_real_market_sample(repo_root),
         _check_config_only_indicator_extension(),
         _check_official_suite(data_dir, official_positive_path, official_negative_path, reports_dir),
         _check_evaluation_report(cases_path, reports_dir),
@@ -475,6 +482,54 @@ def _check_doris_sql_validation() -> DefenseCheck:
             "Generated SQL shape and literal safety",
             "Compile a market literal containing a quote and SQL-looking text.",
             "DORIS_SQL_VALIDATION appears in explain with zero issues and the SQL literal is escaped.",
+            exc,
+        )
+
+
+def _check_real_market_sample(repo_root: Path) -> DefenseCheck:
+    try:
+        data_dir = Path(repo_root).resolve() / REAL_MARKET_SAMPLE_DIR
+        metadata = json.loads((data_dir / "source_metadata.json").read_text(encoding="utf-8"))
+        raw_payload_count = len(list((data_dir / "raw").glob("*.json")))
+        cases = [
+            json.loads(line)
+            for line in (data_dir / "queries.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        case_evidence = []
+        passed_cases = 0
+        for case in cases:
+            result = verify_sql_equivalence(case["dsl"], data_dir)
+            passed_cases += int(result.passed)
+            case_evidence.append(
+                f"{case.get('scenario', '<unnamed>')}: passed={result.passed}, rows={result.sql_row_count}"
+            )
+        source = str(metadata.get("source", ""))
+        passed = (
+            "Eastmoney" in source
+            and raw_payload_count >= 2
+            and bool(cases)
+            and passed_cases == len(cases)
+        )
+        return DefenseCheck(
+            name="Public real-market quote sample",
+            scoring_point="Business credibility with real A-share codes and dates, separated from performance proof",
+            demo_action="Run the Eastmoney sample DSL cases under data\\real_samples\\eastmoney_a_share_sample.",
+            expected_signal="All quote-only DSL cases pass SQL/reference equivalence with cached raw JSON and source metadata present.",
+            passed=passed,
+            evidence=[
+                f"source={source}",
+                f"raw_payloads={raw_payload_count}",
+                f"cases={passed_cases}/{len(cases)}",
+                *case_evidence,
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "Public real-market quote sample",
+            "Business credibility with real A-share codes and dates, separated from performance proof",
+            "Run the Eastmoney sample DSL cases under data\\real_samples\\eastmoney_a_share_sample.",
+            "All quote-only DSL cases pass SQL/reference equivalence with cached raw JSON and source metadata present.",
             exc,
         )
 

@@ -78,6 +78,7 @@ COMMAND_TABLE = [
     ("运行测试", "python -m pytest -q", "验证 parser、semantic、SQL、Doris 证据解析、Demo API 等回归用例。"),
     ("启动 Web Demo", "powershell -ExecutionPolicy Bypass -File .\\scripts\\serve_demo.ps1", "打开本地评委演示控制台。"),
     ("生成 readiness", "powershell -ExecutionPolicy Bypass -File .\\scripts\\submission_readiness.ps1", "生成提交前总验收报告。"),
+    ("验证真实行情样本", "python -m findsl.cli verify-sql 'filter(date_between(\"2024-01-02\", \"2024-01-12\") & RET(indicator(\"close\"), 2) > 0)' --data-dir data/real_samples/eastmoney_a_share_sample", "在公开 A 股行情样本上验证同一套 SQL/reference 口径。"),
     ("导出证据快照", "powershell -ExecutionPolicy Bypass -File .\\scripts\\export_submission_artifacts.ps1", "把 reports 中轻量证据复制到可版本化提交包。"),
     ("复现 Doris 规模证据", "powershell -ExecutionPolicy Bypass -File .\\scripts\\prepare_doris_scale_evidence.ps1 -ProxyUrl \"http://127.0.0.1:7897\"", "启动 Doris、生成 5M 数据、Stream Load、重建 prefix、采集证据。"),
 ]
@@ -87,6 +88,8 @@ EVIDENCE_TABLE = [
     ("Pytest 回归", "174 passed", "覆盖编译器、参考执行、Demo、安全、收益率算子、真实行情样本、答辩视频时间轴和 Doris 证据采集逻辑。"),
     ("官方风格正例", "32/32", "覆盖窗口、排名、日期裁剪、多表指标、prefix-sum、收益率和热点窗口。"),
     ("官方风格负例", "34/34", "覆盖未知指标、非法窗口、非法日期、RET 嵌套窗口、直接 SQL、安全诊断。"),
+    ("真实行情样本", "3/3", "东方财富公开 K 线样本的 turnover、RET 和 rolling volume DSL 均通过 SQL/reference 等价验证。"),
+    ("答辩包检查", "12/12", "把真实行情样本、LLM 安全、语义加固、Doris asset 和官方套件统一映射到得分点。"),
     ("Doris 规模证据", "36.24x", "5,000,000 行数据，baseline window 与 optimized prefix 行数一致。"),
     ("Readiness", "Warning count: 0", "阻塞门禁与警告门禁均通过。"),
 ]
@@ -318,7 +321,7 @@ CHAPTERS = [
             ("CLI 编译操作", "CLI", "最基本的操作是调用 python -m findsl.cli compile 加 DSL 文本。", "输出可以是 SQL，也可以加 --json 查看 AST、trace、explain 和 elapsed_ms。", "建议答辩前准备三条 CLI 示例：普通过滤、窗口查询、prefix-sum 查询。"),
             ("诊断操作", "诊断操作", "当表达式非法时，可以使用 diagnose 命令查看错误码和修复建议。", "这比只看 Python 异常更适合展示工程成熟度，因为真实用户需要知道如何修复输入。", "负例套件中已经覆盖未知指标、非法窗口、非法 rank、非法日期、裸字段绕过等场景。"),
             ("Web Demo 操作", "Web Demo", "serve_demo.ps1 会启动本地 Web Demo，默认端口为 8765。", "页面提供自然语言输入、DSL 输入、样例选择、SQL/AST/Explain/Rows/Evidence 标签和 Copy SQL 按钮。", "推荐现场演示时先跑默认中文需求，再选择 prefix-sum 正例和 UNKNOWN_INDICATOR 负例。"),
-            ("Readiness 操作", "Readiness", "submission_readiness.ps1 是提交前总验收入口。", "它会运行 pytest、evaluation、equivalence、benchmark、official suite、defense package、Doris evidence marker 和 git cleanliness。", "最终报告中 Blocking gates passed 为 True 且 Warning count 为 0 时，项目才进入可提交状态。"),
+            ("Readiness 操作", "Readiness", "submission_readiness.ps1 是提交前总验收入口。", "它会运行 pytest、evaluation、equivalence、benchmark、真实行情样本检查、official suite、defense package、Doris evidence marker 和 git cleanliness。", "最终报告中 Blocking gates passed 为 True 且 Warning count 为 0 时，项目才进入可提交状态。"),
         ],
     ),
     (
@@ -395,7 +398,7 @@ APPENDIX_SECTIONS = [
             "第四项检查 Word 文档。打开 `docs/FinDSL_Forge_中文综合操作指南.docx`，确认目录章节完整、中文字体正常、表格没有越界、页眉页脚没有异常。文档是评审最容易直接打开的材料之一，版式问题会直接影响专业感。",
             "第五项检查演示入口。确认 `scripts/serve_demo.ps1` 能启动，浏览器能访问 `http://127.0.0.1:8765`，默认样例、中文建议、SQL 标签、AST 标签、Evidence 标签和负例诊断都能工作。若现场不准备实时 Doris，则提前打开 evidence snapshot 作为备用材料。",
             "第六项检查 GitHub 与 bundle。push 成功后生成新的 bundle，文件名带时间戳，放在 `git_bundles` 目录。远端仓库和离线 bundle 同时存在，才算完成可回溯备份。提交前最好记录最新 commit hash，便于团队成员之间确认版本一致。",
-            "第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：174 passed、32/32、34/34、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。",
+            "第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：174 passed、32/32、34/34、真实行情样本 3/3、答辩包 12/12、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。",
             "第八项检查风险表述。真实 LLM provider、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。",
         ],
     ),
@@ -947,7 +950,7 @@ SECTION_PARAGRAPHS = {
         "如果现场 Doris 容器不可用，不要临时冒险重配环境。可以展示已经版本化的 Doris evidence snapshot，并说明 Demo 当前使用本地样本做语义验证，规模性能由独立 Doris 证据支撑。这个说法诚实，也更像正式交付。",
     ],
     "Readiness 操作": [
-        "`submission_readiness.ps1` 是提交前总门禁。它会检查测试、官方套件、语义等价、benchmark、defense package、Doris evidence marker、submission artifacts 和 Git 状态，最后生成 `reports/submission_readiness.md`。",
+        "`submission_readiness.ps1` 是提交前总门禁。它会检查测试、官方套件、语义等价、benchmark、真实行情样本、defense package、Doris evidence marker、submission artifacts 和 Git 状态，最后生成 `reports/submission_readiness.md`。",
         "理想提交状态是 blocking gates passed 为 true，warning count 为 0。当前项目已经达到这个状态，说明核心测试、Doris 规模证据和提交快照都能被脚本识别。后续每次关键改动后都应重新运行 readiness，不要只凭单个测试通过就判断可以提交。",
         "readiness 报告也适合答辩使用。它把分散的命令结果集中在一份文件里，能够快速回答“你们现在到底完成到什么程度”。对国家级奖项目标来说，这种总验收文件比口头保证更有分量。",
     ],
@@ -979,7 +982,7 @@ SECTION_PARAGRAPHS = {
     "答辩主线": [
         "答辩建议从痛点开始。金融选股表达复杂，手写 SQL 容易出错；大模型直接生成 SQL 风险高；长窗口在数据仓库中成本大；比赛要求的不只是演示，而是正确性、性能和复现。这个开场能把项目放到真实问题里，而不是从技术名词堆砌开始。",
         "方案部分再讲四层：FinDSL 表达业务意图，确定性编译器生成 Doris SQL，reference 与 validator 保证正确和安全，prefix-sum 与热点窗口证明性能。每层都对应 Demo 或报告，听众能看到问题如何被逐步拆解。",
-        "结尾用证据收束。174 passed、32/32 正例、34/34 负例、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。",
+        "结尾用证据收束。174 passed、32/32 正例、34/34 负例、真实行情 3/3、答辩包 12/12、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。",
     ],
     "演示节奏": [
         "五分钟演示可以分成四段。第一分钟展示中文输入到 DSL 候选，说明 AI 只是辅助；第二分钟展示 AST、SQL 和 explain，说明编译器掌握语义；第三分钟展示 prefix-sum 案例和 Doris evidence，说明长窗口加速；最后一分钟展示负例诊断和 readiness。",
@@ -1092,7 +1095,7 @@ SECTION_SUPPLEMENTS = {
     "CLI 编译操作": "CLI 输出还可以用于生成报告素材。把 `--json` 结果中的 AST、trace 和 explain 截取到文档或 PPT，比单纯复制 SQL 更能展示编译器内部能力。注意不要展示过长 JSON，选关键字段即可。",
     "诊断操作": "负例演示应控制节奏。先让用户看到错误输入，再展示诊断码和建议，最后修正后重新编译成功。这个小闭环能证明系统不仅会拒绝错误，还能帮助用户回到正确路径。",
     "Web Demo 操作": "Web Demo 的价值在于把多个证据面板放在同一页面。评委不用理解命令行，也能看到 DSL、SQL、AST、explain 和验证结果。后续 UI 增强可以继续围绕这个原则做，而不是增加无关装饰。",
-    "Readiness 操作": "readiness 失败时不要简单重跑。应先看是哪一类 gate 失败：测试、official suite、Doris evidence、artifacts 还是 Git 状态。不同失败对应不同处理方式，盲目重跑只会掩盖根因。",
+    "Readiness 操作": "readiness 失败时不要简单重跑。应先看是哪一类 gate 失败：测试、official suite、真实行情样本、Doris evidence、artifacts 还是 Git 状态。不同失败对应不同处理方式，盲目重跑只会掩盖根因。",
     "单元测试体系": "测试文件也能作为答辩材料的一部分。评委如果追问隐藏用例，团队可以指出测试覆盖了哪些边界条件，并解释新增用例如何进入 official suite。用测试回答问题，比临场承诺更有力量。",
     "官方风格覆盖套件": "官方风格套件应继续随赛题理解更新。每发现一种可能的评审输入，就把它变成正例或负例，而不是只在脑中记住。这样项目会越用越稳，隐藏用例准备也会从经验变成资产。",
     "语义等价验证": "等价验证结果建议在 Demo 和报告中都保留。它能向评委说明：编译生成 SQL 后，系统还用另一条语义路径核对结果。这个动作比“我们人工看过 SQL”更可信，也更符合金融系统的审慎风格。",
@@ -1185,7 +1188,7 @@ def build_docx() -> Tuple[Path, int]:
         ("竞赛方向", "研究生金融科技创新大赛赛题 19"),
         ("文档版本", VERSION),
         ("生成时间", GENERATED_AT),
-        ("核心证据", "174 passed；官方风格 32/32 + 34/34；Doris 5M 规模 36.24x；readiness warning 0；公开真实行情小样本已验证"),
+        ("核心证据", "174 passed；官方风格 32/32 + 34/34；真实行情样本 3/3；答辩包 12/12；Doris 5M 规模 36.24x；readiness warning 0"),
     ]
     add_table(doc, ["项目", "内容"], meta, [2200, 7160])
     doc.add_page_break()

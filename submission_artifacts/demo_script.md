@@ -23,9 +23,10 @@ powershell -ExecutionPolicy Bypass -File .\scripts\prepare_doris_scale_evidence.
 5. 输入 `A股近2日收盘价涨幅超过5%`，展示 `RET(indicator("close"), 2)` 被编译为 LAG 收益率特征并通过 SQL/reference 验证。
 6. 选择 `Official positive: 主力净流入3日滚动求和走资金流前缀表`，展示 prefix table SQL。
 7. 选择 `Diagnostic negative: 未知指标名`，展示 `UNKNOWN_INDICATOR` 和 `indicator("close")` 修复建议。
-8. 展示 `submission_artifacts/evidence_snapshots/doris_cluster_evidence.md`，强调 5M 行真实 Doris 证据、结果一致、加速超过 10x。
-9. 展示 `submission_artifacts/evidence_snapshots/submission_readiness.md`，强调 blocking gates 全通过、warning 为 0。
-10. 展示 Git 状态和 bundle 备份，说明可回溯。
+8. 展示 `submission_artifacts/evidence_snapshots/real_market_sample_report.md`，强调真实股票代码和交易日期下 3/3 条 DSL 通过 SQL/reference 验证。
+9. 展示 `submission_artifacts/evidence_snapshots/doris_cluster_evidence.md`，强调 5M 行真实 Doris 证据、结果一致、加速超过 10x。
+10. 展示 `submission_artifacts/evidence_snapshots/submission_readiness.md`，强调 blocking gates 全通过、warning 为 0。
+11. 展示 Git 状态和 bundle 备份，说明可回溯。
 
 ## 兜底路线
 

@@ -19,6 +19,7 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "Official diagnostic negative preset" in check_names
     assert "Semantic hardening diagnostics" in check_names
     assert "Doris SQL validation boundary" in check_names
+    assert "Public real-market quote sample" in check_names
     assert "Config-only indicator extension" in check_names
     assert "Official-style coverage suite" in check_names
     assert "Compiler accuracy and latency" in check_names
@@ -48,6 +49,9 @@ def test_generate_defense_package_maps_demo_to_scoring_evidence(tmp_path):
     assert "date_prefix_sum_pruning" in content
     assert "covered=8/8" in content
     assert "Doris SQL validation boundary" in content
+    assert "Public real-market quote sample" in content
+    assert "real_quote_return_rate" in content
+    assert "Eastmoney public historical K-line endpoint" in content
     assert "Semantic hardening diagnostics" in content
     assert "hardened=6/6" in content
     assert "除数为零字面量" in content

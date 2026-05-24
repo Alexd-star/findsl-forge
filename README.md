@@ -41,7 +41,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Validate optional LLM-proposed DSL candidates while rejecting direct SQL and invalid DSL before execution.
 - Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a defense package that maps live demo steps to competition scoring evidence.
-- Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, Doris assets, and git rollback state.
+- Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, real-market sample evidence, Doris assets, and git rollback state.
 - Run without non-standard Python dependencies.
 - Provide pytest coverage for parser, semantic validation, SQL generation, and SQL/reference equivalence.
 
@@ -212,11 +212,11 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 ## Submission Readiness
 
-`scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris SQL validation evidence, config-only indicator extension evidence, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
+`scripts/submission_readiness.ps1` generates `reports/submission_readiness.md` and companion evidence reports. The readiness report is designed as a pre-submission gate: it runs pytest, compiler evaluation, SQL/reference equivalence, prefix-sum benchmark checks, Demo API smoke checks, NL2DSL validated-candidate checks, structured diagnostics checks, Doris SQL validation evidence, public real-market sample verification, config-only indicator extension evidence, Doris asset integrity checks, Doris cluster evidence marker checks, and git rollback-state inspection.
 
 The readiness report also runs `official-suite`, which currently covers 32 positive official-style cases and 34 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, hot-window materialized columns, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, duplicate named arguments, invalid dates, invalid rank directions, invalid windows, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
-It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, official coverage, compiler latency, Doris asset integrity, and the exported Doris proof to concrete scoring evidence.
+It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, public real-market quote samples, official coverage, compiler latency, Doris asset integrity, and the exported Doris proof to concrete scoring evidence.
 
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight competition risks such as missing Doris-cluster scale proof or uncommitted local changes.
 

@@ -135,7 +135,7 @@ Deliverables:
 - Doris cluster evidence report linked from readiness when generated. (Started)
 - Versioned Web Demo screenshots for the positive compile path and diagnostic negative path. (Started)
 - One-minute demo video generated from versioned screenshots. (Implemented)
-- Public real-market A-share quote sample with SQL/reference verification. (Implemented)
+- Public real-market A-share quote sample with SQL/reference verification, readiness gate, and defense-package evidence. (Implemented)
 - Lean canvas.
 - Technical document.
 - Deployment and test manual.
@@ -155,6 +155,7 @@ Exit criteria:
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Defense package proves a config-only indicator extension can compile and pass Doris SQL validation without changing compiler core.
 - Defense package separately exposes semantic hardening diagnostics for hidden-evaluation style invalid DSL.
+- Real-market quote sample gate must verify cached raw payloads, metadata, and quote-only DSL cases without using the small sample as performance proof.
 - Official-style coverage suite remains a required readiness gate, with representative positive cases passing SQL/reference equivalence and representative negative cases producing stable diagnostic codes plus repair hints.
 - Doris-scale warning is closed only after `scripts/collect_doris_evidence.ps1` captures successful baseline and optimized Doris execution with row-count parity, required plan-shape markers, and default 10x speedup target satisfaction.
 - Local SQLite prefix timing is only a smoke/regression signal and must not be presented as Doris-scale acceleration proof.

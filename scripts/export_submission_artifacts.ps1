@@ -12,6 +12,7 @@ $reportFiles = @(
   "doris_cluster_evidence.json",
   "defense_package.md",
   "official_suite_report.md",
+  "real_market_sample_report.md",
   "evaluation_report.md",
   "sql_equivalence_report.md",
   "prefix_sum_benchmark.md",

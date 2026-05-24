@@ -6,7 +6,7 @@
 powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 ```
 
-脚本会把当前 readiness、Doris 证据、官方风格套件、答辩包等报告复制到 `submission_artifacts/evidence_snapshots/`，避免评审材料只停留在本机临时报告中。
+脚本会把当前 readiness、Doris 证据、真实行情样本证据、官方风格套件、答辩包等报告复制到 `submission_artifacts/evidence_snapshots/`，避免评审材料只停留在本机临时报告中。
 
 ## 推荐提交顺序
 
@@ -35,7 +35,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 - 编译正确性：官方风格正例、负例、SQL/reference 等价验证。
 - 安全性：LLM 候选必须经过 DSL 编译器验证，直接 SQL 和错误 DSL 会被拒绝。
 - 性能：Doris 5,000,000 行真实集群执行证据，baseline window 与 prefix-sum 优化路径结果一致，优化加速超过 10x。
-- 业务可信度：`data/real_samples/eastmoney_a_share_sample/` 已包含东方财富公开 A 股行情小样本，可演示真实股票代码和真实交易日期下的 SQL/reference 验证。
+- 业务可信度：`data/real_samples/eastmoney_a_share_sample/` 已包含东方财富公开 A 股行情小样本，readiness 会校验 raw JSON、metadata 和 3/3 条真实行情 DSL 等价验证。
 - 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断。
 - 视频：`scripts/build_defense_video.py` 可从截图生成一分钟 MP4，`defense_video_script.md` 提供旁白口径。
 - 可回溯：代码进入 Git；报告快照进入 `submission_artifacts/`；大规模 CSV 由脚本可重建，不进入 Git。

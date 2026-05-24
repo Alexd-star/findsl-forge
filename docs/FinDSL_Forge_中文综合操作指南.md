@@ -876,13 +876,13 @@ Web Demo 的价值在于把多个证据面板放在同一页面。评委不用�
 
 
 
-`submission_readiness.ps1` 是提交前总门禁。它会检查测试、官方套件、语义等价、benchmark、defense package、Doris evidence marker、submission artifacts 和 Git 状态，最后生成 `reports/submission_readiness.md`。
+`submission_readiness.ps1` 是提交前总门禁。它会检查测试、官方套件、语义等价、benchmark、真实行情样本、defense package、Doris evidence marker、submission artifacts 和 Git 状态，最后生成 `reports/submission_readiness.md`。
 
 理想提交状态是 blocking gates passed 为 true，warning count 为 0。当前项目已经达到这个状态，说明核心测试、Doris 规模证据和提交快照都能被脚本识别。后续每次关键改动后都应重新运行 readiness，不要只凭单个测试通过就判断可以提交。
 
 readiness 报告也适合答辩使用。它把分散的命令结果集中在一份文件里，能够快速回答“你们现在到底完成到什么程度”。对国家级奖项目标来说，这种总验收文件比口头保证更有分量。
 
-readiness 失败时不要简单重跑。应先看是哪一类 gate 失败：测试、official suite、Doris evidence、artifacts 还是 Git 状态。不同失败对应不同处理方式，盲目重跑只会掩盖根因。
+readiness 失败时不要简单重跑。应先看是哪一类 gate 失败：测试、official suite、真实行情样本、Doris evidence、artifacts 还是 Git 状态。不同失败对应不同处理方式，盲目重跑只会掩盖根因。
 
 
 
@@ -996,7 +996,7 @@ PPT、Word 手册、Demo 和 evidence snapshots 要互相支撑。PPT 给结论�
 
 方案部分再讲四层：FinDSL 表达业务意图，确定性编译器生成 Doris SQL，reference 与 validator 保证正确和安全，prefix-sum 与热点窗口证明性能。每层都对应 Demo 或报告，听众能看到问题如何被逐步拆解。
 
-结尾用证据收束。174 passed、32/32 正例、34/34 负例、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。
+结尾用证据收束。174 passed、32/32 正例、34/34 负例、真实行情 3/3、答辩包 12/12、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。
 
 答辩时要减少空泛形容词，多用动作和证据。比如“系统会拒绝直接 SQL”比“系统很安全”更具体；“baseline 与 optimized 行数一致”比“优化有效”更可验证。语言越具体，越不像临时包装。
 
@@ -1258,7 +1258,7 @@ Readiness 指提交前总验收报告，整合测试、性能、证据和 Git �
 
 第六项检查 GitHub 与 bundle。push 成功后生成新的 bundle，文件名带时间戳，放在 `git_bundles` 目录。远端仓库和离线 bundle 同时存在，才算完成可回溯备份。提交前最好记录最新 commit hash，便于团队成员之间确认版本一致。
 
-第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：174 passed、32/32、34/34、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。
+第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：174 passed、32/32、34/34、真实行情样本 3/3、答辩包 12/12、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。
 
 第八项检查风险表述。真实 LLM provider、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。
 
