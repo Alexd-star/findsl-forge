@@ -37,13 +37,14 @@ powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 7. Confirm the UI shows verification `PASS`, optimizer `Applied`, and SQL containing `dwd_stock_money_flow_prefix`.
 8. Select `Diagnostic negative: UNKNOWN_INDICATOR` from the sample preset list and run it.
 9. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and a repair hint for `indicator("close")`.
-10. Run `scripts\validate_llm_candidates.ps1` and show one accepted DSL, one `UNKNOWN_INDICATOR` rejection, and one `UNSAFE_DIRECT_SQL` rejection.
-11. Open `reports/defense_package.md` and show the score-mapping table.
-12. Open `reports/submission_readiness.md` and show required gates passing.
+10. Run `python scripts\build_defense_video.py` if the one-minute video needs to be refreshed from the latest screenshots.
+11. Run `scripts\validate_llm_candidates.ps1` and show one accepted DSL, one `UNKNOWN_INDICATOR` rejection, and one `UNSAFE_DIRECT_SQL` rejection.
+12. Open `reports/defense_package.md` and show the score-mapping table.
+13. Open `reports/submission_readiness.md` and show required gates passing.
 
 ## Screenshot Checklist
 
-The current committed screenshot set is in `submission_artifacts/demo_screenshots/`. Use it directly for the technical document, then recapture only if the Web Demo UI or evidence values change. For the one-minute video, follow the same sequence and keep the terminal reports open as backup.
+The current committed screenshot set is in `submission_artifacts/demo_screenshots/`. Use it directly for the technical document, then recapture only if the Web Demo UI or evidence values change. The one-minute video can be rebuilt from these screenshots with `scripts/build_defense_video.py`; keep the terminal reports open as backup during live rehearsal.
 
 - Default NL2DSL request with validated candidate and verification `PASS`.
 - Official-style NL2DSL prompts showing `bottom=2`, `percent=50`, B-market average-volume validation, date-window MA validation, signed net-outflow threshold handling, rolling `MIN` threshold handling, and date-prefix-sum pruning.

@@ -24,9 +24,11 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 | `score_mapping.md` | 赛题得分点到实现和证据的映射 |
 | `demo_script.md` | 现场演示脚本和故障兜底顺序 |
 | `defense_ppt_outline.md` | 答辩 PPT 逐页内容 |
+| `defense_video_script.md` | 一分钟答辩视频时间轴、旁白和生成命令 |
 | `real_data_ingestion_plan.md` | 真实行情数据接入方案 |
 | `evidence_snapshots/` | 从 `reports/` 导出的可版本化证据快照 |
 | `demo_screenshots/` | Web Demo 正例、SQL、AST、Explain、Rows、Evidence 和负例诊断截图 |
+| `defense_video/` | 由截图合成的一分钟答辩视频输出目录 |
 
 ## 当前核心证据口径
 
@@ -34,4 +36,5 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 - 安全性：LLM 候选必须经过 DSL 编译器验证，直接 SQL 和错误 DSL 会被拒绝。
 - 性能：Doris 5,000,000 行真实集群执行证据，baseline window 与 prefix-sum 优化路径结果一致，优化加速超过 10x。
 - 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断。
+- 视频：`scripts/build_defense_video.py` 可从截图生成一分钟 MP4，`defense_video_script.md` 提供旁白口径。
 - 可回溯：代码进入 Git；报告快照进入 `submission_artifacts/`；大规模 CSV 由脚本可重建，不进入 Git。

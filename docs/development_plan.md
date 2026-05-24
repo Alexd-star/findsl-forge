@@ -134,7 +134,7 @@ Deliverables:
 - Long-window scale benchmark evidence linked from the readiness report when generated. (Started)
 - Doris cluster evidence report linked from readiness when generated. (Started)
 - Versioned Web Demo screenshots for the positive compile path and diagnostic negative path. (Started)
-- One-minute demo video.
+- One-minute demo video generated from versioned screenshots. (Implemented)
 - Lean canvas.
 - Technical document.
 - Deployment and test manual.
@@ -145,6 +145,7 @@ Exit criteria:
 - `scripts/serve_demo.ps1` opens a local demo where DSL, AST, Doris SQL, optimizer explain, and verification rows are visible in one workflow.
 - Demo examples include baseline cases, official-style positive cases, and diagnostic negative cases with expected/actual diagnostic codes.
 - `submission_artifacts/demo_screenshots/` contains current positive-path and negative-diagnostic screenshots for report/PPT use.
+- `scripts/build_defense_video.py` generates `submission_artifacts/defense_video/findsl_forge_one_minute_demo.mp4` from the committed screenshots.
 - `scripts/defense_package.ps1` produces a repeatable walkthrough that maps visible demo signals to competition scoring points.
 - Demo API smoke check remains a required readiness gate.
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.

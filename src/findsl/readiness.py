@@ -391,7 +391,7 @@ class ReadinessReport:
                 "## Remaining High-Value Work",
                 "",
                 "- Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.",
-                "- Record a one-minute defense video from the versioned Web Demo screenshots and the official positive/diagnostic presets.",
+                "- Refresh the generated one-minute defense video when screenshots or evidence values change; add human voiceover only if the portal requires narrated media.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
                 "- Connect the optional LLM adapter to a real provider only after preserving the same deterministic validation contract.",
             ]
