@@ -26,13 +26,29 @@ def test_analyze_dsl_returns_compile_and_verification_payload():
 def test_demo_examples_loads_sample_queries():
     examples = demo_examples(Path("data/samples/queries.jsonl"))
 
-    assert len(examples) >= 22
+    assert len(examples) >= 25
     assert examples[0]["name"]
     assert examples[0]["dsl"].startswith("then(")
     kinds = {example["kind"] for example in examples}
-    assert {"baseline", "official_positive", "official_negative"} <= kinds
+    assert {"baseline", "official_positive", "official_negative", "real_market"} <= kinds
     assert any(example["scenario"] == "money_flow_prefix_sum" for example in examples)
     assert any(example.get("expected_code") == "UNKNOWN_INDICATOR" for example in examples)
+    assert any(example.get("dataset") == "real_market" for example in examples)
+
+
+def test_analyze_dsl_supports_real_market_sample_data():
+    examples = [
+        item for item in demo_examples(Path("data/samples/queries.jsonl"))
+        if item.get("dataset") == "real_market"
+    ]
+
+    assert len(examples) == 3
+    assert {item["dataset_label"] for item in examples} == {"Eastmoney A-share sample"}
+    for example in examples:
+        result = analyze_dsl(example["dsl"], Path("data/real_samples/eastmoney_a_share_sample"))
+        assert result["ok"]
+        assert result["verification"]["passed"]
+        assert result["verification"]["sql_row_count"] == result["verification"]["reference_row_count"]
 
 
 def test_render_demo_html_contains_workbench_and_api_hooks():
@@ -58,6 +74,8 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "Diagnostic preset" in html
     assert "Expected diagnostic:" in html
     assert "Actual diagnostic:" in html
+    assert "dataset:" in html
+    assert "real_market" in html
 
 
 def test_doris_evidence_summary_reads_cluster_report(tmp_path):

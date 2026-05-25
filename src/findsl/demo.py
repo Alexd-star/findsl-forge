@@ -20,6 +20,9 @@ DEFAULT_DEMO_DSL = (
     'rank(indicator("turnover_rate"), desc, top=100))'
 )
 DEFAULT_NL_REQUEST = "筛选A股连续3天主力净流入为正的股票，并按换手率从高到低排名前100"
+DEMO_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_REAL_MARKET_CASES = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample/queries.jsonl"
+DEFAULT_REAL_MARKET_DATA_DIR = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample"
 
 
 def doris_evidence_summary(report_path: Path = Path("reports/doris_cluster_evidence.md")) -> Dict[str, Any]:
@@ -89,9 +92,10 @@ def demo_examples(
     cases_path: Path = Path("data/samples/queries.jsonl"),
     official_positive_path: Path = DEFAULT_POSITIVE_CASES,
     official_negative_path: Path = DEFAULT_NEGATIVE_CASES,
+    real_market_cases_path: Path = DEFAULT_REAL_MARKET_CASES,
 ) -> List[Dict[str, str]]:
     examples: List[Dict[str, str]] = []
-    for case in _safe_load_cases(Path(cases_path)):
+    for case in _safe_load_cases(_resolve_demo_path(cases_path)):
         if case.get("dsl"):
             examples.append(
                 {
@@ -99,9 +103,11 @@ def demo_examples(
                     "dsl": str(case["dsl"]),
                     "kind": "baseline",
                     "scenario": "evaluation",
+                    "dataset": "default",
+                    "dataset_label": "sample fixtures",
                 }
             )
-    for case in _safe_load_cases(Path(official_positive_path)):
+    for case in _safe_load_cases(_resolve_demo_path(official_positive_path)):
         if case.get("dsl"):
             examples.append(
                 {
@@ -109,9 +115,11 @@ def demo_examples(
                     "dsl": str(case["dsl"]),
                     "kind": "official_positive",
                     "scenario": str(case.get("scenario", "")),
+                    "dataset": "default",
+                    "dataset_label": "sample fixtures",
                 }
             )
-    for case in _safe_load_cases(Path(official_negative_path)):
+    for case in _safe_load_cases(_resolve_demo_path(official_negative_path)):
         if case.get("dsl"):
             examples.append(
                 {
@@ -120,6 +128,20 @@ def demo_examples(
                     "kind": "official_negative",
                     "scenario": "diagnostic",
                     "expected_code": str(case.get("expected_code", "")),
+                    "dataset": "default",
+                    "dataset_label": "sample fixtures",
+                }
+            )
+    for case in _safe_load_cases(_resolve_demo_path(real_market_cases_path)):
+        if case.get("dsl"):
+            examples.append(
+                {
+                    "name": f"Real market: {case.get('name', 'Example')}",
+                    "dsl": str(case["dsl"]),
+                    "kind": "real_market",
+                    "scenario": str(case.get("scenario", "")),
+                    "dataset": "real_market",
+                    "dataset_label": "Eastmoney A-share sample",
                 }
             )
     return examples or [
@@ -128,6 +150,8 @@ def demo_examples(
             "dsl": DEFAULT_DEMO_DSL,
             "kind": "baseline",
             "scenario": "fallback",
+            "dataset": "default",
+            "dataset_label": "sample fixtures",
         }
     ]
 
@@ -167,8 +191,12 @@ def suggest_from_text(
 
 
 def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/queries.jsonl")):
-    data_dir = Path(data_dir)
-    cases_path = Path(cases_path)
+    data_dir = _resolve_demo_path(data_dir)
+    cases_path = _resolve_demo_path(cases_path)
+    dataset_paths = {
+        "default": data_dir,
+        "real_market": DEFAULT_REAL_MARKET_DATA_DIR,
+    }
 
     class DemoHandler(BaseHTTPRequestHandler):
         server_version = "FinDSLDemo/0.1"
@@ -208,7 +236,7 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
                     raise ValueError("DSL is required")
                 result = analyze_dsl(
                     dsl=dsl,
-                    data_dir=data_dir,
+                    data_dir=_resolve_demo_dataset(str(request.get("dataset", "default")), dataset_paths),
                     enable_prefix_sum=bool(request.get("enable_prefix_sum", True)),
                     verify=bool(request.get("verify", True)),
                 )
@@ -274,6 +302,25 @@ def _safe_load_cases(path: Path) -> List[Dict[str, Any]]:
         return load_cases(path)
     except FileNotFoundError:
         return []
+
+
+def _resolve_demo_path(path: Path) -> Path:
+    candidate = Path(path)
+    if candidate.is_absolute():
+        return candidate
+    cwd_candidate = Path.cwd() / candidate
+    if cwd_candidate.exists():
+        return cwd_candidate
+    repo_candidate = DEMO_REPO_ROOT / candidate
+    if repo_candidate.exists():
+        return repo_candidate
+    return candidate
+
+
+def _resolve_demo_dataset(dataset: str, dataset_paths: Dict[str, Path]) -> Path:
+    if dataset not in dataset_paths:
+        raise ValueError(f"Unsupported demo dataset: {dataset}")
+    return dataset_paths[dataset]
 
 
 def _metric_key(value: str) -> str:
@@ -651,6 +698,9 @@ def render_demo_html() -> str:
       if (currentExample.kind === "official_negative") {
         suggestState.textContent = "Diagnostic preset";
         verifyToggle.checked = false;
+      } else if (currentExample.kind === "real_market") {
+        suggestState.textContent = currentExample.dataset_label || "Real-market sample";
+        verifyToggle.checked = true;
       } else if (currentExample.kind === "official_positive") {
         suggestState.textContent = currentExample.scenario || "Official preset";
         verifyToggle.checked = true;
@@ -694,6 +744,7 @@ def render_demo_html() -> str:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             text: nlInput.value,
+            dataset: "default",
             enable_prefix_sum: prefixToggle.checked,
             verify: verifyToggle.checked
           })
@@ -744,7 +795,8 @@ def render_demo_html() -> str:
         option.value = String(idx);
         option.dataset.example = JSON.stringify(item);
         const suffix = item.expected_code ? " [" + item.expected_code + "]" : item.scenario ? " [" + item.scenario + "]" : "";
-        option.textContent = item.name + suffix;
+        const dataset = item.dataset_label ? " - " + item.dataset_label : "";
+        option.textContent = item.name + suffix + dataset;
         sampleSelect.appendChild(option);
       });
       selectExample(0);
@@ -765,6 +817,7 @@ def render_demo_html() -> str:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             dsl: dslInput.value,
+            dataset: currentExample && currentExample.dataset ? currentExample.dataset : "default",
             enable_prefix_sum: prefixToggle.checked,
             verify: verifyToggle.checked
           })

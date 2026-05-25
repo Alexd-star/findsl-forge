@@ -12,7 +12,7 @@
 
 FinDSL Forge 面向中国研究生金融科技创新大赛赛题 19，解决的是金融选股表达如何稳定落到 Apache Doris 高性能查询上的问题。用户可以输入受限 DSL，也可以先用中文需求生成候选 DSL；系统随后完成 AST 构建、语义校验、Doris SQL 生成、SQL 安全检查和参考语义验证。整条链路强调可解释的工程行为，而不是把数据库执行权交给黑盒文本生成。
 
-当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo、答辩视频生成和 submission readiness；报告侧已有 171 项 pytest 回归、32/32 官方风格正例、34/34 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的证据快照、Web Demo 截图和一分钟 MP4。
+当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo、答辩视频生成和 submission readiness；报告侧已有 175 项 pytest 回归、32/32 官方风格正例、34/34 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的证据快照、Web Demo 截图和一分钟 MP4。
 
 这份手册把产品说明、赛题解读、架构设计、算法细节、部署步骤、操作指南、测试验证、答辩材料和后续规划放在一起。正文尽量采用企业技术文档的写法：先讲判断，再讲实现，再给出可复核的文件或命令；表格只承担对照和速查职责，不用来掩盖正文逻辑。
 
@@ -132,7 +132,7 @@ FinDSL Forge 面向中国研究生金融科技创新大赛赛题 19，解决的�
 
 当前版本围绕六类指标做交付验收：编译正确率、诊断可用性、长窗口性能、Doris 兼容性、AI 辅助安全性和提交可复现性。它们分别由 official positive cases、official negative cases、Doris evidence、SQL validator、LLM candidate adapter 和 submission readiness 覆盖。
 
-已有证据里，pytest 全量回归为 174 passed；官方风格正例 32/32 通过，负例 34/34 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。
+已有证据里，pytest 全量回归为 175 passed；官方风格正例 32/32 通过，负例 34/34 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。
 
 评价指标的作用不只是写在文档里好看。每次提交前运行 readiness，团队就能知道哪些证据仍然有效、哪些结果需要重采、Git 是否处在可回溯状态。竞赛后期最怕“功能看似完成但证据散落”，这套指标体系正是为了避免这种情况。
 
@@ -868,7 +868,7 @@ Web Demo 是面向评委的主展示界面。`scripts/serve_demo.ps1` 默认启�
 
 如果现场 Doris 容器不可用，不要临时冒险重配环境。可以展示已经版本化的 Doris evidence snapshot，并说明 Demo 当前使用本地样本做语义验证，规模性能由独立 Doris 证据支撑。这个说法诚实，也更像正式交付。
 
-Web Demo 的价值在于把多个证据面板放在同一页面。评委不用理解命令行，也能看到 DSL、SQL、AST、explain 和验证结果。后续 UI 增强可以继续围绕这个原则做，而不是增加无关装饰。
+Web Demo 的价值在于把多个证据面板放在同一页面。评委不用理解命令行，也能看到 DSL、SQL、AST、explain、验证结果和真实行情样例。后续 UI 增强可以继续围绕这个原则做，而不是增加无关装饰。
 
 
 
@@ -906,7 +906,7 @@ Doris 规模验证则补上真实数据库维度。小样本等价只能说明�
 
 
 
-测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、doris_sql、doris_evidence、demo、真实行情样本、defense video 和 readiness。当前全量 pytest 为 174 passed，说明收益率算子、官方套件、真实行情样本、视频资产和文档增强没有破坏核心链路。
+测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、doris_sql、doris_evidence、demo、真实行情样本、defense video 和 readiness。当前全量 pytest 为 175 passed，说明收益率算子、官方套件、真实行情 Demo 样本、视频资产和文档增强没有破坏核心链路。
 
 测试设计关注高风险行为。比如窗口函数不能出现在 WHERE，未知指标要给修复建议，prefix rewrite 不能改变结果，LLM 直接 SQL 要被拒绝，Demo API 要返回稳定字段。它们不是为了凑数量，而是围绕赛题失分点布防。
 
@@ -996,7 +996,7 @@ PPT、Word 手册、Demo 和 evidence snapshots 要互相支撑。PPT 给结论�
 
 方案部分再讲四层：FinDSL 表达业务意图，确定性编译器生成 Doris SQL，reference 与 validator 保证正确和安全，prefix-sum 与热点窗口证明性能。每层都对应 Demo 或报告，听众能看到问题如何被逐步拆解。
 
-结尾用证据收束。174 passed、32/32 正例、34/34 负例、真实行情 3/3、答辩包 12/12、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。
+结尾用证据收束。175 passed、32/32 正例、34/34 负例、真实行情 3/3、答辩包 12/12、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。
 
 答辩时要减少空泛形容词，多用动作和证据。比如“系统会拒绝直接 SQL”比“系统很安全”更具体；“baseline 与 optimized 行数一致”比“优化有效”更可验证。语言越具体，越不像临时包装。
 
@@ -1006,7 +1006,7 @@ PPT、Word 手册、Demo 和 evidence snapshots 要互相支撑。PPT 给结论�
 
 
 
-五分钟演示可以分成四段。第一分钟展示中文输入到 DSL 候选，说明 AI 只是辅助；第二分钟展示 AST、SQL 和 explain，说明编译器掌握语义；第三分钟展示 prefix-sum 案例和 Doris evidence，说明长窗口加速；最后一分钟展示负例诊断和 readiness。
+五分钟演示可以分成四段。第一分钟展示中文输入到 DSL 候选，说明 AI 只是辅助；第二分钟展示 AST、SQL 和 explain，说明编译器掌握语义；第三分钟展示 prefix-sum 案例、真实行情样例和 Doris evidence，说明业务可信与长窗口加速；最后一分钟展示负例诊断和 readiness。
 
 现场操作要避免过多切窗口。最好提前打开 Web Demo、evidence snapshot、readiness 报告和 PPT 对应页。讲到某个点时，只切到最能支撑它的界面，不要在文件夹里寻找报告。
 
@@ -1026,7 +1026,7 @@ PPT 应该是讲解提纲，不是手册压缩版。推荐结构为：题目理�
 
 手册与 PPT 的关系应当明确：PPT 负责现场表达，手册负责赛后查阅。答辩时可以在页脚或备注里标注证据文件名，让评委知道完整材料并不只存在于口头讲述中。
 
-PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，174 passed 来自 pytest，32/32 和 34/34 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。
+PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，175 passed 来自 pytest，32/32 和 34/34 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。
 
 
 
@@ -1124,7 +1124,7 @@ bundle 备份最好在推送成功后立即生成，并把文件名带上时间�
 
 后续规划要体现优先级。真实数据样本扩大覆盖能提升业务可信度，真实 LLM provider 能提升输入体验，多节点 Doris 能提升企业化说服力，更多 DSL 算子能扩展场景。它们都重要，但投入产出不同。
 
-如果目标是进一步冲击奖项展示，优先级建议是：先把已完成的真实行情样本、一分钟视频和 Demo 截图整理进 PPT，再考虑扩大真实样本覆盖、接入真实 LLM provider，最后推进多节点 Doris。这样能把有限时间用在最容易被评委感知的增强上。
+如果目标是进一步冲击奖项展示，优先级建议是：先把已完成的真实行情 Demo 入口、一分钟视频和 Demo 截图整理进 PPT，再考虑扩大真实样本覆盖、接入真实 LLM provider，最后推进多节点 Doris。这样能把有限时间用在最容易被评委感知的增强上。
 
 技术深化则可以围绕 Doris 继续做。物化视图、增量 prefix 维护、多 BE 集群、查询 profile 和资源隔离，都能让项目更接近真实数据平台。但这些工作需要明确实验环境，否则容易花费很大却难以展示。
 
@@ -1258,7 +1258,7 @@ Readiness 指提交前总验收报告，整合测试、性能、证据和 Git �
 
 第六项检查 GitHub 与 bundle。push 成功后生成新的 bundle，文件名带时间戳，放在 `git_bundles` 目录。远端仓库和离线 bundle 同时存在，才算完成可回溯备份。提交前最好记录最新 commit hash，便于团队成员之间确认版本一致。
 
-第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：174 passed、32/32、34/34、真实行情样本 3/3、答辩包 12/12、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。
+第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：175 passed、32/32、34/34、真实行情样本 3/3、答辩包 12/12、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。
 
 第八项检查风险表述。真实 LLM provider、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。
 
