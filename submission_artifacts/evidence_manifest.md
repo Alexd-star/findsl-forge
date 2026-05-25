@@ -1,7 +1,7 @@
 ﻿# Evidence Snapshot Manifest
 
-- Generated at: 2026-05-25 02:36:51 +08:00
-- Git HEAD at export: b569cef
+- Generated at: 2026-05-25 23:12:52 +08:00
+- Git HEAD at export: d50fb4c
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots

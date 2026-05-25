@@ -7,24 +7,24 @@
 - Failed cases: 0
 - Compile success rate: 100.00%
 - Fragment accuracy: 100.00%
-- Average compile latency: 0.598 ms
-- P50 compile latency: 0.524 ms
-- P95 compile latency: 1.170 ms
+- Average compile latency: 0.335 ms
+- P50 compile latency: 0.299 ms
+- P95 compile latency: 0.625 ms
 
 ## Case Details
 
 | Case | Passed | Latency ms | Errors |
 |---|---:|---:|---|
-| 连续3天主力净流入为正后按换手率排名 | True | 1.341 |  |
-| 今日收盘价创250日新高 | True | 0.459 |  |
-| 近10日存在放量 | True | 0.538 |  |
-| 无引号指标名兼容 | True | 0.392 |  |
-| 近3日成交量前缀和加速 | True | 0.541 |  |
-| A股每日换手率前50百分比 | True | 0.962 |  |
-| 日期区间内收盘价大于10 | True | 0.510 |  |
-| 窗口查询日期上界安全裁剪 | True | 0.591 |  |
-| 主力净流出负阈值 | True | 0.270 |  |
-| 近2日收盘价收益率超过5% | True | 0.379 |  |
+| 连续3天主力净流入为正后按换手率排名 | True | 0.681 |  |
+| 今日收盘价创250日新高 | True | 0.235 |  |
+| 近10日存在放量 | True | 0.323 |  |
+| 无引号指标名兼容 | True | 0.214 |  |
+| 近3日成交量前缀和加速 | True | 0.308 |  |
+| A股每日换手率前50百分比 | True | 0.557 |  |
+| 日期区间内收盘价大于10 | True | 0.242 |  |
+| 窗口查询日期上界安全裁剪 | True | 0.316 |  |
+| 主力净流出负阈值 | True | 0.186 |  |
+| 近2日收盘价收益率超过5% | True | 0.291 |  |
 
 ## Generated SQL
 
