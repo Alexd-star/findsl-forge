@@ -14,7 +14,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 2. 如果需要重做 5M Doris 证据，运行 `scripts/prepare_doris_scale_evidence.ps1`。
 3. 运行 `scripts/export_submission_artifacts.ps1` 导出证据快照。
 4. 按 `demo_script.md` 做一次完整演练。
-5. 结合 `demo_screenshots/` 中的截图制作正式 PPT 或录屏讲解稿。
+5. 结合 `demo_screenshots/` 中的截图和 `defense_video/` 中的一分钟 MP4 制作正式 PPT 或录屏讲解稿。
 
 ## 交付物地图
 
@@ -27,7 +27,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 | `defense_video_script.md` | 一分钟答辩视频时间轴、旁白和生成命令 |
 | `real_data_ingestion_plan.md` | 真实行情数据接入方案 |
 | `evidence_snapshots/` | 从 `reports/` 导出的可版本化证据快照 |
-| `demo_screenshots/` | Web Demo 正例、SQL、AST、Explain、Rows、Evidence 和负例诊断截图 |
+| `demo_screenshots/` | Web Demo 正例、真实行情、SQL、AST、Explain、Rows、Evidence 和负例诊断截图 |
 | `defense_video/` | 由截图合成的一分钟答辩视频输出目录 |
 
 ## 当前核心证据口径
@@ -37,5 +37,5 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 - 性能：Doris 5,000,000 行真实集群执行证据，baseline window 与 prefix-sum 优化路径结果一致，优化加速超过 10x。
 - 业务可信度：`data/real_samples/eastmoney_a_share_sample/` 已包含东方财富公开 A 股行情小样本，readiness 会校验 raw JSON、metadata 和 3/3 条真实行情 DSL 等价验证。
 - 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断；当前 Demo 的样例下拉框也能直接切换 Eastmoney 真实行情样本，便于现场把业务可信度和验证证据连在一起讲。
-- 视频：`scripts/build_defense_video.py` 可从截图生成一分钟 MP4，`defense_video_script.md` 提供旁白口径。
+- 视频：`scripts/build_defense_video.py` 已从 8 张版本化截图生成一分钟 MP4，`defense_video_script.md` 提供旁白口径。
 - 可回溯：代码进入 Git；报告快照进入 `submission_artifacts/`；大规模 CSV 由脚本可重建，不进入 Git。
