@@ -11,5 +11,6 @@
 | `05_positive_rows.png` | SQL/reference 验证结果行 | 展示独立语义校验后的结果预览 |
 | `06_positive_evidence.png` | Doris evidence 摘要 | 展示 5M 行 Doris 规模证据和性能结论入口 |
 | `07_negative_unknown_indicator.png` | `UNKNOWN_INDICATOR` 负例，预期诊断与实际诊断一致 | 展示错误输入会被稳定诊断并给出修复建议 |
+| `real_market_sample.png` | Eastmoney 真实行情样例、PASS 状态、SQL 行数和真实日期条件 | 说明真实股票代码和交易日期也走同一套编译与 SQL/reference 验证链路 |
 
-生成或录制一分钟答辩视频时，建议按 `01 -> 02 -> 04 -> 05 -> 06 -> 07` 的顺序切换。`scripts/build_defense_video.py` 已按这条路线生成 MP4；如果需要真人讲解，再按同样顺序补录旁白。
+生成或录制一分钟答辩视频时，建议按 `01 -> 02 -> real_market_sample -> 03 -> 04 -> 05 -> 06 -> 07` 的顺序切换。`scripts/build_defense_video.py` 已按这条路线生成 MP4；如果需要真人讲解，再按同样顺序补录旁白。
