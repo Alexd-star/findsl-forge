@@ -7,10 +7,10 @@ def test_official_suite_passes_positive_and_negative_cases(tmp_path):
     result = run_official_suite(output_path=output)
 
     assert result.passed
-    assert result.positive_passed == 32
-    assert result.positive_total == 32
-    assert result.negative_passed == 34
-    assert result.negative_total == 34
+    assert result.positive_passed == 36
+    assert result.positive_total == 36
+    assert result.negative_passed == 37
+    assert result.negative_total == 37
     assert output.exists()
     assert all(case.equivalence_passed for case in result.positive_cases)
     assert all(not case.missing_sql_fragments for case in result.positive_cases)
@@ -22,8 +22,10 @@ def test_official_suite_passes_positive_and_negative_cases(tmp_path):
     content = output.read_text(encoding="utf-8")
     assert "Official-Style Coverage Suite" in content
     assert "Suite passed: True" in content
-    assert "Positive cases passed: 32/32" in content
-    assert "Negative diagnostic cases passed: 34/34" in content
+    assert "Positive cases passed: 36/36" in content
+    assert "Negative diagnostic cases passed: 37/37" in content
     assert "money_flow_prefix_sum" in content
     assert "date_close_return_rate" in content
+    assert "parenthesized_or_with_date_pushdown" in content
+    assert "rank_ascending_percent_cutoff" in content
     assert "UNKNOWN_INDICATOR" in content

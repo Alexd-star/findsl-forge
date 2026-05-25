@@ -32,3 +32,6 @@
 {"name": "rank百分比不能为零", "dsl": "rank(indicator(\"close\"), desc, percent=0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["0 < N <= 100"]}
 {"name": "date_between参数不足", "dsl": "filter(date_between(\"2026-01-01\"))", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["date_between(\"YYYY-MM-DD\", \"YYYY-MM-DD\")"]}
 {"name": "RET不能嵌套窗口表达式", "dsl": "filter(RET(MA(indicator(\"close\"), 3), 2) > 0.05)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["RET(indicator(\"close\"), N)"]}
+{"name": "rank不能同时使用top和percent", "dsl": "rank(indicator(\"close\"), desc, top=2, percent=50)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["do not combine it with top/bottom"]}
+{"name": "RET窗口必须为正", "dsl": "filter(RET(indicator(\"close\"), -1) > 0)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["positive integer window"]}
+{"name": "SUM首参不能是布尔条件", "dsl": "filter(SUM(market(\"A\"), 3) > 1)", "expected_code": "SEMANTIC_ERROR", "expected_suggestion_fragments": ["numeric positions"]}
