@@ -3,8 +3,8 @@
 ## Summary
 
 - Suite passed: True
-- Positive cases passed: 32/32
-- Negative diagnostic cases passed: 34/34
+- Positive cases passed: 36/36
+- Negative diagnostic cases passed: 37/37
 
 ## Positive Cases
 
@@ -42,6 +42,10 @@
 | 过滤A股突破低点后按均换手率排名 | staged_min_filter_rank_by_ma | True | True | 4 | 4 | <none> |
 | 日期区间存在资金流出信号 | date_exist_outflow | True | True | 5 | 5 | <none> |
 | 日期区间近2日收益率超过5% | date_close_return_rate | True | True | 5 | 5 | <none> |
+| 成交量不为零且换手率不低于0.5 | not_equal_and_gte_filter | True | True | 14 | 14 | <none> |
+| 日期区间内A股或低价股 | parenthesized_or_with_date_pushdown | True | True | 9 | 9 | <none> |
+| 每日低价前50百分比 | rank_ascending_percent_cutoff | True | True | 10 | 10 | <none> |
+| 近1日收盘收益率为负 | negative_return_rate_threshold | True | True | 3 | 3 | <none> |
 
 ## Negative Diagnostic Cases
 
@@ -81,6 +85,9 @@
 | rank百分比不能为零 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
 | date_between参数不足 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
 | RET不能嵌套窗口表达式 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| rank不能同时使用top和percent | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| RET窗口必须为正 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| SUM首参不能是布尔条件 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
 
 ## Evidence Policy
 

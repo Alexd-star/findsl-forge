@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-05-25T17:16:46+00:00
+- Generated at: 2026-05-25T17:31:01+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `3ea22b1` Clarify versioned defense video artifacts
+- Git HEAD at report generation: `536dd95` Broaden official-style coverage suite
 - Git branch: `main`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,18 +13,18 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 6530.5 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 0.945 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 6808.2 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 0.946 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 1.050 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.672 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
 | Doris SQL validation boundary | required | PASS | validation steps 1, issues 0, escaped literal True |
 | Real-market quote sample | required | PASS | cases 3/3, raw payloads 2, source Eastmoney public historical K-line endpoint |
-| Official-style coverage suite | required | PASS | positive 32/32, negative 34/34 |
+| Official-style coverage suite | required | PASS | positive 36/36, negative 37/37 |
 | Defense package walkthrough | required | PASS | checks 12/12, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
@@ -35,14 +35,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 0.945 ms
+- Compile P95 latency: 0.946 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.16x
+- Local SQLite prefix benchmark speedup smoke: 1.13x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -53,8 +53,8 @@
 - Doris SQL validation smoke: True
 - Real-market quote sample: True
 - Real-market sample cases: 3/3
-- Official-style positive cases: 32/32
-- Official-style negative diagnostics: 34/34
+- Official-style positive cases: 36/36
+- Official-style negative diagnostics: 37/37
 - Defense package checks: 12/12
 
 ## Evidence Artifacts
@@ -73,8 +73,8 @@
 ## Official-Style Coverage Suite
 
 - Suite passed: True
-- Positive cases passed: 32/32
-- Negative diagnostic cases passed: 34/34
+- Positive cases passed: 36/36
+- Negative diagnostic cases passed: 37/37
 - Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\official_suite_report.md`
 
 ## Defense Package
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 1.050 ms
+- Compile latency: 0.672 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -177,13 +177,13 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 6530.5 ms
+- Elapsed: 6808.2 ms
 
 ```text
 ........................................................................ [ 41%]
 ........................................................................ [ 82%]
 ...............................                                          [100%]
-175 passed in 6.16s
+175 passed in 6.39s
 ```
 
 ## Award-Readiness Differentiators
