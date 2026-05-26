@@ -53,6 +53,37 @@ def test_extracts_openai_style_message_content_and_markdown_fences():
     assert candidates[0].source.endswith(".fence")
 
 
+def test_extracts_openai_style_message_content_when_model_returns_json_text():
+    payload = json.dumps(
+        {
+            "choices": [
+                {
+                    "message": {
+                        "content": json.dumps(
+                            {
+                                "candidates": [
+                                    {
+                                        "dsl": 'filter(RET(indicator("close"), 2) > 0.05)',
+                                        "confidence": 0.87,
+                                        "rationale": "close return threshold",
+                                    }
+                                ]
+                            }
+                        )
+                    }
+                }
+            ]
+        }
+    )
+
+    candidates = extract_llm_dsl_candidates(payload)
+
+    assert len(candidates) == 1
+    assert candidates[0].dsl == 'filter(RET(indicator("close"), 2) > 0.05)'
+    assert candidates[0].confidence == 0.87
+    assert ".json_text" in candidates[0].source
+
+
 def test_validate_llm_candidates_accepts_valid_dsl_and_rejects_unsafe_sql():
     payload = Path("data/samples/llm_candidate_response.json").read_text(encoding="utf-8")
 

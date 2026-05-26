@@ -26,9 +26,10 @@ This document maps Topic 19 requirements to implementation modules.
 | AST/SQL/explain/result visualization | `findsl.demo`, `scripts/serve_demo.ps1`, readiness demo smoke gate | Implemented with API smoke gate |
 | AI-assisted natural-language entry without SQL hallucination | `findsl.nl2dsl`, `findsl.demo`, `findsl.readiness`, `suggest-dsl` CLI | Implemented with compiler-validated templates |
 | Optional LLM assistance with deterministic safety guardrails | `findsl.llm_adapter`, `validate-llm-candidates` CLI, `scripts/validate_llm_candidates.ps1`, `data/samples/llm_candidate_response.json`, readiness required gate | Implemented with unsafe-SQL rejection |
+| Optional real-provider LLM entry point | `findsl.llm_provider`, `llm-suggest-dsl` CLI, OpenAI-compatible `/chat/completions` contract, defense-package provider-contract check | Implemented as optional candidate source; no provider output bypasses the compiler |
 | Interactive error explainability and repair guidance | `findsl.diagnostics`, `findsl.demo`, `diagnose` CLI, Web Demo diagnostic presets | Implemented with negative official suite |
 | Official-style task coverage and negative diagnostic evidence | `findsl.official_suite`, `official-suite` CLI, `scripts/official_suite.ps1`, `data/samples/official_*_cases.jsonl`, readiness required gate | Implemented and regression-tested |
-| Defense walkthrough and score-mapping evidence | `findsl.defense_package`, `defense-package` CLI, `scripts/defense_package.ps1`, `reports/defense_package.md`, readiness required gate | Implemented with 12/12 defense checks |
+| Defense walkthrough and score-mapping evidence | `findsl.defense_package`, `defense-package` CLI, `scripts/defense_package.ps1`, `reports/defense_package.md`, readiness required gate | Implemented with 13/13 defense checks |
 | Reproducible evaluation report | `findsl.evaluation`, `scripts/evaluate.ps1` | Implemented |
 | Semantic correctness proof | `findsl.reference`, `findsl.executor`, `findsl.equivalence`, sample CSV tables | Implemented with required readiness gate |
 | Public real-market quote sample | `scripts/fetch_real_market_sample.py`, `data/real_samples/eastmoney_a_share_sample/`, `tests/test_real_market_sample.py`, readiness real-market gate, `reports/real_market_sample_report.md` | Implemented with 3/3 SQL/reference equivalence cases and defense evidence |

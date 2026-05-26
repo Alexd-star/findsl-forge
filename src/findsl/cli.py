@@ -34,6 +34,25 @@ def main() -> None:
     llm_cmd.add_argument("--json", action="store_true", help="Print validation payload as JSON")
     llm_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
     llm_cmd.add_argument("--no-verify", action="store_true", help="Skip SQL/reference verification")
+    provider_cmd = sub.add_parser(
+        "llm-suggest-dsl",
+        help="Ask an OpenAI-compatible provider for DSL candidates, then validate them",
+    )
+    provider_cmd.add_argument("text", help="Natural-language stock-screening request")
+    provider_cmd.add_argument("--base-url", default=None, help="OpenAI-compatible base URL")
+    provider_cmd.add_argument("--model", default=None, help="Provider model name; or set FINDSL_LLM_MODEL")
+    provider_cmd.add_argument("--api-key-env", default="FINDSL_LLM_API_KEY", help="Environment variable containing the API key")
+    provider_cmd.add_argument("--no-api-key", action="store_true", help="Allow local providers that do not require an API key")
+    provider_cmd.add_argument("--timeout", type=float, default=30.0, help="Provider request timeout in seconds")
+    provider_cmd.add_argument("--temperature", type=float, default=0.1, help="Provider sampling temperature")
+    provider_cmd.add_argument("--max-tokens", type=int, default=700, help="Provider max tokens")
+    provider_cmd.add_argument("--max-candidates", type=int, default=5, help="Maximum candidates to extract and validate")
+    provider_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
+    provider_cmd.add_argument("--raw-output", default=None, help="Optional file path for the raw provider response")
+    provider_cmd.add_argument("--json-response-format", action="store_true", help="Request provider JSON-object response_format when supported")
+    provider_cmd.add_argument("--json", action="store_true", help="Print validation payload as JSON")
+    provider_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    provider_cmd.add_argument("--no-verify", action="store_true", help="Skip SQL/reference verification")
     eval_cmd = sub.add_parser("evaluate", help="Evaluate compiler against a JSONL case file")
     eval_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL case file")
     eval_cmd.add_argument("--output", default="reports/evaluation_report.md", help="Output Markdown report")
@@ -212,6 +231,65 @@ def main() -> None:
             print("| Rank | Accepted | Reason | Source | DSL |")
             print("|---:|---:|---|---|---|")
             for candidate in result.candidates:
+                print(
+                    f"| {candidate.rank} | {candidate.accepted} | "
+                    f"{candidate.reason} | {candidate.source} | `{candidate.dsl}` |"
+                )
+        if not result.passed:
+            raise SystemExit(1)
+    elif args.command == "llm-suggest-dsl":
+        from .llm_provider import config_from_env, request_and_validate_llm_candidates
+
+        try:
+            config = config_from_env(
+                base_url=args.base_url,
+                model=args.model,
+                api_key_env=args.api_key_env,
+                allow_missing_api_key=args.no_api_key,
+                timeout_seconds=args.timeout,
+                temperature=args.temperature,
+                max_tokens=args.max_tokens,
+                response_format_json=args.json_response_format,
+            )
+            result = request_and_validate_llm_candidates(
+                text=args.text,
+                config=config,
+                data_dir=Path(args.data_dir),
+                enable_prefix_sum=not args.no_prefix_sum,
+                verify=not args.no_verify,
+                max_candidates=args.max_candidates,
+            )
+        except Exception as exc:  # noqa: BLE001 - CLI should turn provider failures into actionable output.
+            if args.json:
+                print(
+                    json.dumps(
+                        {
+                            "ok": False,
+                            "error": {"type": type(exc).__name__, "message": str(exc)},
+                        },
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                )
+            else:
+                print(f"{type(exc).__name__}: {exc}")
+            raise SystemExit(1)
+
+        if args.raw_output:
+            Path(args.raw_output).write_text(result.raw_response, encoding="utf-8")
+        payload = result.to_dict()
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(f"Provider model: {payload['provider']['model']}")
+            print(f"Provider base URL: {payload['provider']['base_url']}")
+            if result.validation.warnings:
+                print("Warnings:")
+                for warning in result.validation.warnings:
+                    print(f"- {warning}")
+            print("| Rank | Accepted | Reason | Source | DSL |")
+            print("|---:|---:|---|---|---|")
+            for candidate in result.validation.candidates:
                 print(
                     f"| {candidate.rank} | {candidate.accepted} | "
                     f"{candidate.reason} | {candidate.source} | `{candidate.dsl}` |"

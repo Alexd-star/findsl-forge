@@ -33,7 +33,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 ## 当前核心证据口径
 
 - 编译正确性：官方风格正例、负例、SQL/reference 等价验证。
-- 安全性：LLM 候选必须经过 DSL 编译器验证，直接 SQL 和错误 DSL 会被拒绝。
+- 安全性：LLM 候选必须经过 DSL 编译器验证，直接 SQL 和错误 DSL 会被拒绝；真实 provider 也只作为候选来源，不改变这条边界。
 - 性能：Doris 5,000,000 行真实集群执行证据，baseline window 与 prefix-sum 优化路径结果一致，优化加速超过 10x。
 - 业务可信度：`data/real_samples/eastmoney_a_share_sample/` 已包含东方财富公开 A 股行情小样本，readiness 会校验 raw JSON、metadata 和 3/3 条真实行情 DSL 等价验证。
 - 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断；当前 Demo 的样例下拉框也能直接切换 Eastmoney 真实行情样本，便于现场把业务可信度和验证证据连在一起讲。

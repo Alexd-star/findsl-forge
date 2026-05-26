@@ -18,7 +18,7 @@ FinDSL Forge：面向 Apache Doris 的可审计金融选股 DSL 编译与加速�
 
 展示四层：
 
-1. 输入层：DSL / 中文自然语言 / LLM 候选。
+1. 输入层：DSL / 中文自然语言 / 离线 LLM 候选 / OpenAI-compatible provider 候选。
 2. 编译层：lexer、parser、semantic、registry、sqlgen。
 3. 验证层：Pandas reference、SQLite regression、Doris SQL validation。
 4. 执行层：Apache Doris schema、prefix table、EXPLAIN、latency evidence。
@@ -45,7 +45,7 @@ FinDSL Forge：面向 Apache Doris 的可审计金融选股 DSL 编译与加速�
 
 ## 10. AI 辅助但不放弃安全
 
-展示 NL2DSL 和 LLM safety loop：接受合法 DSL，拒绝 direct SQL 和未知指标。
+展示 NL2DSL、LLM safety loop 和 provider contract：接受合法 DSL，拒绝 direct SQL 和未知指标；真实 provider 输出仍作为候选进入同一套验证。
 
 ## 11. 工程化交付
 

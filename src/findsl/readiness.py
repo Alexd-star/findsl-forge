@@ -424,6 +424,7 @@ class ReadinessReport:
                 "- NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.",
                 "- Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, B-market average-volume threshold, date-window moving-average, signed net-outflow, rolling-min, return-rate, and date-prefix-sum pruning scenarios.",
                 "- Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.",
+                "- Optional OpenAI-compatible provider path can request JSON DSL candidates while preserving the same deterministic safety loop.",
                 "- Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.",
                 "- SQL string literals are escaped by the compiler before they reach generated Doris SQL.",
                 "- Public Eastmoney quote sample proves the same SQL/reference verifier works on real A-share codes and dates without using the tiny sample as performance evidence.",
@@ -438,7 +439,7 @@ class ReadinessReport:
                 "- Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.",
                 "- Refresh the generated one-minute defense video when screenshots or evidence values change; add human voiceover only if the portal requires narrated media.",
                 "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
-                "- Connect the optional LLM adapter to a real provider only after preserving the same deterministic validation contract.",
+                "- Use the provider-backed LLM path only with stable credentials, timeout settings, and saved raw responses when preparing live demos.",
             ]
         )
         return "\n".join(lines)

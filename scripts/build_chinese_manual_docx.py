@@ -69,7 +69,7 @@ REQUIREMENT_TABLE = [
     ("Doris SQL 生成", "sqlgen、doris_sql", "生成 CTE、窗口函数、rank、date_between 下推和 prefix-sum 查询。"),
     ("正确性证明", "reference、executor、equivalence", "SQL 执行结果与独立 Pandas 语义参考结果一致。"),
     ("性能优化", "prefix-sum、hot-window materialization", "5,000,000 行 Doris 证据中达到 36.24x 加速。"),
-    ("AI 辅助", "nl2dsl、llm_adapter", "自然语言只生成 DSL 候选，候选必须经过编译器和参考验证。"),
+    ("AI 辅助", "nl2dsl、llm_adapter、llm_provider", "自然语言和真实 provider 都只生成 DSL 候选，候选必须经过编译器和参考验证。"),
     ("工程交付", "scripts、reports、submission_artifacts", "readiness、Doris 证据、答辩包、bundle 备份形成闭环。"),
 ]
 
@@ -79,24 +79,25 @@ COMMAND_TABLE = [
     ("启动 Web Demo", "powershell -ExecutionPolicy Bypass -File .\\scripts\\serve_demo.ps1", "打开本地评委演示控制台。"),
     ("生成 readiness", "powershell -ExecutionPolicy Bypass -File .\\scripts\\submission_readiness.ps1", "生成提交前总验收报告。"),
     ("验证真实行情样本", "python -m findsl.cli verify-sql 'filter(date_between(\"2024-01-02\", \"2024-01-12\") & RET(indicator(\"close\"), 2) > 0)' --data-dir data/real_samples/eastmoney_a_share_sample", "在公开 A 股行情样本上验证同一套 SQL/reference 口径。"),
+    ("调用可选 LLM Provider", "python -m findsl.cli llm-suggest-dsl \"近3日成交量累计大于300\" --model \"<provider-model>\" --json", "当已配置 provider key 时，让真实模型生成 DSL 候选，再进入同一安全验证环。"),
     ("导出证据快照", "powershell -ExecutionPolicy Bypass -File .\\scripts\\export_submission_artifacts.ps1", "把 reports 中轻量证据复制到可版本化提交包。"),
     ("复现 Doris 规模证据", "powershell -ExecutionPolicy Bypass -File .\\scripts\\prepare_doris_scale_evidence.ps1 -ProxyUrl \"http://127.0.0.1:7897\"", "启动 Doris、生成 5M 数据、Stream Load、重建 prefix、采集证据。"),
 ]
 
 
 EVIDENCE_TABLE = [
-    ("Pytest 回归", "175 passed", "覆盖编译器、参考执行、Demo、安全、收益率算子、真实行情样本、答辩视频时间轴和 Doris 证据采集逻辑。"),
+    ("Pytest 回归", "181 passed", "覆盖编译器、参考执行、Demo、安全、收益率算子、真实行情样本、provider 合约、答辩视频时间轴和 Doris 证据采集逻辑。"),
     ("官方风格正例", "36/36", "覆盖窗口、排名、日期裁剪、多表指标、prefix-sum、收益率、不等号和括号 OR 条件。"),
     ("官方风格负例", "37/37", "覆盖未知指标、非法窗口、非法日期、RET 嵌套窗口、rank 截止互斥、直接 SQL、安全诊断。"),
     ("真实行情样本", "3/3", "东方财富公开 K 线样本的 turnover、RET 和 rolling volume DSL 均通过 SQL/reference 等价验证。"),
-    ("答辩包检查", "12/12", "把真实行情样本、LLM 安全、语义加固、Doris asset 和官方套件统一映射到得分点。"),
+    ("答辩包检查", "13/13", "把真实行情样本、LLM 安全、provider 合约、语义加固、Doris asset 和官方套件统一映射到得分点。"),
     ("Doris 规模证据", "36.24x", "5,000,000 行数据，baseline window 与 optimized prefix 行数一致。"),
     ("Readiness", "Warning count: 0", "阻塞门禁与警告门禁均通过。"),
 ]
 
 
 ARCHITECTURE_LINES = [
-    "中文需求 / DSL / LLM 候选",
+    "中文需求 / DSL / LLM 候选 / Provider 候选",
     "  -> Lexer 与 Parser 生成 AST",
     "  -> Semantic Analyzer 检查指标、函数、参数与安全边界",
     "  -> SQL Generator 生成 Doris SQL 与 rewrite trace",
@@ -122,7 +123,7 @@ CHAPTER_INTROS = {
     "测试、验证与质量保障": "质量章节把项目可信度落到具体测试和报告上。当前验证不是单一 pytest，也不是单一 Doris 截图，而是由单元测试、官方风格套件、语义等价、Doris 规模证据和提交包快照共同支撑。这里的重点是证明项目状态可以被重复检查。",
     "竞赛答辩与材料组织": "答辩材料要服务现场沟通。技术团队容易陷入细节，但评委在有限时间内需要听到清楚的痛点、方案、证据和创新点。本章给出主线、演示节奏、PPT 结构和得分点映射，帮助团队把已经完成的工程成果讲成一条有说服力的故事。",
     "工程管理、Git 回溯与风险控制": "竞赛项目越接近提交，工程管理越重要。一次未提交的本地修改、一个没同步的证据快照、一次错误覆盖，都可能让前期工作变得难以回溯。本章说明 Git、bundle、风险清单和质量门禁的配合方式，保证项目不仅能做出来，也能稳稳交出去。",
-    "后续增强路线": "最后一章把增强方向和已完成内容分开。公开真实行情小样本已经进入仓库，后续仍可扩大覆盖范围、补充真实资金流、多节点 Doris、物化视图、真实 LLM provider 和更多 DSL 算子。本章的作用是给评委展示项目成长空间，同时保持对当前交付状态的诚实。",
+    "后续增强路线": "最后一章把增强方向和已完成内容分开。公开真实行情小样本和 provider 接口已经进入仓库，后续仍可扩大真实数据覆盖、补充真实资金流、多节点 Doris、物化视图、模型效果评测和更多 DSL 算子。本章的作用是给评委展示项目成长空间，同时保持对当前交付状态的诚实。",
 }
 
 
@@ -137,7 +138,7 @@ CHAPTER_DEEP_DIVES = {
         "赛题 19 有明显的综合性。它要求理解金融筛选表达，掌握数据库 SQL 生成，知道 Doris 的执行特点，还要能把性能优化做成可复现实验。任何一条线薄弱，最终作品都容易变成“能演示但不够扎实”。",
         "解题时需要把大模型热度放回正确位置。当前 AI 能帮助理解自然语言，却不能保证生成 SQL 的安全性和口径稳定性。因此项目选择编译器作为核心，大模型或模板只作为候选入口，这个判断是项目能否获得高分的基础。",
         "赛题评分通常会关注功能覆盖、复杂查询、性能、创新和交付质量。项目已经覆盖窗口、排名、连续、存在、日期和辅助表 join，并用 prefix-sum 做出明显性能亮点。文档需要把这些点串起来，让评委看到它们不是零散功能。",
-        "策略上应少讲宏大愿景，多讲已完成证据。真实 Doris 5M 实验、36.24x 加速、正负例套件、真实行情小样本和 readiness warning 0 都是硬材料；多节点 Doris、真实 LLM provider 和更多算子则放在增强路线中，保持已完成与规划之间的清楚边界。",
+        "策略上应少讲宏大愿景，多讲已完成证据。真实 Doris 5M 实验、36.24x 加速、正负例套件、真实行情小样本、provider 合约和 readiness warning 0 都是硬材料；多节点 Doris、模型效果评测和更多算子则放在增强路线中，保持已完成与规划之间的清楚边界。",
     ],
     "产品介绍与用户价值": [
         "产品价值来自“把复杂性放到系统内部”。策略用户不该被迫记住窗口函数的 SQL 细节，也不该承担日期裁剪是否正确的风险；他们更关心表达条件和查看结果。系统把这些复杂性封装在编译器、验证器和 Doris 适配层中。",
@@ -208,12 +209,12 @@ CHAPTER_DEEP_DIVES = {
     "工程管理、Git 回溯与风险控制": [
         "工程管理的目标是让项目在任何关键节点都能回到可用状态。Git commit 记录远端历史，bundle 保留离线备份，readiness 标识可提交状态，submission_artifacts 固化证据。它们合在一起，才是真正的回溯体系。",
         "越接近截止，越要避免无证据改动。一个看似很小的文案、脚本或配置修改，都可能影响生成结果或操作路径。重要修改后重新生成文档、运行测试并提交，是防止最后混乱的基本纪律。",
-        "风险清单要写得具体。比如“真实 LLM 未接入”比“AI 能力待完善”更明确，“多 BE Doris 未实测”比“性能还可优化”更可执行。具体风险才能对应具体行动。",
+        "风险清单要写得具体。比如“provider 已接入但未绑定固定比赛账号密钥”比“AI 能力待完善”更明确，“多 BE Doris 未实测”比“性能还可优化”更可执行。具体风险才能对应具体行动。",
         "质量门禁应与团队分工结合。有人负责代码，有人负责文档，有人负责演示和证据，但最终都要汇总到同一套 readiness 和 Git 状态中。这样团队协作不会因为材料分散而失控。",
     ],
     "后续增强路线": [
-        "后续规划要体现优先级。真实数据样本扩大覆盖能提升业务可信度，真实 LLM provider 能提升输入体验，多节点 Doris 能提升企业化说服力，更多 DSL 算子能扩展场景。它们都重要，但投入产出不同。",
-        "如果目标是进一步冲击奖项展示，优先级建议是：先把已完成的真实行情 Demo 入口、一分钟视频和 Demo 截图整理进 PPT，再考虑扩大真实样本覆盖、接入真实 LLM provider，最后推进多节点 Doris。这样能把有限时间用在最容易被评委感知的增强上。",
+        "后续规划要体现优先级。真实数据样本扩大覆盖能提升业务可信度，provider 效果评测能提升输入体验，多节点 Doris 能提升企业化说服力，更多 DSL 算子能扩展场景。它们都重要，但投入产出不同。",
+        "如果目标是进一步冲击奖项展示，优先级建议是：先把已完成的真实行情 Demo 入口、一分钟视频、provider 合约和 Demo 截图整理进 PPT，再考虑扩大真实样本覆盖和模型效果评测，最后推进多节点 Doris。这样能把有限时间用在最容易被评委感知的增强上。",
         "技术深化则可以围绕 Doris 继续做。物化视图、增量 prefix 维护、多 BE 集群、查询 profile 和资源隔离，都能让项目更接近真实数据平台。但这些工作需要明确实验环境，否则容易花费很大却难以展示。",
         "DSL 扩展要坚持证据先行。每新增一个方向，都要同步补语义定义、reference、测试、样例、文档和 Demo。只有这样，路线图才不会变成口号清单，而会变成可逐步实现的工程计划。",
     ],
@@ -251,7 +252,7 @@ CHAPTERS = [
         "系统总体架构",
         [
             ("分层架构概览", "系统架构", "系统从上到下分为输入层、编译层、验证层、执行层和展示层。", "输入层接收 DSL、中文自然语言或 LLM 候选；编译层负责词法、语法、AST、语义和 SQL 生成；验证层负责参考语义、SQLite 回归和 Doris SQL 安全检查。", "执行层面向 Apache Doris，展示层通过 Web Demo、Markdown 报告和 Word 文档服务于竞赛提交。"),
-            ("模块协作方式", "模块协作", "模块之间采用明确的输入输出边界，Compiler 返回 SQL、AST、trace 和 explain，ReferenceEvaluator 返回基准结果键，EquivalenceVerifier 比较两边结果。", "这种接口划分使得每个模块都能单独测试，也便于在未来替换 Doris 集群、扩展指标表或接入真实 LLM provider。", "从竞赛角度看，清晰模块边界也使答辩更容易展开：每个得分点都能对应到一个模块和一份证据。"),
+            ("模块协作方式", "模块协作", "模块之间采用明确的输入输出边界，Compiler 返回 SQL、AST、trace 和 explain，ReferenceEvaluator 返回基准结果键，EquivalenceVerifier 比较两边结果。", "这种接口划分使得每个模块都能单独测试，也便于在未来替换 Doris 集群、扩展指标表或切换不同 OpenAI-compatible provider。", "从竞赛角度看，清晰模块边界也使答辩更容易展开：每个得分点都能对应到一个模块和一份证据。"),
             ("证据链架构", "证据链", "系统不是等到最后才写报告，而是把证据生成纳入工程流程。", "official suite、evaluation report、Doris evidence、defense package 和 submission readiness 都由脚本生成，最终再通过 export_submission_artifacts 进入版本化提交包。", "这种方式避免了手工截图和口头说明不一致的问题，也让每次提交都可以回答：当前状态是否真的可交付。"),
             ("架构可扩展性", "扩展性", "当前系统已经将指标、表、函数注册放在 configs 中，新增普通指标不需要改编译器核心。", "如果未来需要接入更多行情、财务、公告或情绪指标，可以先扩展 registry，再补充 official-style case 和 reference evaluator 支持。", "这种可扩展性体现为低成本业务扩展，而不是在编译器中堆叠越来越多的硬编码分支。"),
         ],
@@ -300,7 +301,7 @@ CHAPTERS = [
         [
             ("AI 辅助定位", "AI 辅助", "项目利用 AI 的方式是降低输入门槛，而不是让模型直接控制数据库。", "中文自然语言会先通过 NL2DSL 模板层生成候选 DSL，然后候选进入同一条确定性编译、验证和执行链路。", "这使 AI 成为业务表达助手，而不是不可审计的 SQL 生成器。"),
             ("NL2DSL 模板层", "NL2DSL", "模板层覆盖连续主力净流入、低价 bottom 排名、换手率百分比、B 股均量阈值、日期区间均线、滚动最小值、日期前缀和等官方风格表达。", "系统还支持斜杠日期、中文年月日、近半年等真实用户常见写法。", "候选 DSL 会带有 rule、confidence 和 rationale，方便在 Demo 中解释为什么这样翻译。"),
-            ("LLM 候选安全环", "LLM Safety", "LLM adapter 可以解析 JSON 或 markdown 风格的模型响应，但会把直接 SQL 输出识别为 UNSAFE_DIRECT_SQL。", "剩余 DSL 候选还要经过编译、Doris SQL validation 和 reference equivalence。", "因此即使未来接入真实模型 provider，也不会改变核心安全约束。"),
+            ("LLM 候选安全环", "LLM Safety", "LLM adapter 可以解析 JSON、markdown 风格或 provider 返回的 OpenAI-style 响应，但会把直接 SQL 输出识别为 UNSAFE_DIRECT_SQL。", "剩余 DSL 候选还要经过编译、Doris SQL validation 和 reference equivalence。", "因此真实 provider 接入后也只是改变候选来源，不会改变核心安全约束。"),
             ("诊断与修复建议", "诊断", "错误 DSL 不会只返回 traceback，而是返回稳定 diagnostic code 和修复建议。", "例如 indicator(\"clos\") 会触发 UNKNOWN_INDICATOR，并建议 indicator(\"close\")。", "这让系统不仅适合比赛演示，也适合真实用户迭代表达式。"),
         ],
     ),
@@ -327,7 +328,7 @@ CHAPTERS = [
     (
         "测试、验证与质量保障",
         [
-            ("单元测试体系", "测试体系", "项目测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、doris_sql、doris_evidence、demo、real market sample、defense video 和 readiness。", "当前全量 pytest 结果为 175 passed，这说明新增收益率算子、真实行情 Demo 样本、答辩视频资产和文档增强没有破坏核心链路。", "测试数量不是目的，关键是每个高风险行为都有对应断言。"),
+            ("单元测试体系", "测试体系", "项目测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、llm_provider、doris_sql、doris_evidence、demo、real market sample、defense video 和 readiness。", "当前全量 pytest 结果为 181 passed，这说明 provider 合约、收益率算子、真实行情 Demo 样本、答辩视频资产和文档增强没有破坏核心链路。", "测试数量不是目的，关键是每个高风险行为都有对应断言。"),
             ("官方风格覆盖套件", "官方套件", "official_positive_cases.jsonl 和 official_negative_cases.jsonl 构成比赛风格回归语料。", "正例要求编译成功、SQL 片段匹配、trace 片段匹配、explain 规则匹配，并且 SQL/reference 等价。", "负例要求失败方式可控，返回预期 diagnostic code 和可操作建议。"),
             ("语义等价验证", "等价验证", "Pandas reference evaluator 直接解释 DSL，SQLite executor 执行编译生成 SQL。", "两者结果按 ts_code、trade_date 键比较，发现 missing 或 extra 即视为语义错误。", "这种双路径验证降低了 SQL 生成器自证正确的风险。"),
             ("Doris 规模验证", "Doris 验证", "Doris evidence collector 在真实 MySQL 兼容端口上执行 EXPLAIN 和 COUNT(*)。", "baseline 与 optimized 必须都成功、行数必须一致、baseline plan 必须包含 window、optimized plan 必须包含 prefix table、加速必须超过阈值。", "任一条件不满足都不应在答辩中宣称性能达标。"),
@@ -348,7 +349,7 @@ CHAPTERS = [
         [
             ("Git 工作流", "Git", "项目使用 main 分支持续提交，每次关键功能完成后运行测试和 readiness，再 commit、push、生成 bundle 备份。", "这种流程保证即使本机环境变化，也能通过 GitHub 或 bundle 回到可用版本。", "竞赛项目越接近提交阶段，越不能依赖未提交的本地状态。"),
             ("Bundle 备份", "备份", "Git bundle 是离线回溯手段，适合在网络不稳定或远端不可访问时保留完整仓库历史。", "当前备份目录位于研究生金融科技创新大赛/git_bundles。", "每次重要提交后生成新的 bundle，可以降低误操作和环境损坏风险。"),
-            ("风险清单", "风险控制", "剩余风险主要包括真实行情样本覆盖还小、如平台要求真人旁白则需要补录讲解音轨、真实 LLM provider 未接入、多 BE 生产 Doris 未实测。", "这些风险不影响当前核心赛题完成度；Web Demo 截图和一分钟 MP4 已经进入提交包，后续重点是按平台格式组织提交。", "文档中应诚实区分已完成证据、可选增强和未来扩展，避免过度承诺。"),
+            ("风险清单", "风险控制", "剩余风险主要包括真实行情样本覆盖还小、如平台要求真人旁白则需要补录讲解音轨、provider 实际效果需结合比赛可用账号复测、多 BE 生产 Doris 未实测。", "这些风险不影响当前核心赛题完成度；Web Demo 截图、一分钟 MP4 和 provider 合约检查已经进入提交包，后续重点是按平台格式组织提交。", "文档中应诚实区分已完成证据、可选增强和未来扩展，避免过度承诺。"),
             ("质量门禁", "质量门禁", "团队开发时应把 pytest、official-suite、submission-readiness 作为三层门禁。", "小改动至少跑相关测试，大改动必须跑全量 readiness；涉及性能或 Doris schema 的改动必须重采 Doris evidence。", "质量门禁的价值在于把主观感觉转化为可复核结果。"),
         ],
     ),
@@ -358,7 +359,7 @@ CHAPTERS = [
             ("真实数据样本", "真实数据增强", "项目已经接入一份公开行情小样本，重点是证明字段、语义和业务场景真实。", "真实样本可以用于 Demo 展示，合成 5M 数据继续作为可复现性能基准。", "二者分工清楚，既能增强业务可信度，又不会牺牲实验可复现性。"),
             ("多节点 Doris", "多节点 Doris", "当前本地环境是单 FE/BE Docker Desktop，已经足够完成赛题证据。", "如果继续提升企业级交付，可以搭建多 BE 集群，测试 replication_num、bucket、colocate group 和 Stream Load 并发写入。", "多节点实测能进一步证明系统不是只适合本机演示。"),
             ("物化视图与增量维护", "物化视图", "prefix table 当前通过重建脚本生成，适合比赛复现。", "生产系统可以研究 Doris materialized view 或定时增量任务维护热点窗口指标。", "这样可以把离线构建成本转化为持续更新机制，更贴近实际投研平台。"),
-            ("真实 LLM Provider", "LLM Provider", "可选增强是接入真实 OpenAI 或国产大模型 provider。", "但接入后仍必须保持“模型只提 DSL 候选，系统负责验证”的架构约束。", "如果模型输出不稳定，安全环应拒绝而不是放宽 SQL 执行边界。"),
+            ("真实 LLM Provider", "LLM Provider", "当前已提供 OpenAI-compatible provider 入口，可通过 base URL、model 和 API key 接入真实模型。", "接入后仍必须保持“模型只提 DSL 候选，系统负责验证”的架构约束。", "如果模型输出不稳定，安全环应拒绝而不是放宽 SQL 执行边界。"),
             ("更多 DSL 算子", "DSL 扩展", "当前已补齐 RET 区间收益率；未来仍可扩展波动率、成交额、行业中性、公告情绪、财务因子等指标。", "扩展时应遵循配置优先、参考语义先行、official case 同步增加的原则。", "不要为了快速增加功能而破坏编译器核心的可审计性。"),
         ],
     ),
@@ -398,8 +399,8 @@ APPENDIX_SECTIONS = [
             "第四项检查 Word 文档。打开 `docs/FinDSL_Forge_中文综合操作指南.docx`，确认目录章节完整、中文字体正常、表格没有越界、页眉页脚没有异常。文档是评审最容易直接打开的材料之一，版式问题会直接影响专业感。",
             "第五项检查演示入口。确认 `scripts/serve_demo.ps1` 能启动，浏览器能访问 `http://127.0.0.1:8765`，默认样例、中文建议、SQL 标签、AST 标签、Evidence 标签和负例诊断都能工作。若现场不准备实时 Doris，则提前打开 evidence snapshot 作为备用材料。",
             "第六项检查 GitHub 与 bundle。push 成功后生成新的 bundle，文件名带时间戳，放在 `git_bundles` 目录。远端仓库和离线 bundle 同时存在，才算完成可回溯备份。提交前最好记录最新 commit hash，便于团队成员之间确认版本一致。",
-            "第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：175 passed、36/36、37/37、真实行情样本 3/3、答辩包 12/12、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。",
-            "第八项检查风险表述。真实 LLM provider、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。",
+            "第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：181 passed、36/36、37/37、真实行情样本 3/3、答辩包 13/13、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。",
+            "第八项检查风险表述。provider 实际效果评测、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。",
         ],
     ),
     (
@@ -448,10 +449,10 @@ APPENDIX_SECTIONS = [
             "第三目标是让亮点集中。答辩材料里应反复强化四个亮点：受限 DSL 保证金融表达可控，AI 安全环防止模型越权，prefix-sum 和热点窗口实现 Doris 长窗口加速，readiness 与 artifacts 保证提交可复核。亮点太散，反而会削弱记忆点。",
             "第四目标是准备追问。每个核心结论都要有下一层解释：为什么要用 DSL，为什么要 reference evaluator，为什么要 prefix table，为什么 SQLite 不能替代 Doris，为什么 36.24x 不能泛化到所有查询。提前准备这些回答，现场会稳很多。",
             "第五目标是清理材料。README 负责快速理解，Word 手册负责深度说明，PPT 负责现场表达，submission_artifacts 负责证据复核，git_bundles 负责离线备份。每份材料都有角色，不要让同一份文件承担所有功能。",
-            "第六目标是控制风险。真实 LLM provider、多节点 Doris 和更多 DSL 算子都值得做，但如果它们在截止前无法形成稳定证据，就不要放进主演示流程。可选增强可以写进规划，主流程必须围绕已经验证的能力。",
+            "第六目标是控制风险。provider 实际效果评测、多节点 Doris 和更多 DSL 算子都值得做，但如果它们在截止前无法形成稳定证据，就不要放进主演示流程。可选增强可以写进规划，主流程必须围绕已经验证的能力。",
             "第七目标是统一语言。团队成员在答辩中要使用同一套术语：候选 DSL、确定性编译链路、reference equivalence、Doris evidence、submission readiness。术语一致能显著减少评委听感上的混乱。",
             "第八目标是保留演示余量。现场不要把所有时间押在容器启动、镜像拉取或实时重采 5M 证据上。最稳妥的方式是现场展示 Demo 和快照，复现脚本作为可查证能力说明。比赛评审看的是作品能力，不是现场运维表演。",
-            "第九目标是强化边界表达。项目已经完成的内容要讲得有底气，暂未完成的内容要讲得诚实。比如真实 provider 未接入，不影响离线安全环成立；多节点 Doris 未实测，不影响单节点 Doris 规模证据成立。边界清楚，反而更专业。",
+            "第九目标是强化边界表达。项目已经完成的内容要讲得有底气，暂未完成的内容要讲得诚实。比如 provider 接口已接入但现场是否调用取决于账号和网络，不影响离线安全环成立；多节点 Doris 未实测，不影响单节点 Doris 规模证据成立。边界清楚，反而更专业。",
             "第十目标是保持仓库干净。最终提交前不要出现未追踪的大文件、临时预览 PDF、渲染图片目录、Docker 中间数据或个人环境配置。一个干净仓库会让评委和后续维护者更容易复核，也降低误提交风险。",
             "第十一目标是把性能证据讲完整。36.24x 的价值不只在数字，而在实验设计：同一 DSL、两条 SQL、行数一致、SQL cache 禁用、baseline window、optimized prefix table、真实 Doris 执行。把这些条件讲清楚，数字才有可信度。",
             "第十二目标是让文档和代码同步。若最后修改了脚本、证据或 README，就要重新生成 Word 和 Markdown；若修改了核心代码，就要重新跑测试；若修改了 Doris 路径，就要重采 evidence 或明确说明未重采。同步纪律是顶级交付的底线。",
@@ -736,7 +737,7 @@ SECTION_PARAGRAPHS = {
     ],
     "核心评价指标": [
         "当前版本围绕六类指标做交付验收：编译正确率、诊断可用性、长窗口性能、Doris 兼容性、AI 辅助安全性和提交可复现性。它们分别由 official positive cases、official negative cases、Doris evidence、SQL validator、LLM candidate adapter 和 submission readiness 覆盖。",
-        "已有证据里，pytest 全量回归为 175 passed；官方风格正例 36/36 通过，负例 37/37 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。",
+        "已有证据里，pytest 全量回归为 181 passed；官方风格正例 36/36 通过，负例 37/37 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。",
         "评价指标的作用不只是写在文档里好看。每次提交前运行 readiness，团队就能知道哪些证据仍然有效、哪些结果需要重采、Git 是否处在可回溯状态。竞赛后期最怕“功能看似完成但证据散落”，这套指标体系正是为了避免这种情况。",
     ],
     "主要技术风险": [
@@ -897,7 +898,7 @@ SECTION_PARAGRAPHS = {
     "LLM 候选安全环": [
         "LLM adapter 用于离线验证模型输出。它可以从 JSON 或 markdown 风格响应中提取候选 DSL，同时识别直接 SQL、空候选和明显不合法内容。直接 SQL 会被标记为 UNSAFE_DIRECT_SQL，不会进入数据库路径。",
         "有效候选也不是立刻放行。系统会继续编译 DSL、运行 Doris SQL validation，并在可用数据集上执行 SQL/reference equivalence。模型提供的 rationale 可以展示给用户，但不能替代编译器判断。",
-        "这个安全环为后续接入真实 provider 留出了接口。无论使用 OpenAI、国产模型还是本地模型，外部模型只改变候选来源，不改变项目的安全边界。对于评委来说，这说明系统具备扩展空间，同时没有为了演示效果牺牲底线。",
+        "这个安全环已经接上 OpenAI-compatible provider 入口。无论使用 OpenAI、国产模型还是本地模型，外部模型只改变候选来源，不改变项目的安全边界。对于评委来说，这说明系统具备扩展空间，同时没有为了演示效果牺牲底线。",
     ],
     "诊断与修复建议": [
         "好的诊断应该告诉用户错在哪里、为什么错、怎么改。系统对未知指标、非法窗口、rank 参数冲突、非法日期、裸字段绕过和直接 SQL 等情况都返回稳定 diagnostic code，并尽量附带修复建议。",
@@ -955,7 +956,7 @@ SECTION_PARAGRAPHS = {
         "readiness 报告也适合答辩使用。它把分散的命令结果集中在一份文件里，能够快速回答“你们现在到底完成到什么程度”。对国家级奖项目标来说，这种总验收文件比口头保证更有分量。",
     ],
     "单元测试体系": [
-        "测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、doris_sql、doris_evidence、demo、真实行情样本、defense video 和 readiness。当前全量 pytest 为 175 passed，说明收益率算子、官方套件、真实行情 Demo 样本、视频资产和文档增强没有破坏核心链路。",
+        "测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、llm_provider、doris_sql、doris_evidence、demo、真实行情样本、defense video 和 readiness。当前全量 pytest 为 181 passed，说明 provider 合约、收益率算子、官方套件、真实行情 Demo 样本、视频资产和文档增强没有破坏核心链路。",
         "测试设计关注高风险行为。比如窗口函数不能出现在 WHERE，未知指标要给修复建议，prefix rewrite 不能改变结果，LLM 直接 SQL 要被拒绝，Demo API 要返回稳定字段。它们不是为了凑数量，而是围绕赛题失分点布防。",
         "后续新增功能时，应先补参考语义和测试，再修改 SQL generator。尤其是新增窗口函数、指标表或优化规则，必须保证正例、负例和 equivalence 同步更新。否则功能越多，隐藏风险越大。",
     ],
@@ -982,7 +983,7 @@ SECTION_PARAGRAPHS = {
     "答辩主线": [
         "答辩建议从痛点开始。金融选股表达复杂，手写 SQL 容易出错；大模型直接生成 SQL 风险高；长窗口在数据仓库中成本大；比赛要求的不只是演示，而是正确性、性能和复现。这个开场能把项目放到真实问题里，而不是从技术名词堆砌开始。",
         "方案部分再讲四层：FinDSL 表达业务意图，确定性编译器生成 Doris SQL，reference 与 validator 保证正确和安全，prefix-sum 与热点窗口证明性能。每层都对应 Demo 或报告，听众能看到问题如何被逐步拆解。",
-        "结尾用证据收束。175 passed、36/36 正例、37/37 负例、真实行情 3/3、答辩包 12/12、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。",
+        "结尾用证据收束。181 passed、36/36 正例、37/37 负例、真实行情 3/3、答辩包 13/13、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。",
     ],
     "演示节奏": [
         "五分钟演示可以分成四段。第一分钟展示中文输入到 DSL 候选，说明 AI 只是辅助；第二分钟展示 AST、SQL 和 explain，说明编译器掌握语义；第三分钟展示 prefix-sum 案例、真实行情样例和 Doris evidence，说明业务可信与长窗口加速；最后一分钟展示负例诊断和 readiness。",
@@ -1010,8 +1011,8 @@ SECTION_PARAGRAPHS = {
         "bundle 不能替代正常 GitHub push。远端仓库适合协作和云端回溯，bundle 适合本地离线保险。两者并行，才符合高风险提交前的稳妥做法。",
     ],
     "风险清单": [
-        "当前剩余风险主要包括真实行情样本覆盖还可以进一步丰富、如果平台要求真人旁白则需要补录讲解音轨、真实 LLM provider 尚未接入、多 BE Doris 生产形态尚未实测。Web Demo 截图已经进入 `submission_artifacts/demo_screenshots/`，一分钟 MP4 已进入 `submission_artifacts/defense_video/`，不会再依赖临场手动截屏。这些风险不会推翻核心赛题完成度，但会影响展示丰满度和企业化延展性。",
-        "文档中应把这些内容写成“可选增强”或“后续规划”，不要包装成已经完成的交付。比如本地单 FE/BE Doris 已足以支撑比赛证据，但多节点 Doris 仍是下一阶段；离线 LLM adapter 已验证安全环，真实 provider 接入仍需单独测试。",
+        "当前剩余风险主要包括真实行情样本覆盖还可以进一步丰富、如果平台要求真人旁白则需要补录讲解音轨、provider 实际效果需结合比赛可用账号复测、多 BE Doris 生产形态尚未实测。Web Demo 截图已经进入 `submission_artifacts/demo_screenshots/`，一分钟 MP4 已进入 `submission_artifacts/defense_video/`，不会再依赖临场手动截屏。这些风险不会推翻核心赛题完成度，但会影响展示丰满度和企业化延展性。",
+        "文档中应把这些内容写成“可选增强”或“后续规划”，不要包装成已经完成的交付。比如本地单 FE/BE Doris 已足以支撑比赛证据，但多节点 Doris 仍是下一阶段；provider 接口已完成，真实模型表现仍需结合目标账号和网络环境单独测试。",
         "风险管理不是示弱。相反，能清楚说明哪些已经验证、哪些还在规划，往往会让评委更信任项目。过度承诺最容易在追问中暴露问题。",
     ],
     "质量门禁": [
@@ -1035,7 +1036,7 @@ SECTION_PARAGRAPHS = {
         "这条路线能把项目从竞赛原型推向投研平台雏形。答辩时可以简要提及，但不宜占用过多时间；当前最强证据仍然是已经完成的 prefix-sum rewrite 和 5M Doris 实测。",
     ],
     "真实 LLM Provider": [
-        "离线 LLM adapter 已经验证了候选提取和安全拒绝逻辑，真实 provider 接入可以作为增强项推进。接入后，用户体验会更接近完整 AI 产品：自然语言输入由模型生成多个 DSL 候选，系统再逐一验证。",
+        "离线 LLM adapter 已经验证了候选提取和安全拒绝逻辑，当前又补上了 OpenAI-compatible provider 入口。接入真实模型后，用户体验会更接近完整 AI 产品：自然语言输入由模型生成多个 DSL 候选，系统再逐一验证。",
         "安全边界必须保持不变。模型不能直接执行 SQL，不能绕过 semantic analyzer，不能跳过 SQL/reference equivalence。provider 的作用是扩大候选覆盖面，而不是替代编译器。",
         "评估真实模型时，应记录命中率、无效候选比例、危险输出比例和平均验证耗时。只展示一个成功例子意义有限，能量化模型在安全环中的表现，才更符合企业交付标准。",
     ],
@@ -1060,7 +1061,7 @@ SECTION_SUPPLEMENTS = {
     "典型业务场景": "这些场景在真实投研中经常组合出现，例如先限定 A 股和日期区间，再判断 120 日成交量，再取每日换手率排名。组合之后 SQL 复杂度会明显上升，也正是编译器价值最容易被看见的时候。演示时应优先选择组合场景，而不是只跑单条件过滤。",
     "与普通文本转 SQL 的区别": "这个差异也决定了项目宣传口径。不能把 FinDSL Forge 简化成“AI 自动写 SQL”，那样会削弱项目真正的技术亮点。更准确的表述是：AI 帮助用户进入 DSL，编译器负责确定性转换，验证链路负责把输出变成可以被审计的数据库查询。",
     "分层架构概览": "架构图建议在 PPT 和手册中保持一致。输入、编译、验证、执行、展示五层不要频繁改名，否则答辩时容易出现概念漂移。稳定的架构语言能让团队在讲 NL2DSL、prefix-sum、readiness 时始终围绕同一张图展开。",
-    "模块协作方式": "模块协作的另一个好处是便于替换实现。未来如果 SQLite 本地执行器换成 DuckDB，或者 LLM provider 从离线样例换成真实 API，只要输入输出契约不变，核心编译器和测试证据就不需要大改。这种可替换性是企业级架构的重要特征。",
+    "模块协作方式": "模块协作的另一个好处是便于替换实现。未来如果 SQLite 本地执行器换成 DuckDB，或者 provider 从 OpenAI-compatible API 换成团队本地模型，只要输入输出契约不变，核心编译器和测试证据就不需要大改。这种可替换性是企业级架构的重要特征。",
     "证据链架构": "证据链应尽量自动生成，减少手工编辑。手工复制结果最容易出现报告和代码不一致：一次测试重跑后数字变了，文档却没更新。项目通过脚本导出 artifacts，就是为了把证据从“人工整理材料”变成“工程产物”。",
     "架构可扩展性": "扩展时要优先判断新增内容属于哪一层。如果只是新增指标，多半在 registry 和数据模型层解决；如果新增函数，需要语义和 reference 同步；如果新增优化，需要 explain、测试和 Doris evidence 一起补。分层思维能防止所有需求都涌入 SQL generator。",
     "语言设计原则": "受限 DSL 的一个重要优势是能给出更好的错误信息。通用 SQL 错误通常面向数据库开发者，而 FinDSL 的错误可以面向策略用户，例如“窗口必须为正整数”“指标 close 是否拼写错误”。这种差异直接影响产品体验。",
@@ -1084,7 +1085,7 @@ SECTION_SUPPLEMENTS = {
     "Doris 证据设计": "证据报告中行数一致非常关键。性能更快但结果不同没有意义，尤其在金融筛选中，少一只股票或多一只股票都可能改变业务判断。项目把 row count equivalence 放进 Doris evidence，是为了防止优化结果只追求速度。",
     "AI 辅助定位": "现场讲 AI 时建议避开泛泛而谈的大模型热词。更好的讲法是：用户语言不稳定，DSL 稳定；模型负责把不稳定输入转成候选，编译器负责把候选变成可信执行计划。这个角度更自然，也更能体现项目设计能力。",
     "NL2DSL 模板层": "模板层的竞争力不在于写了多少规则，而在于规则覆盖了赛题高频问题，并且输出能被后续链路验证。规则命中失败时，系统仍能让用户切回 DSL 或诊断路径，这比单一自然语言入口更可靠。",
-    "LLM 候选安全环": "真实 provider 接入后，还需要考虑速率限制、超时、响应格式漂移和敏感信息处理。当前离线 adapter 先把候选解析和安全拒绝打牢，是合理的分阶段做法；它让后续接 API 时不必重新设计核心安全逻辑。",
+    "LLM 候选安全环": "真实 provider 接入后，还需要考虑速率限制、超时、响应格式漂移和敏感信息处理。当前 provider 路径复用离线 adapter 的候选解析和安全拒绝逻辑，因此后续更换模型或网关时不需要重新设计核心安全边界。",
     "诊断与修复建议": "诊断文案应保持稳定和克制。不要把错误解释写成大段泛泛建议，而要给出最可能的修复动作。比如未知指标就建议相近指标，非法窗口就指出正整数要求，直接 SQL 就说明系统只接受 DSL 候选。",
     "逻辑数据模型": "最小模型的好处是评委容易理解。三张表就能讲清楚行情、资金流和股票市场属性，再通过 join 和窗口组合出复杂筛选。等核心链路被认可后，再谈更多数据源，叙事会更有层次。",
     "Doris 表设计": "表设计章节建议配合 `deploy/doris` 下的 SQL 文件一起阅读。schema、sample data、prefix build 和 smoke queries 分开存放，既方便新手按顺序执行，也方便评委看到项目不是把数据库资产藏在代码里。",
@@ -1103,7 +1104,7 @@ SECTION_SUPPLEMENTS = {
     "提交包证据": "submission_artifacts 是评审最可能实际打开的目录之一。里面的文件命名、时间、内容和 README 提示都要保持清楚。项目越大，越需要让评委在有限时间内找到最关键的证据。",
     "答辩主线": "答辩时要减少空泛形容词，多用动作和证据。比如“系统会拒绝直接 SQL”比“系统很安全”更具体；“baseline 与 optimized 行数一致”比“优化有效”更可验证。语言越具体，越不像临时包装。",
     "演示节奏": "彩排时建议模拟网络不可用、Doris 未启动、端口占用和浏览器刷新等情况。只要提前准备好离线证据和备用命令，现场就不会因为环境波动打乱节奏。演示稳定性本身也是交付能力的一部分。",
-    "PPT 组织": "PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，175 passed 来自 pytest，36/36 和 37/37 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。",
+    "PPT 组织": "PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，181 passed 来自 pytest，36/36 和 37/37 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。",
     "得分点映射": "得分点映射还可以作为最终自检表。提交前逐项确认：是否有实现、是否有测试、是否有报告、是否能演示、是否能解释风险。任何一项缺失，都应在最后冲刺阶段补齐或诚实标注。",
     "Git 工作流": "Git 记录应当和竞赛节点对应起来。完成 Doris 证据、完成中文手册、完成 Web Demo 增强、完成最终提交包，都值得形成清楚提交。后续回看历史时，团队能知道每个里程碑对应哪个 commit。",
     "Bundle 备份": "bundle 备份最好在推送成功后立即生成，并把文件名带上时间戳。这样即使远端仓库短时访问异常，本地仍有完整恢复点。比赛提交前，这类低成本保险非常值得做。",
@@ -1188,7 +1189,7 @@ def build_docx() -> Tuple[Path, int]:
         ("竞赛方向", "研究生金融科技创新大赛赛题 19"),
         ("文档版本", VERSION),
         ("生成时间", GENERATED_AT),
-        ("核心证据", "175 passed；官方风格 36/36 + 37/37；真实行情样本 3/3；答辩包 12/12；Doris 5M 规模 36.24x；readiness warning 0"),
+        ("核心证据", "181 passed；官方风格 36/36 + 37/37；真实行情样本 3/3；答辩包 13/13；Doris 5M 规模 36.24x；readiness warning 0"),
     ]
     add_table(doc, ["项目", "内容"], meta, [2200, 7160])
     doc.add_page_break()

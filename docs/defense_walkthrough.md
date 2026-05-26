@@ -8,6 +8,7 @@ This document is the repeatable live-demo path for Topic 19. It pairs each visib
 $env:PYTHONPATH="src"
 python -m findsl.cli defense-package --json
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --json
+python -m findsl.cli llm-suggest-dsl "近3日成交量累计大于300" --model "<provider-model>" --json
 powershell -ExecutionPolicy Bypass -File .\scripts\defense_package.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\validate_llm_candidates.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
@@ -41,8 +42,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
 9. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and a repair hint for `indicator("close")`.
 10. Run `python scripts\build_defense_video.py` if the one-minute video needs to be refreshed from the latest screenshots.
 11. Run `scripts\validate_llm_candidates.ps1` and show one accepted DSL, one `UNKNOWN_INDICATOR` rejection, and one `UNSAFE_DIRECT_SQL` rejection.
-12. Open `reports/defense_package.md` and show the score-mapping table.
-13. Open `reports/submission_readiness.md` and show required gates passing.
+12. If a provider key is available, run `llm-suggest-dsl`; if not, show the provider-contract row in `reports/defense_package.md`, which proves the real-provider prompt and response shape are wired into the same safety loop.
+13. Open `reports/defense_package.md` and show the score-mapping table.
+14. Open `reports/submission_readiness.md` and show required gates passing.
 
 ## Screenshot Checklist
 
@@ -56,6 +58,7 @@ The current committed screenshot set is in `submission_artifacts/demo_screenshot
 - Diagnostic negative preset showing expected/actual `UNKNOWN_INDICATOR` and repair suggestions.
 - Semantic hardening diagnostics showing bare identifiers, non-integer windows, invalid top-level expressions, invalid `market(...)`, and literal/static division by zero are rejected before SQL generation.
 - CLI output for LLM candidate safety showing accepted DSL plus `UNKNOWN_INDICATOR` and `UNSAFE_DIRECT_SQL` rejections.
+- Provider-contract evidence showing JSON DSL-only prompting and post-provider validation.
 - `reports/defense_package.md` summary and score-mapping table.
 - `reports/submission_readiness.md` gate matrix.
 
@@ -66,6 +69,7 @@ The current committed screenshot set is in `submission_artifacts/demo_screenshot
 | Validated NL2DSL candidate | AI-assisted use without SQL hallucination |
 | NL2DSL official template coverage | AI-assisted entry covers bottom-rank, percent-rank, B-market average-volume, date-window, signed-threshold, rolling-min, and prefix-pruning scenarios |
 | LLM candidate safety loop | Model assistance cannot bypass deterministic compiler validation |
+| OpenAI-compatible provider contract | Real-model entry point exists while provider output remains untrusted candidate DSL |
 | SQL/reference verification PASS | Correctness proof beyond string matching |
 | Prefix-sum preset with prefix table SQL | Long-window optimization design |
 | Date-range prefix-sum pruning | Partition-pruning optimization without truncating rolling history |

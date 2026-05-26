@@ -39,6 +39,7 @@ AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Eve
 - Suggest DSL candidates from Chinese natural-language stock-screening requests, then validate them through the compiler and reference oracle.
 - Cover official-style NL2DSL prompts for low-price bottom picks, turnover percent cuts, B-market average-volume thresholds, high-turnover close ranking, date-window moving-average filters, rolling minimum thresholds, return-rate thresholds, date-prefix-sum pruning, and signed net-outflow thresholds.
 - Validate optional LLM-proposed DSL candidates while rejecting direct SQL and invalid DSL before execution.
+- Call an optional OpenAI-compatible LLM provider as a DSL-candidate source, then force every returned candidate through the same deterministic safety loop.
 - Run an official-style coverage suite with representative positive cases and negative diagnostic cases.
 - Generate a defense package that maps live demo steps to competition scoring evidence.
 - Generate a submission readiness report covering tests, accuracy, equivalence, optimizer evidence, real-market sample evidence, Doris assets, and git rollback state.
@@ -77,6 +78,7 @@ python -m findsl.cli suggest-dsl 'B股近2日均量不低于80' --data-dir data/
 python -m findsl.cli suggest-dsl '主力净流出低于-1.5' --data-dir data/samples --json
 python -m findsl.cli suggest-dsl 'A股近2日收盘价涨幅超过5%' --data-dir data/samples --json
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --text '近3日成交量累计大于300' --data-dir data/samples --json
+python -m findsl.cli llm-suggest-dsl '近3日成交量累计大于300' --model '<provider-model>' --json
 python -m findsl.cli official-suite --output reports/official_suite_report.md --json
 python -m findsl.cli defense-package --output reports/defense_package.md --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
@@ -95,6 +97,7 @@ python -m findsl.cli compile 'filter(RET(indicator("close"), 2) > 0.05)'
 python -m findsl.cli diagnose 'filter(indicator("clos") > 10)'
 python -m findsl.cli suggest-dsl '今日收盘价创二百五十日新高'
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --json
+python -m findsl.cli llm-suggest-dsl '近3日成交量累计大于300' --model '<provider-model>' --json
 python -m findsl.cli official-suite --json
 python -m findsl.cli defense-package --json
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
@@ -184,6 +187,17 @@ The same server exposes JSON APIs:
 
 The bundled `data/samples/llm_candidate_response.json` intentionally contains one valid DSL candidate, one misspelled indicator, and one unsafe direct SQL candidate. This gives the defense package concrete evidence that LLM assistance is useful but cannot bypass parser, semantic validation, diagnostics, optimizer explain, or reference-oracle checks.
 
+`llm-suggest-dsl` adds a real-provider entry point without changing that boundary. It posts a JSON-only FinDSL prompt to an OpenAI-compatible `/chat/completions` endpoint, extracts candidates from the response, and immediately reuses `validate_llm_candidates`. The command reads `FINDSL_LLM_MODEL` or `--model`, `FINDSL_LLM_API_KEY` by default, and optionally `FINDSL_LLM_BASE_URL` for local or domestic-compatible providers:
+
+```powershell
+$env:FINDSL_LLM_API_KEY="<your key>"
+$env:FINDSL_LLM_MODEL="<provider-model>"
+$env:FINDSL_LLM_BASE_URL="https://api.openai.com/v1"
+python -m findsl.cli llm-suggest-dsl "近3日成交量累计大于300" --json
+```
+
+For a local provider that does not require authentication, pass `--no-api-key --base-url http://127.0.0.1:8000/v1 --model <local-model>`. Provider access is optional; the offline adapter and deterministic NL2DSL templates remain the reproducible competition path.
+
 ## Doris Assets
 
 `scripts/generate_doris_assets.ps1` creates the SQL files under `deploy/doris/`:
@@ -216,7 +230,7 @@ For password-protected private clusters, set `DORIS_PASSWORD` and `DORIS_PASSWOR
 
 The readiness report also runs `official-suite`, which currently covers 36 positive official-style cases and 37 negative diagnostic cases across staged filters, top-N ranking, percent-cutoff ranking, date-range pushdown, window-safe date pruning, rolling boolean conditions, moving averages, rolling extrema, prefix-sum aggregates, hot-window materialized columns, market joins, arithmetic predicates, signed numeric thresholds, sparse auxiliary joins, repeated rank stages, case-insensitive inputs, inequality predicates, parenthesized OR predicates, return-rate drawdown thresholds, duplicate named arguments, invalid dates, invalid rank directions, invalid windows, mutually exclusive rank cutoffs, and invalid-DSL repair diagnostics. Each positive case must compile, expose expected SQL/trace/explain evidence, and match the independent SQL/reference result. Each negative case must fail with a stable diagnostic code and actionable suggestions.
 
-It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, prefix-sum positive presets, diagnostic negative presets, public real-market quote samples, official coverage, compiler latency, Doris asset integrity, and the exported Doris proof to concrete scoring evidence.
+It also validates the safe LLM candidate loop and generates `reports/defense_package.md`, a live-defense walkthrough that maps NL2DSL validation, official NL2DSL template coverage, LLM guardrails, the OpenAI-compatible provider contract, prefix-sum positive presets, diagnostic negative presets, public real-market quote samples, official coverage, compiler latency, Doris asset integrity, and the exported Doris proof to concrete scoring evidence.
 
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight competition risks such as missing Doris-cluster scale proof or uncommitted local changes.
 
@@ -231,4 +245,4 @@ This repository is built around the topic's quantitative requirements:
 - Long-range acceleration target: `10x+`
 - New indicator/function target: core compiler code change `0 lines`
 
-The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, real Doris-cluster execution proof, a public real-market quote sample, NL2DSL and safe LLM candidate validation, official-style coverage evidence, and a local demo. Optional provider-backed LLM repair loops can be added later while preserving the same deterministic validation contract.
+The current implementation establishes a reliable compiler kernel, correctness oracle, optimizer evidence, Doris assets, real Doris-cluster execution proof, a public real-market quote sample, NL2DSL templates, safe LLM candidate validation, an optional OpenAI-compatible provider entry point, official-style coverage evidence, and a local demo. Provider output is still treated as untrusted DSL-candidate text, so it cannot bypass compiler validation or SQL/reference equivalence.

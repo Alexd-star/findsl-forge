@@ -8,6 +8,7 @@ findsl.cli
     -> template/rule match over official-style Chinese requests
     -> candidate DSL list with confidence and rationale
   -> Safe LLM candidate adapter
+    -> optionally request DSL candidates from an OpenAI-compatible provider
     -> parse structured/markdown model responses into DSL candidates
     -> reject direct SQL-looking output before compilation
     -> validate surviving candidates through compiler + equivalence verifier
@@ -74,10 +75,12 @@ The template layer intentionally covers official-style edge cases that are easy 
 The optional LLM adapter treats model output as untrusted proposal text. It extracts candidate DSL from JSON payloads, markdown fences, labeled lines, or OpenAI-style `choices[].message.content`, then applies a hard safety boundary:
 
 ```text
-LLM response -> candidate extractor -> SQL bypass rejection -> compiler -> SQL/reference equivalence
+LLM provider or offline response -> candidate extractor -> SQL bypass rejection -> compiler -> SQL/reference equivalence
 ```
 
 Direct SQL-looking output is rejected with `UNSAFE_DIRECT_SQL`. Invalid DSL still enters the normal diagnostic layer, so misspelled indicators produce the same stable repair evidence as hand-written DSL. Accepted candidates are therefore useful only when they survive parser, semantic validation, SQL generation, optimizer explain, and the independent reference oracle. The deterministic Chinese templates include A/B market constraints, rank cutoffs, rolling windows, moving-average thresholds, signed money-flow thresholds, and date-range prefix-sum requests so live demo prompts do not depend on free-form SQL generation.
+
+The provider path is deliberately thin. `llm-suggest-dsl` builds a JSON-only FinDSL prompt, posts it to an OpenAI-compatible `/chat/completions` endpoint, and hands the raw response to the same adapter. API keys, base URLs, and model names are runtime configuration; the repository does not need a provider key to run tests or readiness. This keeps the competition submission reproducible while still showing how a real model can be attached without turning the model into a SQL executor.
 
 ### Diagnostics Layer
 
@@ -157,7 +160,7 @@ explain: machine-readable rule/status/evidence records
 - Broader Doris execution equivalence beyond the current evidence path.
 - Broader prefix-sum optimizer coverage for more aggregate shapes.
 - Materialized-view routing.
-- More provider-backed LLM repair loops.
+- Broader provider-backed LLM repair and clarification loops on top of the existing candidate contract.
 - Larger real-market data ingestion, including real money-flow feeds.
 
 ## Correctness Loop
@@ -202,7 +205,7 @@ The defense package converts engineering evidence into a live-demonstration sequ
 demo scenario -> executable check -> scoring point -> expected visible signal -> Markdown report
 ```
 
-It covers NL2DSL validation, safe LLM candidate validation, prefix-sum official positive presets, diagnostic negative presets, Doris SQL validation, config-only indicator extension, official-style corpus coverage, compiler accuracy/latency, Doris deployment asset integrity, and the latest Doris cluster proof when `reports/doris_cluster_evidence.md` is present.
+It covers NL2DSL validation, safe LLM candidate validation, the OpenAI-compatible provider contract, prefix-sum official positive presets, diagnostic negative presets, Doris SQL validation, config-only indicator extension, official-style corpus coverage, compiler accuracy/latency, Doris deployment asset integrity, and the latest Doris cluster proof when `reports/doris_cluster_evidence.md` is present.
 
 ## Doris Evidence Loop
 

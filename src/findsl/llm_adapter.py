@@ -288,6 +288,11 @@ def _collect_from_json(value: Any, out: List[Dict[str, Any]], source: str) -> No
 
 
 def _collect_from_text(text: str, out: List[Dict[str, Any]], source: str) -> None:
+    parsed = _try_json(text.strip())
+    if isinstance(parsed, (dict, list)):
+        _collect_from_json(parsed, out, f"{source}.json_text")
+        return
+
     for match in CODE_FENCE_RE.finditer(text):
         body = match.group("body").strip()
         parsed = _try_json(body)

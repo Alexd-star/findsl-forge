@@ -124,7 +124,8 @@ Deliverables:
 - AST/IR/SQL/rewrite trace visualization. (Started)
 - Natural-language-to-DSL candidate layer with compiler/reference validation. (Started)
 - Official-style NL2DSL templates for bottom-rank, percent-rank, high-turnover rank, date-window MA, signed net-outflow, rolling-min, return-rate, and date-prefix-sum requests. (Started)
-- Optional LLM response adapter that validates model-proposed DSL and rejects direct SQL bypasses. (Started)
+- Optional LLM response adapter that validates model-proposed DSL and rejects direct SQL bypasses. (Implemented)
+- Optional OpenAI-compatible provider entry point that requests JSON DSL candidates and immediately reuses the same safety loop. (Implemented)
 - Structured compile diagnostics and repair hints for invalid demo/API requests. (Started)
 - Official positive and diagnostic negative presets in the Web Demo for live defense walkthroughs. (Started)
 - Official-style positive and negative coverage suite with SQL/trace/explain/equivalence evidence. (Started)
@@ -152,6 +153,7 @@ Exit criteria:
 - NL2DSL smoke check proves the default Chinese request produces a validated DSL candidate whose SQL matches the independent reference result.
 - Defense package must prove NL2DSL official-template coverage for low-price `bottom`, turnover `percent`, date-window MA, signed net-outflow, rolling-min, return-rate, and date-prefix-sum pruning scenarios.
 - LLM safety smoke check proves model-proposed output accepts only verified DSL, rejects direct SQL, and classifies invalid DSL with stable diagnostics.
+- Provider-contract evidence proves real-model access is wired as a candidate source without turning provider output into executable SQL.
 - Diagnostics smoke check proves invalid DSL produces stable repair guidance rather than only a traceback.
 - Defense package proves a config-only indicator extension can compile and pass Doris SQL validation without changing compiler core.
 - Defense package separately exposes semantic hardening diagnostics for hidden-evaluation style invalid DSL.

@@ -12,7 +12,7 @@ FinDSL Forge 面向金融科技创新大赛赛题 19，构建了一个从金融�
 
 ```mermaid
 flowchart LR
-  A["中文需求 / DSL / LLM候选"] --> B["Lexer & Parser"]
+  A["中文需求 / DSL / LLM候选 / Provider候选"] --> B["Lexer & Parser"]
   B --> C["AST"]
   C --> D["Semantic Analyzer"]
   D --> E["Doris SQL Generator"]
@@ -51,7 +51,7 @@ flowchart LR
 - 编译、SQL/reference 等价、官方风格套件和 demo smoke 均进入 readiness gate。
 - Doris 5M 行证据证明 baseline 与 optimized 行数一致，优化路径包含 prefix table，baseline 包含 window path。
 - 真实行情小样本证明 quote-only DSL 能在公开 A 股行情字段上通过同一套 SQL/reference 验证。
-- LLM 安全环节拒绝直接 SQL 和错误 DSL，避免把不可审计 SQL 直接交给数据库。
+- LLM 安全环节拒绝直接 SQL 和错误 DSL；OpenAI-compatible provider 只是候选来源，输出仍会被编译器和 reference oracle 复核，避免把不可审计 SQL 直接交给数据库。
 
 ## 竞争亮点
 

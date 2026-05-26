@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-05-25T17:31:01+00:00
+- Generated at: 2026-05-26T02:51:04+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `536dd95` Broaden official-style coverage suite
+- Git HEAD at report generation: `5e570c6` Add OpenAI-compatible LLM provider path
 - Git branch: `main`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,19 +13,19 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 6808.2 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 0.946 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 8124.8 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.464 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.672 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.682 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
 | Doris SQL validation boundary | required | PASS | validation steps 1, issues 0, escaped literal True |
 | Real-market quote sample | required | PASS | cases 3/3, raw payloads 2, source Eastmoney public historical K-line endpoint |
 | Official-style coverage suite | required | PASS | positive 36/36, negative 37/37 |
-| Defense package walkthrough | required | PASS | checks 12/12, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
+| Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
 | Git rollback cleanliness | warning | PASS | clean working tree |
@@ -35,14 +35,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 0.946 ms
+- Compile P95 latency: 1.464 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.13x
+- Local SQLite prefix benchmark speedup smoke: 4.46x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -55,7 +55,7 @@
 - Real-market sample cases: 3/3
 - Official-style positive cases: 36/36
 - Official-style negative diagnostics: 37/37
-- Defense package checks: 12/12
+- Defense package checks: 13/13
 
 ## Evidence Artifacts
 
@@ -80,7 +80,7 @@
 ## Defense Package
 
 - Package passed: True
-- Checks passed: 12/12
+- Checks passed: 13/13
 - Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md`
 
 ## Long-Window Scale Evidence
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.672 ms
+- Compile latency: 0.682 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -177,13 +177,13 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 6808.2 ms
+- Elapsed: 8124.8 ms
 
 ```text
-........................................................................ [ 41%]
-........................................................................ [ 82%]
-...............................                                          [100%]
-175 passed in 6.39s
+........................................................................ [ 39%]
+........................................................................ [ 79%]
+.....................................                                    [100%]
+181 passed in 7.68s
 ```
 
 ## Award-Readiness Differentiators
@@ -198,6 +198,7 @@
 - NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.
 - Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, B-market average-volume threshold, date-window moving-average, signed net-outflow, rolling-min, return-rate, and date-prefix-sum pruning scenarios.
 - Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.
+- Optional OpenAI-compatible provider path can request JSON DSL candidates while preserving the same deterministic safety loop.
 - Doris SQL validation enforces single-query shape, known table references, and no window-in-WHERE leaks.
 - SQL string literals are escaped by the compiler before they reach generated Doris SQL.
 - Public Eastmoney quote sample proves the same SQL/reference verifier works on real A-share codes and dates without using the tiny sample as performance evidence.
@@ -212,4 +213,4 @@
 - Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.
 - Refresh the generated one-minute defense video when screenshots or evidence values change; add human voiceover only if the portal requires narrated media.
 - Broaden the DSL corpus with more official-style questions and negative/error cases.
-- Connect the optional LLM adapter to a real provider only after preserving the same deterministic validation contract.
+- Use the provider-backed LLM path only with stable credentials, timeout settings, and saved raw responses when preparing live demos.

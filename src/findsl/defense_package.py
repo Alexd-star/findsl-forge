@@ -12,6 +12,7 @@ from .doris import render_doris_assets
 from .evaluation import evaluate_file, load_cases
 from .equivalence import verify_sql_equivalence
 from .llm_adapter import DEFAULT_LLM_CANDIDATE_RESPONSE, validate_llm_candidates
+from .llm_provider import LLMProviderConfig, build_chat_completion_payload
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES, run_official_suite
 from .registry import Registry, default_registry
 
@@ -66,8 +67,9 @@ class DefensePackageResult:
             "7. Confirm the UI shows `Diagnostic`, expected/actual `UNKNOWN_INDICATOR`, and the `indicator(\"close\")` repair hint.",
             "8. Show the semantic hardening evidence for bare identifiers, invalid windows, invalid top-level expressions, bad market arguments, and literal division by zero.",
             "9. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
-            "10. Run the real-market quote sample verification from `data\\real_samples\\eastmoney_a_share_sample\\queries.jsonl` to show the same checker works on public A-share fields.",
-            "11. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
+            "10. If a provider key is available, run `python -m findsl.cli llm-suggest-dsl \"近3日成交量累计大于300\" --model <model> --json`; otherwise show the offline provider-contract check in this package.",
+            "11. Run the real-market quote sample verification from `data\\real_samples\\eastmoney_a_share_sample\\queries.jsonl` to show the same checker works on public A-share fields.",
+            "12. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
             "",
             "## Score Mapping",
             "",
@@ -97,6 +99,7 @@ class DefensePackageResult:
                 "- Deterministic compiler path keeps correctness auditable: DSL -> AST -> semantic validation -> Doris SQL.",
                 "- AI assistance is constrained to NL2DSL/LLM DSL candidates; every candidate must compile and match the independent reference oracle.",
                 "- The LLM adapter rejects direct SQL and invalid DSL with stable diagnostic evidence before any SQL reaches Doris.",
+                "- The optional OpenAI-compatible provider path is wired as a candidate source only; provider responses still enter the same safety loop.",
                 "- The compiler validates Doris-safe SQL shape and escapes string literals before generated SQL is accepted.",
                 "- Public Eastmoney quote samples show the product story on real A-share codes and dates, while performance claims remain tied to 5M Doris evidence.",
                 "- Prefix-sum optimization is visible in SQL, structured explain records, and benchmark/readiness evidence.",
@@ -143,6 +146,7 @@ def generate_defense_package(
         _check_nl2dsl(data_dir),
         _check_nl2dsl_official_template_coverage(data_dir),
         _check_llm_candidate_safety(data_dir, _resolve_repo_path(repo_root, llm_response_path)),
+        _check_llm_provider_contract(data_dir),
         _check_money_flow_prefix(data_dir, official_positive_path),
         _check_unknown_indicator_diagnostic(official_negative_path),
         _check_semantic_hardening_diagnostics(official_negative_path),
@@ -322,6 +326,94 @@ def _check_llm_candidate_safety(data_dir: Path, response_path: Path) -> DefenseC
             "LLM assistance with deterministic compiler guardrails",
             "Run validate-llm-candidates against data\\samples\\llm_candidate_response.json.",
             "One valid DSL is accepted, direct SQL is rejected, and misspelled indicators produce diagnostics.",
+            exc,
+        )
+
+
+def _check_llm_provider_contract(data_dir: Path) -> DefenseCheck:
+    try:
+        config = LLMProviderConfig(
+            base_url="https://provider.example/v1",
+            model="configured-at-runtime",
+            api_key="configured",
+            response_format_json=True,
+        )
+        request_payload = build_chat_completion_payload("近3日成交量累计大于300", config)
+        raw_response = json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "candidates": [
+                                        {
+                                            "dsl": 'filter(SUM(indicator("volume"), 3) > 300)',
+                                            "confidence": 0.91,
+                                            "rationale": "rolling volume sum",
+                                        },
+                                        {
+                                            "dsl": "SELECT * FROM dwd_stock_daily_quote",
+                                            "confidence": 0.2,
+                                            "rationale": "unsafe direct SQL",
+                                        },
+                                    ]
+                                },
+                                ensure_ascii=False,
+                            )
+                        }
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        )
+        result = validate_llm_candidates(
+            text="近3日成交量累计大于300",
+            payload=raw_response,
+            data_dir=data_dir,
+            verify=True,
+        )
+        rejected_codes = [
+            str(diagnostic.get("code", ""))
+            for candidate in result.candidates
+            if not candidate.accepted
+            for diagnostic in candidate.diagnostics
+        ]
+        system_prompt = str(request_payload["messages"][0]["content"])
+        user_prompt = str(request_payload["messages"][1]["content"])
+        prompt_contract = (
+            "Never output SQL" in system_prompt
+            and "Return only JSON" in user_prompt
+            and request_payload.get("response_format") == {"type": "json_object"}
+        )
+        passed = (
+            prompt_contract
+            and result.accepted_count == 1
+            and result.rejected_count == 1
+            and "UNSAFE_DIRECT_SQL" in rejected_codes
+        )
+        return DefenseCheck(
+            name="OpenAI-compatible LLM provider contract",
+            scoring_point="Real-provider AI entry point without relaxing deterministic safety",
+            demo_action="Use llm-suggest-dsl with a configured provider, or inspect this offline provider-contract check.",
+            expected_signal="Provider prompt asks for JSON DSL only; returned candidates are validated by the same compiler and reference oracle.",
+            passed=passed,
+            evidence=[
+                f"endpoint={config.chat_completions_url}",
+                f"messages={len(request_payload['messages'])}",
+                f"json_response_format={request_payload.get('response_format') == {'type': 'json_object'}}",
+                f"prompt_contract={prompt_contract}",
+                f"accepted={result.accepted_count}",
+                f"rejected={result.rejected_count}",
+                f"rejected_codes={', '.join(rejected_codes) or '<none>'}",
+            ],
+        )
+    except Exception as exc:  # noqa: BLE001 - defense reports should preserve failure evidence.
+        return _failed_check(
+            "OpenAI-compatible LLM provider contract",
+            "Real-provider AI entry point without relaxing deterministic safety",
+            "Use llm-suggest-dsl with a configured provider, or inspect this offline provider-contract check.",
+            "Provider prompt asks for JSON DSL only; returned candidates are validated by the same safety loop.",
             exc,
         )
 
