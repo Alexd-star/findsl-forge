@@ -49,6 +49,14 @@ def test_compile_uses_left_joins_for_auxiliary_tables():
     assert "close > 10 OR main_net_inflow > 0" in result.sql
 
 
+def test_compile_boolean_xor_to_null_safe_case_expression():
+    result = Compiler().compile('filter(market("A") ^ indicator("close") > 10)')
+
+    assert "CASE WHEN market = 'A' THEN 1 ELSE 0 END" in result.sql
+    assert "CASE WHEN close > 10 THEN 1 ELSE 0 END" in result.sql
+    assert "<>" in result.sql
+
+
 def test_compile_uses_daily_quote_as_base_for_auxiliary_only_filters():
     result = Compiler().compile('filter(indicator("main_net_inflow") > 0)')
 

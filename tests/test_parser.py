@@ -30,6 +30,16 @@ def test_parse_single_equal_comparison_operator():
     assert data["args"][0]["op"] == "="
 
 
+def test_parse_boolean_xor_between_and_and_or_precedence():
+    ast = parse('filter(market("A") | market("B") ^ indicator("close") > 10 & indicator("volume") > 100)')
+    data = ast.to_dict()
+
+    condition = data["args"][0]
+    assert condition["op"] == "|"
+    assert condition["right"]["op"] == "^"
+    assert condition["right"]["right"]["op"] == "&"
+
+
 def test_parse_rejects_positional_args_after_named_args():
     with pytest.raises(ParseError, match="Positional argument cannot follow named arguments"):
         parse('rank(top=2, indicator("close"), desc)')

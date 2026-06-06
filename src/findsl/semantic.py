@@ -39,7 +39,7 @@ class SemanticAnalyzer:
         if isinstance(node, BinaryOp):
             left_type = self._validate_node(node.left)
             right_type = self._validate_node(node.right)
-            if node.op in {"&", "|"}:
+            if node.op in {"&", "^", "|"}:
                 if left_type != "boolean" or right_type != "boolean":
                     raise SemanticError(f"Operator {node.op} requires boolean operands")
                 return "boolean"

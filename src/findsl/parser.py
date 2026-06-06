@@ -38,10 +38,17 @@ class Parser:
         return self._advance()
 
     def _parse_or(self) -> Node:
-        node = self._parse_and()
+        node = self._parse_xor()
         while self._match("|"):
-            right = self._parse_and()
+            right = self._parse_xor()
             node = BinaryOp("|", node, right)
+        return node
+
+    def _parse_xor(self) -> Node:
+        node = self._parse_and()
+        while self._match("^"):
+            right = self._parse_and()
+            node = BinaryOp("^", node, right)
         return node
 
     def _parse_and(self) -> Node:

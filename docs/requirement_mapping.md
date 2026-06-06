@@ -8,6 +8,7 @@ This document maps Topic 19 requirements to implementation modules.
 | Generate standard AST | `findsl.ast_nodes` | Implemented and exposed in demo/API |
 | Compile DSL logic into Doris SQL | `findsl.sqlgen`, `findsl.doris_sql`, `DORIS_SQL_VALIDATION` explain evidence | Implemented with required readiness gate |
 | Support cross-sectional ranking cutoffs | `findsl.sqlgen`, `findsl.reference`, `rank(..., top/bottom/percent)` official cases | Implemented with SQL/reference equivalence |
+| Support cross-market boolean operators `&`, `^`, and `|` | `findsl.lexer`, `findsl.parser`, `findsl.semantic`, `findsl.sqlgen`, `findsl.reference`, `market_xor_close_breakout` official case | Implemented with SQL/reference equivalence |
 | Support signed financial thresholds | `findsl.lexer`, `findsl.parser`, `findsl.sqlgen`, signed net-outflow official cases | Implemented with diagnostics coverage |
 | Support return-rate / price-change screening | `RET(...)`, `findsl.sqlgen`, `findsl.reference`, `findsl.nl2dsl`, return-rate official cases | Implemented with SQL/reference equivalence and diagnostics coverage |
 | Support date-range partition pruning predicates | `date_between(...)`, `findsl.sqlgen`, `findsl.reference`, `DATE_RANGE_PUSHDOWN`, `DATE_RANGE_BASE_PRUNING`, and window-safe `DATE_RANGE_WINDOW_PRUNING` explain evidence | Implemented with explain evidence |

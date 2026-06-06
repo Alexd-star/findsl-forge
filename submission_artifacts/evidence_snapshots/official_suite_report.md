@@ -3,7 +3,7 @@
 ## Summary
 
 - Suite passed: True
-- Positive cases passed: 36/36
+- Positive cases passed: 37/37
 - Negative diagnostic cases passed: 37/37
 
 ## Positive Cases
@@ -46,6 +46,7 @@
 | 日期区间内A股或低价股 | parenthesized_or_with_date_pushdown | True | True | 9 | 9 | <none> |
 | 每日低价前50百分比 | rank_ascending_percent_cutoff | True | True | 10 | 10 | <none> |
 | 近1日收盘收益率为负 | negative_return_rate_threshold | True | True | 3 | 3 | <none> |
+| 跨市场异或低价突破筛选 | market_xor_close_breakout | True | True | 1 | 1 | <none> |
 
 ## Negative Diagnostic Cases
 

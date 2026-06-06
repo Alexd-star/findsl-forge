@@ -1,18 +1,34 @@
 ﻿# Evidence Snapshot Manifest
 
-- Generated at: 2026-05-26 10:52:19 +08:00
-- Git HEAD at export: 31c1307
-- Git status when exported, excluding evidence snapshots and this export script: clean
+- Generated at: 2026-06-06 21:27:56 +08:00
+- Git HEAD at export: ea11a10
+- Git status when exported, excluding evidence snapshots and this export script:  M README.md
+ M data/samples/official_positive_cases.jsonl
+ M "docs/FinDSL_Forge_\344\270\255\346\226\207\347\273\274\345\220\210\346\223\215\344\275\234\346\214\207\345\215\227.md"
+ M docs/defense_walkthrough.md
+ M docs/requirement_mapping.md
+ M src/findsl/diagnostics.py
+ M src/findsl/lexer.py
+ M src/findsl/parser.py
+ M src/findsl/readiness.py
+ M src/findsl/reference.py
+ M src/findsl/semantic.py
+ M src/findsl/sqlgen.py
+ M tests/test_compiler.py
+ M tests/test_equivalence.py
+ M tests/test_official_suite.py
+ M tests/test_parser.py
+ M tests/test_readiness.py
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `submission_readiness.md` (11277 bytes)
+- `submission_readiness.md` (12110 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `doris_cluster_evidence.json` (6537 bytes)
 - `defense_package.md` (9652 bytes)
-- `official_suite_report.md` (7451 bytes)
+- `official_suite_report.md` (7549 bytes)
 - `real_market_sample_report.md` (923 bytes)
 - `evaluation_report.md` (12665 bytes)
 - `sql_equivalence_report.md` (1365 bytes)

@@ -216,6 +216,19 @@ def test_sql_matches_reference_for_sparse_auxiliary_table_or_condition(tmp_path)
     ]
 
 
+def test_sql_matches_reference_for_boolean_xor():
+    result = verify_sql_equivalence(
+        'filter(market("A") ^ indicator("close") > 10)',
+        DATA_DIR,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [
+        ("AAA", "2026-01-01"),
+    ]
+    assert "CASE WHEN market = 'A'" in result.sql
+
+
 def test_sql_matches_reference_for_sparse_auxiliary_prefix_sum_window(tmp_path):
     _write_sparse_money_flow_window_fixture(tmp_path)
 

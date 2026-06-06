@@ -104,10 +104,14 @@ class PandasReferenceEvaluator:
             if node.op == "!=":
                 return left != right
             raise SemanticError(f"Unsupported comparison operator {node.op}")
-        if isinstance(node, BinaryOp) and node.op in {"&", "|"}:
+        if isinstance(node, BinaryOp) and node.op in {"&", "^", "|"}:
             left = self._bool(node.left, rows)
             right = self._bool(node.right, rows)
-            return left & right if node.op == "&" else left | right
+            if node.op == "&":
+                return left & right
+            if node.op == "^":
+                return left.fillna(False) ^ right.fillna(False)
+            return left | right
         if isinstance(node, FunctionCall):
             name = node.name.upper()
             if name == "MARKET":

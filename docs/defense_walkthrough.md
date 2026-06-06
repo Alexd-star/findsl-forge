@@ -76,7 +76,7 @@ The current committed screenshot set is in `submission_artifacts/demo_screenshot
 | Structured explain records | Auditable optimizer decisions |
 | Diagnostic negative preset | Stable error handling and repair guidance |
 | Semantic hardening diagnostics | Hidden-evaluation style invalid DSL fails before SQL generation |
-| Official suite 36/36 positive and 37/37 negative | Official-style coverage and regression proof, including RET return-rate, inequality, parenthesized OR, and rank-cutoff exclusivity scenarios |
+| Official suite positive and negative cases | Official-style coverage and regression proof, including RET return-rate, inequality, parenthesized OR, boolean XOR, and rank-cutoff exclusivity scenarios |
 | Doris generated assets | Reproducible deployment path |
 | Eastmoney real-market quote sample | Business credibility without using a tiny sample as performance proof |
 | Git bundle backup | Rollback and delivery discipline |

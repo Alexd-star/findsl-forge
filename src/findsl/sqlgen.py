@@ -418,9 +418,13 @@ class SqlGenerator:
     def _bool_sql(self, node: Node) -> str:
         if isinstance(node, Comparison):
             return f"{self._numeric_sql(node.left)} {_sql_comparison_operator(node.op)} {self._numeric_sql(node.right)}"
-        if isinstance(node, BinaryOp) and node.op in {"&", "|"}:
+        if isinstance(node, BinaryOp) and node.op in {"&", "^", "|"}:
+            left = self._bool_sql(node.left)
+            right = self._bool_sql(node.right)
+            if node.op == "^":
+                return f"((CASE WHEN {left} THEN 1 ELSE 0 END) <> (CASE WHEN {right} THEN 1 ELSE 0 END))"
             op = "AND" if node.op == "&" else "OR"
-            return f"({self._bool_sql(node.left)} {op} {self._bool_sql(node.right)})"
+            return f"({left} {op} {right})"
         if isinstance(node, FunctionCall):
             name = node.name.upper()
             if name == "MARKET":

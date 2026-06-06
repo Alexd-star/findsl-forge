@@ -2,47 +2,47 @@
 
 ## Decision Summary
 
-- Generated at: 2026-05-26T02:51:04+00:00
+- Generated at: 2026-06-06T13:27:44+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `5e570c6` Add OpenAI-compatible LLM provider path
+- Git HEAD at report generation: `ea11a10` Refresh evidence snapshots for LLM provider path
 - Git branch: `main`
 - Blocking gates passed: True
-- Warning count: 0
+- Warning count: 1
 
 ## Gate Matrix
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 8124.8 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.464 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 20884.1 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 2.166 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.682 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 2.032 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
 | Doris SQL validation boundary | required | PASS | validation steps 1, issues 0, escaped literal True |
 | Real-market quote sample | required | PASS | cases 3/3, raw payloads 2, source Eastmoney public historical K-line endpoint |
-| Official-style coverage suite | required | PASS | positive 36/36, negative 37/37 |
+| Official-style coverage suite | required | PASS | positive 37/37, negative 37/37 |
 | Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
-| Git rollback cleanliness | warning | PASS | clean working tree |
+| Git rollback cleanliness | warning | WARN | 17 dirty entries before commit |
 | Doris-scale performance proof | warning | PASS | cluster EXPLAIN/latency and 10x speedup evidence captured |
 
 ## Competition Metrics
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.464 ms
+- Compile P95 latency: 2.166 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 4.46x
+- Local SQLite prefix benchmark speedup smoke: 1.04x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -53,7 +53,7 @@
 - Doris SQL validation smoke: True
 - Real-market quote sample: True
 - Real-market sample cases: 3/3
-- Official-style positive cases: 36/36
+- Official-style positive cases: 37/37
 - Official-style negative diagnostics: 37/37
 - Defense package checks: 13/13
 
@@ -73,7 +73,7 @@
 ## Official-Style Coverage Suite
 
 - Suite passed: True
-- Positive cases passed: 36/36
+- Positive cases passed: 37/37
 - Negative diagnostic cases passed: 37/37
 - Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\official_suite_report.md`
 
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.682 ms
+- Compile latency: 2.032 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -170,20 +170,37 @@
 ## Git Rollback State
 
 - Repository detected: True
-- Clean working tree: True
-- Dirty entries: none
+- Clean working tree: False
+- Dirty entries:
+  - ` M README.md`
+  - ` M data/samples/official_positive_cases.jsonl`
+  - ` M "docs/FinDSL_Forge_\344\270\255\346\226\207\347\273\274\345\220\210\346\223\215\344\275\234\346\214\207\345\215\227.md"`
+  - ` M docs/defense_walkthrough.md`
+  - ` M docs/requirement_mapping.md`
+  - ` M src/findsl/diagnostics.py`
+  - ` M src/findsl/lexer.py`
+  - ` M src/findsl/parser.py`
+  - ` M src/findsl/readiness.py`
+  - ` M src/findsl/reference.py`
+  - ` M src/findsl/semantic.py`
+  - ` M src/findsl/sqlgen.py`
+  - ` M tests/test_compiler.py`
+  - ` M tests/test_equivalence.py`
+  - ` M tests/test_official_suite.py`
+  - ` M tests/test_parser.py`
+  - ` M tests/test_readiness.py`
 
 ## Pytest Evidence
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 8124.8 ms
+- Elapsed: 20884.1 ms
 
 ```text
 ........................................................................ [ 39%]
-........................................................................ [ 79%]
-.....................................                                    [100%]
-181 passed in 7.68s
+........................................................................ [ 78%]
+........................................                                 [100%]
+184 passed in 19.68s
 ```
 
 ## Award-Readiness Differentiators
@@ -195,6 +212,7 @@
 - Prefix-sum rewrite path for long rolling windows with baseline/optimized evidence.
 - Structured optimizer explain records for defense and UI visualization.
 - Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.
+- Cross-market boolean operators `&`, `^`, and `|` compile through the same typed AST, Doris SQL, and reference-equivalence gates.
 - NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.
 - Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, B-market average-volume threshold, date-window moving-average, signed net-outflow, rolling-min, return-rate, and date-prefix-sum pruning scenarios.
 - Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.

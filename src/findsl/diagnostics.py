@@ -106,7 +106,7 @@ def _diagnose_parse_error(message: str) -> Diagnostic:
 def _diagnose_lex_error(message: str) -> Diagnostic:
     suggestions = [
         "Use double quotes for string literals, for example indicator(\"close\").",
-        "Keep DSL punctuation in ASCII form: parentheses, commas, comparison operators, &, and |.",
+        "Keep DSL punctuation in ASCII form: parentheses, commas, comparison operators, &, ^, and |.",
     ]
     if "Unclosed string" in message:
         suggestions.insert(0, "Add the missing closing double quote.")

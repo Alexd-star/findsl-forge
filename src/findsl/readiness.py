@@ -421,6 +421,7 @@ class ReadinessReport:
                 "- Prefix-sum rewrite path for long rolling windows with baseline/optimized evidence.",
                 "- Structured optimizer explain records for defense and UI visualization.",
                 "- Local Web Demo/API exposes DSL, AST, SQL, explain, and SQL/reference verification in one workflow.",
+                "- Cross-market boolean operators `&`, `^`, and `|` compile through the same typed AST, Doris SQL, and reference-equivalence gates.",
                 "- NL2DSL candidate layer turns natural-language requests into compiler-validated DSL rather than free-form SQL.",
                 "- Official-style NL2DSL templates cover bottom-rank, percent-rank, high-turnover rank, B-market average-volume threshold, date-window moving-average, signed net-outflow, rolling-min, return-rate, and date-prefix-sum pruning scenarios.",
                 "- Optional LLM adapter validates model-proposed DSL, rejects direct SQL, and records diagnostic evidence for unsafe outputs.",

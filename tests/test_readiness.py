@@ -69,7 +69,7 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.real_market_sample.passed_cases == report.real_market_sample.total_cases
     assert report.real_market_sample.raw_payload_count >= 2
     assert report.official_suite.passed
-    assert report.official_suite.positive_passed == 36
+    assert report.official_suite.positive_passed == 37
     assert report.official_suite.negative_passed == 37
     assert report.defense_package.passed
     assert report.defense_package.passed_count == report.defense_package.total
