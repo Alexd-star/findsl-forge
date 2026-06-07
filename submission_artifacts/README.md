@@ -6,7 +6,7 @@
 powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 ```
 
-脚本会把当前 readiness、Doris 证据、真实行情样本证据、官方风格套件、答辩包等报告复制到 `submission_artifacts/evidence_snapshots/`，避免评审材料只停留在本机临时报告中。
+脚本会把当前 readiness、Doris 证据、真实行情样本证据、官方风格套件、答辩包等报告复制到 `submission_artifacts/evidence_snapshots/`，并生成 `evidence_metadata.json` 与 `evidence_summary.md`，避免评审材料只停留在本机临时报告中。
 
 ## 推荐提交顺序
 
@@ -26,6 +26,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 | `defense_ppt_outline.md` | 答辩 PPT 逐页内容 |
 | `defense_video_script.md` | 一分钟答辩视频时间轴、旁白和生成命令 |
 | `real_data_ingestion_plan.md` | 真实行情数据接入方案 |
+| `evidence_summary.md` | 从证据元数据自动生成的一屏式核心证据摘要 |
+| `evidence_metadata.json` | 机器可读证据元数据，汇总门禁、pytest、官方套件和 Doris 加速指标 |
 | `evidence_snapshots/` | 从 `reports/` 导出的可版本化证据快照 |
 | `demo_screenshots/` | Web Demo 正例、真实行情、SQL、AST、Explain、Rows、Evidence 和负例诊断截图 |
 | `defense_video/` | 由截图合成的一分钟答辩视频输出目录 |
@@ -39,3 +41,5 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 - 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断；当前 Demo 的样例下拉框也能直接切换 Eastmoney 真实行情样本，便于现场把业务可信度和验证证据连在一起讲。
 - 视频：`scripts/build_defense_video.py` 已从 8 张版本化截图生成一分钟 MP4，`defense_video_script.md` 提供旁白口径。
 - 可回溯：代码进入 Git；报告快照进入 `submission_artifacts/`；大规模 CSV 由脚本可重建，不进入 Git。
+
+建议评审快速核对时先打开 `evidence_summary.md`，确认 blocking gates、warning count、pytest、官方正负例和 Doris speedup 的核心数字；若需要追溯细节，再打开 `evidence_snapshots/submission_readiness.md`、`evidence_snapshots/official_suite_report.md` 和 `evidence_snapshots/doris_cluster_evidence.md`。

@@ -71,7 +71,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 
 ### `submission_artifacts/`
 
-提交包目录。包含技术报告、得分点映射、答辩脚本、Demo 截图、视频、证据快照和 evidence manifest。该目录中的内容面向比赛提交和离线审阅，应保持轻量、稳定、可读。
+提交包目录。包含技术报告、得分点映射、答辩脚本、Demo 截图、视频、证据快照、evidence manifest、机器可读 metadata 和可读 evidence summary。该目录中的内容面向比赛提交和离线审阅，应保持轻量、稳定、可读。
 
 ### `archive/`
 
@@ -99,7 +99,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 | `src/findsl/doris.py` | Doris DDL/SQL 资产生成。 | 配置与样本数据。 | `deploy/doris/*.sql`。 | 与 registry 强绑定，保证表和指标一致。 |
 | `src/findsl/doris_evidence.py` | Doris 集群证据采集。 | MySQL 客户端配置、DSL。 | Markdown/JSON evidence。 | 需真实 Doris 9030 端口和已加载数据。 |
 | `src/findsl/readiness.py` | 提交前综合门禁。 | 项目目录、报告目录。 | readiness report。 | 评估测试、证据、官方套件和 Git clean 状态。 |
-| `src/findsl/evidence_metadata.py` | 提交证据结构化索引。 | evidence snapshots、manifest。 | `evidence_metadata.json`。 | 从已生成证据抽取字段，不重新计算或伪造性能结论。 |
+| `src/findsl/evidence_metadata.py` | 提交证据结构化索引。 | evidence snapshots、manifest。 | `evidence_metadata.json`、`evidence_summary.md`。 | 从已生成证据抽取字段，不重新计算或伪造性能结论。 |
 | `src/findsl/defense_package.py` | 答辩证据包生成。 | 样本、报告、配置。 | defense package。 | 映射演示步骤到得分点。 |
 | `src/findsl/official_suite.py` | 官方风格用例套件。 | JSONL 正/负例。 | coverage report。 | 正例和负例均为 required gate。 |
 | `src/findsl/benchmark.py` | prefix-sum 本地基准。 | DSL、样本数据。 | benchmark report。 | 本地 SQLite timing 只作回归信号。 |
@@ -171,7 +171,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 
 ## 9. 最新版本文件说明
 
-当前最新源码以 `src/findsl/`、`configs/`、`tests/`、`scripts/`、`deploy/doris/`、`submission_artifacts/evidence_snapshots/` 为准。最终提交证据以 `submission_artifacts/evidence_manifest.md`、`submission_artifacts/evidence_metadata.json` 和 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，不以被忽略的 `reports/` 为最终交付依据。
+当前最新源码以 `src/findsl/`、`configs/`、`tests/`、`scripts/`、`deploy/doris/`、`submission_artifacts/evidence_snapshots/` 为准。最终提交证据以 `submission_artifacts/evidence_manifest.md`、`submission_artifacts/evidence_metadata.json`、`submission_artifacts/evidence_summary.md` 和 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，不以被忽略的 `reports/` 为最终交付依据。
 
 ## 10. 不建议删除的文件
 
@@ -213,7 +213,7 @@ python -m findsl.cli compile 'filter(indicator("close") > 10)'
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples
 python -m findsl.cli official-suite --json
 python -m findsl.cli readiness-report --output reports/submission_readiness.md
-python -m findsl.cli evidence-metadata --snapshots-dir submission_artifacts/evidence_snapshots --output submission_artifacts/evidence_metadata.json
+python -m findsl.cli evidence-metadata --snapshots-dir submission_artifacts/evidence_snapshots --output submission_artifacts/evidence_metadata.json --summary-output submission_artifacts/evidence_summary.md
 ```
 
 ### Web Demo 入口
@@ -238,7 +238,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 ```
 
-`export_submission_artifacts.ps1` 会同步生成 `submission_artifacts/evidence_metadata.json`，把 readiness、official suite、Doris cluster evidence 中的关键数值整理为机器可读 JSON，供答辩 PPT、Web Demo、技术报告或后续自动检查复用。
+`export_submission_artifacts.ps1` 会同步生成 `submission_artifacts/evidence_metadata.json` 和 `submission_artifacts/evidence_summary.md`，把 readiness、official suite、Doris cluster evidence 中的关键数值整理为机器可读 JSON 和可读摘要，供答辩 PPT、Web Demo、技术报告或后续自动检查复用。
 
 ## 13. 项目构建、运行、测试流程
 

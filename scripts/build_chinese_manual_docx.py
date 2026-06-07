@@ -87,7 +87,7 @@ COMMAND_TABLE = [
 
 
 EVIDENCE_TABLE = [
-    ("Pytest 回归", "195 passed", "覆盖编译器、参考执行、Demo、安全、收益率算子、真实行情样本、provider 合约、答辩视频时间轴和 Doris 证据采集逻辑。"),
+    ("Pytest 回归", "197 passed", "覆盖编译器、参考执行、Demo、安全、收益率算子、真实行情样本、provider 合约、答辩视频时间轴和 Doris 证据采集逻辑。"),
     ("官方风格正例", "37/37", "覆盖窗口、排名、日期裁剪、多表指标、prefix-sum、收益率、不等号和括号 OR 条件。"),
     ("官方风格负例", "37/37", "覆盖未知指标、非法窗口、非法日期、RET 嵌套窗口、rank 截止互斥、直接 SQL、安全诊断。"),
     ("真实行情样本", "3/3", "东方财富公开 K 线样本的 turnover、RET 和 rolling volume DSL 均通过 SQL/reference 等价验证。"),
@@ -329,7 +329,7 @@ CHAPTERS = [
     (
         "测试、验证与质量保障",
         [
-            ("单元测试体系", "测试体系", "项目测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、llm_provider、doris_sql、doris_evidence、demo、real market sample、defense video 和 readiness。", "当前全量 pytest 结果为 195 passed，这说明 provider 合约、收益率算子、真实行情 Demo 样本、答辩视频资产和文档增强没有破坏核心链路。", "测试数量不是目的，关键是每个高风险行为都有对应断言。"),
+            ("单元测试体系", "测试体系", "项目测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、llm_provider、doris_sql、doris_evidence、demo、real market sample、defense video 和 readiness。", "当前全量 pytest 结果为 197 passed，这说明 provider 合约、收益率算子、真实行情 Demo 样本、答辩视频资产和文档增强没有破坏核心链路。", "测试数量不是目的，关键是每个高风险行为都有对应断言。"),
             ("官方风格覆盖套件", "官方套件", "official_positive_cases.jsonl 和 official_negative_cases.jsonl 构成比赛风格回归语料。", "正例要求编译成功、SQL 片段匹配、trace 片段匹配、explain 规则匹配，并且 SQL/reference 等价。", "负例要求失败方式可控，返回预期 diagnostic code 和可操作建议。"),
             ("语义等价验证", "等价验证", "Pandas reference evaluator 直接解释 DSL，SQLite executor 执行编译生成 SQL。", "两者结果按 ts_code、trade_date 键比较，发现 missing 或 extra 即视为语义错误。", "这种双路径验证降低了 SQL 生成器自证正确的风险。"),
             ("Doris 规模验证", "Doris 验证", "Doris evidence collector 在真实 MySQL 兼容端口上执行 EXPLAIN 和 COUNT(*)。", "baseline 与 optimized 必须都成功、行数必须一致、baseline plan 必须包含 window、optimized plan 必须包含 prefix table、加速必须超过阈值。", "任一条件不满足都不应在答辩中宣称性能达标。"),
@@ -400,7 +400,7 @@ APPENDIX_SECTIONS = [
             "第四项检查 Word 文档。打开 `docs/FinDSL_Forge_中文综合操作指南.docx`，确认目录章节完整、中文字体正常、表格没有越界、页眉页脚没有异常。文档是评审最容易直接打开的材料之一，版式问题会直接影响专业感。",
             "第五项检查演示入口。确认 `scripts/serve_demo.ps1` 能启动，浏览器能访问 `http://127.0.0.1:8765`，默认样例、中文建议、SQL 标签、AST 标签、Evidence 标签和负例诊断都能工作。若现场不准备实时 Doris，则提前打开 evidence snapshot 作为备用材料。",
             "第六项检查 GitHub 与 bundle。push 成功后生成新的 bundle，文件名带时间戳，放在 `git_bundles` 目录。远端仓库和离线 bundle 同时存在，才算完成可回溯备份。提交前最好记录最新 commit hash，便于团队成员之间确认版本一致。",
-            "第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：195 passed、37/37、37/37、真实行情样本 3/3、答辩包 13/13、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。",
+            "第七项检查材料口径。PPT、Word 手册、README 和答辩讲稿中的关键数字要一致：197 passed、37/37、37/37、真实行情样本 3/3、答辩包 13/13、5,000,000 行、36.24x、warning count 0。任何一个数字更新，都要同步到所有材料，避免评委发现前后矛盾。",
             "第八项检查风险表述。provider 实际效果评测、多节点 Doris、更多真实数据样本等内容应写成后续增强或可选冲刺项；已经完成的内容则要能给出文件和命令。诚实区分状态，比把规划写成成果更安全。",
         ],
     ),
@@ -738,7 +738,7 @@ SECTION_PARAGRAPHS = {
     ],
     "核心评价指标": [
         "当前版本围绕六类指标做交付验收：编译正确率、诊断可用性、长窗口性能、Doris 兼容性、AI 辅助安全性和提交可复现性。它们分别由 official positive cases、official negative cases、Doris evidence、SQL validator、LLM candidate adapter 和 submission readiness 覆盖。",
-        "已有证据里，pytest 全量回归为 195 passed；官方风格正例 37/37 通过，负例 37/37 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。",
+        "已有证据里，pytest 全量回归为 197 passed；官方风格正例 37/37 通过，负例 37/37 返回预期诊断；Doris 5,000,000 行规模实验中，120 日成交量滚动窗口从 baseline 平均 5182.042 ms 优化到 142.993 ms，加速比为 36.24x。这个结果超过赛题中通常需要重点展示的 10x 级性能目标。",
         "评价指标的作用不只是写在文档里好看。每次提交前运行 readiness，团队就能知道哪些证据仍然有效、哪些结果需要重采、Git 是否处在可回溯状态。竞赛后期最怕“功能看似完成但证据散落”，这套指标体系正是为了避免这种情况。",
     ],
     "主要技术风险": [
@@ -957,7 +957,7 @@ SECTION_PARAGRAPHS = {
         "readiness 报告也适合答辩使用。它把分散的命令结果集中在一份文件里，能够快速回答“你们现在到底完成到什么程度”。对国家级奖项目标来说，这种总验收文件比口头保证更有分量。",
     ],
     "单元测试体系": [
-        "测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、llm_provider、doris_sql、doris_evidence、demo、真实行情样本、defense video 和 readiness。当前全量 pytest 为 195 passed，说明 provider 合约、收益率算子、官方套件、真实行情 Demo 样本、视频资产和文档增强没有破坏核心链路。",
+        "测试覆盖 parser、compiler、semantic、diagnostics、nl2dsl、llm_adapter、llm_provider、doris_sql、doris_evidence、demo、真实行情样本、defense video 和 readiness。当前全量 pytest 为 197 passed，说明 provider 合约、收益率算子、官方套件、真实行情 Demo 样本、视频资产和文档增强没有破坏核心链路。",
         "测试设计关注高风险行为。比如窗口函数不能出现在 WHERE，未知指标要给修复建议，prefix rewrite 不能改变结果，LLM 直接 SQL 要被拒绝，Demo API 要返回稳定字段。它们不是为了凑数量，而是围绕赛题失分点布防。",
         "后续新增功能时，应先补参考语义和测试，再修改 SQL generator。尤其是新增窗口函数、指标表或优化规则，必须保证正例、负例和 equivalence 同步更新。否则功能越多，隐藏风险越大。",
     ],
@@ -984,7 +984,7 @@ SECTION_PARAGRAPHS = {
     "答辩主线": [
         "答辩建议从痛点开始。金融选股表达复杂，手写 SQL 容易出错；大模型直接生成 SQL 风险高；长窗口在数据仓库中成本大；比赛要求的不只是演示，而是正确性、性能和复现。这个开场能把项目放到真实问题里，而不是从技术名词堆砌开始。",
         "方案部分再讲四层：FinDSL 表达业务意图，确定性编译器生成 Doris SQL，reference 与 validator 保证正确和安全，prefix-sum 与热点窗口证明性能。每层都对应 Demo 或报告，听众能看到问题如何被逐步拆解。",
-        "结尾用证据收束。195 passed、37/37 正例、37/37 负例、真实行情 3/3、答辩包 13/13、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。",
+        "结尾用证据收束。197 passed、37/37 正例、37/37 负例、真实行情 3/3、答辩包 13/13、5M Doris、36.24x、readiness warning 0、GitHub 与 bundle 回溯，这些数字不需要一次性全念完，但要在关键节点自然出现，让评委相信项目状态是真实可复核的。",
     ],
     "演示节奏": [
         "五分钟演示可以分成四段。第一分钟展示中文输入到 DSL 候选，说明 AI 只是辅助；第二分钟展示 AST、SQL 和 explain，说明编译器掌握语义；第三分钟展示 prefix-sum 案例、真实行情样例和 Doris evidence，说明业务可信与长窗口加速；最后一分钟展示负例诊断和 readiness。",
@@ -1105,7 +1105,7 @@ SECTION_SUPPLEMENTS = {
     "提交包证据": "submission_artifacts 是评审最可能实际打开的目录之一。里面的文件命名、时间、内容和 README 提示都要保持清楚。项目越大，越需要让评委在有限时间内找到最关键的证据。",
     "答辩主线": "答辩时要减少空泛形容词，多用动作和证据。比如“系统会拒绝直接 SQL”比“系统很安全”更具体；“baseline 与 optimized 行数一致”比“优化有效”更可验证。语言越具体，越不像临时包装。",
     "演示节奏": "彩排时建议模拟网络不可用、Doris 未启动、端口占用和浏览器刷新等情况。只要提前准备好离线证据和备用命令，现场就不会因为环境波动打乱节奏。演示稳定性本身也是交付能力的一部分。",
-    "PPT 组织": "PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，195 passed 来自 pytest，37/37 和 37/37 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。",
+    "PPT 组织": "PPT 中的每个数字都应能追溯到文件。36.24x 来自 Doris evidence，197 passed 来自 pytest，37/37 和 37/37 来自 official suite，warning 0 来自 readiness。数字旁边标注来源，会让材料更像正式工程汇报。",
     "得分点映射": "得分点映射还可以作为最终自检表。提交前逐项确认：是否有实现、是否有测试、是否有报告、是否能演示、是否能解释风险。任何一项缺失，都应在最后冲刺阶段补齐或诚实标注。",
     "Git 工作流": "Git 记录应当和竞赛节点对应起来。完成 Doris 证据、完成中文手册、完成 Web Demo 增强、完成最终提交包，都值得形成清楚提交。后续回看历史时，团队能知道每个里程碑对应哪个 commit。",
     "Bundle 备份": "bundle 备份最好在推送成功后立即生成，并把文件名带上时间戳。这样即使远端仓库短时访问异常，本地仍有完整恢复点。比赛提交前，这类低成本保险非常值得做。",
@@ -1155,7 +1155,7 @@ def write_markdown() -> str:
 def summary_paragraphs() -> List[str]:
     return [
         "FinDSL Forge 面向中国研究生金融科技创新大赛赛题 19，解决的是金融选股表达如何稳定落到 Apache Doris 高性能查询上的问题。用户可以输入受限 DSL，也可以先用中文需求生成候选 DSL；系统随后完成 AST 构建、语义校验、Doris SQL 生成、SQL 安全检查和参考语义验证。整条链路强调可解释的工程行为，而不是把数据库执行权交给黑盒文本生成。",
-        "当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo、答辩视频生成和 submission readiness；报告侧已有 195 项 pytest 回归、37/37 官方风格正例、37/37 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的证据快照、Web Demo 截图和一分钟 MP4。",
+        "当前项目已经形成可以支撑正式提交的证据基础。代码覆盖 lexer、parser、semantic analyzer、SQL generator、Doris SQL validator、Pandas reference evaluator、SQLite executor、Doris evidence collector、Web Demo、答辩视频生成和 submission readiness；报告侧已有 197 项 pytest 回归、37/37 官方风格正例、37/37 官方风格负例、5,000,000 行 Doris 规模实验、36.24x 长窗口加速、warning count 为 0 的 readiness 结果，以及进入 `submission_artifacts` 的证据快照、Web Demo 截图和一分钟 MP4。",
         "这份手册把产品说明、赛题解读、架构设计、算法细节、部署步骤、操作指南、测试验证、答辩材料和后续规划放在一起。正文尽量采用企业技术文档的写法：先讲判断，再讲实现，再给出可复核的文件或命令；表格只承担对照和速查职责，不用来掩盖正文逻辑。",
     ]
 
@@ -1190,7 +1190,7 @@ def build_docx() -> Tuple[Path, int]:
         ("竞赛方向", "研究生金融科技创新大赛赛题 19"),
         ("文档版本", VERSION),
         ("生成时间", GENERATED_AT),
-        ("核心证据", "195 passed；官方风格 37/37 + 37/37；真实行情样本 3/3；答辩包 13/13；Doris 5M 规模 36.24x；readiness warning 0"),
+        ("核心证据", "197 passed；官方风格 37/37 + 37/37；真实行情样本 3/3；答辩包 13/13；Doris 5M 规模 36.24x；readiness warning 0"),
     ]
     add_table(doc, ["项目", "内容"], meta, [2200, 7160])
     doc.add_page_break()

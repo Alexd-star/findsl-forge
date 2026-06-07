@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from findsl.evidence_metadata import build_evidence_metadata
+from findsl.evidence_metadata import build_evidence_metadata, render_evidence_summary_markdown
 
 
 def _write_minimal_snapshots(snapshot_dir: Path, *, include_doris: bool = True) -> None:
@@ -130,3 +130,32 @@ def test_evidence_metadata_cli_writes_json(tmp_path: Path) -> None:
     assert payload["schema_version"] == 1
     assert payload["readiness"]["blocking_gates_passed"] is True
     assert payload["doris_cluster"]["speedup_display"] == "36.24x"
+
+
+def test_render_evidence_summary_markdown_highlights_auditable_metrics(tmp_path: Path) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    markdown = render_evidence_summary_markdown(metadata)
+
+    assert markdown.startswith("# Evidence Summary")
+    assert "| Blocking gates | PASS |" in markdown
+    assert "| Warning count | 0 |" in markdown
+    assert "| Pytest regression | 192 passed" in markdown
+    assert "| Official positive cases | 37/37 |" in markdown
+    assert "| Doris cluster speedup | 36.24x |" in markdown
+    assert "| Git HEAD at report generation | c7a2164 |" in markdown
+    assert "submission_readiness.md" in markdown
+    assert "doris_cluster_evidence.json" in markdown
+
+
+def test_render_evidence_summary_markdown_marks_missing_doris_metrics(tmp_path: Path) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir, include_doris=False)
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    markdown = render_evidence_summary_markdown(metadata)
+
+    assert "| Doris evidence | UNAVAILABLE |" in markdown
+    assert "doris_cluster_evidence.json not found; Doris metrics are unavailable." in markdown

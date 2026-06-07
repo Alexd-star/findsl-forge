@@ -133,6 +133,7 @@ def main() -> None:
     metadata_cmd.add_argument("--snapshots-dir", default="submission_artifacts/evidence_snapshots", help="Directory containing exported evidence snapshots")
     metadata_cmd.add_argument("--manifest", default="submission_artifacts/evidence_manifest.md", help="Evidence manifest path; use an empty value to skip")
     metadata_cmd.add_argument("--output", default="submission_artifacts/evidence_metadata.json", help="Output JSON metadata path")
+    metadata_cmd.add_argument("--summary-output", default=None, help="Optional output Markdown summary path")
     demo_cmd = sub.add_parser("serve-demo", help="Start the local web demo and JSON API")
     demo_cmd.add_argument("--host", default="127.0.0.1", help="Host interface for the demo server")
     demo_cmd.add_argument("--port", type=int, default=8765, help="Port for the demo server")
@@ -500,6 +501,7 @@ def main() -> None:
             snapshot_dir=Path(args.snapshots_dir),
             manifest_path=manifest_path,
             output_path=Path(args.output),
+            summary_output_path=Path(args.summary_output) if args.summary_output else None,
         )
         print(json.dumps(metadata, ensure_ascii=False, indent=2))
     elif args.command == "serve-demo":

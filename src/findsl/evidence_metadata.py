@@ -32,11 +32,66 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
     }
 
 
-def write_evidence_metadata(snapshot_dir: Path, output_path: Path, manifest_path: Path | None = None) -> dict[str, Any]:
+def write_evidence_metadata(
+    snapshot_dir: Path,
+    output_path: Path,
+    manifest_path: Path | None = None,
+    summary_output_path: Path | None = None,
+) -> dict[str, Any]:
     metadata = build_evidence_metadata(snapshot_dir=snapshot_dir, manifest_path=manifest_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if summary_output_path is not None:
+        summary_output_path.parent.mkdir(parents=True, exist_ok=True)
+        summary_output_path.write_text(render_evidence_summary_markdown(metadata), encoding="utf-8")
     return metadata
+
+
+def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
+    readiness = _dict(metadata.get("readiness"))
+    official = _dict(metadata.get("official_suite"))
+    doris = _dict(metadata.get("doris_cluster"))
+    git = _dict(metadata.get("git"))
+    warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
+    sources = _dict(metadata.get("source_files"))
+
+    lines = [
+        "# Evidence Summary",
+        "",
+        "This summary is generated from `evidence_metadata.json`. Use the snapshot files listed below as the audit source.",
+        "",
+        "## Headline Gates",
+        "",
+        "| Item | Value |",
+        "|---|---|",
+        f"| Blocking gates | {_pass_fail(readiness.get('blocking_gates_passed'))} |",
+        f"| Warning count | {_display(readiness.get('warning_count'))} |",
+        f"| Pytest regression | {_pytest_display(readiness)} |",
+        f"| Official positive cases | {_ratio_display(_dict(official.get('positive')))} |",
+        f"| Official negative diagnostics | {_ratio_display(_dict(official.get('negative')))} |",
+        f"| Defense package checks | {_ratio_display(_dict(readiness.get('defense_package_checks')))} |",
+        f"| Doris evidence | {_doris_evidence_display(doris)} |",
+        f"| Doris cluster speedup | {_display(doris.get('speedup_display'))} |",
+        f"| Doris row parity | {_pass_fail(doris.get('row_counts_match'))} |",
+        f"| Git HEAD at report generation | {_display(git.get('head_at_report_generation'))} |",
+        f"| Git HEAD at export | {_display(git.get('head_at_export'))} |",
+        "",
+        "## Source Files",
+        "",
+        "| Source | Path |",
+        "|---|---|",
+    ]
+    for name, path in sources.items():
+        lines.append(f"| {name} | `{_display(path)}` |")
+
+    lines.extend(["", "## Metadata Warnings", ""])
+    if warnings:
+        for warning in warnings:
+            lines.append(f"- {warning}")
+    else:
+        lines.append("- <none>")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def _read_optional_text(path: Path | None, warnings: list[str]) -> str:
@@ -186,3 +241,46 @@ def _int_or_none(value: Any) -> int | None:
 
 def _bool_or_none(value: Any) -> bool | None:
     return value if isinstance(value, bool) else None
+
+
+def _dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _display(value: Any) -> str:
+    if value is None:
+        return "<unknown>"
+    return str(value)
+
+
+def _pass_fail(value: Any) -> str:
+    if value is True:
+        return "PASS"
+    if value is False:
+        return "FAIL"
+    return "<unknown>"
+
+
+def _ratio_display(value: dict[str, Any]) -> str:
+    passed = value.get("passed")
+    total = value.get("total")
+    if passed is None or total is None:
+        return "<unknown>"
+    return f"{passed}/{total}"
+
+
+def _pytest_display(readiness: dict[str, Any]) -> str:
+    pytest = _dict(readiness.get("pytest"))
+    passed = pytest.get("passed")
+    elapsed = pytest.get("elapsed_seconds")
+    if passed is None:
+        return "<unknown>"
+    if elapsed is None:
+        return f"{passed} passed"
+    return f"{passed} passed in {elapsed:.2f}s"
+
+
+def _doris_evidence_display(doris: dict[str, Any]) -> str:
+    if doris.get("available") is False:
+        return "UNAVAILABLE"
+    return _pass_fail(doris.get("passed"))
