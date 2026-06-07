@@ -134,7 +134,7 @@ def test_compile_rank_percent_uses_partition_count_threshold():
     assert "ROW_NUMBER() OVER" in result.sql
     assert "ORDER BY turnover_rate DESC, ts_code ASC" in result.sql
     assert "COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count" in result.sql
-    assert "rank_no <= CAST(((__partition_count * 50) + 99.999999) / 100.0 AS INTEGER)" in result.sql
+    assert "rank_no <= CEIL((__partition_count * 50) / 100.0)" in result.sql
     rank_steps = [step for step in result.explain if step["rule"] == "RANK_ROW_NUMBER"]
     assert rank_steps[0]["evidence"]["limit_kind"] == "percent"
     assert rank_steps[0]["evidence"]["limit_value"] == 50.0

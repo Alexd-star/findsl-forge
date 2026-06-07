@@ -374,7 +374,7 @@ class SqlGenerator:
             return f" WHERE rank_no <= {int(limit['value'])}"
         if limit["kind"] == "percent":
             value = _format_number(float(limit["value"]))
-            threshold = f"CAST(((__partition_count * {value}) + 99.999999) / 100.0 AS INTEGER)"
+            threshold = f"CEIL((__partition_count * {value}) / 100.0)"
             return f" WHERE rank_no <= {threshold}"
         return ""
 

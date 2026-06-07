@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import math
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
@@ -55,6 +56,7 @@ class SQLiteSampleExecutor:
         conn = sqlite3.connect(":memory:")
         try:
             conn.row_factory = sqlite3.Row
+            conn.create_function("CEIL", 1, math.ceil)
             self._load_tables(conn)
             self._create_prefix_tables(conn)
             return conn

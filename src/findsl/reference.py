@@ -109,10 +109,10 @@ class PandasReferenceEvaluator:
             left = self._bool(node.left, rows)
             right = self._bool(node.right, rows)
             if node.op == "&":
-                return left & right
+                return self._bool_and(left, right)
             if node.op == "^":
-                return left.fillna(False) ^ right.fillna(False)
-            return left | right
+                return self._bool_xor(left, right)
+            return self._bool_or(left, right)
         if isinstance(node, FunctionCall):
             name = node.name.upper()
             if name == "MARKET":
@@ -145,6 +145,20 @@ class PandasReferenceEvaluator:
 
     def _filter_mask(self, mask):
         return mask.where(mask.notna(), False).astype(bool)
+
+    def _bool_and(self, left, right):
+        return self._bool_series(left) & self._bool_series(right)
+
+    def _bool_or(self, left, right):
+        return self._bool_series(left) | self._bool_series(right)
+
+    def _bool_xor(self, left, right):
+        return self._bool_series(left).fillna(False) ^ self._bool_series(right).fillna(False)
+
+    def _bool_series(self, value):
+        if hasattr(value, "astype"):
+            return value.astype("boolean")
+        return self.pd.Series([value], dtype="boolean")
 
     def _numeric(self, node: Node, rows):
         if isinstance(node, Literal):

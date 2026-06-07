@@ -216,6 +216,38 @@ def test_sql_matches_reference_for_sparse_auxiliary_table_or_condition(tmp_path)
     ]
 
 
+def test_sql_matches_reference_for_sparse_auxiliary_or_with_unknown_left_true_right(tmp_path):
+    _write_sparse_money_flow_fixture(tmp_path)
+
+    result = verify_sql_equivalence(
+        'filter(indicator("main_net_inflow") > 0 | indicator("close") > 10)',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [
+        ("AAA", "2026-01-01"),
+        ("BBB", "2026-01-01"),
+    ]
+    assert result.reference_keys == result.sql_keys
+
+
+def test_sql_matches_reference_for_sparse_auxiliary_not_equal_or_with_unknown_left_true_right(tmp_path):
+    _write_sparse_money_flow_fixture(tmp_path)
+
+    result = verify_sql_equivalence(
+        'filter(indicator("main_net_inflow") != 0 | indicator("close") > 10)',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [
+        ("AAA", "2026-01-01"),
+        ("BBB", "2026-01-01"),
+    ]
+    assert result.reference_keys == result.sql_keys
+
+
 def test_sql_matches_reference_for_boolean_xor():
     result = verify_sql_equivalence(
         'filter(market("A") ^ indicator("close") > 10)',
