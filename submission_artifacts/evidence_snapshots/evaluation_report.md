@@ -7,24 +7,24 @@
 - Failed cases: 0
 - Compile success rate: 100.00%
 - Fragment accuracy: 100.00%
-- Average compile latency: 0.419 ms
-- P50 compile latency: 0.363 ms
-- P95 compile latency: 0.799 ms
+- Average compile latency: 0.633 ms
+- P50 compile latency: 0.574 ms
+- P95 compile latency: 1.187 ms
 
 ## Case Details
 
 | Case | Passed | Latency ms | Errors |
 |---|---:|---:|---|
-| 连续3天主力净流入为正后按换手率排名 | True | 0.932 |  |
-| 今日收盘价创250日新高 | True | 0.327 |  |
-| 近10日存在放量 | True | 0.408 |  |
-| 无引号指标名兼容 | True | 0.291 |  |
-| 近3日成交量前缀和加速 | True | 0.403 |  |
-| A股每日换手率前50百分比 | True | 0.637 |  |
-| 日期区间内收盘价大于10 | True | 0.295 |  |
-| 窗口查询日期上界安全裁剪 | True | 0.399 |  |
-| 主力净流出负阈值 | True | 0.232 |  |
-| 近2日收盘价收益率超过5% | True | 0.268 |  |
+| 连续3天主力净流入为正后按换手率排名 | True | 1.382 |  |
+| 今日收盘价创250日新高 | True | 0.523 |  |
+| 近10日存在放量 | True | 0.629 |  |
+| 无引号指标名兼容 | True | 0.432 |  |
+| 近3日成交量前缀和加速 | True | 0.635 |  |
+| A股每日换手率前50百分比 | True | 0.949 |  |
+| 日期区间内收盘价大于10 | True | 0.421 |  |
+| 窗口查询日期上界安全裁剪 | True | 0.625 |  |
+| 主力净流出负阈值 | True | 0.333 |  |
+| 近2日收盘价收益率超过5% | True | 0.398 |  |
 
 ## Generated SQL
 
@@ -40,7 +40,6 @@ Trace:
 - materialize rolling boolean features after numeric features
 - rewrite filter predicate into outer WHERE over materialized features
 - project staged relation columns before re-ranking
-- project staged relation columns before re-ranking
 - rewrite rank() into ROW_NUMBER window
 - exclude null rank expressions before applying rank cutoff
 
@@ -49,7 +48,6 @@ Explain:
 - `ROLLING_BOOLEAN` applied: Rewrite CONS() into rolling boolean window feature
 - `FEATURE_LAYER` applied: Materialize rolling boolean features after numeric features
 - `FILTER_OUTER_WHERE` applied: Rewrite filter predicate into outer WHERE over materialized features
-- `RELATION_PROJECTION` applied: Project staged relation columns before re-ranking
 - `RELATION_PROJECTION` applied: Project staged relation columns before re-ranking
 - `RANK_ROW_NUMBER` applied: Rewrite rank() into ROW_NUMBER window
 - `RANK_NULL_GUARD` applied: Exclude null rank expressions before applying rank cutoff
@@ -130,24 +128,22 @@ Explain:
 ### A股每日换手率前50百分比
 
 ```sql
-WITH stage1 AS (SELECT * FROM (SELECT base.*, su.market AS market FROM dwd_stock_daily_quote AS base LEFT JOIN dim_stock_universe AS su USING (ts_code, trade_date)) base_features WHERE market = 'A'), stage2 AS (SELECT * FROM (SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY turnover_rate DESC, ts_code ASC) AS rank_no FROM (SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count FROM (SELECT base.ts_code AS ts_code, base.trade_date AS trade_date, base.close AS close, base.turnover_rate AS turnover_rate, base.volume AS volume, base.market AS market FROM stage1 AS base) AS base) base WHERE turnover_rate IS NOT NULL) ranked WHERE rank_no <= CAST(((__partition_count * 50) + 99.999999) / 100.0 AS INTEGER)) SELECT * FROM stage2
+WITH stage1 AS (SELECT * FROM (SELECT base.*, su.market AS market FROM dwd_stock_daily_quote AS base LEFT JOIN dim_stock_universe AS su USING (ts_code, trade_date)) base_features WHERE market = 'A'), stage2 AS (SELECT * FROM (SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY turnover_rate DESC, ts_code ASC) AS rank_no FROM (SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count FROM (SELECT base.ts_code AS ts_code, base.trade_date AS trade_date, base.close AS close, base.turnover_rate AS turnover_rate, base.volume AS volume, base.market AS market FROM stage1 AS base) AS base WHERE turnover_rate IS NOT NULL) base) ranked WHERE rank_no <= CAST(((__partition_count * 50) + 99.999999) / 100.0 AS INTEGER)) SELECT * FROM stage2
 ```
 
 Trace:
 - rewrite then() into staged CTE pipeline
 - rewrite filter predicate into outer WHERE over materialized features
 - project staged relation columns before re-ranking
-- project staged relation columns before re-ranking
-- rewrite rank() into ROW_NUMBER window
 - exclude null rank expressions before applying rank cutoff
+- rewrite rank() into ROW_NUMBER window
 
 Explain:
 - `THEN_PIPELINE` applied: Rewrite then() into staged CTE pipeline
 - `FILTER_OUTER_WHERE` applied: Rewrite filter predicate into outer WHERE over materialized features
 - `RELATION_PROJECTION` applied: Project staged relation columns before re-ranking
-- `RELATION_PROJECTION` applied: Project staged relation columns before re-ranking
-- `RANK_ROW_NUMBER` applied: Rewrite rank() into ROW_NUMBER window
 - `RANK_NULL_GUARD` applied: Exclude null rank expressions before applying rank cutoff
+- `RANK_ROW_NUMBER` applied: Rewrite rank() into ROW_NUMBER window
 - `DORIS_SQL_VALIDATION` applied: Validate generated SQL against Doris-safe query shape
 
 ### 日期区间内收盘价大于10
