@@ -23,6 +23,7 @@
 | `15_更新日志.md` | 记录文档体系建立及项目能力演进摘要，并引用根目录 `CHANGELOG.md`。 |
 | `16_历史文件说明.md` | 说明历史文件、临时文件、生成报告和可归档内容，强调不直接删除。 |
 | `17_项目交付说明.md` | 说明比赛提交包、答辩材料、验收顺序、风险项和人工复核事项。 |
+| `18_企业级审计与补强报告.md` | 记录功能、代码、算法、安全边界和交付成熟度审计，以及本轮补强内容。 |
 
 ## 既有专项文档
 
@@ -41,4 +42,4 @@
 
 ## 阅读建议
 
-首次接触项目时，建议按 `README.md`、`PROJECT_INDEX.md`、`docs/01_项目简介.md`、`docs/03_操作手册.md` 的顺序阅读。准备比赛答辩时，建议重点阅读 `docs/17_项目交付说明.md`、`docs/requirement_mapping.md`、`docs/defense_walkthrough.md` 和 `submission_artifacts/evidence_snapshots/` 下的证据文件。继续开发时，建议先阅读 `docs/04_开发者文档.md`、`docs/05_项目架构说明.md`、`docs/07_核心模块说明.md` 和 `docs/13_测试说明.md`，再修改源码或配置。
+首次接触项目时，建议按 `README.md`、`PROJECT_INDEX.md`、`docs/01_项目简介.md`、`docs/03_操作手册.md` 的顺序阅读。准备比赛答辩时，建议重点阅读 `docs/17_项目交付说明.md`、`docs/18_企业级审计与补强报告.md`、`docs/requirement_mapping.md`、`docs/defense_walkthrough.md` 和 `submission_artifacts/evidence_snapshots/` 下的证据文件。继续开发时，建议先阅读 `docs/04_开发者文档.md`、`docs/05_项目架构说明.md`、`docs/07_核心模块说明.md` 和 `docs/13_测试说明.md`，再修改源码或配置。

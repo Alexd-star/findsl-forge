@@ -26,6 +26,25 @@ def test_doris_sql_validator_rejects_unknown_table_references():
     assert any(issue.code == "UNKNOWN_TABLE_REFERENCE" for issue in result.issues)
 
 
+def test_doris_sql_validator_rejects_backticked_unknown_table_references():
+    result = validate_doris_select_sql("SELECT * FROM `surprise_table`")
+
+    assert not result.passed
+    assert result.table_references == ["surprise_table"]
+    assert any(issue.code == "UNKNOWN_TABLE_REFERENCE" for issue in result.issues)
+
+
+def test_doris_sql_validator_normalizes_schema_qualified_table_references():
+    result = validate_doris_select_sql(
+        "SELECT * FROM `findsl_demo`.`dwd_stock_daily_quote` "
+        "JOIN findsl_demo.dwd_stock_daily_quote_prefix USING (ts_code, trade_date)"
+    )
+
+    assert result.passed
+    assert result.table_references == ["dwd_stock_daily_quote", "dwd_stock_daily_quote_prefix"]
+    assert result.contains_prefix_table
+
+
 def test_doris_sql_validator_rejects_window_functions_inside_where():
     result = validate_doris_select_sql(
         "SELECT * FROM dwd_stock_daily_quote WHERE AVG(close) OVER (PARTITION BY ts_code) > 10"

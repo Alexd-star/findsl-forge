@@ -195,8 +195,23 @@ def _starts_clause_boundary(upper_sql: str, idx: int) -> bool:
 
 
 def _table_references(sql: str) -> List[str]:
-    names = re.findall(r"\b(?:FROM|JOIN)\s+([A-Za-z_][A-Za-z0-9_]*)\b", sql, flags=re.IGNORECASE)
+    identifier = r"(?:`[^`]+`|[A-Za-z_][A-Za-z0-9_]*)"
+    qualified_identifier = rf"{identifier}(?:\s*\.\s*{identifier})?"
+    references = re.findall(
+        rf"\b(?:FROM|JOIN)\s+({qualified_identifier})(?=\s|$|,|\)|\()",
+        sql,
+        flags=re.IGNORECASE,
+    )
+    names = [_normalize_table_reference(reference) for reference in references]
     return list(dict.fromkeys(names))
+
+
+def _normalize_table_reference(reference: str) -> str:
+    parts = [part.strip() for part in reference.split(".")]
+    table_name = parts[-1]
+    if table_name.startswith("`") and table_name.endswith("`"):
+        return table_name[1:-1].replace("``", "`")
+    return table_name
 
 
 def _allowed_table_references(registry: Registry) -> Set[str]:

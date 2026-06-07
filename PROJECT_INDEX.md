@@ -145,12 +145,13 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 | `docs/requirement_mapping.md` | 赛题要求映射。 | 保留。 |
 | `docs/submission_package.md` | 提交包生成说明。 | 保留。 |
 | `docs/ui_redesign_plan.md` | Web Demo UI 改造规划。 | 保留，属于历史设计决策。 |
+| `docs/18_企业级审计与补强报告.md` | 功能、代码、算法、安全边界和交付成熟度审计报告。 | 保留，作为后续质量复核入口。 |
 | `docs/FinDSL_Forge_中文综合操作指南.md/.docx` | 长篇中文综合文档。 | 保留，作为正式说明书。 |
 | `docs/FinDSL_Forge_中文操作手册.md/.docx/.pdf` | 中文操作手册。 | 保留，作为用户/操作手册。 |
 
 ### 本次补齐文档
 
-本次新增 `docs/01_项目简介.md` 到 `docs/17_项目交付说明.md`，作为统一中文文档体系。编号文档不会覆盖旧文档，而是提供清晰入口、补充中文解释，并引用已有详细资料。
+此前新增 `docs/01_项目简介.md` 到 `docs/17_项目交付说明.md`，作为统一中文文档体系。当前进一步补充 `docs/18_企业级审计与补强报告.md`，记录功能、代码、算法、安全边界和交付成熟度审计结论。编号文档不会覆盖旧文档，而是提供清晰入口、补充中文解释，并引用已有详细资料。
 
 ## 8. 历史文件说明
 
@@ -254,4 +255,3 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 4. 修改 Doris 表结构后必须重新生成 `deploy/doris/*.sql`，并重新采集或标注 Doris 证据。
 5. `reports/` 只作为本地输出目录；最终可提交证据通过 `submission_artifacts/` 管理。
 6. 历史文件不要直接删除，先记录在 [docs/16_历史文件说明.md](docs/16_历史文件说明.md)，必要时移动到 `archive/`。
-
