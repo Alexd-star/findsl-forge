@@ -7,24 +7,24 @@
 - Failed cases: 0
 - Compile success rate: 100.00%
 - Fragment accuracy: 100.00%
-- Average compile latency: 0.633 ms
-- P50 compile latency: 0.574 ms
-- P95 compile latency: 1.187 ms
+- Average compile latency: 0.416 ms
+- P50 compile latency: 0.365 ms
+- P95 compile latency: 0.746 ms
 
 ## Case Details
 
 | Case | Passed | Latency ms | Errors |
 |---|---:|---:|---|
-| 连续3天主力净流入为正后按换手率排名 | True | 1.382 |  |
-| 今日收盘价创250日新高 | True | 0.523 |  |
-| 近10日存在放量 | True | 0.629 |  |
-| 无引号指标名兼容 | True | 0.432 |  |
-| 近3日成交量前缀和加速 | True | 0.635 |  |
-| A股每日换手率前50百分比 | True | 0.949 |  |
-| 日期区间内收盘价大于10 | True | 0.421 |  |
-| 窗口查询日期上界安全裁剪 | True | 0.625 |  |
-| 主力净流出负阈值 | True | 0.333 |  |
-| 近2日收盘价收益率超过5% | True | 0.398 |  |
+| 连续3天主力净流入为正后按换手率排名 | True | 0.905 |  |
+| 今日收盘价创250日新高 | True | 0.359 |  |
+| 近10日存在放量 | True | 0.366 |  |
+| 无引号指标名兼容 | True | 0.244 |  |
+| 近3日成交量前缀和加速 | True | 0.364 |  |
+| A股每日换手率前50百分比 | True | 0.551 |  |
+| 日期区间内收盘价大于10 | True | 0.274 |  |
+| 窗口查询日期上界安全裁剪 | True | 0.343 |  |
+| 主力净流出负阈值 | True | 0.381 |  |
+| 近2日收盘价收益率超过5% | True | 0.373 |  |
 
 ## Generated SQL
 
@@ -128,7 +128,7 @@ Explain:
 ### A股每日换手率前50百分比
 
 ```sql
-WITH stage1 AS (SELECT * FROM (SELECT base.*, su.market AS market FROM dwd_stock_daily_quote AS base LEFT JOIN dim_stock_universe AS su USING (ts_code, trade_date)) base_features WHERE market = 'A'), stage2 AS (SELECT * FROM (SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY turnover_rate DESC, ts_code ASC) AS rank_no FROM (SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count FROM (SELECT base.ts_code AS ts_code, base.trade_date AS trade_date, base.close AS close, base.turnover_rate AS turnover_rate, base.volume AS volume, base.market AS market FROM stage1 AS base) AS base WHERE turnover_rate IS NOT NULL) base) ranked WHERE rank_no <= CAST(((__partition_count * 50) + 99.999999) / 100.0 AS INTEGER)) SELECT * FROM stage2
+WITH stage1 AS (SELECT * FROM (SELECT base.*, su.market AS market FROM dwd_stock_daily_quote AS base LEFT JOIN dim_stock_universe AS su USING (ts_code, trade_date)) base_features WHERE market = 'A'), stage2 AS (SELECT * FROM (SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY turnover_rate DESC, ts_code ASC) AS rank_no FROM (SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count FROM (SELECT base.ts_code AS ts_code, base.trade_date AS trade_date, base.close AS close, base.turnover_rate AS turnover_rate, base.volume AS volume, base.market AS market FROM stage1 AS base) AS base WHERE turnover_rate IS NOT NULL) base) ranked WHERE rank_no <= CEIL((__partition_count * 50) / 100.0)) SELECT * FROM stage2
 ```
 
 Trace:
