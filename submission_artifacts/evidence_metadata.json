@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-07T10:09:50Z",
+  "generated_at": "2026-06-07T10:26:54Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "3ca18cd",
-    "head_at_export": "3ca18cd",
+    "head_at_report_generation": "be2ea88",
+    "head_at_export": "be2ea88",
     "branch": "main"
   },
   "readiness": {
-    "generated_at": "2026-06-07T10:09:40+00:00",
+    "generated_at": "2026-06-07T10:26:46+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.4,
+    "compile_p95_latency_ms": 1.238,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 195,
-      "elapsed_seconds": 16.98
+      "passed": 197,
+      "elapsed_seconds": 14.13
     }
   },
   "official_suite": {
