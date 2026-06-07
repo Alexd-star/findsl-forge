@@ -79,7 +79,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的工程
 
 赛题 19 要求构建从行情选股 DSL 到高性能 Doris SQL 的自动化编译系统，核心关注语义解析、逻辑等价重写、声明式配置扩展、长周期查询加速和可复核工程交付。FinDSL Forge 的设计路线是先限定 DSL 的合法表达，再把表达编译为 Doris 友好的 SQL，最后用独立 reference evaluator 与真实 Doris evidence 证明结果可信。
 
-当前项目已形成完整证据链。`submission_readiness` 快照显示核心门禁全部通过，官方风格正例 `37/37`、负例 `37/37`；本轮企业级审计新增 SQL validator 回归用例后，全量 pytest 验证为 `197 passed`。Doris 规模证据保留 5,000,000 行数据和 36.24x 长窗口加速证明。
+当前项目已形成完整证据链。`submission_readiness` 快照显示核心门禁全部通过，官方风格正例 `37/37`、负例 `37/37`；本轮企业级审计新增 SQL validator 回归用例后，全量 pytest 验证为 `203 passed`。Doris 规模证据保留 5,000,000 行数据和 36.24x 长窗口加速证明。
 
 ### 1.3 适用对象
 
@@ -184,7 +184,7 @@ DSL 在本项目中不是为了增加概念，而是为复杂查询提供一个�
 
 对于团队内部使用来说，角色说明还能帮助分工。准备答辩的人不一定要理解每个编译器类的实现，但必须能解释 DSL、SQL、验证和 Doris evidence 的关系；负责开发的人不一定要制作视频，但必须保证正负例、测试和配置一致；负责材料的人不一定要修改代码，但必须核对 README、PPT、操作手册和 readiness 中的数字。角色边界越清楚，临近提交时越不容易互相等待或重复劳动。
 
-实际执行中，不同角色之间也需要共享同一套证据口径。比如答辩人员引用 36.24x 加速时，开发人员应能指出对应 Doris evidence；文档人员写 197 passed 时，测试负责人应确认这来自最新 pytest；项目负责人判断是否可提交时，应以 readiness 的 Blocking gates 和 Warning count 为准。这样做能够让团队从“各说各的”转向“围绕同一套证据说明项目”。
+实际执行中，不同角色之间也需要共享同一套证据口径。比如答辩人员引用 36.24x 加速时，开发人员应能指出对应 Doris evidence；文档人员写 203 passed 时，测试负责人应确认这来自最新 pytest；项目负责人判断是否可提交时，应以 readiness 的 Blocking gates 和 Warning count 为准。这样做能够让团队从“各说各的”转向“围绕同一套证据说明项目”。
 
 FinDSL Forge 没有传统业务系统中的登录账号和权限体系。本地演示版本默认由操作者直接在命令行或 Web Demo 中使用，因此“角色”更多体现为使用职责，而不是系统内置权限。为了避免答辩和交接时职责混乱，建议按以下方式理解不同角色。
 
@@ -303,7 +303,7 @@ python -m pytest -q
 python -m pip install -e ".[dev]"
 ```
 
-执行完成后再次运行 pytest。预期结果应为全部测试通过。本轮企业级审计新增 SQL validator 回归用例后，全量测试结果为 `197 passed`。
+执行完成后再次运行 pytest。预期结果应为全部测试通过。本轮企业级审计新增 SQL validator 回归用例后，全量测试结果为 `203 passed`。
 
 ### 4.3 启动 Web Demo
 
@@ -696,13 +696,13 @@ submission_artifacts/defense_video
 ### 8.5 证据口径一致性
 证据口径一致性还包括时间一致性。开发过程中会产生很多中间报告，其中有些来自早期实现，有些来自修复后的最新状态。如果提交材料中混入旧截图或旧报告，读者可能看到已经修复的问题，或者看到与当前 README 不一致的测试数量。因此，提交前应明确哪些文件属于最终证据快照，哪些只是开发过程产物。最终材料应优先引用 `submission_artifacts/evidence_snapshots` 中的快照，而不是随意引用 `reports` 目录下的历史文件。
 
-材料中的数字也要有来源。正例 `37/37`、负例 `37/37`、pytest `197 passed`、Doris 5,000,000 行、36.24x 加速这些数字都不是装饰信息，而是评审判断项目完成度的重要依据。每一个数字都应能追溯到报告或脚本输出。若未来重新运行后数字变化，应更新所有相关材料，或者在文档中说明新旧证据的差异。
+材料中的数字也要有来源。正例 `37/37`、负例 `37/37`、pytest `203 passed`、Doris 5,000,000 行、36.24x 加速这些数字都不是装饰信息，而是评审判断项目完成度的重要依据。每一个数字都应能追溯到报告或脚本输出。若未来重新运行后数字变化，应更新所有相关材料，或者在文档中说明新旧证据的差异。
 
 口径一致并不意味着所有材料写法完全相同。README 可以简短，操作手册可以详细，PPT 可以提炼，视频脚本可以口语化；但核心事实必须一致。比如 PPT 中可以把“reference evaluator 与 SQLite 执行器”简化为“独立等价验证”，但不能把它说成“直接由 Doris 自动证明正确”。表达可以面向不同场景调整，事实不能变。
 
 提交材料中最容易出现的问题不是功能缺失，而是数字口径不一致。例如 README 已经写最新 official suite 结果，PPT 仍保留旧版本数字；readiness 已经刷新，截图却来自旧版本；Doris evidence 的 DSL 与答辩讲述中的 DSL 不一致。评审一旦发现这类问题，会降低对整个项目证据链的信任。
 
-因此，最终提交前应以 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，统一检查 README、中文文档、PPT、讲稿、截图说明和视频脚本中的数字。当前关键数字包括：`197 passed`、官方正例 `37/37`、负例 `37/37`、真实行情样本 `3/3`、答辩包 `13/13`、Doris 5,000,000 行、36.24x 加速和 readiness warning count 0。
+因此，最终提交前应以 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，统一检查 README、中文文档、PPT、讲稿、截图说明和视频脚本中的数字。当前关键数字包括：`203 passed`、官方正例 `37/37`、负例 `37/37`、真实行情样本 `3/3`、答辩包 `13/13`、Doris 5,000,000 行、36.24x 加速和 readiness warning count 0。
 
 ### 8.6 数据安全与敏感信息
 
@@ -823,7 +823,7 @@ Git rollback cleanliness: PASS
 3. 展示 AST 与 Explain，说明语法树、日期下推和 prefix-sum 规则。
 4. 切换到 official positive 的 prefix-sum 示例，展示前缀表路径。
 5. 切换到 negative 示例，展示未知指标诊断和修复建议。
-6. 打开 readiness 或 evidence snapshot，展示 `37/37`、`197 passed`、Doris 10x+ 证据和 warning 0。
+6. 打开 readiness 或 evidence snapshot，展示 `37/37`、`203 passed`、Doris 10x+ 证据和 warning 0。
 
 答辩时不要把所有命令都现场运行一遍。现场重点是说明主线和证据，长耗时 Doris 重采集应作为已生成报告展示。
 
@@ -983,7 +983,7 @@ pdftoppm -png -f 1 -l 3 -r 120 docs\FinDSL_Forge_中文操作手册.pdf reports\
 
 第五步展示负例。推荐使用未知指标 `clos` 或直接 SQL 候选，让系统返回诊断和修复建议。负例展示的目的不是证明用户会犯错，而是证明系统面对错误输入时不会悄悄生成危险 SQL。金融系统尤其需要这种失败边界。
 
-第六步展示 readiness 和 Doris evidence。此时可以打开 `submission_artifacts/evidence_snapshots/submission_readiness.md`，展示 `197 passed`、正例 `37/37`、负例 `37/37`、Doris 证据 PASS 和 warning count 0。最后用一句话收束：“前面演示的是交互路径，这里展示的是可复核证据。”这样的收尾比单独展示截图更有力量。
+第六步展示 readiness 和 Doris evidence。此时可以打开 `submission_artifacts/evidence_snapshots/submission_readiness.md`，展示 `203 passed`、正例 `37/37`、负例 `37/37`、Doris 证据 PASS 和 warning count 0。最后用一句话收束：“前面演示的是交互路径，这里展示的是可复核证据。”这样的收尾比单独展示截图更有力量。
 
 ### 13.3 开发调试场景
 开发调试场景下，最重要的是把问题缩小到具体层级。若一条表达式无法运行，先判断是 DSL 解析失败、语义校验失败、SQL 生成失败、等价验证失败，还是 Doris 执行失败。不同层级对应不同排查路径。解析失败通常查看语法和 token；语义失败查看函数参数、指标配置和类型规则；SQL 失败查看 compiler 输出；验证失败查看 reference evaluator 和样本数据；Doris 失败则查看 schema、连接、数据导入和 SQL 兼容性。
@@ -1014,7 +1014,7 @@ pdftoppm -png -f 1 -l 3 -r 120 docs\FinDSL_Forge_中文操作手册.pdf reports\
 
 如果交接版本已经推送到 GitHub，应记录最新 commit hash。如果还生成了 bundle，应记录 bundle 路径和验证结果。远端仓库和离线 bundle 各有价值：GitHub 方便协作，bundle 适合在网络不可用或远端权限变化时恢复。竞赛后期尤其需要保留 bundle，因为最终材料往往在短时间内多次调整。
 
-交接人员还应检查文档和证据数字是否一致。比如本操作手册写 `197 passed` 和 `37/37`，就应与 latest readiness snapshot 一致。若后续测试数量变化，应同步更新本文档、综合指南、PPT 和讲稿。数字不一致会让评审怀疑材料是拼凑的。
+交接人员还应检查文档和证据数字是否一致。比如本操作手册写 `203 passed` 和 `37/37`，就应与 latest readiness snapshot 一致。若后续测试数量变化，应同步更新本文档、综合指南、PPT 和讲稿。数字不一致会让评审怀疑材料是拼凑的。
 
 ### 13.5 课程或项目验收场景
 
@@ -1390,7 +1390,7 @@ FinDSL Forge 的价值就是把这些隐性风险显式化。通过 DSL 限定�
 
 讲执行层时，要区分本地验证和 Doris 证据。本地 SQLite 验证用于快速回归，Doris 证据用于性能证明。二者服务不同目标，不能互相替代。
 
-讲证据层时，要把数字放在文件后面。比如 `197 passed` 来自 pytest，`37/37` 来自 official suite，36.24x 来自 Doris evidence，warning 0 来自 readiness。这样评委追问时，可以迅速指向对应报告。
+讲证据层时，要把数字放在文件后面。比如 `203 passed` 来自 pytest，`37/37` 来自 official suite，36.24x 来自 Doris evidence，warning 0 来自 readiness。这样评委追问时，可以迅速指向对应报告。
 
 ### 18.4 性能亮点表达
 性能亮点应与场景绑定表达。不要只说系统“性能好”，而要说系统针对长窗口滚动 SUM 查询提供 prefix-sum rewrite，并在 5,000,000 行 Doris 规模数据上保留 36.24x 加速证据。这样的表达包含了查询类型、优化方法、数据规模和结果数字，信息完整，评审也能判断它是否符合赛题要求。
@@ -1510,7 +1510,7 @@ PPT 不应复制操作手册。PPT 适合展示结论、架构图、关键数字
 
 制作 PPT 时，可以从本手册提取以下内容：项目一句话介绍、赛题痛点、总体流程、核心功能、prefix-sum 性能亮点、AI 安全边界、readiness 指标和最终提交检查。每页只放必要信息，不要把长段落塞进幻灯片。
 
-如果 PPT 中引用数字，例如 `197 passed` 或 36.24x，应在备注或页脚写明来源文件。这样评委追问时，可以立即打开 evidence snapshot，而不是让讲解停留在口头承诺。
+如果 PPT 中引用数字，例如 `203 passed` 或 36.24x，应在备注或页脚写明来源文件。这样评委追问时，可以立即打开 evidence snapshot，而不是让讲解停留在口头承诺。
 
 ### 20.4 演示视频与截图管理
 
@@ -1676,7 +1676,3 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 | 日期 | 版本 | 内容 |
 |---|---|---|
 | 2026-06-07 | v1.0 | 生成 FinDSL Forge 中文操作手册，覆盖安装、启动、功能操作、Doris 证据、维护和提交前验收。 |
-
-
-
-
