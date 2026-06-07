@@ -98,6 +98,7 @@ python -m findsl.cli scale-benchmark --stocks 300 --days 260 --window 120 --iter
 python -m findsl.cli collect-doris-evidence --host 127.0.0.1 --port 9030 --user root --database findsl_demo --dsl 'filter(SUM(indicator("volume"), 120) > 1000000)' --output reports/doris_cluster_evidence.md
 python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 python -m findsl.cli readiness-report --output reports/submission_readiness.md
+python -m findsl.cli evidence-metadata --snapshots-dir submission_artifacts/evidence_snapshots --output submission_artifacts/evidence_metadata.json
 ```
 
 If running from the repository root without installing the package:
@@ -247,6 +248,8 @@ It also validates the safe LLM candidate loop and generates `reports/defense_pac
 Required gates fail the command when correctness or asset integrity breaks. Warning gates highlight competition risks such as missing Doris-cluster scale proof or uncommitted local changes.
 
 Because `reports/` is generated and ignored by Git, run `scripts/export_submission_artifacts.ps1` before the final commit. It copies lightweight evidence reports into `submission_artifacts/evidence_snapshots/` so the submitted repository contains a reviewable evidence snapshot without committing large CSV data.
+
+The same export step also writes `submission_artifacts/evidence_metadata.json`, a machine-readable summary of readiness gates, pytest count, official-suite counts, and Doris cluster speedup. Treat it as a consistency index for reports, PPT, and Demo indicators; the original snapshot files remain the audit source.
 
 ## Competition-Oriented Design
 

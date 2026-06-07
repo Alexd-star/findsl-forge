@@ -18,12 +18,13 @@
 - 修复 reference oracle 中 `OR` 对 `NULL/UNKNOWN` 的三值逻辑处理，补充稀疏辅助表回归测试。
 - 保持 `CONS/EXIST`、比较运算、percent rank 与 SQL/Doris 语义一致。
 - 补强 Doris SQL validator 的表引用解析，支持反引号表名和库名限定表名，避免未知表通过 `` `table` `` 或 `db.table` 写法绕过检查。
-- 新增 SQL validator 回归测试，本轮审计后全量测试数为 192。
+- 新增 SQL validator 和 evidence metadata 回归测试，本轮审计后全量测试数为 195。
 
 ### 提交证据
 
 - readiness 证据显示 required gates 全部通过，warning count 为 0。
 - 官方风格正例、负例、SQL/reference 等价、Doris 资产完整性和提交包检查均纳入门禁。
+- 新增 `src/findsl/evidence_metadata.py` 与 `python -m findsl.cli evidence-metadata`，自动从提交证据快照中抽取门禁、pytest、官方套件和 Doris 加速指标，生成 `submission_artifacts/evidence_metadata.json`，降低技术报告、答辩材料和 Demo 指标之间的人工口径漂移风险。
 
 ## 2026-05 至 2026-06
 

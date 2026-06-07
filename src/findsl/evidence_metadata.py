@@ -1,0 +1,188 @@
+from __future__ import annotations
+
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = None) -> dict[str, Any]:
+    """Build a machine-readable index from exported evidence snapshots."""
+    warnings: list[str] = []
+    readiness_text = _read_optional_text(snapshot_dir / "submission_readiness.md", warnings)
+    official_text = _read_optional_text(snapshot_dir / "official_suite_report.md", warnings)
+    manifest_text = _read_optional_text(manifest_path, warnings) if manifest_path else ""
+    doris_payload = _read_optional_json(snapshot_dir / "doris_cluster_evidence.json", warnings)
+
+    return {
+        "schema_version": 1,
+        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "snapshot_dir": str(snapshot_dir),
+        "git": {
+            "head_at_report_generation": _extract_git_head(readiness_text),
+            "head_at_export": _extract_value(manifest_text, r"- Git HEAD at export:\s*`?([^`\n]+?)`?\s*$"),
+            "branch": _extract_value(readiness_text, r"- Git branch:\s*`?([^`\n]+?)`?\s*$"),
+        },
+        "readiness": _readiness_metadata(readiness_text),
+        "official_suite": _official_suite_metadata(official_text or readiness_text),
+        "doris_cluster": _doris_metadata(doris_payload),
+        "warnings": warnings,
+        "source_files": _source_files(snapshot_dir, manifest_path),
+    }
+
+
+def write_evidence_metadata(snapshot_dir: Path, output_path: Path, manifest_path: Path | None = None) -> dict[str, Any]:
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir, manifest_path=manifest_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return metadata
+
+
+def _read_optional_text(path: Path | None, warnings: list[str]) -> str:
+    if path is None:
+        return ""
+    if not path.exists():
+        warnings.append(f"{path.name} not found; related metadata fields are unavailable.")
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+def _read_optional_json(path: Path, warnings: list[str]) -> dict[str, Any] | None:
+    if not path.exists():
+        warnings.append(f"{path.name} not found; Doris metrics are unavailable.")
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        warnings.append(f"{path.name} is not valid JSON: {exc.msg}.")
+        return None
+    if not isinstance(payload, dict):
+        warnings.append(f"{path.name} JSON root is not an object.")
+        return None
+    return payload
+
+
+def _readiness_metadata(text: str) -> dict[str, Any]:
+    pytest_match = re.search(r"(?m)^(\d+)\s+passed\s+in\s+([0-9.]+)s\b", text)
+    return {
+        "generated_at": _extract_value(text, r"- Generated at:\s*([^\n]+)"),
+        "blocking_gates_passed": _extract_bool(text, r"- Blocking gates passed:\s*(True|False)"),
+        "warning_count": _extract_int(text, r"- Warning count:\s*(\d+)"),
+        "compile_success_rate_percent": _extract_float(text, r"- Compile success rate:\s*([0-9.]+)%"),
+        "sql_fragment_accuracy_percent": _extract_float(text, r"- SQL fragment accuracy:\s*([0-9.]+)%"),
+        "compile_p95_latency_ms": _extract_float(text, r"- Compile P95 latency:\s*([0-9.]+)\s*ms"),
+        "evaluation_cases": _extract_ratio(text, r"- Evaluation cases passed:\s*(\d+)/(\d+)"),
+        "defense_package_checks": _extract_ratio(text, r"- Defense package checks:\s*(\d+)/(\d+)"),
+        "pytest": {
+            "passed": int(pytest_match.group(1)) if pytest_match else None,
+            "elapsed_seconds": float(pytest_match.group(2)) if pytest_match else None,
+        },
+    }
+
+
+def _official_suite_metadata(text: str) -> dict[str, Any]:
+    return {
+        "suite_passed": _extract_bool(text, r"- Suite passed:\s*(True|False)"),
+        "positive": _extract_ratio(
+            text,
+            r"- (?:Positive cases passed|Official-style positive cases):\s*(\d+)/(\d+)",
+        ),
+        "negative": _extract_ratio(
+            text,
+            r"- (?:Negative diagnostic cases passed|Official-style negative diagnostics):\s*(\d+)/(\d+)",
+        ),
+    }
+
+
+def _doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "passed": None,
+            "row_counts_match": None,
+            "speedup": None,
+            "speedup_display": None,
+            "speedup_target_met": None,
+        }
+    speedup = _number_or_none(payload.get("speedup"))
+    baseline = payload.get("baseline") if isinstance(payload.get("baseline"), dict) else {}
+    optimized = payload.get("optimized") if isinstance(payload.get("optimized"), dict) else {}
+    return {
+        "available": True,
+        "passed": _bool_or_none(payload.get("passed")),
+        "row_counts_match": _bool_or_none(payload.get("row_counts_match")),
+        "speedup": speedup,
+        "speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
+        "speedup_target_met": _bool_or_none(payload.get("speedup_target_met")),
+        "min_speedup": _number_or_none(payload.get("min_speedup")),
+        "baseline_plan_contains_window": _bool_or_none(payload.get("baseline_plan_contains_window")),
+        "optimized_plan_contains_prefix": _bool_or_none(payload.get("optimized_plan_contains_prefix")),
+        "baseline_avg_execute_ms": _number_or_none(baseline.get("avg_execute_ms")),
+        "optimized_avg_execute_ms": _number_or_none(optimized.get("avg_execute_ms")),
+        "baseline_row_count": _int_or_none(baseline.get("row_count")),
+        "optimized_row_count": _int_or_none(optimized.get("row_count")),
+    }
+
+
+def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, str | None]:
+    return {
+        "submission_readiness": str(snapshot_dir / "submission_readiness.md"),
+        "official_suite_report": str(snapshot_dir / "official_suite_report.md"),
+        "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
+        "evidence_manifest": str(manifest_path) if manifest_path else None,
+    }
+
+
+def _extract_git_head(text: str) -> str | None:
+    value = _extract_value(text, r"- Git HEAD(?: at report generation)?:\s*`?([^`\s]+)")
+    return value.strip() if value else None
+
+
+def _extract_value(text: str, pattern: str) -> str | None:
+    match = re.search(pattern, text, flags=re.MULTILINE)
+    return match.group(1).strip() if match else None
+
+
+def _extract_bool(text: str, pattern: str) -> bool | None:
+    value = _extract_value(text, pattern)
+    if value is None:
+        return None
+    return value == "True"
+
+
+def _extract_int(text: str, pattern: str) -> int | None:
+    value = _extract_value(text, pattern)
+    return int(value) if value is not None else None
+
+
+def _extract_float(text: str, pattern: str) -> float | None:
+    value = _extract_value(text, pattern)
+    return float(value) if value is not None else None
+
+
+def _extract_ratio(text: str, pattern: str) -> dict[str, int | None]:
+    match = re.search(pattern, text, flags=re.MULTILINE)
+    if not match:
+        return {"passed": None, "total": None}
+    return {"passed": int(match.group(1)), "total": int(match.group(2))}
+
+
+def _number_or_none(value: Any) -> float | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    return None
+
+
+def _int_or_none(value: Any) -> int | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, int):
+        return value
+    return None
+
+
+def _bool_or_none(value: Any) -> bool | None:
+    return value if isinstance(value, bool) else None

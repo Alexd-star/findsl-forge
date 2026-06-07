@@ -129,6 +129,10 @@ def main() -> None:
     ready_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     ready_cmd.add_argument("--benchmark-iterations", type=int, default=20, help="Prefix benchmark iterations")
     ready_cmd.add_argument("--skip-pytest", action="store_true", help="Skip pytest when generating the report")
+    metadata_cmd = sub.add_parser("evidence-metadata", help="Build machine-readable evidence metadata from exported snapshots")
+    metadata_cmd.add_argument("--snapshots-dir", default="submission_artifacts/evidence_snapshots", help="Directory containing exported evidence snapshots")
+    metadata_cmd.add_argument("--manifest", default="submission_artifacts/evidence_manifest.md", help="Evidence manifest path; use an empty value to skip")
+    metadata_cmd.add_argument("--output", default="submission_artifacts/evidence_metadata.json", help="Output JSON metadata path")
     demo_cmd = sub.add_parser("serve-demo", help="Start the local web demo and JSON API")
     demo_cmd.add_argument("--host", default="127.0.0.1", help="Host interface for the demo server")
     demo_cmd.add_argument("--port", type=int, default=8765, help="Port for the demo server")
@@ -488,6 +492,16 @@ def main() -> None:
         print(report.to_markdown())
         if not report.blocking_passed:
             raise SystemExit(1)
+    elif args.command == "evidence-metadata":
+        from .evidence_metadata import write_evidence_metadata
+
+        manifest_path = Path(args.manifest) if args.manifest else None
+        metadata = write_evidence_metadata(
+            snapshot_dir=Path(args.snapshots_dir),
+            manifest_path=manifest_path,
+            output_path=Path(args.output),
+        )
+        print(json.dumps(metadata, ensure_ascii=False, indent=2))
     elif args.command == "serve-demo":
         from .demo import run_demo_server
 

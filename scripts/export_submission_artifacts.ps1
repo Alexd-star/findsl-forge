@@ -85,5 +85,13 @@ $manifest += "- Human-narrated raw screen recording: optional final rehearsal ar
 $manifestPath = Join-Path $ArtifactsDir "evidence_manifest.md"
 $manifest -join "`n" | Set-Content -Encoding UTF8 -Path $manifestPath
 
+$metadataPath = Join-Path $ArtifactsDir "evidence_metadata.json"
+$env:PYTHONPATH = "src"
+& python -m findsl.cli evidence-metadata `
+  --snapshots-dir $snapshotDir `
+  --manifest $manifestPath `
+  --output $metadataPath | Out-Null
+
 Write-Host "Exported $($copied.Count) evidence files into $snapshotDir"
 Write-Host "Manifest: $manifestPath"
+Write-Host "Metadata: $metadataPath"
