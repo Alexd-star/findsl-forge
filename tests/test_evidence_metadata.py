@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -109,6 +110,8 @@ def test_evidence_metadata_cli_writes_json(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     output = tmp_path / "evidence_metadata.json"
     _write_minimal_snapshots(snapshot_dir)
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
 
     subprocess.run(
         [
@@ -124,6 +127,7 @@ def test_evidence_metadata_cli_writes_json(tmp_path: Path) -> None:
         check=True,
         text=True,
         capture_output=True,
+        env=env,
     )
 
     payload = json.loads(output.read_text(encoding="utf-8"))
