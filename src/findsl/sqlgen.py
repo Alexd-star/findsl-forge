@@ -266,7 +266,7 @@ class SqlGenerator:
                 raise SemanticError("rank() second argument must be asc or desc")
             order = order_node.name.upper()
             limit = self._rank_limit(node)
-            rank_source = self._rank_count_source_sql(self._rank_source_sql(base_relation), limit)
+            rank_source = self._rank_count_source_sql(rank_source, expr_sql, limit)
             self.trace.append("rewrite rank() into ROW_NUMBER window")
             self._explain(
                 "RANK_ROW_NUMBER",
@@ -289,13 +289,24 @@ class SqlGenerator:
             self._numeric_features = old_numeric
             self._rolling_features = old_rolling
 
-    def _rank_count_source_sql(self, rank_source: str, limit: Dict[str, Any]) -> str:
+    def _rank_count_source_sql(self, rank_source: str, expr_sql: str, limit: Dict[str, Any]) -> str:
         if limit["kind"] != "percent":
             return rank_source
-        return f"(SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count FROM {rank_source}) base"
+        self.trace.append("exclude null rank expressions before applying rank cutoff")
+        self._explain(
+            "RANK_NULL_GUARD",
+            "applied",
+            "Exclude null rank expressions before applying rank cutoff",
+            limit_kind=limit["kind"],
+            denominator="non_null_rank_values",
+        )
+        return (
+            f"(SELECT base.*, COUNT(*) OVER (PARTITION BY trade_date) AS __partition_count "
+            f"FROM {rank_source} WHERE {expr_sql} IS NOT NULL) base"
+        )
 
     def _rank_non_null_guard(self, expr_sql: str, limit: Dict[str, Any]) -> str:
-        if not limit["kind"]:
+        if not limit["kind"] or limit["kind"] == "percent":
             return ""
         self.trace.append("exclude null rank expressions before applying rank cutoff")
         self._explain(

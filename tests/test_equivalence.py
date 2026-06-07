@@ -244,6 +244,49 @@ def test_sql_matches_reference_for_sparse_auxiliary_prefix_sum_window(tmp_path):
     ]
 
 
+def test_sql_matches_reference_for_sparse_auxiliary_not_equal_null_window(tmp_path):
+    _write_sparse_money_flow_fixture(tmp_path)
+
+    result = verify_sql_equivalence(
+        'filter(SUM(indicator("main_net_inflow"), 3) != 0)',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [("BBB", "2026-01-01")]
+    assert result.reference_keys == [("BBB", "2026-01-01")]
+
+
+def test_sql_matches_reference_for_sparse_auxiliary_cons_treats_null_as_false(tmp_path):
+    _write_sparse_money_flow_window_fixture(tmp_path)
+
+    result = verify_sql_equivalence(
+        'filter(CONS(indicator("main_net_inflow") > 0, 2))',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == []
+    assert result.reference_keys == []
+
+
+def test_sql_matches_reference_for_sparse_auxiliary_exist_treats_null_as_false(tmp_path):
+    _write_sparse_money_flow_window_fixture(tmp_path)
+
+    result = verify_sql_equivalence(
+        'filter(EXIST(indicator("main_net_inflow") > 0, 2))',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [
+        ("AAA", "2026-01-01"),
+        ("AAA", "2026-01-02"),
+        ("AAA", "2026-01-03"),
+    ]
+    assert result.reference_keys == result.sql_keys
+
+
 def test_sql_matches_reference_for_sparse_auxiliary_rank_cutoff(tmp_path):
     _write_sparse_money_flow_fixture(tmp_path)
 
@@ -254,6 +297,54 @@ def test_sql_matches_reference_for_sparse_auxiliary_rank_cutoff(tmp_path):
 
     assert result.passed
     assert result.sql_keys == [("BBB", "2026-01-01")]
+
+
+def test_rank_percent_cutoff_counts_only_non_null_rank_values(tmp_path):
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "daily_quote.csv").write_text(
+        "\n".join(
+            [
+                "ts_code,trade_date,close,turnover_rate,volume",
+                "AAA,2026-01-01,1,1,1",
+                "BBB,2026-01-01,2,1,1",
+                "CCC,2026-01-01,3,1,1",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "money_flow.csv").write_text(
+        "\n".join(
+            [
+                "ts_code,trade_date,main_net_inflow",
+                "BBB,2026-01-01,5",
+                "CCC,2026-01-01,10",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "stock_universe.csv").write_text(
+        "\n".join(
+            [
+                "ts_code,trade_date,market",
+                "AAA,2026-01-01,A",
+                "BBB,2026-01-01,A",
+                "CCC,2026-01-01,A",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = verify_sql_equivalence(
+        'rank(indicator("main_net_inflow"), desc, percent=50)',
+        tmp_path,
+    )
+
+    assert result.passed
+    assert result.sql_keys == [("CCC", "2026-01-01")]
+    assert result.reference_keys == result.sql_keys
 
 
 def test_sql_matches_reference_for_then_filter_filter():

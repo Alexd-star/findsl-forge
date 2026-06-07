@@ -53,11 +53,11 @@ class PandasReferenceEvaluator:
             return current
         if isinstance(node, FunctionCall) and node.name.lower() == "filter":
             mask = self._bool(node.args[0], rows)
-            return rows[mask.fillna(False)].copy()
+            return rows[self._filter_mask(mask)].copy()
         if isinstance(node, FunctionCall) and node.name.lower() == "rank":
             return self._rank(node, rows)
         mask = self._bool(node, rows)
-        return rows[mask.fillna(False)].copy()
+        return rows[self._filter_mask(mask)].copy()
 
     def _rank(self, node: FunctionCall, rows):
         expr = self._numeric(node.args[0], rows)
@@ -81,6 +81,7 @@ class PandasReferenceEvaluator:
         if limit is not None:
             ranked = ranked[ranked["rank_no"] <= limit]
         if percent is not None:
+            ranked = ranked[ranked["__rank_expr"].notna()].copy()
             ranked["__partition_count"] = ranked.groupby("trade_date")["ts_code"].transform("count")
             threshold = ((ranked["__partition_count"] * percent) / 100.0).apply(math.ceil)
             ranked = ranked[ranked["rank_no"] <= threshold]
@@ -92,17 +93,17 @@ class PandasReferenceEvaluator:
             left = self._numeric(node.left, rows)
             right = self._numeric(node.right, rows)
             if node.op == ">":
-                return left > right
+                return self._compare(left, right, lambda l, r: l > r)
             if node.op == ">=":
-                return left >= right
+                return self._compare(left, right, lambda l, r: l >= r)
             if node.op == "<":
-                return left < right
+                return self._compare(left, right, lambda l, r: l < r)
             if node.op == "<=":
-                return left <= right
+                return self._compare(left, right, lambda l, r: l <= r)
             if node.op in {"=", "=="}:
-                return left == right
+                return self._compare(left, right, lambda l, r: l == r)
             if node.op == "!=":
-                return left != right
+                return self._compare(left, right, lambda l, r: l != r)
             raise SemanticError(f"Unsupported comparison operator {node.op}")
         if isinstance(node, BinaryOp) and node.op in {"&", "^", "|"}:
             left = self._bool(node.left, rows)
@@ -121,14 +122,29 @@ class PandasReferenceEvaluator:
                 end = self.pd.Timestamp(self._symbol_arg(node.args[1], "date_between"))
                 return (rows["trade_date"] >= start) & (rows["trade_date"] <= end)
             if name == "CONS":
-                cond = self._bool(node.args[0], rows).astype(int)
+                cond = self._filter_mask(self._bool(node.args[0], rows)).astype(int)
                 window = self._window_value(node.args[1])
                 return self._rolling(cond, rows, window, "sum") == window
             if name == "EXIST":
-                cond = self._bool(node.args[0], rows).astype(int)
+                cond = self._filter_mask(self._bool(node.args[0], rows)).astype(int)
                 window = self._window_value(node.args[1])
                 return self._rolling(cond, rows, window, "max") == 1
         raise SemanticError(f"Expected boolean expression, got {node!r}")
+
+    def _compare(self, left, right, op):
+        result = op(left, right)
+        if not hasattr(result, "where"):
+            return result if not (self.pd.isna(left) or self.pd.isna(right)) else self.pd.NA
+        valid = self.pd.Series(True, index=result.index)
+        for operand in (left, right):
+            if hasattr(operand, "isna"):
+                valid &= ~operand.isna()
+            elif self.pd.isna(operand):
+                valid &= False
+        return result.where(valid)
+
+    def _filter_mask(self, mask):
+        return mask.where(mask.notna(), False).astype(bool)
 
     def _numeric(self, node: Node, rows):
         if isinstance(node, Literal):
