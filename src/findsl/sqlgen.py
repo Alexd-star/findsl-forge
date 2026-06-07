@@ -483,6 +483,9 @@ class SqlGenerator:
                 return self._register_numeric_window(node)
             if name == "RET":
                 return self._register_return_feature(node)
+            meta = self.registry.function(node.name)
+            if meta.get("sql_template") and meta.get("return_type") == "numeric":
+                return self._register_template_numeric_function(node, meta)
         raise SemanticError(f"Expected numeric expression, got {node!r}")
 
     def _indicator_sql(self, node: FunctionCall) -> str:
@@ -577,6 +580,23 @@ class SqlGenerator:
         )
         previous = f"LAG({expr}, {window}) OVER (PARTITION BY ts_code ORDER BY trade_date)"
         expression = f"(({expr}) / NULLIF({previous}, 0) - 1)"
+        self._numeric_features.append(Feature(alias=alias, expression=expression))
+        return alias
+
+    def _register_template_numeric_function(self, node: FunctionCall, meta: Dict[str, Any]) -> str:
+        template = str(meta["sql_template"])
+        args = {f"arg{index}": self._numeric_sql(arg) for index, arg in enumerate(node.args)}
+        expression = template.format(**args)
+        alias = self._next_alias("__tpl")
+        self.trace.append(f"rewrite {node.name}() through configured numeric template {alias}")
+        self._explain(
+            "TEMPLATE_NUMERIC_FUNCTION",
+            "applied",
+            "Rewrite configured numeric function through sql_template",
+            alias=alias,
+            function=node.name.upper(),
+            template=template,
+        )
         self._numeric_features.append(Feature(alias=alias, expression=expression))
         return alias
 

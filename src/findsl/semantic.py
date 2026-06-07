@@ -99,10 +99,22 @@ class SemanticAnalyzer:
             if _contains_windowed_function(node.args[0]):
                 raise SemanticError("RET first argument cannot contain window functions")
             self._validate_window_arg(node.args[1], node.name)
+        elif meta.get("sql_template"):
+            self._validate_template_function(node, meta)
         else:
             for arg in node.args:
                 self._validate_node(arg)
         return str(meta.get("return_type", "unknown"))
+
+    def _validate_template_function(self, node: FunctionCall, meta: dict) -> None:
+        expected_types = [str(item) for item in meta.get("arg_types", [])]
+        for index, arg in enumerate(node.args):
+            actual = self._validate_node(arg)
+            expected = expected_types[index] if index < len(expected_types) else None
+            if expected and actual != expected:
+                raise SemanticError(f"{node.name} argument {index + 1} must be {expected}, got {actual}")
+            if _contains_windowed_function(arg):
+                raise SemanticError(f"{node.name} template arguments cannot contain window functions")
 
     def _validate_filter(self, node: FunctionCall) -> None:
         condition_type = self._validate_node(node.args[0])

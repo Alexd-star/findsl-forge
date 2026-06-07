@@ -43,7 +43,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 
 ### `configs/`
 
-配置目录。当前包含 `functions.json`、`indicators.json`、`tables.json`。它们定义 DSL 函数签名、金融指标元数据、逻辑表到 Doris 物理表的映射。新指标优先在这里扩展，除非新增语义确实需要修改编译器。
+配置目录。当前包含 `functions.json`、`indicators.json`、`tables.json`。它们定义 DSL 函数签名、金融指标元数据、逻辑表到 Doris 物理表的映射。新指标优先在这里扩展；简单数值函数可通过 `sql_template` 与 `reference_op` 模板扩展，复杂时序函数再修改编译器。
 
 ### `data/`
 
@@ -64,6 +64,8 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 ### `tests/`
 
 测试目录。覆盖词法、语法、语义、SQL 生成、等价验证、Doris 资产、LLM 安全链路、Web Demo、readiness 和提交包。新增核心能力必须同步补测试。
+
+其中 `tests/test_template_functions.py` 验证 `ABS` 这类简单数值模板函数可以通过配置进入 SQL 生成和 reference 等价验证；`tests/test_topic_compliance.py` 验证赛题 19 完成度报告可以稳定生成，防止“基本实现/部分实现/待证据”口径只停留在人工文档里。
 
 ### `reports/`
 
@@ -107,12 +109,13 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 | `src/findsl/synthetic.py` | 合成市场数据生成。 | 股票数、日期数、随机种子。 | CSV 数据。 | 生成数据默认放 `data/generated/`。 |
 | `src/findsl/diagnostics.py` | 诊断和修复建议。 | 异常对象。 | 结构化诊断。 | Web Demo 和 CLI 共享。 |
 | `src/findsl/cli.py` | 命令行入口。 | `python -m findsl.cli ...`。 | 各类命令输出。 | 所有常用流程均从这里暴露。 |
+| `src/findsl/topic_compliance.py` | 赛题 19 完成度与下一步规划报告生成器。 | 官方要求、registry 配置和证据口径。 | Markdown/JSON 合规报告。 | 用于区分 implemented、partial、needs_evidence，避免人工口径漂移。 |
 
 ## 5. 配置文件说明
 
 | 文件 | 作用 | 维护建议 |
 |---|---|---|
-| `configs/functions.json` | 定义 DSL 函数参数个数、命名参数和返回类型。 | 新增函数时先明确输入输出语义，再同步 semantic/sqlgen/reference/tests。 |
+| `configs/functions.json` | 定义 DSL 函数参数个数、命名参数、返回类型和简单模板函数。 | 普通签名用于核心函数；`ABS` 这类简单数值函数可用 `sql_template`、`reference_op` 进入通用模板路径。复杂窗口/关系函数仍需同步 semantic/sqlgen/reference/tests。 |
 | `configs/indicators.json` | 定义指标类型、来源表、列名、是否支持 prefix-sum。 | 新增普通数值指标通常只需配置；支持 prefix-sum 时必须补 prefix table 信息。 |
 | `configs/tables.json` | 定义逻辑表、物理表、别名、日期列、证券代码列、分区列。 | 修改物理表名后必须重新生成 Doris 资产和报告。 |
 | `pyproject.toml` | Python 包和测试配置。 | 当前核心运行无强依赖；`dev`/`eval` 依赖用于 pandas/pytest。 |
@@ -253,7 +256,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.p
 
 ## 14. 后续维护建议
 
-1. 新增 DSL 函数时，必须同时更新 `configs/functions.json`、`semantic.py`、`sqlgen.py`、`reference.py`、测试和文档。
+1. 新增 DSL 函数时，先判断是否属于简单数值模板函数。若是，优先通过 `configs/functions.json` 的 `sql_template` 和 `reference_op` 扩展，并补 `tests/test_template_functions.py`；若涉及窗口、关系阶段、布尔状态或 Doris 特殊优化，再同步更新 `semantic.py`、`sqlgen.py`、`reference.py`、测试和文档。
 2. 新增指标时优先走 `configs/indicators.json`；如支持 prefix-sum，需要同步 Doris schema 和 prefix 构建逻辑。
 3. 修改 SQL 生成后必须跑 `tests/test_equivalence.py`，防止 SQL 与 reference oracle 分歧。
 4. 修改 Doris 表结构后必须重新生成 `deploy/doris/*.sql`，并重新采集或标注 Doris 证据。

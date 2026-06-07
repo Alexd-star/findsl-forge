@@ -64,5 +64,14 @@
     "min_args": 2,
     "max_args": 2,
     "return_type": "numeric"
+  },
+  "ABS": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "numeric",
+    "arg_types": ["numeric"],
+    "sql_template": "ABS({arg0})",
+    "reference_op": "abs",
+    "category": "template_numeric_scalar"
   }
 }

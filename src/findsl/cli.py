@@ -134,6 +134,9 @@ def main() -> None:
     metadata_cmd.add_argument("--manifest", default="submission_artifacts/evidence_manifest.md", help="Evidence manifest path; use an empty value to skip")
     metadata_cmd.add_argument("--output", default="submission_artifacts/evidence_metadata.json", help="Output JSON metadata path")
     metadata_cmd.add_argument("--summary-output", default=None, help="Optional output Markdown summary path")
+    compliance_cmd = sub.add_parser("topic-compliance", help="Generate Topic 19 compliance and next-step planning report")
+    compliance_cmd.add_argument("--output", default="reports/topic_19_compliance_plan.md", help="Output Markdown report")
+    compliance_cmd.add_argument("--json", action="store_true", help="Print compliance report JSON")
     demo_cmd = sub.add_parser("serve-demo", help="Start the local web demo and JSON API")
     demo_cmd.add_argument("--host", default="127.0.0.1", help="Host interface for the demo server")
     demo_cmd.add_argument("--port", type=int, default=8765, help="Port for the demo server")
@@ -504,6 +507,14 @@ def main() -> None:
             summary_output_path=Path(args.summary_output) if args.summary_output else None,
         )
         print(json.dumps(metadata, ensure_ascii=False, indent=2))
+    elif args.command == "topic-compliance":
+        from .topic_compliance import topic_compliance_json, write_topic_compliance_report
+
+        report = write_topic_compliance_report(Path(args.output))
+        if args.json:
+            print(topic_compliance_json(report))
+        else:
+            print(report.to_dict())
     elif args.command == "serve-demo":
         from .demo import run_demo_server
 

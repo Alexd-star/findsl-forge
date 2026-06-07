@@ -196,7 +196,17 @@ class PandasReferenceEvaluator:
                 previous = self._lag(series, rows, window)
                 previous = previous.mask(previous == 0)
                 return (series / previous) - 1
+            meta = self.registry.function(node.name)
+            if meta.get("reference_op") and meta.get("return_type") == "numeric":
+                return self._template_numeric(node, rows, str(meta["reference_op"]))
         raise SemanticError(f"Expected numeric expression, got {node!r}")
+
+    def _template_numeric(self, node: FunctionCall, rows, reference_op: str):
+        values = [self._numeric(arg, rows) for arg in node.args]
+        if reference_op == "abs" and len(values) == 1:
+            value = values[0]
+            return value.abs() if hasattr(value, "abs") else abs(value)
+        raise SemanticError(f"Unsupported configured reference operation: {reference_op}")
 
     def _lag(self, series, rows, window: int):
         work = rows[["ts_code", "trade_date"]].copy()
