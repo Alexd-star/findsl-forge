@@ -1,14 +1,23 @@
 ﻿# Evidence Snapshot Manifest
 
-- Generated at: 2026-06-07 11:39:08 +08:00
-- Git HEAD at export: b9bbd37
-- Git status when exported, excluding evidence snapshots and this export script: clean
+- Generated at: 2026-06-07 12:33:29 +08:00
+- Git HEAD at export: e06400f
+- Git status when exported, excluding evidence snapshots and this export script:  M src/findsl/demo.py
+ M submission_artifacts/demo_screenshots/01_nl_to_dsl_overview.png
+ M submission_artifacts/demo_screenshots/02_positive_sql.png
+ M submission_artifacts/demo_screenshots/03_positive_ast.png
+ M submission_artifacts/demo_screenshots/04_positive_explain.png
+ M submission_artifacts/demo_screenshots/05_positive_rows.png
+ M submission_artifacts/demo_screenshots/06_positive_evidence.png
+ M submission_artifacts/demo_screenshots/07_negative_unknown_indicator.png
+ M submission_artifacts/demo_screenshots/real_market_sample.png
+?? docs/ui_redesign_plan.md
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `submission_readiness.md` (11413 bytes)
+- `submission_readiness.md` (12064 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `doris_cluster_evidence.json` (6537 bytes)
 - `defense_package.md` (9652 bytes)

@@ -2,23 +2,23 @@
 
 ## Decision Summary
 
-- Generated at: 2026-06-07T03:38:49+00:00
+- Generated at: 2026-06-07T04:33:04+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `b9bbd37` docs: enrich operation manual formatting
+- Git HEAD at report generation: `e06400f` docs: refresh submission evidence snapshots
 - Git branch: `main`
 - Blocking gates passed: True
-- Warning count: 0
+- Warning count: 1
 
 ## Gate Matrix
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 15003.6 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.905 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 10205.0 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.085 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 1.330 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.894 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -28,21 +28,21 @@
 | Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
-| Git rollback cleanliness | warning | PASS | clean working tree |
+| Git rollback cleanliness | warning | WARN | 10 dirty entries before commit |
 | Doris-scale performance proof | warning | PASS | cluster EXPLAIN/latency and 10x speedup evidence captured |
 
 ## Competition Metrics
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.905 ms
+- Compile P95 latency: 1.085 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.39x
+- Local SQLite prefix benchmark speedup smoke: 1.19x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 1.330 ms
+- Compile latency: 0.894 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -170,20 +170,30 @@
 ## Git Rollback State
 
 - Repository detected: True
-- Clean working tree: True
-- Dirty entries: none
+- Clean working tree: False
+- Dirty entries:
+  - ` M src/findsl/demo.py`
+  - ` M submission_artifacts/demo_screenshots/01_nl_to_dsl_overview.png`
+  - ` M submission_artifacts/demo_screenshots/02_positive_sql.png`
+  - ` M submission_artifacts/demo_screenshots/03_positive_ast.png`
+  - ` M submission_artifacts/demo_screenshots/04_positive_explain.png`
+  - ` M submission_artifacts/demo_screenshots/05_positive_rows.png`
+  - ` M submission_artifacts/demo_screenshots/06_positive_evidence.png`
+  - ` M submission_artifacts/demo_screenshots/07_negative_unknown_indicator.png`
+  - ` M submission_artifacts/demo_screenshots/real_market_sample.png`
+  - `?? docs/ui_redesign_plan.md`
 
 ## Pytest Evidence
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 15003.6 ms
+- Elapsed: 10205.0 ms
 
 ```text
 ........................................................................ [ 39%]
 ........................................................................ [ 78%]
 ........................................                                 [100%]
-184 passed in 13.66s
+184 passed in 9.69s
 ```
 
 ## Award-Readiness Differentiators

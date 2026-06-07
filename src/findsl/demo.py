@@ -335,87 +335,158 @@ def _metric_key(value: str) -> str:
 
 def render_demo_html() -> str:
     html = """<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FinDSL Forge Demo</title>
   <style>
     :root {
-      --bg: #f6f7f9;
+      --bg: #f4f7f8;
       --panel: #ffffff;
-      --ink: #172026;
-      --muted: #65717b;
-      --line: #d8dee4;
+      --panel-2: #f8fbfb;
+      --ink: #162124;
+      --muted: #607075;
+      --line: #cad7da;
+      --soft: #d9e3e5;
       --accent: #0f766e;
-      --accent-2: #7c3aed;
+      --accent-deep: #0b4f4a;
+      --accent-soft: #e4f3f1;
+      --blue: #1d4f73;
       --danger: #b42318;
+      --danger-soft: #fff0ed;
       --ok: #137333;
-      --warn: #a15c00;
-      --code: #111827;
+      --ok-soft: #eaf6ee;
+      --warn: #9a5a00;
+      --warn-soft: #fff3d9;
+      --code: #101820;
+      --shadow: 0 8px 24px rgba(18, 36, 42, 0.08);
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; min-width: 0; }
+    html {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--ink);
-      font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font: 14px/1.55 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
     }
-    header {
-      height: 56px;
+    main, .topbar, .hero-strip, .shell, .panel, .brief, .metric, .panel-head, .section {
+      min-width: 0;
+    }
+    .topbar {
+      min-height: 70px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 0 24px;
+      padding: 14px 24px;
       border-bottom: 1px solid var(--line);
       background: var(--panel);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    h1 { font-size: 18px; margin: 0; font-weight: 700; }
-    main { padding: 18px 24px 24px; }
+    .brand { display: flex; flex-direction: column; gap: 2px; min-width: 260px; }
+    h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.01em; }
+    .brand p { margin: 0; color: var(--muted); font-size: 12px; }
+    .top-metrics { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    main { padding: 18px 24px 24px; max-width: 1600px; margin: 0 auto; }
+    .hero-strip {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.2fr) minmax(280px, 0.8fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .brief {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+    .brief h2 { margin: 0 0 6px; font-size: 16px; }
+    .brief p { margin: 0; color: var(--muted); max-width: 84ch; overflow-wrap: anywhere; }
+    .evidence-ribbon { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .shell {
       display: grid;
-      grid-template-columns: minmax(320px, 0.85fr) minmax(420px, 1.15fr);
+      grid-template-columns: minmax(360px, 0.82fr) minmax(520px, 1.18fr);
       gap: 16px;
       align-items: start;
     }
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
+      box-shadow: var(--shadow);
     }
     .panel-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 13px 15px;
       border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
     }
-    .panel-head h2 { font-size: 14px; margin: 0; }
+    .panel-title { display: flex; flex-direction: column; gap: 2px; }
+    .panel-head h2 { font-size: 15px; margin: 0; }
+    .panel-head p { margin: 0; color: var(--muted); font-size: 12px; }
     .panel-actions {
       display: flex;
       align-items: center;
       gap: 8px;
+      min-width: 0;
     }
-    .section { padding: 14px; }
-    label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    .section { padding: 14px 15px 16px; }
+    .field { margin-bottom: 12px; }
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
     select, textarea {
       width: 100%;
+      min-width: 0;
+      max-width: 100%;
       border: 1px solid var(--line);
-      border-radius: 6px;
+      border-radius: 8px;
       background: #fff;
       color: var(--ink);
       font: inherit;
+      outline: none;
+      word-break: break-word;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
-    select { height: 36px; padding: 0 10px; }
+    select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    }
+    select {
+      height: 36px;
+      padding: 0 10px;
+      text-overflow: ellipsis;
+    }
     textarea {
       min-height: 168px;
       resize: vertical;
       padding: 10px;
       font-family: Consolas, "SFMono-Regular", monospace;
       line-height: 1.45;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      overflow-x: hidden;
     }
     #nlInput {
       min-height: 84px;
@@ -428,39 +499,45 @@ def render_demo_html() -> str:
       justify-content: space-between;
       gap: 10px;
       margin-top: 12px;
+      min-width: 0;
     }
-    .checks { display: flex; gap: 12px; color: var(--muted); font-size: 13px; }
+    .checks { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: 13px; }
     .checks label { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: inherit; }
     button {
       border: 0;
-      border-radius: 6px;
+      border-radius: 8px;
       background: var(--accent);
       color: #fff;
       height: 36px;
       padding: 0 14px;
       font-weight: 700;
       cursor: pointer;
+      min-width: 0;
+      transition: transform 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
     }
-    .secondary {
-      background: #27323a;
-    }
+    button:hover { background: var(--accent-deep); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid rgba(15, 118, 110, 0.28); outline-offset: 2px; }
+    .secondary { background: var(--blue); }
     .ghost {
-      background: #eef2f6;
+      background: #eff5f6;
       color: #172026;
       border: 1px solid var(--line);
     }
+    .ghost:hover { background: #e2ecee; color: var(--ink); }
     button:disabled { opacity: 0.65; cursor: default; }
     .candidates {
       display: grid;
       gap: 8px;
       margin-top: 10px;
+      margin-bottom: 12px;
     }
     .candidate {
       width: 100%;
+      max-width: 100%;
       height: auto;
       border: 1px solid var(--line);
-      border-left: 3px solid var(--accent-2);
-      border-radius: 6px;
+      border-radius: 8px;
       background: #fff;
       color: var(--ink);
       padding: 8px 10px;
@@ -470,6 +547,8 @@ def render_demo_html() -> str:
     .candidate strong {
       display: block;
       font-size: 13px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     .candidate span {
       display: block;
@@ -477,30 +556,37 @@ def render_demo_html() -> str:
       font-size: 12px;
       margin-top: 2px;
       overflow-wrap: anywhere;
+      word-break: break-all;
+      white-space: normal;
     }
     .candidate.validated {
-      border-left-color: var(--ok);
+      background: var(--ok-soft);
+      border-color: #b9dfc6;
     }
     .metrics {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
     }
     .metric {
-      border-left: 3px solid var(--accent);
-      padding: 4px 8px;
-      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      padding: 9px 10px;
+      min-height: 60px;
     }
-    .metric strong { display: block; font-size: 16px; }
+    .metric strong { display: block; font-size: 16px; line-height: 1.2; }
     .metric span { color: var(--muted); font-size: 12px; }
     .status-ok { color: var(--ok); }
     .status-fail { color: var(--danger); }
+    .status-warn { color: var(--warn); }
     .tabs {
       display: flex;
       gap: 6px;
       padding: 10px 10px 0;
       border-bottom: 1px solid var(--line);
       background: #fbfcfd;
+      overflow-x: auto;
     }
     .tab {
       height: 32px;
@@ -511,15 +597,17 @@ def render_demo_html() -> str:
       border-bottom: 0;
       border-radius: 6px 6px 0 0;
       font-weight: 600;
+      flex: 0 0 auto;
     }
     .tab.active {
       color: var(--ink);
       background: var(--panel);
       border-color: var(--line);
     }
+    .output { min-height: 500px; background: #fff; }
     pre {
       margin: 0;
-      min-height: 420px;
+      min-height: 500px;
       overflow: auto;
       padding: 14px;
       background: var(--code);
@@ -528,6 +616,47 @@ def render_demo_html() -> str:
       white-space: pre-wrap;
       word-break: break-word;
     }
+    .structured { min-height: 500px; padding: 14px; background: #fff; overflow: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .step-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: var(--panel-2);
+    }
+    .step-card header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .step-card h3 { margin: 0; font-size: 13px; }
+    .step-card p { margin: 0 0 8px; color: var(--muted); }
+    .kv {
+      display: grid;
+      grid-template-columns: minmax(120px, 0.38fr) 1fr;
+      gap: 6px 10px;
+      font-size: 12px;
+      border-top: 1px solid var(--soft);
+      padding-top: 8px;
+      overflow-wrap: anywhere;
+    }
+    .kv dt { color: var(--muted); }
+    .kv dd { margin: 0; font-family: Consolas, "SFMono-Regular", monospace; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .data-table th, .data-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+    .data-table th { color: var(--muted); font-weight: 700; background: var(--panel-2); }
     .rows {
       width: 100%;
       border-collapse: collapse;
@@ -540,11 +669,11 @@ def render_demo_html() -> str:
     }
     .rows th { color: var(--muted); font-weight: 600; }
     .error {
-      border-left: 3px solid var(--danger);
       color: var(--danger);
-      padding: 10px 12px;
-      background: #fff7f5;
+      padding: 12px 14px;
+      background: var(--danger-soft);
       white-space: pre-wrap;
+      border-bottom: 1px solid #ffd1c9;
     }
     .badge {
       display: inline-flex;
@@ -557,53 +686,121 @@ def render_demo_html() -> str:
       color: var(--accent);
       font-size: 12px;
       font-weight: 700;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+    .badge.ok { background: var(--ok-soft); color: var(--ok); }
+    .badge.warn { background: var(--warn-soft); color: var(--warn); }
+    .badge.fail { background: var(--danger-soft); color: var(--danger); }
+    .small-note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .empty { color: var(--muted); padding: 36px 18px; text-align: center; }
+    .diagnostic-list { display: grid; gap: 10px; }
+    .diagnostic-card {
+      border: 1px solid #f2c5bc;
+      background: var(--danger-soft);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .diagnostic-card h3 { margin: 0 0 6px; font-size: 13px; color: var(--danger); }
+    .diagnostic-card p { margin: 0 0 8px; color: #6f2c23; }
+    .suggestion-list { margin: 6px 0 0; padding-left: 18px; color: var(--ink); }
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; transition: none !important; }
     }
     @media (max-width: 960px) {
-      header { padding: 0 14px; }
+      .topbar { padding: 12px 14px; align-items: flex-start; flex-direction: column; }
+      .brand { min-width: 0; }
+      .top-metrics { justify-content: flex-start; width: 100%; }
       main { padding: 14px; }
-      .shell { grid-template-columns: 1fr; }
-      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-strip, .shell { grid-template-columns: 1fr; }
+      .evidence-ribbon, .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       pre { min-height: 280px; }
+      .structured { min-height: 320px; }
+    }
+    @media (max-width: 640px) {
+      .evidence-ribbon, .metrics { grid-template-columns: 1fr; }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+      .panel-actions { width: 100%; justify-content: space-between; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .controls button { width: 100%; }
+      label { flex-direction: column; align-items: flex-start; gap: 2px; }
+      .checks { width: 100%; justify-content: space-between; }
+      .checks label { flex-direction: row; align-items: center; }
+      .badge { white-space: normal; height: auto; min-height: 26px; padding-top: 4px; padding-bottom: 4px; }
+      .top-metrics .badge { white-space: nowrap; }
+      .tab { padding: 0 10px; }
+      .kv { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>FinDSL Forge</h1>
-    <span class="badge" id="buildState">Ready</span>
-  </header>
+  <div class="topbar">
+    <div class="brand">
+      <h1>FinDSL Forge</h1>
+      <p>金融选股 DSL 到 Apache Doris SQL 的确定性编译与证据工作台</p>
+    </div>
+    <div class="top-metrics">
+      <span class="badge ok" id="buildState">Ready</span>
+      <span class="badge" id="evidenceSpeed">Doris evidence loading</span>
+      <span class="badge" id="evidenceRows">Row parity unknown</span>
+    </div>
+  </div>
   <main>
+    <section class="hero-strip">
+      <div class="brief">
+        <h2>评审演示主线</h2>
+        <p>中文需求生成候选 DSL，候选表达式经过编译器、SQL 安全检查和 SQL/reference 等价验证，再展示 Doris evidence。页面不会执行 LLM 直接 SQL。</p>
+      </div>
+      <div class="evidence-ribbon">
+        <div class="metric"><strong id="metricEvidence">-</strong><span>Doris evidence</span></div>
+        <div class="metric"><strong id="metricSpeedup">-</strong><span>cluster speedup</span></div>
+        <div class="metric"><strong id="metricParity">-</strong><span>row counts</span></div>
+      </div>
+    </section>
     <div class="shell">
       <section class="panel">
         <div class="panel-head">
-          <h2>DSL Workbench</h2>
+          <div class="panel-title">
+            <h2>DSL Workbench</h2>
+            <p>输入中文需求、选择样例或直接编辑 FinDSL。</p>
+          </div>
           <span class="badge">Doris SQL</span>
         </div>
         <div class="section">
-          <label for="nlInput">Natural language</label>
-          <textarea id="nlInput" spellcheck="false"></textarea>
+          <div class="field">
+            <label for="nlInput">Natural language <span>NL2DSL candidate source</span></label>
+            <textarea id="nlInput" spellcheck="false"></textarea>
+          </div>
           <div class="controls">
             <span class="badge" id="suggestState">NL2DSL ready</span>
             <button class="secondary" id="suggestButton">Suggest DSL</button>
           </div>
           <div class="candidates" id="candidateList"></div>
-          <label for="exampleSelect">Sample</label>
-          <select id="exampleSelect"></select>
-          <label for="dslInput" style="margin-top:12px;">DSL</label>
-          <textarea id="dslInput" spellcheck="false"></textarea>
+          <div class="field">
+            <label for="exampleSelect">Sample <span>official, negative, real_market</span></label>
+            <select id="exampleSelect"></select>
+          </div>
+          <div class="field">
+            <label for="dslInput">DSL <span>compiler-controlled input</span></label>
+            <textarea id="dslInput" spellcheck="false"></textarea>
+          </div>
           <div class="controls">
             <div class="checks">
               <label><input id="prefixToggle" type="checkbox" checked> Prefix sum</label>
               <label><input id="verifyToggle" type="checkbox" checked> Verify</label>
             </div>
-            <button id="runButton">Run</button>
+            <button id="runButton">Run analysis</button>
           </div>
+          <p class="small-note">负例样例会展示 Diagnostic，不会绕过 DSL 编译器直接执行 SQL。</p>
         </div>
       </section>
 
       <section class="panel">
         <div class="panel-head">
-          <h2>Result</h2>
+          <div class="panel-title">
+            <h2>Result</h2>
+            <p>SQL、AST、Explain、Rows、Evidence 和 Diagnostic 统一展示。</p>
+          </div>
           <div class="panel-actions">
             <button class="ghost" id="copyButton" type="button">Copy SQL</button>
             <span id="resultState" class="badge">Waiting</span>
@@ -614,6 +811,7 @@ def render_demo_html() -> str:
           <div class="metric"><strong id="metricLatency">-</strong><span>compile latency</span></div>
           <div class="metric"><strong id="metricRows">-</strong><span>SQL rows</span></div>
           <div class="metric"><strong id="metricPrefix">-</strong><span>optimizer</span></div>
+          <div class="metric"><strong id="metricDataset">-</strong><span>dataset</span></div>
         </div>
         <div class="tabs">
           <button class="tab active" data-tab="sql">SQL</button>
@@ -621,9 +819,10 @@ def render_demo_html() -> str:
           <button class="tab" data-tab="explain">Explain</button>
           <button class="tab" data-tab="rows">Rows</button>
           <button class="tab" data-tab="evidence">Evidence</button>
+          <button class="tab" data-tab="diagnostic">Diagnostic</button>
         </div>
         <div id="errorBox" class="error" hidden></div>
-        <pre id="outputPane"></pre>
+        <div id="outputPane" class="output"></div>
       </section>
     </div>
   </main>
@@ -642,16 +841,20 @@ def render_demo_html() -> str:
     const buildState = document.getElementById("buildState");
     const prefixToggle = document.getElementById("prefixToggle");
     const verifyToggle = document.getElementById("verifyToggle");
+    const evidenceSpeed = document.getElementById("evidenceSpeed");
+    const evidenceRows = document.getElementById("evidenceRows");
     let currentResult = null;
     let currentEvidence = null;
+    let currentError = null;
     let currentTab = "sql";
     let currentExample = null;
     const defaultNlRequest = "__DEFAULT_NL_REQUEST__";
 
     function setState(text, ok) {
       resultState.textContent = text;
-      resultState.style.color = ok ? "var(--ok)" : "var(--danger)";
       buildState.textContent = text;
+      resultState.className = "badge " + (ok ? "ok" : "fail");
+      buildState.className = "badge " + (ok ? "ok" : "fail");
     }
 
     function pretty(value) {
@@ -661,15 +864,197 @@ def render_demo_html() -> str:
     function render() {
       errorBox.hidden = true;
       if (!currentResult || !currentResult.ok) {
-        outputPane.textContent = "";
+        if (currentTab === "diagnostic" && currentError) {
+          renderDiagnostic(currentError);
+          return;
+        }
+        outputPane.replaceChildren(emptyState("Run an example to see compiler output."));
         return;
       }
       const compiled = currentResult.compile;
-      if (currentTab === "sql") outputPane.textContent = compiled.sql;
-      if (currentTab === "ast") outputPane.textContent = pretty(compiled.ast);
-      if (currentTab === "explain") outputPane.textContent = pretty({ trace: compiled.trace, explain: compiled.explain });
-      if (currentTab === "rows") outputPane.textContent = pretty(currentResult.verification ? currentResult.verification.result_keys : []);
-      if (currentTab === "evidence") outputPane.textContent = pretty(currentEvidence || { available: false });
+      if (currentTab === "sql") renderCode(compiled.sql);
+      if (currentTab === "ast") renderCode(pretty(compiled.ast));
+      if (currentTab === "explain") renderExplain(compiled.trace, compiled.explain);
+      if (currentTab === "rows") renderRows(currentResult.verification);
+      if (currentTab === "evidence") renderEvidence(currentEvidence);
+      if (currentTab === "diagnostic") renderDiagnostic(currentError);
+    }
+
+    function renderCode(text) {
+      const pre = document.createElement("pre");
+      pre.textContent = text || "";
+      outputPane.replaceChildren(pre);
+    }
+
+    function emptyState(text) {
+      const wrap = document.createElement("div");
+      wrap.className = "structured";
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = text;
+      wrap.appendChild(p);
+      return wrap;
+    }
+
+    function kvList(obj) {
+      const dl = document.createElement("dl");
+      dl.className = "kv";
+      Object.entries(obj || {}).forEach(([key, value]) => {
+        const dt = document.createElement("dt");
+        const dd = document.createElement("dd");
+        dt.textContent = key;
+        dd.textContent = typeof value === "object" ? JSON.stringify(value) : String(value);
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+      });
+      return dl;
+    }
+
+    function renderExplain(trace, explain) {
+      const wrap = document.createElement("div");
+      wrap.className = "structured timeline";
+      if (!explain || !explain.length) {
+        wrap.appendChild(emptyState("No explain records.").firstChild);
+      } else {
+        explain.forEach((step, index) => {
+          const card = document.createElement("article");
+          card.className = "step-card";
+          const head = document.createElement("header");
+          const title = document.createElement("h3");
+          const badge = document.createElement("span");
+          title.textContent = (index + 1) + ". " + step.rule;
+          badge.className = "badge " + (step.status === "applied" || step.status === "passed" ? "ok" : "warn");
+          badge.textContent = step.status;
+          head.appendChild(title);
+          head.appendChild(badge);
+          const message = document.createElement("p");
+          message.textContent = step.message || "";
+          card.appendChild(head);
+          card.appendChild(message);
+          if (step.evidence) card.appendChild(kvList(step.evidence));
+          wrap.appendChild(card);
+        });
+      }
+      if (trace && trace.length) {
+        const card = document.createElement("article");
+        card.className = "step-card";
+        const title = document.createElement("h3");
+        title.textContent = "Trace";
+        card.appendChild(title);
+        card.appendChild(kvList(Object.fromEntries(trace.map((item, idx) => [String(idx + 1), item]))));
+        wrap.appendChild(card);
+      }
+      outputPane.replaceChildren(wrap);
+    }
+
+    function renderRows(verification) {
+      const wrap = document.createElement("div");
+      wrap.className = "structured";
+      if (!verification) {
+        wrap.appendChild(emptyState("Verification skipped. Enable Verify and run again.").firstChild);
+        outputPane.replaceChildren(wrap);
+        return;
+      }
+      wrap.appendChild(kvList({
+        passed: verification.passed,
+        sql_row_count: verification.sql_row_count,
+        reference_row_count: verification.reference_row_count,
+        missing_keys: verification.missing_keys.length,
+        extra_keys: verification.extra_keys.length
+      }));
+      const table = document.createElement("table");
+      table.className = "data-table";
+      table.innerHTML = "<thead><tr><th>#</th><th>Result key</th></tr></thead>";
+      const tbody = document.createElement("tbody");
+      (verification.result_keys || []).forEach((key, idx) => {
+        const tr = document.createElement("tr");
+        const c1 = document.createElement("td");
+        const c2 = document.createElement("td");
+        c1.textContent = String(idx + 1);
+        c2.textContent = JSON.stringify(key);
+        tr.appendChild(c1);
+        tr.appendChild(c2);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+      outputPane.replaceChildren(wrap);
+    }
+
+    function renderEvidence(evidence) {
+      const wrap = document.createElement("div");
+      wrap.className = "structured";
+      if (!evidence || !evidence.available) {
+        wrap.appendChild(emptyState("Doris evidence report is not available yet.").firstChild);
+        outputPane.replaceChildren(wrap);
+        return;
+      }
+      wrap.appendChild(kvList({
+        report_path: evidence.path,
+        evidence_passed: evidence.headline.passed,
+        doris_speedup: evidence.headline.speedup,
+        baseline_avg_ms: evidence.headline.baseline_avg_ms,
+        optimized_avg_ms: evidence.headline.optimized_avg_ms,
+        row_counts_match: evidence.headline.row_counts_match
+      }));
+      const details = document.createElement("pre");
+      details.textContent = pretty(evidence.metrics || {});
+      details.style.marginTop = "12px";
+      wrap.appendChild(details);
+      outputPane.replaceChildren(wrap);
+    }
+
+    function renderDiagnostic(error) {
+      const wrap = document.createElement("div");
+      wrap.className = "structured diagnostic-list";
+      if (!error) {
+        wrap.appendChild(emptyState("No diagnostic for the latest successful run.").firstChild);
+        outputPane.replaceChildren(wrap);
+        return;
+      }
+      const diagnostics = error.diagnostics || [];
+      if (!diagnostics.length) {
+        const card = document.createElement("article");
+        card.className = "diagnostic-card";
+        const title = document.createElement("h3");
+        const p = document.createElement("p");
+        title.textContent = error.type || "Error";
+        p.textContent = error.message || "Unknown error";
+        card.appendChild(title);
+        card.appendChild(p);
+        wrap.appendChild(card);
+      }
+      diagnostics.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "diagnostic-card";
+        const title = document.createElement("h3");
+        const p = document.createElement("p");
+        title.textContent = item.code || "DIAGNOSTIC";
+        p.textContent = item.message || error.message || "";
+        card.appendChild(title);
+        card.appendChild(p);
+        if (item.suggestions && item.suggestions.length) {
+          const ul = document.createElement("ul");
+          ul.className = "suggestion-list";
+          item.suggestions.forEach(text => {
+            const li = document.createElement("li");
+            li.textContent = text;
+            ul.appendChild(li);
+          });
+          card.appendChild(ul);
+        }
+        wrap.appendChild(card);
+      });
+      if (currentExample && currentExample.expected_code) {
+        const card = document.createElement("article");
+        card.className = "step-card";
+        card.appendChild(kvList({
+          "Expected diagnostic": currentExample.expected_code,
+          "Actual diagnostic": diagnostics.map(item => item.code).filter(Boolean).join(", ") || "<none>"
+        }));
+        wrap.appendChild(card);
+      }
+      outputPane.replaceChildren(wrap);
     }
 
     function updateMetrics(result) {
@@ -681,6 +1066,8 @@ def render_demo_html() -> str:
       document.getElementById("metricRows").textContent = verification ? verification.sql_row_count : "-";
       const applied = result.compile.explain.some(step => step.rule === "PREFIX_SUM" && step.status === "applied");
       document.getElementById("metricPrefix").textContent = applied ? "Applied" : "Skipped";
+      document.getElementById("metricPrefix").className = applied ? "status-ok" : "status-warn";
+      document.getElementById("metricDataset").textContent = currentExample && currentExample.dataset_label ? currentExample.dataset_label : "sample fixtures";
     }
 
     function resetMetrics(status) {
@@ -689,12 +1076,22 @@ def render_demo_html() -> str:
       document.getElementById("metricLatency").textContent = "-";
       document.getElementById("metricRows").textContent = "-";
       document.getElementById("metricPrefix").textContent = "-";
+      document.getElementById("metricDataset").textContent = currentExample && currentExample.dataset_label ? currentExample.dataset_label : "-";
     }
 
     function selectExample(index) {
       currentExample = sampleSelect.options[index] ? JSON.parse(sampleSelect.options[index].dataset.example) : null;
       if (!currentExample) return;
+      sampleSelect.value = String(index);
       dslInput.value = currentExample.dsl;
+      candidateList.replaceChildren();
+      currentResult = null;
+      currentError = null;
+      currentTab = "sql";
+      setActiveTab("sql");
+      resetMetrics("READY");
+      setState("Ready", true);
+      render();
       if (currentExample.kind === "official_negative") {
         suggestState.textContent = "Diagnostic preset";
         verifyToggle.checked = false;
@@ -778,7 +1175,10 @@ def render_demo_html() -> str:
         errorBox.hidden = false;
         errorBox.textContent = err.message;
         currentResult = null;
-        outputPane.textContent = "";
+        currentError = { type: "SuggestError", message: err.message, diagnostics: [] };
+        currentTab = "diagnostic";
+        setActiveTab("diagnostic");
+        renderDiagnostic(currentError);
         resetMetrics("ERROR");
         setState("Error", false);
       } finally {
@@ -806,6 +1206,23 @@ def render_demo_html() -> str:
       const res = await fetch("/api/evidence");
       const data = await res.json();
       currentEvidence = data.evidence;
+      if (currentEvidence && currentEvidence.available) {
+        document.getElementById("metricEvidence").textContent = currentEvidence.headline.passed === "True" ? "PASS" : currentEvidence.headline.passed;
+        document.getElementById("metricSpeedup").textContent = currentEvidence.headline.speedup || "-";
+        document.getElementById("metricParity").textContent = currentEvidence.headline.row_counts_match === "True" ? "MATCH" : currentEvidence.headline.row_counts_match;
+        evidenceSpeed.textContent = "Doris speedup " + (currentEvidence.headline.speedup || "-");
+        evidenceRows.textContent = "Rows " + (currentEvidence.headline.row_counts_match === "True" ? "match" : currentEvidence.headline.row_counts_match);
+        evidenceSpeed.className = "badge ok";
+        evidenceRows.className = "badge ok";
+      } else {
+        document.getElementById("metricEvidence").textContent = "Missing";
+        document.getElementById("metricSpeedup").textContent = "-";
+        document.getElementById("metricParity").textContent = "-";
+        evidenceSpeed.textContent = "Doris evidence missing";
+        evidenceRows.textContent = "Rows unknown";
+        evidenceSpeed.className = "badge warn";
+        evidenceRows.className = "badge warn";
+      }
     }
 
     async function run() {
@@ -827,14 +1244,18 @@ def render_demo_html() -> str:
           throw new Error(formatError(data.error));
         }
         currentResult = data;
+        currentError = null;
         updateMetrics(data);
         setState(data.verification && !data.verification.passed ? "Failed" : "Passed", !(data.verification && !data.verification.passed));
         render();
       } catch (err) {
         currentResult = null;
+        currentError = errorFromMessage(err.message);
         errorBox.hidden = false;
         errorBox.textContent = err.message;
-        outputPane.textContent = "";
+        currentTab = "diagnostic";
+        setActiveTab("diagnostic");
+        renderDiagnostic(currentError);
         resetMetrics("ERROR");
         setState(currentExample && currentExample.kind === "official_negative" ? "Diagnostic" : "Error", false);
       } finally {
@@ -853,10 +1274,25 @@ def render_demo_html() -> str:
       return error.type + ": " + error.message + expected + actual + "\\n\\nSuggestions:\\n- " + unique.join("\\n- ");
     }
 
+    function errorFromMessage(message) {
+      const actual = (message.match(/Actual diagnostic: ([^\\n]+)/) || [])[1];
+      const suggestions = message.includes("Suggestions:")
+        ? message.split("Suggestions:").slice(1).join("Suggestions:").split("\\n").map(line => line.replace(/^- /, "").trim()).filter(Boolean)
+        : [];
+      return {
+        type: "Diagnostic",
+        message,
+        diagnostics: actual ? [{ code: actual, message, suggestions }] : []
+      };
+    }
+
+    function setActiveTab(tab) {
+      document.querySelectorAll(".tab").forEach(item => item.classList.toggle("active", item.dataset.tab === tab));
+    }
+
     document.querySelectorAll(".tab").forEach(button => {
       button.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
-        button.classList.add("active");
+        setActiveTab(button.dataset.tab);
         currentTab = button.dataset.tab;
         render();
       });
