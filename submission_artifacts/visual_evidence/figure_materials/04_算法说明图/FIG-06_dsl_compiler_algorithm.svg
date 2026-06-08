@@ -1,96 +1,99 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="DSL 编译核心算法流程图">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="FIG-06  DSL 编译核心算法流程图">
 <rect x="0" y="0" width="2400" height="1500" fill="#ffffff"/>
-<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/></filter></defs>
-<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="92.0" dy="0.0">DSL 编译核心算法流程图</tspan>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#4b5563"/></marker></defs>
+<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="92.0" dy="0.0">FIG-06  DSL 编译核心算法流程图</tspan>
 </text>
-<text x="92.0" y="148.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">
+<text x="92.0" y="146.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">确定性编译内核：错误在编译期诊断，成功路径输出可审计 SQL。</tspan>
 </text>
-<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
-<rect x="110.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
-<text x="138.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#2563eb" text-anchor="start">
-<tspan x="138.0" dy="0.0">FinDSL 输入</tspan>
+<text x="2308.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="end">
+<tspan x="2308.0" dy="0.0">SciPilot/Nature-inspired publication style v2</tspan>
 </text>
-<text x="138.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="138.0" dy="0.0">then(filter(...), rank(...)</tspan>
-<tspan x="138.0" dy="27.0">)</tspan>
+<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#b8c0cc" stroke-width="1.2" stroke-linecap="round"/>
+<rect x="110.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#edf6fb" stroke="#0072B2" stroke-width="1.2"/>
+<text x="134.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#0072B2" text-anchor="start">
+<tspan x="134.0" dy="0.0">FinDSL 输入</tspan>
+</text>
+<text x="134.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="134.0" dy="0.0">then(filter(...), rank(...)</tspan>
+<tspan x="134.0" dy="24.3">)</tspan>
 </text>
 <line x1="413.0" y1="445.0" x2="432.0" y2="445.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="440.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
-<text x="468.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#0f766e" text-anchor="start">
-<tspan x="468.0" dy="0.0">Lexer</tspan>
+<rect x="440.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="464.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="464.0" dy="0.0">Lexer</tspan>
 </text>
-<text x="468.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="468.0" dy="0.0">生成 token</tspan>
-<tspan x="468.0" dy="27.0">捕获 LEX_ERROR</tspan>
+<text x="464.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="464.0" dy="0.0">生成 token</tspan>
+<tspan x="464.0" dy="24.3">捕获 LEX_ERROR</tspan>
 </text>
 <line x1="743.0" y1="445.0" x2="762.0" y2="445.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="770.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
-<text x="798.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#0f766e" text-anchor="start">
-<tspan x="798.0" dy="0.0">Parser</tspan>
+<rect x="770.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="794.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="794.0" dy="0.0">Parser</tspan>
 </text>
-<text x="798.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="798.0" dy="0.0">递归下降解析</tspan>
-<tspan x="798.0" dy="27.0">生成 Typed AST</tspan>
+<text x="794.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="794.0" dy="0.0">递归下降解析</tspan>
+<tspan x="794.0" dy="24.3">生成 Typed AST</tspan>
 </text>
 <line x1="1073.0" y1="445.0" x2="1092.0" y2="445.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="1100.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#fef3c7" stroke="#b45309" stroke-width="2" filter="url(#shadow)"/>
-<text x="1128.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#b45309" text-anchor="start">
-<tspan x="1128.0" dy="0.0">Semantic</tspan>
+<rect x="1100.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#fff8e8" stroke="#E69F00" stroke-width="1.2"/>
+<text x="1124.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#E69F00" text-anchor="start">
+<tspan x="1124.0" dy="0.0">Semantic</tspan>
 </text>
-<text x="1128.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1128.0" dy="0.0">指标/函数/窗口/rank/日期/类型</tspan>
-<tspan x="1128.0" dy="27.0">检查</tspan>
+<text x="1124.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1124.0" dy="0.0">指标/函数/窗口/rank/日期/类型</tspan>
+<tspan x="1124.0" dy="24.3">检查</tspan>
 </text>
 <line x1="1403.0" y1="445.0" x2="1422.0" y2="445.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="1430.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" filter="url(#shadow)"/>
-<text x="1458.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#7c3aed" text-anchor="start">
-<tspan x="1458.0" dy="0.0">SQL Plan</tspan>
+<rect x="1430.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#fbf1f7" stroke="#CC79A7" stroke-width="1.2"/>
+<text x="1454.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#CC79A7" text-anchor="start">
+<tspan x="1454.0" dy="0.0">SQL Plan</tspan>
 </text>
-<text x="1458.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1458.0" dy="0.0">CTE / window / prefix</tspan>
-<tspan x="1458.0" dy="27.0">结构化 explain</tspan>
+<text x="1454.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1454.0" dy="0.0">CTE / window / prefix</tspan>
+<tspan x="1454.0" dy="24.3">结构化 explain</tspan>
 </text>
 <line x1="1733.0" y1="445.0" x2="1752.0" y2="445.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="1760.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#dcfce7" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
-<text x="1788.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#15803d" text-anchor="start">
-<tspan x="1788.0" dy="0.0">Doris SQL</tspan>
+<rect x="1760.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="1784.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="1784.0" dy="0.0">Doris SQL</tspan>
 </text>
-<text x="1788.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1788.0" dy="0.0">单查询形态校验</tspan>
-<tspan x="1788.0" dy="27.0">已知表与安全边界</tspan>
+<text x="1784.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1784.0" dy="0.0">单查询形态校验</tspan>
+<tspan x="1784.0" dy="24.3">已知表与安全边界</tspan>
 </text>
 <line x1="2063.0" y1="445.0" x2="2082.0" y2="445.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="2090.0" y="340.0" width="295.0" height="210.0" rx="20" fill="#f1f5f9" stroke="#172033" stroke-width="2" filter="url(#shadow)"/>
-<text x="2118.0" y="382.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="2118.0" dy="0.0">输出</tspan>
+<rect x="2090.0" y="340.0" width="295.0" height="210.0" rx="8" fill="#f3f4f6" stroke="#111827" stroke-width="1.2"/>
+<text x="2114.0" y="380.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="2114.0" dy="0.0">输出</tspan>
 </text>
-<text x="2118.0" y="422.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="2118.0" dy="0.0">SQL / AST / trace</tspan>
-<tspan x="2118.0" dy="27.0">elapsed_ms / diagnostics</tspan>
+<text x="2114.0" y="418.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="2114.0" dy="0.0">SQL / AST / trace</tspan>
+<tspan x="2114.0" dy="24.3">elapsed_ms / diagnostics</tspan>
 </text>
-<line x1="620.0" y1="600.0" x2="620.0" y2="850.0" stroke="#b91c1c" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 9" marker-end="url(#arrow)"/>
-<line x1="950.0" y1="600.0" x2="950.0" y2="850.0" stroke="#b91c1c" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 9" marker-end="url(#arrow)"/>
-<line x1="1280.0" y1="600.0" x2="1280.0" y2="850.0" stroke="#b91c1c" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 9" marker-end="url(#arrow)"/>
-<rect x="430.0" y="860.0" width="1040.0" height="210.0" rx="20" fill="#fee2e2" stroke="#b91c1c" stroke-width="2" filter="url(#shadow)"/>
-<text x="458.0" y="902.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#b91c1c" text-anchor="start">
-<tspan x="458.0" dy="0.0">错误分支</tspan>
+<line x1="620.0" y1="600.0" x2="620.0" y2="850.0" stroke="#D55E00" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 9" marker-end="url(#arrow)"/>
+<line x1="950.0" y1="600.0" x2="950.0" y2="850.0" stroke="#D55E00" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 9" marker-end="url(#arrow)"/>
+<line x1="1280.0" y1="600.0" x2="1280.0" y2="850.0" stroke="#D55E00" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 9" marker-end="url(#arrow)"/>
+<rect x="430.0" y="860.0" width="1040.0" height="210.0" rx="8" fill="#fff0e8" stroke="#D55E00" stroke-width="1.2"/>
+<text x="454.0" y="900.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#D55E00" text-anchor="start">
+<tspan x="454.0" dy="0.0">错误分支</tspan>
 </text>
-<text x="458.0" y="942.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="458.0" dy="0.0">ParseError / SemanticError / UNKNOWN_INDICATOR / UNSAFE_DIRECT_SQL 会进入 diagnostics </tspan>
-<tspan x="458.0" dy="27.0">repair hints，不会继续生成不可控 SQL。</tspan>
+<text x="454.0" y="938.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="454.0" dy="0.0">ParseError / SemanticError / UNKNOWN_INDICATOR / UNSAFE_DIRECT_SQL 会进入 diagnostics </tspan>
+<tspan x="454.0" dy="24.3">repair hints，不会继续生成不可控 SQL。</tspan>
 </text>
-<rect x="1540.0" y="840.0" width="650.0" height="240.0" rx="20" fill="#dcfce7" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
-<text x="1568.0" y="882.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#15803d" text-anchor="start">
-<tspan x="1568.0" dy="0.0">最新门禁</tspan>
+<rect x="1540.0" y="840.0" width="650.0" height="240.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="1564.0" y="880.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="1564.0" dy="0.0">最新门禁</tspan>
 </text>
-<text x="1568.0" y="922.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1568.0" dy="0.0">compile success rate 100.00%；compile P95 2.329 ms；</tspan>
-<tspan x="1568.0" dy="27.0">warning count 0。</tspan>
+<text x="1564.0" y="918.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1564.0" dy="0.0">compile success rate 100.00%；compile P95 2.329 ms；</tspan>
+<tspan x="1564.0" dy="24.3">warning count 0。</tspan>
 </text>
-<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-<text x="92.0" y="1458.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748b" text-anchor="start">
+<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>
+<text x="92.0" y="1457.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">数据源：src/findsl/compiler.py，src/findsl/parser.py，src/findsl/semantic.py，evidence_metadata.json。</tspan>
 </text>
 </svg>

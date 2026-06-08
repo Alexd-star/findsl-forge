@@ -1,44 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="真实行情样本与规模性能证据边界图">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="FIG-17  真实行情样本与规模性能证据边界图">
 <rect x="0" y="0" width="2400" height="1500" fill="#ffffff"/>
-<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/></filter></defs>
-<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="92.0" dy="0.0">真实行情样本与规模性能证据边界图</tspan>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#4b5563"/></marker></defs>
+<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="92.0" dy="0.0">FIG-17  真实行情样本与规模性能证据边界图</tspan>
 </text>
-<text x="92.0" y="148.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">
+<text x="92.0" y="146.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">把业务真实样本和规模性能证据分开讲，避免数据口径混淆。</tspan>
 </text>
-<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
-<rect x="160.0" y="310.0" width="2100.0" height="320.0" rx="20" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
-<text x="188.0" y="352.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#2563eb" text-anchor="start">
-<tspan x="188.0" dy="0.0">业务可信度泳道</tspan>
+<text x="2308.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="end">
+<tspan x="2308.0" dy="0.0">SciPilot/Nature-inspired publication style v2</tspan>
 </text>
-<text x="188.0" y="392.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="188.0" dy="0.0">Eastmoney public historical K-line -&gt; 贵州茅台 / 平安银行真实 A 股字段 -&gt; real market sample cases 3/3 -&gt; Web Demo 真实行情展示</tspan>
-<tspan x="188.0" dy="27.0">结论边界：用于证明字段、日期、A 股代码和验证流程贴近真实业务，不用于 5M 性能结论。</tspan>
+<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#b8c0cc" stroke-width="1.2" stroke-linecap="round"/>
+<rect x="160.0" y="310.0" width="2100.0" height="320.0" rx="8" fill="#edf6fb" stroke="#0072B2" stroke-width="1.2"/>
+<text x="184.0" y="350.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#0072B2" text-anchor="start">
+<tspan x="184.0" dy="0.0">业务可信度泳道</tspan>
 </text>
-<rect x="160.0" y="760.0" width="2100.0" height="320.0" rx="20" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
-<text x="188.0" y="802.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#0f766e" text-anchor="start">
-<tspan x="188.0" dy="0.0">性能可信度泳道</tspan>
+<text x="184.0" y="388.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="184.0" dy="0.0">Eastmoney public historical K-line -&gt; 贵州茅台 / 平安银行真实 A 股字段 -&gt; real market sample cases 3/3 -&gt; Web Demo 真实行情展示</tspan>
+<tspan x="184.0" dy="24.3">结论边界：用于证明字段、日期、A 股代码和验证流程贴近真实业务，不用于 5M 性能结论。</tspan>
 </text>
-<text x="188.0" y="842.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="188.0" dy="0.0">deterministic synthetic A-share-style scale data -&gt; Doris 5,000,000 cardinality -&gt; baseline vs prefix-sum -&gt; speedup 36.24x</tspan>
-<tspan x="188.0" dy="27.0">结论边界：用于证明长窗口 prefix-sum 在 Doris 集群上的性能收益，不声称它是真实行情原始全量数据。</tspan>
+<rect x="160.0" y="760.0" width="2100.0" height="320.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="184.0" y="800.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="184.0" dy="0.0">性能可信度泳道</tspan>
 </text>
-<line x1="250.0" y1="700.0" x2="2150.0" y2="700.0" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 9"/>
-<rect x="500.0" y="1150.0" width="360.0" height="48.0" rx="24" fill="#dbeafe" stroke="#dbeafe" stroke-width="1"/>
-<text x="680.0" y="1181.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#2563eb" text-anchor="middle">
+<text x="184.0" y="838.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="184.0" dy="0.0">deterministic synthetic A-share-style scale data -&gt; Doris 5,000,000 cardinality -&gt; baseline vs prefix-sum -&gt; speedup 36.24x</tspan>
+<tspan x="184.0" dy="24.3">结论边界：用于证明长窗口 prefix-sum 在 Doris 集群上的性能收益，不声称它是真实行情原始全量数据。</tspan>
+</text>
+<line x1="250.0" y1="700.0" x2="2150.0" y2="700.0" stroke="#b8c0cc" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 9"/>
+<rect x="500.0" y="1150.0" width="360.0" height="44.0" rx="8" fill="#edf6fb" stroke="#0072B2" stroke-width="1"/>
+<text x="680.0" y="1181.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#0072B2" text-anchor="middle">
 <tspan x="680.0" dy="0.0">业务样本：真实小样本</tspan>
 </text>
-<rect x="940.0" y="1150.0" width="430.0" height="48.0" rx="24" fill="#ccfbf1" stroke="#ccfbf1" stroke-width="1"/>
-<text x="1155.0" y="1181.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#0f766e" text-anchor="middle">
+<rect x="940.0" y="1150.0" width="430.0" height="44.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1"/>
+<text x="1155.0" y="1181.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#009E73" text-anchor="middle">
 <tspan x="1155.0" dy="0.0">性能样本：可复现规模数据</tspan>
 </text>
-<rect x="1450.0" y="1150.0" width="360.0" height="48.0" rx="24" fill="#dcfce7" stroke="#dcfce7" stroke-width="1"/>
-<text x="1630.0" y="1181.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#15803d" text-anchor="middle">
+<rect x="1450.0" y="1150.0" width="360.0" height="44.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1"/>
+<text x="1630.0" y="1181.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#009E73" text-anchor="middle">
 <tspan x="1630.0" dy="0.0">口径诚实：分开证明</tspan>
 </text>
-<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-<text x="92.0" y="1458.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748b" text-anchor="start">
+<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>
+<text x="92.0" y="1457.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">数据源：README.md，data/real_samples/eastmoney_a_share_sample/README.md，doris_cluster_evidence.json。</tspan>
 </text>
 </svg>

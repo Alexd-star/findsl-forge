@@ -1,63 +1,66 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="Doris SQL 执行计划对比图">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="FIG-08  Doris SQL 执行计划对比图">
 <rect x="0" y="0" width="2400" height="1500" fill="#ffffff"/>
-<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/></filter></defs>
-<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="92.0" dy="0.0">Doris SQL 执行计划对比图</tspan>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#4b5563"/></marker></defs>
+<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="92.0" dy="0.0">FIG-08  Doris SQL 执行计划对比图</tspan>
 </text>
-<text x="92.0" y="148.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">
+<text x="92.0" y="146.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">左右对比 EXPLAIN 摘要，说明性能差异来自执行计划结构变化。</tspan>
 </text>
-<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
-<rect x="130.0" y="270.0" width="980.0" height="860.0" rx="20" fill="#ffedd5" stroke="#c2410c" stroke-width="2" filter="url(#shadow)"/>
-<text x="158.0" y="312.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#c2410c" text-anchor="start">
-<tspan x="158.0" dy="0.0">Baseline window plan</tspan>
+<text x="2308.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="end">
+<tspan x="2308.0" dy="0.0">SciPilot/Nature-inspired publication style v2</tspan>
 </text>
-<text x="158.0" y="352.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="158.0" dy="0.0">VOlapScanNode(dwd_stock_daily_quote)</tspan>
-<tspan x="158.0" dy="27.0">cardinality=5,000,000</tspan>
-<tspan x="158.0" dy="27.0">-&gt; VSORT by ts_code, trade_date</tspan>
-<tspan x="158.0" dy="27.0">-&gt; VANALYTIC sum(volume)</tspan>
-<tspan x="158.0" dy="27.0">ROWS BETWEEN 119 PRECEDING AND CURRENT ROW</tspan>
-<tspan x="158.0" dy="27.0">-&gt; predicate __win_1 &gt; 1000000</tspan>
-<tspan x="158.0" dy="27.0"></tspan>
-<tspan x="158.0" dy="27.0">特点：运行时计算长窗口，包含排序与 analytic window。</tspan>
+<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#b8c0cc" stroke-width="1.2" stroke-linecap="round"/>
+<rect x="130.0" y="270.0" width="980.0" height="860.0" rx="8" fill="#fff3eb" stroke="#D55E00" stroke-width="1.2"/>
+<text x="154.0" y="310.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#D55E00" text-anchor="start">
+<tspan x="154.0" dy="0.0">Baseline window plan</tspan>
 </text>
-<rect x="1290.0" y="270.0" width="980.0" height="860.0" rx="20" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
-<text x="1318.0" y="312.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#0f766e" text-anchor="start">
-<tspan x="1318.0" dy="0.0">Optimized prefix-sum plan</tspan>
+<text x="154.0" y="348.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="154.0" dy="0.0">VOlapScanNode(dwd_stock_daily_quote)</tspan>
+<tspan x="154.0" dy="24.3">cardinality=5,000,000</tspan>
+<tspan x="154.0" dy="24.3">-&gt; VSORT by ts_code, trade_date</tspan>
+<tspan x="154.0" dy="24.3">-&gt; VANALYTIC sum(volume)</tspan>
+<tspan x="154.0" dy="24.3">ROWS BETWEEN 119 PRECEDING AND CURRENT ROW</tspan>
+<tspan x="154.0" dy="24.3">-&gt; predicate __win_1 &gt; 1000000</tspan>
+<tspan x="154.0" dy="24.3"></tspan>
+<tspan x="154.0" dy="24.3">特点：运行时计算长窗口，包含排序与 analytic window。</tspan>
 </text>
-<text x="1318.0" y="352.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1318.0" dy="0.0">VOlapScanNode(dwd_stock_daily_quote_prefix)</tspan>
-<tspan x="1318.0" dy="27.0">predicate volume_sum_120 &gt; 1000000</tspan>
-<tspan x="1318.0" dy="27.0">-&gt; VHASH JOIN(COLOCATE)</tspan>
-<tspan x="1318.0" dy="27.0">with dwd_stock_daily_quote</tspan>
-<tspan x="1318.0" dy="27.0">-&gt; output rows</tspan>
-<tspan x="1318.0" dy="27.0"></tspan>
-<tspan x="1318.0" dy="27.0">特点：直接读取 prefix/hot-window 列，避免运行时窗口聚合。</tspan>
+<rect x="1290.0" y="270.0" width="980.0" height="860.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="1314.0" y="310.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="1314.0" dy="0.0">Optimized prefix-sum plan</tspan>
 </text>
-<line x1="1190.0" y1="280.0" x2="1190.0" y2="1140.0" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 9"/>
-<rect x="260.0" y="1190.0" width="260.0" height="48.0" rx="24" fill="#ffedd5" stroke="#ffedd5" stroke-width="1"/>
-<text x="390.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#c2410c" text-anchor="middle">
+<text x="1314.0" y="348.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1314.0" dy="0.0">VOlapScanNode(dwd_stock_daily_quote_prefix)</tspan>
+<tspan x="1314.0" dy="24.3">predicate volume_sum_120 &gt; 1000000</tspan>
+<tspan x="1314.0" dy="24.3">-&gt; VHASH JOIN(COLOCATE)</tspan>
+<tspan x="1314.0" dy="24.3">with dwd_stock_daily_quote</tspan>
+<tspan x="1314.0" dy="24.3">-&gt; output rows</tspan>
+<tspan x="1314.0" dy="24.3"></tspan>
+<tspan x="1314.0" dy="24.3">特点：直接读取 prefix/hot-window 列，避免运行时窗口聚合。</tspan>
+</text>
+<line x1="1190.0" y1="280.0" x2="1190.0" y2="1140.0" stroke="#b8c0cc" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 9"/>
+<rect x="260.0" y="1190.0" width="260.0" height="44.0" rx="8" fill="#fff3eb" stroke="#D55E00" stroke-width="1"/>
+<text x="390.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#D55E00" text-anchor="middle">
 <tspan x="390.0" dy="0.0">window=True</tspan>
 </text>
-<rect x="560.0" y="1190.0" width="260.0" height="48.0" rx="24" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="1"/>
-<text x="690.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#172033" text-anchor="middle">
+<rect x="560.0" y="1190.0" width="260.0" height="44.0" rx="8" fill="#f3f4f6" stroke="#111827" stroke-width="1"/>
+<text x="690.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#111827" text-anchor="middle">
 <tspan x="690.0" dy="0.0">prefix=False</tspan>
 </text>
-<rect x="1410.0" y="1190.0" width="260.0" height="48.0" rx="24" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="1"/>
-<text x="1540.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#172033" text-anchor="middle">
+<rect x="1410.0" y="1190.0" width="260.0" height="44.0" rx="8" fill="#f3f4f6" stroke="#111827" stroke-width="1"/>
+<text x="1540.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#111827" text-anchor="middle">
 <tspan x="1540.0" dy="0.0">window=False</tspan>
 </text>
-<rect x="1710.0" y="1190.0" width="260.0" height="48.0" rx="24" fill="#ccfbf1" stroke="#ccfbf1" stroke-width="1"/>
-<text x="1840.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#0f766e" text-anchor="middle">
+<rect x="1710.0" y="1190.0" width="260.0" height="44.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1"/>
+<text x="1840.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#009E73" text-anchor="middle">
 <tspan x="1840.0" dy="0.0">prefix=True</tspan>
 </text>
-<rect x="940.0" y="1190.0" width="340.0" height="48.0" rx="24" fill="#dcfce7" stroke="#dcfce7" stroke-width="1"/>
-<text x="1110.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#15803d" text-anchor="middle">
+<rect x="940.0" y="1190.0" width="340.0" height="44.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1"/>
+<text x="1110.0" y="1221.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="800" fill="#009E73" text-anchor="middle">
 <tspan x="1110.0" dy="0.0">row parity True</tspan>
 </text>
-<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-<text x="92.0" y="1458.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748b" text-anchor="start">
+<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>
+<text x="92.0" y="1457.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">数据源：submission_artifacts/evidence_snapshots/doris_cluster_evidence.md / .json；EXPLAIN 为摘要示意。</tspan>
 </text>
 </svg>

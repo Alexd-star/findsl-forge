@@ -24,27 +24,31 @@ CANVAS_W = 2400
 CANVAS_H = 1500
 
 
+STYLE_STANDARD = "SciPilot/Nature-inspired publication style v2"
+
+
+# Okabe-Ito inspired, colorblind-safe palette with low-saturation fills.
 PALETTE = {
-    "ink": "#172033",
-    "muted": "#64748b",
-    "line": "#cbd5e1",
+    "ink": "#111827",
+    "muted": "#4b5563",
+    "line": "#b8c0cc",
     "panel": "#ffffff",
-    "soft": "#f8fafc",
-    "blue": "#2563eb",
-    "blue_soft": "#dbeafe",
-    "teal": "#0f766e",
-    "teal_soft": "#ccfbf1",
-    "green": "#15803d",
-    "green_soft": "#dcfce7",
-    "orange": "#c2410c",
-    "orange_soft": "#ffedd5",
-    "amber": "#b45309",
-    "amber_soft": "#fef3c7",
-    "purple": "#7c3aed",
-    "purple_soft": "#ede9fe",
-    "red": "#b91c1c",
-    "red_soft": "#fee2e2",
-    "gray_soft": "#f1f5f9",
+    "soft": "#f6f7f9",
+    "blue": "#0072B2",
+    "blue_soft": "#edf6fb",
+    "teal": "#009E73",
+    "teal_soft": "#eef8f4",
+    "green": "#009E73",
+    "green_soft": "#eef8f4",
+    "orange": "#D55E00",
+    "orange_soft": "#fff3eb",
+    "amber": "#E69F00",
+    "amber_soft": "#fff8e8",
+    "purple": "#CC79A7",
+    "purple_soft": "#fbf1f7",
+    "red": "#D55E00",
+    "red_soft": "#fff0e8",
+    "gray_soft": "#f3f4f6",
 }
 
 
@@ -122,16 +126,14 @@ class Svg:
         self.items.append(
             '<defs>'
             '<marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">'
-            '<path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker>'
-            '<filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">'
-            '<feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/>'
-            "</filter>"
+            '<path d="M2,2 L10,6 L2,10 Z" fill="#4b5563"/></marker>'
             "</defs>"
         )
-        self.text(92, 92, title, size=42, weight=800, color=PALETTE["ink"], max_units=44)
+        self.text(92, 92, title, size=36, weight=800, color=PALETTE["ink"], max_units=52)
         if subtitle:
-            self.text(92, 148, subtitle, size=23, color=PALETTE["muted"], max_units=98)
-        self.line(92, 188, self.w - 92, 188, PALETTE["line"], 2)
+            self.text(92, 146, subtitle, size=20, color=PALETTE["muted"], max_units=112)
+        self.text(self.w - 92, 92, STYLE_STANDARD, size=16, color=PALETTE["muted"], anchor="end", max_units=34)
+        self.line(92, 188, self.w - 92, 188, PALETTE["line"], 1.2)
 
     def raw(self, value: str) -> None:
         self.items.append(value)
@@ -142,8 +144,8 @@ class Svg:
         y1: float,
         x2: float,
         y2: float,
-        color: str = "#475569",
-        width: float = 3,
+        color: str = "#4b5563",
+        width: float = 1.8,
         dashed: bool = False,
         arrow: bool = False,
     ) -> None:
@@ -162,14 +164,13 @@ class Svg:
         h: float,
         fill: str = "#ffffff",
         stroke: str = PALETTE["line"],
-        radius: int = 18,
-        width: int = 2,
+        radius: int = 8,
+        width: float = 1.2,
         shadow: bool = False,
     ) -> None:
-        filt = ' filter="url(#shadow)"' if shadow else ""
         self.items.append(
             f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" '
-            f'rx="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="{width}"{filt}/>'
+            f'rx="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="{width}"/>'
         )
 
     def diamond(
@@ -189,7 +190,7 @@ class Svg:
         ]
         path = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
         self.items.append(
-            f'<polygon points="{path}" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
+            f'<polygon points="{path}" fill="{fill}" stroke="{stroke}" stroke-width="1.4"/>'
         )
 
     def circle(self, cx: float, cy: float, r: float, fill: str, stroke: str = "none") -> None:
@@ -232,18 +233,18 @@ class Svg:
         stroke: str = PALETTE["line"],
         title_color: str = PALETTE["ink"],
         body_color: str = PALETTE["muted"],
-        title_size: int = 25,
-        body_size: int = 20,
+        title_size: int = 22,
+        body_size: int = 18,
         max_units: int = 24,
     ) -> None:
-        self.rect(x, y, w, h, fill=fill, stroke=stroke, radius=20, shadow=True)
-        self.text(x + 28, y + 42, title, size=title_size, weight=800, color=title_color, max_units=max_units)
+        self.rect(x, y, w, h, fill=fill, stroke=stroke, radius=8, width=1.2)
+        self.text(x + 24, y + 40, title, size=title_size, weight=800, color=title_color, max_units=max_units)
         if body:
-            self.text(x + 28, y + 82, body, size=body_size, color=body_color, max_units=max_units)
+            self.text(x + 24, y + 78, body, size=body_size, color=body_color, max_units=max_units)
 
     def footer(self, source: str) -> None:
         self.line(92, self.h - 82, self.w - 92, self.h - 82, PALETTE["line"], 1)
-        self.text(92, self.h - 42, source, size=18, color=PALETTE["muted"], max_units=130)
+        self.text(92, self.h - 43, source, size=16, color=PALETTE["muted"], max_units=138)
 
     def save(self, path: Path, source: str = "") -> None:
         if source:
@@ -305,12 +306,12 @@ def arrow_between(svg: Svg, x1: float, y1: float, x2: float, y2: float, dashed: 
 
 
 def draw_pill(svg: Svg, x: float, y: float, text: str, fill: str, color: str, w: float = 210) -> None:
-    svg.rect(x, y, w, 48, fill=fill, stroke=fill, radius=24, width=1)
+    svg.rect(x, y, w, 44, fill=fill, stroke=color, radius=8, width=1)
     svg.text(x + w / 2, y + 31, text, size=20, color=color, weight=800, anchor="middle", max_units=16)
 
 
 def fig_01(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "把输入、核心任务、约束、输出、验证和提交材料拆开讲清楚。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "把输入、核心任务、约束、输出、验证和提交材料拆开讲清楚。")
     boxes = [
         ("输入", "中文选股需求\nFinDSL 表达式\nLLM/Provider 候选", PALETTE["blue_soft"], PALETTE["blue"]),
         ("核心任务", "Lexer/Parser\nTyped AST\nSemantic Validation\nSQL Plan -> Doris SQL", PALETTE["teal_soft"], PALETTE["teal"]),
@@ -346,7 +347,7 @@ def fig_01(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_02(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "端到端展示从需求输入到 SQL、验证、Doris evidence 和交付输出的闭环。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "端到端展示从需求输入到 SQL、验证、Doris evidence 和交付输出的闭环。")
     nodes = [
         ("中文需求 / DSL", "用户输入、官方样例、LLM 候选"),
         ("候选治理", "NL2DSL 模板\nLLM candidate extraction"),
@@ -395,7 +396,7 @@ def fig_02(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_03(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "分层展示入口、输入适配、编译内核、配置数据、验证执行和提交证据。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "分层展示入口、输入适配、编译内核、配置数据、验证执行和提交证据。")
     layers = [
         ("评审入口层", ["CLI", "Web Demo", "JSON API", "README / docs / 图表证据"], PALETTE["blue_soft"], PALETTE["blue"]),
         ("输入适配层", ["NL2DSL", "LLM candidate validator", "official examples", "diagnostics"], PALETTE["amber_soft"], PALETTE["amber"]),
@@ -423,7 +424,7 @@ def fig_03(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_04(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "仅保留核心调用链，避免全量函数图过密。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "仅保留核心调用链，避免全量函数图过密。")
     svg.label_box(920, 270, 560, 160, "src/findsl/cli.py", "compile / verify-sql / official-suite / serve-demo / readiness-report", fill=PALETTE["blue_soft"], stroke=PALETTE["blue"], title_color=PALETTE["blue"], max_units=30)
     chains = [
         (260, 560, "编译链路", "Compiler.compile\nparse -> semantic.validate\nSqlGenerator.generate\nvalidate_doris_select_sql", PALETTE["teal_soft"], PALETTE["teal"]),
@@ -441,7 +442,7 @@ def fig_04(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_05(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "按人工验收顺序组织，旁边标出对应截图证据编号。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "按人工验收顺序组织，旁边标出对应截图证据编号。")
     steps = [
         ("1", "Git 状态", "Git HEAD / status / log\nEV-008~EV-010"),
         ("2", "环境依赖", "Python / pip / Git / Node\nEV-011~EV-012"),
@@ -477,7 +478,7 @@ def fig_05(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_06(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "确定性编译内核：错误在编译期诊断，成功路径输出可审计 SQL。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "确定性编译内核：错误在编译期诊断，成功路径输出可审计 SQL。")
     nodes = [
         ("FinDSL 输入", 'then(filter(...), rank(...))'),
         ("Lexer", "生成 token\n捕获 LEX_ERROR"),
@@ -507,7 +508,7 @@ def fig_06(spec: FigureSpec, m: dict) -> Path:
 
 def fig_07(spec: FigureSpec, m: dict) -> Path:
     doris = m["doris"]
-    svg = Svg(spec.title, "长窗口滚动 SUM 的性能亮点：有条件改写，有回退，有行数一致性验证。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "长窗口滚动 SUM 的性能亮点：有条件改写，有回退，有行数一致性验证。")
     svg.label_box(150, 280, 500, 190, "输入表达式", 'SUM(indicator("volume"), 120)\n阈值 > 1000000', fill=PALETTE["blue_soft"], stroke=PALETTE["blue"], title_color=PALETTE["blue"], max_units=25)
     svg.diamond(900, 380, 360, 190, fill=PALETTE["amber_soft"], stroke=PALETTE["amber"])
     svg.text(900, 370, "指标支持 prefix_sum？", size=24, weight=800, color=PALETTE["amber"], anchor="middle", max_units=16)
@@ -530,7 +531,7 @@ def fig_07(spec: FigureSpec, m: dict) -> Path:
 
 def fig_08(spec: FigureSpec, m: dict) -> Path:
     doris = m["doris"]
-    svg = Svg(spec.title, "左右对比 EXPLAIN 摘要，说明性能差异来自执行计划结构变化。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "左右对比 EXPLAIN 摘要，说明性能差异来自执行计划结构变化。")
     svg.label_box(130, 270, 980, 860, "Baseline window plan", "VOlapScanNode(dwd_stock_daily_quote)\ncardinality=5,000,000\n-> VSORT by ts_code, trade_date\n-> VANALYTIC sum(volume)\nROWS BETWEEN 119 PRECEDING AND CURRENT ROW\n-> predicate __win_1 > 1000000\n\n特点：运行时计算长窗口，包含排序与 analytic window。", fill=PALETTE["orange_soft"], stroke=PALETTE["orange"], title_color=PALETTE["orange"], max_units=44)
     svg.label_box(1290, 270, 980, 860, "Optimized prefix-sum plan", "VOlapScanNode(dwd_stock_daily_quote_prefix)\npredicate volume_sum_120 > 1000000\n-> VHASH JOIN(COLOCATE)\nwith dwd_stock_daily_quote\n-> output rows\n\n特点：直接读取 prefix/hot-window 列，避免运行时窗口聚合。", fill=PALETTE["teal_soft"], stroke=PALETTE["teal"], title_color=PALETTE["teal"], max_units=44)
     svg.line(1190, 280, 1190, 1140, color=PALETTE["line"], width=4, dashed=True)
@@ -546,7 +547,7 @@ def fig_08(spec: FigureSpec, m: dict) -> Path:
 
 def fig_09(spec: FigureSpec, m: dict) -> Path:
     d = m["doris"]
-    svg = Svg(spec.title, "真实 Doris evidence：baseline window 与 optimized prefix-sum 的 Avg/P95 延迟对比。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "真实 Doris evidence：baseline window 与 optimized prefix-sum 的 Avg/P95 延迟对比。")
     chart_x, chart_y, chart_w, chart_h = 220, 330, 1280, 720
     values = [
         ("Avg execute ms", d["baseline"]["avg_execute_ms"], d["optimized"]["avg_execute_ms"]),
@@ -594,7 +595,7 @@ def fig_09(spec: FigureSpec, m: dict) -> Path:
 
 def fig_10(spec: FigureSpec, m: dict) -> Path:
     md = m["metadata"]
-    svg = Svg(spec.title, "使用本轮刷新后的 evidence_metadata.json，一页展示关键门禁。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "使用本轮刷新后的 evidence_metadata.json，一页展示关键门禁。")
     cards = [
         ("Blocking gates", "PASS" if md["readiness"]["blocking_gates_passed"] else "CHECK", PALETTE["green"]),
         ("Warning count", str(md["readiness"]["warning_count"]), PALETTE["green"]),
@@ -630,7 +631,7 @@ def fig_10(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_11(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "如实保留 partial 与 needs_evidence，避免把待补证据包装成满分结果。", height=1750)
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "如实保留 partial 与 needs_evidence，避免把待补证据包装成满分结果。", height=1850)
     items = m["topic_items"]
     x0, y0 = 90, 260
     widths = [160, 520, 210, 700, 610]
@@ -665,16 +666,16 @@ def fig_11(spec: FigureSpec, m: dict) -> Path:
                 svg.text(x + 16, y + 36, cell, size=17, color=PALETTE["ink"], max_units=max_units, line_height=1.18)
             x += w
     summary = m["topic_summary"]
-    draw_pill(svg, 180, 1545, f"implemented {summary['implemented']}", PALETTE["green_soft"], PALETTE["green"], 270)
-    draw_pill(svg, 490, 1545, f"partial {summary['partial']}", PALETTE["amber_soft"], PALETTE["amber"], 230)
-    draw_pill(svg, 760, 1545, f"needs_evidence {summary['needs_evidence']}", PALETTE["red_soft"], PALETTE["red"], 310)
+    draw_pill(svg, 180, 1628, f"implemented {summary['implemented']}", PALETTE["green_soft"], PALETTE["green"], 270)
+    draw_pill(svg, 490, 1628, f"partial {summary['partial']}", PALETTE["amber_soft"], PALETTE["amber"], 230)
+    draw_pill(svg, 760, 1628, f"needs_evidence {summary['needs_evidence']}", PALETTE["red_soft"], PALETTE["red"], 310)
     path = FIGURE_DIR / FIG_DIRS[spec.category] / f"{spec.filename}.svg"
     svg.save(path, "数据源：reports/topic_19_compliance_plan.md（本轮重新运行 topic-compliance 生成）。")
     return path
 
 
 def fig_12(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "金融数据场景下，大模型只做候选生成，不能绕过编译和验证。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "金融数据场景下，大模型只做候选生成，不能绕过编译和验证。")
     svg.label_box(120, 310, 440, 220, "中文需求", "例如：近3日成交量累计大于300", fill=PALETTE["blue_soft"], stroke=PALETTE["blue"], title_color=PALETTE["blue"], max_units=22)
     svg.label_box(720, 220, 440, 210, "模板 NL2DSL", "稳定样例路径\n本地可复现", fill=PALETTE["teal_soft"], stroke=PALETTE["teal"], title_color=PALETTE["teal"], max_units=22)
     svg.label_box(720, 520, 440, 230, "LLM Provider", "OpenAI-compatible\n只返回 DSL candidate\n保存原始响应", fill=PALETTE["purple_soft"], stroke=PALETTE["purple"], title_color=PALETTE["purple"], max_units=22)
@@ -692,7 +693,7 @@ def fig_12(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_13(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "业务规则配置化进入注册表，再被语义、SQL、reference 和测试共同消费。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "业务规则配置化进入注册表，再被语义、SQL、reference 和测试共同消费。")
     configs = ["configs/indicators.json", "configs/functions.json", "configs/tables.json"]
     for i, name in enumerate(configs):
         svg.label_box(140, 300 + i * 190, 540, 130, name, "业务元数据 / 模板 / 表映射", fill=PALETTE["blue_soft"], stroke=PALETTE["blue"], title_color=PALETTE["blue"], max_units=26)
@@ -717,7 +718,7 @@ def fig_13(spec: FigureSpec, m: dict) -> Path:
 
 def fig_14(spec: FigureSpec, m: dict) -> Path:
     d = m["doris"]
-    svg = Svg(spec.title, "展示从 Doris SQL assets 到 evidence_summary 的性能证据链。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "展示从 Doris SQL assets 到 evidence_summary 的性能证据链。")
     nodes = [
         ("01_schema.sql", "建 base/prefix 表\ntrade_date auto partitions"),
         ("02_sample_data / scale CSV", "加载行情数据\n5,000,000 EXPLAIN cardinality"),
@@ -741,7 +742,7 @@ def fig_14(spec: FigureSpec, m: dict) -> Path:
 
 
 def fig_15(spec: FigureSpec, m: dict) -> Path:
-    svg = Svg(spec.title, "把 Web Demo 页面区域与真实截图编号对应起来，便于答辩快速定位。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "把 Web Demo 页面区域与真实截图编号对应起来，便于答辩快速定位。")
     svg.rect(150, 260, 2100, 950, fill=PALETTE["soft"], stroke=PALETTE["line"], radius=28, shadow=True)
     svg.label_box(220, 340, 720, 720, "Workbench", "Natural language 输入\nSuggest DSL\ncandidate list\nSample 下拉框\nDSL 输入框\nPrefix/Verify 开关\nRun analysis", fill="#ffffff", stroke=PALETTE["blue"], title_color=PALETTE["blue"], max_units=32)
     svg.label_box(1040, 340, 1070, 220, "Result Metrics", "verification / compile latency / SQL rows / optimizer / dataset\n证据：EV-041 主界面，EV-042 参数区", fill="#ffffff", stroke=PALETTE["teal"], title_color=PALETTE["teal"], max_units=52)
@@ -765,7 +766,7 @@ def fig_15(spec: FigureSpec, m: dict) -> Path:
 
 def fig_16(spec: FigureSpec, m: dict) -> Path:
     vs = m["visual_summary"]
-    svg = Svg(spec.title, "用目录树说明最终交付件在哪里、分别证明什么。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "用目录树说明最终交付件在哪里、分别证明什么。")
     rows = [
         ("README.md / PROJECT_INDEX.md", "项目简介、运行入口、文件索引"),
         ("src/", "编译器、SQL 生成、验证、Demo 后端"),
@@ -794,7 +795,7 @@ def fig_16(spec: FigureSpec, m: dict) -> Path:
 
 def fig_17(spec: FigureSpec, m: dict) -> Path:
     d = m["doris"]
-    svg = Svg(spec.title, "把业务真实样本和规模性能证据分开讲，避免数据口径混淆。")
+    svg = Svg(f"{spec.fig_id}  {spec.title}", "把业务真实样本和规模性能证据分开讲，避免数据口径混淆。")
     svg.label_box(160, 310, 2100, 320, "业务可信度泳道", "Eastmoney public historical K-line -> 贵州茅台 / 平安银行真实 A 股字段 -> real market sample cases 3/3 -> Web Demo 真实行情展示\n结论边界：用于证明字段、日期、A 股代码和验证流程贴近真实业务，不用于 5M 性能结论。", fill=PALETTE["blue_soft"], stroke=PALETTE["blue"], title_color=PALETTE["blue"], max_units=98)
     svg.label_box(160, 760, 2100, 320, "性能可信度泳道", f"deterministic synthetic A-share-style scale data -> Doris 5,000,000 cardinality -> baseline vs prefix-sum -> speedup {d['speedup']:.2f}x\n结论边界：用于证明长窗口 prefix-sum 在 Doris 集群上的性能收益，不声称它是真实行情原始全量数据。", fill=PALETTE["teal_soft"], stroke=PALETTE["teal"], title_color=PALETTE["teal"], max_units=98)
     svg.line(250, 700, 2150, 700, color=PALETTE["line"], width=4, dashed=True)
@@ -935,6 +936,10 @@ def write_index(m: dict, outputs: list[tuple[FigureSpec, Path, Path]]) -> None:
     lines.append(f"最新 official suite：正例 `{md['official_suite']['positive']['passed']}/{md['official_suite']['positive']['total']}`，负例 `{md['official_suite']['negative']['passed']}/{md['official_suite']['negative']['total']}`")
     lines.append(f"Doris evidence：`{d['generated_at']}` 生成，最新 export/readiness 已核验为 PASS；本轮未现场重跑 Doris latency。")
     lines.append("")
+    lines.append("## 科研绘图规范")
+    lines.append("")
+    lines.append(f"本批图表按 `{STYLE_STANDARD}` 重新生成。执行标准包括：白底、矢量优先、PNG 300dpi 元数据、Okabe-Ito 风格色盲安全配色、低饱和辅助底色、无 3D/饼图/彩虹色/装饰渐变、细线框、统一图号图题、脚注标注数据源。流程图和架构图属于机制示意图；FIG-09、FIG-10、FIG-11 等含指标图只使用最新 evidence 文件中的真实数据。")
+    lines.append("")
     lines.append("## 图表总表")
     lines.append("")
     lines.append("| 图号 | 图名 | 类型 | 必须/建议 | 所属目录 | SVG | PNG | 数据来源 | 证明什么 |")
@@ -963,6 +968,16 @@ def write_index(m: dict, outputs: list[tuple[FigureSpec, Path, Path]]) -> None:
         "generated_at": m["generated_at_local"],
         "metadata_generated_at": md["generated_at"],
         "git_head_at_export": md["git"]["head_at_export"],
+        "style_standard": STYLE_STANDARD,
+        "style_rules": [
+            "white background",
+            "vector-first SVG",
+            "300 dpi PNG metadata",
+            "Okabe-Ito inspired colorblind-safe palette",
+            "low-saturation fills",
+            "thin strokes and no drop shadows",
+            "explicit figure id, data source, and evidence boundary",
+        ],
         "pytest": md["readiness"]["pytest"],
         "official_suite": md["official_suite"],
         "doris": {

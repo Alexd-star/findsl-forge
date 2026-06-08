@@ -1,7 +1,17 @@
 {
-  "generated_at": "2026-06-08T21:21:12+08:00",
+  "generated_at": "2026-06-08T21:59:26+08:00",
   "metadata_generated_at": "2026-06-08T13:04:31Z",
   "git_head_at_export": "4f7efdc",
+  "style_standard": "SciPilot/Nature-inspired publication style v2",
+  "style_rules": [
+    "white background",
+    "vector-first SVG",
+    "300 dpi PNG metadata",
+    "Okabe-Ito inspired colorblind-safe palette",
+    "low-saturation fills",
+    "thin strokes and no drop shadows",
+    "explicit figure id, data source, and evidence boundary"
+  ],
   "pytest": {
     "passed": 203,
     "elapsed_seconds": 17.61

@@ -1,71 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="NL2DSL 与 LLM 安全边界图">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="FIG-12  NL2DSL 与 LLM 安全边界图">
 <rect x="0" y="0" width="2400" height="1500" fill="#ffffff"/>
-<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/></filter></defs>
-<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="92.0" dy="0.0">NL2DSL 与 LLM 安全边界图</tspan>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#4b5563"/></marker></defs>
+<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="92.0" dy="0.0">FIG-12  NL2DSL 与 LLM 安全边界图</tspan>
 </text>
-<text x="92.0" y="148.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">
+<text x="92.0" y="146.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">金融数据场景下，大模型只做候选生成，不能绕过编译和验证。</tspan>
 </text>
-<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
-<rect x="120.0" y="310.0" width="440.0" height="220.0" rx="20" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
-<text x="148.0" y="352.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#2563eb" text-anchor="start">
-<tspan x="148.0" dy="0.0">中文需求</tspan>
+<text x="2308.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="end">
+<tspan x="2308.0" dy="0.0">SciPilot/Nature-inspired publication style v2</tspan>
 </text>
-<text x="148.0" y="392.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="148.0" dy="0.0">例如：近3日成交量累计大于300</tspan>
+<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#b8c0cc" stroke-width="1.2" stroke-linecap="round"/>
+<rect x="120.0" y="310.0" width="440.0" height="220.0" rx="8" fill="#edf6fb" stroke="#0072B2" stroke-width="1.2"/>
+<text x="144.0" y="350.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#0072B2" text-anchor="start">
+<tspan x="144.0" dy="0.0">中文需求</tspan>
 </text>
-<rect x="720.0" y="220.0" width="440.0" height="210.0" rx="20" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
-<text x="748.0" y="262.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#0f766e" text-anchor="start">
-<tspan x="748.0" dy="0.0">模板 NL2DSL</tspan>
+<text x="144.0" y="388.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="144.0" dy="0.0">例如：近3日成交量累计大于300</tspan>
 </text>
-<text x="748.0" y="302.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="748.0" dy="0.0">稳定样例路径</tspan>
-<tspan x="748.0" dy="27.0">本地可复现</tspan>
+<rect x="720.0" y="220.0" width="440.0" height="210.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="744.0" y="260.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="744.0" dy="0.0">模板 NL2DSL</tspan>
 </text>
-<rect x="720.0" y="520.0" width="440.0" height="230.0" rx="20" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" filter="url(#shadow)"/>
-<text x="748.0" y="562.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#7c3aed" text-anchor="start">
-<tspan x="748.0" dy="0.0">LLM Provider</tspan>
+<text x="744.0" y="298.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="744.0" dy="0.0">稳定样例路径</tspan>
+<tspan x="744.0" dy="24.3">本地可复现</tspan>
 </text>
-<text x="748.0" y="602.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="748.0" dy="0.0">OpenAI-compatible</tspan>
-<tspan x="748.0" dy="27.0">只返回 DSL candidate</tspan>
-<tspan x="748.0" dy="27.0">保存原始响应</tspan>
+<rect x="720.0" y="520.0" width="440.0" height="230.0" rx="8" fill="#fbf1f7" stroke="#CC79A7" stroke-width="1.2"/>
+<text x="744.0" y="560.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#CC79A7" text-anchor="start">
+<tspan x="744.0" dy="0.0">LLM Provider</tspan>
 </text>
-<rect x="1320.0" y="360.0" width="440.0" height="270.0" rx="20" fill="#fef3c7" stroke="#b45309" stroke-width="2" filter="url(#shadow)"/>
-<text x="1348.0" y="402.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#b45309" text-anchor="start">
-<tspan x="1348.0" dy="0.0">安全闸门</tspan>
+<text x="744.0" y="598.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="744.0" dy="0.0">OpenAI-compatible</tspan>
+<tspan x="744.0" dy="24.3">只返回 DSL candidate</tspan>
+<tspan x="744.0" dy="24.3">保存原始响应</tspan>
 </text>
-<text x="1348.0" y="442.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1348.0" dy="0.0">extract candidates</tspan>
-<tspan x="1348.0" dy="27.0">reject direct SQL</tspan>
-<tspan x="1348.0" dy="27.0">compile + semantic</tspan>
-<tspan x="1348.0" dy="27.0">SQL/reference equivalence</tspan>
+<rect x="1320.0" y="360.0" width="440.0" height="270.0" rx="8" fill="#fff8e8" stroke="#E69F00" stroke-width="1.2"/>
+<text x="1344.0" y="400.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#E69F00" text-anchor="start">
+<tspan x="1344.0" dy="0.0">安全闸门</tspan>
 </text>
-<rect x="1900.0" y="390.0" width="360.0" height="220.0" rx="20" fill="#dcfce7" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
-<text x="1928.0" y="432.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#15803d" text-anchor="start">
-<tspan x="1928.0" dy="0.0">受控输出</tspan>
+<text x="1344.0" y="438.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1344.0" dy="0.0">extract candidates</tspan>
+<tspan x="1344.0" dy="24.3">reject direct SQL</tspan>
+<tspan x="1344.0" dy="24.3">compile + semantic</tspan>
+<tspan x="1344.0" dy="24.3">SQL/reference equivalence</tspan>
 </text>
-<text x="1928.0" y="472.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="1928.0" dy="0.0">validated DSL</tspan>
-<tspan x="1928.0" dy="27.0">Doris SQL</tspan>
-<tspan x="1928.0" dy="27.0">repair hints</tspan>
+<rect x="1900.0" y="390.0" width="360.0" height="220.0" rx="8" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="1924.0" y="430.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#009E73" text-anchor="start">
+<tspan x="1924.0" dy="0.0">受控输出</tspan>
+</text>
+<text x="1924.0" y="468.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="1924.0" dy="0.0">validated DSL</tspan>
+<tspan x="1924.0" dy="24.3">Doris SQL</tspan>
+<tspan x="1924.0" dy="24.3">repair hints</tspan>
 </text>
 <line x1="560.0" y1="420.0" x2="720.0" y2="325.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
 <line x1="560.0" y1="420.0" x2="720.0" y2="635.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
 <line x1="1160.0" y1="325.0" x2="1320.0" y2="455.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
 <line x1="1160.0" y1="635.0" x2="1320.0" y2="495.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
 <line x1="1760.0" y1="495.0" x2="1900.0" y2="495.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="340.0" y="870.0" width="1720.0" height="230.0" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
-<text x="368.0" y="912.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="368.0" dy="0.0">最新 safety smoke</tspan>
+<rect x="340.0" y="870.0" width="1720.0" height="230.0" rx="8" fill="#ffffff" stroke="#b8c0cc" stroke-width="1.2"/>
+<text x="364.0" y="910.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="22" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="364.0" dy="0.0">最新 safety smoke</tspan>
 </text>
-<text x="368.0" y="952.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
-<tspan x="368.0" dy="0.0">accepted candidates=1；rejected candidates=2；rejected diagnostic codes=UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL。答辩时强调：AI 可以提升入口体验，但最终执行权在</tspan>
-<tspan x="368.0" dy="27.0"> deterministic compiler 和 reference verifier。</tspan>
+<text x="364.0" y="948.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
+<tspan x="364.0" dy="0.0">accepted candidates=1；rejected candidates=2；rejected diagnostic codes=UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL。答辩时强调：AI 可以提升入口体验，但最终执行权在</tspan>
+<tspan x="364.0" dy="24.3"> deterministic compiler 和 reference verifier。</tspan>
 </text>
-<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-<text x="92.0" y="1458.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748b" text-anchor="start">
+<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>
+<text x="92.0" y="1457.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">数据源：reports/submission_readiness.md，src/findsl/llm_adapter.py，src/findsl/llm_provider.py。</tspan>
 </text>
 </svg>

@@ -1,152 +1,155 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="项目总体架构图">
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="FIG-03  项目总体架构图">
 <rect x="0" y="0" width="2400" height="1500" fill="#ffffff"/>
-<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/></filter></defs>
-<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#172033" text-anchor="start">
-<tspan x="92.0" dy="0.0">项目总体架构图</tspan>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#4b5563"/></marker></defs>
+<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="36" font-weight="800" fill="#111827" text-anchor="start">
+<tspan x="92.0" dy="0.0">FIG-03  项目总体架构图</tspan>
 </text>
-<text x="92.0" y="148.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">
+<text x="92.0" y="146.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">分层展示入口、输入适配、编译内核、配置数据、验证执行和提交证据。</tspan>
 </text>
-<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
-<rect x="120.0" y="250.0" width="2160.0" height="136.0" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
-<text x="155.0" y="308.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#2563eb" text-anchor="start">
+<text x="2308.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="end">
+<tspan x="2308.0" dy="0.0">SciPilot/Nature-inspired publication style v2</tspan>
+</text>
+<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#b8c0cc" stroke-width="1.2" stroke-linecap="round"/>
+<rect x="120.0" y="250.0" width="2160.0" height="136.0" rx="18" fill="#edf6fb" stroke="#0072B2" stroke-width="1.2"/>
+<text x="155.0" y="308.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#0072B2" text-anchor="start">
 <tspan x="155.0" dy="0.0">评审入口层</tspan>
 </text>
-<rect x="500.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
-<text x="625.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="500.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0072B2" stroke-width="1"/>
+<text x="625.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="625.0" dy="0.0">CLI</tspan>
 </text>
-<rect x="778.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
-<text x="903.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="778.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0072B2" stroke-width="1"/>
+<text x="903.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="903.0" dy="0.0">Web Demo</tspan>
 </text>
-<rect x="1056.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
-<text x="1181.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1056.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0072B2" stroke-width="1"/>
+<text x="1181.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1181.0" dy="0.0">JSON API</tspan>
 </text>
-<rect x="1334.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="1"/>
-<text x="1459.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1334.0" y="288.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0072B2" stroke-width="1"/>
+<text x="1459.0" y="327.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1459.0" dy="0.0">README / docs / 图表证据</tspan>
 </text>
 <line x1="1200.0" y1="392.0" x2="1200.0" y2="420.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="120.0" y="425.0" width="2160.0" height="136.0" rx="18" fill="#fef3c7" stroke="#b45309" stroke-width="2" filter="url(#shadow)"/>
-<text x="155.0" y="483.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#b45309" text-anchor="start">
+<rect x="120.0" y="425.0" width="2160.0" height="136.0" rx="18" fill="#fff8e8" stroke="#E69F00" stroke-width="1.2"/>
+<text x="155.0" y="483.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#E69F00" text-anchor="start">
 <tspan x="155.0" dy="0.0">输入适配层</tspan>
 </text>
-<rect x="500.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#b45309" stroke-width="1"/>
-<text x="625.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="500.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#E69F00" stroke-width="1"/>
+<text x="625.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="625.0" dy="0.0">NL2DSL</tspan>
 </text>
-<rect x="778.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#b45309" stroke-width="1"/>
-<text x="903.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="778.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#E69F00" stroke-width="1"/>
+<text x="903.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="903.0" dy="0.0">LLM candidate validator</tspan>
 </text>
-<rect x="1056.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#b45309" stroke-width="1"/>
-<text x="1181.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1056.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#E69F00" stroke-width="1"/>
+<text x="1181.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1181.0" dy="0.0">official examples</tspan>
 </text>
-<rect x="1334.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#b45309" stroke-width="1"/>
-<text x="1459.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1334.0" y="463.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#E69F00" stroke-width="1"/>
+<text x="1459.0" y="502.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1459.0" dy="0.0">diagnostics</tspan>
 </text>
 <line x1="1200.0" y1="567.0" x2="1200.0" y2="595.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="120.0" y="600.0" width="2160.0" height="136.0" rx="18" fill="#ccfbf1" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
-<text x="155.0" y="658.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#0f766e" text-anchor="start">
+<rect x="120.0" y="600.0" width="2160.0" height="136.0" rx="18" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="155.0" y="658.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#009E73" text-anchor="start">
 <tspan x="155.0" dy="0.0">编译内核层</tspan>
 </text>
-<rect x="500.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0f766e" stroke-width="1"/>
-<text x="625.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="500.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="625.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="625.0" dy="0.0">lexer.py</tspan>
 </text>
-<rect x="778.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0f766e" stroke-width="1"/>
-<text x="903.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="778.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="903.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="903.0" dy="0.0">parser.py</tspan>
 </text>
-<rect x="1056.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0f766e" stroke-width="1"/>
-<text x="1181.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1056.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="1181.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1181.0" dy="0.0">ast_nodes.py</tspan>
 </text>
-<rect x="1334.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0f766e" stroke-width="1"/>
-<text x="1459.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1334.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="1459.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1459.0" dy="0.0">semantic.py</tspan>
 </text>
-<rect x="1612.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0f766e" stroke-width="1"/>
-<text x="1737.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1612.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="1737.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1737.0" dy="0.0">sqlgen.py</tspan>
 </text>
-<rect x="1890.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#0f766e" stroke-width="1"/>
-<text x="2015.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1890.0" y="638.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="2015.0" y="677.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="2015.0" dy="0.0">doris_sql.py</tspan>
 </text>
 <line x1="1200.0" y1="742.0" x2="1200.0" y2="770.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="120.0" y="775.0" width="2160.0" height="136.0" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" filter="url(#shadow)"/>
-<text x="155.0" y="833.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#7c3aed" text-anchor="start">
+<rect x="120.0" y="775.0" width="2160.0" height="136.0" rx="18" fill="#fbf1f7" stroke="#CC79A7" stroke-width="1.2"/>
+<text x="155.0" y="833.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#CC79A7" text-anchor="start">
 <tspan x="155.0" dy="0.0">配置与数据层</tspan>
 </text>
-<rect x="500.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="1"/>
-<text x="625.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="500.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#CC79A7" stroke-width="1"/>
+<text x="625.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="625.0" dy="0.0">configs/*.json</tspan>
 </text>
-<rect x="778.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="1"/>
-<text x="903.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="778.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#CC79A7" stroke-width="1"/>
+<text x="903.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="903.0" dy="0.0">data/samples</tspan>
 </text>
-<rect x="1056.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="1"/>
-<text x="1181.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1056.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#CC79A7" stroke-width="1"/>
+<text x="1181.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1181.0" dy="0.0">real_samples</tspan>
 </text>
-<rect x="1334.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="1"/>
-<text x="1459.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1334.0" y="813.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#CC79A7" stroke-width="1"/>
+<text x="1459.0" y="852.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1459.0" dy="0.0">deploy/doris</tspan>
 </text>
 <line x1="1200.0" y1="917.0" x2="1200.0" y2="945.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="120.0" y="950.0" width="2160.0" height="136.0" rx="18" fill="#dcfce7" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
-<text x="155.0" y="1008.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#15803d" text-anchor="start">
+<rect x="120.0" y="950.0" width="2160.0" height="136.0" rx="18" fill="#eef8f4" stroke="#009E73" stroke-width="1.2"/>
+<text x="155.0" y="1008.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#009E73" text-anchor="start">
 <tspan x="155.0" dy="0.0">验证执行层</tspan>
 </text>
-<rect x="500.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="1"/>
-<text x="625.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="500.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="625.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="625.0" dy="0.0">reference.py</tspan>
 </text>
-<rect x="778.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="1"/>
-<text x="903.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="778.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="903.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="903.0" dy="0.0">executor.py</tspan>
 </text>
-<rect x="1056.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="1"/>
-<text x="1181.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1056.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="1181.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1181.0" dy="0.0">equivalence.py</tspan>
 </text>
-<rect x="1334.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="1"/>
-<text x="1459.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1334.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="1459.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1459.0" dy="0.0">official_suite.py</tspan>
 </text>
-<rect x="1612.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#15803d" stroke-width="1"/>
-<text x="1737.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1612.0" y="988.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#009E73" stroke-width="1"/>
+<text x="1737.0" y="1027.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1737.0" dy="0.0">readiness.py</tspan>
 </text>
 <line x1="1200.0" y1="1092.0" x2="1200.0" y2="1120.0" stroke="#475569" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-<rect x="120.0" y="1125.0" width="2160.0" height="136.0" rx="18" fill="#f1f5f9" stroke="#172033" stroke-width="2" filter="url(#shadow)"/>
-<text x="155.0" y="1183.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#172033" text-anchor="start">
+<rect x="120.0" y="1125.0" width="2160.0" height="136.0" rx="18" fill="#f3f4f6" stroke="#111827" stroke-width="1.2"/>
+<text x="155.0" y="1183.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="28" font-weight="800" fill="#111827" text-anchor="start">
 <tspan x="155.0" dy="0.0">证据交付层</tspan>
 </text>
-<rect x="500.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#172033" stroke-width="1"/>
-<text x="625.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="500.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#111827" stroke-width="1"/>
+<text x="625.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="625.0" dy="0.0">evidence_snapshots</tspan>
 </text>
-<rect x="778.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#172033" stroke-width="1"/>
-<text x="903.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="778.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#111827" stroke-width="1"/>
+<text x="903.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="903.0" dy="0.0">visual_evidence</tspan>
 </text>
-<rect x="1056.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#172033" stroke-width="1"/>
-<text x="1181.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1056.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#111827" stroke-width="1"/>
+<text x="1181.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1181.0" dy="0.0">demo_screenshots</tspan>
 </text>
-<rect x="1334.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#172033" stroke-width="1"/>
-<text x="1459.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#172033" text-anchor="middle">
+<rect x="1334.0" y="1163.0" width="250.0" height="62.0" rx="14" fill="#ffffff" stroke="#111827" stroke-width="1"/>
+<text x="1459.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="19" font-weight="700" fill="#111827" text-anchor="middle">
 <tspan x="1459.0" dy="0.0">defense_video</tspan>
 </text>
-<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-<text x="92.0" y="1458.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748b" text-anchor="start">
+<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>
+<text x="92.0" y="1457.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="start">
 <tspan x="92.0" dy="0.0">数据源：PROJECT_INDEX.md，README.md，src/findsl/，configs/，submission_artifacts/。</tspan>
 </text>
 </svg>
