@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.074016pt" height="242.262pt" viewBox="0 0 518.074016 242.262" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-06-08T23:56:57.779956</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.9.4, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 242.262 
+L 518.074016 242.262 
+L 518.074016 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 133.76126 88.757028 
+C 135.406615 88.757028 136.984802 88.522256 138.148244 88.104419 
+C 139.311686 87.686581 139.965392 87.119792 139.965392 86.52888 
+C 139.965392 85.937968 139.311686 85.371179 138.148244 84.953341 
+C 136.984802 84.535504 135.406615 84.300732 133.76126 84.300732 
+C 132.115905 84.300732 130.537718 84.535504 129.374276 84.953341 
+C 128.210834 85.371179 127.557128 85.937968 127.557128 86.52888 
+C 127.557128 87.119792 128.210834 87.686581 129.374276 88.104419 
+C 130.537718 88.522256 132.115905 88.757028 133.76126 88.757028 
+z
+" clip-path="url(#p8844c946b8)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.55; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 133.76126 117.894348 
+C 135.406615 117.894348 136.984802 117.659576 138.148244 117.241739 
+C 139.311686 116.823901 139.965392 116.257112 139.965392 115.6662 
+C 139.965392 115.075288 139.311686 114.508499 138.148244 114.090661 
+C 136.984802 113.672824 135.406615 113.438052 133.76126 113.438052 
+C 132.115905 113.438052 130.537718 113.672824 129.374276 114.090661 
+C 128.210834 114.508499 127.557128 115.075288 127.557128 115.6662 
+C 127.557128 116.257112 128.210834 116.823901 129.374276 117.241739 
+C 130.537718 117.659576 132.115905 117.894348 133.76126 117.894348 
+z
+" clip-path="url(#p8844c946b8)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.55; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 133.76126 147.031668 
+C 135.406615 147.031668 136.984802 146.796896 138.148244 146.379059 
+C 139.311686 145.961221 139.965392 145.394432 139.965392 144.80352 
+C 139.965392 144.212608 139.311686 143.645819 138.148244 143.227981 
+C 136.984802 142.810144 135.406615 142.575372 133.76126 142.575372 
+C 132.115905 142.575372 130.537718 142.810144 129.374276 143.227981 
+C 128.210834 143.645819 127.557128 144.212608 127.557128 144.80352 
+C 127.557128 145.394432 128.210834 145.961221 129.374276 146.379059 
+C 130.537718 146.796896 132.115905 147.031668 133.76126 147.031668 
+z
+" clip-path="url(#p8844c946b8)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.55; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 362.836913 88.757028 
+C 364.482269 88.757028 366.060456 88.522256 367.223897 88.104419 
+C 368.387339 87.686581 369.041046 87.119792 369.041046 86.52888 
+C 369.041046 85.937968 368.387339 85.371179 367.223897 84.953341 
+C 366.060456 84.535504 364.482269 84.300732 362.836913 84.300732 
+C 361.191558 84.300732 359.613371 84.535504 358.449929 84.953341 
+C 357.286488 85.371179 356.632781 85.937968 356.632781 86.52888 
+C 356.632781 87.119792 357.286488 87.686581 358.449929 88.104419 
+C 359.613371 88.522256 361.191558 88.757028 362.836913 88.757028 
+z
+" clip-path="url(#p8844c946b8)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.55; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 362.836913 117.894348 
+C 364.482269 117.894348 366.060456 117.659576 367.223897 117.241739 
+C 368.387339 116.823901 369.041046 116.257112 369.041046 115.6662 
+C 369.041046 115.075288 368.387339 114.508499 367.223897 114.090661 
+C 366.060456 113.672824 364.482269 113.438052 362.836913 113.438052 
+C 361.191558 113.438052 359.613371 113.672824 358.449929 114.090661 
+C 357.286488 114.508499 356.632781 115.075288 356.632781 115.6662 
+C 356.632781 116.257112 357.286488 116.823901 358.449929 117.241739 
+C 359.613371 117.659576 361.191558 117.894348 362.836913 117.894348 
+z
+" clip-path="url(#p8844c946b8)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.55; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 362.836913 147.031668 
+C 364.482269 147.031668 366.060456 146.796896 367.223897 146.379059 
+C 368.387339 145.961221 369.041046 145.394432 369.041046 144.80352 
+C 369.041046 144.212608 368.387339 143.645819 367.223897 143.227981 
+C 366.060456 142.810144 364.482269 142.575372 362.836913 142.575372 
+C 361.191558 142.575372 359.613371 142.810144 358.449929 143.227981 
+C 357.286488 143.645819 356.632781 144.212608 356.632781 144.80352 
+C 356.632781 145.394432 357.286488 145.961221 358.449929 146.379059 
+C 359.613371 146.796896 361.191558 147.031668 362.836913 147.031668 
+z
+" clip-path="url(#p8844c946b8)" style="fill: #2364aa; stroke: #1c1c1c; stroke-width: 0.55; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 276.933543 165.37104 
+L 276.933543 69.38928 
+" clip-path="url(#p8844c946b8)" style="fill: none; stroke-dasharray: 2.6,1.3; stroke-dashoffset: 0; stroke: #b44848; stroke-width: 0.65"/>
+   </g>
+   <g id="text_1">
+    <text style="fill: #1c1c1c; font: 700 8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="2.52" y="37.22018" transform="rotate(-0 2.52 37.22018)">a</text>
+   </g>
+   <g id="text_2">
+    <text style="fill: #1c1c1c; font: 5.8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="152.850898" y="88.126146" transform="rotate(-0 152.850898 88.126146)">user text</text>
+   </g>
+   <g id="text_3">
+    <text style="fill: #1c1c1c; font: 5.8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="152.850898" y="117.263466" transform="rotate(-0 152.850898 117.263466)">LLM proposal</text>
+   </g>
+   <g id="text_4">
+    <text style="fill: #1c1c1c; font: 5.8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="152.850898" y="146.400786" transform="rotate(-0 152.850898 146.400786)">candidate DSL</text>
+   </g>
+   <g id="text_5">
+    <text style="fill: #1c1c1c; font: 5.8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="381.926551" y="88.126146" transform="rotate(-0 381.926551 88.126146)">compiler</text>
+   </g>
+   <g id="text_6">
+    <text style="fill: #1c1c1c; font: 5.8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="381.926551" y="117.263466" transform="rotate(-0 381.926551 117.263466)">reference oracle</text>
+   </g>
+   <g id="text_7">
+    <text style="fill: #1c1c1c; font: 5.8px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="381.926551" y="146.400786" transform="rotate(-0 381.926551 146.400786)">safe SQL</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 210.119811 86.52888 
+Q 276.933543 86.52888 343.020553 86.52888 
+" style="fill: none; stroke: #1c1c1c; stroke-width: 0.65; stroke-linecap: round"/>
+    <path d="M 340.220553 85.12888 
+L 343.020553 86.52888 
+L 340.220553 87.92888 
+z
+" style="fill: #1c1c1c; stroke: #1c1c1c; stroke-width: 0.65; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 210.119811 115.6662 
+Q 276.933543 115.6662 343.020553 115.6662 
+" style="fill: none; stroke: #1c1c1c; stroke-width: 0.65; stroke-linecap: round"/>
+    <path d="M 340.220553 114.2662 
+L 343.020553 115.6662 
+L 340.220553 117.0662 
+z
+" style="fill: #1c1c1c; stroke: #1c1c1c; stroke-width: 0.65; stroke-linecap: round"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 210.119811 144.80352 
+Q 276.933543 144.80352 343.020553 144.80352 
+" style="fill: none; stroke: #1c1c1c; stroke-width: 0.65; stroke-linecap: round"/>
+    <path d="M 340.220553 143.40352 
+L 343.020553 144.80352 
+L 340.220553 146.20352 
+z
+" style="fill: #1c1c1c; stroke: #1c1c1c; stroke-width: 0.65; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <text style="fill: #b44848; font: 5.2px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: middle" x="276.933543" y="172.22688" transform="rotate(-0 276.933543 172.22688)">model output is untrusted</text>
+   </g>
+   <g id="text_9">
+    <text style="fill: #727272; font: 5.3px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="95.581984" y="187.65252" transform="rotate(-0 95.581984 187.65252)">direct SQL and unknown indicators are rejected before execution.</text>
+   </g>
+  </g>
+  <g id="text_10">
+   <text style="fill: #1c1c1c; font: 700 7.2px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="38.313071" y="8.528625" transform="rotate(-0 38.313071 8.528625)">FIG-12 | NL2DSL 与 LLM 安全边界</text>
+  </g>
+  <g id="text_11">
+   <text style="fill: #727272; font: 5.7px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="38.313071" y="15.770438" transform="rotate(-0 38.313071 15.770438)">LLM 只产生候选 DSL，执行权由编译器和验证器控制。</text>
+  </g>
+  <g id="text_12">
+   <text style="fill: #727272; font: 5px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: start" x="38.313071" y="238.465438" transform="rotate(-0 38.313071 238.465438)">Source: llm_adapter.py + readiness</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p8844c946b8">
+   <rect x="38.313071" y="38.538" width="477.240945" height="171.396"/>
+  </clipPath>
+ </defs>
+</svg>

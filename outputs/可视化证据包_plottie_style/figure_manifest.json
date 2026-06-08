@@ -1,0 +1,325 @@
+{
+  "generated_at": "2026-06-08T23:56:46+08:00",
+  "style_standard": "Plottie atlas mode v1 - chart-class separated scientific figures",
+  "git_head_now": "dbce457",
+  "metadata_generated_at": "2026-06-08T15:25:26Z",
+  "git_head_at_export": "7559e28",
+  "pytest": {
+    "passed": 203,
+    "elapsed_seconds": 13.11
+  },
+  "official_suite": {
+    "suite_passed": true,
+    "positive": {
+      "passed": 37,
+      "total": 37
+    },
+    "negative": {
+      "passed": 37,
+      "total": 37
+    }
+  },
+  "doris": {
+    "generated_at": "2026-05-23T15:11:26Z",
+    "speedup": 36.2398279300624,
+    "speedup_display": "36.24x",
+    "baseline_avg_execute_ms": 5182.042440000001,
+    "optimized_avg_execute_ms": 142.99302000000083,
+    "baseline_p95_execute_ms": 5461.01094,
+    "optimized_p95_execute_ms": 155.7155999999999,
+    "row_counts_match": true,
+    "note": "Doris latency was not re-measured in this figure generation run."
+  },
+  "references": [
+    {
+      "name": "Plottie scientific plot atlas",
+      "url": "https://plottie.art/"
+    },
+    {
+      "name": "Plottie collections",
+      "url": "https://plottie.art/collections"
+    },
+    {
+      "name": "Plottie palettes",
+      "url": "https://plottie.art/palette"
+    },
+    {
+      "name": "Plottie line plots",
+      "url": "https://plottie.art/plots/line-plots"
+    },
+    {
+      "name": "Plottie scatter plots",
+      "url": "https://plottie.art/plots/scatter-plots"
+    },
+    {
+      "name": "Plottie heatmaps",
+      "url": "https://plottie.art/plots/heatmaps"
+    },
+    {
+      "name": "Plottie volcano plots guide",
+      "url": "https://plottie.art/plots/volcano-plots"
+    },
+    {
+      "name": "Nature building and exporting panels",
+      "url": "https://research-figure-guide.nature.com/figures/building-and-exporting-figure-panels/"
+    },
+    {
+      "name": "Nature figure specifications",
+      "url": "https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/"
+    },
+    {
+      "name": "Matplotlib customizing and export",
+      "url": "https://matplotlib.org/stable/users/explain/customizing.html"
+    }
+  ],
+  "chart_class_audit": {
+    "flow": {
+      "plottie_reference": "Flowchart / schematic examples in Plottie collections",
+      "code_file": "scripts/plottie_figures/flow.py",
+      "rule": "用细线、短标签和单一主色表达过程，不用 UI 卡片、阴影或图标堆叠。"
+    },
+    "network": {
+      "plottie_reference": "Network and mechanism-style atlas examples",
+      "code_file": "scripts/plottie_figures/network.py",
+      "rule": "用节点、边和分层坐标表达依赖关系，直接标注，避免彩色系统大屏风格。"
+    },
+    "matrix": {
+      "plottie_reference": "Heatmap and matrix plot examples",
+      "code_file": "scripts/plottie_figures/matrices.py",
+      "rule": "状态、门禁和要求对应关系用矩阵/棒棒糖/紧凑表格表达，不做仪表盘。"
+    },
+    "performance": {
+      "plottie_reference": "Line/scatter/range plot examples",
+      "code_file": "scripts/plottie_figures/performance.py",
+      "rule": "延迟和加速比用 log-scale range/dot plot 表达，保留数据来源和未重测边界。"
+    },
+    "image_plate": {
+      "plottie_reference": "Image panel / multi-panel evidence layouts",
+      "code_file": "scripts/plottie_figures/image_plates.py",
+      "rule": "实际截图按 image plate 排版，只加细边框和 panel label，不合成假界面。"
+    }
+  },
+  "figures": [
+    {
+      "id": "FIG-01",
+      "title": "赛题任务拆解",
+      "chart_class": "flow",
+      "source": "README + topic compliance",
+      "proof": "赛题任务证据链",
+      "conclusion": "赛题任务可以被拆成输入、编译、验证、性能和交付五条证据线。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-01_topic_task_breakdown.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-01_topic_task_breakdown.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-01_topic_task_breakdown_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-01_topic_task_breakdown_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-01_topic_task_breakdown_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-02",
+      "title": "输入-处理-输出链路",
+      "chart_class": "flow",
+      "source": "README + compiler reports",
+      "proof": "端到端闭环",
+      "conclusion": "自然语言候选必须被确定性编译器和 reference oracle 复核后才能形成 Doris SQL。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-02_input_process_output_pipeline.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-02_input_process_output_pipeline.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-02_input_process_output_pipeline_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-02_input_process_output_pipeline_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-02_input_process_output_pipeline_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-03",
+      "title": "项目总体架构",
+      "chart_class": "network",
+      "source": "PROJECT_INDEX + src",
+      "proof": "系统分层架构",
+      "conclusion": "项目由入口、适配、编译、配置、验证和证据交付六层组成。",
+      "svg": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-03_system_architecture.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-03_system_architecture.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-03_system_architecture_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-03_system_architecture_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-03_system_architecture_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-04",
+      "title": "核心模块调用关系",
+      "chart_class": "network",
+      "source": "src/findsl",
+      "proof": "代码可追溯",
+      "conclusion": "CLI 把编译、验证、官方套件、Demo 和证据导出统一到同一链路。",
+      "svg": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-04_code_module_call_graph.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-04_code_module_call_graph.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-04_code_module_call_graph_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-04_code_module_call_graph_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-04_code_module_call_graph_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-05",
+      "title": "运行与人工核验流程",
+      "chart_class": "flow",
+      "source": "SCREENSHOT_EVIDENCE_INDEX",
+      "proof": "复现流程",
+      "conclusion": "验收应从环境、命令、测试、证据到提交状态逐层收口。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-05_operation_acceptance_flow.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-05_operation_acceptance_flow.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-05_operation_acceptance_flow_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-05_operation_acceptance_flow_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-05_operation_acceptance_flow_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-06",
+      "title": "DSL 编译核心算法",
+      "chart_class": "flow",
+      "source": "compiler.py + parser.py + semantic.py",
+      "proof": "核心算法",
+      "conclusion": "FinDSL 先形成 typed AST，再生成可验证的 Doris-safe SQL。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-06_dsl_compiler_algorithm.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-06_dsl_compiler_algorithm.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-06_dsl_compiler_algorithm_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-06_dsl_compiler_algorithm_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-06_dsl_compiler_algorithm_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-07",
+      "title": "Prefix-Sum 长窗口优化",
+      "chart_class": "flow",
+      "source": "sqlgen.py + Doris evidence",
+      "proof": "性能算法",
+      "conclusion": "滚动 SUM 在满足条件时可改写为 prefix-table 访问，并保留窗口函数回退路径。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-07_prefix_sum_optimization_flow.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-07_prefix_sum_optimization_flow.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-07_prefix_sum_optimization_flow_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-07_prefix_sum_optimization_flow_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-07_prefix_sum_optimization_flow_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-08",
+      "title": "Doris 执行计划差异",
+      "chart_class": "matrix",
+      "source": "doris_cluster_evidence",
+      "proof": "执行计划证据",
+      "conclusion": "优化路径把运行时窗口聚合替换为 prefix-table predicate 与 join。",
+      "svg": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-08_doris_plan_comparison.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-08_doris_plan_comparison.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-08_doris_plan_comparison_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-08_doris_plan_comparison_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-08_doris_plan_comparison_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-09",
+      "title": "Doris 延迟与加速比",
+      "chart_class": "performance",
+      "source": "doris_cluster_evidence.json",
+      "proof": "性能达标",
+      "conclusion": "冻结 Doris evidence 显示 prefix-sum 路径达到 36x 级延迟下降。",
+      "svg": "outputs\\可视化证据包_plottie_style\\04_性能图\\FIG-09_doris_latency_speedup.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\04_性能图\\FIG-09_doris_latency_speedup.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\04_性能图\\FIG-09_doris_latency_speedup_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\04_性能图\\FIG-09_doris_latency_speedup_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\04_性能图\\FIG-09_doris_latency_speedup_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-10",
+      "title": "测试验证结果",
+      "chart_class": "matrix",
+      "source": "evidence_metadata.json",
+      "proof": "门禁通过证据",
+      "conclusion": "最新证据显示 required gates 全通过，warning count 为 0。",
+      "svg": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-10_validation_matrix.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-10_validation_matrix.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-10_validation_matrix_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-10_validation_matrix_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-10_validation_matrix_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-11",
+      "title": "赛题要求-实现-证据矩阵",
+      "chart_class": "matrix",
+      "source": "topic_19_compliance_plan.md",
+      "proof": "符合性证据",
+      "conclusion": "已实现、部分实现和待补证据必须如实分开表达。",
+      "svg": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-11_requirement_implementation_evidence_matrix.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-11_requirement_implementation_evidence_matrix.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-11_requirement_implementation_evidence_matrix_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-11_requirement_implementation_evidence_matrix_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\03_矩阵与验证图\\FIG-11_requirement_implementation_evidence_matrix_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-12",
+      "title": "NL2DSL 与 LLM 安全边界",
+      "chart_class": "flow",
+      "source": "llm_adapter.py + readiness",
+      "proof": "AI 安全边界",
+      "conclusion": "LLM 只产生候选 DSL，执行权由编译器和验证器控制。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-12_llm_safety_boundary.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-12_llm_safety_boundary.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-12_llm_safety_boundary_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-12_llm_safety_boundary_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-12_llm_safety_boundary_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-13",
+      "title": "配置化扩展机制",
+      "chart_class": "network",
+      "source": "configs + registry",
+      "proof": "扩展机制",
+      "conclusion": "指标、函数和表配置通过 Registry 同时服务语义、SQL、reference 与测试。",
+      "svg": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-13_configurable_extension.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-13_configurable_extension.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-13_configurable_extension_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-13_configurable_extension_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-13_configurable_extension_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-14",
+      "title": "Doris 部署与数据流",
+      "chart_class": "flow",
+      "source": "deploy/doris + evidence",
+      "proof": "实验环境说明",
+      "conclusion": "Doris 证据从 DDL、prefix 表、采集脚本进入 evidence snapshot。",
+      "svg": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-14_doris_deployment_data_flow.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-14_doris_deployment_data_flow.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-14_doris_deployment_data_flow_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-14_doris_deployment_data_flow_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\01_流程与机制图\\FIG-14_doris_deployment_data_flow_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-15",
+      "title": "Web Demo 图像证据板",
+      "chart_class": "image_plate",
+      "source": "actual screenshots",
+      "proof": "界面证据",
+      "conclusion": "Demo 截图应作为真实图像证据板展示，不重绘、不伪造、不遮挡状态。",
+      "svg": "outputs\\可视化证据包_plottie_style\\05_界面证据图像板\\FIG-15_web_demo_image_plate.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\05_界面证据图像板\\FIG-15_web_demo_image_plate.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\05_界面证据图像板\\FIG-15_web_demo_image_plate_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\05_界面证据图像板\\FIG-15_web_demo_image_plate_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\05_界面证据图像板\\FIG-15_web_demo_image_plate_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-16",
+      "title": "结果与交付包结构",
+      "chart_class": "network",
+      "source": "PROJECT_INDEX + evidence_manifest",
+      "proof": "交付完整性",
+      "conclusion": "最终交付物围绕源码、配置、数据、测试、文档和 evidence snapshots 组织。",
+      "svg": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-16_delivery_package_map.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-16_delivery_package_map.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-16_delivery_package_map_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-16_delivery_package_map_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-16_delivery_package_map_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-17",
+      "title": "真实样本与规模证据边界",
+      "chart_class": "network",
+      "source": "real samples + Doris evidence",
+      "proof": "数据口径边界",
+      "conclusion": "真实行情样本证明语义可信性，5M Doris evidence 证明规模性能，两者不能混为同一数据集。",
+      "svg": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-17_real_sample_vs_scale_evidence.svg",
+      "pdf": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-17_real_sample_vs_scale_evidence.pdf",
+      "png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-17_real_sample_vs_scale_evidence_300dpi.png",
+      "tiff": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-17_real_sample_vs_scale_evidence_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_plottie_style\\02_架构与依赖图\\FIG-17_real_sample_vs_scale_evidence_gray_300dpi.png"
+    }
+  ]
+}
