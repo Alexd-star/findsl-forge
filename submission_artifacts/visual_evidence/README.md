@@ -12,6 +12,7 @@
 | `logs/` | 每张终端类截图对应的原始命令输出，便于复核 |
 | `html/` | 截图渲染用 HTML 和 Playwright 临时脚本 |
 | `generated_outputs/` | 本次运行生成的 JSON/Markdown 样例输出、benchmark 输出和 API 输出 |
+| `figure_materials/` | 图表与可视化材料清单、绘图提示词、报告/PPT 图表目录结构 |
 | `SCREENSHOT_EVIDENCE_INDEX.md` | 完整中文截图清单、通过标准、不适用说明和执行顺序 |
 
 ## 取证原则
