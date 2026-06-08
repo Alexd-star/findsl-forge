@@ -1,0 +1,752 @@
+证据编号: EV-014
+截图名称: 端口与健康检查截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Invoke-RestMethod -Uri 'http://127.0.0.1:59700/api/examples' | ConvertTo-Json -Depth 5
+退出码: 0
+耗时: 0.325s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+    "ok":  true,
+    "examples":  [
+                     {
+                         "name":  "连续3天主力净流入为正后按换手率排名",
+                         "dsl":  "then(filter(market(\"A\") \u0026 CONS(indicator(\"main_net_inflow\") \u003e 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "今日收盘价创250日新高",
+                         "dsl":  "filter(indicator(\"close\") \u003e= MAX(indicator(\"close\"), 250))",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "近10日存在放量",
+                         "dsl":  "filter(EXIST(indicator(\"volume\") \u003e MA(indicator(\"volume\"), 20), 10))",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "无引号指标名兼容",
+                         "dsl":  "filter(indicator(close) \u003e MA(indicator(close), 20))",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "近3日成交量前缀和加速",
+                         "dsl":  "filter(SUM(indicator(\"volume\"), 3) \u003e 300)",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "A股每日换手率前50百分比",
+                         "dsl":  "then(filter(market(\"A\")), rank(indicator(\"turnover_rate\"), desc, percent=50))",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "日期区间内收盘价大于10",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 indicator(\"close\") \u003e 10)",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "窗口查询日期上界安全裁剪",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 indicator(\"close\") \u003e MA(indicator(\"close\"), 3))",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "主力净流出负阈值",
+                         "dsl":  "filter(indicator(\"main_net_inflow\") \u003c -1.5)",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "近2日收盘价收益率超过5%",
+                         "dsl":  "filter(RET(indicator(\"close\"), 2) \u003e 0.05)",
+                         "kind":  "baseline",
+                         "scenario":  "evaluation",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: A股连续3天主力净流入为正后按换手率排名",
+                         "dsl":  "then(filter(market(\"A\") \u0026 CONS(indicator(\"main_net_inflow\") \u003e 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))",
+                         "kind":  "official_positive",
+                         "scenario":  "staged_filter_rank",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 今日收盘价创近3日新高",
+                         "dsl":  "filter(indicator(\"close\") \u003e= MAX(indicator(\"close\"), 3))",
+                         "kind":  "official_positive",
+                         "scenario":  "max_window_breakout",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 近10日存在放量信号",
+                         "dsl":  "filter(EXIST(indicator(\"volume\") \u003e MA(indicator(\"volume\"), 3), 2))",
+                         "kind":  "official_positive",
+                         "scenario":  "exist_volume_above_ma",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 成交量3日滚动求和走前缀表",
+                         "dsl":  "filter(SUM(indicator(\"volume\"), 3) \u003e 300)",
+                         "kind":  "official_positive",
+                         "scenario":  "volume_prefix_sum",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 主力净流入3日滚动求和走资金流前缀表",
+                         "dsl":  "filter(SUM(indicator(\"main_net_inflow\"), 3) \u003e 4)",
+                         "kind":  "official_positive",
+                         "scenario":  "money_flow_prefix_sum",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 收盘价强于均线且成交量创新高",
+                         "dsl":  "filter(indicator(\"close\") \u003e MA(indicator(\"close\"), 3) \u0026 indicator(\"volume\") \u003e= MAX(indicator(\"volume\"), 2))",
+                         "kind":  "official_positive",
+                         "scenario":  "compound_numeric_windows",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: B股近2日均量不低于80",
+                         "dsl":  "filter(market(\"B\") \u0026 MA(indicator(\"volume\"), 2) \u003e= 80)",
+                         "kind":  "official_positive",
+                         "scenario":  "market_join_with_ma",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: A股高换手后按收盘价取每日前2",
+                         "dsl":  "then(filter(market(\"A\") \u0026 indicator(\"turnover_rate\") \u003e 1), rank(indicator(\"close\"), desc, top=2))",
+                         "kind":  "official_positive",
+                         "scenario":  "filter_rank_top",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: A股存在资金流入后按低价取每日2只",
+                         "dsl":  "then(filter(market(\"A\") \u0026 EXIST(indicator(\"main_net_inflow\") \u003e 0, 2)), rank(indicator(\"close\"), asc, bottom=2))",
+                         "kind":  "official_positive",
+                         "scenario":  "exist_rank_bottom",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 收盘价加换手率大于12",
+                         "dsl":  "filter((indicator(\"close\") + indicator(\"turnover_rate\")) \u003e 12)",
+                         "kind":  "official_positive",
+                         "scenario":  "numeric_arithmetic",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: A股高换手率每日前50百分比",
+                         "dsl":  "then(filter(market(\"A\")), rank(indicator(\"turnover_rate\"), desc, percent=50))",
+                         "kind":  "official_positive",
+                         "scenario":  "rank_percent_cutoff",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间下推后筛收盘价",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 indicator(\"close\") \u003e 10)",
+                         "kind":  "official_positive",
+                         "scenario":  "date_range_pushdown",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 窗口查询日期上界安全裁剪",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 indicator(\"close\") \u003e MA(indicator(\"close\"), 3))",
+                         "kind":  "official_positive",
+                         "scenario":  "date_range_window_pruning",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 主力净流出低于负阈值",
+                         "dsl":  "filter(indicator(\"main_net_inflow\") \u003c -1.5)",
+                         "kind":  "official_positive",
+                         "scenario":  "signed_numeric_threshold",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 收盘价跌破近3日最低值阈值",
+                         "dsl":  "filter(Min(indicator(\"close\"), 3) \u003c 10)",
+                         "kind":  "official_positive",
+                         "scenario":  "min_window_floor",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间前缀和完整下推",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 SUM(indicator(\"volume\"), 3) \u003e 300)",
+                         "kind":  "official_positive",
+                         "scenario":  "date_range_prefix_sum_pruning",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 等值比较生成Doris标准等号",
+                         "dsl":  "filter(indicator(\"close\") == 10)",
+                         "kind":  "official_positive",
+                         "scenario":  "sql_equality_operator",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 单等号等值比较兼容",
+                         "dsl":  "filter(indicator(\"close\") = 10)",
+                         "kind":  "official_positive",
+                         "scenario":  "single_equal_operator",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 多阶段过滤后再计算均线",
+                         "dsl":  "then(filter(market(\"A\")), filter(MA(indicator(\"close\"), 2) \u003e 10))",
+                         "kind":  "official_positive",
+                         "scenario":  "then_filter_window_filter",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 按2日均价进行每日排名",
+                         "dsl":  "rank(MA(indicator(\"close\"), 2), desc, top=1)",
+                         "kind":  "official_positive",
+                         "scenario":  "rank_by_window_feature",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 指标名大小写容错",
+                         "dsl":  "filter(indicator(\"Close\") \u003e 10)",
+                         "kind":  "official_positive",
+                         "scenario":  "case_insensitive_indicator_name",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 市场代码大小写容错",
+                         "dsl":  "filter(market(\"a\"))",
+                         "kind":  "official_positive",
+                         "scenario":  "case_insensitive_market_code",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 先全市场排名后过滤A股",
+                         "dsl":  "then(rank(indicator(\"close\"), desc, top=2), filter(market(\"A\")))",
+                         "kind":  "official_positive",
+                         "scenario":  "rank_then_market_filter",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 连续两次排名重新计算名次",
+                         "dsl":  "then(rank(indicator(\"turnover_rate\"), desc, top=2), rank(indicator(\"close\"), asc, bottom=1))",
+                         "kind":  "official_positive",
+                         "scenario":  "rank_then_rank_recompute",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 行情或资金流条件保留稀疏辅助表",
+                         "dsl":  "filter(indicator(\"close\") \u003e 10 | indicator(\"main_net_inflow\") \u003e 0)",
+                         "kind":  "official_positive",
+                         "scenario":  "sparse_auxiliary_left_join",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 120日成交量热点窗口直接读取物化列",
+                         "dsl":  "filter(SUM(indicator(\"volume\"), 120) \u003e 1000000)",
+                         "kind":  "official_positive",
+                         "scenario":  "hot_window_materialized_prefix",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间资金流前缀和后按低收盘价排名",
+                         "dsl":  "then(filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 SUM(indicator(\"main_net_inflow\"), 3) \u003e 4), rank(indicator(\"close\"), asc, bottom=1))",
+                         "kind":  "official_positive",
+                         "scenario":  "date_money_flow_prefix_rank",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间A股换手率每日第一",
+                         "dsl":  "then(filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 market(\"A\")), rank(indicator(\"turnover_rate\"), desc, top=1))",
+                         "kind":  "official_positive",
+                         "scenario":  "date_market_rank_top",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 成交量相对三日均量放大",
+                         "dsl":  "filter((indicator(\"volume\") / MA(indicator(\"volume\"), 3)) \u003e 1.2)",
+                         "kind":  "official_positive",
+                         "scenario":  "volume_ratio_to_ma",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 过滤A股突破低点后按均换手率排名",
+                         "dsl":  "then(filter(market(\"A\") \u0026 indicator(\"close\") \u003e MIN(indicator(\"close\"), 3)), rank(MA(indicator(\"turnover_rate\"), 2), desc, top=1))",
+                         "kind":  "official_positive",
+                         "scenario":  "staged_min_filter_rank_by_ma",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间存在资金流出信号",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 EXIST(indicator(\"main_net_inflow\") \u003c 0, 2))",
+                         "kind":  "official_positive",
+                         "scenario":  "date_exist_outflow",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间近2日收益率超过5%",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 RET(indicator(\"close\"), 2) \u003e 0.05)",
+                         "kind":  "official_positive",
+                         "scenario":  "date_close_return_rate",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 成交量不为零且换手率不低于0.5",
+                         "dsl":  "filter(indicator(\"volume\") != 0 \u0026 indicator(\"turnover_rate\") \u003e= 0.5)",
+                         "kind":  "official_positive",
+                         "scenario":  "not_equal_and_gte_filter",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 日期区间内A股或低价股",
+                         "dsl":  "filter(date_between(\"2026-01-02\", \"2026-01-04\") \u0026 (market(\"A\") | indicator(\"close\") \u003c 9))",
+                         "kind":  "official_positive",
+                         "scenario":  "parenthesized_or_with_date_pushdown",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 每日低价前50百分比",
+                         "dsl":  "rank(indicator(\"close\"), asc, percent=50)",
+                         "kind":  "official_positive",
+                         "scenario":  "rank_ascending_percent_cutoff",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 近1日收盘收益率为负",
+                         "dsl":  "filter(RET(indicator(\"close\"), 1) \u003c -0.01)",
+                         "kind":  "official_positive",
+                         "scenario":  "negative_return_rate_threshold",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Official positive: 跨市场异或低价突破筛选",
+                         "dsl":  "filter(market(\"A\") ^ indicator(\"close\") \u003e 10)",
+                         "kind":  "official_positive",
+                         "scenario":  "market_xor_close_breakout",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 未知指标名",
+                         "dsl":  "filter(indicator(\"clos\") \u003e 10)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "UNKNOWN_INDICATOR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 未知函数",
+                         "dsl":  "filter(UNKNOWN(indicator(\"close\")))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "UNKNOWN_FUNCTION",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: CONS参数类型错误",
+                         "dsl":  "filter(CONS(indicator(\"close\"), 3))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 窗口必须为正数",
+                         "dsl":  "filter(indicator(\"close\") \u003e MA(indicator(\"close\"), 0))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 缺少右括号",
+                         "dsl":  "filter(indicator(\"close\") \u003e MA(indicator(\"close\"), 20)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "PARSE_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 字符串未闭合",
+                         "dsl":  "filter(indicator(\"close) \u003e 10)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "LEX_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank命名参数错误",
+                         "dsl":  "rank(indicator(\"close\"), desc, limit=10)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank百分比越界",
+                         "dsl":  "rank(indicator(\"close\"), desc, percent=120)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank底部排序方向不一致",
+                         "dsl":  "rank(indicator(\"close\"), desc, bottom=2)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 日期区间起止倒置",
+                         "dsl":  "filter(date_between(\"2026-01-04\", \"2026-01-02\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 数字字面量格式错误",
+                         "dsl":  "filter(indicator(\"close\") \u003e 1.2.3)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "LEX_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 裸指标列名绕过",
+                         "dsl":  "close \u003e 10",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: filter条件不是布尔表达式",
+                         "dsl":  "filter(indicator(\"close\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: then阶段不是关系表达式",
+                         "dsl":  "then(filter(indicator(\"close\") \u003e 10), indicator(\"volume\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 窗口不是整数字面量",
+                         "dsl":  "filter(MA(indicator(\"close\"), 2.5) \u003e 10)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 顶层表达式不是关系或布尔",
+                         "dsl":  "indicator(\"close\")",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 市场参数不是字符串或标识符",
+                         "dsl":  "filter(market(1))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 除数为零字面量",
+                         "dsl":  "filter((indicator(\"close\") / 0) \u003e 1)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 指标参数不是字符串或标识符",
+                         "dsl":  "filter(indicator(123) \u003e 10)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 日期格式不是ISO",
+                         "dsl":  "filter(date_between(\"2026/01/01\", \"2026-01-02\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: filter内裸字段单等号误写",
+                         "dsl":  "filter(close=10)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 除数为零常量表达式",
+                         "dsl":  "filter((indicator(\"close\") / (1 - 1)) \u003e 1)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 命名参数后跟位置参数",
+                         "dsl":  "rank(top=2, indicator(\"close\"), desc)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "PARSE_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank顶部排序方向不一致",
+                         "dsl":  "rank(indicator(\"close\"), asc, top=2)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank顶部数量不是整数",
+                         "dsl":  "rank(indicator(\"close\"), desc, top=2.5)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank顶部数量必须为正",
+                         "dsl":  "rank(indicator(\"close\"), desc, top=0)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 重复命名参数",
+                         "dsl":  "rank(indicator(\"close\"), desc, top=1, top=2)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 日期不存在",
+                         "dsl":  "filter(date_between(\"2026-02-30\", \"2026-03-01\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank排序方向非法",
+                         "dsl":  "rank(indicator(\"close\"), sideways, top=2)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: EXIST窗口必须为正",
+                         "dsl":  "filter(EXIST(indicator(\"volume\") \u003e 10, -3))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: 窗口参数不能是字符串",
+                         "dsl":  "filter(indicator(\"close\") \u003e MA(indicator(\"close\"), \"3\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank百分比不能为零",
+                         "dsl":  "rank(indicator(\"close\"), desc, percent=0)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: date_between参数不足",
+                         "dsl":  "filter(date_between(\"2026-01-01\"))",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: RET不能嵌套窗口表达式",
+                         "dsl":  "filter(RET(MA(indicator(\"close\"), 3), 2) \u003e 0.05)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: rank不能同时使用top和percent",
+                         "dsl":  "rank(indicator(\"close\"), desc, top=2, percent=50)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: RET窗口必须为正",
+                         "dsl":  "filter(RET(indicator(\"close\"), -1) \u003e 0)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Diagnostic negative: SUM首参不能是布尔条件",
+                         "dsl":  "filter(SUM(market(\"A\"), 3) \u003e 1)",
+                         "kind":  "official_negative",
+                         "scenario":  "diagnostic",
+                         "expected_code":  "SEMANTIC_ERROR",
+                         "dataset":  "default",
+                         "dataset_label":  "sample fixtures"
+                     },
+                     {
+                         "name":  "Real market: 真实行情样本：A股换手率高于0.3",
+                         "dsl":  "filter(date_between(\"2024-01-02\", \"2024-01-12\") \u0026 market(\"A\") \u0026 indicator(\"turnover_rate\") \u003e 0.3)",
+                         "kind":  "real_market",
+                         "scenario":  "real_quote_turnover",
+                         "dataset":  "real_market",
+                         "dataset_label":  "Eastmoney A-share sample"
+                     },
+                     {
+                         "name":  "Real market: 真实行情样本：近2日收盘收益率为正",
+                         "dsl":  "filter(date_between(\"2024-01-02\", \"2024-01-12\") \u0026 RET(indicator(\"close\"), 2) \u003e 0)",
+                         "kind":  "real_market",
+                         "scenario":  "real_quote_return_rate",
+                         "dataset":  "real_market",
+                         "dataset_label":  "Eastmoney A-share sample"
+                     },
+                     {
+                         "name":  "Real market: 真实行情样本：近3日成交量累计超过2000000",
+                         "dsl":  "filter(date_between(\"2024-01-02\", \"2024-01-12\") \u0026 SUM(indicator(\"volume\"), 3) \u003e 2000000)",
+                         "kind":  "real_market",
+                         "scenario":  "real_quote_volume_sum",
+                         "dataset":  "real_market",
+                         "dataset_label":  "Eastmoney A-share sample"
+                     }
+                 ]
+}
+
+----- STDERR -----
+<empty>

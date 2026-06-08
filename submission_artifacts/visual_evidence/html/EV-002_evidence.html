@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EV-002 核心源码目录截图</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #111827;
+      --ink: #e5e7eb;
+      --muted: #9ca3af;
+      --line: #334155;
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --blue: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: 1360px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .header {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #172033, #111827);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .badges span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #dbeafe;
+      background: #0b1220;
+      font-size: 13px;
+    }
+    pre {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: #020617;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .footer {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="header">
+      <h1>EV-002｜核心源码目录截图</h1>
+      <div class="meta">来源：PowerShell 命令</div>
+      <div class="meta">命令/文件：Get-ChildItem -LiteralPath .\src\findsl -Force | Select-Object Mode,Length,LastWriteTime,Name</div>
+      <div class="meta">生成时间：2026-06-08T16:40:03+08:00</div>
+      <div class="badges"><span>真实命令输出</span><span>exit 0</span><span>0.26s</span><span>PASS</span></div>
+    </section>
+    <pre>证据编号: EV-002
+截图名称: 核心源码目录截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-ChildItem -LiteralPath .\src\findsl -Force | Select-Object Mode,Length,LastWriteTime,Name
+退出码: 0
+耗时: 0.262s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+
+Mode   Length LastWriteTime      Name                
+----   ------ -------------      ----                
+d-----        2026/6/7 23:56:23  __pycache__         
+-a---- 1723   2026/5/23 0:39:56  ast_nodes.py        
+-a---- 6288   2026/5/23 13:44:18 benchmark.py        
+-a---- 29719  2026/6/7 23:56:12  cli.py              
+-a---- 2273   2026/5/23 13:21:35 compiler.py         
+-a---- 37885  2026/5/26 1:38:34  defense_package.py  
+-a---- 50323  2026/6/7 12:28:43  demo.py             
+-a---- 8628   2026/6/6 21:21:44  diagnostics.py      
+-a---- 14451  2026/5/23 22:57:01 doris.py            
+-a---- 11485  2026/5/23 23:10:30 doris_evidence.py   
+-a---- 6972   2026/6/7 17:47:23  doris_sql.py        
+-a---- 2705   2026/5/23 20:16:42 equivalence.py      
+-a---- 401    2026/5/23 0:39:56  errors.py           
+-a---- 6039   2026/5/23 1:27:28  evaluation.py       
+-a---- 11316  2026/6/7 18:21:00  evidence_metadata.py
+-a---- 9573   2026/6/7 17:10:51  executor.py         
+-a---- 335    2026/5/23 1:27:28  explain.py          
+-a---- 2519   2026/6/6 21:21:44  lexer.py            
+-a---- 12452  2026/5/26 1:37:50  llm_adapter.py      
+-a---- 6507   2026/5/26 1:36:40  llm_provider.py     
+-a---- 26755  2026/5/24 12:15:32 nl2dsl.py           
+-a---- 9691   2026/5/23 3:34:47  official_suite.py   
+-a---- 4667   2026/6/6 21:21:44  parser.py           
+-a---- 46328  2026/6/6 21:26:30  readiness.py        
+-a---- 11537  2026/6/7 23:56:12  reference.py        
+-a---- 1739   2026/5/23 20:16:26 registry.py         
+-a---- 6440   2026/5/23 13:44:27 scale_benchmark.py  
+-a---- 11487  2026/6/7 23:56:12  semantic.py         
+-a---- 33159  2026/6/7 23:56:12  sqlgen.py           
+-a---- 4791   2026/5/23 1:50:49  synthetic.py        
+-a---- 8526   2026/6/7 23:56:12  topic_compliance.py 
+-a---- 126    2026/5/23 0:39:56  __init__.py
+
+----- STDERR -----
+&lt;empty&gt;</pre>
+    <div class="footer">说明：终端类截图由真实命令输出或真实文件内容渲染生成，原始日志同步保存在 logs 目录，便于复核。</div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EV-013 服务启动成功截图</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #111827;
+      --ink: #e5e7eb;
+      --muted: #9ca3af;
+      --line: #334155;
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --blue: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: 1360px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .header {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #172033, #111827);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .badges span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #dbeafe;
+      background: #0b1220;
+      font-size: 13px;
+    }
+    pre {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: #020617;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .footer {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="header">
+      <h1>EV-013｜服务启动成功截图</h1>
+      <div class="meta">来源：后台进程与 API 健康检查</div>
+      <div class="meta">命令/文件：C:\Program Files\Python39\python.exe -m findsl.cli serve-demo --host 127.0.0.1 --port 59700</div>
+      <div class="meta">生成时间：2026-06-08T16:40:03+08:00</div>
+      <div class="badges"><span>真实服务进程</span><span>API health PASS</span><span>port 59700</span></div>
+    </section>
+    <pre>证据编号: EV-013
+截图名称: 服务启动成功截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+服务命令: C:\Program Files\Python39\python.exe -m findsl.cli serve-demo --host 127.0.0.1 --port 59700
+进程 PID: 80856
+健康检查 URL: http://127.0.0.1:59700/api/examples
+状态: PASS
+
+----- /api/examples 响应片段 -----
+{
+  &quot;ok&quot;: true,
+  &quot;examples&quot;: [
+    {
+      &quot;name&quot;: &quot;连续3天主力净流入为正后按换手率排名&quot;,
+      &quot;dsl&quot;: &quot;then(filter(market(\&quot;A\&quot;) &amp; CONS(indicator(\&quot;main_net_inflow\&quot;) &gt; 0, 3)), rank(indicator(\&quot;turnover_rate\&quot;), desc, top=100))&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;今日收盘价创250日新高&quot;,
+      &quot;dsl&quot;: &quot;filter(indicator(\&quot;close\&quot;) &gt;= MAX(indicator(\&quot;close\&quot;), 250))&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;近10日存在放量&quot;,
+      &quot;dsl&quot;: &quot;filter(EXIST(indicator(\&quot;volume\&quot;) &gt; MA(indicator(\&quot;volume\&quot;), 20), 10))&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;无引号指标名兼容&quot;,
+      &quot;dsl&quot;: &quot;filter(indicator(close) &gt; MA(indicator(close), 20))&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;近3日成交量前缀和加速&quot;,
+      &quot;dsl&quot;: &quot;filter(SUM(indicator(\&quot;volume\&quot;), 3) &gt; 300)&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;A股每日换手率前50百分比&quot;,
+      &quot;dsl&quot;: &quot;then(filter(market(\&quot;A\&quot;)), rank(indicator(\&quot;turnover_rate\&quot;), desc, percent=50))&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;日期区间内收盘价大于10&quot;,
+      &quot;dsl&quot;: &quot;filter(date_between(\&quot;2026-01-02\&quot;, \&quot;2026-01-04\&quot;) &amp; indicator(\&quot;close\&quot;) &gt; 10)&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;窗口查询日期上界安全裁剪&quot;,
+      &quot;dsl&quot;: &quot;filter(date_between(\&quot;2026-01-02\&quot;, \&quot;2026-01-04\&quot;) &amp; indicator(\&quot;close\&quot;) &gt; MA(indicator(\&quot;close\&quot;), 3))&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;主力净流出负阈值&quot;,
+      &quot;dsl&quot;: &quot;filter(indicator(\&quot;main_net_inflow\&quot;) &lt; -1.5)&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;近2日收盘价收益率超过5%&quot;,
+      &quot;dsl&quot;: &quot;filter(RET(indicator(\&quot;close\&quot;), 2) &gt; 0.05)&quot;,
+      &quot;kind&quot;: &quot;baseline&quot;,
+      &quot;scenario&quot;: &quot;evaluation&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Official positive: A股连续3天主力净流入为正后按换手率排名&quot;,
+      &quot;dsl&quot;: &quot;then(filter(market(\&quot;A\&quot;) &amp; CONS(indicator(\&quot;main_net_inflow\&quot;) &gt; 0, 3)), rank(indicator(\&quot;turnover_rate\&quot;), desc, top=100))&quot;,
+      &quot;kind&quot;: &quot;official_positive&quot;,
+      &quot;scenario&quot;: &quot;staged_filter_rank&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Official positive: 今日收盘价创近3日新高&quot;,
+      &quot;dsl&quot;: &quot;filter(indicator(\&quot;close\&quot;) &gt;= MAX(indicator(\&quot;close\&quot;), 3))&quot;,
+      &quot;kind&quot;: &quot;official_positive&quot;,
+      &quot;scenario&quot;: &quot;max_window_breakout&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Official positive: 近10日存在放量信号&quot;,
+      &quot;dsl&quot;: &quot;filter(EXIST(indicator(\&quot;volume\&quot;) &gt; MA(indicator(\&quot;volume\&quot;), 3), 2))&quot;,
+      &quot;kind&quot;: &quot;official_positive&quot;,
+      &quot;scenario&quot;: &quot;exist_volume_above_ma&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Official positive: 成交量3日滚动求和走前缀表&quot;,
+      &quot;dsl&quot;: &quot;filter(SUM(indicator(\&quot;volume\&quot;), 3) &gt; 300)&quot;,
+      &quot;kind&quot;: &quot;official_positive&quot;,
+      &quot;scenario&quot;: &quot;volume_prefix_sum&quot;,
+      &quot;dataset&quot;: &quot;default&quot;,
+      &quot;dataset_label&quot;: &quot;sample fixtures&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Official positive: 主力净流入3日滚动求和走资金流前缀表&quot;,
+      &quot;dsl&quot;: &quot;filter(SUM(indicator(\&quot;main_net_inflow\&quot;), 3) &gt; 4)&quot;,
+      &quot;kind&quot;: &quot;official_positive&quot;,
+      &quot;scenario&quot;: &quot;money_flow_prefix</pre>
+    <div class="footer">说明：终端类截图由真实命令输出或真实文件内容渲染生成，原始日志同步保存在 logs 目录，便于复核。</div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,107 @@
+证据编号: EV-029
+截图名称: 算法中间结果 Explain 截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: python -m findsl.cli compile 'filter(SUM(indicator("volume"), 120) > 1000000)' --json
+退出码: 0
+耗时: 0.300s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+  "dsl": "filter(SUM(indicator(volume), 120) > 1000000)",
+  "ast": {
+    "type": "FunctionCall",
+    "name": "filter",
+    "args": [
+      {
+        "type": "Comparison",
+        "op": ">",
+        "left": {
+          "type": "FunctionCall",
+          "name": "SUM",
+          "args": [
+            {
+              "type": "FunctionCall",
+              "name": "indicator",
+              "args": [
+                {
+                  "type": "Identifier",
+                  "name": "volume"
+                }
+              ],
+              "named_args": []
+            },
+            {
+              "type": "Literal",
+              "value": 120
+            }
+          ],
+          "named_args": []
+        },
+        "right": {
+          "type": "Literal",
+          "value": 1000000
+        }
+      }
+    ],
+    "named_args": []
+  },
+  "sql": "SELECT * FROM (SELECT base_features.*, __pref_curr_1.volume_sum_120 AS __psum_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_curr_1 ON __pref_curr_1.ts_code = base_features.ts_code AND __pref_curr_1.trade_date = base_features.trade_date) numeric_features_1 WHERE __psum_1 > 1000000",
+  "trace": [
+    "rewrite SUM() on volume into prefix-sum feature __psum_1",
+    "materialize numeric window features before filtering",
+    "rewrite filter predicate into outer WHERE over materialized features"
+  ],
+  "explain": [
+    {
+      "rule": "PREFIX_SUM",
+      "status": "applied",
+      "message": "Rewrite rolling SUM into prefix table subtraction",
+      "evidence": {
+        "alias": "__psum_1",
+        "indicator": "volume",
+        "window": 120,
+        "prefix_table": "dwd_stock_daily_quote_prefix",
+        "prefix_column": "volume_prefix",
+        "materialized_window_column": "volume_sum_120"
+      }
+    },
+    {
+      "rule": "FEATURE_LAYER",
+      "status": "applied",
+      "message": "Materialize numeric features before filtering",
+      "evidence": {
+        "feature_count": 1
+      }
+    },
+    {
+      "rule": "FILTER_OUTER_WHERE",
+      "status": "applied",
+      "message": "Rewrite filter predicate into outer WHERE over materialized features",
+      "evidence": {
+        "condition": "__psum_1 > 1000000"
+      }
+    },
+    {
+      "rule": "DORIS_SQL_VALIDATION",
+      "status": "applied",
+      "message": "Validate generated SQL against Doris-safe query shape",
+      "evidence": {
+        "issue_count": 0,
+        "statement_count": 1,
+        "table_references": [
+          "dwd_stock_daily_quote",
+          "dwd_stock_daily_quote_prefix"
+        ],
+        "contains_window": false,
+        "contains_prefix_table": true
+      }
+    }
+  ],
+  "elapsed_ms": 1.8791000000000087
+}
+
+----- STDERR -----
+<empty>

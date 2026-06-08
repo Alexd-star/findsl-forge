@@ -1,0 +1,81 @@
+证据编号: EV-024
+截图名称: 核心功能执行成功截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --json
+退出码: 0
+耗时: 0.859s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+  "dsl": "filter(SUM(indicator(volume), 3) > 300)",
+  "passed": true,
+  "sql": "SELECT * FROM (SELECT base_features.*, (__pref_curr_1.volume_prefix - COALESCE(__pref_prev_1.volume_prefix, 0)) AS __psum_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_curr_1 ON __pref_curr_1.ts_code = base_features.ts_code AND __pref_curr_1.trade_date = base_features.trade_date LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_prev_1 ON __pref_prev_1.ts_code = __pref_curr_1.ts_code AND __pref_prev_1.row_no = __pref_curr_1.row_no - 3) numeric_features_1 WHERE __psum_1 > 300",
+  "sql_keys": [
+    [
+      "AAA",
+      "2026-01-03"
+    ],
+    [
+      "AAA",
+      "2026-01-04"
+    ],
+    [
+      "AAA",
+      "2026-01-05"
+    ],
+    [
+      "BBB",
+      "2026-01-02"
+    ],
+    [
+      "BBB",
+      "2026-01-03"
+    ],
+    [
+      "BBB",
+      "2026-01-04"
+    ],
+    [
+      "BBB",
+      "2026-01-05"
+    ]
+  ],
+  "reference_keys": [
+    [
+      "AAA",
+      "2026-01-03"
+    ],
+    [
+      "AAA",
+      "2026-01-04"
+    ],
+    [
+      "AAA",
+      "2026-01-05"
+    ],
+    [
+      "BBB",
+      "2026-01-02"
+    ],
+    [
+      "BBB",
+      "2026-01-03"
+    ],
+    [
+      "BBB",
+      "2026-01-04"
+    ],
+    [
+      "BBB",
+      "2026-01-05"
+    ]
+  ],
+  "missing_keys": [],
+  "extra_keys": []
+}
+
+----- STDERR -----
+<empty>

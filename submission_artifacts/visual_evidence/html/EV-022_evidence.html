@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EV-022 样例输出文件截图</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #111827;
+      --ink: #e5e7eb;
+      --muted: #9ca3af;
+      --line: #334155;
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --blue: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: 1360px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .header {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #172033, #111827);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .badges span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #dbeafe;
+      background: #0b1220;
+      font-size: 13px;
+    }
+    pre {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: #020617;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .footer {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="header">
+      <h1>EV-022｜样例输出文件截图</h1>
+      <div class="meta">来源：PowerShell 命令</div>
+      <div class="meta">命令/文件：python -m findsl.cli compile &#x27;filter(ABS(indicator(&quot;main_net_inflow&quot;)) &gt; 0)&#x27; --json | Set-Content -Encoding UTF8 &#x27;D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\sample_compile_result.json&#x27;; Get-Content &#x27;D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\sample_compile_result.json&#x27; -TotalCount 120</div>
+      <div class="meta">生成时间：2026-06-08T16:40:03+08:00</div>
+      <div class="badges"><span>真实命令输出</span><span>exit 0</span><span>0.37s</span><span>PASS</span></div>
+    </section>
+    <pre>证据编号: EV-022
+截图名称: 样例输出文件截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: python -m findsl.cli compile &#x27;filter(ABS(indicator(&quot;main_net_inflow&quot;)) &gt; 0)&#x27; --json | Set-Content -Encoding UTF8 &#x27;D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\sample_compile_result.json&#x27;; Get-Content &#x27;D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\sample_compile_result.json&#x27; -TotalCount 120
+退出码: 0
+耗时: 0.372s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+  &quot;dsl&quot;: &quot;filter(ABS(indicator(main_net_inflow)) &gt; 0)&quot;,
+  &quot;ast&quot;: {
+    &quot;type&quot;: &quot;FunctionCall&quot;,
+    &quot;name&quot;: &quot;filter&quot;,
+    &quot;args&quot;: [
+      {
+        &quot;type&quot;: &quot;Comparison&quot;,
+        &quot;op&quot;: &quot;&gt;&quot;,
+        &quot;left&quot;: {
+          &quot;type&quot;: &quot;FunctionCall&quot;,
+          &quot;name&quot;: &quot;ABS&quot;,
+          &quot;args&quot;: [
+            {
+              &quot;type&quot;: &quot;FunctionCall&quot;,
+              &quot;name&quot;: &quot;indicator&quot;,
+              &quot;args&quot;: [
+                {
+                  &quot;type&quot;: &quot;Identifier&quot;,
+                  &quot;name&quot;: &quot;main_net_inflow&quot;
+                }
+              ],
+              &quot;named_args&quot;: []
+            }
+          ],
+          &quot;named_args&quot;: []
+        },
+        &quot;right&quot;: {
+          &quot;type&quot;: &quot;Literal&quot;,
+          &quot;value&quot;: 0
+        }
+      }
+    ],
+    &quot;named_args&quot;: []
+  },
+  &quot;sql&quot;: &quot;SELECT * FROM (SELECT base_features.*, ABS(main_net_inflow) AS __tpl_1 FROM (SELECT base.*, mf.main_net_inflow AS main_net_inflow FROM dwd_stock_daily_quote AS base LEFT JOIN dwd_stock_money_flow AS mf USING (ts_code, trade_date)) base_features) numeric_features_1 WHERE __tpl_1 &gt; 0&quot;,
+  &quot;trace&quot;: [
+    &quot;rewrite ABS() through configured numeric template __tpl_1&quot;,
+    &quot;materialize numeric window features before filtering&quot;,
+    &quot;rewrite filter predicate into outer WHERE over materialized features&quot;
+  ],
+  &quot;explain&quot;: [
+    {
+      &quot;rule&quot;: &quot;TEMPLATE_NUMERIC_FUNCTION&quot;,
+      &quot;status&quot;: &quot;applied&quot;,
+      &quot;message&quot;: &quot;Rewrite configured numeric function through sql_template&quot;,
+      &quot;evidence&quot;: {
+        &quot;alias&quot;: &quot;__tpl_1&quot;,
+        &quot;function&quot;: &quot;ABS&quot;,
+        &quot;template&quot;: &quot;ABS({arg0})&quot;
+      }
+    },
+    {
+      &quot;rule&quot;: &quot;FEATURE_LAYER&quot;,
+      &quot;status&quot;: &quot;applied&quot;,
+      &quot;message&quot;: &quot;Materialize numeric features before filtering&quot;,
+      &quot;evidence&quot;: {
+        &quot;feature_count&quot;: 1
+      }
+    },
+    {
+      &quot;rule&quot;: &quot;FILTER_OUTER_WHERE&quot;,
+      &quot;status&quot;: &quot;applied&quot;,
+      &quot;message&quot;: &quot;Rewrite filter predicate into outer WHERE over materialized features&quot;,
+      &quot;evidence&quot;: {
+        &quot;condition&quot;: &quot;__tpl_1 &gt; 0&quot;
+      }
+    },
+    {
+      &quot;rule&quot;: &quot;DORIS_SQL_VALIDATION&quot;,
+      &quot;status&quot;: &quot;applied&quot;,
+      &quot;message&quot;: &quot;Validate generated SQL against Doris-safe query shape&quot;,
+      &quot;evidence&quot;: {
+        &quot;issue_count&quot;: 0,
+        &quot;statement_count&quot;: 1,
+        &quot;table_references&quot;: [
+          &quot;dwd_stock_daily_quote&quot;,
+          &quot;dwd_stock_money_flow&quot;
+        ],
+        &quot;contains_window&quot;: false,
+        &quot;contains_prefix_table&quot;: false
+      }
+    }
+  ],
+  &quot;elapsed_ms&quot;: 1.8714999999999982
+}
+
+----- STDERR -----
+&lt;empty&gt;</pre>
+    <div class="footer">说明：终端类截图由真实命令输出或真实文件内容渲染生成，原始日志同步保存在 logs 目录，便于复核。</div>
+  </main>
+</body>
+</html>

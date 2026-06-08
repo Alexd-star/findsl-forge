@@ -1,0 +1,196 @@
+证据编号: EV-015
+截图名称: 终端主命令 compile 成功截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: python -m findsl.cli compile 'then(filter(market("A") & CONS(indicator("main_net_inflow") > 0, 3)), rank(indicator("turnover_rate"), desc, top=100))' --json
+退出码: 0
+耗时: 0.459s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+  "dsl": "then(filter(market(A) & CONS(indicator(main_net_inflow) > 0, 3)), rank(indicator(turnover_rate), desc, top=100))",
+  "ast": {
+    "type": "FunctionCall",
+    "name": "then",
+    "args": [
+      {
+        "type": "FunctionCall",
+        "name": "filter",
+        "args": [
+          {
+            "type": "BinaryOp",
+            "op": "&",
+            "left": {
+              "type": "FunctionCall",
+              "name": "market",
+              "args": [
+                {
+                  "type": "Identifier",
+                  "name": "A"
+                }
+              ],
+              "named_args": []
+            },
+            "right": {
+              "type": "FunctionCall",
+              "name": "CONS",
+              "args": [
+                {
+                  "type": "Comparison",
+                  "op": ">",
+                  "left": {
+                    "type": "FunctionCall",
+                    "name": "indicator",
+                    "args": [
+                      {
+                        "type": "Identifier",
+                        "name": "main_net_inflow"
+                      }
+                    ],
+                    "named_args": []
+                  },
+                  "right": {
+                    "type": "Literal",
+                    "value": 0
+                  }
+                },
+                {
+                  "type": "Literal",
+                  "value": 3
+                }
+              ],
+              "named_args": []
+            }
+          }
+        ],
+        "named_args": []
+      },
+      {
+        "type": "FunctionCall",
+        "name": "rank",
+        "args": [
+          {
+            "type": "FunctionCall",
+            "name": "indicator",
+            "args": [
+              {
+                "type": "Identifier",
+                "name": "turnover_rate"
+              }
+            ],
+            "named_args": []
+          },
+          {
+            "type": "Identifier",
+            "name": "desc"
+          }
+        ],
+        "named_args": [
+          {
+            "name": "top",
+            "value": {
+              "type": "Literal",
+              "value": 100
+            }
+          }
+        ]
+      }
+    ],
+    "named_args": []
+  },
+  "sql": "WITH stage1 AS (SELECT * FROM (SELECT base_features.*, SUM(CASE WHEN main_net_inflow > 0 THEN 1 ELSE 0 END) OVER (PARTITION BY ts_code ORDER BY trade_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS __roll_1 FROM (SELECT base.*, mf.main_net_inflow AS main_net_inflow, su.market AS market FROM dwd_stock_daily_quote AS base LEFT JOIN dwd_stock_money_flow AS mf USING (ts_code, trade_date) LEFT JOIN dim_stock_universe AS su USING (ts_code, trade_date)) base_features) rolling_features_1 WHERE (market = 'A' AND __roll_1 = 3)), stage2 AS (SELECT * FROM (SELECT base.*, ROW_NUMBER() OVER (PARTITION BY trade_date ORDER BY turnover_rate DESC, ts_code ASC) AS rank_no FROM (SELECT base.ts_code AS ts_code, base.trade_date AS trade_date, base.close AS close, base.turnover_rate AS turnover_rate, base.volume AS volume, base.main_net_inflow AS main_net_inflow, base.market AS market FROM stage1 AS base) AS base WHERE turnover_rate IS NOT NULL) ranked WHERE rank_no <= 100) SELECT * FROM stage2",
+  "trace": [
+    "rewrite then() into staged CTE pipeline",
+    "rewrite CONS() into rolling window feature __roll_1",
+    "materialize rolling boolean features after numeric features",
+    "rewrite filter predicate into outer WHERE over materialized features",
+    "project staged relation columns before re-ranking",
+    "rewrite rank() into ROW_NUMBER window",
+    "exclude null rank expressions before applying rank cutoff"
+  ],
+  "explain": [
+    {
+      "rule": "THEN_PIPELINE",
+      "status": "applied",
+      "message": "Rewrite then() into staged CTE pipeline",
+      "evidence": {
+        "stage_count": 2
+      }
+    },
+    {
+      "rule": "ROLLING_BOOLEAN",
+      "status": "applied",
+      "message": "Rewrite CONS() into rolling boolean window feature",
+      "evidence": {
+        "alias": "__roll_1",
+        "function": "CONS"
+      }
+    },
+    {
+      "rule": "FEATURE_LAYER",
+      "status": "applied",
+      "message": "Materialize rolling boolean features after numeric features",
+      "evidence": {
+        "feature_count": 1
+      }
+    },
+    {
+      "rule": "FILTER_OUTER_WHERE",
+      "status": "applied",
+      "message": "Rewrite filter predicate into outer WHERE over materialized features",
+      "evidence": {
+        "condition": "(market = 'A' AND __roll_1 = 3)"
+      }
+    },
+    {
+      "rule": "RELATION_PROJECTION",
+      "status": "applied",
+      "message": "Project staged relation columns before re-ranking",
+      "evidence": {
+        "source": "stage1"
+      }
+    },
+    {
+      "rule": "RANK_ROW_NUMBER",
+      "status": "applied",
+      "message": "Rewrite rank() into ROW_NUMBER window",
+      "evidence": {
+        "source": "stage1",
+        "limit_kind": "top",
+        "limit_value": 100
+      }
+    },
+    {
+      "rule": "RANK_NULL_GUARD",
+      "status": "applied",
+      "message": "Exclude null rank expressions before applying rank cutoff",
+      "evidence": {
+        "limit_kind": "top"
+      }
+    },
+    {
+      "rule": "DORIS_SQL_VALIDATION",
+      "status": "applied",
+      "message": "Validate generated SQL against Doris-safe query shape",
+      "evidence": {
+        "issue_count": 0,
+        "statement_count": 1,
+        "table_references": [
+          "dwd_stock_daily_quote",
+          "dwd_stock_money_flow",
+          "dim_stock_universe",
+          "stage1",
+          "stage2"
+        ],
+        "contains_window": true,
+        "contains_prefix_table": false
+      }
+    }
+  ],
+  "elapsed_ms": 2.3323000000000094
+}
+
+----- STDERR -----
+<empty>

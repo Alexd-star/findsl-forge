@@ -1,0 +1,113 @@
+证据编号: EV-059
+截图名称: 交付包文件列表截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-ChildItem -LiteralPath .\submission_artifacts -Recurse -Depth 3 -File | Sort-Object FullName | Select-Object Length,LastWriteTime,FullName
+退出码: 0
+耗时: 0.339s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+
+Length LastWriteTime      FullName                                                                                                                                                
+------ -------------      --------                                                                                                                                                
+  2575 2026/5/26 1:41:10  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\defense_ppt_outline.md                                                                 
+748310 2026/6/7 12:33:43  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\defense_video\findsl_forge_one_minute_demo.mp4                                         
+   514 2026/5/25 1:48:36  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\defense_video\README.md                                                                
+  2479 2026/5/25 23:31:58 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\defense_video_script.md                                                                
+120232 2026/6/7 12:32:02  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\01_nl_to_dsl_overview.png                                             
+120232 2026/6/7 12:32:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\02_positive_sql.png                                                   
+106723 2026/6/7 12:32:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\03_positive_ast.png                                                   
+114009 2026/6/7 12:32:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\04_positive_explain.png                                               
+ 96756 2026/6/7 12:32:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\05_positive_rows.png                                                  
+128952 2026/6/7 12:32:05  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\06_positive_evidence.png                                              
+ 97865 2026/6/7 12:32:06  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\07_negative_unknown_indicator.png                                     
+  1658 2026/5/25 23:32:15 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\README.md                                                             
+ 94248 2026/6/7 12:32:06  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_screenshots\real_market_sample.png                                                
+  2373 2026/5/25 2:45:51  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\demo_script.md                                                                         
+  1229 2026/6/8 0:04:04   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_manifest.md                                                                   
+  1855 2026/6/8 0:04:04   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_metadata.json                                                                 
+  9652 2026/6/8 0:03:54   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\defense_package.md                                                  
+  6537 2026/5/23 23:11:26 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\doris_cluster_evidence.json                                         
+  6947 2026/5/23 23:11:26 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\doris_cluster_evidence.md                                           
+ 12366 2026/6/8 0:03:54   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\evaluation_report.md                                                
+  7549 2026/6/8 0:03:54   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\official_suite_report.md                                            
+  2870 2026/6/8 0:03:53   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\prefix_sum_benchmark.md                                             
+  3037 2026/5/23 13:45:11 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\prefix_sum_scale_benchmark.md                                       
+   923 2026/6/8 0:03:53   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\real_market_sample_report.md                                        
+  1365 2026/6/8 0:03:53   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\sql_equivalence_report.md                                           
+ 11408 2026/6/8 0:04:03   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_snapshots\submission_readiness.md                                             
+  1023 2026/6/8 0:04:04   D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\evidence_summary.md                                                                    
+  3529 2026/6/7 18:22:44  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\README.md                                                                              
+  2864 2026/5/25 2:14:08  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\real_data_ingestion_plan.md                                                            
+  2394 2026/5/26 1:40:54  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\score_mapping.md                                                                       
+  4582 2026/5/26 1:40:46  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\technical_report.md                                                                    
+   776 2026/6/8 16:40:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\ev030_manual_verify.py                               
+   445 2026/6/8 16:40:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\ev061_sha256.py                                      
+  1855 2026/6/8 16:40:32  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\evidence_metadata_check.json                         
+  1023 2026/6/8 16:40:32  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\evidence_summary_check.md                            
+  7549 2026/6/8 16:40:26  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\official_suite_report.md                             
+  2868 2026/6/8 16:40:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\prefix_sum_benchmark.md                              
+  2524 2026/6/8 16:40:27  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\sample_compile_result.json                           
+  1910 2026/6/8 16:40:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-001_evidence.txt                                               
+  2275 2026/6/8 16:40:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-002_evidence.txt                                               
+  2231 2026/6/8 16:40:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-003_evidence.txt                                               
+  5998 2026/6/8 16:40:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-004_evidence.txt                                               
+  9976 2026/6/8 16:40:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-005_evidence.txt                                               
+  2844 2026/6/8 16:40:05  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-006_docs.txt                                                   
+  1943 2026/6/8 16:40:05  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-007_scripts.txt                                                
+   378 2026/6/8 16:40:05  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-008_git_head.txt                                               
+   428 2026/6/8 16:40:05  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-009_git_status.txt                                             
+   776 2026/6/8 16:40:06  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-010_git_log.txt                                                
+   586 2026/6/8 16:40:07  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-011_evidence.txt                                               
+  1214 2026/6/8 16:40:08  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-012_evidence.txt                                               
+  6402 2026/6/8 16:40:09  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-015_compile.txt                                                
+   583 2026/6/8 16:40:22  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-016_pytest.txt                                                 
+   548 2026/6/8 16:40:25  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-017_evidence.txt                                               
+  1411 2026/6/8 16:40:25  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-018_blocking_gates__warning_count.txt                          
+   847 2026/6/8 16:40:26  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-019_evidence.txt                                               
+  7834 2026/6/8 16:40:27  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-020_results__pass.txt                                          
+  6525 2026/6/8 16:40:27  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-021_evidence.txt                                               
+  3301 2026/6/8 16:40:27  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-022_evidence.txt                                               
+  3804 2026/6/8 16:40:27  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-023_evidence.txt                                               
+  1854 2026/6/8 16:40:28  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-024_evidence.txt                                               
+   815 2026/6/8 16:40:29  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-025_evidence.txt                                               
+  2722 2026/6/8 16:40:29  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-026_compiler.txt                                               
+  4414 2026/6/8 16:40:30  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-027_prefix-sum.txt                                             
+  6398 2026/6/8 16:40:30  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-028_evidence.txt                                               
+  3240 2026/6/8 16:40:31  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-029_explain.txt                                                
+  1661 2026/6/8 16:40:32  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-030_evidence.txt                                               
+  1199 2026/6/8 16:40:32  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-031_evidence.txt                                               
+  8962 2026/6/8 16:40:32  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-032_evidence.txt                                               
+  6137 2026/6/8 16:40:33  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-033_pass.txt                                                   
+  2706 2026/6/8 16:40:33  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-034_evidence.txt                                               
+  6831 2026/6/8 16:40:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-035_evidence.txt                                               
+  3380 2026/6/8 16:40:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-036_speedup.txt                                                
+  4415 2026/6/8 16:40:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-037_doris_evidence_pass.txt                                    
+  6957 2026/6/8 16:40:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-038_doris_speedup.txt                                          
+   819 2026/6/8 16:40:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-039_doris.txt                                                  
+   849 2026/6/8 16:40:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-050_cli.txt                                                    
+  1009 2026/6/8 16:40:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-051_evidence.txt                                               
+  3452 2026/6/8 16:40:38  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-052_evidence.txt                                               
+  2016 2026/6/8 16:40:38  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-053_error_warning.txt                                          
+  6459 2026/6/8 16:40:38  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-054_evidence.txt                                               
+  7466 2026/6/8 16:40:38  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-055_readme.txt                                                 
+  3288 2026/6/8 16:40:39  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-056_evidence.txt                                               
+  6250 2026/6/8 16:40:39  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-057_evidence.txt                                               
+  3894 2026/6/8 16:40:39  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\logs\EV-058_evidence.txt                                               
+  1489 2026/6/8 16:39:14  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\README.md                                                              
+ 56819 2026/6/8 16:39:15  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\SCREENSHOT_EVIDENCE_INDEX.md                                           
+120232 2026/6/7 12:32:02  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\01_nl_to_dsl_overview.png        
+120232 2026/6/7 12:32:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\02_positive_sql.png              
+106723 2026/6/7 12:32:03  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\03_positive_ast.png              
+114009 2026/6/7 12:32:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\04_positive_explain.png          
+ 96756 2026/6/7 12:32:04  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\05_positive_rows.png             
+128952 2026/6/7 12:32:05  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\06_positive_evidence.png         
+ 97865 2026/6/7 12:32:06  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\07_negative_unknown_indicator.png
+  1658 2026/5/25 23:32:15 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\README.md                        
+ 94248 2026/6/7 12:32:06  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\screenshots\existing_demo_screenshots\real_market_sample.png           
+   510 2026/6/8 16:39:15  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\visual_evidence_summary.json
+
+----- STDERR -----
+<empty>

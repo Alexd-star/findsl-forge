@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EV-004 输入数据目录截图</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #111827;
+      --ink: #e5e7eb;
+      --muted: #9ca3af;
+      --line: #334155;
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --blue: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      width: 1360px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .header {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #172033, #111827);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .badges span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #dbeafe;
+      background: #0b1220;
+      font-size: 13px;
+    }
+    pre {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: #020617;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .footer {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="header">
+      <h1>EV-004｜输入数据目录截图</h1>
+      <div class="meta">来源：PowerShell 命令</div>
+      <div class="meta">命令/文件：Get-ChildItem -LiteralPath .\data -Recurse -Depth 2 -Force | Select-Object Mode,Length,LastWriteTime,FullName</div>
+      <div class="meta">生成时间：2026-06-08T16:40:03+08:00</div>
+      <div class="badges"><span>真实命令输出</span><span>exit 0</span><span>0.26s</span><span>PASS</span></div>
+    </section>
+    <pre>证据编号: EV-004
+截图名称: 输入数据目录截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-ChildItem -LiteralPath .\data -Recurse -Depth 2 -Force | Select-Object Mode,Length,LastWriteTime,FullName
+退出码: 0
+耗时: 0.256s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+
+Mode   Length    LastWriteTime      FullName                                                                                                   
+----   ------    -------------      --------                                                                                                   
+d-----           2026/5/23 23:04:32 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated                                                 
+d-----           2026/5/25 2:08:32  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples                                              
+d-----           2026/5/23 9:56:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples                                                   
+d-----           2026/5/23 23:02:50 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_1m                                        
+d-----           2026/5/23 23:04:59 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_5m                                        
+d-----           2026/5/23 1:59:12  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\scale                                           
+-a---- 38004972  2026/5/23 23:02:48 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_1m\daily_quote.csv                        
+-a---- 26466374  2026/5/23 23:02:50 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_1m\money_flow.csv                         
+-a---- 24000027  2026/5/23 23:02:51 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_1m\stock_universe.csv                     
+-a---- 190018043 2026/5/23 23:04:49 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_5m\daily_quote.csv                        
+-a---- 132330990 2026/5/23 23:04:59 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_5m\money_flow.csv                         
+-a---- 120000027 2026/5/23 23:05:05 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\doris_5m\stock_universe.csv                     
+-a---- 2963396   2026/5/23 13:45:03 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\scale\daily_quote.csv                           
+-a---- 2064169   2026/5/23 13:45:03 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\scale\money_flow.csv                            
+-a---- 1872027   2026/5/23 13:45:03 D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\generated\scale\stock_universe.csv                        
+d-----           2026/5/25 2:09:28  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample                     
+d-----           2026/5/25 2:09:18  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\raw                 
+-a---- 748       2026/5/25 2:18:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\daily_quote.csv     
+-a---- 449       2026/5/25 2:18:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\money_flow.csv      
+-a---- 616       2026/5/25 2:18:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\queries.jsonl       
+-a---- 1011      2026/5/25 2:18:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\README.md           
+-a---- 1310      2026/5/25 2:18:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\source_metadata.json
+-a---- 440       2026/5/25 2:18:37  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample\stock_universe.csv  
+-a---- 435       2026/5/23 0:57:36  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\daily_quote.csv                                   
+-a---- 764       2026/5/23 9:56:34  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\llm_candidate_response.json                       
+-a---- 294       2026/5/23 0:57:36  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\money_flow.csv                                    
+-a---- 6921      2026/5/26 1:24:45  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\official_negative_cases.jsonl                     
+-a---- 16596     2026/6/7 17:12:01  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\official_positive_cases.jsonl                     
+-a---- 3286      2026/6/7 17:12:01  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\queries.jsonl                                     
+-a---- 281       2026/5/23 0:57:36  D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\stock_universe.csv
+
+----- STDERR -----
+&lt;empty&gt;</pre>
+    <div class="footer">说明：终端类截图由真实命令输出或真实文件内容渲染生成，原始日志同步保存在 logs 目录，便于复核。</div>
+  </main>
+</body>
+</html>

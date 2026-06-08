@@ -1,0 +1,169 @@
+证据编号: EV-058
+截图名称: 配置文件截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-Content .\configs\indicators.json -TotalCount 120; ''; Get-Content .\configs\functions.json -TotalCount 120; ''; Get-Content .\configs\tables.json -TotalCount 80
+退出码: 0
+耗时: 0.255s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+  "close": {
+    "type": "numeric",
+    "table": "daily_quote",
+    "column": "close",
+    "adjustment": "front",
+    "supports_prefix_sum": false
+  },
+  "turnover_rate": {
+    "type": "numeric",
+    "table": "daily_quote",
+    "column": "turnover_rate",
+    "adjustment": "none",
+    "supports_prefix_sum": false
+  },
+  "main_net_inflow": {
+    "type": "numeric",
+    "table": "money_flow",
+    "column": "main_net_inflow",
+    "adjustment": "none",
+    "supports_prefix_sum": true,
+    "prefix_table": "money_flow_prefix",
+    "prefix_column": "main_net_inflow_prefix"
+  },
+  "volume": {
+    "type": "numeric",
+    "table": "daily_quote",
+    "column": "volume",
+    "adjustment": "none",
+    "supports_prefix_sum": true,
+    "prefix_table": "daily_quote_prefix",
+    "prefix_column": "volume_prefix",
+    "materialized_windows": {
+      "120": "volume_sum_120"
+    }
+  }
+}
+
+{
+  "filter": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "relation"
+  },
+  "then": {
+    "min_args": 2,
+    "max_args": 8,
+    "return_type": "relation"
+  },
+  "rank": {
+    "min_args": 2,
+    "max_args": 2,
+    "named_args": ["top", "bottom", "percent"],
+    "return_type": "relation"
+  },
+  "indicator": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "numeric"
+  },
+  "market": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "boolean"
+  },
+  "date_between": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "boolean"
+  },
+  "CONS": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "boolean"
+  },
+  "EXIST": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "boolean"
+  },
+  "MA": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "SUM": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "MAX": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "MIN": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "RET": {
+    "min_args": 2,
+    "max_args": 2,
+    "return_type": "numeric"
+  },
+  "ABS": {
+    "min_args": 1,
+    "max_args": 1,
+    "return_type": "numeric",
+    "arg_types": ["numeric"],
+    "sql_template": "ABS({arg0})",
+    "reference_op": "abs",
+    "category": "template_numeric_scalar"
+  }
+}
+
+{
+  "daily_quote": {
+    "physical": "dwd_stock_daily_quote",
+    "alias": "dq",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date"
+  },
+  "money_flow": {
+    "physical": "dwd_stock_money_flow",
+    "alias": "mf",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date"
+  },
+  "daily_quote_prefix": {
+    "physical": "dwd_stock_daily_quote_prefix",
+    "alias": "dqp",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date",
+    "row_column": "row_no"
+  },
+  "money_flow_prefix": {
+    "physical": "dwd_stock_money_flow_prefix",
+    "alias": "mfp",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date",
+    "row_column": "row_no"
+  },
+  "stock_universe": {
+    "physical": "dim_stock_universe",
+    "alias": "su",
+    "date_column": "trade_date",
+    "code_column": "ts_code",
+    "partition_column": "trade_date"
+  }
+}
+
+----- STDERR -----
+<empty>

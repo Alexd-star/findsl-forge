@@ -1,0 +1,110 @@
+证据编号: EV-032
+截图名称: 结果文件内容截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-Content .\submission_artifacts\evidence_snapshots\official_suite_report.md -TotalCount 140
+退出码: 0
+耗时: 0.249s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+# Official-Style Coverage Suite
+
+## Summary
+
+- Suite passed: True
+- Positive cases passed: 37/37
+- Negative diagnostic cases passed: 37/37
+
+## Positive Cases
+
+| Case | Scenario | Passed | Equivalence | SQL rows | Reference rows | Missing evidence |
+|---|---|---:|---:|---:|---:|---|
+| A鑲¤繛缁?澶╀富鍔涘噣娴佸叆涓烘鍚庢寜鎹㈡墜鐜囨帓鍚?| staged_filter_rank | True | True | 2 | 2 | <none> |
+| 浠婃棩鏀剁洏浠峰垱杩?鏃ユ柊楂?| max_window_breakout | True | True | 12 | 12 | <none> |
+| 杩?0鏃ュ瓨鍦ㄦ斁閲忎俊鍙?| exist_volume_above_ma | True | True | 11 | 11 | <none> |
+| 鎴愪氦閲?鏃ユ粴鍔ㄦ眰鍜岃蛋鍓嶇紑琛?| volume_prefix_sum | True | True | 7 | 7 | <none> |
+| 涓诲姏鍑€娴佸叆3鏃ユ粴鍔ㄦ眰鍜岃蛋璧勯噾娴佸墠缂€琛?| money_flow_prefix_sum | True | True | 3 | 3 | <none> |
+| 鏀剁洏浠峰己浜庡潎绾夸笖鎴愪氦閲忓垱鏂伴珮 | compound_numeric_windows | True | True | 9 | 9 | <none> |
+| B鑲¤繎2鏃ュ潎閲忎笉浣庝簬80 | market_join_with_ma | True | True | 4 | 4 | <none> |
+| A鑲￠珮鎹㈡墜鍚庢寜鏀剁洏浠峰彇姣忔棩鍓? | filter_rank_top | True | True | 8 | 8 | <none> |
+| A鑲″瓨鍦ㄨ祫閲戞祦鍏ュ悗鎸変綆浠峰彇姣忔棩2鍙?| exist_rank_bottom | True | True | 9 | 9 | <none> |
+| 鏀剁洏浠峰姞鎹㈡墜鐜囧ぇ浜?2 | numeric_arithmetic | True | True | 9 | 9 | <none> |
+| A鑲￠珮鎹㈡墜鐜囨瘡鏃ュ墠50鐧惧垎姣?| rank_percent_cutoff | True | True | 5 | 5 | <none> |
+| 鏃ユ湡鍖洪棿涓嬫帹鍚庣瓫鏀剁洏浠?| date_range_pushdown | True | True | 6 | 6 | <none> |
+| 绐楀彛鏌ヨ鏃ユ湡涓婄晫瀹夊叏瑁佸壀 | date_range_window_pruning | True | True | 7 | 7 | <none> |
+| 涓诲姏鍑€娴佸嚭浣庝簬璐熼槇鍊?| signed_numeric_threshold | True | True | 1 | 1 | <none> |
+| 鏀剁洏浠疯穼鐮磋繎3鏃ユ渶浣庡€奸槇鍊?| min_window_floor | True | True | 5 | 5 | <none> |
+| 鏃ユ湡鍖洪棿鍓嶇紑鍜屽畬鏁翠笅鎺?| date_range_prefix_sum_pruning | True | True | 5 | 5 | <none> |
+| 绛夊€兼瘮杈冪敓鎴怐oris鏍囧噯绛夊彿 | sql_equality_operator | True | True | 1 | 1 | <none> |
+| 鍗曠瓑鍙风瓑鍊兼瘮杈冨吋瀹?| single_equal_operator | True | True | 1 | 1 | <none> |
+| 澶氶樁娈佃繃婊ゅ悗鍐嶈绠楀潎绾?| then_filter_window_filter | True | True | 9 | 9 | <none> |
+| 鎸?鏃ュ潎浠疯繘琛屾瘡鏃ユ帓鍚?| rank_by_window_feature | True | True | 5 | 5 | <none> |
+| 鎸囨爣鍚嶅ぇ灏忓啓瀹归敊 | case_insensitive_indicator_name | True | True | 9 | 9 | <none> |
+| 甯傚満浠ｇ爜澶у皬鍐欏閿?| case_insensitive_market_code | True | True | 10 | 10 | <none> |
+| 鍏堝叏甯傚満鎺掑悕鍚庤繃婊鑲?| rank_then_market_filter | True | True | 10 | 10 | <none> |
+| 杩炵画涓ゆ鎺掑悕閲嶆柊璁＄畻鍚嶆 | rank_then_rank_recompute | True | True | 5 | 5 | <none> |
+| 琛屾儏鎴栬祫閲戞祦鏉′欢淇濈暀绋€鐤忚緟鍔╄〃 | sparse_auxiliary_left_join | True | True | 13 | 13 | <none> |
+| 120鏃ユ垚浜ら噺鐑偣绐楀彛鐩存帴璇诲彇鐗╁寲鍒?| hot_window_materialized_prefix | True | True | 0 | 0 | <none> |
+| 鏃ユ湡鍖洪棿璧勯噾娴佸墠缂€鍜屽悗鎸変綆鏀剁洏浠锋帓鍚?| date_money_flow_prefix_rank | True | True | 1 | 1 | <none> |
+| 鏃ユ湡鍖洪棿A鑲℃崲鎵嬬巼姣忔棩绗竴 | date_market_rank_top | True | True | 3 | 3 | <none> |
+| 鎴愪氦閲忕浉瀵逛笁鏃ュ潎閲忔斁澶?| volume_ratio_to_ma | True | True | 1 | 1 | <none> |
+| 杩囨护A鑲＄獊鐮翠綆鐐瑰悗鎸夊潎鎹㈡墜鐜囨帓鍚?| staged_min_filter_rank_by_ma | True | True | 4 | 4 | <none> |
+| 鏃ユ湡鍖洪棿瀛樺湪璧勯噾娴佸嚭淇″彿 | date_exist_outflow | True | True | 5 | 5 | <none> |
+| 鏃ユ湡鍖洪棿杩?鏃ユ敹鐩婄巼瓒呰繃5% | date_close_return_rate | True | True | 5 | 5 | <none> |
+| 鎴愪氦閲忎笉涓洪浂涓旀崲鎵嬬巼涓嶄綆浜?.5 | not_equal_and_gte_filter | True | True | 14 | 14 | <none> |
+| 鏃ユ湡鍖洪棿鍐匒鑲℃垨浣庝环鑲?| parenthesized_or_with_date_pushdown | True | True | 9 | 9 | <none> |
+| 姣忔棩浣庝环鍓?0鐧惧垎姣?| rank_ascending_percent_cutoff | True | True | 10 | 10 | <none> |
+| 杩?鏃ユ敹鐩樻敹鐩婄巼涓鸿礋 | negative_return_rate_threshold | True | True | 3 | 3 | <none> |
+| 璺ㄥ競鍦哄紓鎴栦綆浠风獊鐮寸瓫閫?| market_xor_close_breakout | True | True | 1 | 1 | <none> |
+
+## Negative Diagnostic Cases
+
+| Case | Passed | Expected code | Actual code | Suggestions | Missing suggestion evidence |
+|---|---:|---|---|---:|---|
+| 鏈煡鎸囨爣鍚?| True | UNKNOWN_INDICATOR | UNKNOWN_INDICATOR | 2 | <none> |
+| 鏈煡鍑芥暟 | True | UNKNOWN_FUNCTION | UNKNOWN_FUNCTION | 1 | <none> |
+| CONS鍙傛暟绫诲瀷閿欒 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 绐楀彛蹇呴』涓烘鏁?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 缂哄皯鍙虫嫭鍙?| True | PARSE_ERROR | PARSE_ERROR | 3 | <none> |
+| 瀛楃涓叉湭闂悎 | True | LEX_ERROR | LEX_ERROR | 3 | <none> |
+| rank鍛藉悕鍙傛暟閿欒 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| rank鐧惧垎姣旇秺鐣?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| rank搴曢儴鎺掑簭鏂瑰悜涓嶄竴鑷?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 鏃ユ湡鍖洪棿璧锋鍊掔疆 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 鏁板瓧瀛楅潰閲忔牸寮忛敊璇?| True | LEX_ERROR | LEX_ERROR | 3 | <none> |
+| 瑁告寚鏍囧垪鍚嶇粫杩?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| filter鏉′欢涓嶆槸甯冨皵琛ㄨ揪寮?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 4 | <none> |
+| then闃舵涓嶆槸鍏崇郴琛ㄨ揪寮?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 绐楀彛涓嶆槸鏁存暟瀛楅潰閲?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 椤跺眰琛ㄨ揪寮忎笉鏄叧绯绘垨甯冨皵 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 4 | <none> |
+| 甯傚満鍙傛暟涓嶆槸瀛楃涓叉垨鏍囪瘑绗?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 闄ゆ暟涓洪浂瀛楅潰閲?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| 鎸囨爣鍙傛暟涓嶆槸瀛楃涓叉垨鏍囪瘑绗?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 鏃ユ湡鏍煎紡涓嶆槸ISO | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| filter鍐呰８瀛楁鍗曠瓑鍙疯鍐?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 闄ゆ暟涓洪浂甯搁噺琛ㄨ揪寮?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| 鍛藉悕鍙傛暟鍚庤窡浣嶇疆鍙傛暟 | True | PARSE_ERROR | PARSE_ERROR | 2 | <none> |
+| rank椤堕儴鎺掑簭鏂瑰悜涓嶄竴鑷?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| rank椤堕儴鏁伴噺涓嶆槸鏁存暟 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| rank椤堕儴鏁伴噺蹇呴』涓烘 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| 閲嶅鍛藉悕鍙傛暟 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 鏃ユ湡涓嶅瓨鍦?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| rank鎺掑簭鏂瑰悜闈炴硶 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 1 | <none> |
+| EXIST绐楀彛蹇呴』涓烘 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| 绐楀彛鍙傛暟涓嶈兘鏄瓧绗︿覆 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| rank鐧惧垎姣斾笉鑳戒负闆?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| date_between鍙傛暟涓嶈冻 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| RET涓嶈兘宓屽绐楀彛琛ㄨ揪寮?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| rank涓嶈兘鍚屾椂浣跨敤top鍜宲ercent | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 3 | <none> |
+| RET绐楀彛蹇呴』涓烘 | True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+| SUM棣栧弬涓嶈兘鏄竷灏旀潯浠?| True | SEMANTIC_ERROR | SEMANTIC_ERROR | 2 | <none> |
+
+## Evidence Policy
+
+- Positive cases must compile, match SQL fragments, match trace fragments, expose expected explain rules, and match the independent SQL/reference result.
+- Negative cases must fail safely with the expected diagnostic code and actionable repair suggestions.
+
+----- STDERR -----
+<empty>

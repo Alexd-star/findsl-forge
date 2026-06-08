@@ -1,0 +1,109 @@
+证据编号: EV-027
+截图名称: 核心算法 prefix-sum 代码位置截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-Content .\src\findsl\sqlgen.py | Select-Object -Skip 595 -First 95
+退出码: 0
+耗时: 0.273s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+            alias=alias,
+            function=node.name.upper(),
+            template=template,
+        )
+        self._numeric_features.append(Feature(alias=alias, expression=expression))
+        return alias
+
+    def _try_register_prefix_sum(self, node: FunctionCall) -> Optional[str]:
+        if not self.enable_prefix_sum:
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Prefix-sum optimizer is disabled",
+                reason="disabled",
+            )
+            return None
+        if self._current_source:
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Prefix-sum optimizer currently applies only to base relations",
+                reason="staged_relation",
+                source=self._current_source,
+            )
+            return None
+        indicator_call = node.args[0]
+        if not isinstance(indicator_call, FunctionCall) or indicator_call.name.upper() != "INDICATOR":
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Prefix-sum optimizer requires SUM(indicator(...), window)",
+                reason="non_indicator_expression",
+            )
+            return None
+        indicator_name = self._symbol_arg(indicator_call.args[0], "indicator")
+        meta = self.registry.indicator(indicator_name)
+        if not meta.get("supports_prefix_sum"):
+            self._explain(
+                "PREFIX_SUM",
+                "skipped",
+                "Indicator does not declare prefix-sum support",
+                reason="unsupported_indicator",
+                indicator=indicator_name,
+            )
+            return None
+
+        window = self._window_value(node.args[1])
+        prefix_table = self.registry.table(meta["prefix_table"])
+        prefix_physical = prefix_table["physical"]
+        prefix_column = meta["prefix_column"]
+        row_column = prefix_table.get("row_column", "row_no")
+        materialized_window_column = _materialized_window_column(meta, window)
+        alias = self._next_alias("__psum")
+        feature_no = self._feature_counter
+        curr = f"__pref_curr_{feature_no}"
+        prev = f"__pref_prev_{feature_no}"
+        self.trace.append(f"rewrite SUM() on {indicator_name} into prefix-sum feature {alias}")
+        self._explain(
+            "PREFIX_SUM",
+            "applied",
+            "Rewrite rolling SUM into prefix table subtraction",
+            alias=alias,
+            indicator=indicator_name,
+            window=window,
+            prefix_table=prefix_physical,
+            prefix_column=prefix_column,
+            materialized_window_column=materialized_window_column,
+        )
+        joins = [
+            (
+                f"LEFT JOIN {prefix_physical} AS {curr} "
+                f"ON {curr}.ts_code = {{source}}.ts_code AND {curr}.trade_date = {{source}}.trade_date"
+            )
+        ]
+        if materialized_window_column:
+            expression = f"{curr}.{materialized_window_column}"
+        else:
+            joins.append(
+                (
+                    f"LEFT JOIN {prefix_physical} AS {prev} "
+                    f"ON {prev}.ts_code = {curr}.ts_code AND {prev}.{row_column} = {curr}.{row_column} - {window}"
+                )
+            )
+            expression = f"({curr}.{prefix_column} - COALESCE({prev}.{prefix_column}, 0))"
+        self._numeric_features.append(Feature(alias=alias, expression=expression, joins=joins))
+        return alias
+
+    def _register_rolling_feature(self, feature_name: str, expression: str) -> str:
+        alias = self._next_alias("__roll")
+        self.trace.append(f"rewrite {feature_name}() into rolling window feature {alias}")
+        self._explain(
+            "ROLLING_BOOLEAN",
+            "applied",
+            f"Rewrite {feature_name}() into rolling boolean window feature",
+            alias=alias,
+
+----- STDERR -----
+<empty>

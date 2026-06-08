@@ -1,0 +1,45 @@
+证据编号: EV-003
+截图名称: 测试目录截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-ChildItem -LiteralPath .\tests -Force | Select-Object Mode,Length,LastWriteTime,Name
+退出码: 0
+耗时: 0.232s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+
+Mode   Length LastWriteTime      Name                      
+----   ------ -------------      ----                      
+d-----        2026/6/8 0:02:59   __pycache__               
+-a---- 1391   2026/5/23 13:44:44 test_benchmark.py         
+-a---- 1025   2026/5/23 20:55:55 test_cli.py               
+-a---- 13778  2026/6/7 17:10:51  test_compiler.py          
+-a---- 1058   2026/5/23 20:17:02 test_config_extension.py  
+-a---- 2861   2026/5/26 1:38:43  test_defense_package.py   
+-a---- 926    2026/5/25 1:54:26  test_defense_video.py     
+-a---- 4098   2026/5/25 2:45:35  test_demo.py              
+-a---- 10288  2026/5/23 19:54:40 test_diagnostics.py       
+-a---- 2072   2026/5/23 22:57:21 test_doris.py             
+-a---- 7144   2026/5/23 3:19:48  test_doris_evidence.py    
+-a---- 2445   2026/6/7 17:46:46  test_doris_sql.py         
+-a---- 14265  2026/6/7 17:13:41  test_equivalence.py       
+-a---- 615    2026/5/23 1:28:59  test_evaluation.py        
+-a---- 6612   2026/6/7 19:01:31  test_evidence_metadata.py 
+-a---- 4049   2026/5/26 1:38:01  test_llm_adapter.py       
+-a---- 5721   2026/5/26 1:37:35  test_llm_provider.py      
+-a---- 9033   2026/5/24 12:18:33 test_nl2dsl.py            
+-a---- 1486   2026/6/6 21:21:44  test_official_suite.py    
+-a---- 1483   2026/6/6 21:21:44  test_parser.py            
+-a---- 7090   2026/6/6 21:24:21  test_readiness.py         
+-a---- 2066   2026/5/25 2:04:10  test_real_market_sample.py
+-a---- 3050   2026/5/24 12:21:58 test_reference.py         
+-a---- 1128   2026/5/23 13:44:50 test_scale_benchmark.py   
+-a---- 5093   2026/5/24 12:18:10 test_semantic.py          
+-a---- 1135   2026/5/23 1:54:54  test_synthetic.py         
+-a---- 1058   2026/6/7 23:53:34  test_template_functions.py
+-a---- 1897   2026/6/8 0:02:51   test_topic_compliance.py
+
+----- STDERR -----
+<empty>

@@ -1,0 +1,49 @@
+证据编号: EV-002
+截图名称: 核心源码目录截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-ChildItem -LiteralPath .\src\findsl -Force | Select-Object Mode,Length,LastWriteTime,Name
+退出码: 0
+耗时: 0.262s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+
+Mode   Length LastWriteTime      Name                
+----   ------ -------------      ----                
+d-----        2026/6/7 23:56:23  __pycache__         
+-a---- 1723   2026/5/23 0:39:56  ast_nodes.py        
+-a---- 6288   2026/5/23 13:44:18 benchmark.py        
+-a---- 29719  2026/6/7 23:56:12  cli.py              
+-a---- 2273   2026/5/23 13:21:35 compiler.py         
+-a---- 37885  2026/5/26 1:38:34  defense_package.py  
+-a---- 50323  2026/6/7 12:28:43  demo.py             
+-a---- 8628   2026/6/6 21:21:44  diagnostics.py      
+-a---- 14451  2026/5/23 22:57:01 doris.py            
+-a---- 11485  2026/5/23 23:10:30 doris_evidence.py   
+-a---- 6972   2026/6/7 17:47:23  doris_sql.py        
+-a---- 2705   2026/5/23 20:16:42 equivalence.py      
+-a---- 401    2026/5/23 0:39:56  errors.py           
+-a---- 6039   2026/5/23 1:27:28  evaluation.py       
+-a---- 11316  2026/6/7 18:21:00  evidence_metadata.py
+-a---- 9573   2026/6/7 17:10:51  executor.py         
+-a---- 335    2026/5/23 1:27:28  explain.py          
+-a---- 2519   2026/6/6 21:21:44  lexer.py            
+-a---- 12452  2026/5/26 1:37:50  llm_adapter.py      
+-a---- 6507   2026/5/26 1:36:40  llm_provider.py     
+-a---- 26755  2026/5/24 12:15:32 nl2dsl.py           
+-a---- 9691   2026/5/23 3:34:47  official_suite.py   
+-a---- 4667   2026/6/6 21:21:44  parser.py           
+-a---- 46328  2026/6/6 21:26:30  readiness.py        
+-a---- 11537  2026/6/7 23:56:12  reference.py        
+-a---- 1739   2026/5/23 20:16:26 registry.py         
+-a---- 6440   2026/5/23 13:44:27 scale_benchmark.py  
+-a---- 11487  2026/6/7 23:56:12  semantic.py         
+-a---- 33159  2026/6/7 23:56:12  sqlgen.py           
+-a---- 4791   2026/5/23 1:50:49  synthetic.py        
+-a---- 8526   2026/6/7 23:56:12  topic_compliance.py 
+-a---- 126    2026/5/23 0:39:56  __init__.py
+
+----- STDERR -----
+<empty>

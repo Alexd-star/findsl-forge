@@ -1,0 +1,249 @@
+证据编号: EV-035
+截图名称: 基线性能截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 10 --output 'D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\submission_artifacts\visual_evidence\generated_outputs\prefix_sum_benchmark.md' --json
+退出码: 0
+耗时: 0.808s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+{
+  "dsl": "filter(SUM(indicator(volume), 3) > 300)",
+  "iterations": 10,
+  "baseline": {
+    "name": "baseline_window",
+    "sql": "SELECT * FROM (SELECT base_features.*, SUM(volume) OVER (PARTITION BY ts_code ORDER BY trade_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS __win_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features) numeric_features_1 WHERE __win_1 > 300",
+    "trace": [
+      "rewrite SUM() into SUM window feature __win_1",
+      "materialize numeric window features before filtering",
+      "rewrite filter predicate into outer WHERE over materialized features"
+    ],
+    "explain": [
+      {
+        "rule": "PREFIX_SUM",
+        "status": "skipped",
+        "message": "Prefix-sum optimizer is disabled",
+        "evidence": {
+          "reason": "disabled"
+        }
+      },
+      {
+        "rule": "WINDOW_FEATURE",
+        "status": "applied",
+        "message": "Rewrite SUM() into SUM window feature",
+        "evidence": {
+          "alias": "__win_1",
+          "function": "SUM",
+          "sql_function": "SUM",
+          "window": 3
+        }
+      },
+      {
+        "rule": "FEATURE_LAYER",
+        "status": "applied",
+        "message": "Materialize numeric features before filtering",
+        "evidence": {
+          "feature_count": 1
+        }
+      },
+      {
+        "rule": "FILTER_OUTER_WHERE",
+        "status": "applied",
+        "message": "Rewrite filter predicate into outer WHERE over materialized features",
+        "evidence": {
+          "condition": "__win_1 > 300"
+        }
+      },
+      {
+        "rule": "DORIS_SQL_VALIDATION",
+        "status": "applied",
+        "message": "Validate generated SQL against Doris-safe query shape",
+        "evidence": {
+          "issue_count": 0,
+          "statement_count": 1,
+          "table_references": [
+            "dwd_stock_daily_quote"
+          ],
+          "contains_window": true,
+          "contains_prefix_table": false
+        }
+      }
+    ],
+    "compile_ms": 1.144299999999987,
+    "execute_ms": [
+      0.08409999999992035,
+      0.03399999999997849,
+      0.03069999999993911,
+      0.02959999999996299,
+      0.029399999999957238,
+      0.028800000000051007,
+      0.02869999999999262,
+      0.028399999999928482,
+      0.028400000000039505,
+      0.02869999999999262
+    ],
+    "keys": [
+      [
+        "AAA",
+        "2026-01-03"
+      ],
+      [
+        "AAA",
+        "2026-01-04"
+      ],
+      [
+        "AAA",
+        "2026-01-05"
+      ],
+      [
+        "BBB",
+        "2026-01-02"
+      ],
+      [
+        "BBB",
+        "2026-01-03"
+      ],
+      [
+        "BBB",
+        "2026-01-04"
+      ],
+      [
+        "BBB",
+        "2026-01-05"
+      ]
+    ]
+  },
+  "optimized": {
+    "name": "optimized_prefix_sum",
+    "sql": "SELECT * FROM (SELECT base_features.*, (__pref_curr_1.volume_prefix - COALESCE(__pref_prev_1.volume_prefix, 0)) AS __psum_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_curr_1 ON __pref_curr_1.ts_code = base_features.ts_code AND __pref_curr_1.trade_date = base_features.trade_date LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_prev_1 ON __pref_prev_1.ts_code = __pref_curr_1.ts_code AND __pref_prev_1.row_no = __pref_curr_1.row_no - 3) numeric_features_1 WHERE __psum_1 > 300",
+    "trace": [
+      "rewrite SUM() on volume into prefix-sum feature __psum_1",
+      "materialize numeric window features before filtering",
+      "rewrite filter predicate into outer WHERE over materialized features"
+    ],
+    "explain": [
+      {
+        "rule": "PREFIX_SUM",
+        "status": "applied",
+        "message": "Rewrite rolling SUM into prefix table subtraction",
+        "evidence": {
+          "alias": "__psum_1",
+          "indicator": "volume",
+          "window": 3,
+          "prefix_table": "dwd_stock_daily_quote_prefix",
+          "prefix_column": "volume_prefix",
+          "materialized_window_column": null
+        }
+      },
+      {
+        "rule": "FEATURE_LAYER",
+        "status": "applied",
+        "message": "Materialize numeric features before filtering",
+        "evidence": {
+          "feature_count": 1
+        }
+      },
+      {
+        "rule": "FILTER_OUTER_WHERE",
+        "status": "applied",
+        "message": "Rewrite filter predicate into outer WHERE over materialized features",
+        "evidence": {
+          "condition": "__psum_1 > 300"
+        }
+      },
+      {
+        "rule": "DORIS_SQL_VALIDATION",
+        "status": "applied",
+        "message": "Validate generated SQL against Doris-safe query shape",
+        "evidence": {
+          "issue_count": 0,
+          "statement_count": 1,
+          "table_references": [
+            "dwd_stock_daily_quote",
+            "dwd_stock_daily_quote_prefix"
+          ],
+          "contains_window": false,
+          "contains_prefix_table": true
+        }
+      }
+    ],
+    "compile_ms": 0.46239999999997394,
+    "execute_ms": [
+      0.09100000000006325,
+      0.025900000000023127,
+      0.022900000000047882,
+      0.022299999999919606,
+      0.021700000000013375,
+      0.02179999999996074,
+      0.02179999999996074,
+      0.021700000000013375,
+      0.021500000000007624,
+      0.021500000000007624
+    ],
+    "keys": [
+      [
+        "AAA",
+        "2026-01-03"
+      ],
+      [
+        "AAA",
+        "2026-01-04"
+      ],
+      [
+        "AAA",
+        "2026-01-05"
+      ],
+      [
+        "BBB",
+        "2026-01-02"
+      ],
+      [
+        "BBB",
+        "2026-01-03"
+      ],
+      [
+        "BBB",
+        "2026-01-04"
+      ],
+      [
+        "BBB",
+        "2026-01-05"
+      ]
+    ]
+  },
+  "reference_keys": [
+    [
+      "AAA",
+      "2026-01-03"
+    ],
+    [
+      "AAA",
+      "2026-01-04"
+    ],
+    [
+      "AAA",
+      "2026-01-05"
+    ],
+    [
+      "BBB",
+      "2026-01-02"
+    ],
+    [
+      "BBB",
+      "2026-01-03"
+    ],
+    [
+      "BBB",
+      "2026-01-04"
+    ],
+    [
+      "BBB",
+      "2026-01-05"
+    ]
+  ]
+}
+
+----- STDERR -----
+<empty>

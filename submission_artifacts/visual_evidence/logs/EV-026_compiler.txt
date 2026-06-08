@@ -1,0 +1,76 @@
+证据编号: EV-026
+截图名称: 核心算法 Compiler 代码位置截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+命令: Get-Content .\src\findsl\compiler.py -TotalCount 120
+退出码: 0
+耗时: 0.248s
+期望退出码: 0
+状态: PASS
+
+----- STDOUT -----
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List
+
+from .parser import parse
+from .registry import Registry, default_registry
+from .semantic import SemanticAnalyzer
+from .doris_sql import validate_doris_select_sql
+from .errors import SemanticError
+from .explain import ExplainStep
+from .sqlgen import SqlGenerator
+
+
+@dataclass(frozen=True)
+class CompileResult:
+    dsl: str
+    ast: Dict[str, Any]
+    sql: str
+    trace: List[str]
+    explain: List[Dict[str, Any]]
+    elapsed_ms: float
+
+
+class Compiler:
+    def __init__(self, registry: Registry = None, enable_prefix_sum: bool = True):
+        self.registry = registry or default_registry()
+        self.enable_prefix_sum = enable_prefix_sum
+
+    def compile(self, dsl: str, enable_prefix_sum: bool = None) -> CompileResult:
+        started = time.perf_counter()
+        ast = parse(dsl)
+        root_type = SemanticAnalyzer(self.registry).validate(ast)
+        if root_type not in {"relation", "boolean"}:
+            raise SemanticError(
+                f"Top-level DSL must be a relation or boolean filter condition, got {root_type}"
+            )
+        use_prefix_sum = self.enable_prefix_sum if enable_prefix_sum is None else enable_prefix_sum
+        plan = SqlGenerator(self.registry, enable_prefix_sum=use_prefix_sum).generate(ast)
+        validation = validate_doris_select_sql(plan.sql, self.registry)
+        if not validation.passed:
+            issue_summary = "; ".join(f"{issue.code}: {issue.message}" for issue in validation.issues)
+            raise SemanticError(f"Generated Doris SQL failed validation: {issue_summary}")
+        explain = list(plan.explain)
+        explain.append(
+            ExplainStep(
+                rule="DORIS_SQL_VALIDATION",
+                status="applied",
+                message="Validate generated SQL against Doris-safe query shape",
+                evidence=validation.to_explain_evidence(),
+            ).to_dict()
+        )
+        elapsed_ms = (time.perf_counter() - started) * 1000
+        return CompileResult(
+            dsl=dsl,
+            ast=ast.to_dict(),
+            sql=plan.sql,
+            trace=plan.trace,
+            explain=explain,
+            elapsed_ms=elapsed_ms,
+        )
+
+----- STDERR -----
+<empty>

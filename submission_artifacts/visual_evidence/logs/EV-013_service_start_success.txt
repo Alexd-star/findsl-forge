@@ -1,0 +1,130 @@
+证据编号: EV-013
+截图名称: 服务启动成功截图
+生成时间: 2026-06-08T16:40:03+08:00
+工作目录: D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge
+服务命令: C:\Program Files\Python39\python.exe -m findsl.cli serve-demo --host 127.0.0.1 --port 59700
+进程 PID: 80856
+健康检查 URL: http://127.0.0.1:59700/api/examples
+状态: PASS
+
+----- /api/examples 响应片段 -----
+{
+  "ok": true,
+  "examples": [
+    {
+      "name": "连续3天主力净流入为正后按换手率排名",
+      "dsl": "then(filter(market(\"A\") & CONS(indicator(\"main_net_inflow\") > 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "今日收盘价创250日新高",
+      "dsl": "filter(indicator(\"close\") >= MAX(indicator(\"close\"), 250))",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "近10日存在放量",
+      "dsl": "filter(EXIST(indicator(\"volume\") > MA(indicator(\"volume\"), 20), 10))",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "无引号指标名兼容",
+      "dsl": "filter(indicator(close) > MA(indicator(close), 20))",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "近3日成交量前缀和加速",
+      "dsl": "filter(SUM(indicator(\"volume\"), 3) > 300)",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "A股每日换手率前50百分比",
+      "dsl": "then(filter(market(\"A\")), rank(indicator(\"turnover_rate\"), desc, percent=50))",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "日期区间内收盘价大于10",
+      "dsl": "filter(date_between(\"2026-01-02\", \"2026-01-04\") & indicator(\"close\") > 10)",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "窗口查询日期上界安全裁剪",
+      "dsl": "filter(date_between(\"2026-01-02\", \"2026-01-04\") & indicator(\"close\") > MA(indicator(\"close\"), 3))",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "主力净流出负阈值",
+      "dsl": "filter(indicator(\"main_net_inflow\") < -1.5)",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "近2日收盘价收益率超过5%",
+      "dsl": "filter(RET(indicator(\"close\"), 2) > 0.05)",
+      "kind": "baseline",
+      "scenario": "evaluation",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "Official positive: A股连续3天主力净流入为正后按换手率排名",
+      "dsl": "then(filter(market(\"A\") & CONS(indicator(\"main_net_inflow\") > 0, 3)), rank(indicator(\"turnover_rate\"), desc, top=100))",
+      "kind": "official_positive",
+      "scenario": "staged_filter_rank",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "Official positive: 今日收盘价创近3日新高",
+      "dsl": "filter(indicator(\"close\") >= MAX(indicator(\"close\"), 3))",
+      "kind": "official_positive",
+      "scenario": "max_window_breakout",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "Official positive: 近10日存在放量信号",
+      "dsl": "filter(EXIST(indicator(\"volume\") > MA(indicator(\"volume\"), 3), 2))",
+      "kind": "official_positive",
+      "scenario": "exist_volume_above_ma",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "Official positive: 成交量3日滚动求和走前缀表",
+      "dsl": "filter(SUM(indicator(\"volume\"), 3) > 300)",
+      "kind": "official_positive",
+      "scenario": "volume_prefix_sum",
+      "dataset": "default",
+      "dataset_label": "sample fixtures"
+    },
+    {
+      "name": "Official positive: 主力净流入3日滚动求和走资金流前缀表",
+      "dsl": "filter(SUM(indicator(\"main_net_inflow\"), 3) > 4)",
+      "kind": "official_positive",
+      "scenario": "money_flow_prefix

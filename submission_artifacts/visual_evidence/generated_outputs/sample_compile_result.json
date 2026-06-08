@@ -1,0 +1,86 @@
+﻿{
+  "dsl": "filter(ABS(indicator(main_net_inflow)) > 0)",
+  "ast": {
+    "type": "FunctionCall",
+    "name": "filter",
+    "args": [
+      {
+        "type": "Comparison",
+        "op": ">",
+        "left": {
+          "type": "FunctionCall",
+          "name": "ABS",
+          "args": [
+            {
+              "type": "FunctionCall",
+              "name": "indicator",
+              "args": [
+                {
+                  "type": "Identifier",
+                  "name": "main_net_inflow"
+                }
+              ],
+              "named_args": []
+            }
+          ],
+          "named_args": []
+        },
+        "right": {
+          "type": "Literal",
+          "value": 0
+        }
+      }
+    ],
+    "named_args": []
+  },
+  "sql": "SELECT * FROM (SELECT base_features.*, ABS(main_net_inflow) AS __tpl_1 FROM (SELECT base.*, mf.main_net_inflow AS main_net_inflow FROM dwd_stock_daily_quote AS base LEFT JOIN dwd_stock_money_flow AS mf USING (ts_code, trade_date)) base_features) numeric_features_1 WHERE __tpl_1 > 0",
+  "trace": [
+    "rewrite ABS() through configured numeric template __tpl_1",
+    "materialize numeric window features before filtering",
+    "rewrite filter predicate into outer WHERE over materialized features"
+  ],
+  "explain": [
+    {
+      "rule": "TEMPLATE_NUMERIC_FUNCTION",
+      "status": "applied",
+      "message": "Rewrite configured numeric function through sql_template",
+      "evidence": {
+        "alias": "__tpl_1",
+        "function": "ABS",
+        "template": "ABS({arg0})"
+      }
+    },
+    {
+      "rule": "FEATURE_LAYER",
+      "status": "applied",
+      "message": "Materialize numeric features before filtering",
+      "evidence": {
+        "feature_count": 1
+      }
+    },
+    {
+      "rule": "FILTER_OUTER_WHERE",
+      "status": "applied",
+      "message": "Rewrite filter predicate into outer WHERE over materialized features",
+      "evidence": {
+        "condition": "__tpl_1 > 0"
+      }
+    },
+    {
+      "rule": "DORIS_SQL_VALIDATION",
+      "status": "applied",
+      "message": "Validate generated SQL against Doris-safe query shape",
+      "evidence": {
+        "issue_count": 0,
+        "statement_count": 1,
+        "table_references": [
+          "dwd_stock_daily_quote",
+          "dwd_stock_money_flow"
+        ],
+        "contains_window": false,
+        "contains_prefix_table": false
+      }
+    }
+  ],
+  "elapsed_ms": 1.8714999999999982
+}
