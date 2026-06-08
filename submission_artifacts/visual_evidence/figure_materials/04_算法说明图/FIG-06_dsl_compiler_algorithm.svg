@@ -89,7 +89,7 @@
 <tspan x="1564.0" dy="0.0">最新门禁</tspan>
 </text>
 <text x="1564.0" y="918.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
-<tspan x="1564.0" dy="0.0">compile success rate 100.00%；compile P95 2.329 ms；</tspan>
+<tspan x="1564.0" dy="0.0">compile success rate 100.00%；compile P95 1.338 ms；</tspan>
 <tspan x="1564.0" dy="24.3">warning count 0。</tspan>
 </text>
 <line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>

@@ -31,7 +31,7 @@
 </text>
 <text x="1645.0" y="410.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#0072B2" text-anchor="start">
 <tspan x="1645.0" dy="0.0">203 passed</tspan>
-<tspan x="1645.0" dy="54.0">17.61s</tspan>
+<tspan x="1645.0" dy="54.0">8.71s</tspan>
 </text>
 <rect x="150.0" y="575.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#009E73" stroke-width="1.2"/>
 <text x="185.0" y="630.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#4b5563" text-anchor="start">
@@ -80,7 +80,7 @@
 <tspan x="444.0" dy="0.0">最新证据时间</tspan>
 </text>
 <text x="444.0" y="1238.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#4b5563" text-anchor="start">
-<tspan x="444.0" dy="0.0">metadata generated_at=2026-06-08T13:04:31Z；Git HEAD at export=4f7efdc；snapshot_dir=submission_artifacts\evidence_snapshots。</tspan>
+<tspan x="444.0" dy="0.0">metadata generated_at=2026-06-08T14:05:03Z；Git HEAD at export=38bb712；snapshot_dir=submission_artifacts\evidence_snapshots。</tspan>
 </text>
 <line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#b8c0cc" stroke-width="1" stroke-linecap="round"/>
 <text x="92.0" y="1457.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="16" font-weight="400" fill="#4b5563" text-anchor="start">

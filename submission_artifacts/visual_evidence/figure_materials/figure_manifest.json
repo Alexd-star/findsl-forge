@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-08T21:59:26+08:00",
-  "metadata_generated_at": "2026-06-08T13:04:31Z",
-  "git_head_at_export": "4f7efdc",
+  "generated_at": "2026-06-08T22:05:28+08:00",
+  "metadata_generated_at": "2026-06-08T14:05:03Z",
+  "git_head_at_export": "38bb712",
   "style_standard": "SciPilot/Nature-inspired publication style v2",
   "style_rules": [
     "white background",
@@ -14,7 +14,7 @@
   ],
   "pytest": {
     "passed": 203,
-    "elapsed_seconds": 17.61
+    "elapsed_seconds": 8.71
   },
   "official_suite": {
     "suite_passed": true,
