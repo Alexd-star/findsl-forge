@@ -1,7 +1,7 @@
 # 01_流程与机制图
 
 代码文件：`scripts/plottie_figures/flow.py`
-绘图规则：用细线、短标签和单一主色表达过程，不用 UI 卡片、阴影或图标堆叠。
+绘图规则：用 nature-skills 的 method schematic 约束和 figures4papers 的 GridSpec/直接标注方式表达过程，不用 UI 卡片、阴影或图标堆叠。
 
 | 图号 | 文件名 |
 |---|---|

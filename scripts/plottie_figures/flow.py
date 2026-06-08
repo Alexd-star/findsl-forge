@@ -38,8 +38,8 @@ def stage_row(ax, labels: list[str], y: float, x0: float = 0.08, x1: float = 0.9
 
 
 def fig_01(spec: FigureSpec, metrics: dict) -> dict[str, str]:
-    fig = plt.figure(figsize=(DOUBLE_IN, 3.55))
-    gs = fig.add_gridspec(1, 2, left=0.06, right=0.98, top=0.83, bottom=0.16, width_ratios=[1.35, 0.85], wspace=0.28)
+    fig = plt.figure(figsize=(DOUBLE_IN, 3.15))
+    gs = fig.add_gridspec(1, 2, left=0.06, right=0.98, top=0.80, bottom=0.17, width_ratios=[1.35, 0.85], wspace=0.28)
     figure_header(fig, spec)
     ax_a = fig.add_subplot(gs[0, 0])
     ax_b = fig.add_subplot(gs[0, 1])
@@ -69,8 +69,8 @@ def fig_01(spec: FigureSpec, metrics: dict) -> dict[str, str]:
 
 
 def fig_02(spec: FigureSpec, metrics: dict) -> dict[str, str]:
-    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 3.25))
-    fig.subplots_adjust(left=0.06, right=0.98, top=0.82, bottom=0.14)
+    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 2.85))
+    fig.subplots_adjust(left=0.06, right=0.98, top=0.78, bottom=0.15)
     figure_header(fig, spec)
     panel_label(ax, "a")
     axis_off(ax)
@@ -95,8 +95,8 @@ def fig_02(spec: FigureSpec, metrics: dict) -> dict[str, str]:
 
 
 def fig_05(spec: FigureSpec, metrics: dict) -> dict[str, str]:
-    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 3.9))
-    fig.subplots_adjust(left=0.08, right=0.98, top=0.83, bottom=0.12)
+    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 3.25))
+    fig.subplots_adjust(left=0.08, right=0.98, top=0.79, bottom=0.14)
     figure_header(fig, spec)
     panel_label(ax, "a")
     axis_off(ax)
@@ -118,34 +118,34 @@ def fig_05(spec: FigureSpec, metrics: dict) -> dict[str, str]:
 
 
 def fig_06(spec: FigureSpec, metrics: dict) -> dict[str, str]:
-    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 3.7))
-    fig.subplots_adjust(left=0.06, right=0.98, top=0.83, bottom=0.13)
+    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 2.8))
+    fig.subplots_adjust(left=0.06, right=0.98, top=0.78, bottom=0.15)
     figure_header(fig, spec)
     panel_label(ax, "a")
     axis_off(ax)
     boxes = [
-        (0.11, 0.61, "lexer\nparser"),
-        (0.30, 0.61, "typed\nAST"),
-        (0.49, 0.61, "semantic\ngates"),
-        (0.69, 0.61, "SQL\nemitter"),
-        (0.88, 0.61, "Doris-safe\nSQL"),
+        (0.11, 0.69, "lexer\nparser"),
+        (0.30, 0.69, "typed\nAST"),
+        (0.49, 0.69, "semantic\ngates"),
+        (0.69, 0.69, "SQL\nemitter"),
+        (0.88, 0.69, "Doris-safe\nSQL"),
     ]
     for i, (x, y, label) in enumerate(boxes):
-        ax.add_patch(Rectangle((x - 0.055, y - 0.045), 0.11, 0.09, facecolor=BLUE_LIGHT if i in {1, 3} else WHITE, edgecolor=INK, lw=0.55))
-        ax.text(x, y, label, ha="center", va="center", fontsize=5.7)
+        ax.add_patch(Rectangle((x - 0.058, y - 0.055), 0.116, 0.11, facecolor=BLUE_LIGHT if i in {1, 3} else WHITE, edgecolor=INK, lw=0.55))
+        ax.text(x, y, label, ha="center", va="center", fontsize=5.25, linespacing=0.92)
         if i:
             thin_arrow(ax, (boxes[i - 1][0] + 0.06, y), (x - 0.06, y))
-    thin_arrow(ax, (0.49, 0.55), (0.49, 0.34), color=RED)
-    ax.text(0.52, 0.34, "stable diagnostic\ncode + repair hint", va="center", fontsize=5.4, color=TEXT)
-    ax.text(0.11, 0.26, "No SQL is emitted before the typed and semantic gates pass.", fontsize=5.3, color=MUTED)
+    thin_arrow(ax, (0.49, 0.62), (0.49, 0.40), color=RED)
+    ax.text(0.52, 0.40, "stable diagnostic\ncode + repair hint", va="center", fontsize=5.4, color=TEXT)
+    ax.text(0.11, 0.30, "No SQL is emitted before the typed and semantic gates pass.", fontsize=5.3, color=MUTED)
     add_source(fig, spec.source)
     return save_figure(fig, spec)
 
 
 def fig_07(spec: FigureSpec, metrics: dict) -> dict[str, str]:
     doris = metrics["doris"]
-    fig = plt.figure(figsize=(DOUBLE_IN, 3.65))
-    gs = fig.add_gridspec(1, 2, left=0.07, right=0.98, top=0.82, bottom=0.16, width_ratios=[1.25, 0.8], wspace=0.30)
+    fig = plt.figure(figsize=(DOUBLE_IN, 3.1))
+    gs = fig.add_gridspec(1, 2, left=0.07, right=0.98, top=0.78, bottom=0.18, width_ratios=[1.25, 0.8], wspace=0.30)
     figure_header(fig, spec)
     ax_a = fig.add_subplot(gs[0, 0])
     ax_b = fig.add_subplot(gs[0, 1])
@@ -175,8 +175,8 @@ def fig_07(spec: FigureSpec, metrics: dict) -> dict[str, str]:
 
 
 def fig_12(spec: FigureSpec, metrics: dict) -> dict[str, str]:
-    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 3.45))
-    fig.subplots_adjust(left=0.06, right=0.98, top=0.83, bottom=0.14)
+    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 2.9))
+    fig.subplots_adjust(left=0.06, right=0.98, top=0.78, bottom=0.16)
     figure_header(fig, spec)
     panel_label(ax, "a")
     axis_off(ax)
@@ -198,8 +198,8 @@ def fig_12(spec: FigureSpec, metrics: dict) -> dict[str, str]:
 
 
 def fig_14(spec: FigureSpec, metrics: dict) -> dict[str, str]:
-    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 3.45))
-    fig.subplots_adjust(left=0.06, right=0.98, top=0.83, bottom=0.14)
+    fig, ax = plt.subplots(figsize=(DOUBLE_IN, 2.95))
+    fig.subplots_adjust(left=0.06, right=0.98, top=0.78, bottom=0.16)
     figure_header(fig, spec)
     panel_label(ax, "a")
     axis_off(ax)
@@ -231,4 +231,3 @@ BUILDERS = {
     "FIG-12": fig_12,
     "FIG-14": fig_14,
 }
-

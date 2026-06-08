@@ -2,6 +2,8 @@
 
 本轮重写删除了旧单体绘图脚本，改为按图类拆分代码。Plottie 的作用是提供论文图型检索和视觉语法参考：不同证据类型对应不同图型，而不是把所有内容塞进同一种 dashboard 模板。
 
+本轮同时安装并核验 figures4papers、Show2Know 和 nature-skills；参考样例接触表见：`outputs\可视化证据包_plottie_style\00_参考样例学习\reference_examples_contact_sheet.png`。
+
 ## 外部参考
 
 | 来源 | 用途 |
@@ -17,15 +19,37 @@
 | [Nature figure specifications](https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/) | 图型分类、配色、尺寸或导出参考 |
 | [Matplotlib customizing and export](https://matplotlib.org/stable/users/explain/customizing.html) | 图型分类、配色、尺寸或导出参考 |
 
+## 已安装 GitHub 参考项目
+
+| 项目 | 本地路径 | HEAD | 安装核验 | 应用方式 |
+|---|---|---|---|---|
+| [figures4papers](https://github.com/ChenLiu-1996/figures4papers) | `external_references/scientific_figure_code/figures4papers` | `ce567dd` | PASS | GridSpec multi-panel composition, direct labelling, semantic palette and vector export helpers |
+| [Show2Know](https://github.com/Winn1y/Show2Know) | `external_references/scientific_figure_code/Show2Know` | `40f33d1` | PASS | paper color temple, heatmap/matrix recipes, line/range plot patterns and multi-image plate layout |
+| [nature-skills](https://github.com/Yuan1z0825/nature-skills) | `external_references/scientific_figure_code/nature-skills` | `6f1a944` | PASS | Nature figure contract, backend exclusivity, QA checklist, editable SVG/PDF and image integrity rules |
+
+## 已查看参考样例
+
+| 编号 | 项目 | 样例 | 学到的规则 | 应用到本项目 |
+|---|---|---|---|---|
+| REF-01 | figures4papers | speed comparison panel | wide comparison panel, direct numeric annotations, semantic blue for the key method | FIG-09 Doris latency/speedup and matrix/performance panels |
+| REF-02 | figures4papers | composition heatmap | compact matrix with cell annotations, quiet axes and one continuous color scale | FIG-08 plan comparison, FIG-10 validation matrix, FIG-11 compliance matrix |
+| REF-03 | figures4papers | method schematic | schematic-first method panel with small supporting panels and consistent panel labels | FIG-01, FIG-02, FIG-06, FIG-07, FIG-12 and FIG-14 |
+| REF-04 | Show2Know | confidence interval line | line or dot estimates with uncertainty bands instead of isolated metric cards | FIG-09 paired range plot and performance annotation strategy |
+| REF-05 | Show2Know | multi-line fill | thin line plus low-alpha interval fill, with restrained legend use | performance-family charts where intervals or paired comparisons are needed |
+| REF-06 | Show2Know | multi-image plate | image plate assembly with consistent tile geometry and minimal captions | FIG-15 Web Demo image evidence plate |
+| REF-07 | nature-skills | heatmap atlas | multi-panel matrix atlas, tight gutters, no decorative containers | matrix charts and requirement/evidence maps |
+| REF-08 | nature-skills | forest and interval atlas | interval/dot estimates as evidence, using the axis rather than dashboard badges | FIG-09 latency and speedup evidence |
+| REF-09 | nature-skills | Nature-style mechanism gallery | one visual claim per panel, lowercase panel labels, restrained supporting plots | all generated figures as the final QA target |
+
 ## 图类规则
 
 | 图类 | 代码文件 | 采用规则 |
 |---|---|---|
-| flow | `scripts/plottie_figures/flow.py` | 用细线、短标签和单一主色表达过程，不用 UI 卡片、阴影或图标堆叠。 |
-| network | `scripts/plottie_figures/network.py` | 用节点、边和分层坐标表达依赖关系，直接标注，避免彩色系统大屏风格。 |
-| matrix | `scripts/plottie_figures/matrices.py` | 状态、门禁和要求对应关系用矩阵/棒棒糖/紧凑表格表达，不做仪表盘。 |
-| performance | `scripts/plottie_figures/performance.py` | 延迟和加速比用 log-scale range/dot plot 表达，保留数据来源和未重测边界。 |
-| image_plate | `scripts/plottie_figures/image_plates.py` | 实际截图按 image plate 排版，只加细边框和 panel label，不合成假界面。 |
+| flow | `scripts/plottie_figures/flow.py` | 用 nature-skills 的 method schematic 约束和 figures4papers 的 GridSpec/直接标注方式表达过程，不用 UI 卡片、阴影或图标堆叠。 |
+| network | `scripts/plottie_figures/network.py` | 用 figures4papers 的分层/网络示意写法表达依赖关系，采用 Show2Know 低饱和配色作极少量强调，避免彩色系统大屏风格。 |
+| matrix | `scripts/plottie_figures/matrices.py` | 参考 Show2Know heatmap 和 figures4papers validation panel，把状态、门禁和要求对应关系画成矩阵/棒棒糖/紧凑表格，不做仪表盘。 |
+| performance | `scripts/plottie_figures/performance.py` | 结合 Show2Know line/errorbar 思路和 figures4papers comparison panel，把延迟和加速比画成 log-scale range/dot plot，保留未重测边界。 |
+| image_plate | `scripts/plottie_figures/image_plates.py` | 参考 Show2Know Multi-Image-To-One 与 nature-skills image integrity，实际截图只做 image plate 排版，不合成假界面。 |
 
 ## 逐图结论
 

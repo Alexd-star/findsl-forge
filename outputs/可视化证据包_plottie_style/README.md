@@ -1,22 +1,31 @@
 # Plottie Style 科研图表证据包
 
-生成时间：2026-06-09T00:04:32+08:00
-样式标准：`Plottie atlas mode v1 - chart-class separated scientific figures`
-图包渲染时 Git HEAD：`9cdbad7`
+生成时间：2026-06-09T00:29:47+08:00
+样式标准：`Plottie atlas + figures4papers + Show2Know + nature-skills reference mode v2`
+图包渲染时 Git HEAD：`25dc18e`
 Evidence metadata：`2026-06-08T15:25:26Z`
 Pytest：`203 passed in 13.11s`
 Official suite：正例 `37/37`，负例 `37/37`
 Doris speedup：`36.24x`；Doris evidence generated_at：`2026-05-23T15:11:26Z`
+参考样例接触表：`outputs\可视化证据包_plottie_style\00_参考样例学习\reference_examples_contact_sheet.png`
+
+## 已安装参考项目
+
+| 项目 | 本地 HEAD | 安装/接入状态 | 本轮用于 |
+|---|---|---|---|
+| [figures4papers](https://github.com/ChenLiu-1996/figures4papers) | `ce567dd` | PASS：Codex local skill: scientific-figure-making; source templates cached locally | GridSpec multi-panel composition, direct labelling, semantic palette and vector export helpers |
+| [Show2Know](https://github.com/Winn1y/Show2Know) | `40f33d1` | PASS：Source-template library; repository has no pip package metadata | paper color temple, heatmap/matrix recipes, line/range plot patterns and multi-image plate layout |
+| [nature-skills](https://github.com/Yuan1z0825/nature-skills) | `6f1a944` | PASS：Codex local skill bundle; all nature-* folders plus _shared copied into Codex skills | Nature figure contract, backend exclusivity, QA checklist, editable SVG/PDF and image integrity rules |
 
 ## 代码结构
 
 | 图类 | 代码文件 | Plottie 参考方式 |
 |---|---|---|
-| flow | `scripts/plottie_figures/flow.py` | 用细线、短标签和单一主色表达过程，不用 UI 卡片、阴影或图标堆叠。 |
-| network | `scripts/plottie_figures/network.py` | 用节点、边和分层坐标表达依赖关系，直接标注，避免彩色系统大屏风格。 |
-| matrix | `scripts/plottie_figures/matrices.py` | 状态、门禁和要求对应关系用矩阵/棒棒糖/紧凑表格表达，不做仪表盘。 |
-| performance | `scripts/plottie_figures/performance.py` | 延迟和加速比用 log-scale range/dot plot 表达，保留数据来源和未重测边界。 |
-| image_plate | `scripts/plottie_figures/image_plates.py` | 实际截图按 image plate 排版，只加细边框和 panel label，不合成假界面。 |
+| flow | `scripts/plottie_figures/flow.py` | 用 nature-skills 的 method schematic 约束和 figures4papers 的 GridSpec/直接标注方式表达过程，不用 UI 卡片、阴影或图标堆叠。 |
+| network | `scripts/plottie_figures/network.py` | 用 figures4papers 的分层/网络示意写法表达依赖关系，采用 Show2Know 低饱和配色作极少量强调，避免彩色系统大屏风格。 |
+| matrix | `scripts/plottie_figures/matrices.py` | 参考 Show2Know heatmap 和 figures4papers validation panel，把状态、门禁和要求对应关系画成矩阵/棒棒糖/紧凑表格，不做仪表盘。 |
+| performance | `scripts/plottie_figures/performance.py` | 结合 Show2Know line/errorbar 思路和 figures4papers comparison panel，把延迟和加速比画成 log-scale range/dot plot，保留未重测边界。 |
+| image_plate | `scripts/plottie_figures/image_plates.py` | 参考 Show2Know Multi-Image-To-One 与 nature-skills image integrity，实际截图只做 image plate 排版，不合成假界面。 |
 
 ## 图表清单
 

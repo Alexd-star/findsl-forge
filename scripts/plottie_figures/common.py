@@ -14,30 +14,31 @@ import matplotlib.pyplot as plt
 from matplotlib import font_manager
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "outputs" / "可视化证据包_plottie_style"
+REFERENCE_GALLERY_DIRNAME = "00_参考样例学习"
 
 DOUBLE_IN = 183 / 25.4
 SINGLE_IN = 89 / 25.4
 MAX_HEIGHT_IN = 170 / 25.4
-STYLE_STANDARD = "Plottie atlas mode v1 - chart-class separated scientific figures"
+STYLE_STANDARD = "Plottie atlas + figures4papers + Show2Know + nature-skills reference mode v2"
 
-# A restrained Plottie-inspired palette: journal white background, neutral text,
-# one blue family for primary evidence, one warm accent for risks/boundaries.
+# Restrained publication palette: figures4papers semantic blue plus
+# Show2Know paper palette 05 as low-saturation secondary roles.
 INK = "#1C1C1C"
 TEXT = "#404040"
 MUTED = "#727272"
 RULE = "#C7C7C7"
 PALE = "#F5F5F3"
-BLUE = "#2364AA"
+BLUE = "#0F4D92"
 BLUE_LIGHT = "#D8E6F3"
-TEAL = "#4A9A9D"
-GREEN = "#4E8B61"
-ORANGE = "#C96A3C"
-RED = "#B44848"
+TEAL = "#388498"
+GREEN = "#779043"
+ORANGE = "#BF7334"
+RED = "#943C39"
 GOLD = "#C9A227"
 WHITE = "#FFFFFF"
 
@@ -60,6 +61,111 @@ PLOTTIE_LINKS = [
     ("Nature building and exporting panels", "https://research-figure-guide.nature.com/figures/building-and-exporting-figure-panels/"),
     ("Nature figure specifications", "https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/"),
     ("Matplotlib customizing and export", "https://matplotlib.org/stable/users/explain/customizing.html"),
+]
+
+REFERENCE_PROJECTS = [
+    {
+        "name": "figures4papers",
+        "url": "https://github.com/ChenLiu-1996/figures4papers",
+        "relative_path": "external_references/scientific_figure_code/figures4papers",
+        "install_mode": "Codex local skill: scientific-figure-making; source templates cached locally",
+        "install_check": "scientific-figure-making/SKILL.md and references/api.md copied into Codex skills",
+        "used_for": "GridSpec multi-panel composition, direct labelling, semantic palette and vector export helpers",
+    },
+    {
+        "name": "Show2Know",
+        "url": "https://github.com/Winn1y/Show2Know",
+        "relative_path": "external_references/scientific_figure_code/Show2Know",
+        "install_mode": "Source-template library; repository has no pip package metadata",
+        "install_check": "selected scatter, line, confidence interval, heatmap, image-plate and violin scripts compile",
+        "used_for": "paper color temple, heatmap/matrix recipes, line/range plot patterns and multi-image plate layout",
+    },
+    {
+        "name": "nature-skills",
+        "url": "https://github.com/Yuan1z0825/nature-skills",
+        "relative_path": "external_references/scientific_figure_code/nature-skills",
+        "install_mode": "Codex local skill bundle; all nature-* folders plus _shared copied into Codex skills",
+        "install_check": "nature-figure manifest/static/references installed; MCP requirements installed under Python 3.11",
+        "used_for": "Nature figure contract, backend exclusivity, QA checklist, editable SVG/PDF and image integrity rules",
+    },
+]
+
+REFERENCE_EXAMPLES = [
+    {
+        "id": "REF-01",
+        "project": "figures4papers",
+        "title": "speed comparison panel",
+        "relative_path": "external_references/scientific_figure_code/figures4papers/figure_RNAGenScape/figures/results_comparison_speed.png",
+        "learned_pattern": "wide comparison panel, direct numeric annotations, semantic blue for the key method",
+        "applied_to": "FIG-09 Doris latency/speedup and matrix/performance panels",
+    },
+    {
+        "id": "REF-02",
+        "project": "figures4papers",
+        "title": "composition heatmap",
+        "relative_path": "external_references/scientific_figure_code/figures4papers/figure_ophthal_review/figures/composition_heatmap.png",
+        "learned_pattern": "compact matrix with cell annotations, quiet axes and one continuous color scale",
+        "applied_to": "FIG-08 plan comparison, FIG-10 validation matrix, FIG-11 compliance matrix",
+    },
+    {
+        "id": "REF-03",
+        "project": "figures4papers",
+        "title": "method schematic",
+        "relative_path": "external_references/scientific_figure_code/figures4papers/assets/ImmunoStruct_schematic.png",
+        "learned_pattern": "schematic-first method panel with small supporting panels and consistent panel labels",
+        "applied_to": "FIG-01, FIG-02, FIG-06, FIG-07, FIG-12 and FIG-14",
+    },
+    {
+        "id": "REF-04",
+        "project": "Show2Know",
+        "title": "confidence interval line",
+        "relative_path": "external_references/scientific_figure_code/Show2Know/2 Line Plot/95ConfidenceInterval/draw_95_CI.py",
+        "preview_path": "external_references/scientific_figure_code/Show2Know/2 Line Plot/errorbar/errorbar.png",
+        "learned_pattern": "line or dot estimates with uncertainty bands instead of isolated metric cards",
+        "applied_to": "FIG-09 paired range plot and performance annotation strategy",
+    },
+    {
+        "id": "REF-05",
+        "project": "Show2Know",
+        "title": "multi-line fill",
+        "relative_path": "external_references/scientific_figure_code/Show2Know/15 Multi-Line-With-Fill/run.py",
+        "preview_path": "external_references/scientific_figure_code/Show2Know/15 Multi-Line-With-Fill/multi_line_chart_with_fill.png",
+        "learned_pattern": "thin line plus low-alpha interval fill, with restrained legend use",
+        "applied_to": "performance-family charts where intervals or paired comparisons are needed",
+    },
+    {
+        "id": "REF-06",
+        "project": "Show2Know",
+        "title": "multi-image plate",
+        "relative_path": "external_references/scientific_figure_code/Show2Know/14 Multi-Image-To-One/run.py",
+        "preview_path": "external_references/scientific_figure_code/Show2Know/14 Multi-Image-To-One/collage_with_text4.jpg",
+        "learned_pattern": "image plate assembly with consistent tile geometry and minimal captions",
+        "applied_to": "FIG-15 Web Demo image evidence plate",
+    },
+    {
+        "id": "REF-07",
+        "project": "nature-skills",
+        "title": "heatmap atlas",
+        "relative_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/chart-atlas/atlas-03-heatmaps.png",
+        "learned_pattern": "multi-panel matrix atlas, tight gutters, no decorative containers",
+        "applied_to": "matrix charts and requirement/evidence maps",
+    },
+    {
+        "id": "REF-08",
+        "project": "nature-skills",
+        "title": "forest and interval atlas",
+        "relative_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/chart-atlas/atlas-07-forest-interval.png",
+        "learned_pattern": "interval/dot estimates as evidence, using the axis rather than dashboard badges",
+        "applied_to": "FIG-09 latency and speedup evidence",
+    },
+    {
+        "id": "REF-09",
+        "project": "nature-skills",
+        "title": "Nature-style mechanism gallery",
+        "relative_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/gallery/fig1-material-mechanism-rich.png",
+        "learned_pattern": "one visual claim per panel, lowercase panel labels, restrained supporting plots",
+        "applied_to": "all generated figures as the final QA target",
+    },
 ]
 
 
@@ -99,27 +205,27 @@ PLOTTIE_AUDIT = {
     "flow": {
         "plottie_reference": "Flowchart / schematic examples in Plottie collections",
         "code_file": "scripts/plottie_figures/flow.py",
-        "rule": "用细线、短标签和单一主色表达过程，不用 UI 卡片、阴影或图标堆叠。",
+        "rule": "用 nature-skills 的 method schematic 约束和 figures4papers 的 GridSpec/直接标注方式表达过程，不用 UI 卡片、阴影或图标堆叠。",
     },
     "network": {
         "plottie_reference": "Network and mechanism-style atlas examples",
         "code_file": "scripts/plottie_figures/network.py",
-        "rule": "用节点、边和分层坐标表达依赖关系，直接标注，避免彩色系统大屏风格。",
+        "rule": "用 figures4papers 的分层/网络示意写法表达依赖关系，采用 Show2Know 低饱和配色作极少量强调，避免彩色系统大屏风格。",
     },
     "matrix": {
         "plottie_reference": "Heatmap and matrix plot examples",
         "code_file": "scripts/plottie_figures/matrices.py",
-        "rule": "状态、门禁和要求对应关系用矩阵/棒棒糖/紧凑表格表达，不做仪表盘。",
+        "rule": "参考 Show2Know heatmap 和 figures4papers validation panel，把状态、门禁和要求对应关系画成矩阵/棒棒糖/紧凑表格，不做仪表盘。",
     },
     "performance": {
         "plottie_reference": "Line/scatter/range plot examples",
         "code_file": "scripts/plottie_figures/performance.py",
-        "rule": "延迟和加速比用 log-scale range/dot plot 表达，保留数据来源和未重测边界。",
+        "rule": "结合 Show2Know line/errorbar 思路和 figures4papers comparison panel，把延迟和加速比画成 log-scale range/dot plot，保留未重测边界。",
     },
     "image_plate": {
         "plottie_reference": "Image panel / multi-panel evidence layouts",
         "code_file": "scripts/plottie_figures/image_plates.py",
-        "rule": "实际截图按 image plate 排版，只加细边框和 panel label，不合成假界面。",
+        "rule": "参考 Show2Know Multi-Image-To-One 与 nature-skills image integrity，实际截图只做 image plate 排版，不合成假界面。",
     },
 }
 
@@ -186,6 +292,80 @@ def git_head() -> str:
         return "unknown"
 
 
+def _git_value(args: list[str], cwd: Path) -> str:
+    try:
+        return subprocess.check_output(["git", *args], cwd=cwd, text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        return "unknown"
+
+
+def _skill_root() -> Path:
+    return Path.home() / ".codex" / "skills"
+
+
+def _reference_checks(name: str) -> list[dict[str, str | bool]]:
+    skill_root = _skill_root()
+    if name == "figures4papers":
+        checks = [
+            ("local skill", skill_root / "scientific-figure-making" / "SKILL.md"),
+            ("palette API", skill_root / "scientific-figure-making" / "references" / "api.md"),
+            ("common patterns", skill_root / "scientific-figure-making" / "references" / "common-patterns.md"),
+        ]
+    elif name == "Show2Know":
+        checks = [
+            ("line script", ROOT / "external_references" / "scientific_figure_code" / "Show2Know" / "2 Line Plot" / "line.py"),
+            ("confidence interval script", ROOT / "external_references" / "scientific_figure_code" / "Show2Know" / "2 Line Plot" / "95ConfidenceInterval" / "draw_95_CI.py"),
+            ("heatmap script", ROOT / "external_references" / "scientific_figure_code" / "Show2Know" / "4 HeatMap Plot" / "heatmap.py"),
+            ("image plate script", ROOT / "external_references" / "scientific_figure_code" / "Show2Know" / "14 Multi-Image-To-One" / "run.py"),
+            ("paper palette", ROOT / "external_references" / "scientific_figure_code" / "Show2Know" / "0 Collection and Color" / "Color" / "PaperColorTemple.md"),
+        ]
+    elif name == "nature-skills":
+        checks = [
+            ("nature-figure skill", skill_root / "nature-figure" / "SKILL.md"),
+            ("nature-figure manifest", skill_root / "nature-figure" / "manifest.yaml"),
+            ("QA contract", skill_root / "nature-figure" / "references" / "qa-contract.md"),
+            ("shared skill assets", skill_root / "_shared"),
+        ]
+    else:
+        checks = []
+    return [{"name": label, "path": str(path), "exists": path.exists()} for label, path in checks]
+
+
+def reference_project_inventory() -> list[dict]:
+    inventory: list[dict] = []
+    for project in REFERENCE_PROJECTS:
+        repo_path = ROOT / project["relative_path"]
+        checks = _reference_checks(project["name"])
+        inventory.append(
+            {
+                **project,
+                "local_exists": repo_path.exists(),
+                "git_head": _git_value(["rev-parse", "--short", "HEAD"], repo_path) if repo_path.exists() else "missing",
+                "origin_url": _git_value(["remote", "get-url", "origin"], repo_path) if repo_path.exists() else "missing",
+                "install_checks": checks,
+                "install_checks_passed": bool(checks) and all(bool(check["exists"]) for check in checks),
+            }
+        )
+    return inventory
+
+
+def reference_examples_inventory() -> list[dict]:
+    rows: list[dict] = []
+    for example in REFERENCE_EXAMPLES:
+        preview_rel = example.get("preview_path", example["relative_path"])
+        preview_path = ROOT / preview_rel
+        source_path = ROOT / example["relative_path"]
+        rows.append(
+            {
+                **example,
+                "source_exists": source_path.exists(),
+                "preview_path": preview_rel,
+                "preview_exists": preview_path.exists(),
+            }
+        )
+    return rows
+
+
 def parse_topic_items(text: str) -> tuple[list[dict[str, str]], dict[str, int]]:
     items: list[dict[str, str]] = []
     for line in text.splitlines():
@@ -210,6 +390,8 @@ def latest_metrics() -> dict:
         "topic_summary": topic_summary,
         "generated_at_local": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
         "git_head_now": git_head(),
+        "reference_projects": reference_project_inventory(),
+        "reference_examples": reference_examples_inventory(),
     }
 
 
@@ -254,6 +436,7 @@ def thin_arrow(ax: Axes, start: tuple[float, float], end: tuple[float, float], c
 def reset_output() -> None:
     if OUT_DIR.exists():
         shutil.rmtree(OUT_DIR)
+    (OUT_DIR / REFERENCE_GALLERY_DIRNAME).mkdir(parents=True, exist_ok=True)
     for dirname in FIG_DIRS.values():
         (OUT_DIR / dirname).mkdir(parents=True, exist_ok=True)
 
@@ -278,9 +461,107 @@ def save_figure(fig: Figure, spec: FigureSpec) -> dict[str, str]:
     return {key: str(value.relative_to(ROOT)) for key, value in paths.items()}
 
 
+def _load_gallery_font(size: int) -> ImageFont.ImageFont:
+    for font_name in ["arial.ttf", "DejaVuSans.ttf", "simhei.ttf"]:
+        try:
+            return ImageFont.truetype(font_name, size)
+        except Exception:
+            continue
+    return ImageFont.load_default()
+
+
+def _paste_fit(canvas: Image.Image, image_path: Path, box: tuple[int, int, int, int]) -> None:
+    x0, y0, x1, y1 = box
+    with Image.open(image_path) as img:
+        img = img.convert("RGB")
+        img.thumbnail((x1 - x0, y1 - y0), Image.Resampling.LANCZOS)
+        x = x0 + (x1 - x0 - img.width) // 2
+        y = y0 + (y1 - y0 - img.height) // 2
+        canvas.paste(img, (x, y))
+
+
+def write_reference_gallery(metrics: dict) -> dict[str, object]:
+    gallery = OUT_DIR / REFERENCE_GALLERY_DIRNAME
+    gallery.mkdir(parents=True, exist_ok=True)
+    examples = metrics["reference_examples"]
+
+    title_font = _load_gallery_font(18)
+    small_font = _load_gallery_font(13)
+    thumb_w, thumb_h = 390, 235
+    label_h = 50
+    pad = 20
+    cols = 3
+    rows = (len(examples) + cols - 1) // cols
+    sheet = Image.new("RGB", (cols * (thumb_w + pad) + pad, rows * (thumb_h + label_h + pad) + pad), "white")
+    draw = ImageDraw.Draw(sheet)
+
+    thumbnails: dict[str, str] = {}
+    for i, example in enumerate(examples):
+        row, col = divmod(i, cols)
+        x = pad + col * (thumb_w + pad)
+        y = pad + row * (thumb_h + label_h + pad)
+        preview_path = ROOT / example["preview_path"]
+        thumb_path = gallery / f"{example['id']}_{example['project']}_preview.png"
+
+        if preview_path.exists():
+            thumb = Image.new("RGB", (thumb_w, thumb_h), "white")
+            _paste_fit(thumb, preview_path, (0, 0, thumb_w, thumb_h))
+            thumb.save(thumb_path, dpi=(300, 300))
+            _paste_fit(sheet, preview_path, (x, y + label_h, x + thumb_w, y + label_h + thumb_h))
+            thumbnails[example["id"]] = str(thumb_path.relative_to(ROOT))
+        else:
+            draw.text((x + 120, y + label_h + 95), "preview missing", fill=(120, 120, 120), font=small_font)
+
+        draw.text((x, y), f"{example['id']} {example['project']}", fill=(28, 28, 28), font=title_font)
+        draw.text((x, y + 25), example["title"], fill=(86, 86, 86), font=small_font)
+        draw.rectangle([x, y + label_h, x + thumb_w, y + label_h + thumb_h], outline=(190, 190, 190), width=1)
+
+    contact_sheet = gallery / "reference_examples_contact_sheet.png"
+    sheet.save(contact_sheet, dpi=(300, 300))
+
+    lines = [
+        "# 参考样例学习包",
+        "",
+        "本目录用于记录本轮重画前实际查看过的参考项目样例。它不是项目成果图，也不建议作为最终提交图件；作用是说明本项目图表的版式、配色、线宽、图例和导出规则来自哪些已安装参考项目。",
+        "",
+        f"样例接触表：`{contact_sheet.relative_to(ROOT)}`",
+        "",
+        "## 参考样例",
+        "",
+        "| 编号 | 项目 | 样例 | 源文件/脚本 | 预览 | 学到的绘图规则 | 应用到本项目 |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for example in examples:
+        preview = thumbnails.get(example["id"], "预览缺失")
+        lines.append(
+            f"| {example['id']} | {example['project']} | {example['title']} | `{example['relative_path']}` | `{preview}` | {example['learned_pattern']} | {example['applied_to']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## 抽取后的统一规则",
+            "",
+            "1. 采用最终论文尺寸绘制，不做网页大屏比例。",
+            "2. 定量图优先使用点图、区间图、矩阵图和 log-scale range plot，不使用指标卡、饼图、3D 图或无来源曲线。",
+            "3. 主色采用 figures4papers 的深蓝，辅助色采用 Show2Know 低饱和论文配色，红/橙仅用于风险、阈值或边界。",
+            "4. SVG/PDF 保持文字可编辑；PNG 用于预览；TIFF 用于高分辨率归档；灰度版用于检查脱离颜色后仍可阅读。",
+            "5. 真实截图只做 image plate 编排，不重绘、不美化成虚假界面。",
+        ]
+    )
+    (gallery / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    return {
+        "directory": str(gallery.relative_to(ROOT)),
+        "contact_sheet": str(contact_sheet.relative_to(ROOT)),
+        "thumbnails": thumbnails,
+    }
+
+
 def write_outputs(metrics: dict, rows: list[dict]) -> None:
     md = metrics["metadata"]
     d = metrics["doris"]
+    reference_gallery = write_reference_gallery(metrics)
+    reference_projects = metrics["reference_projects"]
     readme = [
         "# Plottie Style 科研图表证据包",
         "",
@@ -291,12 +572,27 @@ def write_outputs(metrics: dict, rows: list[dict]) -> None:
         f"Pytest：`{md['readiness']['pytest']['passed']} passed in {md['readiness']['pytest']['elapsed_seconds']:.2f}s`",
         f"Official suite：正例 `{md['official_suite']['positive']['passed']}/{md['official_suite']['positive']['total']}`，负例 `{md['official_suite']['negative']['passed']}/{md['official_suite']['negative']['total']}`",
         f"Doris speedup：`{md['doris_cluster']['speedup_display']}`；Doris evidence generated_at：`{d['generated_at']}`",
+        f"参考样例接触表：`{reference_gallery['contact_sheet']}`",
+        "",
+        "## 已安装参考项目",
+        "",
+        "| 项目 | 本地 HEAD | 安装/接入状态 | 本轮用于 |",
+        "|---|---|---|---|",
+    ]
+    for project in reference_projects:
+        status = "PASS" if project["local_exists"] and project["install_checks_passed"] else "待核验"
+        readme.append(
+            f"| [{project['name']}]({project['url']}) | `{project['git_head']}` | {status}：{project['install_mode']} | {project['used_for']} |"
+        )
+    readme.extend(
+        [
         "",
         "## 代码结构",
         "",
         "| 图类 | 代码文件 | Plottie 参考方式 |",
         "|---|---|---|",
-    ]
+        ]
+    )
     for chart_class, info in PLOTTIE_AUDIT.items():
         readme.append(f"| {chart_class} | `{info['code_file']}` | {info['rule']} |")
     readme.extend(
@@ -322,6 +618,8 @@ def write_outputs(metrics: dict, rows: list[dict]) -> None:
         "",
         "本轮重写删除了旧单体绘图脚本，改为按图类拆分代码。Plottie 的作用是提供论文图型检索和视觉语法参考：不同证据类型对应不同图型，而不是把所有内容塞进同一种 dashboard 模板。",
         "",
+        f"本轮同时安装并核验 figures4papers、Show2Know 和 nature-skills；参考样例接触表见：`{reference_gallery['contact_sheet']}`。",
+        "",
         "## 外部参考",
         "",
         "| 来源 | 用途 |",
@@ -329,6 +627,17 @@ def write_outputs(metrics: dict, rows: list[dict]) -> None:
     ]
     for name, url in PLOTTIE_LINKS:
         notes.append(f"| [{name}]({url}) | 图型分类、配色、尺寸或导出参考 |")
+    notes.extend(["", "## 已安装 GitHub 参考项目", "", "| 项目 | 本地路径 | HEAD | 安装核验 | 应用方式 |", "|---|---|---|---|---|"])
+    for project in reference_projects:
+        status = "PASS" if project["local_exists"] and project["install_checks_passed"] else "待核验"
+        notes.append(
+            f"| [{project['name']}]({project['url']}) | `{project['relative_path']}` | `{project['git_head']}` | {status} | {project['used_for']} |"
+        )
+    notes.extend(["", "## 已查看参考样例", "", "| 编号 | 项目 | 样例 | 学到的规则 | 应用到本项目 |", "|---|---|---|---|---|"])
+    for example in metrics["reference_examples"]:
+        notes.append(
+            f"| {example['id']} | {example['project']} | {example['title']} | {example['learned_pattern']} | {example['applied_to']} |"
+        )
     notes.extend(["", "## 图类规则", "", "| 图类 | 代码文件 | 采用规则 |", "|---|---|---|"])
     for chart_class, info in PLOTTIE_AUDIT.items():
         notes.append(f"| {chart_class} | `{info['code_file']}` | {info['rule']} |")
@@ -358,6 +667,9 @@ def write_outputs(metrics: dict, rows: list[dict]) -> None:
             "note": "Doris latency was not re-measured in this figure generation run.",
         },
         "references": [{"name": name, "url": url} for name, url in PLOTTIE_LINKS],
+        "reference_projects": reference_projects,
+        "reference_examples": metrics["reference_examples"],
+        "reference_gallery": reference_gallery,
         "chart_class_audit": PLOTTIE_AUDIT,
         "figures": [
             {

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-09T00:04:32+08:00",
-  "style_standard": "Plottie atlas mode v1 - chart-class separated scientific figures",
-  "git_head_at_render": "9cdbad7",
+  "generated_at": "2026-06-09T00:29:47+08:00",
+  "style_standard": "Plottie atlas + figures4papers + Show2Know + nature-skills reference mode v2",
+  "git_head_at_render": "25dc18e",
   "metadata_generated_at": "2026-06-08T15:25:26Z",
   "git_head_at_export": "7559e28",
   "pytest": {
@@ -72,31 +72,251 @@
       "url": "https://matplotlib.org/stable/users/explain/customizing.html"
     }
   ],
+  "reference_projects": [
+    {
+      "name": "figures4papers",
+      "url": "https://github.com/ChenLiu-1996/figures4papers",
+      "relative_path": "external_references/scientific_figure_code/figures4papers",
+      "install_mode": "Codex local skill: scientific-figure-making; source templates cached locally",
+      "install_check": "scientific-figure-making/SKILL.md and references/api.md copied into Codex skills",
+      "used_for": "GridSpec multi-panel composition, direct labelling, semantic palette and vector export helpers",
+      "local_exists": true,
+      "git_head": "ce567dd",
+      "origin_url": "https://github.com/ChenLiu-1996/figures4papers.git",
+      "install_checks": [
+        {
+          "name": "local skill",
+          "path": "C:\\Users\\26312\\.codex\\skills\\scientific-figure-making\\SKILL.md",
+          "exists": true
+        },
+        {
+          "name": "palette API",
+          "path": "C:\\Users\\26312\\.codex\\skills\\scientific-figure-making\\references\\api.md",
+          "exists": true
+        },
+        {
+          "name": "common patterns",
+          "path": "C:\\Users\\26312\\.codex\\skills\\scientific-figure-making\\references\\common-patterns.md",
+          "exists": true
+        }
+      ],
+      "install_checks_passed": true
+    },
+    {
+      "name": "Show2Know",
+      "url": "https://github.com/Winn1y/Show2Know",
+      "relative_path": "external_references/scientific_figure_code/Show2Know",
+      "install_mode": "Source-template library; repository has no pip package metadata",
+      "install_check": "selected scatter, line, confidence interval, heatmap, image-plate and violin scripts compile",
+      "used_for": "paper color temple, heatmap/matrix recipes, line/range plot patterns and multi-image plate layout",
+      "local_exists": true,
+      "git_head": "40f33d1",
+      "origin_url": "https://github.com/Winn1y/Show2Know.git",
+      "install_checks": [
+        {
+          "name": "line script",
+          "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\external_references\\scientific_figure_code\\Show2Know\\2 Line Plot\\line.py",
+          "exists": true
+        },
+        {
+          "name": "confidence interval script",
+          "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\external_references\\scientific_figure_code\\Show2Know\\2 Line Plot\\95ConfidenceInterval\\draw_95_CI.py",
+          "exists": true
+        },
+        {
+          "name": "heatmap script",
+          "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\external_references\\scientific_figure_code\\Show2Know\\4 HeatMap Plot\\heatmap.py",
+          "exists": true
+        },
+        {
+          "name": "image plate script",
+          "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\external_references\\scientific_figure_code\\Show2Know\\14 Multi-Image-To-One\\run.py",
+          "exists": true
+        },
+        {
+          "name": "paper palette",
+          "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\external_references\\scientific_figure_code\\Show2Know\\0 Collection and Color\\Color\\PaperColorTemple.md",
+          "exists": true
+        }
+      ],
+      "install_checks_passed": true
+    },
+    {
+      "name": "nature-skills",
+      "url": "https://github.com/Yuan1z0825/nature-skills",
+      "relative_path": "external_references/scientific_figure_code/nature-skills",
+      "install_mode": "Codex local skill bundle; all nature-* folders plus _shared copied into Codex skills",
+      "install_check": "nature-figure manifest/static/references installed; MCP requirements installed under Python 3.11",
+      "used_for": "Nature figure contract, backend exclusivity, QA checklist, editable SVG/PDF and image integrity rules",
+      "local_exists": true,
+      "git_head": "6f1a944",
+      "origin_url": "https://github.com/Yuan1z0825/nature-skills.git",
+      "install_checks": [
+        {
+          "name": "nature-figure skill",
+          "path": "C:\\Users\\26312\\.codex\\skills\\nature-figure\\SKILL.md",
+          "exists": true
+        },
+        {
+          "name": "nature-figure manifest",
+          "path": "C:\\Users\\26312\\.codex\\skills\\nature-figure\\manifest.yaml",
+          "exists": true
+        },
+        {
+          "name": "QA contract",
+          "path": "C:\\Users\\26312\\.codex\\skills\\nature-figure\\references\\qa-contract.md",
+          "exists": true
+        },
+        {
+          "name": "shared skill assets",
+          "path": "C:\\Users\\26312\\.codex\\skills\\_shared",
+          "exists": true
+        }
+      ],
+      "install_checks_passed": true
+    }
+  ],
+  "reference_examples": [
+    {
+      "id": "REF-01",
+      "project": "figures4papers",
+      "title": "speed comparison panel",
+      "relative_path": "external_references/scientific_figure_code/figures4papers/figure_RNAGenScape/figures/results_comparison_speed.png",
+      "learned_pattern": "wide comparison panel, direct numeric annotations, semantic blue for the key method",
+      "applied_to": "FIG-09 Doris latency/speedup and matrix/performance panels",
+      "source_exists": true,
+      "preview_path": "external_references/scientific_figure_code/figures4papers/figure_RNAGenScape/figures/results_comparison_speed.png",
+      "preview_exists": true
+    },
+    {
+      "id": "REF-02",
+      "project": "figures4papers",
+      "title": "composition heatmap",
+      "relative_path": "external_references/scientific_figure_code/figures4papers/figure_ophthal_review/figures/composition_heatmap.png",
+      "learned_pattern": "compact matrix with cell annotations, quiet axes and one continuous color scale",
+      "applied_to": "FIG-08 plan comparison, FIG-10 validation matrix, FIG-11 compliance matrix",
+      "source_exists": true,
+      "preview_path": "external_references/scientific_figure_code/figures4papers/figure_ophthal_review/figures/composition_heatmap.png",
+      "preview_exists": true
+    },
+    {
+      "id": "REF-03",
+      "project": "figures4papers",
+      "title": "method schematic",
+      "relative_path": "external_references/scientific_figure_code/figures4papers/assets/ImmunoStruct_schematic.png",
+      "learned_pattern": "schematic-first method panel with small supporting panels and consistent panel labels",
+      "applied_to": "FIG-01, FIG-02, FIG-06, FIG-07, FIG-12 and FIG-14",
+      "source_exists": true,
+      "preview_path": "external_references/scientific_figure_code/figures4papers/assets/ImmunoStruct_schematic.png",
+      "preview_exists": true
+    },
+    {
+      "id": "REF-04",
+      "project": "Show2Know",
+      "title": "confidence interval line",
+      "relative_path": "external_references/scientific_figure_code/Show2Know/2 Line Plot/95ConfidenceInterval/draw_95_CI.py",
+      "preview_path": "external_references/scientific_figure_code/Show2Know/2 Line Plot/errorbar/errorbar.png",
+      "learned_pattern": "line or dot estimates with uncertainty bands instead of isolated metric cards",
+      "applied_to": "FIG-09 paired range plot and performance annotation strategy",
+      "source_exists": true,
+      "preview_exists": true
+    },
+    {
+      "id": "REF-05",
+      "project": "Show2Know",
+      "title": "multi-line fill",
+      "relative_path": "external_references/scientific_figure_code/Show2Know/15 Multi-Line-With-Fill/run.py",
+      "preview_path": "external_references/scientific_figure_code/Show2Know/15 Multi-Line-With-Fill/multi_line_chart_with_fill.png",
+      "learned_pattern": "thin line plus low-alpha interval fill, with restrained legend use",
+      "applied_to": "performance-family charts where intervals or paired comparisons are needed",
+      "source_exists": true,
+      "preview_exists": true
+    },
+    {
+      "id": "REF-06",
+      "project": "Show2Know",
+      "title": "multi-image plate",
+      "relative_path": "external_references/scientific_figure_code/Show2Know/14 Multi-Image-To-One/run.py",
+      "preview_path": "external_references/scientific_figure_code/Show2Know/14 Multi-Image-To-One/collage_with_text4.jpg",
+      "learned_pattern": "image plate assembly with consistent tile geometry and minimal captions",
+      "applied_to": "FIG-15 Web Demo image evidence plate",
+      "source_exists": true,
+      "preview_exists": true
+    },
+    {
+      "id": "REF-07",
+      "project": "nature-skills",
+      "title": "heatmap atlas",
+      "relative_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/chart-atlas/atlas-03-heatmaps.png",
+      "learned_pattern": "multi-panel matrix atlas, tight gutters, no decorative containers",
+      "applied_to": "matrix charts and requirement/evidence maps",
+      "source_exists": true,
+      "preview_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/chart-atlas/atlas-03-heatmaps.png",
+      "preview_exists": true
+    },
+    {
+      "id": "REF-08",
+      "project": "nature-skills",
+      "title": "forest and interval atlas",
+      "relative_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/chart-atlas/atlas-07-forest-interval.png",
+      "learned_pattern": "interval/dot estimates as evidence, using the axis rather than dashboard badges",
+      "applied_to": "FIG-09 latency and speedup evidence",
+      "source_exists": true,
+      "preview_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/chart-atlas/atlas-07-forest-interval.png",
+      "preview_exists": true
+    },
+    {
+      "id": "REF-09",
+      "project": "nature-skills",
+      "title": "Nature-style mechanism gallery",
+      "relative_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/gallery/fig1-material-mechanism-rich.png",
+      "learned_pattern": "one visual claim per panel, lowercase panel labels, restrained supporting plots",
+      "applied_to": "all generated figures as the final QA target",
+      "source_exists": true,
+      "preview_path": "external_references/scientific_figure_code/nature-skills/skills/nature-figure/assets/gallery/fig1-material-mechanism-rich.png",
+      "preview_exists": true
+    }
+  ],
+  "reference_gallery": {
+    "directory": "outputs\\可视化证据包_plottie_style\\00_参考样例学习",
+    "contact_sheet": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\reference_examples_contact_sheet.png",
+    "thumbnails": {
+      "REF-01": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-01_figures4papers_preview.png",
+      "REF-02": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-02_figures4papers_preview.png",
+      "REF-03": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-03_figures4papers_preview.png",
+      "REF-04": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-04_Show2Know_preview.png",
+      "REF-05": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-05_Show2Know_preview.png",
+      "REF-06": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-06_Show2Know_preview.png",
+      "REF-07": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-07_nature-skills_preview.png",
+      "REF-08": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-08_nature-skills_preview.png",
+      "REF-09": "outputs\\可视化证据包_plottie_style\\00_参考样例学习\\REF-09_nature-skills_preview.png"
+    }
+  },
   "chart_class_audit": {
     "flow": {
       "plottie_reference": "Flowchart / schematic examples in Plottie collections",
       "code_file": "scripts/plottie_figures/flow.py",
-      "rule": "用细线、短标签和单一主色表达过程，不用 UI 卡片、阴影或图标堆叠。"
+      "rule": "用 nature-skills 的 method schematic 约束和 figures4papers 的 GridSpec/直接标注方式表达过程，不用 UI 卡片、阴影或图标堆叠。"
     },
     "network": {
       "plottie_reference": "Network and mechanism-style atlas examples",
       "code_file": "scripts/plottie_figures/network.py",
-      "rule": "用节点、边和分层坐标表达依赖关系，直接标注，避免彩色系统大屏风格。"
+      "rule": "用 figures4papers 的分层/网络示意写法表达依赖关系，采用 Show2Know 低饱和配色作极少量强调，避免彩色系统大屏风格。"
     },
     "matrix": {
       "plottie_reference": "Heatmap and matrix plot examples",
       "code_file": "scripts/plottie_figures/matrices.py",
-      "rule": "状态、门禁和要求对应关系用矩阵/棒棒糖/紧凑表格表达，不做仪表盘。"
+      "rule": "参考 Show2Know heatmap 和 figures4papers validation panel，把状态、门禁和要求对应关系画成矩阵/棒棒糖/紧凑表格，不做仪表盘。"
     },
     "performance": {
       "plottie_reference": "Line/scatter/range plot examples",
       "code_file": "scripts/plottie_figures/performance.py",
-      "rule": "延迟和加速比用 log-scale range/dot plot 表达，保留数据来源和未重测边界。"
+      "rule": "结合 Show2Know line/errorbar 思路和 figures4papers comparison panel，把延迟和加速比画成 log-scale range/dot plot，保留未重测边界。"
     },
     "image_plate": {
       "plottie_reference": "Image panel / multi-panel evidence layouts",
       "code_file": "scripts/plottie_figures/image_plates.py",
-      "rule": "实际截图按 image plate 排版，只加细边框和 panel label，不合成假界面。"
+      "rule": "参考 Show2Know Multi-Image-To-One 与 nature-skills image integrity，实际截图只做 image plate 排版，不合成假界面。"
     }
   },
   "figures": [

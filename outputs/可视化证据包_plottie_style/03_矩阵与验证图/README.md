@@ -1,7 +1,7 @@
 # 03_矩阵与验证图
 
 代码文件：`scripts/plottie_figures/matrices.py`
-绘图规则：状态、门禁和要求对应关系用矩阵/棒棒糖/紧凑表格表达，不做仪表盘。
+绘图规则：参考 Show2Know heatmap 和 figures4papers validation panel，把状态、门禁和要求对应关系画成矩阵/棒棒糖/紧凑表格，不做仪表盘。
 
 | 图号 | 文件名 |
 |---|---|
