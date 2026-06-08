@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-label="测试验证结果汇总图">
+<rect x="0" y="0" width="2400" height="1500" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#475569"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/></filter></defs>
+<text x="92.0" y="92.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="42" font-weight="800" fill="#172033" text-anchor="start">
+<tspan x="92.0" dy="0.0">测试验证结果汇总图</tspan>
+</text>
+<text x="92.0" y="148.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="23" font-weight="400" fill="#64748b" text-anchor="start">
+<tspan x="92.0" dy="0.0">使用本轮刷新后的 evidence_metadata.json，一页展示关键门禁。</tspan>
+</text>
+<line x1="92.0" y1="188.0" x2="2308.0" y2="188.0" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+<rect x="150.0" y="285.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
+<text x="185.0" y="340.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="185.0" dy="0.0">Blocking gates</tspan>
+</text>
+<text x="185.0" y="410.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#15803d" text-anchor="start">
+<tspan x="185.0" dy="0.0">PASS</tspan>
+</text>
+<rect x="880.0" y="285.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
+<text x="915.0" y="340.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="915.0" dy="0.0">Warning count</tspan>
+</text>
+<text x="915.0" y="410.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#15803d" text-anchor="start">
+<tspan x="915.0" dy="0.0">0</tspan>
+</text>
+<rect x="1610.0" y="285.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
+<text x="1645.0" y="340.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="1645.0" dy="0.0">Pytest</tspan>
+</text>
+<text x="1645.0" y="410.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#2563eb" text-anchor="start">
+<tspan x="1645.0" dy="0.0">203 passed</tspan>
+<tspan x="1645.0" dy="54.0">17.61s</tspan>
+</text>
+<rect x="150.0" y="575.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
+<text x="185.0" y="630.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="185.0" dy="0.0">Official positive</tspan>
+</text>
+<text x="185.0" y="700.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#0f766e" text-anchor="start">
+<tspan x="185.0" dy="0.0">37/37</tspan>
+</text>
+<rect x="880.0" y="575.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
+<text x="915.0" y="630.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="915.0" dy="0.0">Official negative</tspan>
+</text>
+<text x="915.0" y="700.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#0f766e" text-anchor="start">
+<tspan x="915.0" dy="0.0">37/37</tspan>
+</text>
+<rect x="1610.0" y="575.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#7c3aed" stroke-width="2" filter="url(#shadow)"/>
+<text x="1645.0" y="630.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="1645.0" dy="0.0">Defense checks</tspan>
+</text>
+<text x="1645.0" y="700.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#7c3aed" text-anchor="start">
+<tspan x="1645.0" dy="0.0">13/13</tspan>
+</text>
+<rect x="150.0" y="865.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
+<text x="185.0" y="920.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="185.0" dy="0.0">Doris evidence</tspan>
+</text>
+<text x="185.0" y="990.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#15803d" text-anchor="start">
+<tspan x="185.0" dy="0.0">PASS</tspan>
+</text>
+<rect x="880.0" y="865.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#c2410c" stroke-width="2" filter="url(#shadow)"/>
+<text x="915.0" y="920.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="915.0" dy="0.0">Doris speedup</tspan>
+</text>
+<text x="915.0" y="990.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#c2410c" text-anchor="start">
+<tspan x="915.0" dy="0.0">36.24x</tspan>
+</text>
+<rect x="1610.0" y="865.0" width="640.0" height="210.0" rx="24" fill="#ffffff" stroke="#15803d" stroke-width="2" filter="url(#shadow)"/>
+<text x="1645.0" y="920.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="700" fill="#64748b" text-anchor="start">
+<tspan x="1645.0" dy="0.0">Metadata warnings</tspan>
+</text>
+<text x="1645.0" y="990.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="40" font-weight="900" fill="#15803d" text-anchor="start">
+<tspan x="1645.0" dy="0.0">&lt;none&gt;</tspan>
+</text>
+<rect x="420.0" y="1160.0" width="1560.0" height="150.0" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+<text x="448.0" y="1202.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="25" font-weight="800" fill="#172033" text-anchor="start">
+<tspan x="448.0" dy="0.0">最新证据时间</tspan>
+</text>
+<text x="448.0" y="1242.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="20" font-weight="400" fill="#64748b" text-anchor="start">
+<tspan x="448.0" dy="0.0">metadata generated_at=2026-06-08T13:04:31Z；Git HEAD at export=4f7efdc；snapshot_dir=submission_artifacts\evidence_snapshots。</tspan>
+</text>
+<line x1="92.0" y1="1418.0" x2="2308.0" y2="1418.0" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
+<text x="92.0" y="1458.0" font-family="Microsoft YaHei, SimSun, Noto Sans CJK SC, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748b" text-anchor="start">
+<tspan x="92.0" dy="0.0">数据源：submission_artifacts/evidence_metadata.json，submission_artifacts/evidence_summary.md。</tspan>
+</text>
+</svg>
