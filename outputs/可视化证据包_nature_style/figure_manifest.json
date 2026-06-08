@@ -1,0 +1,410 @@
+{
+  "generated_at": "2026-06-08T23:20:50+08:00",
+  "style_standard": "Nature figure mode v2 - paper-first Python/matplotlib figures",
+  "git_head_now": "b5d3beb",
+  "target_size": {
+    "single_column_in": 3.5039370078740157,
+    "double_column_in": 7.204724409448819,
+    "max_height_in": 6.692913385826772
+  },
+  "metadata_generated_at": "2026-06-08T14:05:03Z",
+  "git_head_at_export": "38bb712",
+  "pytest": {
+    "passed": 203,
+    "elapsed_seconds": 8.71
+  },
+  "official_suite": {
+    "suite_passed": true,
+    "positive": {
+      "passed": 37,
+      "total": 37
+    },
+    "negative": {
+      "passed": 37,
+      "total": 37
+    }
+  },
+  "doris": {
+    "generated_at": "2026-05-23T15:11:26Z",
+    "speedup": 36.2398279300624,
+    "speedup_display": "36.24x",
+    "baseline_avg_execute_ms": 5182.042440000001,
+    "optimized_avg_execute_ms": 142.99302000000083,
+    "baseline_p95_execute_ms": 5461.01094,
+    "optimized_p95_execute_ms": 155.7155999999999,
+    "row_counts_match": true,
+    "note": "Doris latency was not re-measured in this figure generation run."
+  },
+  "references": [
+    {
+      "name": "Nature Research Figure Guide: preparing figures",
+      "url": "https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/"
+    },
+    {
+      "name": "Nature Research Figure Guide: building and exporting figure panels",
+      "url": "https://research-figure-guide.nature.com/figures/building-and-exporting-figure-panels/"
+    },
+    {
+      "name": "Matplotlib rcParams and savefig documentation",
+      "url": "https://matplotlib.org/stable/users/explain/customizing.html"
+    },
+    {
+      "name": "SciencePlots publication styles",
+      "url": "https://github.com/garrettj403/SciencePlots"
+    },
+    {
+      "name": "cnsplots publication-ready Cell/Nature/Science plotting patterns",
+      "url": "https://github.com/faridrashidi/cnsplots"
+    },
+    {
+      "name": "figures4papers scientific matplotlib examples",
+      "url": "https://github.com/ChenLiu-1996/figures4papers"
+    },
+    {
+      "name": "Wong, B. Colour blindness, Nature Methods",
+      "url": "https://www.nature.com/articles/nmeth.1618"
+    }
+  ],
+  "local_reference_inventory": [
+    {
+      "name": "SciencePlots",
+      "local_cache": "present",
+      "head": "8d281ea"
+    },
+    {
+      "name": "cnsplots",
+      "local_cache": "present",
+      "head": "219fabc"
+    },
+    {
+      "name": "figures4papers",
+      "local_cache": "present",
+      "head": "ce567dd"
+    }
+  ],
+  "figures": [
+    {
+      "id": "FIG-01",
+      "title": "赛题任务拆解",
+      "archetype": "schematic-led composite + quantitative summary",
+      "conclusion": "赛题能力可以拆成输入、编译、验证、性能和交付五条可审计证据链。",
+      "source": "README + topic compliance + evidence metadata",
+      "redesign": "panel a 使用线稿证据链；panel b 使用真实要求状态计数，不做指标卡。",
+      "reference_pattern": "Nature schematic-led composite; cnsplots horizontal bar style",
+      "search_audit": {
+        "search_queries": "Nature schematic composite, cnsplots horizontal bar, publication-ready requirement evidence bar",
+        "best_code_pattern": "GridSpec 双面板；左侧无填充 method timeline，右侧 horizontal barh；不用指标卡。",
+        "style_contract": "双栏宽，黑灰线稿为主体，深蓝只标已实现主链路，红色只标需补证据项。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-01_topic_task_breakdown.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-01_topic_task_breakdown.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-01_topic_task_breakdown_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-01_topic_task_breakdown_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-01_topic_task_breakdown_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-02",
+      "title": "输入-处理-输出链路",
+      "archetype": "method schematic",
+      "conclusion": "自然语言或 DSL 候选必须经过确定性编译与验证后才进入 Doris SQL。",
+      "source": "README + technical report + evidence metadata",
+      "redesign": "用 trust-boundary 线稿显示 LLM 候选、编译器门禁和可执行 SQL 的责任边界。",
+      "reference_pattern": "Nature editable method schematic; no decorative icons",
+      "search_audit": {
+        "search_queries": "Nature method schematic trust boundary, editable SVG schematic matplotlib, LLM safety workflow figure",
+        "best_code_pattern": "细箭头 pipeline + trust-boundary 竖线 + reject branch；直接标签代替图例。",
+        "style_contract": "白底线稿，少量边界虚线，不使用 AI 图标、渐变、发光或卡片。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-02_input_process_output_pipeline.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-02_input_process_output_pipeline.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-02_input_process_output_pipeline_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-02_input_process_output_pipeline_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\01_赛题与方法示意图\\FIG-02_input_process_output_pipeline_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-03",
+      "title": "项目总体架构",
+      "archetype": "paper architecture schematic",
+      "conclusion": "项目由入口、适配、编译、配置、验证和证据交付六层组成。",
+      "source": "PROJECT_INDEX + src + configs",
+      "redesign": "以分层表格和跨层调用线呈现工程结构，避免彩色模块卡片。",
+      "reference_pattern": "Nature space-efficient panel arrangement; figures4papers GridSpec",
+      "search_audit": {
+        "search_queries": "Nature system architecture schematic, figures4papers GridSpec architecture, software method schematic",
+        "best_code_pattern": "分层结构表 + 跨层调用细线；每层只保留必要术语和依赖方向。",
+        "style_contract": "工程架构以论文 method schematic 表达，避免 PPT 模块堆叠。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-03_system_architecture.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-03_system_architecture.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-03_system_architecture_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-03_system_architecture_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-03_system_architecture_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-04",
+      "title": "核心模块调用关系",
+      "archetype": "network schematic",
+      "conclusion": "CLI 将编译、验证、官方套件、Demo 与提交证据统一到同一工程链路。",
+      "source": "src/findsl/*.py",
+      "redesign": "用无填充节点和细线表示调用图，突出核心模块而非界面效果。",
+      "reference_pattern": "method graph / direct labelling",
+      "search_audit": {
+        "search_queries": "scientific call graph figure direct labelling, method network schematic matplotlib",
+        "best_code_pattern": "无填充节点、细线边、直接标注；强调核心入口与核心模块。",
+        "style_contract": "所有节点同一视觉权重，只用深蓝标主入口，防止变成彩色系统图。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-04_code_module_call_graph.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-04_code_module_call_graph.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-04_code_module_call_graph_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-04_code_module_call_graph_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\02_架构与代码示意图\\FIG-04_code_module_call_graph_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-05",
+      "title": "运行与人工核验流程",
+      "archetype": "acceptance timeline",
+      "conclusion": "验收流程从环境、命令、测试、证据到提交状态逐层收口。",
+      "source": "SCREENSHOT_EVIDENCE_INDEX + evidence metadata",
+      "redesign": "改为纵向 checkpoint timeline，并标注证据类型，不使用流程卡片。",
+      "reference_pattern": "clinical timeline / checkpoint strip",
+      "search_audit": {
+        "search_queries": "Nature checklist timeline figure, acceptance workflow timeline, clinical checkpoint strip",
+        "best_code_pattern": "纵向 checkpoint timeline + 证据类型小标签；不用流程卡片。",
+        "style_contract": "时间线只表达复现顺序和验收门禁，注释短句放图内，细节放文档。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\03_运行核验流程图\\FIG-05_operation_acceptance_flow.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\03_运行核验流程图\\FIG-05_operation_acceptance_flow.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\03_运行核验流程图\\FIG-05_operation_acceptance_flow_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\03_运行核验流程图\\FIG-05_operation_acceptance_flow_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\03_运行核验流程图\\FIG-05_operation_acceptance_flow_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-06",
+      "title": "DSL 编译核心算法",
+      "archetype": "algorithm schematic",
+      "conclusion": "FinDSL 先形成 typed AST，再生成可验证的 Doris-safe SQL。",
+      "source": "compiler.py + parser.py + semantic.py",
+      "redesign": "用解析状态机、错误分支和 SQL 输出三部分解释算法，不画装饰型流程。",
+      "reference_pattern": "method schematic + error branch",
+      "search_audit": {
+        "search_queries": "compiler algorithm schematic typed AST SQL generation figure, Nature method algorithm diagram",
+        "best_code_pattern": "解析状态机 + 语义错误分支 + SQL 输出路径；用线条说明算法责任边界。",
+        "style_contract": "算法图不做商业宣传式图标，核心是输入、状态、门禁、输出。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-06_dsl_compiler_algorithm.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-06_dsl_compiler_algorithm.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-06_dsl_compiler_algorithm_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-06_dsl_compiler_algorithm_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-06_dsl_compiler_algorithm_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-07",
+      "title": "Prefix-Sum 长窗口优化",
+      "archetype": "formula + quantitative inset",
+      "conclusion": "滚动 SUM 可在满足条件时改写为前缀表访问，并保留窗口函数回退路径。",
+      "source": "sqlgen.py + prefix_sum_benchmark + Doris evidence",
+      "redesign": "把核心公式、回退条件和实测加速拆成公式面板与小型证据面板。",
+      "reference_pattern": "formula-led method schematic + dot comparison",
+      "search_audit": {
+        "search_queries": "prefix sum optimization formula figure, rolling window optimization schematic, scientific formula inset plot",
+        "best_code_pattern": "公式主面板 + fallback 条件 + 小型 paired dot 证据；不用夸张速度仪表盘。",
+        "style_contract": "公式与证据共图但分 panel，定量点只来自真实 benchmark/evidence。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-07_prefix_sum_optimization_flow.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-07_prefix_sum_optimization_flow.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-07_prefix_sum_optimization_flow_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-07_prefix_sum_optimization_flow_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\04_算法机制图\\FIG-07_prefix_sum_optimization_flow_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-08",
+      "title": "Doris 执行计划差异",
+      "archetype": "plan tree + binary matrix",
+      "conclusion": "优化路径把运行时窗口聚合替换为 prefix-table predicate 与 join。",
+      "source": "doris_cluster_evidence.md/json",
+      "redesign": "左侧为 explain plan tree；右侧为计划特征矩阵，避免把 plan 画成 PPT 模块。",
+      "reference_pattern": "binary heatmap / plan tree",
+      "search_audit": {
+        "search_queries": "database query plan tree figure, binary heatmap feature matrix, Nature methods plan comparison",
+        "best_code_pattern": "左侧 plan tree，右侧 binary feature matrix；计划特征用 0/1 热图表达。",
+        "style_contract": "执行计划不画成彩色系统流程，保持可读的数据库证据口径。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-08_doris_plan_comparison.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-08_doris_plan_comparison.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-08_doris_plan_comparison_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-08_doris_plan_comparison_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-08_doris_plan_comparison_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-09",
+      "title": "Doris 延迟与加速比",
+      "archetype": "quantitative dot-range plot",
+      "conclusion": "prefix-sum 优化在已采集 Doris evidence 中达到 36x 级延迟下降。",
+      "source": "doris_cluster_evidence.json",
+      "redesign": "采用 log-scale paired dot-range 和 speedup inset，保留未重测 Doris 的口径说明。",
+      "reference_pattern": "cnsplots forest/range plot; Matplotlib log axis",
+      "search_audit": {
+        "search_queries": "Nature log scale latency dot range plot, forest plot speedup matplotlib, cnsplots range plot",
+        "best_code_pattern": "log-scale paired dot-range + speedup inset；baseline 空心点，optimized 实心点。",
+        "style_contract": "不画大色块 speedup bar；保留 evidence reused / not rerun 说明。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-09_doris_latency_speedup.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-09_doris_latency_speedup.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-09_doris_latency_speedup_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-09_doris_latency_speedup_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\06_性能证据图\\FIG-09_doris_latency_speedup_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-10",
+      "title": "测试验证结果",
+      "archetype": "lollipop plot + evidence table",
+      "conclusion": "最新证据显示 required gates 全通过，warning count 为 0。",
+      "source": "evidence_metadata.json",
+      "redesign": "pass fraction 用 lollipop 展示，关键数值放小表，不再做 dashboard 指标卡。",
+      "reference_pattern": "lollipop / compact evidence table",
+      "search_audit": {
+        "search_queries": "validation gate lollipop plot, compact evidence table Nature figure, pass fraction scientific plot",
+        "best_code_pattern": "lollipop pass fraction + 小表格 inset；门禁结果按比例和计数分开显示。",
+        "style_contract": "PASS 不是 UI 徽章，改成可复核比例图和审计表。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-10_validation_matrix.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-10_validation_matrix.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-10_validation_matrix_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-10_validation_matrix_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-10_validation_matrix_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-11",
+      "title": "赛题要求-实现-证据矩阵",
+      "archetype": "requirement heatmap",
+      "conclusion": "已实现、部分实现和待补证据必须如实分开表达。",
+      "source": "reports/topic_19_compliance_plan.md",
+      "redesign": "以状态热图和计数条形图如实呈现 implemented、partial、needs_evidence。",
+      "reference_pattern": "status heatmap / horizontal summary bar",
+      "search_audit": {
+        "search_queries": "requirement implementation evidence matrix, status heatmap publication figure, compliance matrix scientific plot",
+        "best_code_pattern": "状态 heatmap + 计数条形图；implemented/partial/needs_evidence 如实分色。",
+        "style_contract": "矩阵图必须保留部分实现与待证据边界，不把风险项美化成全绿。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-11_requirement_implementation_evidence_matrix.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-11_requirement_implementation_evidence_matrix.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-11_requirement_implementation_evidence_matrix_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-11_requirement_implementation_evidence_matrix_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\05_验证与符合性图\\FIG-11_requirement_implementation_evidence_matrix_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-12",
+      "title": "NL2DSL 与 LLM 安全边界",
+      "archetype": "trust-boundary schematic",
+      "conclusion": "LLM 只产生候选 DSL，执行权由编译器和验证器控制。",
+      "source": "submission readiness + llm_adapter.py",
+      "redesign": "用垂直边界线和 reject branch 呈现安全控制，不把 AI 能力夸大成直接执行。",
+      "reference_pattern": "trust boundary schematic",
+      "search_audit": {
+        "search_queries": "LLM guardrail trust boundary schematic, safe AI workflow scientific figure, reject branch method schematic",
+        "best_code_pattern": "候选生成、编译门禁、reference oracle 三段式；reject 分支用虚线。",
+        "style_contract": "明确 LLM 不直接执行 SQL，不夸大模型自主决策能力。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-12_llm_safety_boundary.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-12_llm_safety_boundary.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-12_llm_safety_boundary_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-12_llm_safety_boundary_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-12_llm_safety_boundary_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-13",
+      "title": "配置化扩展机制",
+      "archetype": "bipartite dependency graph",
+      "conclusion": "指标、函数和表配置通过 Registry 同时服务语义、SQL、reference 与测试。",
+      "source": "configs + registry + tests",
+      "redesign": "用配置到消费者的二分图表达解耦关系，突出 0 行核心代码改动边界。",
+      "reference_pattern": "dependency graph / direct labelling",
+      "search_audit": {
+        "search_queries": "configuration registry dependency graph, extensible software architecture bipartite graph",
+        "best_code_pattern": "配置文件到消费者模块的二分图；边线显示解耦关系。",
+        "style_contract": "突出配置化扩展的工程机制，不做产品功能卡片。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-13_configurable_extension.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-13_configurable_extension.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-13_configurable_extension_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-13_configurable_extension_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-13_configurable_extension_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-14",
+      "title": "Doris 部署与数据流",
+      "archetype": "infrastructure schematic",
+      "conclusion": "Doris 证据从 DDL、prefix 表、采集脚本进入 evidence snapshot。",
+      "source": "deploy/doris + Doris evidence",
+      "redesign": "改为实验管线线稿，区分环境准备、SQL 执行和证据冻结。",
+      "reference_pattern": "method/infrastructure schematic",
+      "search_audit": {
+        "search_queries": "Doris deployment data pipeline schematic, database evidence pipeline Nature methods, infrastructure method figure",
+        "best_code_pattern": "环境准备、DDL/load、evidence snapshot 三段 pipeline；区别现场环境与冻结证据。",
+        "style_contract": "部署图只说明实验链路，不把本地 Doris 状态伪装成实时在线。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-14_doris_deployment_data_flow.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-14_doris_deployment_data_flow.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-14_doris_deployment_data_flow_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-14_doris_deployment_data_flow_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-14_doris_deployment_data_flow_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-15",
+      "title": "Web Demo 图像证据板",
+      "archetype": "image plate",
+      "conclusion": "Demo 截图应作为真实图像证据板展示，而不是把截图索引画成说明卡。",
+      "source": "EV-041 to EV-048 screenshots",
+      "redesign": "使用实际截图 image plate，统一 panel 字母、边框和 gutter。",
+      "reference_pattern": "Nature image plate layout",
+      "search_audit": {
+        "search_queries": "Nature image plate layout, screenshot evidence plate, multi-panel image plate matplotlib",
+        "best_code_pattern": "实际截图 image plate；统一 gutters、细边框、panel label；不叠加假 UI。",
+        "style_contract": "所有画面来自现有截图文件，不重绘、伪造或遮盖关键状态。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\08_界面证据图像板\\FIG-15_web_demo_image_plate.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\08_界面证据图像板\\FIG-15_web_demo_image_plate.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\08_界面证据图像板\\FIG-15_web_demo_image_plate_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\08_界面证据图像板\\FIG-15_web_demo_image_plate_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\08_界面证据图像板\\FIG-15_web_demo_image_plate_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-16",
+      "title": "结果与交付包结构",
+      "archetype": "delivery tree schematic",
+      "conclusion": "最终交付物围绕源码、配置、数据、测试、文档和 evidence snapshots 组织。",
+      "source": "PROJECT_INDEX + evidence_manifest",
+      "redesign": "用树形线稿表示项目交付结构，不用目录卡片或网页式列表。",
+      "reference_pattern": "tree schematic / direct labels",
+      "search_audit": {
+        "search_queries": "scientific tree schematic direct labels, software delivery package map figure",
+        "best_code_pattern": "树形交付结构线稿；目录说明用短标签和右侧释义列。",
+        "style_contract": "交付结构不做目录卡片，按审计树显示源码、数据、测试、文档、证据。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\09_交付结构图\\FIG-16_delivery_package_map.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\09_交付结构图\\FIG-16_delivery_package_map.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\09_交付结构图\\FIG-16_delivery_package_map_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\09_交付结构图\\FIG-16_delivery_package_map_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\09_交付结构图\\FIG-16_delivery_package_map_gray_300dpi.png"
+    },
+    {
+      "id": "FIG-17",
+      "title": "真实样本与规模证据边界",
+      "archetype": "evidence boundary matrix",
+      "conclusion": "真实行情样本证明语义可信性，5M Doris evidence 证明规模性能，两者不能混为同一数据集。",
+      "source": "README + real samples + Doris evidence",
+      "redesign": "用双证据泳道和小矩阵说明口径边界，防止答辩时过度宣称。",
+      "reference_pattern": "claim-boundary figure / evidence matrix",
+      "search_audit": {
+        "search_queries": "claim boundary evidence matrix, data provenance lane figure, scientific evidence boundary diagram",
+        "best_code_pattern": "双证据泳道 + 0/1 矩阵；真实样本和规模性能分开证明。",
+        "style_contract": "防止把小样本业务真实性与 5M Doris 性能混为一类证据。"
+      },
+      "svg": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-17_real_sample_vs_scale_evidence.svg",
+      "pdf": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-17_real_sample_vs_scale_evidence.pdf",
+      "png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-17_real_sample_vs_scale_evidence_300dpi.png",
+      "tiff": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-17_real_sample_vs_scale_evidence_600dpi.tiff",
+      "gray_png": "outputs\\可视化证据包_nature_style\\07_专项机制与边界图\\FIG-17_real_sample_vs_scale_evidence_gray_300dpi.png"
+    }
+  ]
+}

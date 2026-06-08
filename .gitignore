@@ -15,4 +15,4 @@ reports/
 *.db
 *.sqlite
 *.log
-
+external_references/
