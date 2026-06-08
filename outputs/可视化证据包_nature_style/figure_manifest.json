@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-06-08T23:20:50+08:00",
+  "generated_at": "2026-06-08T23:25:36+08:00",
   "style_standard": "Nature figure mode v2 - paper-first Python/matplotlib figures",
-  "git_head_now": "b5d3beb",
+  "git_head_now": "7559e28",
   "target_size": {
     "single_column_in": 3.5039370078740157,
     "double_column_in": 7.204724409448819,
     "max_height_in": 6.692913385826772
   },
-  "metadata_generated_at": "2026-06-08T14:05:03Z",
-  "git_head_at_export": "38bb712",
+  "metadata_generated_at": "2026-06-08T15:25:26Z",
+  "git_head_at_export": "7559e28",
   "pytest": {
     "passed": 203,
-    "elapsed_seconds": 8.71
+    "elapsed_seconds": 13.11
   },
   "official_suite": {
     "suite_passed": true,

@@ -1,11 +1,11 @@
 # Nature Style 科研图表证据包
 
-生成时间：2026-06-08T23:20:50+08:00
+生成时间：2026-06-08T23:25:36+08:00
 样式标准：`Nature figure mode v2 - paper-first Python/matplotlib figures`
-当前 Git HEAD：`b5d3beb`
-最新 evidence metadata：`2026-06-08T14:05:03Z`
-Git HEAD at export：`38bb712`
-Pytest：`203 passed in 8.71s`
+当前 Git HEAD：`7559e28`
+最新 evidence metadata：`2026-06-08T15:25:26Z`
+Git HEAD at export：`7559e28`
+Pytest：`203 passed in 13.11s`
 Official suite：正例 `37/37`，负例 `37/37`
 Doris speedup：`36.24x`；Doris evidence generated_at：`2026-05-23T15:11:26Z`
 

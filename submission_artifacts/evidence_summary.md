@@ -8,15 +8,15 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 |---|---|
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 203 passed in 8.71s |
+| Pytest regression | 203 passed in 13.11s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Defense package checks | 13/13 |
 | Doris evidence | PASS |
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | 38bb712 |
-| Git HEAD at export | 38bb712 |
+| Git HEAD at report generation | 7559e28 |
+| Git HEAD at export | 7559e28 |
 
 ## Source Files
 
