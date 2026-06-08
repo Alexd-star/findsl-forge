@@ -1,8 +1,8 @@
 # Plottie Style 科研图表证据包
 
-生成时间：2026-06-08T23:56:46+08:00
+生成时间：2026-06-09T00:04:32+08:00
 样式标准：`Plottie atlas mode v1 - chart-class separated scientific figures`
-当前 Git HEAD：`dbce457`
+图包渲染时 Git HEAD：`9cdbad7`
 Evidence metadata：`2026-06-08T15:25:26Z`
 Pytest：`203 passed in 13.11s`
 Official suite：正例 `37/37`，负例 `37/37`

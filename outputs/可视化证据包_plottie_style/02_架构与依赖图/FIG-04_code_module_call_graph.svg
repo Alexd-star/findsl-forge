@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-06-08T23:56:49.332368</dc:date>
+    <dc:date>2026-06-09T00:04:36.123430</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -123,7 +123,7 @@ C 98.798361 125.838273 97.490948 127.173757 97.490948 128.56608
 C 97.490948 129.958403 98.798361 131.293887 101.125245 132.278408 
 C 103.452128 133.262928 106.608502 133.816104 109.899213 133.816104 
 z
-" clip-path="url(#p058782993d)" style="fill: #2364aa; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #2364aa; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_2">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: middle" x="109.899213" y="143.988525" transform="rotate(-0 109.899213 143.988525)">cli.py</text>
@@ -139,7 +139,7 @@ C 199.018959 97.568913 197.711546 98.904397 197.711546 100.29672
 C 197.711546 101.689043 199.018959 103.024527 201.345843 104.009048 
 C 203.672727 104.993568 206.829101 105.546744 210.119811 105.546744 
 z
-" clip-path="url(#p058782993d)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_3">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif" transform="translate(198.794999 115.719165)">compiler</text>
@@ -157,7 +157,7 @@ C 299.239558 97.568913 297.932145 98.904397 297.932145 100.29672
 C 297.932145 101.689043 299.239558 103.024527 301.566441 104.009048 
 C 303.893325 104.993568 307.049699 105.546744 310.340409 105.546744 
 z
-" clip-path="url(#p058782993d)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_4">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: middle" x="310.340409" y="115.719165" transform="rotate(-0 310.340409 115.719165)">sqlgen.py</text>
@@ -173,7 +173,7 @@ C 299.239558 154.107633 297.932145 155.443117 297.932145 156.83544
 C 297.932145 158.227763 299.239558 159.563247 301.566441 160.547768 
 C 303.893325 161.532288 307.049699 162.085464 310.340409 162.085464 
 z
-" clip-path="url(#p058782993d)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_5">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif" transform="translate(298.271409 172.257885)">reference</text>
@@ -190,7 +190,7 @@ C 399.460156 117.761313 398.152743 119.096797 398.152743 120.48912
 C 398.152743 121.881443 399.460156 123.216927 401.78704 124.201448 
 C 404.113923 125.185968 407.270298 125.739144 410.561008 125.739144 
 z
-" clip-path="url(#p058782993d)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_6">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif" transform="translate(402.024367 135.911565)">official</text>
@@ -207,7 +207,7 @@ C 399.460156 174.300033 398.152743 175.635517 398.152743 177.02784
 C 398.152743 178.420163 399.460156 179.755647 401.78704 180.740168 
 C 404.113923 181.724688 407.270298 182.277864 410.561008 182.277864 
 z
-" clip-path="url(#p058782993d)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_7">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif" transform="translate(399.085164 192.450285)">evidence</text>
@@ -224,7 +224,7 @@ C 199.018959 174.300033 197.711546 175.635517 197.711546 177.02784
 C 197.711546 178.420163 199.018959 179.755647 201.345843 180.740168 
 C 203.672727 181.724688 206.829101 182.277864 210.119811 182.277864 
 z
-" clip-path="url(#p058782993d)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
+" clip-path="url(#pbd21aa97ab)" style="fill: #ffffff; stroke: #1c1c1c; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="text_8">
     <text style="fill: #1c1c1c; font: 5.4px 'Microsoft YaHei', 'Arial', 'Helvetica', 'DejaVu Sans', 'Liberation Sans', sans-serif; text-anchor: middle" x="210.119811" y="192.450285" transform="rotate(-0 210.119811 192.450285)">web demo</text>
@@ -241,7 +241,7 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="p058782993d">
+  <clipPath id="pbd21aa97ab">
    <rect x="38.313071" y="43.758" width="477.240945" height="201.924"/>
   </clipPath>
  </defs>

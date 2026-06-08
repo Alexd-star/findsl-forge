@@ -286,7 +286,7 @@ def write_outputs(metrics: dict, rows: list[dict]) -> None:
         "",
         f"生成时间：{metrics['generated_at_local']}",
         f"样式标准：`{STYLE_STANDARD}`",
-        f"当前 Git HEAD：`{metrics['git_head_now']}`",
+        f"图包渲染时 Git HEAD：`{metrics['git_head_now']}`",
         f"Evidence metadata：`{md['generated_at']}`",
         f"Pytest：`{md['readiness']['pytest']['passed']} passed in {md['readiness']['pytest']['elapsed_seconds']:.2f}s`",
         f"Official suite：正例 `{md['official_suite']['positive']['passed']}/{md['official_suite']['positive']['total']}`，负例 `{md['official_suite']['negative']['passed']}/{md['official_suite']['negative']['total']}`",
@@ -341,7 +341,7 @@ def write_outputs(metrics: dict, rows: list[dict]) -> None:
     manifest = {
         "generated_at": metrics["generated_at_local"],
         "style_standard": STYLE_STANDARD,
-        "git_head_now": metrics["git_head_now"],
+        "git_head_at_render": metrics["git_head_now"],
         "metadata_generated_at": md["generated_at"],
         "git_head_at_export": md["git"]["head_at_export"],
         "pytest": md["readiness"]["pytest"],
