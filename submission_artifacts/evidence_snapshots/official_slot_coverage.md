@@ -9,57 +9,54 @@
 | 官方样例总数 | 5799 |
 | 语法解析成功 | 5792 |
 | 语法解析失败 | 7 |
-| Doris SQL 编译成功 | 1718 |
-| Doris SQL 编译失败 | 4074 |
-| 全量样例可落地编译率 | 29.63% |
-| 解析成功样例可落地编译率 | 29.66% |
+| Doris SQL 编译成功 | 1823 |
+| Doris SQL 编译失败 | 3969 |
+| 全量样例可落地编译率 | 31.44% |
+| 解析成功样例可落地编译率 | 31.47% |
 
 ## 编译失败错误码
 
 | 错误码 | 次数 |
 |---|---:|
-| UNSUPPORTED_OFFICIAL_INDICATOR | 3928 |
-| OFFICIAL_RANK_SHAPE_ERROR | 28 |
-| OFFICIAL_EXPR_ERROR | 10 |
-| OFFICIAL_RANK_OPERATOR_ERROR | 10 |
-| UNSUPPORTED_OFFICIAL_COUNT_EXP | 49 |
+| UNSUPPORTED_OFFICIAL_INDICATOR | 3889 |
+| OFFICIAL_EXPR_ERROR | 6 |
+| UNSUPPORTED_OFFICIAL_COUNT_EXP | 56 |
 | UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION | 18 |
-| UNSUPPORTED_OFFICIAL_FUNCTION | 31 |
 
 ## 编译失败细分原因 TopN
 
 | 原因 | 次数 |
 |---|---:|
-| UNSUPPORTED_OFFICIAL_INDICATOR: 成分股 | 164 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 跟踪指数 | 112 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 热门 | 102 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 成分股 | 165 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 跟踪指数 | 114 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 热门 | 103 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 主营业务 | 98 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 基金类型 | 76 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润 | 73 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润 | 77 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 基金类型 | 77 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 上市日期 | 69 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 龙头股 | 64 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润同比增长率 | 55 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 基金十大重仓股 | 52 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 股息率 | 50 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 股息率 | 51 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 已发布财报期 | 47 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 净利润同比增长率 | 44 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 分红金额 | 43 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 净利润同比增长率 | 43 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 投资市场 | 42 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 净资产收益率 | 38 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 净资产收益率 | 39 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 我的持仓股 | 36 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 营业收入同比增长率 | 34 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 每手股数 | 33 |
-| UNSUPPORTED_OFFICIAL_FUNCTION: rank | 31 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 潜力 | 28 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 潜力 | 29 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 优质 | 27 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 强势 | 27 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 优质 | 26 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 波动率 | 26 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 龙虎榜上榜日期 | 25 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 波动率 | 24 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 估值 | 23 |
-| OFFICIAL_RANK_SHAPE_ERROR: then right side must be rank(...) comparison | 21 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 估值 | 24 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: MACD金叉 | 21 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 基金公司 | 21 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: MACD金叉 | 20 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 上市天数 | 20 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 规模 | 19 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 我的自选股 | 18 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 净利润 | 18 |
 
 ## 缺失数据域分层
 
@@ -67,21 +64,19 @@
 
 | 缺失或待增强类别 | 次数 |
 |---|---:|
-| 官方三表未覆盖的其他指标 | 1721 |
-| 财务报表数据缺失 | 762 |
-| 公司画像与题材热度数据缺失 | 379 |
-| 指数成分与权重数据缺失 | 277 |
-| 基金产品与持仓数据缺失 | 256 |
-| 高级形态/相似度模型数据缺失 | 160 |
-| 公司事件与交易日历扩展数据缺失 | 147 |
-| 用户账户与自选股数据缺失 | 87 |
-| 交易规则与跨市场标的属性缺失 | 86 |
-| 龙虎榜与交易异动数据缺失 | 53 |
-| 出现次数/连续次数时间语义待特征表增强 | 49 |
-| 排名表达式形态待规范或待扩展 | 38 |
-| 函数语义待扩展 | 31 |
+| 官方三表未覆盖的其他指标 | 1682 |
+| 财务报表数据缺失 | 778 |
+| 公司画像与题材热度数据缺失 | 383 |
+| 指数成分与权重数据缺失 | 280 |
+| 基金产品与持仓数据缺失 | 257 |
+| 高级形态/相似度模型数据缺失 | 165 |
+| 公司事件与交易日历扩展数据缺失 | 148 |
+| 用户账户与自选股数据缺失 | 89 |
+| 出现次数/连续次数时间语义待特征表增强 | 56 |
+| 龙虎榜与交易异动数据缺失 | 54 |
+| 交易规则与跨市场标的属性缺失 | 53 |
 | 创新高低/位置函数复杂周期待增强 | 18 |
-| 复杂表达式组合待扩展 | 10 |
+| 复杂表达式组合待扩展 | 6 |
 
 ## 语法解析失败样本
 
@@ -149,6 +144,36 @@
 | 57 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 我的自选股 | `indicator('', '', '我的自选股', '', '', '', '') = True and indicator('', '', 'ROIC', '今年上半年', '', '', '') > indicator('', '', 'ROIC', '二二年', '', '', '') + 0.1 and indicator('', '', 'ST股票标识', '今年上半年', '', '', '') = False` |
 | 59 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 我的自选股 | `indicator('京', '', '我的自选股', '', '', '', '') = True and indicator('京', '', 'WR金叉', '', '', '', '') = True and indicator('京', '', '价跌量缩', '', '', '', '') = True and indicator('京', '', '周均线空头排列', '', '', '', '') = True` |
 | 60 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 头肩顶 | `indicator('沪\|深', '', '港股通标识', '', '', '', '') = True and (indicator('沪\|深', '', '头肩顶', '2009年', '', '', '') = True or indicator('沪\|深', '无机盐行业', '每股净资产', '2009年', '', '', '') > 10)` |
+| 61 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 研发费用 | `indicator('港', '', '研发费用', '2023年2月18日', '', '', '') > 20 and indicator('港', '', '港股美股同时上市标识', '', '', '', '') = True and indicator('港', '', '主营业务', '', '', '', '') = '飞机'` |
+| 62 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 我的持仓股 | `indicator('', '', '我的持仓股', '', 'ETF', '', '') = True and indicator('', '', '除权除息日', '2002年', 'ETF', '', '') ~= queryData('港', '华泰', '除权除息日', '2002年', '') and indicator('', '', '净申购金额', '2002年', 'ETF', '', '') > queryData('港', '华泰', '净申购金额', '2002年', '')` |
+| 63 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 股息率 | `indicator('港', '', '股息率', '19年', '', '', '') > 5% and indicator('港', '', '深股通标识', '19年', '', '', '') = True` |
+| 64 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 营业收入同比增长率 | `indicator('深', '', '营业收入同比增长率', '本月', '', '', '') < 0 then rank('深', '', '营业收入同比增长率', 'asc', '本月', '', '', '') <= 10 and indicator('深', '', '港股通标识', '', '', '', '') = True` |
+| 66 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 净资产收益率 | `indicator('', '军工', '净资产收益率', '03年', '场外基金', '', '') > 10% and rank('', '军工', 'RSI', 'desc', '03年', '场外基金', '', '') <= 10` |
+| 67 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 个人持有比例 | `indicator('', '', '个人持有比例', '2005年', '私募基金', '', '') > 20% and belong_industry('', '', '上穿压力位', '', '') = True` |
+| 68 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 净利润同比增长率 | `indicator('沪\|深\|京', '', '净利润同比增长率', '两个月内', '', '', '') > 10%` |
+| 69 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: KDJ底背离 | `indicator('沪', '', '港股通标识', '', '', '', '') = True and indicator('沪', '', 'KDJ底背离', '20年', '', '', '') = False then rank('沪', '', '', 'asc', '20年', '', '', '') = 3` |
+| 70 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 研发费用 | `indicator('京\|沪', '', '换手率', '前一天', '', '', '') < 5% then rank('京\|沪', '', '研发费用', 'desc', '前一天', '', '', '') <= 10` |
+| 72 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 分红日期 | `indicator('', '', '分红日期', '', '', '', '') = '31日' and indicator('', '', '陆股通标识', '', '', '', '') = True then rank('', '', '主力净流出', 'desc', '', '', '', '') = 1` |
+| 73 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 归母净利润同比增长率 | `indicator('其他', '', '归母净利润同比增长率', '这个月', '', '', '') > 5% and indicator('其他', '', '净申购金额', '这个月', '', '', '') >= 5000000000` |
+| 74 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 净利润同比增长率 | `indicator('', '', '3分钟涨速', '1周内', '', '', '') ~= 3% and indicator('', '', '净利润同比增长率', '1周内', '', '', '') ~= indicator('', '', '净利润同比增长率', '4月25日', '', '', '')` |
+| 75 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: KDJ底背离 | `indicator('', '', 'KDJ底背离', '2022年', '', '', '') = True and indicator('', '', '分红日期', '2022年', '', '', '') = '10月' and indicator('', '', '分红日期', '2022年', '', '', '') <= queryData('', '海都矿产', '分红日期', '2022年', '')` |
+| 76 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 单位净值 | `rank('', '医疗器材行业', '单位净值', 'desc', '2019年', '', '', '') <= 10 and indicator('', '医疗器材行业', '我的持仓股', '2019年', '', '', '') = True` |
+| 77 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 跌破支撑位 | `indicator('沪\|深\|京', '', '成交量', '昨日', '', '', '') = indicator('沪\|深\|京', '', '30日均量线', '昨日', '', '', '') * 2 and indicator('沪\|深\|京', '', '市盈率', '昨日', '', '', '') > 20 and indicator('沪\|深\|京', '', '跌破支撑位', '昨日', '', '', '') = False` |
+| 78 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 归母净利润同比增长率 | `indicator('', '上证上游指数', '归母净利润同比增长率', '近五天', '', '', '') ~= 0.04% and indicator('', '上证上游指数', '成交量', '近五天', '', 'GROWTH_RISE', 'CONS!=每日') > 0 and indicator('', '上证上游指数', '超买', '近五天', '', '', '') = True` |
+| 80 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 营业总成本 | `indicator('', '', '营业总成本', '这四个月', '', '', '') > 300000000` |
+| 82 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 归母净利润同比增长率 | `indicator('沪\|深', '', '归母净利润同比增长率', '近期', '', '', '') > 100%` |
+| 85 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 我的持仓股 | `indicator('', '', '我的持仓股', '', '', '', '') = True and indicator('', '', '累计净值', '二三季度', '', '', '') / indicator('', '', '每手股数', '二三季度', '', '', '') > 1000 and indicator('', '', '股票名称', '二三季度', '', '', '') = '%金'` |
+| 86 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 累计净值 | `indicator('美', '', '累计净值', '近三月', '', '', '') > 100 and position('美', '', '', '', '目前', '', '', '') = '低'` |
+| 87 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 净利润同比增长率 | `indicator('港', '', '净利润同比增长率', '当天', '', '', '') > 10% and rank('港', '', '净利润同比增长率', 'desc', '当天', '', '', '') <= 10` |
+| 88 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 股权质押总占比 | `indicator('沪', '', '股权质押总占比', '00年', '', '', '') > 20% and indicator('沪', '', '涨幅', '00年', '', '', 'CONS=5日') > 0` |
+| 89 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 周均线多头排列 | `indicator('港', '航天装备', '最高价', '零三年', '', '', '') > 100 and indicator('港', '航天装备', '周均线多头排列', '', '', '', '') = True` |
+| 90 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: WR金叉 | `indicator('深', '', 'WR金叉', '今日', '', '', '') = True and indicator('深', '', '净利润同比增长率', '今日', '', 'AVG', '') > queryData('', '贵州茅台', '净利润同比增长率', '今日', 'AVG')` |
+| 91 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 跌破所有均线 | `indicator('沪主板\|深主板', '', '跌破所有均线', '', '', '', '') = True and indicator('沪主板\|深主板', '', '机构持有比例', '', '', '', '') > 10% and indicator('沪主板\|深主板', '', '股票名称', '', '', '', '') = '龙%'` |
+| 92 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 头肩顶 | `indicator('', '', '头肩顶', '2001年9月2日', '', '', '') = True or indicator('', '码头业务', '主力净流入', '2001年9月2日', '', '', '') > 5000000` |
+| 93 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 头肩顶 | `indicator('', '', '深港通标识', '', '', '', '') = True and indicator('', '', '主力净流入', '一一年', '', 'AVG', '') > 100000000 then rank('', '', '主力净流入', 'desc', '一一年', '', '', '') <= 10 and indicator('', '', '头肩顶', '', '', '', '') = True and indicator('', '', '我的持仓股', '', '', '', '') = True` |
+| 94 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 资产总计 | `indicator('', '', '陆股通标识', '', '', '', '') = True and indicator('', '', '主力净流出', '', '', '', '') > 100000 and indicator('', '', '资产总计', '2014年', '', '', '') > 15 and rank('', '', '资产总计', 'desc', '2014年', '', '', '') <= 10` |
+| 95 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 基本每股收益同比增长率 | `indicator('沪\|深\|京', '', '基本每股收益同比增长率', '', '', '', '') < 0` |
+| 96 | UNSUPPORTED_OFFICIAL_INDICATOR | Official indicator is not mapped to the provided three-table dataset: 头肩底 | `indicator('港', '', '头肩底', '20230423至本月初', '', '', '') = False and indicator('港', '', '港股美股同时上市标识', '', '', '', '') = True` |
 
 ## 可落地编译样本
 
@@ -174,6 +199,7 @@
 | 101 | hsj_stock_hq_basic, hsj_stock_code_info | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (code.name LIKE '%科技%' AND ((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) > 10) AND base.mktcode IN (0) AND base.bizdate BETWEEN '2016-01-01' AND '2016-12-31'` |
 | 108 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (EXISTS (   SELECT 1   FROM newzl.hsj_stock_hq_basic AS lb     LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode   WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)  FROM newzl.hsj_stock_hq_basic AS wb  WHERE wb.mktcode = lb.mktcode AND wb.tgtcode = lb.tgtcode AND wb.bizdate BETWEEN '2012-01-01' AND '2012-12-` |
 | 112 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (EXISTS (   SELECT 1   FROM newzl.hsj_stock_hq_basic AS lb     LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode   WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (((lb.lastPx - lb.preClosePx) * 100.0 / NULLIF(lb.preClosePx, 0)) >= 8 AND (SELECT COUNT(*)  FROM newzl.hsj_stock_hq_basic AS wb  WHERE wb.mktcode = lb.mktcode AN` |
+| 118 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (((base.dynPE / 10000.0) < 20 AND (base.volume / 100) >= 1000000) AND EXISTS (   SELECT 1 FROM (     SELECT rb.mktcode, rb.tgtcode, rb.bizdate,            ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.volume DESC, rb.tgtcode ASC) AS rank_no     FROM newzl.hsj_stock_hq_basic AS rb     LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = r` |
 | 120 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (base.lastPx / 10000.0) < 30 AND code.gemFlag = TRUE AND (code.hyBlkRefName = '储能&数据中心' OR code.name = '储能&数据中心')` |
 | 121 | hsj_stock_hq_basic, hsj_stock_hq_ext | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode LEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate WHERE ext.ZJLXMainNetTur > 0 AND base.mktcode IN (0) AND (code.hyBlkRefName = '白酒&消费' OR code.name = '白酒&消费')` |
 | 127 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (((base.openPx / 10000.0) > 50 AND code.gemFlag = TRUE AND base.bizdate BETWEEN '2020-01-01' AND '2020-12-31') OR ((base.openPx / 10000.0) = 92 AND code.gemFlag = TRUE AND base.bizdate BETWEEN '2024-01-01' AND '2026-04-14'))` |
@@ -204,3 +230,32 @@
 | 195 | hsj_stock_hq_basic | `SELECT * FROM (   SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,          ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no   FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode   WHERE base.mktcode NOT IN (0, 1, 103) AND (code.hyBlkRefName = 'S板' OR code.name = 'S板') AND 1=1 ) AS ranked WHERE rank_no = 1` |
 | 196 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE ((base.lastPx / 10000.0) <= ((base.lastPx / 10000.0) + 30.52) AND (base.lastPx / 10000.0) < (base.lastPx / 10000.0)) AND base.bizdate BETWEEN '2022-01-01' AND '2022-12-31' AND 1=1` |
 | 197 | hsj_stock_hq_basic, hsj_stock_hq_basic_technical | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode LEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate WHERE ((base.lastPx / 10000.0) > 4.5 AND tech.ma_bullish = TRUE) AND base.mktcode IN (0, 1, 103) AND base.bizdate = '2026-04-13'` |
+| 198 | hsj_stock_hq_basic | `SELECT * FROM (   SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,          ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.firstLimitUpTime ASC, base.tgtcode ASC) AS rank_no   FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode   WHERE base.limitFlag = 1 AND base.mktcode IN (0, 1) AND base.bizdate BETWEEN '2010-01-01' AND '2010-12-31' ) AS ranked WHERE rank_no <= 10` |
+| 200 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (0, 1) AND base.mktcode NOT IN (0) AND (code.hyBlkRefName = '沪深300医药' OR code.name = '沪深300医药')` |
+| 201 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND code.kcbFlag = TRUE AND (code.hyBlkRefName = '上证180指数' OR code.name = '上证180指数')` |
+| 202 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (0, 1, 103) AND (code.hyBlkRefName = '鸿蒙概念' OR code.name = '鸿蒙概念')` |
+| 203 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND code.gemFlag = TRUE AND (code.hyBlkRefName = '上证380稳定' OR code.name = '上证380稳定')` |
+| 204 | hsj_stock_hq_basic, hsj_stock_hq_basic_technical | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode LEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate WHERE ((base.volume >= 10000000000 AND base.volume <= 20000000000) AND (SELECT COUNT(*)  FROM newzl.hsj_stock_hq_basic AS wb  LEFT JOIN newzl.hsj_stock_hq_basic_technical AS wt ON wt.mktcode = wb.mktcode AND wt.tgtcode = wb.tgtcode AND wt.bizdate =` |
+| 208 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (103) AND (code.hyBlkRefName = '沪深300能源&石膏石材板块' OR code.name = '沪深300能源&石膏石材板块')` |
+| 209 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (103) AND (code.hyBlkRefName = '华为概念' OR code.name = '华为概念')` |
+| 210 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND (code.hyBlkRefName = '沪深300医药' OR code.name = '沪深300医药')` |
+| 213 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND (code.hyBlkRefName = '上证380稳定' OR code.name = '上证380稳定')` |
+| 220 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (EXISTS (   SELECT 1   FROM newzl.hsj_stock_hq_basic AS lb     LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode   WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND lb.limitFlag = 1 AND lc.gemFlag = TRUE AND (lc.hyBlkRefName = 'SHEIN' OR lc.name = 'SHEIN') AND lb.bizdate BETWEEN '2026-04-08' AND '2026-04-14' ) AND EXISTS (   ` |
+| 221 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (EXISTS (   SELECT 1   FROM newzl.hsj_stock_hq_basic AS lb     LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode   WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)  FROM newzl.hsj_stock_hq_basic AS wb  WHERE wb.mktcode = lb.mktcode AND wb.tgtcode = lb.tgtcode AND wb.bizdate BETWEEN '2026-04-08' AND '2026-04-` |
+| 222 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (base.turnover > 100000000000 AND (((base.lastPx / 10000.0) * base.listedShare) >= 1000000000 AND ((base.lastPx / 10000.0) * base.listedShare) <= 1500000000)) AND base.mktcode IN (0) AND (code.hyBlkRefName = '印花板' OR code.name = '印花板') AND base.bizdate BETWEEN '2025-10-15' AND '2026-04-14'` |
+| 223 | hsj_stock_hq_basic, hsj_stock_code_info | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (EXISTS (   SELECT 1 FROM (     SELECT rb.mktcode, rb.tgtcode, rb.bizdate,            ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.closePx / 10000.0) ASC, rb.tgtcode ASC) AS rank_no     FROM newzl.hsj_stock_hq_basic AS rb     LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode     WHERE rb.mktcode IN (0, 1) AND rb.bizdate =` |
+| 229 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (0) AND (code.hyBlkRefName = '幕墙板块\|沪深300能源' OR code.name = '幕墙板块\|沪深300能源') LIMIT 22` |
+| 230 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (1) AND (code.hyBlkRefName = 'VPN概念' OR code.name = 'VPN概念') LIMIT 35` |
+| 231 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND (code.hyBlkRefName = '沪深300医药' OR code.name = '沪深300医药') LIMIT 180` |
+| 233 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (0) AND (code.hyBlkRefName = '上证380稳定' OR code.name = '上证380稳定') LIMIT 300` |
+| 236 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE ((((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) > 10 AND NOT (code.kcbFlag = TRUE) AND (code.hyBlkRefName = '^白酒行业' OR code.name = '^白酒行业')) OR ((base.pBR / 10000.0) < 5 AND base.mktcode IN (0) AND NOT (code.kcbFlag = TRUE) AND (code.hyBlkRefName = '^白酒行业' OR code.name = '^白酒行业') AND base.bizdate BETWEEN '2023-01-01' AND '2023-` |
+| 237 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE ((base.closePx / 10000.0) >= 10 AND (base.closePx / 10000.0) <= 10.02) AND base.mktcode NOT IN (103) AND 1=1 LIMIT 20` |
+| 238 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE ((base.amplitude / 10000.0) < 3 AND (base.amplitude / 10000.0) > 10.03) AND base.mktcode IN (103) AND 1=1` |
+| 239 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode NOT IN (0, 1, 103) AND (code.hyBlkRefName = '沪深300港元净收益指数' OR code.name = '沪深300港元净收益指数')` |
+| 240 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (0, 1, 103) AND (code.hyBlkRefName = '^沪深300港元净收益指数' OR code.name = '^沪深300港元净收益指数') LIMIT 20` |
+| 242 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND base.mktcode IN (1) AND 1=0 AND (code.hyBlkRefName = '^白酒行业' OR code.name = '^白酒行业') LIMIT 35` |
+| 246 | hsj_stock_hq_basic, hsj_stock_code_info | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (code.hkConnFlag = TRUE AND ((base.closePx / 10000.0) > 421 AND (base.closePx / 10000.0) <= 19.52)) AND base.mktcode IN (0, 1) AND (code.hyBlkRefName = '通信行业' OR code.name = '通信行业') AND base.bizdate = '2026-04-13'` |
+| 249 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE (base.outerVol > 20 OR EXISTS (   SELECT 1 FROM (     SELECT rb.mktcode, rb.tgtcode, rb.bizdate,            ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.outerVol DESC, rb.tgtcode ASC) AS rank_no     FROM newzl.hsj_stock_hq_basic AS rb     LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode     WHERE 1=1   ) AS ranked   WHERE` |
+| 251 | hsj_stock_hq_basic | `SELECT * FROM (   SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,          ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.openPx / 10000.0) DESC, base.tgtcode ASC) AS rank_no   FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode   WHERE (code.hyBlkRefName = '金属管件制品行业&能源技术服务' OR code.name = '金属管件制品行业&能源技术服务') AND base.bizdate = '2026-04-14' ) AS ranked WHERE rank_no > 0 LIMIT 10` |
+| 260 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE ((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) > 15 AND code.gemFlag = TRUE AND code.kcbFlag = TRUE AND (code.hyBlkRefName = '白酒行业' OR code.name = '白酒行业') AND base.bizdate BETWEEN '2022-01-01' AND '2022-12-31' LIMIT 50` |
+| 261 | hsj_stock_hq_basic | `SELECT base.mktcode, base.tgtcode, base.bizdate, code.name FROM newzl.hsj_stock_hq_basic AS base LEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode WHERE 'all' = 'all' AND (code.hyBlkRefName = '农产品行业&中字头' OR code.name = '农产品行业&中字头') LIMIT 202` |
