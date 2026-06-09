@@ -1,32 +1,14 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-06-10 01:59:16 +08:00
-- Git HEAD at export: e1a210d
-- Git status when exported, excluding evidence snapshots and this export script:  M CHANGELOG.md
- M PROJECT_INDEX.md
- M README.md
- M deploy/doris/official/01_schema.sql
- M deploy/doris/official/02_stream_load.md
- M deploy/doris/official/04_feature_tables.sql
- M "docs/17_\351\241\271\347\233\256\344\272\244\344\273\230\350\257\264\346\230\216.md"
- M "docs/21_\345\256\230\346\226\271\347\234\237\345\256\236\346\225\260\346\215\256\345\206\262\345\210\272\350\256\241\345\210\222\344\270\216\351\252\214\346\224\266\351\227\255\347\216\257.md"
- M docs/README.md
- M src/findsl/evidence_metadata.py
- M submission_artifacts/evidence_metadata.json
- M submission_artifacts/evidence_summary.md
- M tests/test_evidence_metadata.py
- M tests/test_official_doris_assets.py
- M tests/test_official_slot.py
-?? deploy/doris/official/05_technical_features_by_market.sql
-?? "docs/22_\345\256\230\346\226\271\347\234\237\345\256\236\346\225\260\346\215\256\350\220\275\345\272\223\345\244\215\347\233\230\344\270\216\346\273\241\345\210\206\345\206\262\345\210\272\350\256\241\345\210\222.md"
-?? docs/superpowers/plans/2026-06-10-official-doris-evidence-automation.md
-?? scripts/prepare_official_doris_evidence.ps1
+- Generated at: 2026-06-10 02:02:05 +08:00
+- Git HEAD at export: b2ba3a9
+- Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `submission_readiness.md` (13234 bytes)
+- `submission_readiness.md` (11489 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `doris_cluster_evidence.json` (6537 bytes)
 - `defense_package.md` (9652 bytes)
