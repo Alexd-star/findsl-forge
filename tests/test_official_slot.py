@@ -134,6 +134,26 @@ def test_compile_official_limit_count_aliases_from_real_workbook():
     assert "UNSUPPORTED_OFFICIAL_INDICATOR" not in result.sql
 
 
+def test_compile_official_lot_size_as_a_share_rule_constant():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '今天', '', '', '') "
+        "/ indicator('', '', '每手股数', '今天', '', '', '') > 1000"
+    )
+
+    assert "(base.volume / 100) > 1000" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert result.warnings == []
+
+
+def test_compile_official_t0_flag_as_a_share_rule_constant_false():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '是否T+0', '今天', '', '', '') = True"
+    )
+
+    assert "WHERE FALSE AND base.bizdate = '2026-04-14'" in result.sql
+    assert result.warnings == []
+
+
 def test_compile_official_hk_connect_aliases_from_real_workbook():
     result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
         "indicator('', '', '沪港通标识', '今天', '', '', '') = True "
@@ -193,6 +213,87 @@ def test_compile_official_extended_ma_and_volume_average_aliases_from_real_workb
     assert "tech.volume_avg_30 > 1000" in result.sql
     assert "tech.volume_avg_60 > 1000" in result.sql
     assert "hsj_stock_hq_basic_technical" in result.requires_tables
+
+
+def test_compile_dynamic_daily_ma_uses_official_prefix_table():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '7日均线', '今天', '', '', '') > 10"
+    )
+
+    assert "newzl.hsj_stock_hq_basic_prefix AS p" in result.sql
+    assert "p_prev.row_no = p.row_no - 7" in result.sql
+    assert "p.close_prefix" in result.sql
+    assert "p.close_count_prefix" in result.sql
+    assert "/ 10000.0" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert "hsj_stock_hq_basic_prefix" in result.requires_tables
+
+
+def test_compile_dynamic_daily_volume_average_uses_official_prefix_table():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '8日均量线', '今天', '', '', '') > 1000"
+    )
+
+    assert "newzl.hsj_stock_hq_basic_prefix AS p" in result.sql
+    assert "p_prev.row_no = p.row_no - 8" in result.sql
+    assert "p.volume_prefix" in result.sql
+    assert "p.volume_count_prefix" in result.sql
+    assert "hsj_stock_hq_basic_prefix" in result.requires_tables
+
+
+def test_dynamic_prefix_indicators_work_inside_pattern_and_cross_functions():
+    reset_result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "reset('', '', '最新价', '25日均线', '今天', '', '') = True"
+    )
+    cross_result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "cross_above('', '', '13日均线', '55日均线', '今天', '', '') = True"
+    )
+
+    assert "p_prev.row_no = p.row_no - 25" in reset_result.sql
+    assert "p_prev.row_no = p.row_no - 13" in cross_result.sql
+    assert "p_prev.row_no = p.row_no - 55" in cross_result.sql
+    assert "hsj_stock_hq_basic_prefix" in reset_result.requires_tables
+    assert "hsj_stock_hq_basic_prefix" in cross_result.requires_tables
+
+
+def test_weekly_and_monthly_moving_averages_remain_explicitly_unsupported():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile("indicator('', '', '5周均线', '', '', '', '') > 0")
+
+    assert excinfo.value.code == "UNSUPPORTED_OFFICIAL_INDICATOR"
+
+
+def test_rank_function_can_be_used_inside_arithmetic_expression():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '涨停天数', 'desc', '本周', '', '', '') "
+        "+ rank('', '', '跌停天数', 'desc', '本周', '', '', '') > 0"
+    )
+
+    assert "SELECT ranked.rank_no" in result.sql
+    assert "ROW_NUMBER() OVER" in result.sql
+    assert "ORDER BY rb.upCount DESC" in result.sql
+    assert "ORDER BY rb.downCount DESC" in result.sql
+    assert "ranked.mktcode = base.mktcode" in result.sql
+
+
+def test_rank_expression_supports_division_with_ext_indicators():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '主力净流入', 'desc', '今天', '', '', '') "
+        "/ rank('', '', '主力净流出', 'desc', '今天', '', '', '') <= 3"
+    )
+
+    assert "ORDER BY rext.ZJLXMainNetTur DESC" in result.sql
+    assert "ORDER BY (-rext.ZJLXMainNetTur) DESC" in result.sql
+    assert "newzl.hsj_stock_hq_ext AS rext" in result.sql
+
+
+def test_rank_approximate_operator_falls_back_to_scalar_rank_expression():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '跌幅', 'desc', '四月二十号', '', 'AVG', '') ~= 10"
+    )
+
+    assert "SELECT ranked.rank_no" in result.sql
+    assert "= 10" in result.sql
 
 
 def test_compile_official_board_break_order_diff_and_drawdown_aliases_from_real_workbook():
@@ -536,6 +637,51 @@ def test_compile_chained_then_rank_pipeline_uses_cte_stages():
     assert "ranked_1.rank_no <= 50" in result.sql
     assert "ranked_2.rank_no <= 10" in result.sql
     assert result.requires_tables == ["hsj_stock_hq_basic", "hsj_stock_code_info", "hsj_stock_hq_ext"]
+
+
+def test_compile_then_rank_between_uses_scoped_rank_stage():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '最新价', '', '', '', '') < 100 "
+        "then rank('', '', '最新价', 'desc', '', '', '', '') between '[5,10]'"
+    )
+
+    assert "WITH stage_0 AS" in result.sql
+    assert "stage_1 AS" in result.sql
+    assert "FROM stage_0 AS prev" in result.sql
+    assert "ROW_NUMBER() OVER" in result.sql
+    assert "ranked.rank_no >= 5" in result.sql
+    assert "ranked.rank_no <= 10" in result.sql
+
+
+def test_compile_then_rank_and_plain_filter_stays_inside_prefiltered_stage():
+    result = OfficialSlotCompiler().compile(
+        "indicator('沪', '', '涨停', '8号', '', '', '') = True "
+        "then rank('沪', '', '总市值', 'desc', '8号', '', '', '') = 3 "
+        "and indicator('沪', '', 'ST股票标识', '8号', '', '', '') = False"
+    )
+
+    assert "WITH stage_0 AS" in result.sql
+    assert "stage_1 AS" in result.sql
+    assert "FROM stage_0 AS prev" in result.sql
+    assert "ranked.rank_no = 3" in result.sql
+    assert "NOT (code.stFlag = TRUE)" in result.sql
+    assert "base.mktcode IN (1)" in result.sql
+
+
+def test_compile_then_grouped_rank_or_conditions_share_prefiltered_stage():
+    result = OfficialSlotCompiler().compile(
+        "indicator('沪主板|深主板', '', '开盘价', '', '', '', '') < 2 "
+        "then (rank('沪主板|深主板', '', '开盘价', 'asc', '', '', '', '') <= 20 "
+        "or rank('沪主板|深主板', '', '开盘价', 'desc', '', '', '', '') <= 20)"
+    )
+
+    assert "WITH stage_0 AS" in result.sql
+    assert "stage_1 AS" in result.sql
+    assert "FROM stage_0 AS prev" in result.sql
+    assert result.sql.count("ROW_NUMBER() OVER") == 2
+    assert "ORDER BY (rb.openPx / 10000.0) ASC" in result.sql
+    assert "ORDER BY (rb.openPx / 10000.0) DESC" in result.sql
+    assert " OR " in result.sql
 
 
 def test_compile_rank_comparison_inside_boolean_pipeline():

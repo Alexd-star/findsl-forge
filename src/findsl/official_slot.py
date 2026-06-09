@@ -247,6 +247,7 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "流通股本": IndicatorMeta("hsj_stock_hq_basic", "listedShare"),
     "自由流通股股本": IndicatorMeta("hsj_stock_hq_basic", "freeShare"),
     "自由流通股本": IndicatorMeta("hsj_stock_hq_basic", "freeShare"),
+    "每手股数": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression="100"),
     "总市值": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
@@ -502,11 +503,70 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "科创板标识": IndicatorMeta("hsj_stock_code_info", "kcbFlag", kind="boolean"),
     "创业板标识": IndicatorMeta("hsj_stock_code_info", "gemFlag", kind="boolean"),
     "B股标识": IndicatorMeta("hsj_stock_code_info", "bShareFlag", kind="boolean"),
+    "是否T+0": IndicatorMeta("hsj_stock_hq_basic", kind="boolean", true_condition="FALSE"),
     "股票名称": IndicatorMeta("hsj_stock_code_info", "name", kind="string"),
     "证券代码": IndicatorMeta("hsj_stock_code_info", "tztcode", kind="string"),
     "股票代码": IndicatorMeta("hsj_stock_code_info", "tgtcode", kind="string"),
     "所属行业": IndicatorMeta("hsj_stock_code_info", "hyBlkRefName", kind="string"),
 }
+
+
+def _resolve_indicator_meta(indicator_name: str) -> Optional[IndicatorMeta]:
+    meta = INDICATORS.get(indicator_name)
+    if meta:
+        return meta
+    return _dynamic_prefix_indicator_meta(indicator_name)
+
+
+def _dynamic_prefix_indicator_meta(indicator_name: str) -> Optional[IndicatorMeta]:
+    match = re.fullmatch(
+        r"(?P<count>\d+|[零〇一二两三四五六七八九十百两]+)(?:日|天)均(?P<volume>量)?线",
+        str(indicator_name or "").strip(),
+    )
+    if not match:
+        return None
+    window = _parse_small_count(match.group("count"))
+    if window <= 0:
+        return None
+    if match.group("volume"):
+        expression = _dynamic_prefix_average_expr(
+            window,
+            prefix_column="volume_prefix",
+            count_column="volume_count_prefix",
+            scale_divisor=None,
+        )
+    else:
+        expression = _dynamic_prefix_average_expr(
+            window,
+            prefix_column="close_prefix",
+            count_column="close_count_prefix",
+            scale_divisor=10000.0,
+        )
+    return IndicatorMeta("hsj_stock_hq_basic_prefix", kind="numeric", expression=expression)
+
+
+def _dynamic_prefix_average_expr(
+    window: int,
+    *,
+    prefix_column: str,
+    count_column: str,
+    scale_divisor: Optional[float],
+) -> str:
+    average_sql = (
+        f"(SELECT ((p.{prefix_column} - COALESCE(p_prev.{prefix_column}, 0)) * 1.0 "
+        f"/ NULLIF(p.{count_column} - COALESCE(p_prev.{count_column}, 0), 0))\n"
+        " FROM newzl.hsj_stock_hq_basic_prefix AS p\n"
+        " LEFT JOIN newzl.hsj_stock_hq_basic_prefix AS p_prev "
+        "ON p_prev.mktcode = p.mktcode "
+        "AND p_prev.tgtcode = p.tgtcode "
+        f"AND p_prev.row_no = p.row_no - {window}\n"
+        " WHERE p.mktcode = base.mktcode "
+        "AND p.tgtcode = base.tgtcode "
+        "AND p.bizdate = base.bizdate)"
+    )
+    if scale_divisor is None:
+        return average_sql
+    return f"({average_sql} / {scale_divisor:.1f})"
 
 
 def lex_official_slot(source: str) -> List[Token]:
@@ -782,7 +842,7 @@ class OfficialSlotCompiler:
             if len(stages) > 2:
                 return self._compile_then_chain(stages, warnings)
             return self._compile_then(node, warnings)
-        if self._is_rank_comparison(node):
+        if self._is_rank_filter_comparison(node):
             return self._compile_rank_query(node, None, warnings)
         condition = self._condition_sql(node, warnings)
         tables = self._ordered_tables(condition.tables)
@@ -791,7 +851,37 @@ class OfficialSlotCompiler:
 
     def _compile_then(self, node: OfficialBinaryOp, warnings: List[str]) -> Tuple[str, List[str]]:
         left = self._condition_sql(node.left, warnings)
-        return self._compile_rank_query(node.right, left, warnings)
+        if self._is_rank_filter_comparison(node.right):
+            return self._compile_rank_query(node.right, left, warnings)
+        return self._compile_then_condition_stage(left, node.right, warnings)
+
+    def _compile_then_condition_stage(
+        self,
+        prefilter: SqlExpr,
+        right: OfficialNode,
+        warnings: List[str],
+    ) -> Tuple[str, List[str]]:
+        stage_0_tables = self._ordered_tables(prefilter.tables + ["hsj_stock_code_info"])
+        right_condition = self._then_condition_sql(right, "stage_0", warnings)
+        stage_1_tables = self._ordered_tables(right_condition.tables + ["hsj_stock_code_info"])
+        all_tables = self._ordered_tables(stage_0_tables + stage_1_tables)
+        sql = (
+            "WITH stage_0 AS (\n"
+            f"{self._select_sql(stage_0_tables, self._where_clause(prefilter))}\n"
+            "),\n"
+            "stage_1 AS (\n"
+            "  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\n"
+            "  FROM stage_0 AS prev\n"
+            "  INNER JOIN newzl.hsj_stock_hq_basic AS base "
+            "ON base.mktcode = prev.mktcode "
+            "AND base.tgtcode = prev.tgtcode "
+            "AND base.bizdate = prev.bizdate\n"
+            f"{self._joins(stage_1_tables)}"
+            f"  WHERE {self._where_clause(right_condition)}\n"
+            ")\n"
+            "SELECT * FROM stage_1"
+        )
+        return sql, all_tables
 
     def _flatten_then_chain(self, node: OfficialNode) -> List[OfficialNode]:
         if isinstance(node, OfficialBinaryOp) and node.op == "then":
@@ -812,11 +902,26 @@ class OfficialSlotCompiler:
         ]
         previous = "stage_0"
         for stage_index, stage in enumerate(stages[1:], 1):
-            if not self._is_rank_comparison(stage):
-                raise OfficialSlotError(
-                    "OFFICIAL_RANK_SHAPE_ERROR",
-                    "all stages after then must be rank(...) comparisons in the grounded pipeline",
+            if not self._is_rank_filter_comparison(stage):
+                condition = self._then_condition_sql(stage, previous, warnings)
+                stage_tables = self._ordered_tables(condition.tables + ["hsj_stock_code_info"])
+                all_tables = self._ordered_tables(all_tables + stage_tables)
+                ctes.append(
+                    (
+                        f"stage_{stage_index} AS (\n"
+                        "  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\n"
+                        f"  FROM {previous} AS prev\n"
+                        "  INNER JOIN newzl.hsj_stock_hq_basic AS base "
+                        "ON base.mktcode = prev.mktcode "
+                        "AND base.tgtcode = prev.tgtcode "
+                        "AND base.bizdate = prev.bizdate\n"
+                        f"{self._joins(stage_tables)}"
+                        f"  WHERE {self._where_clause(condition)}\n"
+                        ")"
+                    )
                 )
+                previous = f"stage_{stage_index}"
+                continue
             assert isinstance(stage, OfficialComparison)
             rank_call = stage.left
             assert isinstance(rank_call, OfficialFunctionCall)
@@ -897,6 +1002,84 @@ class OfficialSlotCompiler:
         )
         return sql, tables
 
+    def _then_condition_sql(self, node: OfficialNode, rank_scope: str, warnings: List[str]) -> SqlExpr:
+        if isinstance(node, OfficialBinaryOp) and node.op in {"and", "or"}:
+            left = self._then_condition_sql(node.left, rank_scope, warnings)
+            right = self._then_condition_sql(node.right, rank_scope, warnings)
+            if node.op == "or":
+                return SqlExpr(
+                    sql=f"({self._condition_with_constraints(left)} OR {self._condition_with_constraints(right)})",
+                    kind="boolean",
+                    tables=left.tables + right.tables,
+                    constraints=[],
+                )
+            return SqlExpr(
+                sql=f"({left.sql} AND {right.sql})",
+                kind="boolean",
+                tables=left.tables + right.tables,
+                constraints=left.constraints + right.constraints,
+            )
+        if self._is_rank_comparison(node):
+            return self._then_rank_condition_sql(node, rank_scope, warnings)
+        return self._condition_sql(node, warnings)
+
+    def _then_rank_condition_sql(
+        self,
+        node: OfficialNode,
+        rank_scope: str,
+        warnings: List[str],
+    ) -> SqlExpr:
+        if not isinstance(node, OfficialComparison) or not isinstance(node.left, OfficialFunctionCall):
+            raise OfficialSlotError("OFFICIAL_RANK_SHAPE_ERROR", "then rank stage must be rank(...) comparison")
+        rank_call = node.left
+        if self._rank_count_exp(rank_call):
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "then rank(..., count_exp) inside composite conditions needs a materialized temporal rank feature table",
+            )
+        rank_expr = self._rank_expr(rank_call, warnings)
+        rank_sql = _rank_alias_sql(rank_expr.sql)
+        constraints = [_rank_alias_sql(item) for item in rank_expr.constraints]
+        where = " AND ".join(_dedupe(constraints)) or "1=1"
+        tables = self._ordered_tables(rank_expr.tables)
+        joins = self._joins_for_aliases(tables, "rb", "rcode", "rext")
+        predicate = self._rank_no_predicate(node, "ranked.rank_no")
+        sql = (
+            "EXISTS (\n"
+            "  SELECT 1 FROM (\n"
+            "    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n"
+            f"           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no\n"
+            f"    FROM {rank_scope} AS prev_rank\n"
+            "    INNER JOIN newzl.hsj_stock_hq_basic AS rb "
+            "ON rb.mktcode = prev_rank.mktcode "
+            "AND rb.tgtcode = prev_rank.tgtcode "
+            "AND rb.bizdate = prev_rank.bizdate\n"
+            f"{joins}"
+            f"    WHERE {where}\n"
+            "  ) AS ranked\n"
+            "  WHERE ranked.mktcode = base.mktcode\n"
+            "    AND ranked.tgtcode = base.tgtcode\n"
+            "    AND ranked.bizdate = base.bizdate\n"
+            f"    AND {predicate}\n"
+            ")"
+        )
+        return SqlExpr(sql=sql, kind="boolean", tables=["hsj_stock_hq_basic"], constraints=[])
+
+    def _rank_no_predicate(self, node: OfficialComparison, rank_no_sql: str) -> str:
+        if node.op == "between":
+            if not isinstance(node.right, OfficialRangeLiteral):
+                right = self._expr_sql(node.right, [])
+                return f"{rank_no_sql} BETWEEN {right.sql}"
+            lower = self._expr_sql(node.right.lower, [])
+            upper = self._expr_sql(node.right.upper, [])
+            lower_op = ">=" if node.right.lower_inclusive else ">"
+            upper_op = "<=" if node.right.upper_inclusive else "<"
+            return f"({rank_no_sql} {lower_op} {lower.sql} AND {rank_no_sql} {upper_op} {upper.sql})"
+        if node.op not in {"<=", "=", "<", ">", ">=", "!=", "~="}:
+            raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
+        limit_value = self._literal_sql(node.right)
+        return f"{rank_no_sql} {self._sql_operator(node.op)} {limit_value}"
+
     def _condition_sql(self, node: OfficialNode, warnings: List[str]) -> SqlExpr:
         if isinstance(node, OfficialBinaryOp) and node.op in {"and", "or"}:
             left = self._condition_sql(node.left, warnings)
@@ -932,7 +1115,7 @@ class OfficialSlotCompiler:
                 tables=left.tables + right.tables,
                 constraints=left.constraints + right.constraints,
             )
-        if self._is_rank_comparison(node):
+        if self._is_rank_filter_comparison(node):
             return self._rank_condition_sql(node, warnings)
         if isinstance(node, OfficialComparison):
             return self._comparison_sql(node, warnings)
@@ -1110,6 +1293,8 @@ class OfficialSlotCompiler:
                 return self._belong_industry_expr(node, warnings)
             if name == "queryData":
                 return self._query_data_expr(node, warnings)
+            if name == "rank":
+                return self._rank_scalar_expr(node, warnings)
             if name in {"record_high", "record_low", "position"}:
                 return self._period_feature_expr(node, warnings)
             if name in {"cross_above", "cross_down", "golden_cross"}:
@@ -1167,7 +1352,7 @@ class OfficialSlotCompiler:
         return predicate, tables, market, filter_scope, date, select_type, count_exp
 
     def _technical_pattern_operand_sql(self, indicator_name: str, aliases: Dict[str, str]) -> Tuple[str, str]:
-        meta = INDICATORS.get(indicator_name)
+        meta = _resolve_indicator_meta(indicator_name)
         if not meta:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
@@ -1198,7 +1383,7 @@ class OfficialSlotCompiler:
                 ["hsj_stock_hq_basic"],
                 self._slot_constraints(market, filter_scope, date, select_type, warnings),
             )
-        meta = INDICATORS.get(indicator_name)
+        meta = _resolve_indicator_meta(indicator_name)
         if not meta:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
@@ -1285,7 +1470,7 @@ class OfficialSlotCompiler:
     ) -> SqlExpr:
         args = self._slot_args(indicator_call, 7)
         market, filter_scope, indicator_name, date, select_type, agg_func, count_exp = args[:7]
-        meta = INDICATORS.get(indicator_name)
+        meta = _resolve_indicator_meta(indicator_name)
         if not meta:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
@@ -1531,7 +1716,7 @@ class OfficialSlotCompiler:
     def _belong_industry_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
         args = self._slot_args(node, 5)
         market, filter_scope, indicator_name, date, agg_func = args[:5]
-        meta = INDICATORS.get(indicator_name)
+        meta = _resolve_indicator_meta(indicator_name)
         if not meta:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
@@ -1644,7 +1829,7 @@ class OfficialSlotCompiler:
                 constraints,
             )
 
-        meta = INDICATORS.get(indicator_name)
+        meta = _resolve_indicator_meta(indicator_name)
         if not meta:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
@@ -1674,7 +1859,7 @@ class OfficialSlotCompiler:
         constraints: List[str],
         warnings: List[str],
     ) -> SqlExpr:
-        meta = INDICATORS.get(indicator_name)
+        meta = _resolve_indicator_meta(indicator_name)
         if not meta:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
@@ -1818,6 +2003,33 @@ class OfficialSlotCompiler:
             ],
         )
         return self._indicator_expr(indicator_call, warnings)
+
+    def _rank_scalar_expr(self, rank_call: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
+        if self._rank_count_exp(rank_call):
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "rank(...) inside arithmetic expressions does not yet support count_exp",
+            )
+        rank_expr = self._rank_expr_without_count_exp(rank_call, warnings)
+        rank_sql = _rank_alias_sql(rank_expr.sql)
+        constraints = [_rank_alias_sql(item) for item in rank_expr.constraints]
+        tables = self._ordered_tables(rank_expr.tables)
+        joins = self._joins_for_aliases(tables, "rb", "rcode", "rext")
+        where = " AND ".join(_dedupe(constraints)) or "1=1"
+        sql = (
+            "(SELECT ranked.rank_no\n"
+            " FROM (\n"
+            "   SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n"
+            f"          ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no\n"
+            "   FROM newzl.hsj_stock_hq_basic AS rb\n"
+            f"{joins}"
+            f"   WHERE {where}\n"
+            " ) AS ranked\n"
+            " WHERE ranked.mktcode = base.mktcode\n"
+            "   AND ranked.tgtcode = base.tgtcode\n"
+            "   AND ranked.bizdate = base.bizdate)"
+        )
+        return SqlExpr(sql, "numeric", tables, [])
 
     def _rank_order(self, rank_call: OfficialFunctionCall) -> str:
         args = self._slot_args(rank_call, 8)
@@ -2050,6 +2262,16 @@ class OfficialSlotCompiler:
     def _is_rank_comparison(self, node: OfficialNode) -> bool:
         return isinstance(node, OfficialComparison) and isinstance(node.left, OfficialFunctionCall) and node.left.name == "rank"
 
+    def _is_rank_filter_comparison(self, node: OfficialNode) -> bool:
+        return self._is_rank_comparison(node) and isinstance(node, OfficialComparison) and node.op in {
+            "<=",
+            "=",
+            "<",
+            ">",
+            ">=",
+            "!=",
+        }
+
     def _rank_count_exp(self, rank_call: OfficialFunctionCall) -> str:
         args = self._slot_args(rank_call, 8)
         return args[7]
@@ -2167,7 +2389,13 @@ class OfficialSlotCompiler:
     def _ordered_tables(self, tables: Iterable[str]) -> List[str]:
         table_set = set(tables)
         ordered = []
-        for item in ["hsj_stock_hq_basic", "hsj_stock_code_info", "hsj_stock_hq_ext", "hsj_stock_hq_basic_technical"]:
+        for item in [
+            "hsj_stock_hq_basic",
+            "hsj_stock_code_info",
+            "hsj_stock_hq_ext",
+            "hsj_stock_hq_basic_technical",
+            "hsj_stock_hq_basic_prefix",
+        ]:
             if item in table_set or item == "hsj_stock_hq_basic":
                 ordered.append(item)
         return ordered
