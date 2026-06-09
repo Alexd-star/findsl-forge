@@ -1,0 +1,1125 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/f9ly5o",
+    "id": "f9ly5o",
+    "slide": 7,
+    "layoutId": "b4c3b2b8-b450-4360-ad0e-c87b62837cf0",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FFFFFF",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Consolas",
+      "Microsoft YaHei"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "b4c3b2b8-b450-4360-ad0e-c87b62837cf0",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/c7u54zid",
+      "id": "1",
+      "bbox": [
+        64,
+        38,
+        900,
+        46
+      ],
+      "geometry": "rect",
+      "text": "核心算法：AST 驱动的 SQL 生成",
+      "textPreview": "核心算法：AST 驱动的 SQL 生成",
+      "resolvedFontSize": 30,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 30,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "核心算法：AST 驱动的 SQL 生成"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "核心算法：AST 驱动的 SQL 生成",
+          "resolvedTextStyle": {
+            "fontSize": 30,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "核心算法：AST 驱动的 SQL 生成",
+              "fontSize": 30,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jm1cfa9w",
+      "id": "2",
+      "bbox": [
+        64,
+        121,
+        1152,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#E4EAF0",
+      "lineColor": "#E4EAF0",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u18jqh0f",
+      "id": "3",
+      "bbox": [
+        64,
+        675,
+        1152,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#E4EAF0",
+      "lineColor": "#E4EAF0",
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1032lszq",
+      "id": "4",
+      "bbox": [
+        64,
+        687,
+        700,
+        18
+      ],
+      "geometry": "rect",
+      "text": "FinDSL Forge | 赛题19答辩展示稿 | 数据来源：evidence_metadata.json 与项目文档",
+      "textPreview": "FinDSL Forge | 赛题19答辩展示稿 | 数据来源：evidence_metadata.json 与项目文档",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 10,
+        "typeface": "Microsoft YaHei",
+        "color": "#64727F",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "FinDSL Forge | 赛题19答辩展示稿 | 数据来源：evidence_metadata.json 与项目文档"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "FinDSL Forge | 赛题19答辩展示稿 | 数据来源：evidence_metadata.json 与项目文档",
+          "resolvedTextStyle": {
+            "fontSize": 10,
+            "typeface": "Microsoft YaHei",
+            "color": "#64727F",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "FinDSL Forge | 赛题19答辩展示稿 | 数据来源：evidence_metadata.json 与项目文档",
+              "fontSize": 10,
+              "typeface": "Microsoft YaHei",
+              "color": "#64727F"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cfa9w3m9",
+      "id": "5",
+      "bbox": [
+        1120,
+        687,
+        96,
+        18
+      ],
+      "geometry": "rect",
+      "text": "07 / 24",
+      "textPreview": "07 / 24",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 10,
+        "typeface": "Microsoft YaHei",
+        "color": "#64727F",
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "07 / 24"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "07 / 24",
+          "resolvedTextStyle": {
+            "fontSize": 10,
+            "typeface": "Microsoft YaHei",
+            "color": "#64727F",
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "07 / 24",
+              "fontSize": 10,
+              "typeface": "Microsoft YaHei",
+              "color": "#64727F"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/judg7ads",
+      "id": "6",
+      "bbox": [
+        92,
+        155,
+        450,
+        28
+      ],
+      "geometry": "rect",
+      "text": "输入 DSL 示例",
+      "textPreview": "输入 DSL 示例",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "输入 DSL 示例"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "输入 DSL 示例",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "输入 DSL 示例",
+              "fontSize": 18,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u9knih4b",
+      "id": "7",
+      "bbox": [
+        704,
+        155,
+        450,
+        28
+      ],
+      "geometry": "rect",
+      "text": "输出 SQL 语义",
+      "textPreview": "输出 SQL 语义",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "输出 SQL 语义"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "输出 SQL 语义",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "输出 SQL 语义",
+              "fontSize": 18,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/54zidony",
+      "id": "8",
+      "bbox": [
+        92,
+        195,
+        470,
+        245
+      ],
+      "geometry": "rect",
+      "fillColor": "#0B1F33",
+      "lineColor": "#0B1F33",
+      "lineWidth": 1
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cj6tovah",
+      "id": "9",
+      "bbox": [
+        704,
+        195,
+        470,
+        245
+      ],
+      "geometry": "rect",
+      "fillColor": "#0B1F33",
+      "lineColor": "#0B1F33",
+      "lineWidth": 1
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ex0nuxc3",
+      "id": "10",
+      "bbox": [
+        116,
+        226,
+        420,
+        190
+      ],
+      "geometry": "rect",
+      "text": "SELECT code WHERE\\n  SUM(indicator(\"volume\"), 120) > 0\\n  AND close > MA(close, 20)",
+      "textPreview": "SELECT code WHERE\\n  SUM(indicator(\"volume\"), 120) > 0\\n  AND close > MA(close, 20)",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Consolas",
+        "color": "#DCEEFF",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SELECT code WHERE\\n"
+          },
+          {
+            "index": 2,
+            "text": "SUM(indicator(\"volume\"), 120) > 0\\n  AND"
+          },
+          {
+            "index": 3,
+            "text": "close > MA(close, 20)"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SELECT code WHERE\\n  SUM(indicator(\"volume\"), 120) > 0\\n  AND close > MA(close, 20)",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Consolas",
+            "color": "#DCEEFF",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SELECT code WHERE\\n  SUM(indicator(\"volume\"), 120) > 0\\n  AND close > MA(close, 20)",
+              "fontSize": 18,
+              "typeface": "Consolas",
+              "color": "#DCEEFF"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3itgfmlk",
+      "id": "11",
+      "bbox": [
+        728,
+        226,
+        420,
+        190
+      ],
+      "geometry": "rect",
+      "text": "WITH base AS (...),\\noptimized AS (\\n  SELECT code, trade_date\\n  FROM quote_prefix_120\\n  WHERE volume_sum_120 > 0\\n)",
+      "textPreview": "WITH base AS (...),\\noptimized AS (\\n  SELECT code, trade_date\\n  FROM quote_prefix_120\\n  WHERE volume_sum_120 > 0\\n)",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Consolas",
+        "color": "#DCEEFF",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "WITH base AS (...),\\noptimized AS (\\n"
+          },
+          {
+            "index": 2,
+            "text": "SELECT code, trade_date\\n  FROM"
+          },
+          {
+            "index": 3,
+            "text": "quote_prefix_120\\n  WHERE volume_sum_120 >"
+          },
+          {
+            "index": 4,
+            "text": "0\\n)"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "WITH base AS (...),\\noptimized AS (\\n  SELECT code, trade_date\\n  FROM quote_prefix_120\\n  WHERE volume_sum_120 > 0\\n)",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Consolas",
+            "color": "#DCEEFF",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "WITH base AS (...),\\noptimized AS (\\n  SELECT code, trade_date\\n  FROM quote_prefix_120\\n  WHERE volume_sum_120 > 0\\n)",
+              "fontSize": 18,
+              "typeface": "Consolas",
+              "color": "#DCEEFF"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/w3m94fu1",
+      "id": "12",
+      "bbox": [
+        420,
+        500,
+        98,
+        72
+      ],
+      "geometry": "rect",
+      "fillColor": "#EAF2FA",
+      "lineColor": "#CAD6E2",
+      "lineWidth": 1
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/loj2t83i",
+      "id": "13",
+      "bbox": [
+        430,
+        520,
+        78,
+        32
+      ],
+      "geometry": "rect",
+      "text": "parse",
+      "textPreview": "parse",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 17,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "parse"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "parse",
+          "resolvedTextStyle": {
+            "fontSize": 17,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "parse",
+              "fontSize": 17,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e9cvixcz",
+      "id": "14",
+      "bbox": [
+        520,
+        536,
+        12,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#0F4D92",
+      "lineColor": "#0F4D92",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3q5o7qpg",
+      "id": "15",
+      "bbox": [
+        526,
+        532,
+        8,
+        8
+      ],
+      "geometry": "rect",
+      "fillColor": "#0F4D92",
+      "lineColor": "#0F4D92",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wb2hwfyx",
+      "id": "16",
+      "bbox": [
+        534,
+        500,
+        98,
+        72
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#CAD6E2",
+      "lineWidth": 1
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lwval87e",
+      "id": "17",
+      "bbox": [
+        544,
+        520,
+        78,
+        32
+      ],
+      "geometry": "rect",
+      "text": "AST",
+      "textPreview": "AST",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 17,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "AST"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "AST",
+          "resolvedTextStyle": {
+            "fontSize": 17,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "AST",
+              "fontSize": 17,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ahoza1gv",
+      "id": "18",
+      "bbox": [
+        634,
+        536,
+        12,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#0F4D92",
+      "lineColor": "#0F4D92",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/32lszqtc",
+      "id": "19",
+      "bbox": [
+        640,
+        532,
+        8,
+        8
+      ],
+      "geometry": "rect",
+      "fillColor": "#0F4D92",
+      "lineColor": "#0F4D92",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/v6psfil0",
+      "id": "20",
+      "bbox": [
+        648,
+        500,
+        98,
+        72
+      ],
+      "geometry": "rect",
+      "fillColor": "#EAF2FA",
+      "lineColor": "#CAD6E2",
+      "lineWidth": 1
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2lszqtcj",
+      "id": "21",
+      "bbox": [
+        658,
+        520,
+        78,
+        32
+      ],
+      "geometry": "rect",
+      "text": "rewrite",
+      "textPreview": "rewrite",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 17,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "rewrite"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "rewrite",
+          "resolvedTextStyle": {
+            "fontSize": 17,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "rewrite",
+              "fontSize": 17,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d8bat47y",
+      "id": "22",
+      "bbox": [
+        748,
+        536,
+        12,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#0F4D92",
+      "lineColor": "#0F4D92",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/knih4byh",
+      "id": "23",
+      "bbox": [
+        754,
+        532,
+        8,
+        8
+      ],
+      "geometry": "rect",
+      "fillColor": "#0F4D92",
+      "lineColor": "#0F4D92",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vu9knih4",
+      "id": "24",
+      "bbox": [
+        762,
+        500,
+        98,
+        72
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#CAD6E2",
+      "lineWidth": 1
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/29gr2p8n",
+      "id": "25",
+      "bbox": [
+        772,
+        520,
+        78,
+        32
+      ],
+      "geometry": "rect",
+      "text": "SQL",
+      "textPreview": "SQL",
+      "resolvedFontSize": 17,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 17,
+        "typeface": "Microsoft YaHei",
+        "color": "#0B1F33",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "SQL"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "SQL",
+          "resolvedTextStyle": {
+            "fontSize": 17,
+            "typeface": "Microsoft YaHei",
+            "color": "#0B1F33",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "SQL",
+              "fontSize": 17,
+              "typeface": "Microsoft YaHei",
+              "color": "#0B1F33",
+              "bold": true
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d0z61032",
+      "id": "26",
+      "bbox": [
+        108,
+        600,
+        1060,
+        36
+      ],
+      "geometry": "rect",
+      "text": "真实 SQL 以 sqlgen 输出和 Doris validator 结果为准，PPT 中为简化讲解片段。",
+      "textPreview": "真实 SQL 以 sqlgen 输出和 Doris validator 结果为准，PPT 中为简化讲解片段。",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "color": "#64727F",
+        "alignment": "center",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "真实 SQL 以 sqlgen 输出和 Doris validator 结果为准，PPT 中为简化讲解片段。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "真实 SQL 以 sqlgen 输出和 Doris validator 结果为准，PPT 中为简化讲解片段。",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "typeface": "Microsoft YaHei",
+            "color": "#64727F",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "真实 SQL 以 sqlgen 输出和 Doris validator 结果为准，PPT 中为简化讲解片段。",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#64727F"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

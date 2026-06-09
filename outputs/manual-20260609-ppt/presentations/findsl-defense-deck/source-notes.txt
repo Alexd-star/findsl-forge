@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-09T09:48:11",
+  "primary_sources": {
+    "evidence_metadata": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/submission_artifacts/evidence_metadata.json",
+    "evidence_summary": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/submission_artifacts/evidence_summary.md",
+    "readme": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/README.md",
+    "topic_compliance_docs": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/项目全流程导师文档/08_官方赛题原文摘录与符合性复核.md"
+  },
+  "image_assets": {
+    "01_项目封面_FindSL_Forge": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/01_项目封面_FindSL_Forge.png",
+    "02_系统总体架构": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/02_系统总体架构.png",
+    "03_DSL编译与语义校验": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/03_DSL编译与语义校验.png",
+    "04_Doris_SQL性能优化": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/04_Doris_SQL性能优化.png",
+    "05_数据治理与元数据闭环": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/05_数据治理与元数据闭环.png",
+    "06_Web演示与人工核验界面": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/06_Web演示与人工核验界面.png",
+    "07_LLM安全边界与确定性编译": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/07_LLM安全边界与确定性编译.png",
+    "08_可视化证据包结构": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/08_可视化证据包结构.png",
+    "09_答辩展示总览": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/09_答辩展示总览.png",
+    "10_最终交付状态": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/10_最终交付状态.png",
+    "imagegen_hero_gpt_style": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/imagegen_hero_gpt_style.png",
+    "imagegen_method_schematic": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/imagegen_method_schematic.png",
+    "imagegen_data_governance_schematic": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/imagegen_data_governance_schematic.png",
+    "imagegen_delivery_package": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/imagegen_delivery_package.png"
+  },
+  "chart_assets": {
+    "gate_matrix": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/chart_gate_matrix.png",
+    "doris_latency": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/chart_doris_latency.png",
+    "test_coverage": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/chart_test_coverage.png",
+    "latency_target": "D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/outputs/manual-20260609-ppt/presentations/findsl-defense-deck/assets/chart_latency_target.png"
+  },
+  "notes": [
+    "PPT uses current evidence metadata for hard metrics.",
+    "AI-generated images are presentation concept visuals, not runtime screenshots.",
+    "Chinese titles and metric values are editable PPT text or code-rendered charts."
+  ]
+}

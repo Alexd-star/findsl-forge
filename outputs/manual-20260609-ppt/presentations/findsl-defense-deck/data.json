@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-08T15:25:26Z",
+  "snapshot_dir": "submission_artifacts\\evidence_snapshots",
+  "git": {
+    "head_at_report_generation": "7559e28",
+    "head_at_export": "7559e28",
+    "branch": "main"
+  },
+  "readiness": {
+    "generated_at": "2026-06-08T15:25:12+00:00",
+    "blocking_gates_passed": true,
+    "warning_count": 0,
+    "compile_success_rate_percent": 100.0,
+    "sql_fragment_accuracy_percent": 100.0,
+    "compile_p95_latency_ms": 1.831,
+    "evaluation_cases": {
+      "passed": 10,
+      "total": 10
+    },
+    "defense_package_checks": {
+      "passed": 13,
+      "total": 13
+    },
+    "pytest": {
+      "passed": 203,
+      "elapsed_seconds": 13.11
+    }
+  },
+  "official_suite": {
+    "suite_passed": true,
+    "positive": {
+      "passed": 37,
+      "total": 37
+    },
+    "negative": {
+      "passed": 37,
+      "total": 37
+    }
+  },
+  "doris_cluster": {
+    "available": true,
+    "passed": true,
+    "row_counts_match": true,
+    "speedup": 36.2398279300624,
+    "speedup_display": "36.24x",
+    "speedup_target_met": true,
+    "min_speedup": 10.0,
+    "baseline_plan_contains_window": true,
+    "optimized_plan_contains_prefix": true,
+    "baseline_avg_execute_ms": 5182.042440000001,
+    "optimized_avg_execute_ms": 142.99302000000083,
+    "baseline_row_count": 88586,
+    "optimized_row_count": 88586
+  },
+  "warnings": [],
+  "source_files": {
+    "submission_readiness": "submission_artifacts\\evidence_snapshots\\submission_readiness.md",
+    "official_suite_report": "submission_artifacts\\evidence_snapshots\\official_suite_report.md",
+    "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
+    "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
+  }
+}

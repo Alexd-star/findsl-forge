@@ -1,0 +1,7 @@
+task mode: create
+primary deck-profile: engineering-platform
+secondary gates: competition defense, evidence-led technical delivery, Chinese presentation
+required proof objects: architecture map, compiler workflow, validation gates, Doris performance proof, delivery package evidence
+source/asset requirements: evidence_metadata.json, README, docs, generated imagegen concept assets, exact metric charts
+brand constraints: no unofficial 华泰证券 logo; no fabricated partner logos; project identity is FinDSL Forge text only
+imagegen contract: imagegen assets are concept visuals only; exact numbers are rendered by code or PPT editable objects
