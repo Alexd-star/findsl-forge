@@ -139,6 +139,15 @@ class SqlExpr:
 
 
 @dataclass(frozen=True)
+class CountExpRule:
+    mode: str
+    operator: str
+    count: Optional[int]
+    unit: str = ""
+    every: bool = False
+
+
+@dataclass(frozen=True)
 class OfficialCompileResult:
     source: str
     ast: Dict[str, Any]
@@ -149,6 +158,8 @@ class OfficialCompileResult:
 
 OPERATORS = {">=", "<=", "!=", "~=", ">", "<", "=", "+", "-", "*", "/", "(", ")", "[", "]", ","}
 KEYWORDS = {"and", "or", "then", "between", "limit", "true", "false"}
+AGGREGATE_FUNCTIONS = {"MAX", "MIN", "AVG", "SUM"}
+GROWTH_FUNCTIONS = {"GROWTH_RISE", "GROWTH_FALL"}
 
 
 MARKET_CODE_MAP = {
@@ -788,6 +799,10 @@ class OfficialSlotCompiler:
         return SqlExpr(sql=sql, kind="boolean", tables=["hsj_stock_hq_basic"], constraints=[])
 
     def _comparison_sql(self, node: OfficialComparison, warnings: List[str]) -> SqlExpr:
+        if isinstance(node.left, OfficialFunctionCall) and node.left.name == "indicator":
+            args = self._slot_args(node.left, 7)
+            if args[6]:
+                return self._count_exp_comparison_sql(node.left, node.op, node.right, warnings)
         left = self._expr_sql(node.left, warnings)
         if node.op == "between":
             if not isinstance(node.right, OfficialRangeLiteral):
@@ -868,6 +883,21 @@ class OfficialSlotCompiler:
                 "UNSUPPORTED_OFFICIAL_INDICATOR",
                 f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
             )
+        if count_exp:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                f"count_exp must be compiled together with a comparison: {count_exp}",
+            )
+        if agg_func:
+            return self._aggregate_indicator_expr(
+                meta=meta,
+                market=market,
+                filter_scope=filter_scope,
+                date=date,
+                select_type=select_type,
+                agg_func=agg_func,
+                warnings=warnings,
+            )
         constraints = self._slot_constraints(market, filter_scope, date, select_type, warnings)
         tables = ["hsj_stock_hq_basic", meta.table]
         if meta.kind == "boolean":
@@ -879,6 +909,252 @@ class OfficialSlotCompiler:
             return SqlExpr(meta.expression, meta.kind, tables, constraints)
         assert meta.column is not None
         return SqlExpr(f"{self._alias(meta.table)}.{meta.column}", meta.kind, tables, constraints)
+
+    def _aggregate_indicator_expr(
+        self,
+        *,
+        meta: IndicatorMeta,
+        market: str,
+        filter_scope: str,
+        date: str,
+        select_type: str,
+        agg_func: str,
+        warnings: List[str],
+    ) -> SqlExpr:
+        agg = agg_func.upper()
+        if agg not in AGGREGATE_FUNCTIONS and agg not in GROWTH_FUNCTIONS:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_AGG_FUNC",
+                f"Unsupported official aggregate function for real-data SQL: {agg_func}",
+            )
+        if meta.kind not in {"numeric", "time"}:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_AGG_FUNC",
+                f"Aggregate {agg_func} is only grounded for numeric/time indicators, got {meta.kind}",
+            )
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        value_sql = self._indicator_value_sql(meta, aliases)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", meta.table])
+        where_parts = self._window_correlated_where(date, "wb", warnings)
+        select_sql = f"{agg}({value_sql})"
+        if agg in GROWTH_FUNCTIONS:
+            first_value = f"MIN_BY({value_sql}, wb.bizdate)"
+            last_value = f"MAX_BY({value_sql}, wb.bizdate)"
+            if agg == "GROWTH_RISE":
+                delta = f"({last_value} - {first_value})"
+            else:
+                delta = f"({first_value} - {last_value})"
+            select_sql = f"({delta} * 100.0 / NULLIF(ABS({first_value}), 0))"
+        subquery = (
+            f"(SELECT {select_sql}\n"
+            " FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._window_joins(tables)}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))})"
+        )
+        constraints = self._slot_constraints(market, filter_scope, "", select_type, warnings)
+        constraints.extend(self._outer_snapshot_constraints(date))
+        return SqlExpr(subquery, meta.kind, tables, constraints)
+
+    def _count_exp_comparison_sql(
+        self,
+        indicator_call: OfficialFunctionCall,
+        op: str,
+        right_node: OfficialNode,
+        warnings: List[str],
+    ) -> SqlExpr:
+        args = self._slot_args(indicator_call, 7)
+        market, filter_scope, indicator_name, date, select_type, agg_func, count_exp = args[:7]
+        meta = INDICATORS.get(indicator_name)
+        if not meta:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_INDICATOR",
+                f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
+            )
+        rule = _parse_count_exp_rule(count_exp)
+        if agg_func:
+            return self._aggregate_count_exp_comparison_sql(
+                meta=meta,
+                market=market,
+                filter_scope=filter_scope,
+                date=date,
+                select_type=select_type,
+                agg_func=agg_func,
+                rule=rule,
+                op=op,
+                right_node=right_node,
+                warnings=warnings,
+            )
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        value_sql = self._indicator_value_sql(meta, aliases)
+        if op == "between":
+            if not isinstance(right_node, OfficialRangeLiteral):
+                right = self._expr_sql(right_node, warnings)
+                predicate = f"{value_sql} BETWEEN {_rewrite_aliases(right.sql, aliases)}"
+            else:
+                lower = self._expr_sql(right_node.lower, warnings)
+                upper = self._expr_sql(right_node.upper, warnings)
+                lower_op = ">=" if right_node.lower_inclusive else ">"
+                upper_op = "<=" if right_node.upper_inclusive else "<"
+                predicate = (
+                    f"({value_sql} {lower_op} {_rewrite_aliases(lower.sql, aliases)} "
+                    f"AND {value_sql} {upper_op} {_rewrite_aliases(upper.sql, aliases)})"
+                )
+        else:
+            right = self._expr_sql(right_node, warnings)
+            right_sql = _rewrite_aliases(right.sql, aliases)
+            predicate = self._comparison_predicate_sql(value_sql, meta.kind, op, right_node, right_sql)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", meta.table])
+        where_parts = self._window_correlated_where(date, "wb", warnings)
+        if rule.mode == "CONS" and rule.every:
+            subquery = (
+                "(SELECT COUNT(*) > 0 AND "
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) = COUNT(*)\n"
+                " FROM newzl.hsj_stock_hq_basic AS wb\n"
+                f"{self._window_joins(tables)}"
+                f" WHERE {' AND '.join(_dedupe(where_parts))})"
+            )
+        else:
+            threshold = 1 if rule.count is None else rule.count
+            comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
+            if rule.mode == "CONS":
+                warnings.append(
+                    f"count_exp {count_exp!r} is compiled as a threshold count over the normalized window; "
+                    "exact longest consecutive-run detection requires a dedicated Doris feature table"
+                )
+            subquery = (
+                f"(SELECT COUNT(*)\n"
+                " FROM newzl.hsj_stock_hq_basic AS wb\n"
+                f"{self._window_joins(tables)}"
+                f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))}) "
+                f"{self._sql_operator(comparator)} {threshold}"
+            )
+        constraints = self._slot_constraints(market, filter_scope, "", select_type, warnings)
+        constraints.extend(self._outer_snapshot_constraints(date))
+        return SqlExpr(subquery, "boolean", tables, constraints)
+
+    def _aggregate_count_exp_comparison_sql(
+        self,
+        *,
+        meta: IndicatorMeta,
+        market: str,
+        filter_scope: str,
+        date: str,
+        select_type: str,
+        agg_func: str,
+        rule: CountExpRule,
+        op: str,
+        right_node: OfficialNode,
+        warnings: List[str],
+    ) -> SqlExpr:
+        agg = agg_func.upper()
+        if agg not in AGGREGATE_FUNCTIONS and agg not in GROWTH_FUNCTIONS:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_AGG_FUNC",
+                f"Unsupported official aggregate function for real-data SQL: {agg_func}",
+            )
+        if meta.kind not in {"numeric", "time"}:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_AGG_FUNC",
+                f"Aggregate count_exp is only grounded for numeric/time indicators, got {meta.kind}",
+            )
+        right_sql = self._right_sql_for_bucket_predicate(right_node, warnings)
+        predicate = self._bucket_predicate_sql(op, right_node, right_sql)
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        value_sql = self._indicator_value_sql(meta, aliases)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", meta.table])
+        if agg in GROWTH_FUNCTIONS and rule.unit in {"", "日"}:
+            inner_sql = self._daily_growth_bucket_sql(agg, value_sql, tables, date, warnings)
+        else:
+            inner_sql = self._aggregate_bucket_sql(agg, value_sql, tables, date, rule, warnings)
+        subquery = self._count_bucketed_predicate_sql(inner_sql, predicate, rule)
+        constraints = self._slot_constraints(market, filter_scope, "", select_type, warnings)
+        constraints.extend(self._outer_snapshot_constraints(date))
+        return SqlExpr(subquery, "boolean", tables, constraints)
+
+    def _right_sql_for_bucket_predicate(self, right_node: OfficialNode, warnings: List[str]) -> str:
+        if isinstance(right_node, OfficialRangeLiteral):
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "between with agg_func and count_exp is not yet grounded as a bucketed aggregate",
+            )
+        right = self._expr_sql(right_node, warnings)
+        return _rewrite_aliases(right.sql, {"base": "bucketed", "code": "bucketed", "ext": "bucketed", "tech": "bucketed"})
+
+    def _bucket_predicate_sql(self, op: str, right_node: OfficialNode, right_sql: str) -> str:
+        if op == "between":
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "between with agg_func and count_exp is not yet grounded as a bucketed aggregate",
+            )
+        return self._comparison_predicate_sql("bucketed.agg_value", "numeric", op, right_node, right_sql)
+
+    def _aggregate_bucket_sql(
+        self,
+        agg: str,
+        value_sql: str,
+        tables: Sequence[str],
+        date: str,
+        rule: CountExpRule,
+        warnings: List[str],
+    ) -> str:
+        bucket_expr = self._bucket_expr("wb", rule)
+        if agg in GROWTH_FUNCTIONS:
+            first_value = f"MIN_BY({value_sql}, wb.bizdate)"
+            last_value = f"MAX_BY({value_sql}, wb.bizdate)"
+            delta = f"({last_value} - {first_value})" if agg == "GROWTH_RISE" else f"({first_value} - {last_value})"
+            agg_value = f"({delta} * 100.0 / NULLIF(ABS({first_value}), 0))"
+        else:
+            agg_value = f"{agg}({value_sql})"
+        where_parts = self._window_correlated_where(date, "wb", warnings)
+        return (
+            f"SELECT {bucket_expr} AS bucket_key,\n"
+            f"       {agg_value} AS agg_value\n"
+            " FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._window_joins(tables)}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))}\n"
+            f" GROUP BY {bucket_expr}"
+        )
+
+    def _daily_growth_bucket_sql(
+        self,
+        agg: str,
+        value_sql: str,
+        tables: Sequence[str],
+        date: str,
+        warnings: List[str],
+    ) -> str:
+        previous = f"LAG({value_sql}) OVER (PARTITION BY wb.mktcode, wb.tgtcode ORDER BY wb.bizdate)"
+        delta = f"({value_sql} - {previous})" if agg == "GROWTH_RISE" else f"({previous} - {value_sql})"
+        growth = f"({delta} * 100.0 / NULLIF(ABS({previous}), 0))"
+        where_parts = self._window_correlated_where(date, "wb", warnings)
+        return (
+            "SELECT wb.bizdate AS bucket_key,\n"
+            f"       {growth} AS agg_value\n"
+            " FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._window_joins(tables)}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))}"
+        )
+
+    def _count_bucketed_predicate_sql(self, inner_sql: str, predicate: str, rule: CountExpRule) -> str:
+        if rule.every:
+            return (
+                "(SELECT COUNT(*) > 0 AND "
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) = COUNT(*)\n"
+                " FROM (\n"
+                f"{inner_sql}\n"
+                ") AS bucketed\n"
+                " WHERE bucketed.agg_value IS NOT NULL)"
+            )
+        threshold = 1 if rule.count is None else rule.count
+        comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
+        return (
+            "(SELECT COUNT(*)\n"
+            " FROM (\n"
+            f"{inner_sql}\n"
+            ") AS bucketed\n"
+            f" WHERE bucketed.agg_value IS NOT NULL AND {predicate}) "
+            f"{self._sql_operator(comparator)} {threshold}"
+        )
 
     def _query_data_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
         args = self._slot_args(node, 5)
@@ -984,6 +1260,105 @@ class OfficialSlotCompiler:
         if direction in {"desc", ""}:
             return "DESC"
         raise OfficialSlotError("OFFICIAL_RANK_DIRECTION_ERROR", f"Unsupported rank direction: {args[3]}")
+
+    def _indicator_value_sql(self, meta: IndicatorMeta, aliases: Dict[str, str]) -> str:
+        if meta.kind == "boolean":
+            if meta.true_condition:
+                return _rewrite_aliases(meta.true_condition, aliases)
+            assert meta.column is not None
+            return f"{aliases[self._alias(meta.table)]}.{meta.column} = TRUE"
+        if meta.expression:
+            return _rewrite_aliases(meta.expression, aliases)
+        assert meta.column is not None
+        return f"{aliases[self._alias(meta.table)]}.{meta.column}"
+
+    def _comparison_predicate_sql(
+        self,
+        left_sql: str,
+        left_kind: str,
+        op: str,
+        right_node: OfficialNode,
+        right_sql: str,
+    ) -> str:
+        if left_kind == "boolean" and isinstance(right_node, OfficialLiteral):
+            if right_node.value is True:
+                return left_sql if op in {"=", "=="} else f"NOT ({left_sql})"
+            if right_node.value is False:
+                return f"NOT ({left_sql})" if op in {"=", "=="} else left_sql
+        return f"{left_sql} {self._sql_operator(op)} {right_sql}"
+
+    def _window_correlated_where(self, date: str, base_alias: str, warnings: List[str]) -> List[str]:
+        where_parts = [
+            f"{base_alias}.mktcode = base.mktcode",
+            f"{base_alias}.tgtcode = base.tgtcode",
+        ]
+        if date:
+            normalized = normalize_official_date(
+                date,
+                anchor_date=self.anchor_date,
+                trading_dates=self.trading_dates,
+                field=f"{base_alias}.bizdate",
+            )
+            where_parts.extend(normalized.constraints)
+            warnings.extend(normalized.warnings)
+        return where_parts
+
+    def _outer_snapshot_constraints(self, date: str) -> List[str]:
+        if not date:
+            return []
+        normalized = normalize_official_date(
+            date,
+            anchor_date=self.anchor_date,
+            trading_dates=self.trading_dates,
+            field="base.bizdate",
+        )
+        constraints: List[str] = []
+        for constraint in normalized.constraints:
+            exact = re.fullmatch(r"base\.bizdate = '([^']+)'", constraint)
+            if exact:
+                constraints.append(constraint)
+                continue
+            between = re.fullmatch(r"base\.bizdate BETWEEN '([^']+)' AND '([^']+)'", constraint)
+            if between:
+                constraints.append(f"base.bizdate = '{between.group(2)}'")
+        return constraints
+
+    def _window_joins(self, tables: Sequence[str]) -> str:
+        joins = []
+        table_set = set(tables)
+        if "hsj_stock_code_info" in table_set:
+            joins.append(
+                " LEFT JOIN newzl.hsj_stock_code_info AS wc "
+                "ON wc.mktcode = wb.mktcode AND wc.tgtcode = wb.tgtcode\n"
+            )
+        if "hsj_stock_hq_ext" in table_set:
+            joins.append(
+                " LEFT JOIN newzl.hsj_stock_hq_ext AS we "
+                "ON we.mktcode = wb.mktcode "
+                "AND we.tgtcode = wb.tgtcode "
+                "AND we.bizdate = wb.bizdate\n"
+            )
+        if "hsj_stock_hq_basic_technical" in table_set:
+            joins.append(
+                " LEFT JOIN newzl.hsj_stock_hq_basic_technical AS wt "
+                "ON wt.mktcode = wb.mktcode "
+                "AND wt.tgtcode = wb.tgtcode "
+                "AND wt.bizdate = wb.bizdate\n"
+            )
+        return "".join(joins)
+
+    def _bucket_expr(self, base_alias: str, rule: CountExpRule) -> str:
+        unit = rule.unit or "日"
+        granularity = {
+            "日": "day",
+            "周": "week",
+            "月": "month",
+            "季度": "quarter",
+            "年": "year",
+        }.get(unit)
+        if not granularity:
+            raise OfficialSlotError("UNSUPPORTED_OFFICIAL_COUNT_EXP", f"Unsupported count_exp unit: {rule.unit}")
+        return f"DATE_TRUNC({base_alias}.bizdate, '{granularity}')"
 
     def _slot_args(self, node: OfficialFunctionCall, min_count: int) -> List[str]:
         if len(node.args) < min_count:
@@ -1183,6 +1558,67 @@ class OfficialSlotCompiler:
             "hsj_stock_hq_ext": "ext",
             "hsj_stock_hq_basic_technical": "tech",
         }[table]
+
+
+def _parse_count_exp_rule(value: str) -> CountExpRule:
+    text = str(value or "").strip()
+    match = re.fullmatch(
+        r"(?P<mode>CONS|EXIST)\s*(?P<op>>=|<=|!=|=|>|<)?\s*(?P<count>每|\d+|[零〇一二两三四五六七八九十百两]+)?\s*(?P<unit>年|季度|月|周|日|天)?",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        raise OfficialSlotError("UNSUPPORTED_OFFICIAL_COUNT_EXP", f"Unsupported official count_exp: {value}")
+    mode = match.group("mode").upper()
+    operator = match.group("op") or (">" if mode == "EXIST" else ">")
+    count_text = match.group("count") or ""
+    unit = match.group("unit") or ""
+    if unit == "天":
+        unit = "日"
+    if count_text == "每":
+        return CountExpRule(mode=mode, operator="=", count=None, unit=unit, every=True)
+    count = _parse_small_count(count_text) if count_text else (0 if mode == "EXIST" else 1)
+    return CountExpRule(mode=mode, operator=operator, count=count, unit=unit, every=False)
+
+
+def _parse_small_count(value: str) -> int:
+    if value.isdigit():
+        return int(value)
+    digits = {
+        "零": 0,
+        "〇": 0,
+        "一": 1,
+        "二": 2,
+        "两": 2,
+        "三": 3,
+        "四": 4,
+        "五": 5,
+        "六": 6,
+        "七": 7,
+        "八": 8,
+        "九": 9,
+    }
+    if value in digits:
+        return digits[value]
+    if value == "十":
+        return 10
+    if "十" in value:
+        left, _, right = value.partition("十")
+        tens = digits[left] if left else 1
+        ones = digits[right] if right else 0
+        return tens * 10 + ones
+    if "百" in value:
+        left, _, right = value.partition("百")
+        hundreds = digits[left] if left else 1
+        return hundreds * 100 + (_parse_small_count(right) if right else 0)
+    raise OfficialSlotError("UNSUPPORTED_OFFICIAL_COUNT_EXP", f"Unsupported count number: {value}")
+
+
+def _rewrite_aliases(sql: str, aliases: Dict[str, str]) -> str:
+    result = sql
+    for source, target in aliases.items():
+        result = re.sub(rf"\b{re.escape(source)}\.", f"{target}.", result)
+    return result
 
 
 def profile_training_workbook(path: str, sample_size: int = 100) -> Dict[str, Any]:

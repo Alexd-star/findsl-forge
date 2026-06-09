@@ -151,6 +151,115 @@ def test_compile_official_time_and_order_flow_indicators_from_real_columns():
     assert "(ext.ZJLXMainTradeVolPer / 10000.0) > 5" in result.sql
 
 
+def test_compile_official_avg_volume_window_uses_correlated_aggregate():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '近5日', '', 'AVG', '') > 1000"
+    )
+
+    assert "SELECT AVG(wb.volume)" in result.sql
+    assert "FROM newzl.hsj_stock_hq_basic AS wb" in result.sql
+    assert "wb.mktcode = base.mktcode" in result.sql
+    assert "wb.tgtcode = base.tgtcode" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_official_sum_main_net_inflow_window_joins_ext_table():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '主力净流入', '近5日', '', 'SUM', '') > 50000000"
+    )
+
+    assert "SELECT SUM(we.ZJLXMainNetTur)" in result.sql
+    assert "FROM newzl.hsj_stock_hq_basic AS wb" in result.sql
+    assert "LEFT JOIN newzl.hsj_stock_hq_ext AS we" in result.sql
+    assert "we.bizdate = wb.bizdate" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+
+
+def test_compile_official_min_max_price_windows_scale_to_human_units():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '最高价', '近5日', '', 'MAX', '') > 20 "
+        "and indicator('', '', '最低价', '近5日', '', 'MIN', '') < 10"
+    )
+
+    assert "SELECT MAX((wb.highPx / 10000.0))" in result.sql
+    assert "SELECT MIN((wb.lowPx / 10000.0))" in result.sql
+    assert result.sql.count("wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'") == 2
+
+
+def test_compile_official_growth_rate_window_uses_min_by_and_max_by():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '近5日', '', 'GROWTH_RISE', '') > 60% "
+        "and indicator('', '', '成交量', '近5日', '', 'GROWTH_FALL', '') > 20%"
+    )
+
+    assert "MAX_BY(wb.volume, wb.bizdate)" in result.sql
+    assert "MIN_BY(wb.volume, wb.bizdate)" in result.sql
+    assert "(MAX_BY(wb.volume, wb.bizdate) - MIN_BY(wb.volume, wb.bizdate))" in result.sql
+    assert "(MIN_BY(wb.volume, wb.bizdate) - MAX_BY(wb.volume, wb.bizdate))" in result.sql
+    assert result.sql.count("wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'") == 2
+
+
+def test_compile_official_exist_rise_pct_count_window():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '涨幅', '近5日', '', '', 'EXIST>=3日') > 5%"
+    )
+
+    assert "SELECT COUNT(*)" in result.sql
+    assert "FROM newzl.hsj_stock_hq_basic AS wb" in result.sql
+    assert "((wb.lastPx - wb.preClosePx) * 100.0 / NULLIF(wb.preClosePx, 0)) > 5" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+    assert ") >= 3" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_official_cons_everyday_volume_count_window():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '近5日', '', '', 'CONS=每日') > 1000"
+    )
+
+    assert "SELECT COUNT(*)" in result.sql
+    assert "SUM(CASE WHEN wb.volume > 1000 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_official_count_exp_between_window():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '换手率', '近5日', '', '', 'EXIST>=3日') between '[9%,18%]'"
+    )
+
+    assert "SELECT COUNT(*)" in result.sql
+    assert "(wb.turnRatio / 10000.0) >= 9" in result.sql
+    assert "(wb.turnRatio / 10000.0) <= 18" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+    assert ") >= 3" in result.sql
+
+
+def test_compile_official_aggregate_count_exp_uses_bucketed_aggregate():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '近5日', '', 'AVG', 'EXIST>=3日') > 1000"
+    )
+
+    assert "DATE_TRUNC(wb.bizdate, 'day') AS bucket_key" in result.sql
+    assert "AVG(wb.volume) AS agg_value" in result.sql
+    assert "GROUP BY DATE_TRUNC(wb.bizdate, 'day')" in result.sql
+    assert "bucketed.agg_value > 1000" in result.sql
+    assert ") >= 3" in result.sql
+
+
+def test_compile_official_daily_growth_count_exp_uses_lag_pairs():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '近5日', '', 'GROWTH_FALL', 'CONS=每日') > 0"
+    )
+
+    assert "LAG(wb.volume) OVER" in result.sql
+    assert "((LAG(wb.volume) OVER" in result.sql
+    assert "- wb.volume) * 100.0" in result.sql
+    assert "bucketed.agg_value IS NOT NULL" in result.sql
+    assert "SUM(CASE WHEN bucketed.agg_value > 0 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+
+
 def test_compile_rank_then_pipeline_for_official_slot_dsl():
     result = OfficialSlotCompiler().compile(
         "indicator('沪', '', '涨停', '2026-04-14', '', '', '') = True "

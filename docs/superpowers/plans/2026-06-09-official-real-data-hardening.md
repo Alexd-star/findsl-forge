@@ -197,7 +197,7 @@ python -m findsl.cli official-slot-coverage `
   --json
 ```
 
-Expected current result: `compile_ok = 1455`, `parse_ok = 5792`, `parse_failed = 7`.
+Expected current result after strict `agg_func/count_exp` semantics: `compile_ok = 1411`, `parse_ok = 5792`, `parse_failed = 7`. This number is lower than the earlier 1455 because the compiler no longer treats unsupported aggregate/count semantics as ordinary field filters.
 
 - [x] **Step 2: Update human-readable plan**
 
@@ -242,13 +242,13 @@ Run representative compiled SQL for simple filters, rank queries, technical-feat
 
 Expected: at least 10 official compiled SQL cases execute successfully on official data; feature-table queries should avoid query-time MA windows.
 
-### Task 7: Next Required Work - `count_exp` and `agg_func`
+### Task 7: `count_exp` and `agg_func` Grounding
 
 **Files:**
 - Modify: `src/findsl/official_slot.py`
 - Test: `tests/test_official_slot.py`
 
-- [ ] **Step 1: Add failing tests for AVG/SUM/MAX/MIN**
+- [x] **Step 1: Add failing tests for AVG/SUM/MAX/MIN**
 
 Use official-style examples:
 
@@ -260,7 +260,7 @@ def test_compile_official_avg_volume_window():
     assert "AVG(" in result.sql or "volume_avg_5" in result.sql
 ```
 
-- [ ] **Step 2: Add failing tests for EXIST/CONS**
+- [x] **Step 2: Add failing tests for EXIST/CONS**
 
 Use:
 
@@ -272,18 +272,40 @@ def test_compile_official_exist_rise_pct_count():
     assert "HAVING" in result.sql or "COUNT" in result.sql
 ```
 
-- [ ] **Step 3: Implement minimal window subqueries**
+- [x] **Step 3: Implement minimal window subqueries**
 
-Start with `成交量、成交额、涨幅、主力净流入`; use table-specific expressions already normalized by `INDICATORS`.
+Implemented correlated aggregate subqueries for `AVG/SUM/MAX/MIN`, count subqueries for `EXIST/CONS`, `between` inside count windows, `GROWTH_RISE/GROWTH_FALL` using `MIN_BY/MAX_BY`, and bucketed aggregate counting for `agg_func + count_exp`. Daily growth count windows use `LAG(...) OVER (...)` so "逐日上涨/下跌" is compiled as adjacent trading-day change rather than a fake total-window shortcut.
 
-- [ ] **Step 4: Run targeted and full tests**
+- [x] **Step 4: Run targeted tests and refresh official coverage**
 
 Run:
 
 ```powershell
 $env:PYTHONPATH='src'
 python -m pytest tests\test_official_slot.py -q
-python -m pytest -q
+python -m findsl.cli official-slot-coverage --workbook "<official workbook>" --json-output reports\official_slot_coverage.json --report-output reports\official_slot_coverage.md --sample-size 30 --json
 ```
 
-Expected: all tests pass and official coverage increases without hiding unsupported missing data.
+Current evidence: `tests\test_official_slot.py` has 30 passing tests. Official coverage is `parse_ok=5792`, `parse_failed=7`, `compile_ok=1411`, `compile_failed=4381`. Remaining `UNSUPPORTED_OFFICIAL_COUNT_EXP` is mostly `rank(..., count_exp)` and count-bearing indicators embedded in arithmetic expressions; those need a separate rank-over-time design and should not be silently flattened.
+
+### Task 8: Next Required Work - Rank/Then Temporal Semantics
+
+**Files:**
+- Modify: `src/findsl/official_slot.py`
+- Test: `tests/test_official_slot.py`
+
+- [ ] **Step 1: Design rank-over-time semantics**
+
+Examples remaining in the official workbook include `rank(..., 'CONS=每年') > 10`, `rank(..., 'EXIST>=8') <= 3`, and chained `then rank(...) then rank(...)`. These cannot be reduced to ordinary row filters without changing the meaning. The next design should choose between:
+
+1. bucketed rank counting, where rank is computed per day/week/month/year bucket and the `CONS/EXIST` rule counts buckets;
+2. materialized rank feature tables in Doris for high-frequency rank/count combinations;
+3. explicit unsupported diagnostics for multi-stage rank chains until Doris evidence confirms the cost model.
+
+- [ ] **Step 2: Add failing tests for rank count and chained then**
+
+Use representative official examples and require the generated SQL to preserve the ordering scope, date bucket, and count rule.
+
+- [ ] **Step 3: Implement only the grounded subset**
+
+Implement rank-over-time only for indicators that already map to official tables. Keep unsupported diagnostics for missing data domains and ambiguous chained-rank semantics.
