@@ -39,14 +39,77 @@ def test_parse_official_slot_supports_single_quotes_percent_and_word_logic():
 
 def test_compile_indicator_to_official_doris_sql_with_market_and_date_filters():
     result = OfficialSlotCompiler().compile(
-        "indicator('深', '', '最新价', '2026-04-14', '', '', '') > 100000"
+        "indicator('深', '', '最新价', '2026-04-14', '', '', '') > 10.5"
     )
 
     assert "newzl.hsj_stock_hq_basic" in result.sql
-    assert "base.lastPx > 100000" in result.sql
+    assert "(base.lastPx / 10000.0) > 10.5" in result.sql
     assert "base.mktcode IN (0)" in result.sql
     assert "base.bizdate = '2026-04-14'" in result.sql
     assert result.requires_tables == ["hsj_stock_hq_basic"]
+
+
+def test_compile_official_relative_date_to_anchor_filter_without_warning():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('沪', '', '成交量', '今天', '', '', '') > 1000"
+    )
+
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert result.warnings == []
+
+
+def test_compile_official_recent_date_with_trading_calendar_window():
+    compiler = OfficialSlotCompiler(
+        anchor_date="2026-04-14",
+        trading_dates=["2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14"],
+    )
+
+    result = compiler.compile("indicator('', '', '成交量', '近3日', '', '', '') > 1000")
+
+    assert "base.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+    assert result.warnings == []
+
+
+def test_compile_official_numeric_scales_to_human_units():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '市净率', '今日', '', '', '') < 2 "
+        "and indicator('', '', '涨幅', '今日', '', '', '') > 5%"
+    )
+
+    assert "(base.pBR / 10000.0) < 2" in result.sql
+    assert "((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0)) > 5" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_official_price_like_auxiliary_fields_to_human_units():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '每股净资产', '今日', '', '', '') > 5 "
+        "and indicator('', '', '集合竞价匹配价', '今日', '', '', '') > 10 "
+        "and indicator('', '', '涨停封单价', '今日', '', '', '') > 10"
+    )
+
+    assert "(base.bVPS / 10000.0) > 5" in result.sql
+    assert "(ext.callAucMatchPx / 10000.0) > 10" in result.sql
+    assert "(base.upSealPx / 10000.0) > 10" in result.sql
+
+
+def test_compile_or_keeps_branch_specific_date_constraints_inside_each_branch():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('创业板', '', '开盘价', '20年', '', '', '') > 50 "
+        "or indicator('创业板', '', '开盘价', '近三年', '', '', '') ~= 92"
+    )
+
+    first_branch = (
+        "((base.openPx / 10000.0) > 50 AND code.gemFlag = TRUE "
+        "AND base.bizdate BETWEEN '2020-01-01' AND '2020-12-31')"
+    )
+    second_branch = (
+        "((base.openPx / 10000.0) = 92 AND code.gemFlag = TRUE "
+        "AND base.bizdate BETWEEN '2024-01-01' AND '2026-04-14')"
+    )
+
+    assert f"({first_branch} OR {second_branch})" in result.sql
+    assert "AND base.bizdate BETWEEN '2020-01-01' AND '2020-12-31' AND base.bizdate BETWEEN '2024-01-01' AND '2026-04-14'" not in result.sql
 
 
 def test_compile_official_generated_market_value_indicators_from_real_columns():
@@ -55,8 +118,25 @@ def test_compile_official_generated_market_value_indicators_from_real_columns():
         "and indicator('', '', '流通市值', '', '', '', '') > 5000000000"
     )
 
-    assert "(base.lastPx * base.totalShare) > 10000000000" in result.sql
-    assert "(base.lastPx * base.listedShare) > 5000000000" in result.sql
+    assert "((base.lastPx / 10000.0) * base.totalShare) > 10000000000" in result.sql
+    assert "((base.lastPx / 10000.0) * base.listedShare) > 5000000000" in result.sql
+
+
+def test_compile_official_technical_indicators_from_feature_table():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '5日均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '放量', '今天', '', '', '') = True "
+        "and indicator('', '', '均线多头排列', '今天', '', '', '') = True "
+        "and indicator('', '', '十字星', '今天', '', '', '') = False"
+    )
+
+    assert "newzl.hsj_stock_hq_basic_technical AS tech" in result.sql
+    assert "tech.ma5 > 10" in result.sql
+    assert "tech.volume_breakout = TRUE" in result.sql
+    assert "tech.ma_bullish = TRUE" in result.sql
+    assert "NOT (tech.doji = TRUE)" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert "hsj_stock_hq_basic_technical" in result.requires_tables
 
 
 def test_compile_official_time_and_order_flow_indicators_from_real_columns():
@@ -68,7 +148,7 @@ def test_compile_official_time_and_order_flow_indicators_from_real_columns():
 
     assert "base.firstLimitUpTime < '10:00:00'" in result.sql
     assert "base.outerVol > 1000" in result.sql
-    assert "ext.ZJLXMainTradeVolPer > 5" in result.sql
+    assert "(ext.ZJLXMainTradeVolPer / 10000.0) > 5" in result.sql
 
 
 def test_compile_rank_then_pipeline_for_official_slot_dsl():
@@ -101,7 +181,8 @@ def test_compile_rank_greater_than_zero_as_official_rank_only_intent():
     )
 
     assert "rank_no > 0" in result.sql
-    assert "ORDER BY ((base.lastPx - base.preClosePx) / NULLIF(base.preClosePx, 0)) DESC" in result.sql
+    assert "ORDER BY ((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0)) DESC" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
 
 
 def test_parse_official_slot_supports_signed_percent_and_negative_limit_bound():
@@ -122,7 +203,7 @@ def test_compile_between_range_literal_from_official_workbook_style():
         "indicator('沪|深', '', '市净率', '', '', '', '') between [10,50]"
     )
 
-    assert "(base.pBR >= 10 AND base.pBR <= 50)" in result.sql
+    assert "((base.pBR / 10000.0) >= 10 AND (base.pBR / 10000.0) <= 50)" in result.sql
     assert "base.mktcode IN (0, 1)" in result.sql
 
 
@@ -134,7 +215,8 @@ def test_compile_official_slot_keeps_sql_comment_free_and_reports_warnings():
     assert "/*" not in result.sql
     assert "*/" not in result.sql
     assert "1=0" in result.sql
-    assert "date slot requires runtime normalization: 今天" in result.warnings
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert "date slot requires runtime normalization: 今天" not in result.warnings
     assert "select_type '期货' is not present in official A-share CSV tables" in result.warnings
     assert "market '港' is not present in official A-share CSV tables" in result.warnings
 

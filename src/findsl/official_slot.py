@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
+from .official_time import normalize_official_date
+
 
 class OfficialSlotError(Exception):
     def __init__(self, code: str, message: str):
@@ -166,25 +168,37 @@ MARKET_FLAG_MAP = {
 }
 
 
+def _scale_expr(sql: str, scale: float = 10000.0) -> str:
+    return f"({sql} / {scale:.1f})"
+
+
+def _price_expr(column: str) -> str:
+    return _scale_expr(f"base.{column}")
+
+
+def _rate_expr(column: str, alias: str = "base") -> str:
+    return _scale_expr(f"{alias}.{column}")
+
+
 INDICATORS: Dict[str, IndicatorMeta] = {
-    "最新价": IndicatorMeta("hsj_stock_hq_basic", "lastPx"),
-    "现价": IndicatorMeta("hsj_stock_hq_basic", "lastPx"),
-    "开盘价": IndicatorMeta("hsj_stock_hq_basic", "openPx"),
-    "最高价": IndicatorMeta("hsj_stock_hq_basic", "highPx"),
-    "最低价": IndicatorMeta("hsj_stock_hq_basic", "lowPx"),
-    "收盘价": IndicatorMeta("hsj_stock_hq_basic", "closePx"),
-    "昨收价": IndicatorMeta("hsj_stock_hq_basic", "preClosePx"),
+    "最新价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("lastPx")),
+    "现价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("lastPx")),
+    "开盘价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("openPx")),
+    "最高价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("highPx")),
+    "最低价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("lowPx")),
+    "收盘价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("closePx")),
+    "昨收价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("preClosePx")),
     "成交量": IndicatorMeta("hsj_stock_hq_basic", "volume"),
     "成交额": IndicatorMeta("hsj_stock_hq_basic", "turnover"),
-    "换手率": IndicatorMeta("hsj_stock_hq_basic", "turnRatio"),
-    "实际换手率": IndicatorMeta("hsj_stock_hq_basic", "trueTurnRatio"),
-    "量比": IndicatorMeta("hsj_stock_hq_basic", "quantRatio"),
+    "换手率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("turnRatio")),
+    "实际换手率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("trueTurnRatio")),
+    "量比": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("quantRatio")),
     "外盘": IndicatorMeta("hsj_stock_hq_basic", "outerVol"),
     "内盘": IndicatorMeta("hsj_stock_hq_basic", "innerVol"),
     "委买": IndicatorMeta("hsj_stock_hq_basic", "commissionBuy"),
     "委卖": IndicatorMeta("hsj_stock_hq_basic", "commissionSale"),
     "挂单量": IndicatorMeta("hsj_stock_hq_basic", "numOfOrders"),
-    "振幅": IndicatorMeta("hsj_stock_hq_basic", "amplitude"),
+    "振幅": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("amplitude")),
     "总股本": IndicatorMeta("hsj_stock_hq_basic", "totalShare"),
     "流通股本": IndicatorMeta("hsj_stock_hq_basic", "listedShare"),
     "自由流通股股本": IndicatorMeta("hsj_stock_hq_basic", "freeShare"),
@@ -192,38 +206,38 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "总市值": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
-        expression="(base.lastPx * base.totalShare)",
+        expression="((base.lastPx / 10000.0) * base.totalShare)",
     ),
     "流通市值": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
-        expression="(base.lastPx * base.listedShare)",
+        expression="((base.lastPx / 10000.0) * base.listedShare)",
     ),
-    "每股净资产": IndicatorMeta("hsj_stock_hq_basic", "bVPS"),
-    "市净率": IndicatorMeta("hsj_stock_hq_basic", "pBR"),
-    "动态市盈率": IndicatorMeta("hsj_stock_hq_basic", "dynPE"),
-    "静态市盈率": IndicatorMeta("hsj_stock_hq_basic", "staticPE"),
-    "市盈率": IndicatorMeta("hsj_stock_hq_basic", "pETTM"),
-    "TTM市盈率": IndicatorMeta("hsj_stock_hq_basic", "pETTM"),
+    "每股净资产": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("bVPS")),
+    "市净率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("pBR")),
+    "动态市盈率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("dynPE")),
+    "静态市盈率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("staticPE")),
+    "市盈率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("pETTM")),
+    "TTM市盈率": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("pETTM")),
     "成交均价": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
-        expression="(base.turnover / NULLIF(base.volume, 0))",
+        expression="((base.turnover / NULLIF(base.volume, 0)) / 100.0)",
     ),
     "涨跌幅": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
-        expression="((base.lastPx - base.preClosePx) / NULLIF(base.preClosePx, 0))",
+        expression="((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0))",
     ),
     "涨幅": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
-        expression="((base.lastPx - base.preClosePx) / NULLIF(base.preClosePx, 0))",
+        expression="((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0))",
     ),
     "跌幅": IndicatorMeta(
         "hsj_stock_hq_basic",
         kind="numeric",
-        expression="((base.preClosePx - base.lastPx) / NULLIF(base.preClosePx, 0))",
+        expression="((base.preClosePx - base.lastPx) * 100.0 / NULLIF(base.preClosePx, 0))",
     ),
     "涨停": IndicatorMeta(
         "hsj_stock_hq_basic",
@@ -260,31 +274,31 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "跌停成交额": IndicatorMeta("hsj_stock_hq_basic", "downTradeAmt"),
     "最高涨停封单量": IndicatorMeta("hsj_stock_hq_basic", "maxUpSealVol"),
     "最高跌停封单量": IndicatorMeta("hsj_stock_hq_basic", "maxDownSealVol"),
-    "涨停封单价": IndicatorMeta("hsj_stock_hq_basic", "upSealPx"),
+    "涨停封单价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("upSealPx")),
     "涨停封单量": IndicatorMeta("hsj_stock_hq_basic", "upSealVol"),
-    "跌停封单价": IndicatorMeta("hsj_stock_hq_basic", "downSealPx"),
+    "跌停封单价": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("downSealPx")),
     "跌停封单量": IndicatorMeta("hsj_stock_hq_basic", "downSealVol"),
     "最后一次炸板时间": IndicatorMeta("hsj_stock_hq_basic", "lastFUpTime", kind="time"),
     "最后一次跌停打开时间": IndicatorMeta("hsj_stock_hq_basic", "lastFDownTime", kind="time"),
-    "压力位": IndicatorMeta("hsj_stock_hq_basic", "pressure"),
-    "支持位": IndicatorMeta("hsj_stock_hq_basic", "support"),
-    "上影线": IndicatorMeta("hsj_stock_hq_basic", "upperShadow"),
-    "下影线": IndicatorMeta("hsj_stock_hq_basic", "lowerShadow"),
-    "3分钟涨速": IndicatorMeta("hsj_stock_hq_ext", "riseSpd3m"),
-    "三分钟涨速": IndicatorMeta("hsj_stock_hq_ext", "riseSpd3m"),
-    "5分钟涨速": IndicatorMeta("hsj_stock_hq_ext", "riseSpd5m"),
-    "五分钟涨速": IndicatorMeta("hsj_stock_hq_ext", "riseSpd5m"),
-    "10分钟涨速": IndicatorMeta("hsj_stock_hq_ext", "riseSpd10m"),
-    "十分钟涨速": IndicatorMeta("hsj_stock_hq_ext", "riseSpd10m"),
+    "压力位": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("pressure")),
+    "支持位": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("support")),
+    "上影线": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("upperShadow")),
+    "下影线": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("lowerShadow")),
+    "3分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd3m", "ext")),
+    "三分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd3m", "ext")),
+    "5分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd5m", "ext")),
+    "五分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd5m", "ext")),
+    "10分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd10m", "ext")),
+    "十分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd10m", "ext")),
     "集合竞价金额": IndicatorMeta("hsj_stock_hq_ext", "callAucAmt"),
-    "集合竞价涨幅": IndicatorMeta("hsj_stock_hq_ext", "callAucRisePct"),
-    "集合竞价涨跌幅": IndicatorMeta("hsj_stock_hq_ext", "callAucRisePct"),
+    "集合竞价涨幅": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("callAucRisePct", "ext")),
+    "集合竞价涨跌幅": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("callAucRisePct", "ext")),
     "集合竞价卖方未匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucAsk2Vol"),
     "集合竞价买方未匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucBid2Vol"),
     "集合竞价匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucMatchVol"),
-    "集合竞价匹配价": IndicatorMeta("hsj_stock_hq_ext", "callAucMatchPx"),
+    "集合竞价匹配价": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("callAucMatchPx", "ext")),
     "主力分歧度": IndicatorMeta("hsj_stock_hq_ext", "MPResExt"),
-    "主力成本": IndicatorMeta("hsj_stock_hq_ext", "MPCost"),
+    "主力成本": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("MPCost", "ext")),
     "主力净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainNetTur"),
     "资金净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainNetTur"),
     "主力净流出": IndicatorMeta(
@@ -292,7 +306,7 @@ INDICATORS: Dict[str, IndicatorMeta] = {
         kind="numeric",
         expression="(-ext.ZJLXMainNetTur)",
     ),
-    "今日主力增仓占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainIncPer"),
+    "今日主力增仓占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainIncPer", "ext")),
     "小单买入": IndicatorMeta("hsj_stock_hq_ext", "smBuyTur"),
     "小单卖出": IndicatorMeta("hsj_stock_hq_ext", "smSellTur"),
     "大单买入": IndicatorMeta("hsj_stock_hq_ext", "bigBuyTur"),
@@ -304,24 +318,24 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "主力买入金额": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainBuyTur"),
     "主力卖出金额": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainSellTur"),
     "主力成交量": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainCnt"),
-    "主力成交量占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainTradeVolPer"),
+    "主力成交量占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainTradeVolPer", "ext")),
     "超大单净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXSupNetTur"),
     "大单净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXBigNetTur"),
     "中单净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMidNetTur"),
     "小单净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXSmNetTur"),
     "主力主动买入数量": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainActBuyCnt"),
-    "主力主动买入占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainActBuyCntPer"),
+    "主力主动买入占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainActBuyCntPer", "ext")),
     "主力主动卖出数量": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainActSellCnt"),
-    "主力主动卖出占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainActSellCntPer"),
+    "主力主动卖出占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainActSellCntPer", "ext")),
     "散户买入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXRetailBuyCnt"),
     "散户卖出": IndicatorMeta("hsj_stock_hq_ext", "ZJLXRetailSellCnt"),
     "主力买入手数": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainBuyCnt"),
-    "主力买入占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainBuyCntPer"),
+    "主力买入占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainBuyCntPer", "ext")),
     "主力卖出手数": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainSellCnt"),
-    "主力卖出占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainSellCntPer"),
-    "散户买入占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXRetailBuyCntPer"),
-    "散户卖出占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXRetailSellCntPer"),
-    "主力净占比": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainNetCntTurPer"),
+    "主力卖出占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainSellCntPer", "ext")),
+    "散户买入占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXRetailBuyCntPer", "ext")),
+    "散户卖出占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXRetailSellCntPer", "ext")),
+    "主力净占比": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("ZJLXMainNetCntTurPer", "ext")),
     "散户净流入": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMidAndSmNetTur"),
     "主力连续净流入天数": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainNetTurInDays"),
     "主力连续净流出天数": IndicatorMeta("hsj_stock_hq_ext", "ZJLXMainNetTurOutDays"),
@@ -341,6 +355,52 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "涨停开板次数": IndicatorMeta("hsj_stock_hq_ext", "lmtUpNum"),
     "破板次数": IndicatorMeta("hsj_stock_hq_ext", "boardBreaks"),
     "跌停破板次数": IndicatorMeta("hsj_stock_hq_ext", "downBoardBreaks"),
+    "5日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma5"),
+    "10日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma10"),
+    "20日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma20"),
+    "60日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma60"),
+    "阳线": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.yang_line = TRUE",
+        false_condition="tech.yang_line != TRUE",
+    ),
+    "阴线": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.yin_line = TRUE",
+        false_condition="tech.yin_line != TRUE",
+    ),
+    "十字星": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.doji = TRUE",
+        false_condition="tech.doji != TRUE",
+    ),
+    "放量": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.volume_breakout = TRUE",
+        false_condition="tech.volume_breakout != TRUE",
+    ),
+    "均线多头排列": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.ma_bullish = TRUE",
+        false_condition="tech.ma_bullish != TRUE",
+    ),
+    "均线空头排列": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.ma_bearish = TRUE",
+        false_condition="tech.ma_bearish != TRUE",
+    ),
+    "上涨趋势": IndicatorMeta(
+        "hsj_stock_hq_basic_technical",
+        kind="boolean",
+        true_condition="tech.uptrend = TRUE",
+        false_condition="tech.uptrend != TRUE",
+    ),
     "ST股票标识": IndicatorMeta("hsj_stock_code_info", "stFlag", kind="boolean"),
     "ST标识": IndicatorMeta("hsj_stock_code_info", "stFlag", kind="boolean"),
     "A股港股同时上市标识": IndicatorMeta("hsj_stock_code_info", "ahFlag", kind="boolean"),
@@ -603,6 +663,10 @@ def parse_official_slot(source: str) -> OfficialNode:
 
 
 class OfficialSlotCompiler:
+    def __init__(self, anchor_date: str = "2026-04-14", trading_dates: Optional[Sequence[str]] = None):
+        self.anchor_date = anchor_date
+        self.trading_dates = list(trading_dates or [])
+
     def compile(self, source: str) -> OfficialCompileResult:
         ast = parse_official_slot(source)
         warnings: List[str] = []
@@ -671,9 +735,15 @@ class OfficialSlotCompiler:
         if isinstance(node, OfficialBinaryOp) and node.op in {"and", "or"}:
             left = self._condition_sql(node.left, warnings)
             right = self._condition_sql(node.right, warnings)
-            op = "AND" if node.op == "and" else "OR"
+            if node.op == "or":
+                return SqlExpr(
+                    sql=f"({self._condition_with_constraints(left)} OR {self._condition_with_constraints(right)})",
+                    kind="boolean",
+                    tables=left.tables + right.tables,
+                    constraints=[],
+                )
             return SqlExpr(
-                sql=f"({left.sql} {op} {right.sql})",
+                sql=f"({left.sql} AND {right.sql})",
                 kind="boolean",
                 tables=left.tables + right.tables,
                 constraints=left.constraints + right.constraints,
@@ -940,12 +1010,14 @@ class OfficialSlotCompiler:
             constraints.append("1=0")
             warnings.append(f"select_type {select_type!r} is not present in official A-share CSV tables")
         if date:
-            normalized = _normalize_iso_date(date)
-            if normalized:
-                constraints.append(f"base.bizdate = {_sql_quote(normalized)}")
-            else:
-                constraints.append("1=1")
-                warnings.append(f"date slot requires runtime normalization: {date}")
+            normalized = normalize_official_date(
+                date,
+                anchor_date=self.anchor_date,
+                trading_dates=self.trading_dates,
+                field="base.bizdate",
+            )
+            constraints.extend(normalized.constraints)
+            warnings.extend(normalized.warnings)
         return constraints
 
     def _market_constraints(self, market: str, warnings: List[str]) -> List[str]:
@@ -1028,6 +1100,14 @@ class OfficialSlotCompiler:
     def _where_clause(self, condition: SqlExpr) -> str:
         return " AND ".join(_dedupe([condition.sql] + condition.constraints)) or "1=1"
 
+    def _condition_with_constraints(self, condition: SqlExpr) -> str:
+        parts = _dedupe([condition.sql] + condition.constraints)
+        if not parts:
+            return "1=1"
+        if len(parts) == 1:
+            return parts[0]
+        return "(" + " AND ".join(parts) + ")"
+
     def _select_sql(self, tables: List[str], where: str) -> str:
         joins = self._joins(tables)
         return (
@@ -1049,6 +1129,11 @@ class OfficialSlotCompiler:
             joins.append(
                 "LEFT JOIN newzl.hsj_stock_hq_ext AS ext "
                 "ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n"
+            )
+        if "hsj_stock_hq_basic_technical" in table_set:
+            joins.append(
+                "LEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech "
+                "ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\n"
             )
         return "".join(joins)
 
@@ -1074,12 +1159,19 @@ class OfficialSlotCompiler:
                 f"AND {ext_alias}.tgtcode = {base_alias}.tgtcode "
                 f"AND {ext_alias}.bizdate = {base_alias}.bizdate\n"
             )
+        if "hsj_stock_hq_basic_technical" in table_set:
+            joins.append(
+                f"    LEFT JOIN newzl.hsj_stock_hq_basic_technical AS rtech "
+                f"ON rtech.mktcode = {base_alias}.mktcode "
+                f"AND rtech.tgtcode = {base_alias}.tgtcode "
+                f"AND rtech.bizdate = {base_alias}.bizdate\n"
+            )
         return "".join(joins)
 
     def _ordered_tables(self, tables: Iterable[str]) -> List[str]:
         table_set = set(tables)
         ordered = []
-        for item in ["hsj_stock_hq_basic", "hsj_stock_code_info", "hsj_stock_hq_ext"]:
+        for item in ["hsj_stock_hq_basic", "hsj_stock_code_info", "hsj_stock_hq_ext", "hsj_stock_hq_basic_technical"]:
             if item in table_set or item == "hsj_stock_hq_basic":
                 ordered.append(item)
         return ordered
@@ -1089,6 +1181,7 @@ class OfficialSlotCompiler:
             "hsj_stock_hq_basic": "base",
             "hsj_stock_code_info": "code",
             "hsj_stock_hq_ext": "ext",
+            "hsj_stock_hq_basic_technical": "tech",
         }[table]
 
 
@@ -1477,7 +1570,7 @@ def _md_escape(value: str) -> str:
 
 
 def _rank_alias_sql(sql: str) -> str:
-    return sql.replace("base.", "rb.").replace("code.", "rcode.").replace("ext.", "rext.")
+    return sql.replace("base.", "rb.").replace("code.", "rcode.").replace("ext.", "rext.").replace("tech.", "rtech.")
 
 
 def _normalize_iso_date(value: str) -> str:
