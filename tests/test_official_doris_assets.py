@@ -32,6 +32,11 @@ def test_official_doris_assets_are_present_and_target_real_tables():
     assert "SUM(COALESCE(ext.ZJLXMainNetTur, 0)) OVER" in feature
     assert "hsj_stock_hq_basic_technical" in feature
     assert "ma5 DOUBLE" in feature
+    assert "ma30 DOUBLE" in feature
+    assert "ma120 DOUBLE" in feature
+    assert "ma250 DOUBLE" in feature
+    assert "volume_avg_30 DOUBLE" in feature
+    assert "volume_avg_60 DOUBLE" in feature
     assert "ma_bullish BOOLEAN" in feature
     assert "volume_breakout BOOLEAN" in feature
     assert "doji BOOLEAN" in feature

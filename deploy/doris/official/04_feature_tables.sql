@@ -113,12 +113,20 @@ CREATE TABLE IF NOT EXISTS newzl.hsj_stock_hq_basic_technical (
   pressure_price DOUBLE,
   support_price DOUBLE,
   rise_pct DOUBLE,
+  ma3 DOUBLE,
   ma5 DOUBLE,
   ma10 DOUBLE,
   ma20 DOUBLE,
+  ma30 DOUBLE,
   ma60 DOUBLE,
+  ma120 DOUBLE,
+  ma200 DOUBLE,
+  ma250 DOUBLE,
   volume_avg_5 DOUBLE,
+  volume_avg_10 DOUBLE,
   volume_avg_20 DOUBLE,
+  volume_avg_30 DOUBLE,
+  volume_avg_60 DOUBLE,
   yang_line BOOLEAN,
   yin_line BOOLEAN,
   doji BOOLEAN,
@@ -152,12 +160,20 @@ SELECT
   w.pressure_price,
   w.support_price,
   w.rise_pct,
+  w.ma3,
   w.ma5,
   w.ma10,
   w.ma20,
+  w.ma30,
   w.ma60,
+  w.ma120,
+  w.ma200,
+  w.ma250,
   w.volume_avg_5,
+  w.volume_avg_10,
   w.volume_avg_20,
+  w.volume_avg_30,
+  w.volume_avg_60,
   CASE WHEN w.close_price > w.open_price THEN TRUE ELSE FALSE END AS yang_line,
   CASE WHEN w.close_price < w.open_price THEN TRUE ELSE FALSE END AS yin_line,
   CASE
@@ -203,6 +219,11 @@ FROM (
     AVG(base.closePx / 10000.0) OVER (
       PARTITION BY base.mktcode, base.tgtcode
       ORDER BY base.bizdate
+      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) AS ma3,
+    AVG(base.closePx / 10000.0) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
       ROWS BETWEEN 4 PRECEDING AND CURRENT ROW
     ) AS ma5,
     AVG(base.closePx / 10000.0) OVER (
@@ -218,8 +239,28 @@ FROM (
     AVG(base.closePx / 10000.0) OVER (
       PARTITION BY base.mktcode, base.tgtcode
       ORDER BY base.bizdate
+      ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+    ) AS ma30,
+    AVG(base.closePx / 10000.0) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
       ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
     ) AS ma60,
+    AVG(base.closePx / 10000.0) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
+      ROWS BETWEEN 119 PRECEDING AND CURRENT ROW
+    ) AS ma120,
+    AVG(base.closePx / 10000.0) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
+      ROWS BETWEEN 199 PRECEDING AND CURRENT ROW
+    ) AS ma200,
+    AVG(base.closePx / 10000.0) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
+      ROWS BETWEEN 249 PRECEDING AND CURRENT ROW
+    ) AS ma250,
     AVG(base.volume) OVER (
       PARTITION BY base.mktcode, base.tgtcode
       ORDER BY base.bizdate
@@ -228,7 +269,22 @@ FROM (
     AVG(base.volume) OVER (
       PARTITION BY base.mktcode, base.tgtcode
       ORDER BY base.bizdate
+      ROWS BETWEEN 9 PRECEDING AND CURRENT ROW
+    ) AS volume_avg_10,
+    AVG(base.volume) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
       ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
-    ) AS volume_avg_20
+    ) AS volume_avg_20,
+    AVG(base.volume) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
+      ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+    ) AS volume_avg_30,
+    AVG(base.volume) OVER (
+      PARTITION BY base.mktcode, base.tgtcode
+      ORDER BY base.bizdate
+      ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+    ) AS volume_avg_60
   FROM newzl.hsj_stock_hq_basic AS base
 ) AS w;

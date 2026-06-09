@@ -166,6 +166,57 @@ def test_compile_official_order_book_and_ma_aliases_from_real_workbook():
     assert "base.bizdate = '2026-04-14'" in result.sql
 
 
+def test_compile_official_extended_ma_and_volume_average_aliases_from_real_workbook():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '3日均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '30日均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '120日均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '200日均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '250日均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '半年均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '一年均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '5日均量线', '今天', '', '', '') > 1000 "
+        "and indicator('', '', '10日均量线', '今天', '', '', '') > 1000 "
+        "and indicator('', '', '30日均量线', '今天', '', '', '') > 1000 "
+        "and indicator('', '', '一个季度均量线', '今天', '', '', '') > 1000"
+    )
+
+    assert "tech.ma3 > 10" in result.sql
+    assert "tech.ma30 > 10" in result.sql
+    assert "tech.ma120 > 10" in result.sql
+    assert "tech.ma200 > 10" in result.sql
+    assert "tech.ma250 > 10" in result.sql
+    assert result.sql.count("tech.ma120 > 10") == 2
+    assert result.sql.count("tech.ma250 > 10") == 2
+    assert "tech.volume_avg_5 > 1000" in result.sql
+    assert "tech.volume_avg_10 > 1000" in result.sql
+    assert "tech.volume_avg_30 > 1000" in result.sql
+    assert "tech.volume_avg_60 > 1000" in result.sql
+    assert "hsj_stock_hq_basic_technical" in result.requires_tables
+
+
+def test_compile_official_board_break_order_diff_and_drawdown_aliases_from_real_workbook():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '委差', '今天', '', '', '') > 0 "
+        "and rank('', '', '委差', 'desc', '今天', '', '', '') <= 20 "
+        "and indicator('', '', '涨停炸板', '今天', '', '', '') = True "
+        "and indicator('', '', '涨停未封板', '今天', '', '', '') = True "
+        "and indicator('', '', '历史最大跌幅', '今天', '', '', '') > 5 "
+        "and indicator('', '', '大单卖出金额', '今天', '', '', '') > 1000000 "
+        "and indicator('', '', '大单买入金额', '今天', '', '', '') > 1000000"
+    )
+
+    assert "(base.commissionBuy - base.commissionSale) > 0" in result.sql
+    assert "ORDER BY (rb.commissionBuy - rb.commissionSale) DESC" in result.sql
+    assert "COALESCE(ext.lmtUpNum, 0) > 0" in result.sql
+    assert "COALESCE(ext.boardBreaks, 0) > 0" in result.sql
+    assert "base.limitFlag != 1" in result.sql
+    assert "(ext.maxRetreat / 10000.0) > 5" in result.sql
+    assert "ext.bigSellTur > 1000000" in result.sql
+    assert "ext.bigBuyTur > 1000000" in result.sql
+    assert "hsj_stock_hq_ext" in result.requires_tables
+
+
 def test_compile_official_string_percent_wildcard_uses_like_without_breaking_numeric_percent():
     result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
         "indicator('', '', '股票名称', '', '', '', '') = '%科技%' "
