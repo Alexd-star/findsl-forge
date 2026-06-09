@@ -37,6 +37,36 @@ def test_normalize_recent_n_days_uses_trading_calendar_window():
     assert result.warnings == []
 
 
+def test_normalize_official_colloquial_recent_windows():
+    cases = {
+        "过去20天": "base.bizdate BETWEEN '2026-03-26' AND '2026-04-14'",
+        "30个交易日": "base.bizdate BETWEEN '2026-03-16' AND '2026-04-14'",
+        "三个月之内": "base.bizdate BETWEEN '2026-01-15' AND '2026-04-14'",
+        "近半年": "base.bizdate BETWEEN '2025-10-14' AND '2026-04-14'",
+        "近5个月至今": "base.bizdate BETWEEN '2025-11-15' AND '2026-04-14'",
+    }
+
+    for text, expected in cases.items():
+        result = normalize_official_date(text, anchor_date="2026-04-14")
+
+        assert result.constraints == [expected]
+        assert result.warnings == []
+
+
+def test_normalize_official_month_and_day_forms():
+    cases = {
+        "2024年8月": "base.bizdate BETWEEN '2024-08-01' AND '2024-08-31'",
+        "9号": "base.bizdate = '2026-04-09'",
+        "九月十五号": "1=0",
+        "本季度": "base.bizdate BETWEEN '2026-04-01' AND '2026-04-14'",
+    }
+
+    for text, expected in cases.items():
+        result = normalize_official_date(text, anchor_date="2026-04-14")
+
+        assert result.constraints == [expected]
+
+
 def test_normalize_common_chinese_year_and_period_forms():
     cases = {
         "2024年": "base.bizdate BETWEEN '2024-01-01' AND '2024-12-31'",

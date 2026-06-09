@@ -69,6 +69,10 @@ def _normalize_interval(text: str, anchor: date, calendar: List[date]) -> Option
         exact_date = _parse_iso_date(exact)
         return _DateInterval(exact_date, exact_date), []
 
+    month_interval = _normalize_month_interval(text, anchor)
+    if month_interval:
+        return month_interval, []
+
     if text in CURRENT_DAY_ALIASES:
         return _DateInterval(anchor, anchor), []
     if text in PREVIOUS_TRADING_DAY_ALIASES:
@@ -118,6 +122,11 @@ def _normalize_interval(text: str, anchor: date, calendar: List[date]) -> Option
         start = _add_months(date(anchor.year, anchor.month, 1), -1)
         end = date(anchor.year, anchor.month, 1) - timedelta(days=1)
         return _DateInterval(start, end), []
+    if text in {"近半年", "最近半年", "过去半年", "半年内", "半年之内"}:
+        return _DateInterval(anchor - timedelta(days=182), anchor), []
+    if text in {"本季度", "这个季度"}:
+        quarter_start_month = ((anchor.month - 1) // 3) * 3 + 1
+        return _DateInterval(date(anchor.year, quarter_start_month, 1), anchor), []
     if text == "本周":
         start = anchor - timedelta(days=anchor.weekday())
         return _DateInterval(start, anchor), []
@@ -142,10 +151,25 @@ def _normalize_exact_date(text: str, anchor: date) -> str:
     match = re.fullmatch(r"(?P<year>\d{4})年(?P<month>\d{1,2})月(?P<day>\d{1,2})[日号]?", text)
     if match:
         return date(int(match.group("year")), int(match.group("month")), int(match.group("day"))).isoformat()
-    match = re.fullmatch(r"(?P<month>\d{1,2})月(?P<day>\d{1,2})[日号]?", text)
+    number = r"\d{1,2}|[零〇一二两三四五六七八九十]+"
+    match = re.fullmatch(rf"(?P<month>{number})月(?P<day>{number})[日号]?", text)
     if match:
-        return date(anchor.year, int(match.group("month")), int(match.group("day"))).isoformat()
+        return date(anchor.year, _parse_count(match.group("month")), _parse_count(match.group("day"))).isoformat()
+    match = re.fullmatch(rf"(?P<day>{number})[日号]", text)
+    if match:
+        return date(anchor.year, anchor.month, _parse_count(match.group("day"))).isoformat()
     return ""
+
+
+def _normalize_month_interval(text: str, anchor: date) -> Optional[_DateInterval]:
+    number = r"\d{1,2}|[零〇一二两三四五六七八九十]+"
+    match = re.fullmatch(rf"(?P<year>\d{{4}})年(?P<month>{number})月", text)
+    if not match:
+        return None
+    year = int(match.group("year"))
+    month = _parse_count(match.group("month"))
+    start = date(year, month, 1)
+    return _DateInterval(start, date(year, month, _month_last_day(year, month)))
 
 
 def _normalize_year_text(text: str) -> Optional[int]:
@@ -181,9 +205,11 @@ def _normalize_year_range_text(text: str) -> Optional[tuple[int, int]]:
 
 
 def _parse_recent_window(text: str) -> Optional[tuple[int, str]]:
-    match = re.fullmatch(r"(?:近|最近|这)(?P<num>\d+|[零〇一二两三四五六七八九十百个]+)(?P<unit>日|天|个交易日|周|月|个月|年)", text)
+    number = r"\d+|[零〇一二两三四五六七八九十百两个]+"
+    unit = r"个交易日|日|天|周|月|个月|年"
+    match = re.fullmatch(rf"(?:近|最近|这|过去)(?P<num>{number})(?P<unit>{unit})(?:内|之内|至今)?", text)
     if not match:
-        match = re.fullmatch(r"(?P<num>\d+|[零〇一二两三四五六七八九十百个]+)(?P<unit>日|天|个交易日|周|月|个月|年)内", text)
+        match = re.fullmatch(rf"(?P<num>{number})(?P<unit>{unit})(?:内|之内)?", text)
     if not match:
         return None
     amount = _parse_count(match.group("num"))

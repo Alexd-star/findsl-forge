@@ -4,6 +4,16 @@
 
 ## 2026-06-10
 
+### 官方 DSL 语义补强
+
+- 支持 `rank(..., agg_func, count_exp)`，将聚合排名编译为时间桶聚合、桶内 `ROW_NUMBER()` 排名和 `CONS/EXIST` 命中桶统计。
+- 支持 `cross_above/cross_down/golden_cross(..., count_exp)`，将上穿、下穿和金叉编译为基于 `LAG()` 的每日事件行，再交给统一 `count_exp` 逻辑统计。
+- 修正穿越事件窗口语义：`LAG()` 源数据保留目标窗口开始日前的历史行，事件次数只在 `event_rows.bizdate` 目标窗口内统计，避免漏判窗口首日上穿/下穿/金叉。
+- 补充 `涨停价`、`跌停价` 官方指标别名，分别映射到 `upSealPx`、`downSealPx` 并沿用价格单位换算。
+- 补强官方口语日期归一化，覆盖 `过去20天`、`30个交易日`、`三个月之内`、`近半年`、`近5个月至今`、`2024年8月`、`9号`、`九月十五号`、`本季度` 等表达。
+- `count_exp` 表达式比较支持同义日期 scope：当两个日期槽能无 warning 归一到同一日期窗口时，可以在同一个计数比较中使用。
+- 官方 workbook 覆盖刷新为 `5,792/5,799` 可解析、`1,872` 条可落地编译，`UNSUPPORTED_OFFICIAL_COUNT_EXP` 降至 `15`。
+
 ### 官方真实数据与 Doris 证据
 
 - 完成官方三张 CSV 在本地 Apache Doris 中的真实落库核验：`hsj_stock_code_info=5686`、`hsj_stock_hq_basic=13650347`、`hsj_stock_hq_ext=6170822`。

@@ -836,6 +836,90 @@ def test_compile_rank_count_exp_between_percent_uses_partition_count():
     assert "ranked.rank_no <=" in result.sql
 
 
+def test_compile_rank_aggregate_count_exp_growth_percent_bucket_rank():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '成交量', 'desc', '近10日', '', 'GROWTH_RISE', 'CONS=10日') <= 20%"
+    )
+
+    assert "DATE_TRUNC(rb.bizdate, 'day') AS bucket_key" in result.sql
+    assert "MAX_BY(rb.volume, rb.bizdate)" in result.sql
+    assert "MIN_BY(rb.volume, rb.bizdate)" in result.sql
+    assert "ROW_NUMBER() OVER (PARTITION BY bucketed.bucket_key ORDER BY bucketed.agg_value DESC" in result.sql
+    assert "COUNT(*) OVER (PARTITION BY bucketed.bucket_key) AS partition_count" in result.sql
+    assert "CEIL((ranked.partition_count * 20) / 100.0)" in result.sql
+
+
+def test_compile_rank_aggregate_count_exp_yearly_average_bucket_rank():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '集合竞价金额', 'asc', '2023年', '', 'AVG', 'CONS=每年') <= 10"
+    )
+
+    assert "DATE_TRUNC(rb.bizdate, 'year') AS bucket_key" in result.sql
+    assert "AVG(rext.callAucAmt) AS agg_value" in result.sql
+    assert "GROUP BY rb.mktcode, rb.tgtcode, DATE_TRUNC(rb.bizdate, 'year')" in result.sql
+    assert "ORDER BY bucketed.agg_value ASC" in result.sql
+    assert "SUM(CASE WHEN ranked.rank_no <= 10 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+
+
+def test_compile_cross_above_count_exp_everyday_event_window():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "cross_above('', '', '最新价', '60日均线', '近5日', '', 'CONS=每日') = True"
+    )
+
+    assert "LAG((wb.lastPx / 10000.0)) OVER" in result.sql
+    assert "wt.ma60" in result.sql
+    assert "AS event_value" in result.sql
+    assert "SUM(CASE WHEN event_rows.event_value THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+    assert "event_rows.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+
+
+def test_compile_cross_count_exp_lag_source_keeps_pre_window_rows():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "cross_above('', '', '最新价', '60日均线', '近5日', '', 'EXIST=1日') = True"
+    )
+
+    assert "wb.bizdate <= '2026-04-14'" in result.sql
+    assert "event_rows.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+
+
+def test_compile_golden_cross_count_exp_exist_event_window():
+    result = OfficialSlotCompiler(
+        anchor_date="2026-04-14",
+        trading_dates=[
+            "2026-04-01",
+            "2026-04-02",
+            "2026-04-03",
+            "2026-04-06",
+            "2026-04-07",
+            "2026-04-08",
+            "2026-04-09",
+            "2026-04-10",
+            "2026-04-13",
+            "2026-04-14",
+        ],
+    ).compile(
+        "golden_cross('', '', '5日均量线', '10日均量线', '近10个交易日', '', 'EXIST=2日') = True"
+    )
+
+    assert "wt.volume_avg_5" in result.sql
+    assert "wt.volume_avg_10" in result.sql
+    assert "AS event_value" in result.sql
+    assert ") = 2" in result.sql
+    assert "event_rows.bizdate BETWEEN '2026-04-01' AND '2026-04-14'" in result.sql
+
+
+def test_compile_count_exp_comparison_accepts_equivalent_recent_date_spellings():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '涨停价', '30个交易日内', '', '', 'EXIST=2') >= "
+        "indicator('', '', '60日均线', '30个交易日', '', '', 'EXIST=2')"
+    )
+
+    assert "(wb.upSealPx / 10000.0)" in result.sql
+    assert "wt.ma60" in result.sql
+    assert "wb.bizdate BETWEEN '2026-03-16' AND '2026-04-14'" in result.sql
+    assert ") = 2" in result.sql
+
+
 def test_parse_official_slot_supports_signed_percent_and_negative_limit_bound():
     ast = parse_official_slot(
         "indicator('', '', '跌幅', '', '', '', '') > -5% limit 20,-1"
