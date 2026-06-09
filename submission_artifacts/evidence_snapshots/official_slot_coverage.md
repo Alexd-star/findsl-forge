@@ -9,17 +9,16 @@
 | 官方样例总数 | 5799 |
 | 语法解析成功 | 5792 |
 | 语法解析失败 | 7 |
-| Doris SQL 编译成功 | 1823 |
-| Doris SQL 编译失败 | 3969 |
-| 全量样例可落地编译率 | 31.44% |
-| 解析成功样例可落地编译率 | 31.47% |
+| Doris SQL 编译成功 | 1824 |
+| Doris SQL 编译失败 | 3968 |
+| 全量样例可落地编译率 | 31.45% |
+| 解析成功样例可落地编译率 | 31.49% |
 
 ## 编译失败错误码
 
 | 错误码 | 次数 |
 |---|---:|
-| UNSUPPORTED_OFFICIAL_INDICATOR | 3889 |
-| OFFICIAL_EXPR_ERROR | 6 |
+| UNSUPPORTED_OFFICIAL_INDICATOR | 3894 |
 | UNSUPPORTED_OFFICIAL_COUNT_EXP | 56 |
 | UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION | 18 |
 
@@ -29,11 +28,11 @@
 |---|---:|
 | UNSUPPORTED_OFFICIAL_INDICATOR: 成分股 | 165 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 跟踪指数 | 114 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 热门 | 103 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 热门 | 104 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 主营业务 | 98 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润 | 77 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 基金类型 | 77 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 上市日期 | 69 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 上市日期 | 70 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 龙头股 | 64 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润同比增长率 | 55 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 基金十大重仓股 | 52 |
@@ -45,7 +44,7 @@
 | UNSUPPORTED_OFFICIAL_INDICATOR: 净资产收益率 | 39 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 我的持仓股 | 36 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 营业收入同比增长率 | 34 |
-| UNSUPPORTED_OFFICIAL_INDICATOR: 潜力 | 29 |
+| UNSUPPORTED_OFFICIAL_INDICATOR: 潜力 | 30 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 优质 | 27 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 强势 | 27 |
 | UNSUPPORTED_OFFICIAL_INDICATOR: 波动率 | 26 |
@@ -65,18 +64,17 @@
 | 缺失或待增强类别 | 次数 |
 |---|---:|
 | 官方三表未覆盖的其他指标 | 1682 |
-| 财务报表数据缺失 | 778 |
-| 公司画像与题材热度数据缺失 | 383 |
+| 财务报表数据缺失 | 780 |
+| 公司画像与题材热度数据缺失 | 385 |
 | 指数成分与权重数据缺失 | 280 |
 | 基金产品与持仓数据缺失 | 257 |
 | 高级形态/相似度模型数据缺失 | 165 |
-| 公司事件与交易日历扩展数据缺失 | 148 |
+| 公司事件与交易日历扩展数据缺失 | 149 |
 | 用户账户与自选股数据缺失 | 89 |
 | 出现次数/连续次数时间语义待特征表增强 | 56 |
 | 龙虎榜与交易异动数据缺失 | 54 |
 | 交易规则与跨市场标的属性缺失 | 53 |
 | 创新高低/位置函数复杂周期待增强 | 18 |
-| 复杂表达式组合待扩展 | 6 |
 
 ## 语法解析失败样本
 
