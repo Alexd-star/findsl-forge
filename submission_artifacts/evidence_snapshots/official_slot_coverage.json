@@ -3,24 +3,24 @@
   "row_count": 5799,
   "parse_ok": 5792,
   "parse_failed": 7,
-  "compile_ok": 1824,
-  "compile_failed": 3968,
-  "compile_rate_on_all_rows": 0.314537,
-  "compile_rate_on_parse_ok": 0.314917,
+  "compile_ok": 1844,
+  "compile_failed": 3948,
+  "compile_rate_on_all_rows": 0.317986,
+  "compile_rate_on_parse_ok": 0.31837,
   "parse_errors": {
     "OFFICIAL_PARSE_ERROR": 3,
     "OFFICIAL_LEX_ERROR": 4
   },
   "compile_errors": {
-    "UNSUPPORTED_OFFICIAL_INDICATOR": 3894,
-    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 56,
-    "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION": 18
+    "UNSUPPORTED_OFFICIAL_INDICATOR": 3902,
+    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 45,
+    "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION": 1
   },
   "compile_error_details": {
     "UNSUPPORTED_OFFICIAL_INDICATOR: 成分股": 165,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 跟踪指数": 114,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 热门": 104,
-    "UNSUPPORTED_OFFICIAL_INDICATOR: 主营业务": 98,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 主营业务": 99,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润": 77,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 基金类型": 77,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 上市日期": 70,
@@ -41,7 +41,7 @@
     "UNSUPPORTED_OFFICIAL_INDICATOR: 波动率": 26,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 龙虎榜上榜日期": 25,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 估值": 24,
-    "UNSUPPORTED_OFFICIAL_INDICATOR: MACD金叉": 21,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: MACD金叉": 23,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 基金公司": 21,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 上市天数": 20,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 规模": 19,
@@ -49,18 +49,18 @@
     "UNSUPPORTED_OFFICIAL_INDICATOR: 净利润": 18
   },
   "compile_error_domains": {
-    "官方三表未覆盖的其他指标": 1682,
+    "官方三表未覆盖的其他指标": 1685,
     "财务报表数据缺失": 780,
-    "公司画像与题材热度数据缺失": 385,
+    "公司画像与题材热度数据缺失": 386,
     "指数成分与权重数据缺失": 280,
-    "基金产品与持仓数据缺失": 257,
-    "高级形态/相似度模型数据缺失": 165,
+    "基金产品与持仓数据缺失": 258,
+    "高级形态/相似度模型数据缺失": 168,
     "公司事件与交易日历扩展数据缺失": 149,
     "用户账户与自选股数据缺失": 89,
-    "出现次数/连续次数时间语义待特征表增强": 56,
     "龙虎榜与交易异动数据缺失": 54,
     "交易规则与跨市场标的属性缺失": 53,
-    "创新高低/位置函数复杂周期待增强": 18
+    "出现次数/连续次数时间语义待特征表增强": 45,
+    "创新高低/位置函数复杂周期待增强": 1
   },
   "parse_error_samples": [
     {
@@ -684,7 +684,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_hq_ext"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ((ext.riseSpd3m / 10000.0) > 5 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.lastPx / 10000.0) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_bas"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ((ext.riseSpd3m / 10000.0) > 5 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.lastPx / 10000.0) DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PART"
     },
     {
       "excel_row": 18,
@@ -704,7 +704,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_hq_ext"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (ext.riseSpd3m / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE (ext.riseSpd3m / 10000.0) < (ext.riseSpd3m / 10000.0) AND base.mktcode IN (1, 103) AND base.bizdate = '2011-03-2"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (ext.riseSpd3m / 10000.0) ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE (ext.riseSpd3m / 10000.0) < (ext.riseSpd3"
     },
     {
       "excel_row": 29,
@@ -742,7 +742,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = base.tgtcode AND wb.bizdate BETWEEN '2025-11-15' AND '2026-04-14' AND ((wb.lastPx - wb.preClosePx) * 100.0 / NULLIF(wb.preClosePx, 0)) > 0) > 3 AND CASE WHEN (base.lastPx / 10000.0) IS NULL OR (SELECT MIN((wb.lastPx / 10000.0))\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = "
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((SELECT MAX(run_length) > 3\n FROM (\n   SELECT run_group, COUNT(*) AS run_length\n   FROM (\n     SELECT matched.bizdate,\n            DATEDIFF(matched.bizdate, DATE '1970-01-01') - ROW_NUMBER() OVER (ORDER BY matched.bizdate) AS run_group\n     FROM (\n       SELECT DISTINCT wb.bizdate\n       FROM newzl.hsj_stock_hq_basic AS wb\n    LEFT JOIN newzl.hsj_stock_code_info AS wc ON wc.mktcode = wb"
     },
     {
       "excel_row": 56,
@@ -769,7 +769,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.listedShare DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0) AND (code.hyBlkRefName = '金属管件制品' OR code.name = '金属管件制品') AND 1=0 AND base.bizdate BETWEEN '2006-01-01' AND '2012-12-31'\n) AS ranked\nWHERE rank_no <= 10"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.listedShare DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0) AND (code.hyBlkRefName = '金属管件制品' OR code.name = '金属管件制品') AND 1=0 AND base.bizdate BETWEEN '2006-01-01' AND '2012-12-31'\n) AS ranked\nWHERE ranked.rank_no <= 10"
     },
     {
       "excel_row": 71,
@@ -778,7 +778,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.totalShare ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 1, 103) AND (code.hyBlkRefName = '算力' OR code.name = '算力')\n) AS ranked\nWHERE rank_no <= 10"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.totalShare ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 1, 103) AND (code.hyBlkRefName = '算力' OR code.name = '算力')\n) AS ranked\nWHERE ranked.rank_no <= 10"
     },
     {
       "excel_row": 79,
@@ -787,7 +787,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (SELECT MIN(((wb.lastPx / 10000.0) * wb.totalShare))\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = base.tgtcode) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE (code.hyBlkRefName = '家居日用品' OR code.name = '家居日用品')\n) AS ranked\nWHERE rank_no = 1"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (SELECT MIN(((wb.lastPx / 10000.0) * wb.totalShare))\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = base.tgtcode) DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE (code.hyBlkRefName = '家居日用品' OR code.name = "
     },
     {
       "excel_row": 81,
@@ -816,7 +816,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_code_info"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.pBR / 10000.0) ASC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mktcode IN (0, 1)\n  ) AS ranked\n  WHER"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.pBR / 10000.0) ASC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.t"
     },
     {
       "excel_row": 97,
@@ -835,7 +835,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.dynPE / 10000.0) > 20 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.dynPE / 10000.0) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mkt"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.dynPE / 10000.0) > 20 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.dynPE / 10000.0) DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rco"
     },
     {
       "excel_row": 101,
@@ -854,7 +854,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = lb.mktcode AND wb.tgtcode = lb.tgtcode AND wb.bizdate BETWEEN '2012-01-01' AND '2012-12-"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n    LEFT JOIN newzl.hsj_stock_code_info AS wc ON wc.mktcode = wb.mktcode AND wc.tgtcode = wb.tgtcode\n WHERE "
     },
     {
       "excel_row": 112,
@@ -863,7 +863,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (((lb.lastPx - lb.preClosePx) * 100.0 / NULLIF(lb.preClosePx, 0)) >= 8 AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = lb.mktcode AN"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (((lb.lastPx - lb.preClosePx) * 100.0 / NULLIF(lb.preClosePx, 0)) >= 8 AND (SELECT MAX(run_length) >= 3\n FROM (\n   SELECT run_group, COUNT(*) AS run_length\n   FRO"
     },
     {
       "excel_row": 118,
@@ -872,7 +872,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (((base.dynPE / 10000.0) < 20 AND (base.volume / 100) >= 1000000) AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.volume DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = r"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (((base.dynPE / 10000.0) < 20 AND (base.volume / 100) >= 1000000) AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.volume DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock"
     },
     {
       "excel_row": 120,
@@ -909,7 +909,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.bVPS / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 1) AND (code.hyBlkRefName = 'deepseek相关' OR code.name = 'deepseek相关')\n) AS ranked\nWHERE rank_no = 1"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.bVPS / 10000.0) ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 1) AND (code.hyBlkRefName = 'deepseek相关' OR code.name = 'deepseek相关')\n) AS ranked\nWHERE ranked.rank_no = 1"
     },
     {
       "excel_row": 130,
@@ -927,7 +927,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ((base.lastPx / 10000.0) * base.totalShare) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 103)\n) AS ranked\nWHERE rank_no <= 10"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ((base.lastPx / 10000.0) * base.totalShare) DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 103)\n) AS ranked\nWHERE ranked.rank_no <= 10"
     },
     {
       "excel_row": 139,
@@ -936,7 +936,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (-rext.ZJLXMainNetTur) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    LEFT JOIN newzl.hsj_stock_hq_ext AS rext O"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (-rext.ZJLXMainNetTur) DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rc"
     },
     {
       "excel_row": 142,
@@ -955,7 +955,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_code_info"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.quantRatio / 10000.0) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE (rcode.hyBlkRefName = 'SHEIN' OR "
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.quantRatio / 10000.0) DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND"
     },
     {
       "excel_row": 162,
@@ -964,7 +964,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.pBR / 10000.0) > 1.5 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.listedShare DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mktcode IN"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.pBR / 10000.0) > 1.5 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.listedShare DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktc"
     },
     {
       "excel_row": 166,
@@ -993,7 +993,7 @@
         "hsj_stock_code_info",
         "hsj_stock_hq_ext"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (-ext.ZJLXMainNetTur) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE code.hkConnFlag = TRUE AND (code.hyBlkRefName = '工程咨询板块' OR code.name = '工程咨询板块')\n) AS ranked\nWHERE rank_no <= 3"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (-ext.ZJLXMainNetTur) DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE code.hkConnFlag = TRUE AND (code.hyBlkRefNam"
     },
     {
       "excel_row": 175,
@@ -1066,7 +1066,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_code_info"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ((base.lastPx / 10000.0) * base.totalShare) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE code.szConnFlag = TRUE AND 1=1\n) AS ranked\nWHERE rank_no <= 15"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ((base.lastPx / 10000.0) * base.totalShare) ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE code.szConnFlag = TRUE AND 1=1\n) AS ranked\nWHERE ranked.rank_no <= 15"
     },
     {
       "excel_row": 185,
@@ -1075,7 +1075,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lowPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE 1=1\n) AS ranked\nWHERE rank_no <= 5\nLIMIT 1"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lowPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE 1=1\n) AS ranked\nWHERE ranked.rank_no <= 5\nLIMIT 1"
     },
     {
       "excel_row": 188,
@@ -1113,7 +1113,7 @@
         "hsj_stock_code_info",
         "hsj_stock_hq_basic_technical"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n LEFT JOIN newzl.hsj_stock_hq_basic_technical AS wt ON wt.mktcode = wb.mktcode AND wt.tgtcode = wb.tgtcode AND wt.bizdate = wb.bizdate\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = ba"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((SELECT MAX(run_length) >= 3\n FROM (\n   SELECT run_group, COUNT(*) AS run_length\n   FROM (\n     SELECT matched.bizdate,\n            DATEDIFF(matched.bizdate, DATE '1970-01-01') - ROW_NUMBER() OVER (ORDER BY matched.bizdate) AS run_group\n    "
     },
     {
       "excel_row": 194,
@@ -1122,7 +1122,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (103) AND 1=1\n) AS ranked\nWHERE rank_no > 0"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (103) AND 1=1\n) AS ranked\nWHERE ranked.rank_no > 0"
     },
     {
       "excel_row": 195,
@@ -1131,7 +1131,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode NOT IN (0, 1, 103) AND (code.hyBlkRefName = 'S板' OR code.name = 'S板') AND 1=1\n) AS ranked\nWHERE rank_no = 1"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode NOT IN (0, 1, 103) AND (code.hyBlkRefName = 'S板' OR code.name = 'S板') AND 1=1\n) AS ranked\nWHERE ranked.rank_no = 1"
     },
     {
       "excel_row": 196,
@@ -1159,7 +1159,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.firstLimitUpTime ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.limitFlag = 1 AND base.mktcode IN (0, 1) AND base.bizdate BETWEEN '2010-01-01' AND '2010-12-31'\n) AS ranked\nWHERE rank_no <= 10"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.firstLimitUpTime ASC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.limitFlag = 1 AND base.mktcode IN (0, 1) AND base.bizdate BETWEEN '2010-01-01' AND '2010-12-31'\n) AS ranked\nWHERE ranked.rank_no <= 10"
     },
     {
       "excel_row": 200,
@@ -1205,7 +1205,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_hq_basic_technical"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((base.volume >= 10000000000 AND base.volume <= 20000000000) AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n LEFT JOIN newzl.hsj_stock_hq_basic_technical AS wt ON wt.mktcode = wb.mktcode AND wt.tgtcode = wb.tgtcode AND wt.bizdate ="
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((base.volume >= 10000000000 AND base.volume <= 20000000000) AND (SELECT MAX(run_length) >= 3\n FROM (\n   SELECT run_group, COUNT(*) AS run_length\n   FROM (\n     SELECT matched.bizdate,\n            DATEDIFF(matched.bizdate, DATE '1970-01-01') "
     },
     {
       "excel_row": 208,
@@ -1259,7 +1259,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = lb.mktcode AND wb.tgtcode = lb.tgtcode AND wb.bizdate BETWEEN '2026-04-08' AND '2026-04-"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n    LEFT JOIN newzl.hsj_stock_code_info AS wc ON wc.mktcode = wb.mktcode AND wc.tgtcode = wb.tgtcode\n WHERE "
     },
     {
       "excel_row": 222,
@@ -1278,7 +1278,7 @@
         "hsj_stock_hq_basic",
         "hsj_stock_code_info"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.closePx / 10000.0) ASC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mktcode IN (0, 1) AND rb.bizdate ="
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.closePx / 10000.0) ASC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rco"
     },
     {
       "excel_row": 229,
@@ -1387,7 +1387,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (base.outerVol > 20 OR EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.outerVol DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE 1=1\n  ) AS ranked\n  WHERE"
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (base.outerVol > 20 OR EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.outerVol DESC, rb.tgtcode ASC) AS rank_no,\n           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mkt"
     },
     {
       "excel_row": 251,
@@ -1396,7 +1396,7 @@
       "requires_tables": [
         "hsj_stock_hq_basic"
       ],
-      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.openPx / 10000.0) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE (code.hyBlkRefName = '金属管件制品行业&能源技术服务' OR code.name = '金属管件制品行业&能源技术服务') AND base.bizdate = '2026-04-14'\n) AS ranked\nWHERE rank_no > 0\nLIMIT 10"
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.openPx / 10000.0) DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE (code.hyBlkRefName = '金属管件制品行业&能源技术服务' OR code.name = '金属管件制品行业&能源技术服务') AND base.bizdate = '2026-04-14'\n) AS ranked\nWHERE ranked.rank_no > 0\nLIMIT 10"
     },
     {
       "excel_row": 260,
