@@ -3,22 +3,22 @@
   "row_count": 5799,
   "parse_ok": 5792,
   "parse_failed": 7,
-  "compile_ok": 1682,
-  "compile_failed": 4110,
-  "compile_rate_on_all_rows": 0.29005,
-  "compile_rate_on_parse_ok": 0.290401,
+  "compile_ok": 1718,
+  "compile_failed": 4074,
+  "compile_rate_on_all_rows": 0.296258,
+  "compile_rate_on_parse_ok": 0.296616,
   "parse_errors": {
     "OFFICIAL_PARSE_ERROR": 3,
     "OFFICIAL_LEX_ERROR": 4
   },
   "compile_errors": {
-    "UNSUPPORTED_OFFICIAL_INDICATOR": 3911,
+    "UNSUPPORTED_OFFICIAL_INDICATOR": 3928,
     "OFFICIAL_RANK_SHAPE_ERROR": 28,
-    "OFFICIAL_EXPR_ERROR": 8,
+    "OFFICIAL_EXPR_ERROR": 10,
     "OFFICIAL_RANK_OPERATOR_ERROR": 10,
-    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 48,
+    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 49,
     "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION": 18,
-    "UNSUPPORTED_OFFICIAL_FUNCTION": 87
+    "UNSUPPORTED_OFFICIAL_FUNCTION": 31
   },
   "compile_error_details": {
     "UNSUPPORTED_OFFICIAL_INDICATOR: 成分股": 164,
@@ -28,7 +28,7 @@
     "UNSUPPORTED_OFFICIAL_INDICATOR: 基金类型": 76,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润": 73,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 上市日期": 69,
-    "UNSUPPORTED_OFFICIAL_INDICATOR: 龙头股": 63,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 龙头股": 64,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润同比增长率": 55,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 基金十大重仓股": 52,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 股息率": 50,
@@ -41,33 +41,33 @@
     "UNSUPPORTED_OFFICIAL_INDICATOR: 营业收入同比增长率": 34,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 每手股数": 33,
     "UNSUPPORTED_OFFICIAL_FUNCTION: rank": 31,
-    "UNSUPPORTED_OFFICIAL_FUNCTION: reset": 29,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 潜力": 28,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 强势": 27,
-    "UNSUPPORTED_OFFICIAL_FUNCTION: close_together": 27,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 优质": 26,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 龙虎榜上榜日期": 25,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 波动率": 24,
     "UNSUPPORTED_OFFICIAL_INDICATOR: 估值": 23,
     "OFFICIAL_RANK_SHAPE_ERROR: then right side must be rank(...) comparison": 21,
-    "UNSUPPORTED_OFFICIAL_INDICATOR: 基金公司": 21
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 基金公司": 21,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: MACD金叉": 20,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 上市天数": 20
   },
   "compile_error_domains": {
-    "官方三表未覆盖的其他指标": 1706,
+    "官方三表未覆盖的其他指标": 1721,
     "财务报表数据缺失": 762,
-    "公司画像与题材热度数据缺失": 378,
+    "公司画像与题材热度数据缺失": 379,
     "指数成分与权重数据缺失": 277,
-    "基金产品与持仓数据缺失": 255,
+    "基金产品与持仓数据缺失": 256,
     "高级形态/相似度模型数据缺失": 160,
     "公司事件与交易日历扩展数据缺失": 147,
     "用户账户与自选股数据缺失": 87,
-    "函数语义待扩展": 87,
     "交易规则与跨市场标的属性缺失": 86,
     "龙虎榜与交易异动数据缺失": 53,
-    "出现次数/连续次数时间语义待特征表增强": 48,
+    "出现次数/连续次数时间语义待特征表增强": 49,
     "排名表达式形态待规范或待扩展": 38,
+    "函数语义待扩展": 31,
     "创新高低/位置函数复杂周期待增强": 18,
-    "复杂表达式组合待扩展": 8
+    "复杂表达式组合待扩展": 10
   },
   "parse_error_samples": [
     {

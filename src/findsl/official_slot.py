@@ -163,6 +163,28 @@ AGGREGATE_FUNCTIONS = {"MAX", "MIN", "AVG", "SUM"}
 GROWTH_FUNCTIONS = {"GROWTH_RISE", "GROWTH_FALL"}
 
 
+DEFAULT_TECHNICAL_PATTERN_CONFIG: Dict[str, Any] = {
+    "close_together": {"relative_threshold": 0.03},
+    "reset": {"near_line_threshold": 0.02, "below_line_tolerance": 0.005},
+}
+
+
+def _load_technical_pattern_config() -> Dict[str, Any]:
+    config = json.loads(json.dumps(DEFAULT_TECHNICAL_PATTERN_CONFIG))
+    path = Path(__file__).resolve().parents[2] / "configs" / "official_technical_patterns.json"
+    if not path.exists():
+        return config
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return config
+    for section in DEFAULT_TECHNICAL_PATTERN_CONFIG:
+        user_values = loaded.get(section, {})
+        if isinstance(user_values, dict):
+            config[section].update(user_values)
+    return config
+
+
 MARKET_CODE_MAP = {
     "深": 0,
     "深主板": 0,
@@ -322,6 +344,7 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     ),
     "压力位": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("pressure")),
     "支持位": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("support")),
+    "支撑位": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("support")),
     "上影线": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("upperShadow")),
     "下影线": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_price_expr("lowerShadow")),
     "3分钟涨速": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("riseSpd3m", "ext")),
@@ -734,6 +757,7 @@ class OfficialSlotCompiler:
     def __init__(self, anchor_date: str = "2026-04-14", trading_dates: Optional[Sequence[str]] = None):
         self.anchor_date = anchor_date
         self.trading_dates = list(trading_dates or [])
+        self.technical_pattern_config = _load_technical_pattern_config()
 
     def compile(self, source: str) -> OfficialCompileResult:
         ast = parse_official_slot(source)
@@ -1033,6 +1057,10 @@ class OfficialSlotCompiler:
             args = self._slot_args(node.left, 7)
             if args[6]:
                 return self._count_exp_comparison_sql(node.left, node.op, node.right, warnings)
+        if isinstance(node.left, OfficialFunctionCall) and node.left.name in {"reset", "close_together"}:
+            args = self._slot_args(node.left, 7)
+            if args[6]:
+                return self._pattern_count_exp_comparison_sql(node.left, node.op, node.right, warnings)
         left = self._expr_sql(node.left, warnings)
         if node.op == "between":
             if not isinstance(node.right, OfficialRangeLiteral):
@@ -1086,10 +1114,79 @@ class OfficialSlotCompiler:
                 return self._period_feature_expr(node, warnings)
             if name in {"cross_above", "cross_down", "golden_cross"}:
                 return self._cross_expr(node, name, warnings)
+            if name in {"reset", "close_together"}:
+                return self._technical_pattern_expr(node, warnings)
             raise OfficialSlotError("UNSUPPORTED_OFFICIAL_FUNCTION", f"Unsupported official function: {name}")
         if isinstance(node, OfficialIdentifier):
             return SqlExpr(node.name, "identifier", [], [])
         raise OfficialSlotError("OFFICIAL_EXPR_ERROR", f"Unsupported expression node: {type(node).__name__}")
+
+    def _technical_pattern_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
+        predicate, tables, market, filter_scope, date, select_type, count_exp = self._technical_pattern_predicate(
+            node,
+            {"base": "base", "code": "code", "ext": "ext", "tech": "tech"},
+        )
+        if count_exp:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                f"{node.name} count_exp must be compiled together with a comparison: {count_exp}",
+            )
+        constraints = self._slot_constraints(market, filter_scope, date, select_type, warnings)
+        return SqlExpr(predicate, "boolean", tables, constraints)
+
+    def _technical_pattern_predicate(
+        self,
+        node: OfficialFunctionCall,
+        aliases: Dict[str, str],
+    ) -> Tuple[str, List[str], str, str, str, str, str]:
+        args = self._slot_args(node, 7)
+        market, filter_scope, left_indicator, right_indicator, date, select_type, count_exp = args[:7]
+        left_name = left_indicator or "最新价"
+        right_name = right_indicator
+        if not right_name:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_FUNCTION",
+                f"{node.name} requires a grounded right-side indicator",
+            )
+        left_sql, left_table = self._technical_pattern_operand_sql(left_name, aliases)
+        right_sql, right_table = self._technical_pattern_operand_sql(right_name, aliases)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", left_table, right_table])
+        if node.name == "close_together":
+            threshold = self._pattern_threshold("close_together", "relative_threshold")
+            denominator = f"NULLIF(GREATEST(ABS({left_sql}), ABS({right_sql})), 0)"
+            predicate = f"(ABS({left_sql} - {right_sql}) / {denominator}) <= {threshold}"
+        elif node.name == "reset":
+            near_threshold = self._pattern_threshold("reset", "near_line_threshold")
+            below_tolerance = self._pattern_threshold("reset", "below_line_tolerance")
+            predicate = (
+                f"((ABS({left_sql} - {right_sql}) / NULLIF(ABS({right_sql}), 0)) <= {near_threshold} "
+                f"AND {left_sql} >= ({right_sql} * (1 - {below_tolerance})))"
+            )
+        else:
+            raise OfficialSlotError("UNSUPPORTED_OFFICIAL_FUNCTION", f"Unsupported official function: {node.name}")
+        return predicate, tables, market, filter_scope, date, select_type, count_exp
+
+    def _technical_pattern_operand_sql(self, indicator_name: str, aliases: Dict[str, str]) -> Tuple[str, str]:
+        meta = INDICATORS.get(indicator_name)
+        if not meta:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_INDICATOR",
+                f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
+            )
+        if meta.kind != "numeric":
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_FUNCTION",
+                f"technical pattern functions require numeric indicators, got {meta.kind}: {indicator_name}",
+            )
+        return self._indicator_value_sql(meta, aliases), meta.table
+
+    def _pattern_threshold(self, section: str, key: str) -> float:
+        fallback = DEFAULT_TECHNICAL_PATTERN_CONFIG[section][key]
+        value = self.technical_pattern_config.get(section, {}).get(key, fallback)
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return float(fallback)
 
     def _indicator_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
         args = self._slot_args(node, 7)
@@ -1249,6 +1346,57 @@ class OfficialSlotCompiler:
                 f"(SELECT COUNT(*)\n"
                 " FROM newzl.hsj_stock_hq_basic AS wb\n"
                 f"{self._window_joins(tables)}"
+                f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))}) "
+                f"{self._sql_operator(comparator)} {threshold}"
+            )
+        constraints = self._slot_constraints(market, filter_scope, "", select_type, warnings)
+        constraints.extend(self._outer_snapshot_constraints(date))
+        return SqlExpr(subquery, "boolean", tables, constraints)
+
+    def _pattern_count_exp_comparison_sql(
+        self,
+        pattern_call: OfficialFunctionCall,
+        op: str,
+        right_node: OfficialNode,
+        warnings: List[str],
+    ) -> SqlExpr:
+        predicate, tables, market, filter_scope, date, select_type, count_exp = self._technical_pattern_predicate(
+            pattern_call,
+            {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"},
+        )
+        right = self._expr_sql(right_node, warnings)
+        predicate = self._comparison_predicate_sql(predicate, "boolean", op, right_node, right.sql)
+        rule = _parse_count_exp_rule(count_exp)
+        where_parts = self._window_correlated_where(date, "wb", warnings)
+        joins = self._window_joins(tables)
+        if rule.every:
+            subquery = (
+                "(SELECT COUNT(*) > 0 AND "
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) = COUNT(*)\n"
+                " FROM newzl.hsj_stock_hq_basic AS wb\n"
+                f"{joins}"
+                f" WHERE {' AND '.join(_dedupe(where_parts))})"
+            )
+        elif rule.mode == "CONS":
+            threshold = 1 if rule.count is None else rule.count
+            warnings.append(
+                f"count_exp {count_exp!r} for {pattern_call.name} is compiled as a threshold count over "
+                "the normalized window; exact longest consecutive-run detection requires a dedicated Doris feature table"
+            )
+            subquery = (
+                "(SELECT COUNT(*) > 0 AND "
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) {self._sql_operator(rule.operator)} {threshold}\n"
+                " FROM newzl.hsj_stock_hq_basic AS wb\n"
+                f"{joins}"
+                f" WHERE {' AND '.join(_dedupe(where_parts))})"
+            )
+        else:
+            threshold = 1 if rule.count is None else rule.count
+            comparator = rule.operator or ">"
+            subquery = (
+                "(SELECT COUNT(*)\n"
+                " FROM newzl.hsj_stock_hq_basic AS wb\n"
+                f"{joins}"
                 f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))}) "
                 f"{self._sql_operator(comparator)} {threshold}"
             )

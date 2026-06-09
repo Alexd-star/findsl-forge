@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-09T18:02:06Z",
+  "generated_at": "2026-06-09T18:19:37Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "b2ba3a9",
-    "head_at_export": "b2ba3a9",
+    "head_at_export": "53df867",
     "branch": "main"
   },
   "readiness": {
@@ -61,10 +61,10 @@
       "row_count": 5799,
       "parse_ok": 5792,
       "parse_failed": 7,
-      "compile_ok": 1682,
-      "compile_failed": 4110,
-      "compile_rate_on_all_rows": 0.29005,
-      "compile_rate_on_parse_ok": 0.290401
+      "compile_ok": 1718,
+      "compile_failed": 4074,
+      "compile_rate_on_all_rows": 0.296258,
+      "compile_rate_on_parse_ok": 0.296616
     }
   },
   "doris_cluster": {

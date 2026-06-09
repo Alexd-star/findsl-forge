@@ -310,6 +310,57 @@ def test_compile_official_technical_indicators_from_feature_table():
     assert "hsj_stock_hq_basic_technical" in result.requires_tables
 
 
+def test_compile_close_together_default_price_to_ma_uses_configured_relative_threshold():
+    result = OfficialSlotCompiler().compile(
+        "close_together('', '', '', '20日均线', '今天', '', '') = True"
+    )
+
+    assert "ABS((base.lastPx / 10000.0) - tech.ma20)" in result.sql
+    assert "0.03" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert "hsj_stock_hq_basic_technical" in result.requires_tables
+
+
+def test_compile_reset_default_price_to_support_line_uses_near_line_threshold():
+    result = OfficialSlotCompiler().compile(
+        "reset('', '', '', '支撑位', '今天', '', '') = True"
+    )
+
+    assert "ABS((base.lastPx / 10000.0) - (base.support / 10000.0))" in result.sql
+    assert "0.02" in result.sql
+    assert "0.005" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_reset_false_negates_grounded_pattern_expression():
+    result = OfficialSlotCompiler().compile(
+        "reset('', '', '最新价', '10日均线', '今天', '', '') = False"
+    )
+
+    assert "NOT (" in result.sql
+    assert "tech.ma10" in result.sql
+
+
+def test_compile_close_together_count_exp_uses_window_count():
+    result = OfficialSlotCompiler(
+        trading_dates=["2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14"]
+    ).compile("close_together('', '', '', '5日均线', '近5日', '', 'CONS=5日') = True")
+
+    assert "SELECT COUNT(*)" in result.sql
+    assert "SUM(CASE WHEN" in result.sql
+    assert "ABS((wb.lastPx / 10000.0) - wt.ma5)" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_close_together_missing_indicator_stays_diagnostic_not_fake_sql():
+    with pytest.raises(OfficialSlotError) as exc:
+        OfficialSlotCompiler().compile(
+            "close_together('', '', 'K值', 'D值', '近五天', '', '') = True"
+        )
+
+    assert exc.value.code == "UNSUPPORTED_OFFICIAL_INDICATOR"
+
+
 def test_compile_record_high_low_uses_official_ext_days_without_window_predicate():
     result = OfficialSlotCompiler().compile(
         "record_high('', '', '', '120日', '今天', '', '', '') = True "

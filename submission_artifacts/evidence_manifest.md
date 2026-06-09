@@ -1,8 +1,12 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-06-10 02:02:05 +08:00
-- Git HEAD at export: b2ba3a9
-- Git status when exported, excluding evidence snapshots and this export script: clean
+- Generated at: 2026-06-10 02:19:37 +08:00
+- Git HEAD at export: 53df867
+- Git status when exported, excluding evidence snapshots and this export script:  M src/findsl/official_slot.py
+ M tests/test_official_slot.py
+?? configs/official_technical_patterns.json
+?? "docs/23_\345\256\230\346\226\271\347\234\237\345\256\236\346\225\260\346\215\256\344\272\214\346\254\241\350\247\243\345\211\226\344\270\216\346\212\200\346\234\257\345\275\242\346\200\201\345\207\275\346\225\260\350\241\245\345\274\272.md"
+?? docs/superpowers/plans/2026-06-10-official-technical-pattern-functions.md
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
@@ -20,8 +24,8 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `official_doris_evidence.md` (19875 bytes)
 - `official_doris_evidence.json` (21914 bytes)
-- `official_slot_coverage.md` (47462 bytes)
-- `official_slot_coverage.json` (74625 bytes)
+- `official_slot_coverage.md` (47469 bytes)
+- `official_slot_coverage.json` (74633 bytes)
 
 ## Excluded By Design
 

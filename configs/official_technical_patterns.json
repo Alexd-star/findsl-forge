@@ -1,0 +1,13 @@
+{
+  "version": "2026-06-10",
+  "description": "Official Topic 19 grounded technical-pattern thresholds. Values are default engineering parameters and can be adjusted to the sponsor's business definition without changing compiler code.",
+  "close_together": {
+    "relative_threshold": 0.03,
+    "description": "Two numeric indicators are considered close together when their relative distance is within 3% of the larger absolute value."
+  },
+  "reset": {
+    "near_line_threshold": 0.02,
+    "below_line_tolerance": 0.005,
+    "description": "A pullback/reset is grounded as the left indicator being near the target line within 2%, with at most 0.5% downside tolerance below the line."
+  }
+}
