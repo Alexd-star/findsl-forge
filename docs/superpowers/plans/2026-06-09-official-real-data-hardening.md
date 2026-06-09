@@ -197,7 +197,7 @@ python -m findsl.cli official-slot-coverage `
   --json
 ```
 
-Then-current result after strict `agg_func/count_exp` semantics: `compile_ok = 1411`, `parse_ok = 5792`, `parse_failed = 7`. This number was lower than the earlier 1455 because the compiler no longer treated unsupported aggregate/count semantics as ordinary field filters. Later period, industry, cross-date, and rank-count work raised the grounded compile count to 1532; chained-rank and missing-data audit work then raised the latest grounded compile count to 1536.
+Then-current result after strict `agg_func/count_exp` semantics: `compile_ok = 1411`, `parse_ok = 5792`, `parse_failed = 7`. This number was lower than the earlier 1455 because the compiler no longer treated unsupported aggregate/count semantics as ordinary field filters. Later period, industry, cross-date, and rank-count work raised the grounded compile count to 1532; chained-rank and missing-data audit work raised it to 1536; official alias grounding and string-wildcard fixes later raised the latest grounded compile count to 1607.
 
 - [x] **Step 2: Update human-readable plan**
 
@@ -395,10 +395,10 @@ Covered representative unsupported indicators:
 row_count=5799
 parse_ok=5792
 parse_failed=7
-compile_ok=1536
-compile_failed=4256
-compile_rate_on_all_rows=26.49%
-compile_rate_on_parse_ok=26.52%
+compile_ok=1607
+compile_failed=4185
+compile_rate_on_all_rows=27.71%
+compile_rate_on_parse_ok=27.75%
 ```
 
 - [x] **Step 5: Refresh official data profile**
@@ -422,7 +422,7 @@ hsj_stock_hq_ext: 6170822
 
 - [x] **Step 6: Update docs**
 
-README, Chapter 20, and Chapter 21 now describe the latest `1536` grounded compile count, chained-rank CTE support, missing-data-domain audit, and remaining Doris evidence requirement.
+README, Chapter 20, and Chapter 21 now describe the latest `1607` grounded compile count, chained-rank CTE support, missing-data-domain audit, grounded official aliases, string-wildcard SQL repair, and remaining Doris evidence requirement.
 
 ### Task 11: Remaining Required Work
 
@@ -438,7 +438,11 @@ Support `rank(..., agg_func, count_exp)` and chained temporal rank with a precom
 
 Support expressions such as `本月的前一周`, `2018年的第五年`, and `最近的第二天` without falling back to `1=1`.
 
-Implemented in `src/findsl/official_time.py` with an internal date interval model. Covered by tests for explicit year ranges (`2006年-12年`, `06年到12年`), `昨天的前1日`, `本月的前一周`, `2012年的后4年`, `一二年的第4年`, `2018年的第五年`, `最近的第二天`, `最近的第二天的后3日`, and the impossible future window `本周的后3日`. Latest official coverage remains `parse_ok=5792`, `parse_failed=7`, `compile_ok=1536`, `compile_failed=4256`; this task improves predicate correctness rather than increasing the compile count.
+Implemented in `src/findsl/official_time.py` with an internal date interval model. Covered by tests for explicit year ranges (`2006年-12年`, `06年到12年`), `昨天的前1日`, `本月的前一周`, `2012年的后4年`, `一二年的第4年`, `2018年的第五年`, `最近的第二天`, `最近的第二天的后3日`, and the impossible future window `本周的后3日`. That task improved predicate correctness rather than increasing the compile count; later alias and literal repairs raised latest official coverage to `parse_ok=5792`, `parse_failed=7`, `compile_ok=1607`, `compile_failed=4185`.
+
+- [x] **Official real-workbook alias grounding and string wildcard repair**
+
+Implemented in `src/findsl/official_slot.py` and covered by `tests/test_official_slot.py`. Added grounded mappings for `涨停天数/跌停天数/连续涨停天数`, `沪港通标识/深港通标识`, `委比`, `买方未匹配量/卖方未匹配量`, and MA period aliases `一周均线/一个月均线/一个季度均线`. Fixed string literals such as `%科技%` so they compile to `LIKE '%科技%'` while numeric percent literals such as `5%` still compile to numeric `5`. Latest official workbook coverage is `compile_ok=1607`, `compile_failed=4185`.
 
 - [ ] **Second-pass missing-data-domain classification**
 

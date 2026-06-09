@@ -121,6 +121,62 @@ def test_compile_official_numeric_scales_to_human_units():
     assert "base.bizdate = '2026-04-14'" in result.sql
 
 
+def test_compile_official_limit_count_aliases_from_real_workbook():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '涨停天数', '近10个交易日', '', '', '') <= 3 "
+        "and indicator('', '', '连续涨停天数', '近10个交易日', '', '', '') >= 2 "
+        "and rank('', '', '跌停天数', 'desc', '本周', '', '', '') <= 10"
+    )
+
+    assert "base.upCount <= 3" in result.sql
+    assert "base.upSerialLb >= 2" in result.sql
+    assert "ORDER BY rb.downCount DESC" in result.sql
+    assert "UNSUPPORTED_OFFICIAL_INDICATOR" not in result.sql
+
+
+def test_compile_official_hk_connect_aliases_from_real_workbook():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '沪港通标识', '今天', '', '', '') = True "
+        "and indicator('', '', '深港通标识', '今天', '', '', '') = False"
+    )
+
+    assert "code.shConnFlag = TRUE" in result.sql
+    assert "NOT (code.szConnFlag = TRUE)" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_official_order_book_and_ma_aliases_from_real_workbook():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '委比', '今天', '', '', '') > 10 "
+        "and rank('', '', '委比', 'desc', '今天', '', '', '') <= 5 "
+        "and indicator('', '', '买方未匹配量', '今天', '', '', '') > 100 "
+        "and indicator('', '', '卖方未匹配量', '今天', '', '', '') < 50 "
+        "and indicator('', '', '一周均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '一个月均线', '今天', '', '', '') > 10 "
+        "and indicator('', '', '一个季度均线', '今天', '', '', '') > 10"
+    )
+
+    assert "((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) > 10" in result.sql
+    assert "ORDER BY ((rb.commissionBuy - rb.commissionSale) * 100.0 / NULLIF(rb.commissionBuy + rb.commissionSale, 0)) DESC" in result.sql
+    assert "ext.callAucBid2Vol > 100" in result.sql
+    assert "ext.callAucAsk2Vol < 50" in result.sql
+    assert "tech.ma5 > 10" in result.sql
+    assert "tech.ma20 > 10" in result.sql
+    assert "tech.ma60 > 10" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_official_string_percent_wildcard_uses_like_without_breaking_numeric_percent():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '股票名称', '', '', '', '') = '%科技%' "
+        "and indicator('', '', '涨幅', '今天', '', '', '') > 5%"
+    )
+
+    assert "code.name LIKE '%科技%'" in result.sql
+    assert "code.name = %科技" not in result.sql
+    assert "((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0)) > 5" in result.sql
+
+
 def test_compile_official_price_like_auxiliary_fields_to_human_units():
     result = OfficialSlotCompiler().compile(
         "indicator('', '', '每股净资产', '今日', '', '', '') > 5 "

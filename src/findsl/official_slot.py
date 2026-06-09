@@ -209,6 +209,11 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "内盘": IndicatorMeta("hsj_stock_hq_basic", "innerVol"),
     "委买": IndicatorMeta("hsj_stock_hq_basic", "commissionBuy"),
     "委卖": IndicatorMeta("hsj_stock_hq_basic", "commissionSale"),
+    "委比": IndicatorMeta(
+        "hsj_stock_hq_basic",
+        kind="numeric",
+        expression="((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0))",
+    ),
     "挂单量": IndicatorMeta("hsj_stock_hq_basic", "numOfOrders"),
     "振幅": IndicatorMeta("hsj_stock_hq_basic", kind="numeric", expression=_rate_expr("amplitude")),
     "总股本": IndicatorMeta("hsj_stock_hq_basic", "totalShare"),
@@ -269,6 +274,9 @@ INDICATORS: Dict[str, IndicatorMeta] = {
         true_condition="base.limitFlag = 1 AND COALESCE(base.upSerialLb, 0) = 1",
         false_condition="NOT (base.limitFlag = 1 AND COALESCE(base.upSerialLb, 0) = 1)",
     ),
+    "涨停天数": IndicatorMeta("hsj_stock_hq_basic", "upCount"),
+    "跌停天数": IndicatorMeta("hsj_stock_hq_basic", "downCount"),
+    "连续涨停天数": IndicatorMeta("hsj_stock_hq_basic", "upSerialLb"),
     "连板天数": IndicatorMeta("hsj_stock_hq_basic", "upSerialLb"),
     "涨停次数": IndicatorMeta("hsj_stock_hq_basic", "upCount"),
     "跌停次数": IndicatorMeta("hsj_stock_hq_basic", "downCount"),
@@ -306,7 +314,9 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "集合竞价涨幅": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("callAucRisePct", "ext")),
     "集合竞价涨跌幅": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("callAucRisePct", "ext")),
     "集合竞价卖方未匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucAsk2Vol"),
+    "卖方未匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucAsk2Vol"),
     "集合竞价买方未匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucBid2Vol"),
+    "买方未匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucBid2Vol"),
     "集合竞价匹配量": IndicatorMeta("hsj_stock_hq_ext", "callAucMatchVol"),
     "集合竞价匹配价": IndicatorMeta("hsj_stock_hq_ext", kind="numeric", expression=_rate_expr("callAucMatchPx", "ext")),
     "主力分歧度": IndicatorMeta("hsj_stock_hq_ext", "MPResExt"),
@@ -368,9 +378,12 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "破板次数": IndicatorMeta("hsj_stock_hq_ext", "boardBreaks"),
     "跌停破板次数": IndicatorMeta("hsj_stock_hq_ext", "downBoardBreaks"),
     "5日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma5"),
+    "一周均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma5"),
     "10日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma10"),
     "20日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma20"),
+    "一个月均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma20"),
     "60日均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma60"),
+    "一个季度均线": IndicatorMeta("hsj_stock_hq_basic_technical", "ma60"),
     "阳线": IndicatorMeta(
         "hsj_stock_hq_basic_technical",
         kind="boolean",
@@ -419,7 +432,9 @@ INDICATORS: Dict[str, IndicatorMeta] = {
     "陆股通标识": IndicatorMeta("hsj_stock_code_info", "hkConnFlag", kind="boolean"),
     "港股通标识": IndicatorMeta("hsj_stock_code_info", "hkConnFlag", kind="boolean"),
     "沪股通标识": IndicatorMeta("hsj_stock_code_info", "shConnFlag", kind="boolean"),
+    "沪港通标识": IndicatorMeta("hsj_stock_code_info", "shConnFlag", kind="boolean"),
     "深股通标识": IndicatorMeta("hsj_stock_code_info", "szConnFlag", kind="boolean"),
+    "深港通标识": IndicatorMeta("hsj_stock_code_info", "szConnFlag", kind="boolean"),
     "科创板标识": IndicatorMeta("hsj_stock_code_info", "kcbFlag", kind="boolean"),
     "创业板标识": IndicatorMeta("hsj_stock_code_info", "gemFlag", kind="boolean"),
     "B股标识": IndicatorMeta("hsj_stock_code_info", "bShareFlag", kind="boolean"),
@@ -998,15 +1013,7 @@ class OfficialSlotCompiler:
                 constraints=left.constraints + lower.constraints + upper.constraints,
             )
         right = self._expr_sql(node.right, warnings)
-        if left.kind == "boolean" and isinstance(node.right, OfficialLiteral):
-            if node.right.value is True:
-                sql = left.sql if node.op in {"=", "=="} else f"NOT ({left.sql})"
-            elif node.right.value is False:
-                sql = f"NOT ({left.sql})" if node.op in {"=", "=="} else left.sql
-            else:
-                sql = f"{left.sql} {self._sql_operator(node.op)} {right.sql}"
-        else:
-            sql = f"{left.sql} {self._sql_operator(node.op)} {right.sql}"
+        sql = self._comparison_predicate_sql(left.sql, left.kind, node.op, node.right, right.sql)
         return SqlExpr(
             sql=sql,
             kind="boolean",
@@ -1656,6 +1663,17 @@ class OfficialSlotCompiler:
                 return left_sql if op in {"=", "=="} else f"NOT ({left_sql})"
             if right_node.value is False:
                 return f"NOT ({left_sql})" if op in {"=", "=="} else left_sql
+        if (
+            left_kind == "string"
+            and isinstance(right_node, OfficialLiteral)
+            and isinstance(right_node.value, str)
+            and not _is_numeric_percent_literal(right_node.value)
+            and any(ch in right_node.value for ch in {"%", "_"})
+        ):
+            if op in {"=", "==", "~="}:
+                return f"{left_sql} LIKE {right_sql}"
+            if op == "!=":
+                return f"{left_sql} NOT LIKE {right_sql}"
         return f"{left_sql} {self._sql_operator(op)} {right_sql}"
 
     def _window_correlated_where(self, date: str, base_alias: str, warnings: List[str]) -> List[str]:
@@ -1815,7 +1833,7 @@ class OfficialSlotCompiler:
             return "TRUE" if value else "FALSE"
         if isinstance(value, (int, float)):
             return str(value)
-        if isinstance(value, str) and value.endswith("%"):
+        if isinstance(value, str) and _is_numeric_percent_literal(value):
             return value[:-1]
         return _sql_quote(str(value))
 
@@ -1824,7 +1842,7 @@ class OfficialSlotCompiler:
             return "boolean"
         if isinstance(value, (int, float)):
             return "numeric"
-        if isinstance(value, str) and value.endswith("%"):
+        if isinstance(value, str) and _is_numeric_percent_literal(value):
             return "numeric"
         return "string"
 
@@ -2584,6 +2602,10 @@ def _normalize_iso_date(value: str) -> str:
 
 def _sql_quote(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
+
+
+def _is_numeric_percent_literal(value: str) -> bool:
+    return bool(re.fullmatch(r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)%", value.strip()))
 
 
 def _dedupe(items: Iterable[str]) -> List[str]:
