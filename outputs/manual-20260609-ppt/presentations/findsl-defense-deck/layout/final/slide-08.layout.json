@@ -2,13 +2,13 @@
   "schema": "openai.presentation.layout/v4",
   "unit": "px",
   "slide": {
-    "aid": "sl/bnxs1h",
-    "id": "bnxs1h",
+    "aid": "sl/c1jmae",
+    "id": "c1jmae",
     "slide": 8,
-    "layoutId": "b4c3b2b8-b450-4360-ad0e-c87b62837cf0",
+    "layoutId": "ffb8dfa8-83b2-4415-a3b3-84e6ab21db03",
     "layoutName": "Title Slide",
     "layoutType": "title",
-    "masterLayoutId": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+    "masterLayoutId": "8bfb5e9b-3a6e-4fc9-81ad-7f72a622942a",
     "masterLayoutName": "Master",
     "backgroundColor": "#FFFFFF",
     "frame": {
@@ -45,15 +45,15 @@
   "inheritedLayers": [
     {
       "scope": "layout",
-      "id": "b4c3b2b8-b450-4360-ad0e-c87b62837cf0",
+      "id": "ffb8dfa8-83b2-4415-a3b3-84e6ab21db03",
       "name": "Title Slide",
       "type": "title",
-      "parentLayoutId": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+      "parentLayoutId": "8bfb5e9b-3a6e-4fc9-81ad-7f72a622942a",
       "elements": []
     },
     {
       "scope": "master",
-      "id": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+      "id": "8bfb5e9b-3a6e-4fc9-81ad-7f72a622942a",
       "name": "Master",
       "type": "master",
       "elements": []
@@ -64,7 +64,7 @@
       "order": 1,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/epkzupwb",
+      "aid": "sh/byhgn29g",
       "id": "1",
       "bbox": [
         64,
@@ -132,7 +132,7 @@
       "order": 2,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/pg3ex0nu",
+      "aid": "sh/0je9cvix",
       "id": "2",
       "bbox": [
         64,
@@ -149,7 +149,7 @@
       "order": 3,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/wval87ed",
+      "aid": "sh/t47y1kre",
       "id": "3",
       "bbox": [
         64,
@@ -166,7 +166,7 @@
       "order": 4,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/7mp0bi9s",
+      "aid": "sh/il0rqd4v",
       "id": "4",
       "bbox": [
         64,
@@ -231,7 +231,7 @@
       "order": 5,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/e1w7mp0b",
+      "aid": "sh/b6xkf6dc",
       "id": "5",
       "bbox": [
         1120,
@@ -296,7 +296,7 @@
       "order": 6,
       "kind": "image",
       "scope": "slide",
-      "aid": "im/wb2hwfyx",
+      "aid": "im/9w3m94fu",
       "id": "6",
       "bbox": [
         82,
@@ -308,7 +308,7 @@
       "contentType": "image/png",
       "imageFit": "contain",
       "asset": {
-        "assetId": "9327b918-49fd-46b8-bb68-c4e838701143",
+        "assetId": "8295ff77-2940-42df-8d2d-2af7851de1db",
         "contentType": "image/png",
         "byteLength": 85793
       }
@@ -317,7 +317,7 @@
       "order": 7,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/w7mp0bi9",
+      "aid": "sh/tcj6tova",
       "id": "7",
       "bbox": [
         850,
@@ -334,7 +334,7 @@
       "order": 8,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/7u54zido",
+      "aid": "sh/ixczed8v",
       "id": "8",
       "bbox": [
         872,
@@ -399,7 +399,7 @@
       "order": 9,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/ed8bat47",
+      "aid": "sh/bi9s36hc",
       "id": "9",
       "bbox": [
         850,
@@ -416,7 +416,7 @@
       "order": 10,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/onyd0z61",
+      "aid": "sh/rytsvu9k",
       "id": "10",
       "bbox": [
         872,
@@ -481,7 +481,7 @@
       "order": 11,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/d8v6psfi",
+      "aid": "sh/yd0z6103",
       "id": "11",
       "bbox": [
         850,
@@ -498,7 +498,7 @@
       "order": 12,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/6hcrmhk3",
+      "aid": "sh/90je9cvi",
       "id": "12",
       "bbox": [
         872,

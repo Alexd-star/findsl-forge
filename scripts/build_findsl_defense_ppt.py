@@ -237,8 +237,9 @@ def js_string(value: str) -> str:
 
 
 def write_slide_modules(data: dict, assets: dict, charts: dict) -> None:
-    current_head = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, text=True).strip()
     evidence_head = data["git"]["head_at_export"]
+    evidence_branch = data["git"].get("branch", "main")
+    evidence_generated_at = data.get("generated_at", "待核验")
     readiness = data["readiness"]
     official = data["official_suite"]
     doris = data["doris_cluster"]
@@ -359,7 +360,8 @@ def write_slide_modules(data: dict, assets: dict, charts: dict) -> None:
                 ["Pytest", f"{readiness['pytest']['passed']} passed"],
                 ["Doris speedup", doris["speedup_display"]],
                 ["Evidence HEAD", evidence_head],
-                ["Current deck HEAD", current_head],
+                ["Evidence branch", evidence_branch],
+                ["Evidence generated", evidence_generated_at],
             ],
         },
         {
@@ -565,8 +567,8 @@ export async function addSlide(presentation, ctx, idx) {{
     s.groups.forEach((g,i)=>card(slide, ctx, 120+(i%2)*530, 170+Math.floor(i/2)*180, 450, 122, g[0], g[1], i<2?C.blue:C.teal));
   }} else if (s.type === 'evidence') {{
     header(slide, ctx, s, idx);
-    table(slide, ctx, [['证据项','当前值'], ...s.rows], 240, 150, [360, 440], 54);
-    text(slide, ctx, 240, 548, 760, 42, '注意：Evidence HEAD 是证据生成时的 Git 版本；Current deck HEAD 是本 PPT 生成时的代码版本。', {{size:14, color:C.muted}});
+    table(slide, ctx, [['证据项','当前值'], ...s.rows], 240, 132, [360, 440], 48);
+    text(slide, ctx, 240, 570, 760, 42, '注意：本页展示的是证据采集时的稳定元数据；最终交付版本以仓库 git log 和推送记录为准。', {{size:14, color:C.muted}});
   }} else if (s.type === 'risk') {{
     header(slide, ctx, s, idx);
     table(slide, ctx, [['容易被问穿的点','成熟回答边界'], ...s.risks], 92, 165, [260, 840], 76);

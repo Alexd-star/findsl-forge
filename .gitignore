@@ -16,3 +16,5 @@ reports/
 *.sqlite
 *.log
 external_references/
+outputs/**/node_modules/
+outputs/**/presentations/runtime-check/

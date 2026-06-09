@@ -2,13 +2,13 @@
   "schema": "openai.presentation.layout/v4",
   "unit": "px",
   "slide": {
-    "aid": "sl/2vam9l",
-    "id": "2vam9l",
+    "aid": "sl/5aj0f6",
+    "id": "5aj0f6",
     "slide": 17,
-    "layoutId": "b4c3b2b8-b450-4360-ad0e-c87b62837cf0",
+    "layoutId": "ffb8dfa8-83b2-4415-a3b3-84e6ab21db03",
     "layoutName": "Title Slide",
     "layoutType": "title",
-    "masterLayoutId": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+    "masterLayoutId": "8bfb5e9b-3a6e-4fc9-81ad-7f72a622942a",
     "masterLayoutName": "Master",
     "backgroundColor": "#FFFFFF",
     "frame": {
@@ -45,15 +45,15 @@
   "inheritedLayers": [
     {
       "scope": "layout",
-      "id": "b4c3b2b8-b450-4360-ad0e-c87b62837cf0",
+      "id": "ffb8dfa8-83b2-4415-a3b3-84e6ab21db03",
       "name": "Title Slide",
       "type": "title",
-      "parentLayoutId": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+      "parentLayoutId": "8bfb5e9b-3a6e-4fc9-81ad-7f72a622942a",
       "elements": []
     },
     {
       "scope": "master",
-      "id": "56b3c89b-0dfb-40f4-87e9-218178b312c9",
+      "id": "8bfb5e9b-3a6e-4fc9-81ad-7f72a622942a",
       "name": "Master",
       "type": "master",
       "elements": []
@@ -64,7 +64,7 @@
       "order": 1,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/vmtwra5g",
+      "aid": "sh/upwb2hwf",
       "id": "1",
       "bbox": [
         64,
@@ -132,7 +132,7 @@
       "order": 2,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/o7qpg3ex",
+      "aid": "sh/5gbq1ory",
       "id": "2",
       "bbox": [
         64,
@@ -149,7 +149,7 @@
       "order": 3,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/dsji5sne",
+      "aid": "sh/cvixczed",
       "id": "3",
       "bbox": [
         64,
@@ -166,7 +166,7 @@
       "order": 4,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/6dcbulwv",
+      "aid": "sh/nyd0z610",
       "id": "4",
       "bbox": [
         64,
@@ -231,7 +231,7 @@
       "order": 5,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/vy90je9c",
+      "aid": "sh/udg7adsj",
       "id": "5",
       "bbox": [
         1120,
@@ -296,13 +296,13 @@
       "order": 6,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/oj2t83it",
+      "aid": "sh/54zidony",
       "id": "6",
       "bbox": [
         240,
-        150,
+        132,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#0B1F33",
@@ -313,13 +313,13 @@
       "order": 7,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/d4vmtwra",
+      "aid": "sh/cj6tovah",
       "id": "7",
       "bbox": [
         252,
-        162,
+        144,
         336,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "证据项",
@@ -381,13 +381,13 @@
       "order": 8,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/6hcrmhk3",
+      "aid": "sh/judg7ads",
       "id": "8",
       "bbox": [
         600,
-        150,
+        132,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#0B1F33",
@@ -398,13 +398,13 @@
       "order": 9,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/z25kb6xk",
+      "aid": "sh/u9knih4b",
       "id": "9",
       "bbox": [
         612,
-        162,
+        144,
         416,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "当前值",
@@ -466,13 +466,13 @@
       "order": 10,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/vy90je9c",
+      "aid": "sh/47y1kre1",
       "id": "10",
       "bbox": [
         240,
-        204,
+        180,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#FFFFFF",
@@ -483,13 +483,13 @@
       "order": 11,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/6dcbulwv",
+      "aid": "sh/tsvu9kni",
       "id": "11",
       "bbox": [
         252,
-        216,
+        192,
         336,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "Blocking gates",
@@ -548,13 +548,13 @@
       "order": 12,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/d4vmtwra",
+      "aid": "sh/m1cfa9w3",
       "id": "12",
       "bbox": [
         600,
-        204,
+        180,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#FFFFFF",
@@ -565,13 +565,13 @@
       "order": 13,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/oj2t83it",
+      "aid": "sh/bm58z25k",
       "id": "13",
       "bbox": [
         612,
-        216,
+        192,
         416,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "PASS",
@@ -630,13 +630,13 @@
       "order": 14,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/vmtwra5g",
+      "aid": "sh/4vmtwra5",
       "id": "14",
       "bbox": [
         240,
-        258,
+        228,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#F7FAFC",
@@ -647,13 +647,13 @@
       "order": 15,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/61032lsz",
+      "aid": "sh/tgfmlkjm",
       "id": "15",
       "bbox": [
         252,
-        270,
+        240,
         336,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "Warning count",
@@ -712,13 +712,13 @@
       "order": 16,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/dsji5sne",
+      "aid": "sh/mp0bi9s3",
       "id": "16",
       "bbox": [
         600,
-        258,
+        228,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#F7FAFC",
@@ -729,13 +729,13 @@
       "order": 17,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/o7qpg3ex",
+      "aid": "sh/bat47y1k",
       "id": "17",
       "bbox": [
         612,
-        270,
+        240,
         416,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "0",
@@ -794,13 +794,13 @@
       "order": 18,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/vahoza1g",
+      "aid": "sh/4nap4r65",
       "id": "18",
       "bbox": [
         240,
-        312,
+        276,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#FFFFFF",
@@ -811,13 +811,13 @@
       "order": 19,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/6tovahoz",
+      "aid": "sh/t83itgfm",
       "id": "19",
       "bbox": [
         252,
-        324,
+        288,
         336,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "Pytest",
@@ -876,13 +876,13 @@
       "order": 20,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/epkzupwb",
+      "aid": "sh/xs72x4na",
       "id": "20",
       "bbox": [
         600,
-        312,
+        276,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#FFFFFF",
@@ -893,13 +893,13 @@
       "order": 21,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/7adsji5s",
+      "aid": "sh/87ed8bat",
       "id": "21",
       "bbox": [
         612,
-        324,
+        288,
         416,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "203 passed",
@@ -958,13 +958,13 @@
       "order": 22,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/wval87ed",
+      "aid": "sh/fmlkjm1c",
       "id": "22",
       "bbox": [
         240,
-        366,
+        324,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#F7FAFC",
@@ -975,13 +975,13 @@
       "order": 23,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/pg3ex0nu",
+      "aid": "sh/q1orytsv",
       "id": "23",
       "bbox": [
         252,
-        378,
         336,
-        30
+        336,
+        24
       ],
       "geometry": "rect",
       "text": "Doris speedup",
@@ -1040,13 +1040,13 @@
       "order": 24,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/e1w7mp0b",
+      "aid": "sh/1gvy90je",
       "id": "24",
       "bbox": [
         600,
-        366,
+        324,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#F7FAFC",
@@ -1057,13 +1057,13 @@
       "order": 25,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/7mp0bi9s",
+      "aid": "sh/8z25kb6x",
       "id": "25",
       "bbox": [
         612,
-        378,
+        336,
         416,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "36.24x",
@@ -1122,13 +1122,13 @@
       "order": 26,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/w7mp0bi9",
+      "aid": "sh/je9cvixc",
       "id": "26",
       "bbox": [
         240,
-        420,
+        372,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#FFFFFF",
@@ -1139,13 +1139,13 @@
       "order": 27,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/psfil0rq",
+      "aid": "sh/qtcj6tov",
       "id": "27",
       "bbox": [
         252,
-        432,
+        384,
         336,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "Evidence HEAD",
@@ -1204,13 +1204,13 @@
       "order": 28,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/ed8bat47",
+      "aid": "sh/xczed8v6",
       "id": "28",
       "bbox": [
         600,
-        420,
+        372,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#FFFFFF",
@@ -1221,13 +1221,13 @@
       "order": 29,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/7u54zido",
+      "aid": "sh/8v6psfil",
       "id": "29",
       "bbox": [
         612,
-        432,
+        384,
         416,
-        30
+        24
       ],
       "geometry": "rect",
       "text": "7559e28",
@@ -1286,13 +1286,13 @@
       "order": 30,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/twra5gbq",
+      "aid": "sh/25kb6xkf",
       "id": "30",
       "bbox": [
         240,
-        474,
+        420,
         360,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#F7FAFC",
@@ -1303,17 +1303,17 @@
       "order": 31,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/4byhgn29",
+      "aid": "sh/rqd4vmtw",
       "id": "31",
       "bbox": [
         252,
-        486,
+        432,
         336,
-        30
+        24
       ],
       "geometry": "rect",
-      "text": "Current deck HEAD",
-      "textPreview": "Current deck HEAD",
+      "text": "Evidence branch",
+      "textPreview": "Evidence branch",
       "resolvedFontSize": 13,
       "resolvedTextStyle": {
         "anchor": 1,
@@ -1334,14 +1334,14 @@
         "lines": [
           {
             "index": 1,
-            "text": "Current deck HEAD"
+            "text": "Evidence branch"
           }
         ]
       },
       "paragraphs": [
         {
           "index": 1,
-          "text": "Current deck HEAD",
+          "text": "Evidence branch",
           "resolvedTextStyle": {
             "fontSize": 13,
             "typeface": "Microsoft YaHei",
@@ -1351,7 +1351,7 @@
           "runs": [
             {
               "index": 1,
-              "text": "Current deck HEAD",
+              "text": "Evidence branch",
               "fontSize": 13,
               "typeface": "Microsoft YaHei",
               "color": "#263238"
@@ -1368,13 +1368,13 @@
       "order": 32,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/bq1oryts",
+      "aid": "sh/kb6xkf6d",
       "id": "32",
       "bbox": [
         600,
-        474,
+        420,
         440,
-        54
+        48
       ],
       "geometry": "rect",
       "fillColor": "#F7FAFC",
@@ -1385,17 +1385,17 @@
       "order": 33,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/m58z25kb",
+      "aid": "sh/9w3m94fu",
       "id": "33",
       "bbox": [
         612,
-        486,
+        432,
         416,
-        30
+        24
       ],
       "geometry": "rect",
-      "text": "49a86c6",
-      "textPreview": "49a86c6",
+      "text": "main",
+      "textPreview": "main",
       "resolvedFontSize": 13,
       "resolvedTextStyle": {
         "anchor": 1,
@@ -1416,14 +1416,14 @@
         "lines": [
           {
             "index": 1,
-            "text": "49a86c6"
+            "text": "main"
           }
         ]
       },
       "paragraphs": [
         {
           "index": 1,
-          "text": "49a86c6",
+          "text": "main",
           "resolvedTextStyle": {
             "fontSize": 13,
             "typeface": "Microsoft YaHei",
@@ -1433,7 +1433,7 @@
           "runs": [
             {
               "index": 1,
-              "text": "49a86c6",
+              "text": "main",
               "fontSize": 13,
               "typeface": "Microsoft YaHei",
               "color": "#263238"
@@ -1450,17 +1450,181 @@
       "order": 34,
       "kind": "shape",
       "scope": "slide",
-      "aid": "sh/t83itgfm",
+      "aid": "sh/2t83itgf",
       "id": "34",
       "bbox": [
         240,
-        548,
+        468,
+        360,
+        48
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D8E2EA",
+      "lineWidth": 1
+    },
+    {
+      "order": 35,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/re1w7mp0",
+      "id": "35",
+      "bbox": [
+        252,
+        480,
+        336,
+        24
+      ],
+      "geometry": "rect",
+      "text": "Evidence generated",
+      "textPreview": "Evidence generated",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "color": "#263238",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Evidence generated"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Evidence generated",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "typeface": "Microsoft YaHei",
+            "color": "#263238",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Evidence generated",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#263238"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 36,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kzupwb2h",
+      "id": "36",
+      "bbox": [
+        600,
+        468,
+        440,
+        48
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D8E2EA",
+      "lineWidth": 1
+    },
+    {
+      "order": 37,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9knih4by",
+      "id": "37",
+      "bbox": [
+        612,
+        480,
+        416,
+        24
+      ],
+      "geometry": "rect",
+      "text": "2026-06-08T15:25:26Z",
+      "textPreview": "2026-06-08T15:25:26Z",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 13,
+        "typeface": "Microsoft YaHei",
+        "color": "#263238",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2026-06-08T15:25:26Z"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2026-06-08T15:25:26Z",
+          "resolvedTextStyle": {
+            "fontSize": 13,
+            "typeface": "Microsoft YaHei",
+            "color": "#263238",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2026-06-08T15:25:26Z",
+              "fontSize": 13,
+              "typeface": "Microsoft YaHei",
+              "color": "#263238"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "fillColor": "rgba(255, 255, 255, 0)",
+      "lineColor": "rgba(255, 255, 255, 0)",
+      "lineWidth": 0
+    },
+    {
+      "order": 38,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2p8nqxs7",
+      "id": "38",
+      "bbox": [
+        240,
+        570,
         760,
         42
       ],
       "geometry": "rect",
-      "text": "注意：Evidence HEAD 是证据生成时的 Git 版本；Current deck HEAD 是本 PPT 生成时的代码版本。",
-      "textPreview": "注意：Evidence HEAD 是证据生成时的 Git 版本；Current deck HEAD 是本 PPT 生成时的代码版本。",
+      "text": "注意：本页展示的是证据采集时的稳定元数据；最终交付版本以仓库 git log 和推送记录为准。",
+      "textPreview": "注意：本页展示的是证据采集时的稳定元数据；最终交付版本以仓库 git log 和推送记录为准。",
       "resolvedFontSize": 14,
       "resolvedTextStyle": {
         "anchor": 1,
@@ -1481,14 +1645,14 @@
         "lines": [
           {
             "index": 1,
-            "text": "注意：Evidence HEAD 是证据生成时的 Git 版本；Current deck HEAD 是本 PPT 生成时的代码版本。"
+            "text": "注意：本页展示的是证据采集时的稳定元数据；最终交付版本以仓库 git log 和推送记录为准。"
           }
         ]
       },
       "paragraphs": [
         {
           "index": 1,
-          "text": "注意：Evidence HEAD 是证据生成时的 Git 版本；Current deck HEAD 是本 PPT 生成时的代码版本。",
+          "text": "注意：本页展示的是证据采集时的稳定元数据；最终交付版本以仓库 git log 和推送记录为准。",
           "resolvedTextStyle": {
             "fontSize": 14,
             "typeface": "Microsoft YaHei",
@@ -1498,7 +1662,7 @@
           "runs": [
             {
               "index": 1,
-              "text": "注意：Evidence HEAD 是证据生成时的 Git 版本；Current deck HEAD 是本 PPT 生成时的代码版本。",
+              "text": "注意：本页展示的是证据采集时的稳定元数据；最终交付版本以仓库 git log 和推送记录为准。",
               "fontSize": 14,
               "typeface": "Microsoft YaHei",
               "color": "#64727F"
