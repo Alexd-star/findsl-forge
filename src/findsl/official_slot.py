@@ -155,6 +155,7 @@ class CountExpSpec:
     filter_scope: str
     date: str
     select_type: str
+    agg_func: str = ""
 
 
 @dataclass(frozen=True)
@@ -1483,6 +1484,8 @@ class OfficialSlotCompiler:
                     "mixed market/filter/date/select scopes inside one count_exp comparison are not grounded",
                 )
         rule = _parse_count_exp_rule(first.count_exp)
+        if any(spec.agg_func for spec in specs):
+            return self._aggregate_count_exp_expression_comparison_sql(node, first, rule, warnings)
         aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
         predicate, predicate_tables, predicate_constraints = self._comparison_predicate_with_aliases(
             node,
@@ -1506,6 +1509,137 @@ class OfficialSlotCompiler:
         constraints = self._slot_constraints(first.market, first.filter_scope, "", first.select_type, warnings)
         constraints.extend(self._outer_snapshot_constraints(first.date))
         return SqlExpr(subquery, "boolean", tables, constraints)
+
+    def _aggregate_count_exp_expression_comparison_sql(
+        self,
+        node: OfficialComparison,
+        first: CountExpSpec,
+        rule: CountExpRule,
+        warnings: List[str],
+    ) -> SqlExpr:
+        if (rule.unit or "日") != "日":
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "aggregate count_exp arithmetic expressions are only grounded for daily buckets",
+            )
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        aggregate_columns: Dict[Tuple[str, ...], str] = {}
+        value_columns: Dict[Tuple[str, ...], str] = {}
+        aggregate_selects: List[str] = []
+        value_selects: List[str] = []
+        tables: List[str] = ["hsj_stock_hq_basic"]
+
+        def indicator_bucket_expr(call: OfficialFunctionCall) -> SqlExpr:
+            args = self._slot_args(call, 7)
+            market, filter_scope, indicator_name, date, select_type, agg_func, count_exp = args[:7]
+            if not indicator_name:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    "aggregate count_exp arithmetic expressions require grounded indicators",
+                )
+            candidate = CountExpSpec(first.count_exp, market, filter_scope, date, select_type, agg_func)
+            if self._count_exp_scope_key(candidate) != self._count_exp_scope_key(first):
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    "aggregate count_exp arithmetic expressions require one market/filter/date/select scope",
+                )
+            meta = _resolve_indicator_meta(indicator_name)
+            if not meta:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_INDICATOR",
+                    f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
+                )
+            if meta.kind not in {"numeric", "time"}:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    f"aggregate count_exp arithmetic expressions require numeric/time indicators, got {meta.kind}",
+                )
+            tables.append(meta.table)
+            value_sql = self._indicator_value_sql(meta, aliases)
+            key = tuple(args)
+            if count_exp:
+                if count_exp != first.count_exp or not agg_func:
+                    raise OfficialSlotError(
+                        "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                        "mixed aggregate and non-aggregate count_exp expressions are not yet grounded",
+                    )
+                agg = agg_func.upper()
+                if agg in GROWTH_FUNCTIONS:
+                    raise OfficialSlotError(
+                        "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                        "growth aggregate count_exp arithmetic expressions need lag-aware bucket rows",
+                    )
+                if agg not in AGGREGATE_FUNCTIONS:
+                    raise OfficialSlotError(
+                        "UNSUPPORTED_OFFICIAL_AGG_FUNC",
+                        f"Unsupported official aggregate function for real-data SQL: {agg_func}",
+                    )
+                alias = aggregate_columns.get(key)
+                if not alias:
+                    alias = f"agg_{len(aggregate_columns)}"
+                    aggregate_columns[key] = alias
+                    aggregate_selects.append(f"       {agg}({value_sql}) AS {alias}")
+                return SqlExpr(f"bucketed.{alias}", meta.kind, [meta.table], [])
+            if agg_func:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    "ordinary aggregate indicators inside aggregate count_exp expressions need explicit count_exp",
+                )
+            alias = value_columns.get(key)
+            if not alias:
+                alias = f"value_{len(value_columns)}"
+                value_columns[key] = alias
+                value_selects.append(f"       MAX({value_sql}) AS {alias}")
+            return SqlExpr(f"bucketed.{alias}", meta.kind, [meta.table], [])
+
+        def bucket_expr(node_part: OfficialNode) -> SqlExpr:
+            if isinstance(node_part, OfficialLiteral):
+                return self._expr_sql(node_part, warnings)
+            if isinstance(node_part, OfficialBinaryOp) and node_part.op in {"+", "-", "*", "/"}:
+                left = bucket_expr(node_part.left)
+                right = bucket_expr(node_part.right)
+                return SqlExpr(
+                    f"({left.sql} {node_part.op} {right.sql})",
+                    "numeric",
+                    left.tables + right.tables,
+                    [],
+                )
+            if isinstance(node_part, OfficialFunctionCall) and node_part.name == "indicator":
+                return indicator_bucket_expr(node_part)
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                f"Unsupported aggregate count_exp arithmetic expression node: {type(node_part).__name__}",
+            )
+
+        left = bucket_expr(node.left)
+        if node.op == "between":
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "between with aggregate count_exp arithmetic expressions is not yet grounded",
+            )
+        right = bucket_expr(node.right)
+        if not aggregate_selects:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "aggregate count_exp arithmetic comparison has no aggregate bucket expression",
+            )
+        predicate = self._comparison_predicate_sql(left.sql, left.kind, node.op, node.right, right.sql)
+        table_list = self._ordered_tables(tables + left.tables + right.tables)
+        bucket_key = self._bucket_expr("wb", rule)
+        where_parts = self._window_correlated_where(first.date, "wb", warnings)
+        inner_sql = (
+            f"SELECT {bucket_key} AS bucket_key,\n"
+            + ",\n".join(aggregate_selects + value_selects)
+            + "\n"
+            " FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._window_joins(table_list)}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))}\n"
+            f" GROUP BY {bucket_key}"
+        )
+        subquery = self._count_bucketed_predicate_sql(inner_sql, predicate, rule)
+        constraints = self._slot_constraints(first.market, first.filter_scope, "", first.select_type, warnings)
+        constraints.extend(self._outer_snapshot_constraints(first.date))
+        return SqlExpr(subquery, "boolean", table_list, constraints)
 
     def _count_exp_scope_key(self, spec: CountExpSpec) -> Tuple[str, str, Any, str]:
         date_key: Any = spec.date
@@ -1746,8 +1880,8 @@ class OfficialSlotCompiler:
         for call in _iter_function_calls(node):
             if call.name == "indicator":
                 args = self._slot_args(call, 7)
-                if args[6] and not args[5]:
-                    specs.append(CountExpSpec(args[6], args[0], args[1], args[3], args[4]))
+                if args[6]:
+                    specs.append(CountExpSpec(args[6], args[0], args[1], args[3], args[4], args[5]))
             elif call.name in {"record_high", "record_low", "position"}:
                 args = self._slot_args(call, 8)
                 if args[7] and not args[6]:

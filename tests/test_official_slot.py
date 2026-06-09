@@ -641,6 +641,20 @@ def test_compile_official_aggregate_count_exp_uses_bucketed_aggregate():
     assert ") >= 3" in result.sql
 
 
+def test_compile_aggregate_count_exp_inside_arithmetic_expression_uses_bucket_rows():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '外盘', '近3日', '', 'AVG', 'CONS=每日') "
+        "/ indicator('', '', '每手股数', '近3日', '', '', '') < 80000"
+    )
+
+    assert "DATE_TRUNC(wb.bizdate, 'day') AS bucket_key" in result.sql
+    assert "AVG(wb.outerVol) AS agg_0" in result.sql
+    assert "MAX(100) AS value_0" in result.sql
+    assert "(bucketed.agg_0 / bucketed.value_0) < 80000" in result.sql
+    assert "SUM(CASE WHEN (bucketed.agg_0 / bucketed.value_0) < 80000 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-12' AND '2026-04-14'" in result.sql
+
+
 def test_compile_official_daily_growth_count_exp_uses_lag_pairs():
     result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
         "indicator('', '', '成交量', '近5日', '', 'GROWTH_FALL', 'CONS=每日') > 0"
