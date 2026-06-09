@@ -9,6 +9,7 @@ import pytest
 from findsl.official_slot import (
     OfficialSlotCompiler,
     OfficialSlotError,
+    classify_official_indicator_domain,
     compile_training_workbook,
     parse_official_slot,
     profile_training_workbook,
@@ -112,6 +113,19 @@ def test_compile_or_keeps_branch_specific_date_constraints_inside_each_branch():
     assert "AND base.bizdate BETWEEN '2020-01-01' AND '2020-12-31' AND base.bizdate BETWEEN '2024-01-01' AND '2026-04-14'" not in result.sql
 
 
+def test_compile_and_with_different_date_slots_uses_correlated_exists_per_branch():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '流通股本', '零三年', '', '', '') > 3005200 "
+        "and indicator('', '', '跌停', '零四年', '', '', '') = True"
+    )
+
+    assert result.sql.count("EXISTS (") == 2
+    assert "lb.bizdate BETWEEN '2003-01-01' AND '2003-12-31'" in result.sql
+    assert "lb.bizdate BETWEEN '2004-01-01' AND '2004-12-31'" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert "base.bizdate BETWEEN '2003-01-01' AND '2003-12-31' AND base.bizdate BETWEEN '2004-01-01' AND '2004-12-31'" not in result.sql
+
+
 def test_compile_official_generated_market_value_indicators_from_real_columns():
     result = OfficialSlotCompiler().compile(
         "indicator('', '', '总市值', '', '', '', '') > 10000000000 "
@@ -120,6 +134,17 @@ def test_compile_official_generated_market_value_indicators_from_real_columns():
 
     assert "((base.lastPx / 10000.0) * base.totalShare) > 10000000000" in result.sql
     assert "((base.lastPx / 10000.0) * base.listedShare) > 5000000000" in result.sql
+
+
+def test_compile_belong_industry_uses_code_table_industry_aggregate():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '市盈率', '', '', '', '') < belong_industry('', '', '市盈率', '', 'AVG')"
+    )
+
+    assert "SELECT AVG((wb.pETTM / 10000.0))" in result.sql
+    assert "wc.hyBlkRefName = code.hyBlkRefName" in result.sql
+    assert "wc.hyBlkRefName IS NOT NULL" in result.sql
+    assert "LEFT JOIN newzl.hsj_stock_code_info AS wc" in result.sql
 
 
 def test_compile_official_technical_indicators_from_feature_table():
@@ -137,6 +162,32 @@ def test_compile_official_technical_indicators_from_feature_table():
     assert "NOT (tech.doji = TRUE)" in result.sql
     assert "base.bizdate = '2026-04-14'" in result.sql
     assert "hsj_stock_hq_basic_technical" in result.requires_tables
+
+
+def test_compile_record_high_low_uses_official_ext_days_without_window_predicate():
+    result = OfficialSlotCompiler().compile(
+        "record_high('', '', '', '120日', '今天', '', '', '') = True "
+        "and record_low('', '', '', '60日', '今天', '', '', '') = False"
+    )
+
+    assert "ext.pxMkTopDays >= 120" in result.sql
+    assert "NOT (ext.pxMkBotDays >= 60)" in result.sql
+    assert "OVER (" not in result.sql
+    assert "newzl.hsj_stock_hq_ext AS ext" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_position_generates_grounded_case_expression_for_price_window():
+    result = OfficialSlotCompiler().compile(
+        "position('', '', '最新价', '10日', '今天', '', '', '') = '低'"
+    )
+
+    assert "CASE" in result.sql
+    assert "MIN((wb.lastPx / 10000.0))" in result.sql
+    assert "MAX((wb.lastPx / 10000.0))" in result.sql
+    assert "DATE_SUB(base.bizdate, INTERVAL 9 DAY)" in result.sql
+    assert "= '低'" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
 
 
 def test_compile_official_time_and_order_flow_indicators_from_real_columns():
@@ -272,6 +323,24 @@ def test_compile_rank_then_pipeline_for_official_slot_dsl():
     assert "base.limitFlag = 1" in result.sql
 
 
+def test_compile_chained_then_rank_pipeline_uses_cte_stages():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '涨停', '今天', '', '', '') = True "
+        "then rank('', '', '成交量', 'desc', '今天', '', '', '') <= 50 "
+        "then rank('', '', '主力净流入', 'desc', '今天', '', '', '') <= 10"
+    )
+
+    assert "WITH stage_0 AS" in result.sql
+    assert "stage_1 AS" in result.sql
+    assert "stage_2 AS" in result.sql
+    assert "base.limitFlag = 1" in result.sql
+    assert "ORDER BY base.volume DESC" in result.sql
+    assert "ORDER BY ext.ZJLXMainNetTur DESC" in result.sql
+    assert "ranked_1.rank_no <= 50" in result.sql
+    assert "ranked_2.rank_no <= 10" in result.sql
+    assert result.requires_tables == ["hsj_stock_hq_basic", "hsj_stock_code_info", "hsj_stock_hq_ext"]
+
+
 def test_compile_rank_comparison_inside_boolean_pipeline():
     result = OfficialSlotCompiler().compile(
         "rank('', '', '市净率', 'desc', '', '', '', '') <= 10 "
@@ -292,6 +361,29 @@ def test_compile_rank_greater_than_zero_as_official_rank_only_intent():
     assert "rank_no > 0" in result.sql
     assert "ORDER BY ((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0)) DESC" in result.sql
     assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_rank_count_exp_exist_over_date_buckets():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '收盘价', 'desc', '近5日', '', '', 'EXIST>=3日') <= 3"
+    )
+
+    assert "ROW_NUMBER() OVER" in result.sql
+    assert "DATE_TRUNC(rb.bizdate, 'day')" in result.sql
+    assert "ranked.rank_no <= 3" in result.sql
+    assert ") >= 3" in result.sql
+    assert "rb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_rank_count_exp_every_bucket_requires_all_ranked_buckets():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '成交量', 'desc', '近5日', '', '', 'CONS=每日') <= 10"
+    )
+
+    assert "SUM(CASE WHEN ranked.rank_no <= 10 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+    assert "COUNT(*) > 0" in result.sql
+    assert "DATE_TRUNC(rb.bizdate, 'day')" in result.sql
 
 
 def test_parse_official_slot_supports_signed_percent_and_negative_limit_bound():
@@ -364,7 +456,19 @@ def test_compile_training_workbook_reports_real_parse_and_compile_coverage(tmp_p
     assert coverage["compile_failed"] > 0
     assert coverage["compile_errors"]["UNSUPPORTED_OFFICIAL_INDICATOR"] > 0
     assert coverage["compile_error_samples"]
+    assert coverage["compile_error_domains"]["财务报表数据缺失"] > 0
+    assert coverage["compile_error_domains"]["指数成分与权重数据缺失"] > 0
     assert "官方槽位 DSL 编译覆盖率报告" in output.read_text(encoding="utf-8")
+    assert "缺失数据域分层" in output.read_text(encoding="utf-8")
+
+
+def test_classify_official_indicator_domains_for_audit_report():
+    assert classify_official_indicator_domain("成分股") == "指数成分与权重数据缺失"
+    assert classify_official_indicator_domain("归母净利润") == "财务报表数据缺失"
+    assert classify_official_indicator_domain("基金十大重仓股") == "基金产品与持仓数据缺失"
+    assert classify_official_indicator_domain("我的持仓股") == "用户账户与自选股数据缺失"
+    assert classify_official_indicator_domain("龙虎榜净流入") == "龙虎榜与交易异动数据缺失"
+    assert classify_official_indicator_domain("相似K线") == "高级形态/相似度模型数据缺失"
 
 
 def test_official_slot_compile_cli_prints_json_payload():

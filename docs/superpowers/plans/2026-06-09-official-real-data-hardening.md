@@ -197,7 +197,7 @@ python -m findsl.cli official-slot-coverage `
   --json
 ```
 
-Expected current result after strict `agg_func/count_exp` semantics: `compile_ok = 1411`, `parse_ok = 5792`, `parse_failed = 7`. This number is lower than the earlier 1455 because the compiler no longer treats unsupported aggregate/count semantics as ordinary field filters.
+Then-current result after strict `agg_func/count_exp` semantics: `compile_ok = 1411`, `parse_ok = 5792`, `parse_failed = 7`. This number was lower than the earlier 1455 because the compiler no longer treated unsupported aggregate/count semantics as ordinary field filters. Later period, industry, cross-date, and rank-count work raised the grounded compile count to 1532; chained-rank and missing-data audit work then raised the latest grounded compile count to 1536.
 
 - [x] **Step 2: Update human-readable plan**
 
@@ -286,7 +286,7 @@ python -m pytest tests\test_official_slot.py -q
 python -m findsl.cli official-slot-coverage --workbook "<official workbook>" --json-output reports\official_slot_coverage.json --report-output reports\official_slot_coverage.md --sample-size 30 --json
 ```
 
-Current evidence: `tests\test_official_slot.py` has 30 passing tests. Official coverage is `parse_ok=5792`, `parse_failed=7`, `compile_ok=1411`, `compile_failed=4381`. Remaining `UNSUPPORTED_OFFICIAL_COUNT_EXP` is mostly `rank(..., count_exp)` and count-bearing indicators embedded in arithmetic expressions; those need a separate rank-over-time design and should not be silently flattened.
+Evidence at the end of Task 7: `tests\test_official_slot.py` had 30 passing tests. Official coverage was `parse_ok=5792`, `parse_failed=7`, `compile_ok=1411`, `compile_failed=4381`. Remaining `UNSUPPORTED_OFFICIAL_COUNT_EXP` was mostly `rank(..., count_exp)` and count-bearing indicators embedded in arithmetic expressions; those needed a separate rank-over-time design and should not be silently flattened.
 
 ### Task 8: Next Required Work - Rank/Then Temporal Semantics
 
@@ -294,7 +294,7 @@ Current evidence: `tests\test_official_slot.py` has 30 passing tests. Official c
 - Modify: `src/findsl/official_slot.py`
 - Test: `tests/test_official_slot.py`
 
-- [ ] **Step 1: Design rank-over-time semantics**
+- [x] **Step 1: Design rank-over-time semantics**
 
 Examples remaining in the official workbook include `rank(..., 'CONS=每年') > 10`, `rank(..., 'EXIST>=8') <= 3`, and chained `then rank(...) then rank(...)`. These cannot be reduced to ordinary row filters without changing the meaning. The next design should choose between:
 
@@ -302,10 +302,142 @@ Examples remaining in the official workbook include `rank(..., 'CONS=每年') > 
 2. materialized rank feature tables in Doris for high-frequency rank/count combinations;
 3. explicit unsupported diagnostics for multi-stage rank chains until Doris evidence confirms the cost model.
 
-- [ ] **Step 2: Add failing tests for rank count and chained then**
+- [x] **Step 2: Add failing tests for rank count**
 
-Use representative official examples and require the generated SQL to preserve the ordering scope, date bucket, and count rule.
+Added representative official-style examples and required the generated SQL to preserve the ordering scope, date bucket, count rule, and outer snapshot constraint.
 
-- [ ] **Step 3: Implement only the grounded subset**
+- [x] **Step 3: Implement only the grounded subset**
 
 Implement rank-over-time only for indicators that already map to official tables. Keep unsupported diagnostics for missing data domains and ambiguous chained-rank semantics.
+
+Implemented the first grounded subset: ordinary numeric/time `rank(..., count_exp)` now computes `ROW_NUMBER()` per `DATE_TRUNC` bucket and counts buckets satisfying the rank predicate. `CONS=每日` requires all effective buckets to satisfy the predicate. `rank(..., count_exp)` with `agg_func` still returns `UNSUPPORTED_OFFICIAL_COUNT_EXP` because that path needs a materialized rank feature table for credible Doris performance.
+
+### Task 9: Official Period, Cross-Date, and Industry Semantics
+
+**Files:**
+- Modify: `src/findsl/official_slot.py`
+- Test: `tests/test_official_slot.py`
+- Update: `docs/20_官方真实数据适配分析与开发计划.md`
+
+- [x] **Step 1: Add failing tests for period functions**
+
+Covered `record_high/record_low` on official `pxMkTopDays/pxMkBotDays` and `position(...) = '低'` as a grounded CASE expression.
+
+- [x] **Step 2: Implement period function subset**
+
+Price new-high/new-low uses official ext-table days fields. Other mapped numeric/time indicators use legal correlated `MAX/MIN` subqueries. `position` maps current value into `最低/低/中/高/最高` based on period min/max.
+
+- [x] **Step 3: Add failing test for incompatible AND date slots**
+
+Covered `零三年` and `零四年` conditions that previously became impossible global `base.bizdate` constraints.
+
+- [x] **Step 4: Localize conflicting date branches**
+
+When AND branches contain different date constraints, each branch is compiled as a correlated `EXISTS` over the same stock identity instead of forcing all date ranges onto one base row.
+
+- [x] **Step 5: Add and implement grounded `belong_industry`**
+
+Numeric/time indicators can now be compared with industry aggregates keyed by `code.hyBlkRefName`. Missing financial/fund/topic indicators continue to fail with stable unsupported-indicator diagnostics.
+
+- [x] **Step 6: Refresh coverage and tests**
+
+Current evidence after Task 9 and rank-count grounding:
+
+```text
+pytest: full suite passed
+tests/test_official_slot.py: 36 passed
+official workbook: parse_ok=5792, parse_failed=7, compile_ok=1532, compile_failed=4260
+UNSUPPORTED_OFFICIAL_COUNT_EXP: 43
+UNSUPPORTED_OFFICIAL_FUNCTION: 85
+```
+
+### Task 10: Chained Rank and Missing-Data Audit
+
+**Files:**
+- Modify: `src/findsl/official_slot.py`
+- Test: `tests/test_official_slot.py`
+- Update: `README.md`
+- Update: `docs/20_官方真实数据适配分析与开发计划.md`
+- Create: `docs/21_官方真实数据冲刺计划与验收闭环.md`
+
+- [x] **Step 1: Add failing chained-rank test**
+
+Covered a monotonic official pipeline:
+
+```text
+indicator(..., '涨停', '今天') = True
+then rank(..., '成交量', 'desc', '今天') <= 50
+then rank(..., '主力净流入', 'desc', '今天') <= 10
+```
+
+- [x] **Step 2: Implement CTE stage pipeline**
+
+`OfficialSlotCompiler` now flattens top-level `then` chains with more than two stages and emits `stage_0/stage_1/stage_2` CTEs. Each rank stage re-ranks only the previous stage output. Unsupported chained `rank(..., count_exp)` still fails with `UNSUPPORTED_OFFICIAL_COUNT_EXP` instead of generating a heavy ambiguous nested window query.
+
+- [x] **Step 3: Add failing missing-domain classification test**
+
+Covered representative unsupported indicators:
+
+```text
+成分股 -> 指数成分与权重数据缺失
+归母净利润 -> 财务报表数据缺失
+基金十大重仓股 -> 基金产品与持仓数据缺失
+我的持仓股 -> 用户账户与自选股数据缺失
+龙虎榜净流入 -> 龙虎榜与交易异动数据缺失
+相似K线 -> 高级形态/相似度模型数据缺失
+```
+
+- [x] **Step 4: Implement coverage-domain audit**
+
+`compile_training_workbook` now returns `compile_error_domains`, and `write_coverage_report` writes a `缺失数据域分层` section. Latest official coverage:
+
+```text
+row_count=5799
+parse_ok=5792
+parse_failed=7
+compile_ok=1536
+compile_failed=4256
+compile_rate_on_all_rows=26.49%
+compile_rate_on_parse_ok=26.52%
+```
+
+- [x] **Step 5: Refresh official data profile**
+
+Generated local reports:
+
+```text
+reports/official_data_profile.md
+reports/official_data_profile.json
+reports/official_slot_coverage.md
+reports/official_slot_coverage.json
+```
+
+Official CSV row counts remain:
+
+```text
+hsj_stock_code_info: 5686
+hsj_stock_hq_basic: 13650347
+hsj_stock_hq_ext: 6170822
+```
+
+- [x] **Step 6: Update docs**
+
+README, Chapter 20, and Chapter 21 now describe the latest `1536` grounded compile count, chained-rank CTE support, missing-data-domain audit, and remaining Doris evidence requirement.
+
+### Task 11: Remaining Required Work
+
+- [ ] **Official Doris evidence on real CSVs**
+
+Load all three official CSVs into Doris, build feature tables, and collect row-count parity, EXPLAIN, latency, and speedup evidence in `reports/official_doris_evidence.md`.
+
+- [ ] **Materialized temporal rank feature table**
+
+Support `rank(..., agg_func, count_exp)` and chained temporal rank with a precomputed Doris feature table. Avoid deeply nested runtime windows.
+
+- [ ] **Composite relative date AST**
+
+Support expressions such as `本月的前一周`, `2018年的第五年`, and `最近的第二天` without falling back to `1=1`.
+
+- [ ] **Second-pass missing-data-domain classification**
+
+Reduce the large `官方三表未覆盖的其他指标` bucket by adding more precise categories for ownership ratio, market-cap style labels, chip indicators, and company-action metadata.

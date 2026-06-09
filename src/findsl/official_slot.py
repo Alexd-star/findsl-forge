@@ -136,6 +136,7 @@ class SqlExpr:
     kind: str
     tables: List[str]
     constraints: List[str]
+    date_localized: bool = False
 
 
 @dataclass(frozen=True)
@@ -697,6 +698,9 @@ class OfficialSlotCompiler:
                 return f"{inner_sql}\nLIMIT {node.upper}", tables
             return inner_sql, tables
         if isinstance(node, OfficialBinaryOp) and node.op == "then":
+            stages = self._flatten_then_chain(node)
+            if len(stages) > 2:
+                return self._compile_then_chain(stages, warnings)
             return self._compile_then(node, warnings)
         if self._is_rank_comparison(node):
             return self._compile_rank_query(node, None, warnings)
@@ -709,6 +713,72 @@ class OfficialSlotCompiler:
         left = self._condition_sql(node.left, warnings)
         return self._compile_rank_query(node.right, left, warnings)
 
+    def _flatten_then_chain(self, node: OfficialNode) -> List[OfficialNode]:
+        if isinstance(node, OfficialBinaryOp) and node.op == "then":
+            return self._flatten_then_chain(node.left) + self._flatten_then_chain(node.right)
+        return [node]
+
+    def _compile_then_chain(self, stages: Sequence[OfficialNode], warnings: List[str]) -> Tuple[str, List[str]]:
+        if len(stages) < 2:
+            raise OfficialSlotError("OFFICIAL_RANK_SHAPE_ERROR", "then pipeline requires a prefilter and rank stage")
+        prefilter = self._condition_sql(stages[0], warnings)
+        all_tables = self._ordered_tables(prefilter.tables + ["hsj_stock_code_info"])
+        ctes = [
+            (
+                "stage_0 AS (\n"
+                f"{self._select_sql(all_tables, self._where_clause(prefilter))}\n"
+                ")"
+            )
+        ]
+        previous = "stage_0"
+        for stage_index, stage in enumerate(stages[1:], 1):
+            if not self._is_rank_comparison(stage):
+                raise OfficialSlotError(
+                    "OFFICIAL_RANK_SHAPE_ERROR",
+                    "all stages after then must be rank(...) comparisons in the grounded pipeline",
+                )
+            assert isinstance(stage, OfficialComparison)
+            rank_call = stage.left
+            assert isinstance(rank_call, OfficialFunctionCall)
+            if self._rank_count_exp(rank_call):
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    "chained then rank(..., count_exp) needs a materialized temporal rank feature table",
+                )
+            if stage.op not in {"<=", "=", "<", ">", ">=", "!="}:
+                raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {stage.op}")
+            rank_expr = self._rank_expr(rank_call, warnings)
+            stage_tables = self._ordered_tables(rank_expr.tables + ["hsj_stock_code_info"])
+            all_tables = self._ordered_tables(all_tables + stage_tables)
+            where = " AND ".join(_dedupe(rank_expr.constraints)) or "1=1"
+            joins = self._joins(stage_tables)
+            limit_value = self._literal_sql(stage.right)
+            rank_limit = f"ranked_{stage_index}.rank_no {self._sql_operator(stage.op)} {limit_value}"
+            ctes.append(
+                (
+                    f"stage_{stage_index} AS (\n"
+                    f"  SELECT ranked_{stage_index}.mktcode, ranked_{stage_index}.tgtcode, "
+                    f"ranked_{stage_index}.bizdate, ranked_{stage_index}.name\n"
+                    "  FROM (\n"
+                    f"    SELECT prev.mktcode, prev.tgtcode, prev.bizdate, prev.name,\n"
+                    f"           ROW_NUMBER() OVER (PARTITION BY prev.bizdate ORDER BY {rank_expr.sql} "
+                    f"{self._rank_order(rank_call)}, prev.tgtcode ASC) AS rank_no\n"
+                    f"    FROM {previous} AS prev\n"
+                    "    INNER JOIN newzl.hsj_stock_hq_basic AS base "
+                    "ON base.mktcode = prev.mktcode "
+                    "AND base.tgtcode = prev.tgtcode "
+                    "AND base.bizdate = prev.bizdate\n"
+                    f"{joins}"
+                    f"    WHERE {where}\n"
+                    f"  ) AS ranked_{stage_index}\n"
+                    f"  WHERE {rank_limit}\n"
+                    ")"
+                )
+            )
+            previous = f"stage_{stage_index}"
+        sql = "WITH " + ",\n".join(ctes) + f"\nSELECT * FROM {previous}"
+        return sql, all_tables
+
     def _compile_rank_query(
         self, node: OfficialNode, prefilter: Optional[SqlExpr], warnings: List[str]
     ) -> Tuple[str, List[str]]:
@@ -717,6 +787,11 @@ class OfficialSlotCompiler:
         rank_call = node.left
         if rank_call.name != "rank":
             raise OfficialSlotError("OFFICIAL_RANK_SHAPE_ERROR", "then right side must start with rank(...)")
+        if self._rank_count_exp(rank_call):
+            condition = self._rank_count_condition_sql(node, prefilter, warnings)
+            tables = self._ordered_tables(condition.tables)
+            where = self._where_clause(condition)
+            return self._select_sql(tables, where), tables
         rank_expr = self._rank_expr(rank_call, warnings)
         limit_value = self._literal_sql(node.right)
         if node.op not in {"<=", "=", "<", ">", ">=", "!="}:
@@ -753,6 +828,24 @@ class OfficialSlotCompiler:
                     tables=left.tables + right.tables,
                     constraints=[],
                 )
+            if self._has_conflicting_date_constraints(left, right):
+                return SqlExpr(
+                    sql=f"({self._condition_as_correlated_exists(left)} AND {self._condition_as_correlated_exists(right)})",
+                    kind="boolean",
+                    tables=["hsj_stock_hq_basic"],
+                    constraints=[],
+                    date_localized=True,
+                )
+            if left.date_localized or right.date_localized:
+                left_sql = left.sql if left.date_localized else self._condition_as_correlated_exists(left)
+                right_sql = right.sql if right.date_localized else self._condition_as_correlated_exists(right)
+                return SqlExpr(
+                    sql=f"({left_sql} AND {right_sql})",
+                    kind="boolean",
+                    tables=["hsj_stock_hq_basic"],
+                    constraints=[],
+                    date_localized=True,
+                )
             return SqlExpr(
                 sql=f"({left.sql} AND {right.sql})",
                 kind="boolean",
@@ -772,6 +865,8 @@ class OfficialSlotCompiler:
         if not isinstance(node, OfficialComparison) or not isinstance(node.left, OfficialFunctionCall):
             raise OfficialSlotError("OFFICIAL_RANK_SHAPE_ERROR", "rank condition must be rank(...) comparison")
         rank_call = node.left
+        if self._rank_count_exp(rank_call):
+            return self._rank_count_condition_sql(node, None, warnings)
         rank_expr = self._rank_expr(rank_call, warnings)
         if node.op not in {"<=", "=", "<", ">", ">=", "!="}:
             raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
@@ -797,6 +892,85 @@ class OfficialSlotCompiler:
             ")"
         )
         return SqlExpr(sql=sql, kind="boolean", tables=["hsj_stock_hq_basic"], constraints=[])
+
+    def _rank_count_condition_sql(
+        self,
+        node: OfficialComparison,
+        prefilter: Optional[SqlExpr],
+        warnings: List[str],
+    ) -> SqlExpr:
+        rank_call = node.left
+        if not isinstance(rank_call, OfficialFunctionCall) or rank_call.name != "rank":
+            raise OfficialSlotError("OFFICIAL_RANK_SHAPE_ERROR", "rank count condition must start with rank(...)")
+        if node.op not in {"<=", "=", "<", ">", ">=", "!="}:
+            raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
+        args = self._slot_args(rank_call, 8)
+        market, filter_scope, indicator_name, direction, date, select_type, agg_func, count_exp = args[:8]
+        if agg_func:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "rank(..., count_exp) with agg_func needs a materialized rank feature table",
+            )
+        if not indicator_name:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                "rank(..., count_exp) requires a grounded numeric indicator",
+            )
+        rule = _parse_count_exp_rule(count_exp)
+        rank_expr = self._rank_expr_without_count_exp(rank_call, warnings)
+        if rank_expr.kind not in {"numeric", "time"}:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                f"rank(..., count_exp) is only grounded for numeric/time indicators, got {rank_expr.kind}",
+            )
+        rank_sql = _rank_alias_sql(rank_expr.sql)
+        constraints = [_rank_alias_sql(item) for item in rank_expr.constraints]
+        tables = self._ordered_tables(rank_expr.tables + (prefilter.tables if prefilter else []))
+        if prefilter:
+            aliases = {"base": "rb", "code": "rcode", "ext": "rext", "tech": "rtech"}
+            constraints.append(_rewrite_aliases(prefilter.sql, aliases))
+            constraints.extend(_rewrite_aliases(item, aliases) for item in prefilter.constraints)
+        where = " AND ".join(_dedupe(constraints)) or "1=1"
+        bucket_expr = self._bucket_expr("rb", rule)
+        joins = self._joins_for_aliases(tables, "rb", "rcode", "rext")
+        limit_value = self._literal_sql(node.right)
+        predicate = f"ranked.rank_no {self._sql_operator(node.op)} {limit_value}"
+        ranked_sql = (
+            "SELECT rb.mktcode, rb.tgtcode,\n"
+            f"       {bucket_expr} AS bucket_key,\n"
+            f"       ROW_NUMBER() OVER (PARTITION BY {bucket_expr} ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no\n"
+            "FROM newzl.hsj_stock_hq_basic AS rb\n"
+            f"{joins}"
+            f"WHERE {where}"
+        )
+        if rule.every:
+            subquery = (
+                "(SELECT COUNT(*) > 0 AND "
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) = COUNT(*)\n"
+                " FROM (\n"
+                f"{ranked_sql}\n"
+                ") AS ranked\n"
+                " WHERE ranked.mktcode = base.mktcode AND ranked.tgtcode = base.tgtcode)"
+            )
+        else:
+            threshold = 1 if rule.count is None else rule.count
+            comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
+            subquery = (
+                "(SELECT COUNT(*)\n"
+                " FROM (\n"
+                f"{ranked_sql}\n"
+                ") AS ranked\n"
+                " WHERE ranked.mktcode = base.mktcode\n"
+                "   AND ranked.tgtcode = base.tgtcode\n"
+                f"   AND {predicate}) "
+                f"{self._sql_operator(comparator)} {threshold}"
+            )
+        return SqlExpr(
+            subquery,
+            "boolean",
+            ["hsj_stock_hq_basic"],
+            self._outer_snapshot_constraints(date),
+        )
 
     def _comparison_sql(self, node: OfficialComparison, warnings: List[str]) -> SqlExpr:
         if isinstance(node.left, OfficialFunctionCall) and node.left.name == "indicator":
@@ -856,6 +1030,8 @@ class OfficialSlotCompiler:
             name = node.name
             if name == "indicator":
                 return self._indicator_expr(node, warnings)
+            if name == "belong_industry":
+                return self._belong_industry_expr(node, warnings)
             if name == "queryData":
                 return self._query_data_expr(node, warnings)
             if name in {"record_high", "record_low", "position"}:
@@ -1156,6 +1332,45 @@ class OfficialSlotCompiler:
             f"{self._sql_operator(comparator)} {threshold}"
         )
 
+    def _belong_industry_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
+        args = self._slot_args(node, 5)
+        market, filter_scope, indicator_name, date, agg_func = args[:5]
+        meta = INDICATORS.get(indicator_name)
+        if not meta:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_INDICATOR",
+                f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
+            )
+        if meta.kind not in {"numeric", "time"}:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_FUNCTION",
+                f"belong_industry is only grounded for numeric/time indicators, got {meta.kind}",
+            )
+        aggregate = (agg_func or "AVG").upper()
+        if aggregate not in AGGREGATE_FUNCTIONS:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_AGG_FUNC",
+                f"Unsupported belong_industry aggregate function: {agg_func}",
+            )
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        value_sql = self._indicator_value_sql(meta, aliases)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", "hsj_stock_code_info", meta.table])
+        where_parts = [
+            "wc.hyBlkRefName = code.hyBlkRefName",
+            "wc.hyBlkRefName IS NOT NULL",
+            "wc.hyBlkRefName != ''",
+        ]
+        local_constraints = self._slot_constraints(market, filter_scope, date, "", warnings)
+        where_parts.extend(_rewrite_aliases(item, aliases) for item in local_constraints)
+        subquery = (
+            f"(SELECT {aggregate}({value_sql})\n"
+            " FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._window_joins(tables)}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))})"
+        )
+        outer_constraints = self._slot_constraints(market, filter_scope, "", "", warnings)
+        return SqlExpr(subquery, meta.kind, tables, outer_constraints)
+
     def _query_data_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
         args = self._slot_args(node, 5)
         market, keywords, indicator_name, date, agg_func = args[:5]
@@ -1182,25 +1397,165 @@ class OfficialSlotCompiler:
     def _period_feature_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
         name = node.name
         args = self._slot_args(node, 8)
-        indicator_name = args[2]
-        period = args[3]
-        if indicator_name in {"最新价", "收盘价", "最高价"} and name == "record_high":
-            return SqlExpr(
-                "base.highPx >= MAX(base.highPx) OVER (PARTITION BY base.tgtcode)",
-                "boolean",
-                ["hsj_stock_hq_basic"],
-                self._slot_constraints(args[0], args[1], args[4], args[5], warnings),
+        market, filter_scope, indicator_name, period, date, select_type, agg_func, count_exp = args[:8]
+        if agg_func or count_exp:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+                f"{name} with agg_func/count_exp is not grounded in the official three-table adapter",
             )
-        if indicator_name in {"最新价", "收盘价", "最低价"} and name == "record_low":
-            return SqlExpr(
-                "base.lowPx <= MIN(base.lowPx) OVER (PARTITION BY base.tgtcode)",
-                "boolean",
-                ["hsj_stock_hq_basic"],
-                self._slot_constraints(args[0], args[1], args[4], args[5], warnings),
+        normalized_indicator = indicator_name or "最新价"
+        constraints = self._slot_constraints(market, filter_scope, date, select_type, warnings)
+        if name in {"record_high", "record_low"}:
+            return self._record_extreme_expr(
+                function_name=name,
+                indicator_name=normalized_indicator,
+                period=period,
+                constraints=constraints,
+                warnings=warnings,
+            )
+        if name == "position":
+            return self._position_expr(
+                indicator_name=normalized_indicator,
+                period=period,
+                constraints=constraints,
+                warnings=warnings,
             )
         raise OfficialSlotError(
             "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
-            f"{name}({indicator_name}, period={period}) is not mapped in the first official-data adapter",
+            f"{name}({indicator_name}, period={period}) is not mapped in the official-data adapter",
+        )
+
+    def _record_extreme_expr(
+        self,
+        *,
+        function_name: str,
+        indicator_name: str,
+        period: str,
+        constraints: List[str],
+        warnings: List[str],
+    ) -> SqlExpr:
+        if self._can_use_official_price_extreme_days(function_name, indicator_name, period):
+            days = _parse_period_day_count(period)
+            column = "pxMkTopDays" if function_name == "record_high" else "pxMkBotDays"
+            if days is None:
+                sql = f"ext.{column} > 0"
+            else:
+                sql = f"ext.{column} >= {days}"
+            return SqlExpr(
+                sql,
+                "boolean",
+                ["hsj_stock_hq_basic", "hsj_stock_hq_ext"],
+                constraints,
+            )
+
+        meta = INDICATORS.get(indicator_name)
+        if not meta:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_INDICATOR",
+                f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
+            )
+        if meta.kind not in {"numeric", "time"}:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+                f"{function_name} is only grounded for numeric/time indicators, got {meta.kind}",
+            )
+        current_sql = self._indicator_value_sql(meta, {"base": "base", "code": "code", "ext": "ext", "tech": "tech"})
+        aggregate = "MAX" if function_name == "record_high" else "MIN"
+        subquery = self._period_aggregate_subquery(aggregate, meta, period, warnings)
+        comparator = ">=" if function_name == "record_high" else "<="
+        return SqlExpr(
+            f"{current_sql} {comparator} {subquery}",
+            "boolean",
+            self._ordered_tables(["hsj_stock_hq_basic", meta.table]),
+            constraints,
+        )
+
+    def _position_expr(
+        self,
+        *,
+        indicator_name: str,
+        period: str,
+        constraints: List[str],
+        warnings: List[str],
+    ) -> SqlExpr:
+        meta = INDICATORS.get(indicator_name)
+        if not meta:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_INDICATOR",
+                f"Official indicator is not mapped to the provided three-table dataset: {indicator_name}",
+            )
+        if meta.kind not in {"numeric", "time"}:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+                f"position is only grounded for numeric/time indicators, got {meta.kind}",
+            )
+        current_sql = self._indicator_value_sql(meta, {"base": "base", "code": "code", "ext": "ext", "tech": "tech"})
+        min_sql = self._period_aggregate_subquery("MIN", meta, period, warnings)
+        max_sql = self._period_aggregate_subquery("MAX", meta, period, warnings)
+        ratio_sql = f"(({current_sql} - {min_sql}) / NULLIF(({max_sql} - {min_sql}), 0))"
+        sql = (
+            "CASE "
+            f"WHEN {current_sql} IS NULL OR {min_sql} IS NULL OR {max_sql} IS NULL THEN NULL "
+            f"WHEN {current_sql} <= {min_sql} THEN '最低' "
+            f"WHEN {current_sql} >= {max_sql} THEN '最高' "
+            f"WHEN {ratio_sql} <= 0.25 THEN '低' "
+            f"WHEN {ratio_sql} >= 0.75 THEN '高' "
+            "ELSE '中' END"
+        )
+        return SqlExpr(
+            sql,
+            "string",
+            self._ordered_tables(["hsj_stock_hq_basic", meta.table]),
+            constraints,
+        )
+
+    def _period_aggregate_subquery(
+        self,
+        aggregate: str,
+        meta: IndicatorMeta,
+        period: str,
+        warnings: List[str],
+    ) -> str:
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        value_sql = self._indicator_value_sql(meta, aliases)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", meta.table])
+        where_parts = self._period_window_where(period, "wb", warnings)
+        return (
+            f"(SELECT {aggregate}({value_sql})\n"
+            " FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._window_joins(tables)}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))})"
+        )
+
+    def _period_window_where(self, period: str, base_alias: str, warnings: List[str]) -> List[str]:
+        where_parts = [
+            f"{base_alias}.mktcode = base.mktcode",
+            f"{base_alias}.tgtcode = base.tgtcode",
+        ]
+        days = _parse_period_day_count(period)
+        if days is not None:
+            lookback = max(days - 1, 0)
+            where_parts.append(
+                f"{base_alias}.bizdate BETWEEN DATE_SUB(base.bizdate, INTERVAL {lookback} DAY) AND base.bizdate"
+            )
+            return where_parts
+        where_parts.append(f"{base_alias}.bizdate <= base.bizdate")
+        if period and period not in {"历史", "史高", "史低"}:
+            warnings.append(
+                f"period {period!r} is compiled as history-to-current because no exact relative window is grounded"
+            )
+        return where_parts
+
+    def _can_use_official_price_extreme_days(self, function_name: str, indicator_name: str, period: str) -> bool:
+        if period and period in {"历史", "史高", "史低"}:
+            return False
+        if function_name == "record_high":
+            return indicator_name in {"最新价", "现价", "收盘价", "最高价"}
+        if function_name == "record_low":
+            return indicator_name in {"最新价", "现价", "收盘价", "最低价"}
+        raise OfficialSlotError(
+            "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+            f"{function_name}({indicator_name}, period={period}) is not mapped in the official-data adapter",
         )
 
     def _cross_expr(self, node: OfficialFunctionCall, name: str, warnings: List[str]) -> SqlExpr:
@@ -1248,6 +1603,22 @@ class OfficialSlotCompiler:
                 OfficialLiteral(args[5]),
                 OfficialLiteral(args[6]),
                 OfficialLiteral(args[7]),
+            ],
+        )
+        return self._indicator_expr(indicator_call, warnings)
+
+    def _rank_expr_without_count_exp(self, rank_call: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
+        args = self._slot_args(rank_call, 8)
+        indicator_call = OfficialFunctionCall(
+            "indicator",
+            [
+                OfficialLiteral(args[0]),
+                OfficialLiteral(args[1]),
+                OfficialLiteral(args[2]),
+                OfficialLiteral(args[4]),
+                OfficialLiteral(args[5]),
+                OfficialLiteral(args[6]),
+                OfficialLiteral(""),
             ],
         )
         return self._indicator_expr(indicator_call, warnings)
@@ -1472,8 +1843,15 @@ class OfficialSlotCompiler:
     def _is_rank_comparison(self, node: OfficialNode) -> bool:
         return isinstance(node, OfficialComparison) and isinstance(node.left, OfficialFunctionCall) and node.left.name == "rank"
 
+    def _rank_count_exp(self, rank_call: OfficialFunctionCall) -> str:
+        args = self._slot_args(rank_call, 8)
+        return args[7]
+
     def _where_clause(self, condition: SqlExpr) -> str:
-        return " AND ".join(_dedupe([condition.sql] + condition.constraints)) or "1=1"
+        parts = [condition.sql] + condition.constraints
+        if condition.date_localized and not self._date_constraints(condition):
+            parts.append(f"base.bizdate = '{self.anchor_date}'")
+        return " AND ".join(_dedupe(parts)) or "1=1"
 
     def _condition_with_constraints(self, condition: SqlExpr) -> str:
         parts = _dedupe([condition.sql] + condition.constraints)
@@ -1482,6 +1860,41 @@ class OfficialSlotCompiler:
         if len(parts) == 1:
             return parts[0]
         return "(" + " AND ".join(parts) + ")"
+
+    def _has_conflicting_date_constraints(self, left: SqlExpr, right: SqlExpr) -> bool:
+        left_dates = set(self._date_constraints(left))
+        right_dates = set(self._date_constraints(right))
+        return bool(left_dates and right_dates and left_dates != right_dates)
+
+    def _date_constraints(self, condition: SqlExpr) -> List[str]:
+        return [item for item in condition.constraints if self._is_base_date_constraint(item)]
+
+    def _is_base_date_constraint(self, value: str) -> bool:
+        return bool(
+            re.fullmatch(r"base\.bizdate = '[^']+'", value)
+            or re.fullmatch(r"base\.bizdate BETWEEN '[^']+' AND '[^']+'", value)
+        )
+
+    def _condition_as_correlated_exists(self, condition: SqlExpr) -> str:
+        aliases = {"base": "lb", "code": "lc", "ext": "le", "tech": "lt"}
+        tables = self._ordered_tables(condition.tables)
+        condition_sql = _rewrite_aliases(condition.sql, aliases)
+        constraints = [_rewrite_aliases(item, aliases) for item in condition.constraints]
+        where_parts = [
+            "lb.mktcode = base.mktcode",
+            "lb.tgtcode = base.tgtcode",
+            condition_sql,
+            *constraints,
+        ]
+        joins = self._joins_for_aliases(tables, "lb", "lc", "le", "lt")
+        return (
+            "EXISTS (\n"
+            "  SELECT 1\n"
+            "  FROM newzl.hsj_stock_hq_basic AS lb\n"
+            f"{joins}"
+            f"  WHERE {' AND '.join(_dedupe(where_parts))}\n"
+            ")"
+        )
 
     def _select_sql(self, tables: List[str], where: str) -> str:
         joins = self._joins(tables)
@@ -1518,6 +1931,7 @@ class OfficialSlotCompiler:
         base_alias: str,
         code_alias: str,
         ext_alias: str,
+        tech_alias: str = "rtech",
     ) -> str:
         joins = []
         table_set = set(tables)
@@ -1536,10 +1950,10 @@ class OfficialSlotCompiler:
             )
         if "hsj_stock_hq_basic_technical" in table_set:
             joins.append(
-                f"    LEFT JOIN newzl.hsj_stock_hq_basic_technical AS rtech "
-                f"ON rtech.mktcode = {base_alias}.mktcode "
-                f"AND rtech.tgtcode = {base_alias}.tgtcode "
-                f"AND rtech.bizdate = {base_alias}.bizdate\n"
+                f"    LEFT JOIN newzl.hsj_stock_hq_basic_technical AS {tech_alias} "
+                f"ON {tech_alias}.mktcode = {base_alias}.mktcode "
+                f"AND {tech_alias}.tgtcode = {base_alias}.tgtcode "
+                f"AND {tech_alias}.bizdate = {base_alias}.bizdate\n"
             )
         return "".join(joins)
 
@@ -1579,6 +1993,56 @@ def _parse_count_exp_rule(value: str) -> CountExpRule:
         return CountExpRule(mode=mode, operator="=", count=None, unit=unit, every=True)
     count = _parse_small_count(count_text) if count_text else (0 if mode == "EXIST" else 1)
     return CountExpRule(mode=mode, operator=operator, count=count, unit=unit, every=False)
+
+
+def _parse_period_day_count(value: str) -> Optional[int]:
+    text = str(value or "").strip()
+    if not text or text in {"历史", "史高", "史低", "阶段"}:
+        return None
+    aliases = {
+        "本周": 7,
+        "这周": 7,
+        "本月": 31,
+        "这个月": 31,
+        "本月内": 31,
+        "今年": 365,
+        "年内": 365,
+        "今年内": 365,
+        "半年": 183,
+        "半年内": 183,
+        "半个月": 15,
+        "半个月内": 15,
+        "季度": 90,
+        "本季度": 90,
+    }
+    if text in aliases:
+        return aliases[text]
+    match = re.fullmatch(
+        r"(?P<count>\d+|[零〇一二两三四五六七八九十百两]+|半)"
+        r"\s*(?:个)?(?P<unit>交易日|日|天|周|星期|月|个月|季度|季|年)(?:内)?",
+        text,
+    )
+    if not match:
+        return None
+    count_text = match.group("count")
+    if count_text == "半":
+        amount = 0.5
+    else:
+        amount = float(_parse_small_count(count_text))
+    unit = match.group("unit")
+    multipliers = {
+        "交易日": 1,
+        "日": 1,
+        "天": 1,
+        "周": 7,
+        "星期": 7,
+        "月": 31,
+        "个月": 31,
+        "季度": 90,
+        "季": 90,
+        "年": 365,
+    }
+    return max(1, int(round(amount * multipliers[unit])))
 
 
 def _parse_small_count(value: str) -> int:
@@ -1684,6 +2148,7 @@ def compile_training_workbook(path: str, sample_size: int = 20) -> Dict[str, Any
     parse_errors: Counter[str] = Counter()
     compile_errors: Counter[str] = Counter()
     compile_error_details: Counter[str] = Counter()
+    compile_error_domains: Counter[str] = Counter()
     parse_error_samples: List[Dict[str, Any]] = []
     compile_error_samples: List[Dict[str, Any]] = []
     compiled_samples: List[Dict[str, Any]] = []
@@ -1713,6 +2178,7 @@ def compile_training_workbook(path: str, sample_size: int = 20) -> Dict[str, Any
         except OfficialSlotError as exc:
             compile_errors[exc.code] += 1
             compile_error_details[_compile_error_detail(exc)] += 1
+            compile_error_domains[classify_official_compile_error_domain(exc)] += 1
             if len(compile_error_samples) < sample_size:
                 compile_error_samples.append(_workbook_error_sample(row_index, row, exc))
     return {
@@ -1727,6 +2193,7 @@ def compile_training_workbook(path: str, sample_size: int = 20) -> Dict[str, Any
         "parse_errors": dict(parse_errors),
         "compile_errors": dict(compile_errors),
         "compile_error_details": dict(compile_error_details.most_common(30)),
+        "compile_error_domains": dict(compile_error_domains.most_common(30)),
         "parse_error_samples": parse_error_samples,
         "compile_error_samples": compile_error_samples,
         "compiled_samples": compiled_samples,
@@ -1858,6 +2325,20 @@ def write_coverage_report(coverage: Dict[str, Any], output: str) -> None:
     lines.extend(["", "## 编译失败细分原因 TopN", "", "| 原因 | 次数 |", "|---|---:|"])
     for detail, count in coverage.get("compile_error_details", {}).items():
         lines.append(f"| {_md_escape(detail)} | {count} |")
+    if coverage.get("compile_error_domains"):
+        lines.extend(
+            [
+                "",
+                "## 缺失数据域分层",
+                "",
+                "这一节把不能落地的官方样例按根因归类。它不是为失败找借口，而是区分“本批三张官方 A 股行情表没有该数据域”和“编译器函数语义仍需增强”两类问题，避免生成看似可执行但实际无字段来源的伪 SQL。",
+                "",
+                "| 缺失或待增强类别 | 次数 |",
+                "|---|---:|",
+            ]
+        )
+        for domain, count in coverage["compile_error_domains"].items():
+            lines.append(f"| {_md_escape(domain)} | {count} |")
     if coverage.get("parse_error_samples"):
         lines.extend(["", "## 语法解析失败样本", "", "| Excel 行 | 错误码 | 原因 | DSL |", "|---:|---|---|---|"])
         for item in coverage["parse_error_samples"]:
@@ -1976,6 +2457,91 @@ def _compile_error_detail(exc: OfficialSlotError) -> str:
         if match:
             return f"{exc.code}: {match.group('name')}"
     return f"{exc.code}: {message}"
+
+
+DOMAIN_KEYWORDS: Tuple[Tuple[str, Tuple[str, ...]], ...] = (
+    (
+        "指数成分与权重数据缺失",
+        ("成分股", "跟踪指数", "指数权重", "权重", "成份股"),
+    ),
+    (
+        "基金产品与持仓数据缺失",
+        ("基金", "ETF", "LOF", "REIT", "累计净值", "单位净值", "规模", "申购", "赎回", "限购"),
+    ),
+    (
+        "财务报表数据缺失",
+        (
+            "归母",
+            "净利润",
+            "营业收入",
+            "每股收益",
+            "资产",
+            "负债",
+            "现金",
+            "资本公积",
+            "利润",
+            "收入",
+            "股息",
+            "分红",
+            "净资产收益率",
+            "资产回报率",
+            "销售净利率",
+            "总资产",
+            "净资产",
+            "预测市盈率",
+        ),
+    ),
+    (
+        "用户账户与自选股数据缺失",
+        ("我的", "持仓", "自选", "账户"),
+    ),
+    (
+        "龙虎榜与交易异动数据缺失",
+        ("龙虎榜", "上榜"),
+    ),
+    (
+        "公司画像与题材热度数据缺失",
+        ("主营业务", "热门", "龙头", "题材", "概念热度", "优质", "潜力", "强势", "估值"),
+    ),
+    (
+        "公司事件与交易日历扩展数据缺失",
+        ("上市日期", "复牌日期", "停牌日期", "除权除息", "财报期", "分红日"),
+    ),
+    (
+        "高级形态/相似度模型数据缺失",
+        ("相似K线", "KDJ", "RSI", "MACD", "波动率", "背离", "主力抢筹", "回调", "粘合"),
+    ),
+    (
+        "交易规则与跨市场标的属性缺失",
+        ("每手股数", "投资市场", "港股", "美股", "期货", "债券", "可转债", "新三板"),
+    ),
+)
+
+
+def classify_official_indicator_domain(indicator_name: str) -> str:
+    text = str(indicator_name or "").strip()
+    for domain, keywords in DOMAIN_KEYWORDS:
+        if any(keyword in text for keyword in keywords):
+            return domain
+    return "官方三表未覆盖的其他指标"
+
+
+def classify_official_compile_error_domain(exc: OfficialSlotError) -> str:
+    detail = _compile_error_detail(exc)
+    if exc.code == "UNSUPPORTED_OFFICIAL_INDICATOR":
+        indicator = detail.split(":", 1)[-1].strip()
+        return classify_official_indicator_domain(indicator)
+    if exc.code == "UNSUPPORTED_OFFICIAL_FUNCTION":
+        return "函数语义待扩展"
+    if exc.code == "UNSUPPORTED_OFFICIAL_COUNT_EXP":
+        return "出现次数/连续次数时间语义待特征表增强"
+    if exc.code == "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION":
+        return "创新高低/位置函数复杂周期待增强"
+    if exc.code.startswith("OFFICIAL_RANK"):
+        return "排名表达式形态待规范或待扩展"
+    if exc.code == "OFFICIAL_EXPR_ERROR":
+        return "复杂表达式组合待扩展"
+    return "其他解析或编译问题"
 
 
 def _parse_range_text(value: str) -> Optional[OfficialRangeLiteral]:
