@@ -16,6 +16,25 @@ def main() -> None:
     compile_cmd.add_argument("dsl", help="DSL expression")
     compile_cmd.add_argument("--json", action="store_true", help="Print full JSON result")
     compile_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    official_parse_cmd = sub.add_parser("official-slot-parse", help="Parse official slot DSL into an AST")
+    official_parse_cmd.add_argument("dsl", help="Official slot DSL expression")
+    official_parse_cmd.add_argument("--json", action="store_true", help="Print AST as JSON")
+    official_compile_cmd = sub.add_parser("official-slot-compile", help="Compile official slot DSL to Doris SQL")
+    official_compile_cmd.add_argument("dsl", help="Official slot DSL expression")
+    official_compile_cmd.add_argument("--json", action="store_true", help="Print full JSON result")
+    official_profile_cmd = sub.add_parser("official-data-profile", help="Profile official CSV data and slot DSL workbook")
+    official_profile_cmd.add_argument("--root", required=True, help="Official data package root directory")
+    official_profile_cmd.add_argument("--workbook", default=None, help="Optional official slot DSL workbook path")
+    official_profile_cmd.add_argument("--json-output", default=None, help="Optional JSON profile output path")
+    official_profile_cmd.add_argument("--report-output", default=None, help="Optional Markdown profile output path")
+    official_profile_cmd.add_argument("--sample-size", type=int, default=20, help="Number of training examples to include")
+    official_profile_cmd.add_argument("--json", action="store_true", help="Print profile as JSON")
+    official_coverage_cmd = sub.add_parser("official-slot-coverage", help="Analyze official slot DSL parse and compile coverage")
+    official_coverage_cmd.add_argument("--workbook", required=True, help="Official slot DSL workbook path")
+    official_coverage_cmd.add_argument("--json-output", default=None, help="Optional JSON coverage output path")
+    official_coverage_cmd.add_argument("--report-output", default=None, help="Optional Markdown coverage output path")
+    official_coverage_cmd.add_argument("--sample-size", type=int, default=20, help="Number of error/success samples to include")
+    official_coverage_cmd.add_argument("--json", action="store_true", help="Print coverage as JSON")
     diagnose_cmd = sub.add_parser("diagnose", help="Diagnose invalid DSL and print repair hints")
     diagnose_cmd.add_argument("dsl", help="DSL expression")
     diagnose_cmd.add_argument("--json", action="store_true", help="Print diagnostics as JSON")
@@ -155,6 +174,76 @@ def main() -> None:
             for item in result.trace:
                 print(f"- {item}")
             print(f"Elapsed: {result.elapsed_ms:.3f} ms")
+    elif args.command == "official-slot-parse":
+        from .official_slot import parse_official_slot
+
+        ast = parse_official_slot(args.dsl)
+        payload = ast.to_dict()
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+    elif args.command == "official-slot-compile":
+        from .official_slot import OfficialSlotCompiler
+
+        result = OfficialSlotCompiler().compile(args.dsl)
+        payload = asdict(result)
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(result.sql)
+            print()
+            print("Requires tables:")
+            for table in result.requires_tables:
+                print(f"- {table}")
+            if result.warnings:
+                print()
+                print("Warnings:")
+                for warning in result.warnings:
+                    print(f"- {warning}")
+    elif args.command == "official-data-profile":
+        from .official_slot import (
+            profile_official_csvs,
+            profile_to_json,
+            profile_training_workbook,
+            write_profile_report,
+        )
+
+        root = Path(args.root)
+        workbook = (
+            Path(args.workbook)
+            if args.workbook
+            else root / "选股 DSL 规范文档" / "选股提槽实例.xlsx"
+        )
+        profile = {
+            "root": str(root),
+            "csv": profile_official_csvs(str(root)),
+            "workbook": profile_training_workbook(str(workbook), sample_size=args.sample_size),
+        }
+        if args.json_output:
+            profile_to_json(profile, args.json_output)
+        if args.report_output:
+            write_profile_report(profile, args.report_output)
+        if args.json:
+            print(json.dumps(profile, ensure_ascii=False, indent=2))
+        else:
+            print(f"Official CSV tables: {len(profile['csv'])}")
+            print(f"Official training rows: {profile['workbook']['row_count']}")
+            print(f"Parse ok: {profile['workbook']['parse_ok']}")
+    elif args.command == "official-slot-coverage":
+        from .official_slot import compile_training_workbook, profile_to_json, write_coverage_report
+
+        coverage = compile_training_workbook(args.workbook, sample_size=args.sample_size)
+        if args.json_output:
+            profile_to_json(coverage, args.json_output)
+        if args.report_output:
+            write_coverage_report(coverage, args.report_output)
+        if args.json:
+            print(json.dumps(coverage, ensure_ascii=False, indent=2))
+        else:
+            print(f"Official training rows: {coverage['row_count']}")
+            print(f"Parse ok: {coverage['parse_ok']}")
+            print(f"Compile ok: {coverage['compile_ok']}")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 

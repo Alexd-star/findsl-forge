@@ -50,6 +50,8 @@ Current readiness passes required gates and the Doris-scale performance proof. T
 
 The repository also includes a versioned public A-share quote sample under `data/real_samples/eastmoney_a_share_sample/`. It uses Eastmoney historical K-line rows for 贵州茅台 and 平安银行 so the demo can show real market fields without mixing that small business sample with the 5M-row Doris performance claim.
 
+The official Topic 19 real-data adapter is tracked separately from the staged internal DSL path. It reads the official `选股提槽实例.xlsx` workbook and the three `newzl` Doris CSV tables (`hsj_stock_code_info`, `hsj_stock_hq_basic`, `hsj_stock_hq_ext`), reports parse/compile coverage, and emits SQL only for indicators that can be grounded in the provided A-share tables. See `docs/20_官方真实数据适配分析与开发计划.md` and `deploy/doris/official/` for the current official-data plan, schema, Stream Load runbook, smoke queries, and feature-table SQL.
+
 ## Comprehensive Chinese Manual
 
 The repository includes a long-form Chinese Word manual for competition submission and defense:
@@ -92,6 +94,7 @@ python -m findsl.cli suggest-dsl 'A股近2日收盘价涨幅超过5%' --data-dir
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --text '近3日成交量累计大于300' --data-dir data/samples --json
 python -m findsl.cli llm-suggest-dsl '近3日成交量累计大于300' --model '<provider-model>' --json
 python -m findsl.cli official-suite --output reports/official_suite_report.md --json
+python -m findsl.cli official-slot-coverage --workbook "D:\path\to\选股提槽实例.xlsx" --json-output reports/official_slot_coverage.json --report-output reports/official_slot_coverage.md
 python -m findsl.cli defense-package --output reports/defense_package.md --json
 python -m findsl.cli benchmark-prefix-sum 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples --iterations 20 --output reports/prefix_sum_benchmark.md
 python -m findsl.cli scale-benchmark --stocks 300 --days 260 --window 120 --iterations 5 --output reports/prefix_sum_scale_benchmark.md
@@ -112,6 +115,7 @@ python -m findsl.cli suggest-dsl '今日收盘价创二百五十日新高'
 python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_candidate_response.json --json
 python -m findsl.cli llm-suggest-dsl '近3日成交量累计大于300' --model '<provider-model>' --json
 python -m findsl.cli official-suite --json
+python -m findsl.cli official-slot-coverage --workbook "D:\path\to\选股提槽实例.xlsx" --json-output reports/official_slot_coverage.json --report-output reports/official_slot_coverage.md
 python -m findsl.cli defense-package --json
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\reference_sample.ps1
