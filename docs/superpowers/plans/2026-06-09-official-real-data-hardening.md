@@ -434,9 +434,11 @@ Load all three official CSVs into Doris, build feature tables, and collect row-c
 
 Support `rank(..., agg_func, count_exp)` and chained temporal rank with a precomputed Doris feature table. Avoid deeply nested runtime windows.
 
-- [ ] **Composite relative date AST**
+- [x] **Composite relative date AST**
 
 Support expressions such as `本月的前一周`, `2018年的第五年`, and `最近的第二天` without falling back to `1=1`.
+
+Implemented in `src/findsl/official_time.py` with an internal date interval model. Covered by tests for explicit year ranges (`2006年-12年`, `06年到12年`), `昨天的前1日`, `本月的前一周`, `2012年的后4年`, `一二年的第4年`, `2018年的第五年`, `最近的第二天`, `最近的第二天的后3日`, and the impossible future window `本周的后3日`. Latest official coverage remains `parse_ok=5792`, `parse_failed=7`, `compile_ok=1536`, `compile_failed=4256`; this task improves predicate correctness rather than increasing the compile count.
 
 - [ ] **Second-pass missing-data-domain classification**
 

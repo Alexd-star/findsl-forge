@@ -71,6 +71,45 @@ def test_compile_official_recent_date_with_trading_calendar_window():
     assert result.warnings == []
 
 
+def test_compile_official_composite_date_slots_from_real_workbook():
+    compiler = OfficialSlotCompiler(
+        anchor_date="2026-04-14",
+        trading_dates=["2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14"],
+    )
+
+    recent_ordinal = compiler.compile("indicator('', '', '跌幅', '最近的第二天', '', '', '') >= 0")
+    clipped_following = compiler.compile("indicator('', '', '跌幅', '最近的第二天的后3日', '', '', '') > 8")
+    previous_week = compiler.compile("indicator('', '', '成交量', '本月的前一周', '', '', '') > 0")
+    ordinal_year = compiler.compile("indicator('', '', '成交量', '2018年的第五年', '', '', '') > 0")
+    impossible_future = compiler.compile("indicator('', '', '成交量', '本周的后3日', '', '', '') > 0")
+
+    assert "base.bizdate = '2026-04-13'" in recent_ordinal.sql
+    assert recent_ordinal.warnings == []
+    assert "base.bizdate = '2026-04-14'" in clipped_following.sql
+    assert clipped_following.warnings == [
+        "date slot '最近的第二天的后3日' extends beyond official anchor date 2026-04-14; clipped to available official data"
+    ]
+    assert "base.bizdate BETWEEN '2026-03-25' AND '2026-03-31'" in previous_week.sql
+    assert previous_week.warnings == []
+    assert "base.bizdate BETWEEN '2022-01-01' AND '2022-12-31'" in ordinal_year.sql
+    assert ordinal_year.warnings == []
+    assert "1=0" in impossible_future.sql
+    assert impossible_future.warnings == [
+        "date slot '本周的后3日' starts after official anchor date 2026-04-14; no official rows can satisfy it"
+    ]
+    assert all("1=1" not in result.sql for result in [recent_ordinal, clipped_following, previous_week, ordinal_year])
+
+
+def test_compile_official_year_range_date_slot_from_real_workbook():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '成交量', '2006年-12年', '', '', '') > 0"
+    )
+
+    assert "base.bizdate BETWEEN '2006-01-01' AND '2012-12-31'" in result.sql
+    assert "1=1" not in result.sql
+    assert result.warnings == []
+
+
 def test_compile_official_numeric_scales_to_human_units():
     result = OfficialSlotCompiler().compile(
         "indicator('', '', '市净率', '今日', '', '', '') < 2 "
