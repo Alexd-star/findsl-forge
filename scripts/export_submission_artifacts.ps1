@@ -16,7 +16,11 @@ $reportFiles = @(
   "evaluation_report.md",
   "sql_equivalence_report.md",
   "prefix_sum_benchmark.md",
-  "prefix_sum_scale_benchmark.md"
+  "prefix_sum_scale_benchmark.md",
+  "official_doris_evidence.md",
+  "official_doris_evidence.json",
+  "official_slot_coverage.md",
+  "official_slot_coverage.json"
 )
 
 $status = ""

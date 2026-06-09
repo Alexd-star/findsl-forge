@@ -629,8 +629,8 @@ def test_official_slot_compile_cli_prints_json_payload():
         ],
         check=True,
         capture_output=True,
-        encoding="gb18030",
-        env={**os.environ, "PYTHONPATH": "src"},
+        encoding="utf-8",
+        env={**os.environ, "PYTHONPATH": "src", "PYTHONIOENCODING": "utf-8"},
     )
 
     assert '"requires_tables"' in proc.stdout
@@ -660,8 +660,8 @@ def test_official_slot_coverage_cli_writes_json_and_markdown(tmp_path):
         ],
         check=True,
         capture_output=True,
-        encoding="gb18030",
-        env={**os.environ, "PYTHONPATH": "src"},
+        encoding="utf-8",
+        env={**os.environ, "PYTHONPATH": "src", "PYTHONIOENCODING": "utf-8"},
     )
 
     assert '"compile_ok"' in proc.stdout

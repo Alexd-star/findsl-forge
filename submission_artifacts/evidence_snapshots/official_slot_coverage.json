@@ -1,0 +1,944 @@
+{
+  "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
+  "row_count": 5799,
+  "parse_ok": 5792,
+  "parse_failed": 7,
+  "compile_ok": 1682,
+  "compile_failed": 4110,
+  "compile_rate_on_all_rows": 0.29005,
+  "compile_rate_on_parse_ok": 0.290401,
+  "parse_errors": {
+    "OFFICIAL_PARSE_ERROR": 3,
+    "OFFICIAL_LEX_ERROR": 4
+  },
+  "compile_errors": {
+    "UNSUPPORTED_OFFICIAL_INDICATOR": 3911,
+    "OFFICIAL_RANK_SHAPE_ERROR": 28,
+    "OFFICIAL_EXPR_ERROR": 8,
+    "OFFICIAL_RANK_OPERATOR_ERROR": 10,
+    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 48,
+    "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION": 18,
+    "UNSUPPORTED_OFFICIAL_FUNCTION": 87
+  },
+  "compile_error_details": {
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 成分股": 164,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 跟踪指数": 112,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 热门": 102,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 主营业务": 98,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 基金类型": 76,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润": 73,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 上市日期": 69,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 龙头股": 63,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 归母净利润同比增长率": 55,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 基金十大重仓股": 52,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 股息率": 50,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 已发布财报期": 47,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 分红金额": 43,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 净利润同比增长率": 43,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 投资市场": 42,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 净资产收益率": 38,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 我的持仓股": 36,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 营业收入同比增长率": 34,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 每手股数": 33,
+    "UNSUPPORTED_OFFICIAL_FUNCTION: rank": 31,
+    "UNSUPPORTED_OFFICIAL_FUNCTION: reset": 29,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 潜力": 28,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 强势": 27,
+    "UNSUPPORTED_OFFICIAL_FUNCTION: close_together": 27,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 优质": 26,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 龙虎榜上榜日期": 25,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 波动率": 24,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 估值": 23,
+    "OFFICIAL_RANK_SHAPE_ERROR: then right side must be rank(...) comparison": 21,
+    "UNSUPPORTED_OFFICIAL_INDICATOR: 基金公司": 21
+  },
+  "compile_error_domains": {
+    "官方三表未覆盖的其他指标": 1706,
+    "财务报表数据缺失": 762,
+    "公司画像与题材热度数据缺失": 378,
+    "指数成分与权重数据缺失": 277,
+    "基金产品与持仓数据缺失": 255,
+    "高级形态/相似度模型数据缺失": 160,
+    "公司事件与交易日历扩展数据缺失": 147,
+    "用户账户与自选股数据缺失": 87,
+    "函数语义待扩展": 87,
+    "交易规则与跨市场标的属性缺失": 86,
+    "龙虎榜与交易异动数据缺失": 53,
+    "出现次数/连续次数时间语义待特征表增强": 48,
+    "排名表达式形态待规范或待扩展": 38,
+    "创新高低/位置函数复杂周期待增强": 18,
+    "复杂表达式组合待扩展": 8
+  },
+  "parse_error_samples": [
+    {
+      "excel_row": 2122,
+      "query": "现金流占比最大的20家，今日创200天新高，昨天回调出现十字星，标的类型是股票",
+      "slot_dsl": "rank('', '', '现金储备率', 'desc', '', '', '', '') <= 20 and record_high('', '', '', '200天', '今日', '', '', '') = True and indicator('', '', '回调', '昨天', '', '', '') = True and indicator('', '', '十字星', 昨天'', '', '', 'EXIST>0') = True",
+      "code": "OFFICIAL_PARSE_ERROR",
+      "message": "Expected ), got STRING at 197"
+    },
+    {
+      "excel_row": 2194,
+      "query": "光伏ETF基金515790的主要成分股，只要有息负债5-7e上下的",
+      "slot_dsl": "indicator('', '', '成分股', '', '', '', '') = '光伏ETF基金515790' and indicator('', '', '有息负债', '', '', '', '') between [500000000,700000000]'",
+      "code": "OFFICIAL_LEX_ERROR",
+      "message": "Unclosed string starting at 134"
+    },
+    {
+      "excel_row": 2466,
+      "query": "外盘昨天和前一天，不同的沪深股票有哪些？",
+      "slot_dsl": "indicator('沪|深', '', '外盘', '昨天', '', '', '') != indicator('沪|深', '', '外盘', '昨天的前1日', '', '', '')\"",
+      "code": "OFFICIAL_LEX_ERROR",
+      "message": "Unclosed string starting at 96"
+    },
+    {
+      "excel_row": 3785,
+      "query": "人工智能里找出今天有5倍量并且回调至20日附近小十字星的营业收入同比增长前10个。",
+      "slot_dsl": "indicator('', '人工智能', '成交量', '今天', '', 'GROWTH_RISE', '') = 400% and reset('', '人工智能', '', '20日均线', '今天', '', '') = True and indicator('', '人工智能', '十字星', '今天', '', '', '') = True then rank('', '人工智能', '营业收入同比增长率', 'desc', '今天', '', '', '') <= 10)",
+      "code": "OFFICIAL_PARSE_ERROR",
+      "message": "Expected EOF, got ) at 245"
+    },
+    {
+      "excel_row": 5328,
+      "query": "瑞士&法国市场中，市盈率最高的，从大到小排序",
+      "slot_dsl": "rank('其他&法', '', '市盈率', 'desc', '', '', '', '') > 0\"",
+      "code": "OFFICIAL_LEX_ERROR",
+      "message": "Unclosed string starting at 51"
+    },
+    {
+      "excel_row": 5521,
+      "query": "前天涨停但是尾盘没涨停的股票",
+      "slot_dsl": "and indicator('', '', '涨停未封板', '前天', '', '', '') = True",
+      "code": "OFFICIAL_PARSE_ERROR",
+      "message": "Unexpected token AND at 0"
+    },
+    {
+      "excel_row": 5753,
+      "query": "涨幅3%-9%、量能≥近5日均值1.5倍、大单净流入≥0.5%、六日rsi小于20的股票",
+      "slot_dsl": "\"indicator('', '', '涨幅', '', '', '', '') between '[3%,9%]' and indicator('', '', '成交量', '', '', '', '') >= indicator('', '', '成交量', '近5日', '', 'AVG', '') * 1.5 and indicator('', '', '大单净流入', '', '', '', '') >= 0.5% and indicator('', '', 'RSI(6)', '', '', '', '') < 20",
+      "code": "OFFICIAL_LEX_ERROR",
+      "message": "Unclosed string starting at 0"
+    }
+  ],
+  "compile_error_samples": [
+    {
+      "excel_row": 2,
+      "query": "请告诉我深交所5日内个人持有比例超过百分之5，日均线多头趋势的票",
+      "slot_dsl": "indicator('深', '', '个人持有比例', '5日内', '', '', '') > 5% and indicator('深', '', '均线多头排列', '5日内', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 个人持有比例"
+    },
+    {
+      "excel_row": 3,
+      "query": "有哪些股票1周内基本每股收益小于22手,周均线空头排列的主板和新三板",
+      "slot_dsl": "indicator('沪主板|深主板|新三板', '', '基本每股收益', '1周内', '', '', '') <= 22 * indicator('沪主板|深主板|新三板', '', '每手股数', '1周内', '', '', '') and indicator('沪主板|深主板|新三板', '', '周均线空头排列', '1周内', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 基本每股收益"
+    },
+    {
+      "excel_row": 4,
+      "query": "查询股票：满足最近一周上交所资产回报率最高的白酒行业未亏损股",
+      "slot_dsl": "rank('沪', '白酒行业', '资产回报率', 'desc', '最近一周', '', '', '') = 1 and indicator('沪', '白酒行业', '归母净利润', '', '', '', '') >= 0",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 资产回报率"
+    },
+    {
+      "excel_row": 5,
+      "query": "有什么大盘股京深市场上市在21年之后300691之前，次日跌幅5个点且历史最高价大于15",
+      "slot_dsl": "indicator('京|深', '', '上市日期', '', '', '', '') > '21年' and indicator('京|深', '', '上市日期', '', '', '', '') < queryData('京|深', '300691', '上市日期', '', '') and indicator('京|深', '', '跌幅', '上市次日', '', '', '') = 5% and indicator('京|深', '', '历史最高价', '', '', '', '') > 15",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 上市日期"
+    },
+    {
+      "excel_row": 6,
+      "query": "查询股票：查询A股07年预测市盈率大于100且KDJtop5",
+      "slot_dsl": "indicator('沪|深|京', '', '预测市盈率', '07年', '', '', '') > 100 and rank('沪|深|京', '', 'KDJ', 'desc', '07年', '', '', '') <= 5",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 预测市盈率"
+    },
+    {
+      "excel_row": 7,
+      "query": "想了解一下沪深每股收益增长率在11月18日大于10%的港股通期货",
+      "slot_dsl": "indicator('沪|深', '', '基本每股收益同比增长率', '11月18日', '期货', '', '') > 10% and indicator('沪|深', '', '港股通标识', '11月18日', '期货', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 基本每股收益同比增长率"
+    },
+    {
+      "excel_row": 8,
+      "query": "我需要知道今天净利润率大于10，本周后三个交易日机构资金买入最多的股票的加拿大或者美国股票",
+      "slot_dsl": "indicator('其他|美', '', '净利润率', '今天', '', '', '') > 10 and rank('其他|美', '', '主力净流入', 'desc', '本周的后3日', '', '', '') = 1",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 净利润率"
+    },
+    {
+      "excel_row": 9,
+      "query": "想了解一下00年深市主板KDJ底背离的债券",
+      "slot_dsl": "indicator('深主板', '', 'KDJ底背离', '00年', '债券', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: KDJ底背离"
+    },
+    {
+      "excel_row": 10,
+      "query": "帮我查找港股除权除息日为上周的私募基金",
+      "slot_dsl": "indicator('港', '', '除权除息日', '', '私募基金', '', '') = '上周'",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 除权除息日"
+    },
+    {
+      "excel_row": 11,
+      "query": "请告诉我2021年筹码集中度大于50的，北向通资金净流入超10万的股票",
+      "slot_dsl": "indicator('', '', '90%筹码集中度', '2021年', '', '', '') > 50 and indicator('', '', '陆股通标识', '2021年', '', '', '') = True and indicator('', '', '主力净流入', '2021年', '', '', '') > 100000",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 90%筹码集中度"
+    },
+    {
+      "excel_row": 12,
+      "query": "想了解一下最近一周资产总计大于15，期货升水率5%上下的场内基金",
+      "slot_dsl": "indicator('', '', '资产总计', '最近一周', '场内基金', '', '') > 15 and indicator('', '', '升水率', '最近一周', '场内基金', '', '') ~= 5%",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 资产总计"
+    },
+    {
+      "excel_row": 14,
+      "query": "查询场内基金：列出07年股息率TTM大于千分之四且RSI小于30的上证",
+      "slot_dsl": "indicator('沪', '', '股息率TTM', '07年', '场内基金', '', '') > 0.4% and indicator('沪', '', 'RSI', '07年', '场内基金', '', '') < 30",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 股息率TTM"
+    },
+    {
+      "excel_row": 15,
+      "query": "什么沪港股通19年之后除权除息日，并且要今天上穿压力位的",
+      "slot_dsl": "indicator('沪', '', '港股通标识', '', '', '', '') = True and indicator('沪', '', '除权除息日', '', '', '', '') >= '19年' and indicator('沪', '', '上穿压力位', '今天', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 除权除息日"
+    },
+    {
+      "excel_row": 16,
+      "query": "给我找出沪主板五年之内归母净利润增长最低值排名前10的股票",
+      "slot_dsl": "rank('沪主板', '', '归母净利润同比增长率', 'desc', '五年之内', '', 'MIN', '') <= 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 17,
+      "query": "有什么A股销售净利10%以下且k线走势高度贴合沪上阿姨的",
+      "slot_dsl": "indicator('沪|深|京', '', '销售净利率', '', '', '', '') < 10% and indicator('沪|深|京', '', '相似K线', '', '', '', '') = '沪上阿姨'",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 销售净利率"
+    },
+    {
+      "excel_row": 19,
+      "query": "找出复牌日期在2007年之前且内盘在零六年600万手以下的期货",
+      "slot_dsl": "indicator('', '', '复牌日期', '', '期货', '', '') < '2007年' and indicator('', '', '内盘', '零六年', '期货', '', '') / indicator('', '', '每手股数', '零六年', '期货', '', '') < 6000000",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 复牌日期"
+    },
+    {
+      "excel_row": 21,
+      "query": "有哪些沪市和深市股票，所属行业半年之内净资产收益率约为5%",
+      "slot_dsl": "belong_industry('沪|深', '', '净资产收益率', '半年之内', '') ~= 5%",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 净资产收益率"
+    },
+    {
+      "excel_row": 22,
+      "query": "查找上个月深市和英伟达业务相似的公司里个人拥有比例前10的",
+      "slot_dsl": "indicator('深', '', '主营业务', '上个月', '', '', '') ~= queryData('', '英伟达', '主营业务', '上个月', '') then rank('深', '', '个人持有比例', 'desc', '上个月', '', '', '') <= 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 主营业务"
+    },
+    {
+      "excel_row": 23,
+      "query": "有哪些深市可转债复牌日期在本周之后，投资港美市场",
+      "slot_dsl": "indicator('深', '', '复牌日期', '', '可转债', '', '') > '本周' and (indicator('深', '', '投资市场', '', '可转债', '', '') = '港股' or indicator('深', '', '投资市场', '', '可转债', '', '') = '美股')",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 复牌日期"
+    },
+    {
+      "excel_row": 24,
+      "query": "查询账户里上月利润总额大于0.3万，有3天穿压力位的，主力资金抢筹的股票",
+      "slot_dsl": "indicator('', '', '我的持仓股', '', '', '', '') = True and indicator('', '', '利润总额', '上月', '', '', '') > 3000 and indicator('', '', '上穿压力位', '上月', '', '', 'EXIST=3日') = True and indicator('', '', '主力抢筹', '上月', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 我的持仓股"
+    },
+    {
+      "excel_row": 25,
+      "query": "我需要知道总资产净利率在这六个月大于千分三的深港股通有什么",
+      "slot_dsl": "indicator('深', '', '总资产净利率', '这六个月', '', '', '') > 0.3% and indicator('深', '', '港股通标识', '这六个月', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 总资产净利率"
+    },
+    {
+      "excel_row": 26,
+      "query": "非我持仓池中，本周10元以内总资产从大到小排名前20%，本月前一周资金净流入大于资金净流出的公司有哪些？",
+      "slot_dsl": "indicator('', '', '我的持仓股', '', '', '', '') = False and indicator('', '', '最新价', '本周', '', '', '') <= 10 then rank('', '', '资产总计', 'desc', '本周', '', '', '') <= 20% and indicator('', '', '主力净流入', '本月的前一周', '', '', '') > indicator('', '', '主力净流出', '本月的前1周', '', '', '')",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 我的持仓股"
+    },
+    {
+      "excel_row": 27,
+      "query": "北交所上市净率大于1且龙虎榜净流入2023年top5的股票",
+      "slot_dsl": "indicator('京', '', '市净率', '', '', '', '') > 1 and rank('京', '', '龙虎榜净流入', 'desc', '2023年', '', '', '') <= 5",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 龙虎榜净流入"
+    },
+    {
+      "excel_row": 28,
+      "query": "查询私募：深港通个人持有比例最靠后",
+      "slot_dsl": "indicator('', '', '深港通标识', '', '私募基金', '', '') = True and rank('', '', '个人持有比例', 'asc', '', '私募基金', '', '') = 1",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 个人持有比例"
+    },
+    {
+      "excel_row": 30,
+      "query": "请告诉我二二年净资产前10的沪港通的票有哪些",
+      "slot_dsl": "rank('', '', '净资产', 'desc', '二二年', '', '', '') <= 10 and indicator('', '', '沪港通标识', '二二年', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 净资产"
+    },
+    {
+      "excel_row": 31,
+      "query": "帮我找出光伏产业前年累计净值大于1千亿且D值最少的前十的我持有股票",
+      "slot_dsl": "indicator('', '光伏产业', '累计净值', '前年', '', '', '') > 100000000000 and rank('', '光伏产业', 'D值', 'asc', '前年', '', '', '') <= 10 and indicator('', '光伏产业', '我的持仓股', '前年', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 累计净值"
+    },
+    {
+      "excel_row": 32,
+      "query": "找出北交所复牌日期不早于2017年且资本公积大于1的股票",
+      "slot_dsl": "indicator('京', '', '复牌日期', '', '', '', '') >= '2017年' and indicator('京', '', '资本公积', '', '', '', '') > 1",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 复牌日期"
+    },
+    {
+      "excel_row": 33,
+      "query": "请列出基金规模五千左右的，期货贴水率3个点左右的限购基金",
+      "slot_dsl": "indicator('', '', '规模', '', '场内基金', '', '') ~= 5000 and indicator('', '', '贴水率', '', '场内基金', '', '') ~= 3% and indicator('', '', '暂停大额申购标识', '', '场内基金', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 规模"
+    },
+    {
+      "excel_row": 34,
+      "query": "我需要知道中盘股或者小盘股昨日收盘股价排名最低的5个票",
+      "slot_dsl": "(indicator('', '', '中盘股', '', '', '', '') = True or indicator('', '', '小盘股', '', '', '', '') = True) then rank('', '', '收盘价', 'asc', '昨日', '', '', '') <= 5",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 中盘股"
+    },
+    {
+      "excel_row": 35,
+      "query": "请给出零五年沪市和深市归属母公司所得者净利润回升大于10的票",
+      "slot_dsl": "indicator('沪|深', '', '归母净利润同比增长率', '零五年', '', '', '') > 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 36,
+      "query": "列出符合零七年净利润率大于1000万的股票",
+      "slot_dsl": "indicator('', '', '净利润率', '零七年', '', '', '') > 10000000",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 净利润率"
+    },
+    {
+      "excel_row": 38,
+      "query": "选出科创股已经盈利的，近三天金叉的芯片公司。",
+      "slot_dsl": "indicator('科创板', '芯片公司', '归母净利润', '', '', '', '') > 0 and indicator('科创板', '芯片公司', '金叉', '近三天', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 归母净利润"
+    },
+    {
+      "excel_row": 40,
+      "query": "帮我找出16年主板融资净流入从大到小前十的票",
+      "slot_dsl": "rank('沪主板|深主板', '', '融资净流入', 'desc', '16年', '', '', '') <= 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 融资净流入"
+    },
+    {
+      "excel_row": 41,
+      "query": "有什么股票06年京市分红金额大于10万手，又跌破支撑位",
+      "slot_dsl": "indicator('京', '', '分红金额', '06年', '', '', '') / indicator('京', '', '每手股数', '06年', '', '', '') > 100000 and indicator('京', '', '跌破支撑位', '06年', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 分红金额"
+    },
+    {
+      "excel_row": 42,
+      "query": "哪些是自选中小盘组内预测每股收益2015年从小到大前十的股票",
+      "slot_dsl": "indicator('', '', '我的自选股', '', '', '', '') = True and (indicator('', '', '中盘股', '', '', '', '') = True or indicator('', '', '小盘股', '', '', '', '') = True) then rank('', '', '预测每股收益', 'asc', '2015年', '', '', '') <= 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 我的自选股"
+    },
+    {
+      "excel_row": 43,
+      "query": "我需要知道粘合均线且上上季度分红大于500万的深市通",
+      "slot_dsl": "indicator('', '', '均线粘合', '', '', '', '') = True and indicator('', '', '分红金额', '上上季度', '', '', '') > 5000000 and indicator('', '', '深股通标识', '上上季度', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 均线粘合"
+    },
+    {
+      "excel_row": 44,
+      "query": "帮我查一下这个月预测每股收益大于0.5手,南向通资金流入大于10k的股票",
+      "slot_dsl": "indicator('', '', '预测每股收益', '这个月', '', '', '') / indicator('', '', '每手股数', '这个月', '', '', '') > 0.5 and indicator('', '', '港股通标识', '这个月', '', '', '') = True and indicator('', '', '主力净流入', '这个月', '', '', '') > 10000",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 预测每股收益"
+    },
+    {
+      "excel_row": 45,
+      "query": "帮我查一下创业板零四年预测每股收益排名倒数第一的票",
+      "slot_dsl": "rank('创业板', '', '预测每股收益', 'asc', '零四年', '', '', '') = 1",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 预测每股收益"
+    },
+    {
+      "excel_row": 46,
+      "query": "有什么参股保险板块ETF2010年净流入份额大于50万手且历史最低价排名前10，标的类型是股票",
+      "slot_dsl": "indicator('', '参股保险板块', 'ETF净流入份额', '2010年', '', '', '') / indicator('', '参股保险板块', '每手股数', '2010年', '', '', '') > 500000 and rank('', '参股保险板块', '历史最低价', 'desc', '2010年', '', '', '') <= 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: ETF净流入份额"
+    },
+    {
+      "excel_row": 47,
+      "query": "请查询近一月没有出现过阳包阴且业绩top50的深证基金",
+      "slot_dsl": "indicator('深', '', '阳包阴', '近一月', '场内基金', '', '') = False and rank('深', '', '归母净利润', 'desc', '近一月', '场内基金', '', '') <= 50",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 阳包阴"
+    },
+    {
+      "excel_row": 48,
+      "query": "帮我找出沪深主板MACD日线金叉的股票以及净利润提升幅度大于千分之十个点的票",
+      "slot_dsl": "indicator('沪主板|深主板', '', 'MACD金叉', '', '', '', '') = True and indicator('沪主板|深主板', '', '净利润同比增长率', '', '', '', '') > 1%",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: MACD金叉"
+    },
+    {
+      "excel_row": 49,
+      "query": "帮我找出科创股单股分红在10年前一年比零八年增加大于1千万的票",
+      "slot_dsl": "indicator('科创板', '', '每股分红', '10年的前1年', '', '', '') > indicator('科创板', '', '每股分红', '零八年', '', '', '') + 10000000",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 每股分红"
+    },
+    {
+      "excel_row": 50,
+      "query": "查找全市场股息率TTM大于4%且月线MACD金叉的票",
+      "slot_dsl": "indicator('沪|深|京', '', '股息率TTM', '', '', '', '') > 4% and indicator('沪|深|京', '', '月线MACD金叉', '', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 股息率TTM"
+    },
+    {
+      "excel_row": 51,
+      "query": "有什么非科创板成长层股票预测每股收益大于1元且2003年前10",
+      "slot_dsl": "indicator('', '', '科创成长层标识', '', '', '', '') = False and indicator('', '', '预测每股收益', '', '', '', '') > 1 and rank('', '', '预测每股收益', 'desc', '2003年', '', '', '') <= 10",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 科创成长层标识"
+    },
+    {
+      "excel_row": 52,
+      "query": "我需要知道零五年沪港通未有跳空下跌的股票",
+      "slot_dsl": "indicator('', '', '沪港通标识', '零五年', '', '', '') = True and indicator('', '', '跳空低开', '零五年', '', '', '') = False",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 跳空低开"
+    },
+    {
+      "excel_row": 54,
+      "query": "查询股票：符合2002年分红日期是12月且上交所超过港股估值至少五个点",
+      "slot_dsl": "indicator('沪', '', '分红日期', '2002年', '', '', '') = '12月' and indicator('沪', '', 'A/H溢价率', '2002年', '', '', '') >= 5%",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 分红日期"
+    },
+    {
+      "excel_row": 55,
+      "query": "有哪些我当前未持有的中证700股票满足零一年利润总额大于1000万且委卖总量百分比前20",
+      "slot_dsl": "indicator('', '中证700', '我的持仓股', '当前', '', '', '') = False and indicator('', '中证700', '利润总额', '零一年', '', '', '') > 10000000 and rank('', '中证700', '委比', 'desc', '零一年', '', '', '') <= 20",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 我的持仓股"
+    },
+    {
+      "excel_row": 57,
+      "query": "哪些自选今年上半年比二二年ROIC增长超过0.1，非st",
+      "slot_dsl": "indicator('', '', '我的自选股', '', '', '', '') = True and indicator('', '', 'ROIC', '今年上半年', '', '', '') > indicator('', '', 'ROIC', '二二年', '', '', '') + 0.1 and indicator('', '', 'ST股票标识', '今年上半年', '', '', '') = False",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 我的自选股"
+    },
+    {
+      "excel_row": 59,
+      "query": "我需要知道手里的票哪些京市WR金叉，价格下跌量也缩小，周线空头排列的票;",
+      "slot_dsl": "indicator('京', '', '我的自选股', '', '', '', '') = True and indicator('京', '', 'WR金叉', '', '', '', '') = True and indicator('京', '', '价跌量缩', '', '', '', '') = True and indicator('京', '', '周均线空头排列', '', '', '', '') = True",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 我的自选股"
+    },
+    {
+      "excel_row": 60,
+      "query": "哪些沪深市场港股通股票2009年头肩顶或者无机盐行业市净值大于10",
+      "slot_dsl": "indicator('沪|深', '', '港股通标识', '', '', '', '') = True and (indicator('沪|深', '', '头肩顶', '2009年', '', '', '') = True or indicator('沪|深', '无机盐行业', '每股净资产', '2009年', '', '', '') > 10)",
+      "code": "UNSUPPORTED_OFFICIAL_INDICATOR",
+      "message": "Official indicator is not mapped to the provided three-table dataset: 头肩顶"
+    }
+  ],
+  "compiled_samples": [
+    {
+      "excel_row": 13,
+      "query": "给我找出科创板16年3分钟涨速大于5%且现价最贵的前十的票",
+      "slot_dsl": "indicator('科创板', '', '3分钟涨速', '16年', '', '', '') > 5% and rank('科创板', '', '最新价', 'desc', '16年', '', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ((ext.riseSpd3m / 10000.0) > 5 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.lastPx / 10000.0) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_bas"
+    },
+    {
+      "excel_row": 18,
+      "query": "请告诉我2000年港股通最高价两百块七毛以下的场外",
+      "slot_dsl": "indicator('', '', '港股通标识', '2000年', '场外基金', '', '') = True and indicator('', '', '最高价', '2000年', '场外基金', '', '') < 200.7",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (code.hkConnFlag = TRUE AND (base.highPx / 10000.0) < 200.7) AND 1=0 AND base.bizdate BETWEEN '2000-01-01' AND '2000-12-31'"
+    },
+    {
+      "excel_row": 20,
+      "query": "帮我找出2011年3月25日京沪市场3分钟涨速比九月十五号低排名后十的票",
+      "slot_dsl": "indicator('京|沪', '', '3分钟涨速', '2011年3月25日', '', '', '') < indicator('京|沪', '', '3分钟涨速', '九月十五号', '', '', '') then rank('京|沪', '', '3分钟涨速', 'asc', '2011年3月25日', '', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (ext.riseSpd3m / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE (ext.riseSpd3m / 10000.0) < (ext.riseSpd3m / 10000.0) AND base.mktcode IN (1, 103) AND base.bizdate = '2011-03-2"
+    },
+    {
+      "excel_row": 29,
+      "query": "05年京沪市场振幅大于5%，今日收阳线的鸡肉概念和家电类股票",
+      "slot_dsl": "indicator('京|沪', '鸡肉概念|家电类', '振幅', '05年', '', '', '') > 5% and indicator('京|沪', '鸡肉概念|家电类', '阳线', '今日', '', '', '') = True",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (lb.amplitude / 10000.0) > 5 AND lb.mktcode IN (1, 103) AND (lc.hyBlkRefName = '鸡肉概念|家电类' OR lc.name = '鸡肉概念|家电类') AND lb.bizdate BETWEEN '2005-01-01' AND '2005-1"
+    },
+    {
+      "excel_row": 37,
+      "query": "科创股，主力大单卖出超过100e的上影线的，成交量一个季度均线超过500w的标的。",
+      "slot_dsl": "indicator('科创板', '', '大单卖出金额', '', '', '', '') > 10000000000 and indicator('科创板', '', '上影线', '', '', '', '') > 0 and indicator('科创板', '', '一个季度均量线', '', '', '', '') > 5000000",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext",
+        "hsj_stock_hq_basic_technical"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((ext.bigSellTur > 10000000000 AND (base.upperShadow / 10000.0) > 0) AND tech.volume_avg_60 > 5000000) AND cod"
+    },
+    {
+      "excel_row": 39,
+      "query": "列出创业板近3个月收盘股价等于5的两市转债",
+      "slot_dsl": "indicator('创业板&沪&深', '', '收盘价', '近3个月', '可转债', '', '') = 5",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (base.closePx / 10000.0) = 5 AND base.mktcode IN (0, 1) AND code.gemFlag = TRUE AND 1=0 AND base.bizdate BETWEEN '2026-01-15' AND '2026-04-14'"
+    },
+    {
+      "excel_row": 53,
+      "query": "请给出近5个月连涨天数大于3天的，并且今天低位洼地的墨西哥市场股票",
+      "slot_dsl": "indicator('其他', '', '涨幅', '近5个月', '', '', 'CONS>3日') > 0 and position('其他', '', '', '', '今天', '', '', '') = '低'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = base.tgtcode AND wb.bizdate BETWEEN '2025-11-15' AND '2026-04-14' AND ((wb.lastPx - wb.preClosePx) * 100.0 / NULLIF(wb.preClosePx, 0)) > 0) > 3 AND CASE WHEN (base.lastPx / 10000.0) IS NULL OR (SELECT MIN((wb.lastPx / 10000.0))\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = "
+    },
+    {
+      "excel_row": 56,
+      "query": "我想知道近4日动态市盈率超过万分五的，成交量又逐渐下跌的上海A股的票",
+      "slot_dsl": "indicator('沪', '', '动态市盈率', '近4日', '', '', '') > 0.05% and indicator('沪', '', '成交量', '近4日', '', 'GROWTH_FALL', 'CONS=每日') > 0",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (lb.dynPE / 10000.0) > 0.05 AND lb.mktcode IN (1) AND lb.bizdate BETWEEN '2026-04-11' AND '2026-04-14'\n) AND EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic A"
+    },
+    {
+      "excel_row": 58,
+      "query": "请列出41个2017年沪港通静态PE大于15的，并且当天放量40%上涨的股票",
+      "slot_dsl": "indicator('', '', '沪港通标识', '2017年', '', '', '') = True and indicator('', '', '静态市盈率', '2017年', '', '', '') > 15 and indicator('', '', '成交量', '当天', '', 'GROWTH_RISE', '') = 40% and indicator('', '', '涨幅', '当天', '', '', '') > 0 limit 0,41",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (lc.shConnFlag = TRUE AND (lb.staticPE / 10000.0) > 15) AND lb.bizdate BETWEEN '2017-01-01' AND '2017-12-31'\n) AND EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_"
+    },
+    {
+      "excel_row": 65,
+      "query": "深市2006年-12年流通股本排名前十的金属管件制品期货有哪些",
+      "slot_dsl": "rank('深', '金属管件制品', '流通股本', 'desc', '2006年-12年', '期货', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.listedShare DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0) AND (code.hyBlkRefName = '金属管件制品' OR code.name = '金属管件制品') AND 1=0 AND base.bizdate BETWEEN '2006-01-01' AND '2012-12-31'\n) AS ranked\nWHERE rank_no <= 10"
+    },
+    {
+      "excel_row": 71,
+      "query": "在算力总股本从后往前前十的A股票",
+      "slot_dsl": "rank('沪|深|京', '算力', '总股本', 'asc', '', '', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.totalShare ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 1, 103) AND (code.hyBlkRefName = '算力' OR code.name = '算力')\n) AS ranked\nWHERE rank_no <= 10"
+    },
+    {
+      "excel_row": 79,
+      "query": "想了解一下家居日用品规模最低值从大到小第一的票",
+      "slot_dsl": "rank('', '家居日用品', '总市值', 'desc', '', '', 'MIN', '') = 1",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (SELECT MIN(((wb.lastPx / 10000.0) * wb.totalShare))\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = base.tgtcode) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE (code.hyBlkRefName = '家居日用品' OR code.name = '家居日用品')\n) AS ranked\nWHERE rank_no = 1"
+    },
+    {
+      "excel_row": 81,
+      "query": "给我找出一八年深圳A股总股本大于500亿的股票",
+      "slot_dsl": "indicator('深', '', '总股本', '一八年', '', '', '') > 50000000000",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE base.totalShare > 50000000000 AND base.mktcode IN (0) AND base.bizdate BETWEEN '2018-01-01' AND '2018-12-31'"
+    },
+    {
+      "excel_row": 83,
+      "query": "19日主力净流入大于0.5亿的a股上证180动量指数股票",
+      "slot_dsl": "indicator('沪|深|京', '上证180动量指数', '主力净流入', '19日', '', '', '') > 50000000",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ext.ZJLXMainNetTur > 50000000 AND base.mktcode IN (0, 1, 103) AND (code.hyBlkRefName = '上证180动量指数' OR code.name = '上证180动量指数') AND 1=1"
+    },
+    {
+      "excel_row": 84,
+      "query": "沪深两市中市净率从小到大第一的深市通",
+      "slot_dsl": "rank('沪|深', '', '市净率', 'asc', '', '', '', '') = 1 and indicator('沪|深', '', '深股通标识', '', '', '', '') = True",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.pBR / 10000.0) ASC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mktcode IN (0, 1)\n  ) AS ranked\n  WHER"
+    },
+    {
+      "excel_row": 97,
+      "query": "想了解一下非aigc概念中，沪市和深市最近两三天股票价格刚好超过年线的股票。",
+      "slot_dsl": "indicator('沪|深', '^aigc', '最新价', '最近两三天', '', '', '') > indicator('沪|深', '^aigc', '一年均线', '最近两三天', '', '', '')",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_basic_technical"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE (base.lastPx / 10000.0) > tech.ma250 AND base.mktcode IN (0, 1) AND (code.hyBlkRefName = '^aigc' OR code.name = '^aigc') AND 1=1"
+    },
+    {
+      "excel_row": 99,
+      "query": "我想知道找一下京沪市场动态PE二二年大于20且2007年前10的票",
+      "slot_dsl": "indicator('京|沪', '', '动态市盈率', '二二年', '', '', '') > 20 and rank('京|沪', '', '动态市盈率', 'desc', '2007年', '', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.dynPE / 10000.0) > 20 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.dynPE / 10000.0) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mkt"
+    },
+    {
+      "excel_row": 101,
+      "query": "有哪些深圳主板股票名字带“科技”的股票一六年委卖百分比大于10",
+      "slot_dsl": "indicator('深主板', '', '股票名称', '', '', '', '') = '%科技%' and indicator('深主板', '', '委比', '一六年', '', '', '') > 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (code.name LIKE '%科技%' AND ((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) > 10) AND base.mktcode IN (0) AND base.bizdate BETWEEN '2016-01-01' AND '2016-12-31'"
+    },
+    {
+      "excel_row": 108,
+      "query": "一二年科创板下跌大于50天，第4年又一直下跌3年的股票",
+      "slot_dsl": "indicator('科创板', '', '跌幅', '一二年', '', '', 'EXIST>50日') > 0 and indicator('科创板', '', '跌幅', '一二年的第4年', '', '', 'CONS=3年') > 0",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = lb.mktcode AND wb.tgtcode = lb.tgtcode AND wb.bizdate BETWEEN '2012-01-01' AND '2012-12-"
+    },
+    {
+      "excel_row": 112,
+      "query": "最近有哪些股票在大涨不低于八个点，之后第二天一直下跌3日且累计八个点以上",
+      "slot_dsl": "indicator('', '', '涨幅', '最近', '', '', '') >= 8% and indicator('', '', '跌幅', '最近的第二天', '', '', 'CONS=3日') >= 0 and indicator('', '', '跌幅', '最近的第二天的后3日', '', 'SUM', '') > 8%",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (((lb.lastPx - lb.preClosePx) * 100.0 / NULLIF(lb.preClosePx, 0)) >= 8 AND (SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n WHERE wb.mktcode = lb.mktcode AN"
+    },
+    {
+      "excel_row": 120,
+      "query": "储能＋数据中心＋创业板，股价低于30有哪些",
+      "slot_dsl": "indicator('创业板', '储能&数据中心', '最新价', '', '', '', '') < 30",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (base.lastPx / 10000.0) < 30 AND code.gemFlag = TRUE AND (code.hyBlkRefName = '储能&数据中心' OR code.name = '储能&数据中心')"
+    },
+    {
+      "excel_row": 121,
+      "query": "主力买了啥股啊，白酒+深主板+消费的",
+      "slot_dsl": "indicator('深主板', '白酒&消费', '主力净流入', '', '', '', '') > 0",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ext.ZJLXMainNetTur > 0 AND base.mktcode IN (0) AND (code.hyBlkRefName = '白酒&消费' OR code.name = '白酒&消费')"
+    },
+    {
+      "excel_row": 127,
+      "query": "请给出20年开盘价大于50或者近三年约为92的创业板",
+      "slot_dsl": "indicator('创业板', '', '开盘价', '20年', '', '', '') > 50 or indicator('创业板', '', '开盘价', '近三年', '', '', '') ~= 92",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (((base.openPx / 10000.0) > 50 AND code.gemFlag = TRUE AND base.bizdate BETWEEN '2020-01-01' AND '2020-12-31') OR ((base.openPx / 10000.0) = 92 AND code.gemFlag = TRUE AND base.bizdate BETWEEN '2024-01-01' AND '2026-04-14'))"
+    },
+    {
+      "excel_row": 128,
+      "query": "哪些股票deepseek相关沪深两市每股净资产倒数第一",
+      "slot_dsl": "rank('沪|深', 'deepseek相关', '每股净资产', 'asc', '', '', '', '') = 1",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.bVPS / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 1) AND (code.hyBlkRefName = 'deepseek相关' OR code.name = 'deepseek相关')\n) AS ranked\nWHERE rank_no = 1"
+    },
+    {
+      "excel_row": 130,
+      "query": "人形机器人相关概念股",
+      "slot_dsl": "indicator('', '人形机器人', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND (code.hyBlkRefName = '人形机器人' OR code.name = '人形机器人')"
+    },
+    {
+      "excel_row": 135,
+      "query": "有哪些股票市价总额从大到小前十的京深市场",
+      "slot_dsl": "rank('京|深', '', '总市值', 'desc', '', '', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ((base.lastPx / 10000.0) * base.totalShare) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (0, 103)\n) AS ranked\nWHERE rank_no <= 10"
+    },
+    {
+      "excel_row": 139,
+      "query": "请列出2012年主力卖出最多的前5，但之后四年一直排不到前十的股票",
+      "slot_dsl": "rank('', '', '主力净流出', 'desc', '2012年', '', '', '') <= 5 and rank('', '', '主力净流出', 'desc', '2012年的后4年', '', '', 'CONS=每年') > 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (-rext.ZJLXMainNetTur) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    LEFT JOIN newzl.hsj_stock_hq_ext AS rext O"
+    },
+    {
+      "excel_row": 142,
+      "query": "帮我查一下2018年涨速大于5%，第五年一直低于九个点的股票",
+      "slot_dsl": "indicator('', '', '3分钟涨速', '2018年', '', '', '') > 5% and indicator('', '', '3分钟涨速', '2018年的第五年', '', '', 'CONS>1') < 9%",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n    LEFT JOIN newzl.hsj_stock_hq_ext AS le ON le.mktcode = lb.mktcode AND le.tgtcode = lb.tgtcode AND le.bizdate = lb.bizdate\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND (le.riseSpd3m / 10000.0) > 5 AND lb."
+    },
+    {
+      "excel_row": 152,
+      "query": "想了解一下满足2022年量比前十的深港通的SHEIN相关票",
+      "slot_dsl": "rank('', 'SHEIN', '量比', 'desc', '2022年', '', '', '') <= 10 and indicator('', 'SHEIN', '深港通标识', '2022年', '', '', '') = True",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY (rb.quantRatio / 10000.0) DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE (rcode.hyBlkRefName = 'SHEIN' OR "
+    },
+    {
+      "excel_row": 162,
+      "query": "找一下2000年市净率大于1.5且沪深市场流通股本排名前十三的票",
+      "slot_dsl": "indicator('沪|深', '', '市净率', '2000年', '', '', '') > 1.5 and rank('沪|深', '', '流通股本', 'desc', '2000年', '', '', '') <= 13",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.pBR / 10000.0) > 1.5 AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY rb.listedShare DESC, rb.tgtcode ASC) AS rank_no\n    FROM newzl.hsj_stock_hq_basic AS rb\n    LEFT JOIN newzl.hsj_stock_code_info AS rcode ON rcode.mktcode = rb.mktcode AND rcode.tgtcode = rb.tgtcode\n    WHERE rb.mktcode IN"
+    },
+    {
+      "excel_row": 166,
+      "query": "查询股票：零三年流通股本大于300.52万，零四年跌停突破120日新低",
+      "slot_dsl": "indicator('', '', '流通股本', '零三年', '', '', '') > 3005200 and indicator('', '', '跌停', '零四年', '', '', '') = True and record_low('', '', '', '120日', '零四年', '', '', '') = True",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl.hsj_stock_code_info AS lc ON lc.mktcode = lb.mktcode AND lc.tgtcode = lb.tgtcode\n  WHERE lb.mktcode = base.mktcode AND lb.tgtcode = base.tgtcode AND lb.listedShare > 3005200 AND lb.bizdate BETWEEN '2003-01-01' AND '2003-12-31'\n) AND EXISTS (\n  SELECT 1\n  FROM newzl.hsj_stock_hq_basic AS lb\n    LEFT JOIN newzl"
+    },
+    {
+      "excel_row": 173,
+      "query": "找找电商行业的主板股看看",
+      "slot_dsl": "indicator('沪主板|深主板', '电商行业', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND base.mktcode IN (0, 1) AND (code.hyBlkRefName = '电商行业' OR code.name = '电商行业')"
+    },
+    {
+      "excel_row": 174,
+      "query": "工程咨询板块都有啥股票，南向通资金净流出前3的吧",
+      "slot_dsl": "indicator('', '工程咨询板块', '港股通标识', '', '', '', '') = True then rank('', '工程咨询板块', '主力净流出', 'desc', '', '', '', '') <= 3",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info",
+        "hsj_stock_hq_ext"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (-ext.ZJLXMainNetTur) DESC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE code.hkConnFlag = TRUE AND (code.hyBlkRefName = '工程咨询板块' OR code.name = '工程咨询板块')\n) AS ranked\nWHERE rank_no <= 3"
+    },
+    {
+      "excel_row": 175,
+      "query": "沪市调味发酵品行业有哪些股票啊",
+      "slot_dsl": "indicator('沪', '调味发酵品行业', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND base.mktcode IN (1) AND (code.hyBlkRefName = '调味发酵品行业' OR code.name = '调味发酵品行业')"
+    },
+    {
+      "excel_row": 176,
+      "query": "查找创业板的家居陈设股票",
+      "slot_dsl": "indicator('创业板', '家居陈设', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND code.gemFlag = TRUE AND (code.hyBlkRefName = '家居陈设' OR code.name = '家居陈设')"
+    },
+    {
+      "excel_row": 177,
+      "query": "找一下石膏石材板块的科创股",
+      "slot_dsl": "indicator('科创板', '石膏石材板块', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND code.kcbFlag = TRUE AND (code.hyBlkRefName = '石膏石材板块' OR code.name = '石膏石材板块')"
+    },
+    {
+      "excel_row": 178,
+      "query": "看看鸿蒙概念",
+      "slot_dsl": "indicator('', '鸿蒙概念', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND (code.hyBlkRefName = '鸿蒙概念' OR code.name = '鸿蒙概念')"
+    },
+    {
+      "excel_row": 179,
+      "query": "宠物经济的股票都包括啥呢",
+      "slot_dsl": "indicator('', '宠物经济', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND (code.hyBlkRefName = '宠物经济' OR code.name = '宠物经济')"
+    },
+    {
+      "excel_row": 180,
+      "query": "列出两市主板里社区团购里都有哪些票",
+      "slot_dsl": "indicator('沪主板|深主板', '社区团购', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND base.mktcode IN (0, 1) AND (code.hyBlkRefName = '社区团购' OR code.name = '社区团购')"
+    },
+    {
+      "excel_row": 181,
+      "query": "请查询在中关村60指数R内的深市股票",
+      "slot_dsl": "indicator('', '中关村60指数R', '', '', '', '', '') = 'all'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE 'all' = 'all' AND (code.hyBlkRefName = '中关村60指数R' OR code.name = '中关村60指数R')"
+    },
+    {
+      "excel_row": 183,
+      "query": "什么股票近期是深港通规模排名后十五",
+      "slot_dsl": "indicator('', '', '深港通标识', '近期', '', '', '') = True then rank('', '', '总市值', 'asc', '近期', '', '', '') <= 15",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ((base.lastPx / 10000.0) * base.totalShare) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE code.szConnFlag = TRUE AND 1=1\n) AS ranked\nWHERE rank_no <= 15"
+    },
+    {
+      "excel_row": 185,
+      "query": "找一只，三个月之内最低价后5的股票",
+      "slot_dsl": "rank('', '', '最低价', 'asc', '三个月之内', '', '', '') <= 5 limit 0,1",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lowPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE 1=1\n) AS ranked\nWHERE rank_no <= 5\nLIMIT 1"
+    },
+    {
+      "excel_row": 188,
+      "query": "找找沪市家电行业板块每股净资产大于一万块不多于三万的票",
+      "slot_dsl": "indicator('沪', '家电行业板块', '每股净资产', '', '', '', '') between '(10000,30000]'",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.bVPS / 10000.0) > 10000 AND (base.bVPS / 10000.0) <= 30000) AND base.mktcode IN (1) AND (code.hyBlkRefName = '家电行业板块' OR code.name = '家电行业板块')"
+    },
+    {
+      "excel_row": 189,
+      "query": "我要看看本月有啥换手率在10到20之间的股票，3~10个",
+      "slot_dsl": "indicator('', '', '换手率', '本月', '', '', '') between '[10,20]' limit 3,10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.turnRatio / 10000.0) >= 10 AND (base.turnRatio / 10000.0) <= 20) AND base.bizdate BETWEEN '2026-04-01' AND '2026-04-14'\nLIMIT 10"
+    },
+    {
+      "excel_row": 190,
+      "query": "2024年8月委比不小于50不多于90且9号前一天从小到大排名后10",
+      "slot_dsl": "indicator('', '', '委比', '2024年8月', '', '', '') between '[50,90]' and rank('', '', '委比', 'asc', '9号的前1日', '', '', '') <= 10",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) >= 50 AND ((base.commissionBuy - base.commissionSale) * 100.0 / NULLIF(base.commissionBuy + base.commissionSale, 0)) <= 90) AND EXISTS (\n  SELECT 1 FROM (\n    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY ((rb.commissionB"
+    },
+    {
+      "excel_row": 192,
+      "query": "请给出近5个月至今连着3天收阳线的沪股通股票",
+      "slot_dsl": "indicator('', '', '阳线', '近5个月至今', '', '', 'CONS=3日') = True and indicator('', '', '沪股通标识', '近5个月至今', '', '', '') = True",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_code_info",
+        "hsj_stock_hq_basic_technical"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((SELECT COUNT(*)\n FROM newzl.hsj_stock_hq_basic AS wb\n LEFT JOIN newzl.hsj_stock_hq_basic_technical AS wt ON wt.mktcode = wb.mktcode AND wt.tgtcode = wb.tgtcode AND wt.bizdate = wb.bizdate\n WHERE wb.mktcode = base.mktcode AND wb.tgtcode = ba"
+    },
+    {
+      "excel_row": 194,
+      "query": "查询北交所上周二至周四股价最低的股票排行榜",
+      "slot_dsl": "rank('京', '', '最新价', 'asc', '上周二至周四', '', '', '') > 0",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode IN (103) AND 1=1\n) AS ranked\nWHERE rank_no > 0"
+    },
+    {
+      "excel_row": 195,
+      "query": "非沪深，不统计北交所，本周一至周五最便宜的股票，S板",
+      "slot_dsl": "rank('^沪&^深&^京', 'S板', '最新价', 'asc', '本周一至周五', '', '', '') = 1",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY (base.lastPx / 10000.0) ASC, base.tgtcode ASC) AS rank_no\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.mktcode NOT IN (0, 1, 103) AND (code.hyBlkRefName = 'S板' OR code.name = 'S板') AND 1=1\n) AS ranked\nWHERE rank_no = 1"
+    },
+    {
+      "excel_row": 196,
+      "query": "帮我找出股价相较22年增长不大于30.52，且比22年后两个财年要低的票",
+      "slot_dsl": "indicator('', '', '最新价', '', '', '', '') <= indicator('', '', '最新价', '22年', '', '', '') + 30.52 and indicator('', '', '最新价', '', '', '', '') < indicator('', '', '最新价', '22年后2年', '', '', '')",
+      "requires_tables": [
+        "hsj_stock_hq_basic"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.lastPx / 10000.0) <= ((base.lastPx / 10000.0) + 30.52) AND (base.lastPx / 10000.0) < (base.lastPx / 10000.0)) AND base.bizdate BETWEEN '2022-01-01' AND '2022-12-31' AND 1=1"
+    },
+    {
+      "excel_row": 197,
+      "query": "查找全市场昨日股价大于4.5的日线多头形态排列票",
+      "slot_dsl": "indicator('沪|深|京', '', '最新价', '昨日', '', '', '') > 4.5 and indicator('沪|深|京', '', '均线多头排列', '昨日', '', '', '') = True",
+      "requires_tables": [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_basic_technical"
+      ],
+      "sql_preview": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((base.lastPx / 10000.0) > 4.5 AND tech.ma_bullish = TRUE) AND base.mktcode IN (0, 1, 103) AND base.bizdate = '2026-04-13'"
+    }
+  ]
+}

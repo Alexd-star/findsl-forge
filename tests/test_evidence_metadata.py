@@ -9,7 +9,12 @@ from pathlib import Path
 from findsl.evidence_metadata import build_evidence_metadata, render_evidence_summary_markdown
 
 
-def _write_minimal_snapshots(snapshot_dir: Path, *, include_doris: bool = True) -> None:
+def _write_minimal_snapshots(
+    snapshot_dir: Path,
+    *,
+    include_doris: bool = True,
+    include_official_real_data: bool = True,
+) -> None:
     snapshot_dir.mkdir(parents=True)
     (snapshot_dir / "submission_readiness.md").write_text(
         "\n".join(
@@ -69,6 +74,43 @@ def _write_minimal_snapshots(snapshot_dir: Path, *, include_doris: bool = True) 
             ),
             encoding="utf-8",
         )
+    if include_official_real_data:
+        (snapshot_dir / "official_doris_evidence.json").write_text(
+            json.dumps(
+                {
+                    "row_counts": {
+                        "hsj_stock_code_info": 5686,
+                        "hsj_stock_hq_basic": 13650347,
+                        "hsj_stock_hq_ext": 6170822,
+                    },
+                    "feature_tables_available": True,
+                    "feature_table_row_counts": {
+                        "hsj_stock_hq_basic_prefix": 13650347,
+                        "hsj_stock_hq_ext_prefix": 13650347,
+                        "hsj_stock_hq_basic_technical": 13650347,
+                    },
+                    "baseline_prefix_row_count_match": True,
+                    "baseline_vs_prefix_speedup": 1.173,
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        (snapshot_dir / "official_slot_coverage.json").write_text(
+            json.dumps(
+                {
+                    "row_count": 5799,
+                    "parse_ok": 5792,
+                    "parse_failed": 7,
+                    "compile_ok": 1682,
+                    "compile_failed": 4110,
+                    "compile_rate_on_all_rows": 0.29005,
+                    "compile_rate_on_parse_ok": 0.290401,
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
 
 
 def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(tmp_path: Path) -> None:
@@ -90,6 +132,13 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["doris_cluster"]["row_counts_match"] is True
     assert metadata["doris_cluster"]["baseline_avg_execute_ms"] == 5182.04244
     assert metadata["doris_cluster"]["optimized_avg_execute_ms"] == 142.99302
+    assert metadata["official_real_data"]["doris"]["available"] is True
+    assert metadata["official_real_data"]["doris"]["feature_tables_available"] is True
+    assert metadata["official_real_data"]["doris"]["baseline_prefix_row_count_match"] is True
+    assert metadata["official_real_data"]["doris"]["baseline_vs_prefix_speedup_display"] == "1.17x"
+    assert metadata["official_real_data"]["slot_coverage"]["row_count"] == 5799
+    assert metadata["official_real_data"]["slot_coverage"]["parse_ok"] == 5792
+    assert metadata["official_real_data"]["slot_coverage"]["compile_ok"] == 1682
     assert metadata["git"]["head_at_report_generation"] == "c7a2164"
     assert metadata["git"]["head_at_export"] == "c7a2164"
     assert metadata["warnings"] == []
@@ -148,6 +197,9 @@ def test_render_evidence_summary_markdown_highlights_auditable_metrics(tmp_path:
     assert "| Warning count | 0 |" in markdown
     assert "| Pytest regression | 192 passed" in markdown
     assert "| Official positive cases | 37/37 |" in markdown
+    assert "| Official slot coverage | 1682/5799 compiled |" in markdown
+    assert "| Official Doris real data | AVAILABLE |" in markdown
+    assert "| Official Doris feature tables | PASS |" in markdown
     assert "| Doris cluster speedup | 36.24x |" in markdown
     assert "| Git HEAD at report generation | c7a2164 |" in markdown
     assert "submission_readiness.md" in markdown

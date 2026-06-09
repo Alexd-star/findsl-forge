@@ -157,6 +157,8 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 
 此前新增 `docs/01_项目简介.md` 到 `docs/17_项目交付说明.md`，作为统一中文文档体系。当前进一步补充 `docs/18_企业级审计与补强报告.md`，记录功能、代码、算法、安全边界和交付成熟度审计结论。编号文档不会覆盖旧文档，而是提供清晰入口、补充中文解释，并引用已有详细资料。
 
+最新官方真实数据复盘见 `docs/22_官方真实数据落库复盘与满分冲刺计划.md`。该文档记录官方 CSV 全量落库、Doris Stream Load 修正、技术特征表分桶构建、官方三表和三张派生特征表行数、官方 workbook 覆盖率以及下一步满分冲刺任务。
+
 ## 8. 历史文件说明
 
 历史或可归档内容包括：
@@ -174,7 +176,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 
 ## 9. 最新版本文件说明
 
-当前最新源码以 `src/findsl/`、`configs/`、`tests/`、`scripts/`、`deploy/doris/`、`submission_artifacts/evidence_snapshots/` 为准。最终提交证据以 `submission_artifacts/evidence_manifest.md`、`submission_artifacts/evidence_metadata.json`、`submission_artifacts/evidence_summary.md` 和 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，不以被忽略的 `reports/` 为最终交付依据。
+当前最新源码以 `src/findsl/`、`configs/`、`tests/`、`scripts/`、`deploy/doris/`、`submission_artifacts/evidence_snapshots/` 为准。官方真实数据 Doris 证据以 `reports/official_doris_evidence.md/json` 的最新运行结果为本地原始产物，提交前应复制到 `submission_artifacts/evidence_snapshots/`。最终提交证据以 `submission_artifacts/evidence_manifest.md`、`submission_artifacts/evidence_metadata.json`、`submission_artifacts/evidence_summary.md` 和 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，不以被忽略的 `reports/` 为最终交付依据。
 
 ## 10. 不建议删除的文件
 

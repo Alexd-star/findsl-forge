@@ -1,24 +1,24 @@
-﻿# FinDSL Forge Submission Readiness Report
+# FinDSL Forge Submission Readiness Report
 
 ## Decision Summary
 
-- Generated at: 2026-06-08T15:25:12+00:00
+- Generated at: 2026-06-09T17:59:05+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `7559e28` docs: rebuild visual evidence figures in paper style
+- Git HEAD at report generation: `e1a210d` docs: mark official alias plan complete
 - Git branch: `main`
 - Blocking gates passed: True
-- Warning count: 0
+- Warning count: 1
 
 ## Gate Matrix
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 13844.6 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.831 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 17866.1 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.825 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 1.282 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 1.163 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -28,21 +28,21 @@
 | Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
-| Git rollback cleanliness | warning | PASS | clean working tree |
+| Git rollback cleanliness | warning | WARN | 26 dirty entries before commit |
 | Doris-scale performance proof | warning | PASS | cluster EXPLAIN/latency and 10x speedup evidence captured |
 
 ## Competition Metrics
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.831 ms
+- Compile P95 latency: 1.825 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.41x
+- Local SQLite prefix benchmark speedup smoke: 1.01x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 1.282 ms
+- Compile latency: 1.163 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -170,20 +170,47 @@
 ## Git Rollback State
 
 - Repository detected: True
-- Clean working tree: True
-- Dirty entries: none
+- Clean working tree: False
+- Dirty entries:
+  - ` M CHANGELOG.md`
+  - ` M PROJECT_INDEX.md`
+  - ` M README.md`
+  - ` M deploy/doris/official/01_schema.sql`
+  - ` M deploy/doris/official/02_stream_load.md`
+  - ` M deploy/doris/official/04_feature_tables.sql`
+  - ` M "docs/17_\351\241\271\347\233\256\344\272\244\344\273\230\350\257\264\346\230\216.md"`
+  - ` M "docs/21_\345\256\230\346\226\271\347\234\237\345\256\236\346\225\260\346\215\256\345\206\262\345\210\272\350\256\241\345\210\222\344\270\216\351\252\214\346\224\266\351\227\255\347\216\257.md"`
+  - ` M docs/README.md`
+  - ` M scripts/export_submission_artifacts.ps1`
+  - ` M src/findsl/evidence_metadata.py`
+  - ` M submission_artifacts/evidence_manifest.md`
+  - ` M submission_artifacts/evidence_metadata.json`
+  - ` M submission_artifacts/evidence_snapshots/submission_readiness.md`
+  - ` M submission_artifacts/evidence_summary.md`
+  - ` M tests/test_evidence_metadata.py`
+  - ` M tests/test_official_doris_assets.py`
+  - ` M tests/test_official_slot.py`
+  - `?? deploy/doris/official/05_technical_features_by_market.sql`
+  - `?? "docs/22_\345\256\230\346\226\271\347\234\237\345\256\236\346\225\260\346\215\256\350\220\275\345\272\223\345\244\215\347\233\230\344\270\216\346\273\241\345\210\206\345\206\262\345\210\272\350\256\241\345\210\222.md"`
+  - `?? docs/superpowers/plans/2026-06-10-official-doris-evidence-automation.md`
+  - `?? scripts/prepare_official_doris_evidence.ps1`
+  - `?? submission_artifacts/evidence_snapshots/official_doris_evidence.json`
+  - `?? submission_artifacts/evidence_snapshots/official_doris_evidence.md`
+  - `?? submission_artifacts/evidence_snapshots/official_slot_coverage.json`
+  - `?? submission_artifacts/evidence_snapshots/official_slot_coverage.md`
 
 ## Pytest Evidence
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest`
 - Exit code: 0
-- Elapsed: 13844.6 ms
+- Elapsed: 17866.1 ms
 
 ```text
-........................................................................ [ 35%]
-........................................................................ [ 70%]
-...........................................................              [100%]
-203 passed in 13.11s
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+........................................................................ [ 82%]
+.............................................                            [100%]
+261 passed in 17.23s
 ```
 
 ## Award-Readiness Differentiators

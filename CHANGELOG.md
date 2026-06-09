@@ -2,6 +2,19 @@
 
 本文档记录 FinDSL Forge 的重要变更。详细提交历史以 Git 为准，提交包证据以 `submission_artifacts/evidence_snapshots/` 为准。
 
+## 2026-06-10
+
+### 官方真实数据与 Doris 证据
+
+- 完成官方三张 CSV 在本地 Apache Doris 中的真实落库核验：`hsj_stock_code_info=5686`、`hsj_stock_hq_basic=13650347`、`hsj_stock_hq_ext=6170822`。
+- 修正官方 schema 中 `lastPx/preClosePx` 真实空值处理，避免 Stream Load 过滤或失败。
+- 将官方 Stream Load 默认路径调整为宿主机直连 BE `8040`，并显式使用 `Expect: 100-continue`、`strict_mode:false`、`max_filter_ratio:0` 和长超时。
+- 将 `hsj_stock_hq_basic_technical` 构建从单次大 INSERT 改为 `mktcode + tgtcode hash bucket` 分片构建，解决单 BE Docker 环境下的内存 OOM。
+- 新增 `scripts/prepare_official_doris_evidence.ps1`，统一完成官方文件检查、Doris 就绪检查、落库、特征表构建、行数验收、SQL/EXPLAIN 证据和 Markdown/JSON 报告生成。
+- 新增 `deploy/doris/official/05_technical_features_by_market.sql`，用于按市场和 hash bucket 构建长周期技术特征。
+- 生成官方 Doris 证据报告，确认三张派生特征表均为 `13650347` 行，并在报告生成前强制校验 baseline/prefix 行数一致。
+- 新增 `docs/22_官方真实数据落库复盘与满分冲刺计划.md`，记录真实数据分析、根因修复、证据结果、剩余短板和后续冲刺计划。
+
 ## 2026-06-07
 
 ### 文档整理

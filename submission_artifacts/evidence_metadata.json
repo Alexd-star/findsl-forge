@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T15:25:26Z",
+  "generated_at": "2026-06-09T17:59:17Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "7559e28",
-    "head_at_export": "7559e28",
+    "head_at_report_generation": "e1a210d",
+    "head_at_export": "e1a210d",
     "branch": "main"
   },
   "readiness": {
-    "generated_at": "2026-06-08T15:25:12+00:00",
+    "generated_at": "2026-06-09T17:59:05+00:00",
     "blocking_gates_passed": true,
-    "warning_count": 0,
+    "warning_count": 1,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.831,
+    "compile_p95_latency_ms": 1.825,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 203,
-      "elapsed_seconds": 13.11
+      "passed": 261,
+      "elapsed_seconds": 17.23
     }
   },
   "official_suite": {
@@ -36,6 +36,35 @@
     "negative": {
       "passed": 37,
       "total": 37
+    }
+  },
+  "official_real_data": {
+    "doris": {
+      "available": true,
+      "feature_tables_available": true,
+      "baseline_prefix_row_count_match": true,
+      "baseline_vs_prefix_speedup": 1.173,
+      "baseline_vs_prefix_speedup_display": "1.17x",
+      "row_counts": {
+        "hsj_stock_hq_ext": 6170822,
+        "hsj_stock_hq_basic": 13650347,
+        "hsj_stock_code_info": 5686
+      },
+      "feature_table_row_counts": {
+        "hsj_stock_hq_basic_technical": 13650347,
+        "hsj_stock_hq_basic_prefix": 13650347,
+        "hsj_stock_hq_ext_prefix": 13650347
+      }
+    },
+    "slot_coverage": {
+      "available": true,
+      "row_count": 5799,
+      "parse_ok": 5792,
+      "parse_failed": 7,
+      "compile_ok": 1682,
+      "compile_failed": 4110,
+      "compile_rate_on_all_rows": 0.29005,
+      "compile_rate_on_parse_ok": 0.290401
     }
   },
   "doris_cluster": {
@@ -57,6 +86,8 @@
   "source_files": {
     "submission_readiness": "submission_artifacts\\evidence_snapshots\\submission_readiness.md",
     "official_suite_report": "submission_artifacts\\evidence_snapshots\\official_suite_report.md",
+    "official_doris_evidence_json": "submission_artifacts\\evidence_snapshots\\official_doris_evidence.json",
+    "official_slot_coverage_json": "submission_artifacts\\evidence_snapshots\\official_slot_coverage.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }

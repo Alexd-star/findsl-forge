@@ -14,6 +14,16 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
     official_text = _read_optional_text(snapshot_dir / "official_suite_report.md", warnings)
     manifest_text = _read_optional_text(manifest_path, warnings) if manifest_path else ""
     doris_payload = _read_optional_json(snapshot_dir / "doris_cluster_evidence.json", warnings)
+    official_doris_payload = _read_optional_json(
+        snapshot_dir / "official_doris_evidence.json",
+        warnings,
+        warn_missing=False,
+    )
+    official_slot_payload = _read_optional_json(
+        snapshot_dir / "official_slot_coverage.json",
+        warnings,
+        warn_missing=False,
+    )
 
     return {
         "schema_version": 1,
@@ -26,6 +36,10 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         },
         "readiness": _readiness_metadata(readiness_text),
         "official_suite": _official_suite_metadata(official_text or readiness_text),
+        "official_real_data": {
+            "doris": _official_doris_metadata(official_doris_payload),
+            "slot_coverage": _official_slot_coverage_metadata(official_slot_payload),
+        },
         "doris_cluster": _doris_metadata(doris_payload),
         "warnings": warnings,
         "source_files": _source_files(snapshot_dir, manifest_path),
@@ -50,6 +64,9 @@ def write_evidence_metadata(
 def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     readiness = _dict(metadata.get("readiness"))
     official = _dict(metadata.get("official_suite"))
+    official_real = _dict(metadata.get("official_real_data"))
+    official_doris = _dict(official_real.get("doris"))
+    official_slot = _dict(official_real.get("slot_coverage"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
     warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
@@ -69,6 +86,10 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Pytest regression | {_pytest_display(readiness)} |",
         f"| Official positive cases | {_ratio_display(_dict(official.get('positive')))} |",
         f"| Official negative diagnostics | {_ratio_display(_dict(official.get('negative')))} |",
+        f"| Official slot coverage | {_official_slot_coverage_display(official_slot)} |",
+        f"| Official Doris real data | {_official_doris_display(official_doris)} |",
+        f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
+        f"| Official Doris prefix speedup | {_display(official_doris.get('baseline_vs_prefix_speedup_display'))} |",
         f"| Defense package checks | {_ratio_display(_dict(readiness.get('defense_package_checks')))} |",
         f"| Doris evidence | {_doris_evidence_display(doris)} |",
         f"| Doris cluster speedup | {_display(doris.get('speedup_display'))} |",
@@ -103,9 +124,10 @@ def _read_optional_text(path: Path | None, warnings: list[str]) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _read_optional_json(path: Path, warnings: list[str]) -> dict[str, Any] | None:
+def _read_optional_json(path: Path, warnings: list[str], *, warn_missing: bool = True) -> dict[str, Any] | None:
     if not path.exists():
-        warnings.append(f"{path.name} not found; Doris metrics are unavailable.")
+        if warn_missing:
+            warnings.append(f"{path.name} not found; Doris metrics are unavailable.")
         return None
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -180,10 +202,65 @@ def _doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
     }
 
 
+def _official_doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "feature_tables_available": None,
+            "baseline_prefix_row_count_match": None,
+            "baseline_vs_prefix_speedup": None,
+            "baseline_vs_prefix_speedup_display": None,
+            "row_counts": {},
+            "feature_table_row_counts": {},
+        }
+    speedup = _number_or_none(payload.get("baseline_vs_prefix_speedup"))
+    row_counts = payload.get("row_counts") if isinstance(payload.get("row_counts"), dict) else {}
+    feature_rows = (
+        payload.get("feature_table_row_counts")
+        if isinstance(payload.get("feature_table_row_counts"), dict)
+        else {}
+    )
+    return {
+        "available": True,
+        "feature_tables_available": _bool_or_none(payload.get("feature_tables_available")),
+        "baseline_prefix_row_count_match": _bool_or_none(payload.get("baseline_prefix_row_count_match")),
+        "baseline_vs_prefix_speedup": speedup,
+        "baseline_vs_prefix_speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
+        "row_counts": row_counts,
+        "feature_table_row_counts": feature_rows,
+    }
+
+
+def _official_slot_coverage_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "row_count": None,
+            "parse_ok": None,
+            "parse_failed": None,
+            "compile_ok": None,
+            "compile_failed": None,
+            "compile_rate_on_all_rows": None,
+            "compile_rate_on_parse_ok": None,
+        }
+    return {
+        "available": True,
+        "row_count": _int_or_none(payload.get("row_count")),
+        "parse_ok": _int_or_none(payload.get("parse_ok")),
+        "parse_failed": _int_or_none(payload.get("parse_failed")),
+        "compile_ok": _int_or_none(payload.get("compile_ok")),
+        "compile_failed": _int_or_none(payload.get("compile_failed")),
+        "compile_rate_on_all_rows": _number_or_none(payload.get("compile_rate_on_all_rows")),
+        "compile_rate_on_parse_ok": _number_or_none(payload.get("compile_rate_on_parse_ok")),
+    }
+
+
 def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, str | None]:
     return {
         "submission_readiness": str(snapshot_dir / "submission_readiness.md"),
         "official_suite_report": str(snapshot_dir / "official_suite_report.md"),
+        "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
+        "official_slot_coverage_json": str(snapshot_dir / "official_slot_coverage.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }
@@ -284,3 +361,19 @@ def _doris_evidence_display(doris: dict[str, Any]) -> str:
     if doris.get("available") is False:
         return "UNAVAILABLE"
     return _pass_fail(doris.get("passed"))
+
+
+def _official_doris_display(doris: dict[str, Any]) -> str:
+    if doris.get("available") is False:
+        return "UNAVAILABLE"
+    return "AVAILABLE"
+
+
+def _official_slot_coverage_display(slot_coverage: dict[str, Any]) -> str:
+    if slot_coverage.get("available") is False:
+        return "UNAVAILABLE"
+    compile_ok = slot_coverage.get("compile_ok")
+    row_count = slot_coverage.get("row_count")
+    if compile_ok is None or row_count is None:
+        return "<unknown>"
+    return f"{compile_ok}/{row_count} compiled"
