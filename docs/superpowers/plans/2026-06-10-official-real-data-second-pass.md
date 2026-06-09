@@ -162,7 +162,7 @@ git diff -- src/findsl/official_slot.py tests/test_official_slot.py tests/test_o
 
 Expected: only planned files changed.
 
-- [ ] **Step 3: Commit and push**
+- [x] **Step 3: Commit and push**
 
 Use a focused commit message:
 
