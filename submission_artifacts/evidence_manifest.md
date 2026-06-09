@@ -1,18 +1,14 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-06-10 02:19:37 +08:00
-- Git HEAD at export: 53df867
-- Git status when exported, excluding evidence snapshots and this export script:  M src/findsl/official_slot.py
- M tests/test_official_slot.py
-?? configs/official_technical_patterns.json
-?? "docs/23_\345\256\230\346\226\271\347\234\237\345\256\236\346\225\260\346\215\256\344\272\214\346\254\241\350\247\243\345\211\226\344\270\216\346\212\200\346\234\257\345\275\242\346\200\201\345\207\275\346\225\260\350\241\245\345\274\272.md"
-?? docs/superpowers/plans/2026-06-10-official-technical-pattern-functions.md
+- Generated at: 2026-06-10 02:21:36 +08:00
+- Git HEAD at export: 32d5cdf
+- Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `submission_readiness.md` (11489 bytes)
+- `submission_readiness.md` (11501 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `doris_cluster_evidence.json` (6537 bytes)
 - `defense_package.md` (9652 bytes)
