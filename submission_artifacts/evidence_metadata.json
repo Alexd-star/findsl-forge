@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-09T19:38:02Z",
+  "generated_at": "2026-06-09T20:19:30Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "015287e",
-    "head_at_export": "015287e",
+    "head_at_report_generation": "182a189",
+    "head_at_export": "182a189",
     "branch": "main"
   },
   "readiness": {
-    "generated_at": "2026-06-09T19:37:50+00:00",
+    "generated_at": "2026-06-09T20:19:12+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 2.529,
+    "compile_p95_latency_ms": 2.576,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 287,
-      "elapsed_seconds": 19.74
+      "passed": 295,
+      "elapsed_seconds": 25.88
     }
   },
   "official_suite": {
@@ -61,10 +61,10 @@
       "row_count": 5799,
       "parse_ok": 5792,
       "parse_failed": 7,
-      "compile_ok": 1844,
-      "compile_failed": 3948,
-      "compile_rate_on_all_rows": 0.317986,
-      "compile_rate_on_parse_ok": 0.31837
+      "compile_ok": 1872,
+      "compile_failed": 3920,
+      "compile_rate_on_all_rows": 0.322814,
+      "compile_rate_on_parse_ok": 0.323204
     }
   },
   "doris_cluster": {

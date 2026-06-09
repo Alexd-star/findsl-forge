@@ -1,14 +1,14 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-06-10 03:38:02 +08:00
-- Git HEAD at export: 015287e
+- Generated at: 2026-06-10 04:19:30 +08:00
+- Git HEAD at export: 182a189
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `submission_readiness.md` (11499 bytes)
+- `submission_readiness.md` (11594 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `doris_cluster_evidence.json` (6537 bytes)
 - `defense_package.md` (9652 bytes)
@@ -20,8 +20,8 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `official_doris_evidence.md` (19875 bytes)
 - `official_doris_evidence.json` (21914 bytes)
-- `official_slot_coverage.md` (71609 bytes)
-- `official_slot_coverage.json` (114309 bytes)
+- `official_slot_coverage.md` (71606 bytes)
+- `official_slot_coverage.json` (114283 bytes)
 
 ## Excluded By Design
 
