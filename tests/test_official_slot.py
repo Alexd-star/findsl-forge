@@ -684,6 +684,36 @@ def test_compile_then_grouped_rank_or_conditions_share_prefiltered_stage():
     assert " OR " in result.sql
 
 
+def test_compile_or_of_independent_then_rank_branches_uses_union():
+    result = OfficialSlotCompiler().compile(
+        "(indicator('', '', '港股通标识', '', '', '', '') = True "
+        "then rank('', '', '主力净流入', 'desc', '', '', '', '') = 1) "
+        "or (indicator('', '', '陆股通标识', '', '', '', '') = True "
+        "then rank('', '', '主力净流入', 'desc', '', '', '', '') = 1)"
+    )
+
+    assert "\nUNION\n" in result.sql
+    assert result.sql.count("ROW_NUMBER() OVER") == 2
+    assert "code.hkConnFlag = TRUE" in result.sql
+    assert "ORDER BY ext.ZJLXMainNetTur DESC" in result.sql
+    assert result.requires_tables == ["hsj_stock_hq_basic", "hsj_stock_code_info", "hsj_stock_hq_ext"]
+
+
+def test_compile_then_branch_inside_and_as_membership_condition():
+    result = OfficialSlotCompiler().compile(
+        "(indicator('', '', '港股通标识', '', '', '', '') = True "
+        "then rank('', '', '主力净流入', 'desc', '', '', '', '') = 1) "
+        "and indicator('', '', 'ST股票标识', '', '', '', '') = False"
+    )
+
+    assert "EXISTS (" in result.sql
+    assert "then_result.mktcode = base.mktcode" in result.sql
+    assert "then_result.tgtcode = base.tgtcode" in result.sql
+    assert "ROW_NUMBER() OVER" in result.sql
+    assert "code.hkConnFlag = TRUE" in result.sql
+    assert "NOT (code.stFlag = TRUE)" in result.sql
+
+
 def test_compile_rank_comparison_inside_boolean_pipeline():
     result = OfficialSlotCompiler().compile(
         "rank('', '', '市净率', 'desc', '', '', '', '') <= 10 "

@@ -842,12 +842,24 @@ class OfficialSlotCompiler:
             if len(stages) > 2:
                 return self._compile_then_chain(stages, warnings)
             return self._compile_then(node, warnings)
+        if isinstance(node, OfficialBinaryOp) and node.op == "or" and self._contains_then(node):
+            return self._compile_or_union_query(node, warnings)
         if self._is_rank_filter_comparison(node):
             return self._compile_rank_query(node, None, warnings)
         condition = self._condition_sql(node, warnings)
         tables = self._ordered_tables(condition.tables)
         where = self._where_clause(condition)
         return self._select_sql(tables, where), tables
+
+    def _compile_or_union_query(self, node: OfficialNode, warnings: List[str]) -> Tuple[str, List[str]]:
+        branches = self._flatten_boolean_chain(node, "or")
+        branch_sql: List[str] = []
+        all_tables: List[str] = []
+        for branch in branches:
+            sql, tables = self._compile_query(branch, warnings)
+            branch_sql.append(sql)
+            all_tables.extend(tables)
+        return "\nUNION\n".join(branch_sql), self._ordered_tables(all_tables)
 
     def _compile_then(self, node: OfficialBinaryOp, warnings: List[str]) -> Tuple[str, List[str]]:
         left = self._condition_sql(node.left, warnings)
@@ -887,6 +899,26 @@ class OfficialSlotCompiler:
         if isinstance(node, OfficialBinaryOp) and node.op == "then":
             return self._flatten_then_chain(node.left) + self._flatten_then_chain(node.right)
         return [node]
+
+    def _flatten_boolean_chain(self, node: OfficialNode, op: str) -> List[OfficialNode]:
+        if isinstance(node, OfficialBinaryOp) and node.op == op:
+            return self._flatten_boolean_chain(node.left, op) + self._flatten_boolean_chain(node.right, op)
+        return [node]
+
+    def _contains_then(self, node: OfficialNode) -> bool:
+        if isinstance(node, OfficialBinaryOp):
+            if node.op == "then":
+                return True
+            return self._contains_then(node.left) or self._contains_then(node.right)
+        if isinstance(node, OfficialComparison):
+            return self._contains_then(node.left) or self._contains_then(node.right)
+        if isinstance(node, OfficialLimit):
+            return self._contains_then(node.expr)
+        if isinstance(node, OfficialFunctionCall):
+            return any(self._contains_then(arg) for arg in node.args)
+        if isinstance(node, OfficialRangeLiteral):
+            return self._contains_then(node.lower) or self._contains_then(node.upper)
+        return False
 
     def _compile_then_chain(self, stages: Sequence[OfficialNode], warnings: List[str]) -> Tuple[str, List[str]]:
         if len(stages) < 2:
@@ -1081,6 +1113,8 @@ class OfficialSlotCompiler:
         return f"{rank_no_sql} {self._sql_operator(node.op)} {limit_value}"
 
     def _condition_sql(self, node: OfficialNode, warnings: List[str]) -> SqlExpr:
+        if isinstance(node, OfficialBinaryOp) and node.op == "then":
+            return self._then_membership_condition_sql(node, warnings)
         if isinstance(node, OfficialBinaryOp) and node.op in {"and", "or"}:
             left = self._condition_sql(node.left, warnings)
             right = self._condition_sql(node.right, warnings)
@@ -1123,6 +1157,26 @@ class OfficialSlotCompiler:
         if expr.kind == "boolean":
             return expr
         raise OfficialSlotError("OFFICIAL_CONDITION_ERROR", "Top-level official DSL expression must be boolean")
+
+    def _then_membership_condition_sql(self, node: OfficialBinaryOp, warnings: List[str]) -> SqlExpr:
+        sql, tables = self._compile_query(node, warnings)
+        if sql.lstrip().upper().startswith("WITH "):
+            raise OfficialSlotError(
+                "OFFICIAL_EXPR_ERROR",
+                "then chain inside boolean conditions needs top-level query planning",
+            )
+        membership_sql = (
+            "EXISTS (\n"
+            "  SELECT 1\n"
+            "  FROM (\n"
+            f"{sql}\n"
+            "  ) AS then_result\n"
+            "  WHERE then_result.mktcode = base.mktcode\n"
+            "    AND then_result.tgtcode = base.tgtcode\n"
+            "    AND then_result.bizdate = base.bizdate\n"
+            ")"
+        )
+        return SqlExpr(membership_sql, "boolean", tables, [])
 
     def _rank_condition_sql(self, node: OfficialNode, warnings: List[str]) -> SqlExpr:
         if not isinstance(node, OfficialComparison) or not isinstance(node.left, OfficialFunctionCall):
