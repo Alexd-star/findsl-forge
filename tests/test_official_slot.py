@@ -488,6 +488,27 @@ def test_compile_position_generates_grounded_case_expression_for_price_window():
     assert "base.bizdate = '2026-04-14'" in result.sql
 
 
+def test_compile_position_count_exp_window_predicate():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "position('', '', '最新价', '10日', '近5日', '', '', 'CONS=3日') = '低'"
+    )
+
+    assert "CASE" in result.sql
+    assert "MAX(run_length) >= 3" in result.sql
+    assert "= '低'" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+
+
+def test_compile_record_high_count_exp_window_predicate():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "record_high('', '', '最高价', '120日', '近5日', '', '', 'EXIST>=2日') = True"
+    )
+
+    assert "we.pxMkTopDays >= 120" in result.sql
+    assert ") >= 2" in result.sql
+    assert "wb.bizdate BETWEEN '2026-04-10' AND '2026-04-14'" in result.sql
+
+
 def test_compile_official_time_and_order_flow_indicators_from_real_columns():
     result = OfficialSlotCompiler().compile(
         "indicator('', '', '涨停时间', '', '', '', '') < '10:00:00' "
@@ -585,6 +606,29 @@ def test_compile_official_count_exp_between_window():
     assert ") >= 3" in result.sql
 
 
+def test_compile_count_exp_inside_arithmetic_expression_uses_window_predicate():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('沪', '', '内盘', '近5周', '', '', 'EXIST>6日') "
+        "/ indicator('沪', '', '每手股数', '近5周', '', '', 'EXIST>6日') > 2000"
+    )
+
+    assert "FROM newzl.hsj_stock_hq_basic AS wb" in result.sql
+    assert "(wb.innerVol / 100) > 2000" in result.sql
+    assert ") > 6" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
+def test_compile_count_exp_expression_supports_indicator_to_indicator_comparison():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '收盘价', '近三十天', '', '', 'CONS=4日') "
+        ">= indicator('', '', '5日均线', '近三十天', '', '', 'CONS=4日')"
+    )
+
+    assert "(wb.closePx / 10000.0) >= wt.ma5" in result.sql
+    assert "MAX(run_length) >= 4" in result.sql
+    assert "wb.bizdate BETWEEN '2026-03-16' AND '2026-04-14'" in result.sql
+
+
 def test_compile_official_aggregate_count_exp_uses_bucketed_aggregate():
     result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
         "indicator('', '', '成交量', '近5日', '', 'AVG', 'EXIST>=3日') > 1000"
@@ -607,6 +651,16 @@ def test_compile_official_daily_growth_count_exp_uses_lag_pairs():
     assert "- wb.volume) * 100.0" in result.sql
     assert "bucketed.agg_value IS NOT NULL" in result.sql
     assert "SUM(CASE WHEN bucketed.agg_value > 0 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
+
+
+def test_compile_cons_count_exp_uses_longest_run_not_plain_count():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '涨幅', '近5日', '', '', 'CONS=3日') > 5%"
+    )
+
+    assert "ROW_NUMBER() OVER (ORDER BY matched.bizdate)" in result.sql
+    assert "DATEDIFF(matched.bizdate" in result.sql
+    assert "MAX(run_length) >= 3" in result.sql
 
 
 def test_compile_rank_then_pipeline_for_official_slot_dsl():
@@ -726,6 +780,17 @@ def test_compile_rank_comparison_inside_boolean_pipeline():
     assert "base.limitFlag = 1" in result.sql
 
 
+def test_compile_rank_between_top_level_condition():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '收盘价', 'desc', '今天', '', '', '') between '[5,10]'"
+    )
+
+    assert "ROW_NUMBER() OVER" in result.sql
+    assert "ranked.rank_no >= 5" in result.sql
+    assert "ranked.rank_no <= 10" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+
+
 def test_compile_rank_greater_than_zero_as_official_rank_only_intent():
     result = OfficialSlotCompiler().compile(
         "rank('', '', '涨幅', 'desc', '今日', '板块', '', '') > 0 limit 30,-1"
@@ -757,6 +822,18 @@ def test_compile_rank_count_exp_every_bucket_requires_all_ranked_buckets():
     assert "SUM(CASE WHEN ranked.rank_no <= 10 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
     assert "COUNT(*) > 0" in result.sql
     assert "DATE_TRUNC(rb.bizdate, 'day')" in result.sql
+
+
+def test_compile_rank_count_exp_between_percent_uses_partition_count():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "rank('', '', '市盈率', 'desc', '近15天', '', '', 'CONS=3日') between '[5%,10%]'"
+    )
+
+    assert "COUNT(*) OVER (PARTITION BY DATE_TRUNC(rb.bizdate, 'day')) AS partition_count" in result.sql
+    assert "CEIL((ranked.partition_count * 5) / 100.0)" in result.sql
+    assert "CEIL((ranked.partition_count * 10) / 100.0)" in result.sql
+    assert "ranked.rank_no >=" in result.sql
+    assert "ranked.rank_no <=" in result.sql
 
 
 def test_parse_official_slot_supports_signed_percent_and_negative_limit_bound():

@@ -149,6 +149,15 @@ class CountExpRule:
 
 
 @dataclass(frozen=True)
+class CountExpSpec:
+    count_exp: str
+    market: str
+    filter_scope: str
+    date: str
+    select_type: str
+
+
+@dataclass(frozen=True)
 class OfficialCompileResult:
     source: str
     ast: Dict[str, Any]
@@ -863,7 +872,9 @@ class OfficialSlotCompiler:
 
     def _compile_then(self, node: OfficialBinaryOp, warnings: List[str]) -> Tuple[str, List[str]]:
         left = self._condition_sql(node.left, warnings)
-        if self._is_rank_filter_comparison(node.right):
+        if self._is_rank_filter_comparison(node.right) and not (
+            isinstance(node.right, OfficialComparison) and node.right.op == "between"
+        ):
             return self._compile_rank_query(node.right, left, warnings)
         return self._compile_then_condition_stage(left, node.right, warnings)
 
@@ -1010,10 +1021,8 @@ class OfficialSlotCompiler:
             where = self._where_clause(condition)
             return self._select_sql(tables, where), tables
         rank_expr = self._rank_expr(rank_call, warnings)
-        limit_value = self._literal_sql(node.right)
-        if node.op not in {"<=", "=", "<", ">", ">=", "!="}:
+        if node.op not in {"<=", "=", "<", ">", ">=", "!=", "between"}:
             raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
-        rank_limit = f"rank_no {self._sql_operator(node.op)} {limit_value}"
         tables = self._ordered_tables(rank_expr.tables + (prefilter.tables if prefilter else []))
         constraints = rank_expr.constraints + (prefilter.constraints if prefilter else [])
         where_parts = []
@@ -1025,12 +1034,13 @@ class OfficialSlotCompiler:
         sql = (
             "SELECT * FROM (\n"
             "  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n"
-            f"         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY {rank_expr.sql} {self._rank_order(rank_call)}, base.tgtcode ASC) AS rank_no\n"
+            f"         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY {rank_expr.sql} {self._rank_order(rank_call)}, base.tgtcode ASC) AS rank_no,\n"
+            "         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n"
             "  FROM newzl.hsj_stock_hq_basic AS base\n"
             f"{joins}"
             f"  WHERE {where}\n"
             ") AS ranked\n"
-            f"WHERE {rank_limit}"
+            f"WHERE {self._rank_no_predicate(node, 'ranked.rank_no', 'ranked.partition_count')}"
         )
         return sql, tables
 
@@ -1097,20 +1107,36 @@ class OfficialSlotCompiler:
         )
         return SqlExpr(sql=sql, kind="boolean", tables=["hsj_stock_hq_basic"], constraints=[])
 
-    def _rank_no_predicate(self, node: OfficialComparison, rank_no_sql: str) -> str:
+    def _rank_no_predicate(
+        self,
+        node: OfficialComparison,
+        rank_no_sql: str,
+        partition_count_sql: str = "",
+    ) -> str:
         if node.op == "between":
             if not isinstance(node.right, OfficialRangeLiteral):
                 right = self._expr_sql(node.right, [])
                 return f"{rank_no_sql} BETWEEN {right.sql}"
-            lower = self._expr_sql(node.right.lower, [])
-            upper = self._expr_sql(node.right.upper, [])
+            lower = self._rank_bound_sql(node.right.lower, partition_count_sql)
+            upper = self._rank_bound_sql(node.right.upper, partition_count_sql)
             lower_op = ">=" if node.right.lower_inclusive else ">"
             upper_op = "<=" if node.right.upper_inclusive else "<"
-            return f"({rank_no_sql} {lower_op} {lower.sql} AND {rank_no_sql} {upper_op} {upper.sql})"
+            return f"({rank_no_sql} {lower_op} {lower} AND {rank_no_sql} {upper_op} {upper})"
         if node.op not in {"<=", "=", "<", ">", ">=", "!=", "~="}:
             raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
-        limit_value = self._literal_sql(node.right)
+        limit_value = self._rank_bound_sql(node.right, partition_count_sql)
         return f"{rank_no_sql} {self._sql_operator(node.op)} {limit_value}"
+
+    def _rank_bound_sql(self, node: OfficialNode, partition_count_sql: str = "") -> str:
+        if (
+            partition_count_sql
+            and isinstance(node, OfficialLiteral)
+            and isinstance(node.value, str)
+            and _is_numeric_percent_literal(node.value)
+        ):
+            percent = node.value.strip()[:-1]
+            return f"CEIL(({partition_count_sql} * {percent}) / 100.0)"
+        return self._expr_sql(node, []).sql
 
     def _condition_sql(self, node: OfficialNode, warnings: List[str]) -> SqlExpr:
         if isinstance(node, OfficialBinaryOp) and node.op == "then":
@@ -1185,19 +1211,19 @@ class OfficialSlotCompiler:
         if self._rank_count_exp(rank_call):
             return self._rank_count_condition_sql(node, None, warnings)
         rank_expr = self._rank_expr(rank_call, warnings)
-        if node.op not in {"<=", "=", "<", ">", ">=", "!="}:
+        if node.op not in {"<=", "=", "<", ">", ">=", "!=", "between"}:
             raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
         rank_sql = _rank_alias_sql(rank_expr.sql)
         constraints = [_rank_alias_sql(item) for item in rank_expr.constraints]
         where = " AND ".join(_dedupe(constraints)) or "1=1"
         tables = self._ordered_tables(rank_expr.tables)
         joins = self._joins_for_aliases(tables, "rb", "rcode", "rext")
-        limit_value = self._literal_sql(node.right)
         sql = (
             "EXISTS (\n"
             "  SELECT 1 FROM (\n"
             "    SELECT rb.mktcode, rb.tgtcode, rb.bizdate,\n"
-            f"           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no\n"
+            f"           ROW_NUMBER() OVER (PARTITION BY rb.bizdate ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no,\n"
+            "           COUNT(*) OVER (PARTITION BY rb.bizdate) AS partition_count\n"
             "    FROM newzl.hsj_stock_hq_basic AS rb\n"
             f"{joins}"
             f"    WHERE {where}\n"
@@ -1205,7 +1231,7 @@ class OfficialSlotCompiler:
             "  WHERE ranked.mktcode = base.mktcode\n"
             "    AND ranked.tgtcode = base.tgtcode\n"
             "    AND ranked.bizdate = base.bizdate\n"
-            f"    AND ranked.rank_no {self._sql_operator(node.op)} {limit_value}\n"
+            f"    AND {self._rank_no_predicate(node, 'ranked.rank_no', 'ranked.partition_count')}\n"
             ")"
         )
         return SqlExpr(sql=sql, kind="boolean", tables=["hsj_stock_hq_basic"], constraints=[])
@@ -1219,7 +1245,7 @@ class OfficialSlotCompiler:
         rank_call = node.left
         if not isinstance(rank_call, OfficialFunctionCall) or rank_call.name != "rank":
             raise OfficialSlotError("OFFICIAL_RANK_SHAPE_ERROR", "rank count condition must start with rank(...)")
-        if node.op not in {"<=", "=", "<", ">", ">=", "!="}:
+        if node.op not in {"<=", "=", "<", ">", ">=", "!=", "between"}:
             raise OfficialSlotError("OFFICIAL_RANK_OPERATOR_ERROR", f"Unsupported rank comparison: {node.op}")
         args = self._slot_args(rank_call, 8)
         market, filter_scope, indicator_name, direction, date, select_type, agg_func, count_exp = args[:8]
@@ -1250,12 +1276,12 @@ class OfficialSlotCompiler:
         where = " AND ".join(_dedupe(constraints)) or "1=1"
         bucket_expr = self._bucket_expr("rb", rule)
         joins = self._joins_for_aliases(tables, "rb", "rcode", "rext")
-        limit_value = self._literal_sql(node.right)
-        predicate = f"ranked.rank_no {self._sql_operator(node.op)} {limit_value}"
+        predicate = self._rank_no_predicate(node, "ranked.rank_no", "ranked.partition_count")
         ranked_sql = (
             "SELECT rb.mktcode, rb.tgtcode,\n"
             f"       {bucket_expr} AS bucket_key,\n"
-            f"       ROW_NUMBER() OVER (PARTITION BY {bucket_expr} ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no\n"
+            f"       ROW_NUMBER() OVER (PARTITION BY {bucket_expr} ORDER BY {rank_sql} {self._rank_order(rank_call)}, rb.tgtcode ASC) AS rank_no,\n"
+            f"       COUNT(*) OVER (PARTITION BY {bucket_expr}) AS partition_count\n"
             "FROM newzl.hsj_stock_hq_basic AS rb\n"
             f"{joins}"
             f"WHERE {where}"
@@ -1292,12 +1318,14 @@ class OfficialSlotCompiler:
     def _comparison_sql(self, node: OfficialComparison, warnings: List[str]) -> SqlExpr:
         if isinstance(node.left, OfficialFunctionCall) and node.left.name == "indicator":
             args = self._slot_args(node.left, 7)
-            if args[6]:
+            if args[6] and args[5]:
                 return self._count_exp_comparison_sql(node.left, node.op, node.right, warnings)
         if isinstance(node.left, OfficialFunctionCall) and node.left.name in {"reset", "close_together"}:
             args = self._slot_args(node.left, 7)
             if args[6]:
                 return self._pattern_count_exp_comparison_sql(node.left, node.op, node.right, warnings)
+        if self._comparison_has_grounded_count_exp(node):
+            return self._count_exp_expression_comparison_sql(node, warnings)
         left = self._expr_sql(node.left, warnings)
         if node.op == "between":
             if not isinstance(node.right, OfficialRangeLiteral):
@@ -1326,6 +1354,312 @@ class OfficialSlotCompiler:
             tables=left.tables + right.tables,
             constraints=left.constraints + right.constraints,
         )
+
+    def _comparison_has_grounded_count_exp(self, node: OfficialComparison) -> bool:
+        return bool(self._count_exp_specs_from_node(node))
+
+    def _count_exp_expression_comparison_sql(self, node: OfficialComparison, warnings: List[str]) -> SqlExpr:
+        specs = self._count_exp_specs_from_node(node)
+        if not specs:
+            raise OfficialSlotError("UNSUPPORTED_OFFICIAL_COUNT_EXP", "count_exp comparison has no grounded count slot")
+        first = specs[0]
+        for spec in specs[1:]:
+            if spec.count_exp != first.count_exp:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    "mixed count_exp values inside one comparison need an explicit temporal feature table",
+                )
+            if (spec.market, spec.filter_scope, spec.date, spec.select_type) != (
+                first.market,
+                first.filter_scope,
+                first.date,
+                first.select_type,
+            ):
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_COUNT_EXP",
+                    "mixed market/filter/date/select scopes inside one count_exp comparison are not grounded",
+                )
+        rule = _parse_count_exp_rule(first.count_exp)
+        aliases = {"base": "wb", "code": "wc", "ext": "we", "tech": "wt"}
+        predicate, predicate_tables, predicate_constraints = self._comparison_predicate_with_aliases(
+            node,
+            aliases,
+            warnings,
+        )
+        tables = self._ordered_tables(["hsj_stock_hq_basic"] + predicate_tables)
+        where_parts = self._window_correlated_where(first.date, "wb", warnings)
+        where_parts.extend(_rewrite_aliases(item, aliases) for item in predicate_constraints)
+        from_sql = (
+            "FROM newzl.hsj_stock_hq_basic AS wb\n"
+            f"{self._joins_for_aliases(tables, 'wb', 'wc', 'we', 'wt')}"
+        )
+        subquery = self._count_exp_predicate_subquery(
+            from_sql=from_sql,
+            where_parts=where_parts,
+            predicate=predicate,
+            rule=rule,
+            base_alias="wb",
+        )
+        constraints = self._slot_constraints(first.market, first.filter_scope, "", first.select_type, warnings)
+        constraints.extend(self._outer_snapshot_constraints(first.date))
+        return SqlExpr(subquery, "boolean", tables, constraints)
+
+    def _comparison_predicate_with_aliases(
+        self,
+        node: OfficialComparison,
+        aliases: Dict[str, str],
+        warnings: List[str],
+    ) -> Tuple[str, List[str], List[str]]:
+        left = self._expr_sql_with_aliases(node.left, aliases, warnings)
+        if node.op == "between":
+            if not isinstance(node.right, OfficialRangeLiteral):
+                right = self._expr_sql_with_aliases(node.right, aliases, warnings)
+                return (
+                    f"{left.sql} BETWEEN {right.sql}",
+                    left.tables + right.tables,
+                    left.constraints + right.constraints,
+                )
+            lower = self._expr_sql_with_aliases(node.right.lower, aliases, warnings)
+            upper = self._expr_sql_with_aliases(node.right.upper, aliases, warnings)
+            lower_op = ">=" if node.right.lower_inclusive else ">"
+            upper_op = "<=" if node.right.upper_inclusive else "<"
+            return (
+                f"({left.sql} {lower_op} {lower.sql} AND {left.sql} {upper_op} {upper.sql})",
+                left.tables + lower.tables + upper.tables,
+                left.constraints + lower.constraints + upper.constraints,
+            )
+        right = self._expr_sql_with_aliases(node.right, aliases, warnings)
+        return (
+            self._comparison_predicate_sql(left.sql, left.kind, node.op, node.right, right.sql),
+            left.tables + right.tables,
+            left.constraints + right.constraints,
+        )
+
+    def _expr_sql_with_aliases(
+        self,
+        node: OfficialNode,
+        aliases: Dict[str, str],
+        warnings: List[str],
+    ) -> SqlExpr:
+        if isinstance(node, OfficialFunctionCall) and node.name in {"record_high", "record_low", "position"}:
+            return self._period_feature_expr_for_aliases(node, aliases, warnings)
+        stripped = self._strip_count_exp(node)
+        expr = self._expr_sql(stripped, warnings)
+        return SqlExpr(
+            _rewrite_aliases(expr.sql, aliases),
+            expr.kind,
+            expr.tables,
+            [_rewrite_aliases(item, aliases) for item in expr.constraints],
+            expr.date_localized,
+        )
+
+    def _period_feature_expr_for_aliases(
+        self,
+        node: OfficialFunctionCall,
+        aliases: Dict[str, str],
+        warnings: List[str],
+    ) -> SqlExpr:
+        name = node.name
+        args = self._slot_args(node, 8)
+        market, filter_scope, indicator_name, period, date, select_type, agg_func, _count_exp = args[:8]
+        if agg_func:
+            raise OfficialSlotError(
+                "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+                f"{name} with agg_func is not grounded in expression-level count_exp SQL",
+            )
+        normalized_indicator = indicator_name or "最新价"
+        constraints = [
+            _rewrite_aliases(item, aliases)
+            for item in self._slot_constraints(market, filter_scope, date, select_type, warnings)
+        ]
+        if name in {"record_high", "record_low"}:
+            if self._can_use_official_price_extreme_days(name, normalized_indicator, period):
+                days = _parse_period_day_count(period)
+                column = "pxMkTopDays" if name == "record_high" else "pxMkBotDays"
+                sql = f"{aliases['ext']}.{column} > 0" if days is None else f"{aliases['ext']}.{column} >= {days}"
+                return SqlExpr(sql, "boolean", ["hsj_stock_hq_basic", "hsj_stock_hq_ext"], constraints)
+            meta = _resolve_indicator_meta(normalized_indicator)
+            if not meta:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_INDICATOR",
+                    f"Official indicator is not mapped to the provided three-table dataset: {normalized_indicator}",
+                )
+            if meta.kind not in {"numeric", "time"}:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+                    f"{name} is only grounded for numeric/time indicators, got {meta.kind}",
+                )
+            current_sql = self._indicator_value_sql(meta, aliases)
+            aggregate = "MAX" if name == "record_high" else "MIN"
+            subquery = self._period_aggregate_subquery_for_aliases(aggregate, meta, period, aliases, warnings)
+            comparator = ">=" if name == "record_high" else "<="
+            return SqlExpr(
+                f"{current_sql} {comparator} {subquery}",
+                "boolean",
+                self._ordered_tables(["hsj_stock_hq_basic", meta.table]),
+                constraints,
+            )
+        if name == "position":
+            meta = _resolve_indicator_meta(normalized_indicator)
+            if not meta:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_INDICATOR",
+                    f"Official indicator is not mapped to the provided three-table dataset: {normalized_indicator}",
+                )
+            if meta.kind not in {"numeric", "time"}:
+                raise OfficialSlotError(
+                    "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION",
+                    f"position is only grounded for numeric/time indicators, got {meta.kind}",
+                )
+            current_sql = self._indicator_value_sql(meta, aliases)
+            min_sql = self._period_aggregate_subquery_for_aliases("MIN", meta, period, aliases, warnings)
+            max_sql = self._period_aggregate_subquery_for_aliases("MAX", meta, period, aliases, warnings)
+            ratio_sql = f"(({current_sql} - {min_sql}) / NULLIF(({max_sql} - {min_sql}), 0))"
+            sql = (
+                "CASE "
+                f"WHEN {current_sql} IS NULL OR {min_sql} IS NULL OR {max_sql} IS NULL THEN NULL "
+                f"WHEN {current_sql} <= {min_sql} THEN '最低' "
+                f"WHEN {current_sql} >= {max_sql} THEN '最高' "
+                f"WHEN {ratio_sql} <= 0.25 THEN '低' "
+                f"WHEN {ratio_sql} >= 0.75 THEN '高' "
+                "ELSE '中' END"
+            )
+            return SqlExpr(
+                sql,
+                "string",
+                self._ordered_tables(["hsj_stock_hq_basic", meta.table]),
+                constraints,
+            )
+        raise OfficialSlotError("UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION", f"Unsupported period function: {name}")
+
+    def _period_aggregate_subquery_for_aliases(
+        self,
+        aggregate: str,
+        meta: IndicatorMeta,
+        period: str,
+        current_aliases: Dict[str, str],
+        warnings: List[str],
+    ) -> str:
+        inner_aliases = {"base": "pw", "code": "pc", "ext": "pe", "tech": "pt"}
+        value_sql = self._indicator_value_sql(meta, inner_aliases)
+        tables = self._ordered_tables(["hsj_stock_hq_basic", meta.table])
+        where_parts = self._period_window_where_for_aliases(period, "pw", current_aliases["base"], warnings)
+        joins = self._joins_for_aliases(tables, "pw", "pc", "pe", "pt")
+        return (
+            f"(SELECT {aggregate}({value_sql})\n"
+            " FROM newzl.hsj_stock_hq_basic AS pw\n"
+            f"{joins}"
+            f" WHERE {' AND '.join(_dedupe(where_parts))})"
+        )
+
+    def _period_window_where_for_aliases(
+        self,
+        period: str,
+        inner_base_alias: str,
+        current_base_alias: str,
+        warnings: List[str],
+    ) -> List[str]:
+        where_parts = [
+            f"{inner_base_alias}.mktcode = {current_base_alias}.mktcode",
+            f"{inner_base_alias}.tgtcode = {current_base_alias}.tgtcode",
+        ]
+        days = _parse_period_day_count(period)
+        if days is not None:
+            lookback = max(days - 1, 0)
+            where_parts.append(
+                f"{inner_base_alias}.bizdate BETWEEN DATE_SUB({current_base_alias}.bizdate, INTERVAL {lookback} DAY) "
+                f"AND {current_base_alias}.bizdate"
+            )
+            return where_parts
+        where_parts.append(f"{inner_base_alias}.bizdate <= {current_base_alias}.bizdate")
+        if period and period not in {"历史", "史高", "史低"}:
+            warnings.append(
+                f"period {period!r} is compiled as history-to-current because no exact relative window is grounded"
+            )
+        return where_parts
+
+    def _count_exp_predicate_subquery(
+        self,
+        *,
+        from_sql: str,
+        where_parts: Sequence[str],
+        predicate: str,
+        rule: CountExpRule,
+        base_alias: str,
+    ) -> str:
+        where = " AND ".join(_dedupe(where_parts))
+        if rule.every:
+            return (
+                "(SELECT COUNT(*) > 0 AND "
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) = COUNT(*)\n"
+                f" {from_sql}"
+                f" WHERE {where})"
+            )
+        threshold = 1 if rule.count is None else rule.count
+        comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
+        if rule.mode == "CONS" and threshold > 1 and (rule.unit in {"", "日"}):
+            comparator = ">=" if comparator == "=" else comparator
+            return (
+                "(SELECT MAX(run_length) "
+                f"{self._sql_operator(comparator)} {threshold}\n"
+                " FROM (\n"
+                "   SELECT run_group, COUNT(*) AS run_length\n"
+                "   FROM (\n"
+                "     SELECT matched.bizdate,\n"
+                "            DATEDIFF(matched.bizdate, '1970-01-01') "
+                "- ROW_NUMBER() OVER (ORDER BY matched.bizdate) AS run_group\n"
+                "     FROM (\n"
+                f"       SELECT DISTINCT {base_alias}.bizdate\n"
+                f"       {from_sql}"
+                f"       WHERE {where} AND {predicate}\n"
+                "     ) AS matched\n"
+                "   ) AS grouped\n"
+                "   GROUP BY run_group\n"
+                " ) AS runs)"
+            )
+        comparator = comparator if comparator else (">" if rule.mode == "EXIST" else ">=")
+        return (
+            "(SELECT COUNT(*)\n"
+            f" {from_sql}"
+            f" WHERE {where} AND {predicate}) "
+            f"{self._sql_operator(comparator)} {threshold}"
+        )
+
+    def _count_exp_specs_from_node(self, node: OfficialNode) -> List[CountExpSpec]:
+        specs: List[CountExpSpec] = []
+        for call in _iter_function_calls(node):
+            if call.name == "indicator":
+                args = self._slot_args(call, 7)
+                if args[6] and not args[5]:
+                    specs.append(CountExpSpec(args[6], args[0], args[1], args[3], args[4]))
+            elif call.name in {"record_high", "record_low", "position"}:
+                args = self._slot_args(call, 8)
+                if args[7] and not args[6]:
+                    specs.append(CountExpSpec(args[7], args[0], args[1], args[4], args[5]))
+        return specs
+
+    def _strip_count_exp(self, node: OfficialNode) -> OfficialNode:
+        if isinstance(node, OfficialFunctionCall):
+            args = [self._strip_count_exp(arg) for arg in node.args]
+            if node.name == "indicator" and len(args) >= 7:
+                args[6] = OfficialLiteral("")
+            elif node.name in {"record_high", "record_low", "position"} and len(args) >= 8:
+                args[7] = OfficialLiteral("")
+            return OfficialFunctionCall(node.name, args)
+        if isinstance(node, OfficialBinaryOp):
+            return OfficialBinaryOp(node.op, self._strip_count_exp(node.left), self._strip_count_exp(node.right))
+        if isinstance(node, OfficialComparison):
+            return OfficialComparison(node.op, self._strip_count_exp(node.left), self._strip_count_exp(node.right))
+        if isinstance(node, OfficialLimit):
+            return OfficialLimit(self._strip_count_exp(node.expr), node.lower, node.upper)
+        if isinstance(node, OfficialRangeLiteral):
+            return OfficialRangeLiteral(
+                self._strip_count_exp(node.lower),
+                self._strip_count_exp(node.upper),
+                node.lower_inclusive,
+                node.upper_inclusive,
+            )
+        return node
 
     def _expr_sql(self, node: OfficialNode, warnings: List[str]) -> SqlExpr:
         if isinstance(node, OfficialLiteral):
@@ -2324,6 +2658,7 @@ class OfficialSlotCompiler:
             ">",
             ">=",
             "!=",
+            "between",
         }
 
     def _rank_count_exp(self, rank_call: OfficialFunctionCall) -> str:
