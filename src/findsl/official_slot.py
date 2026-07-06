@@ -146,6 +146,7 @@ class CountExpRule:
     count: Optional[int]
     unit: str = ""
     every: bool = False
+    max_count: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -581,6 +582,61 @@ def _dynamic_prefix_average_expr(
     return f"({average_sql} / {scale_divisor:.1f})"
 
 
+def _sanitize_official_slot_source(source: str) -> str:
+    text = str(source or "").strip()
+    text = re.sub(r"^\s*(and|or|then)\b\s+", "", text, flags=re.IGNORECASE)
+    text = _strip_dangling_edge_quotes(text)
+    text = _quote_orphan_literal_before_empty_string(text)
+    text = _strip_unmatched_closing_parens(text)
+    return text.strip()
+
+
+def _strip_dangling_edge_quotes(text: str) -> str:
+    result = text
+    for quote in ("'", '"'):
+        if result.count(quote) % 2 == 0:
+            continue
+        stripped = result.strip()
+        if stripped.startswith(quote) and re.match(rf"^\s*{re.escape(quote)}\s*[A-Za-z_]", result):
+            result = re.sub(rf"^\s*{re.escape(quote)}\s*", "", result, count=1)
+        elif stripped.endswith(quote):
+            result = re.sub(rf"\s*{re.escape(quote)}\s*$", "", result, count=1)
+    return result
+
+
+def _quote_orphan_literal_before_empty_string(text: str) -> str:
+    return re.sub(r"(,\s*)([^,'\"\(\)\[\]\s]+)''(?=\s*,)", r"\1'\2'", text)
+
+
+def _strip_unmatched_closing_parens(text: str) -> str:
+    depth = 0
+    remove_positions = set()
+    quote: Optional[str] = None
+    escaped = False
+    for index, ch in enumerate(text):
+        if quote:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == quote:
+                quote = None
+            continue
+        if ch in {"'", '"'}:
+            quote = ch
+            continue
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            if depth == 0:
+                remove_positions.add(index)
+            else:
+                depth -= 1
+    if not remove_positions:
+        return text
+    return "".join(ch for index, ch in enumerate(text) if index not in remove_positions)
+
+
 def lex_official_slot(source: str) -> List[Token]:
     tokens: List[Token] = []
     i = 0
@@ -652,7 +708,8 @@ def lex_official_slot(source: str) -> List[Token]:
 class OfficialSlotParser:
     def __init__(self, source: str):
         self.source = source
-        self.tokens = lex_official_slot(source)
+        self.normalized_source = _sanitize_official_slot_source(source)
+        self.tokens = lex_official_slot(self.normalized_source)
         self.index = 0
 
     def parse(self) -> OfficialNode:
@@ -1849,9 +1906,9 @@ class OfficialSlotCompiler:
         comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
         if rule.mode == "CONS" and threshold > 1 and (rule.unit in {"", "日"}):
             comparator = ">=" if comparator == "=" else comparator
+            run_predicate = _count_rule_predicate_sql("MAX(run_length)", rule, comparator)
             return (
-                "(SELECT MAX(run_length) "
-                f"{self._sql_operator(comparator)} {threshold}\n"
+                f"(SELECT {run_predicate}\n"
                 " FROM (\n"
                 "   SELECT run_group, COUNT(*) AS run_length\n"
                 "   FROM (\n"
@@ -1868,11 +1925,12 @@ class OfficialSlotCompiler:
                 " ) AS runs)"
             )
         comparator = comparator if comparator else (">" if rule.mode == "EXIST" else ">=")
+        count_predicate = _count_rule_predicate_sql("COUNT(*)", rule, comparator)
         return (
-            "(SELECT COUNT(*)\n"
+            "(SELECT "
+            f"{count_predicate}\n"
             f" {from_sql}"
-            f" WHERE {where} AND {predicate}) "
-            f"{self._sql_operator(comparator)} {threshold}"
+            f" WHERE {where} AND {predicate})"
         )
 
     def _count_exp_specs_from_node(self, node: OfficialNode) -> List[CountExpSpec]:
@@ -2165,12 +2223,12 @@ class OfficialSlotCompiler:
                     f"count_exp {count_exp!r} is compiled as a threshold count over the normalized window; "
                     "exact longest consecutive-run detection requires a dedicated Doris feature table"
                 )
+            count_predicate = _count_rule_predicate_sql("COUNT(*)", rule, comparator)
             subquery = (
-                f"(SELECT COUNT(*)\n"
+                f"(SELECT {count_predicate}\n"
                 " FROM newzl.hsj_stock_hq_basic AS wb\n"
                 f"{self._window_joins(tables)}"
-                f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))}) "
-                f"{self._sql_operator(comparator)} {threshold}"
+                f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))})"
             )
         constraints = self._slot_constraints(market, filter_scope, "", select_type, warnings)
         constraints.extend(self._outer_snapshot_constraints(date))
@@ -2206,9 +2264,14 @@ class OfficialSlotCompiler:
                 f"count_exp {count_exp!r} for {pattern_call.name} is compiled as a threshold count over "
                 "the normalized window; exact longest consecutive-run detection requires a dedicated Doris feature table"
             )
+            count_predicate = _count_rule_predicate_sql(
+                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END)",
+                rule,
+                rule.operator,
+            )
             subquery = (
                 "(SELECT COUNT(*) > 0 AND "
-                f"SUM(CASE WHEN {predicate} THEN 1 ELSE 0 END) {self._sql_operator(rule.operator)} {threshold}\n"
+                f"{count_predicate}\n"
                 " FROM newzl.hsj_stock_hq_basic AS wb\n"
                 f"{joins}"
                 f" WHERE {' AND '.join(_dedupe(where_parts))})"
@@ -2216,12 +2279,12 @@ class OfficialSlotCompiler:
         else:
             threshold = 1 if rule.count is None else rule.count
             comparator = rule.operator or ">"
+            count_predicate = _count_rule_predicate_sql("COUNT(*)", rule, comparator)
             subquery = (
-                "(SELECT COUNT(*)\n"
+                f"(SELECT {count_predicate}\n"
                 " FROM newzl.hsj_stock_hq_basic AS wb\n"
                 f"{joins}"
-                f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))}) "
-                f"{self._sql_operator(comparator)} {threshold}"
+                f" WHERE {' AND '.join(_dedupe(where_parts + [predicate]))})"
             )
         constraints = self._slot_constraints(market, filter_scope, "", select_type, warnings)
         constraints.extend(self._outer_snapshot_constraints(date))
@@ -2420,13 +2483,13 @@ class OfficialSlotCompiler:
             )
         threshold = 1 if rule.count is None else rule.count
         comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
+        count_predicate = _count_rule_predicate_sql("COUNT(*)", rule, comparator)
         return (
-            "(SELECT COUNT(*)\n"
+            f"(SELECT {count_predicate}\n"
             " FROM (\n"
             f"{inner_sql}\n"
             ") AS bucketed\n"
-            f" WHERE bucketed.agg_value IS NOT NULL AND {predicate}) "
-            f"{self._sql_operator(comparator)} {threshold}"
+            f" WHERE bucketed.agg_value IS NOT NULL AND {predicate})"
         )
 
     def _belong_industry_expr(self, node: OfficialFunctionCall, warnings: List[str]) -> SqlExpr:
@@ -3175,7 +3238,13 @@ class OfficialSlotCompiler:
 def _parse_count_exp_rule(value: str) -> CountExpRule:
     text = str(value or "").strip()
     match = re.fullmatch(
-        r"(?P<mode>CONS|EXIST)\s*(?P<op>>=|<=|!=|=|>|<)?\s*(?P<count>每|\d+|[零〇一二两三四五六七八九十百两]+)?\s*(?P<unit>年|季度|月|周|日|天)?",
+        r"(?P<mode>CONS|EXIST)\s*"
+        r"(?P<op>>=|<=|!=|=|>|<)?\s*"
+        r"(?P<count>每|\d+(?:\.\d+)?|[零〇一二两三四五六七八九十百两]+)?\s*"
+        r"(?P<count_unit>年|季度|月|周|日|天|分钟)?\s*"
+        r"(?:[-~至到]\s*(?P<max_count>\d+(?:\.\d+)?|[零〇一二两三四五六七八九十百两]+)\s*"
+        r"(?P<max_unit>年|季度|月|周|日|天|分钟)?)?\s*"
+        r"(?P<unit>年|季度|月|周|日|天|分钟)?",
         text,
         flags=re.IGNORECASE,
     )
@@ -3184,13 +3253,68 @@ def _parse_count_exp_rule(value: str) -> CountExpRule:
     mode = match.group("mode").upper()
     operator = match.group("op") or (">" if mode == "EXIST" else ">")
     count_text = match.group("count") or ""
-    unit = match.group("unit") or ""
-    if unit == "天":
-        unit = "日"
+    unit = _canonical_count_unit(match.group("unit") or match.group("max_unit") or match.group("count_unit") or "")
+    if _canonical_count_unit(match.group("count_unit") or ""):
+        unit = _canonical_count_unit(match.group("count_unit") or "")
     if count_text == "每":
         return CountExpRule(mode=mode, operator="=", count=None, unit=unit, every=True)
-    count = _parse_small_count(count_text) if count_text else (0 if mode == "EXIST" else 1)
-    return CountExpRule(mode=mode, operator=operator, count=count, unit=unit, every=False)
+    count_amount = _parse_count_amount(count_text) if count_text else (0 if mode == "EXIST" else 1)
+    max_count_text = match.group("max_count") or ""
+    max_amount = _parse_count_amount(max_count_text) if max_count_text else None
+    count, max_count, unit = _normalize_count_amounts(count_amount, max_amount, unit)
+    return CountExpRule(mode=mode, operator=operator, count=count, unit=unit, every=False, max_count=max_count)
+
+
+def _count_rule_predicate_sql(value_sql: str, rule: CountExpRule, comparator: str) -> str:
+    threshold = 1 if rule.count is None else rule.count
+    if rule.max_count is not None:
+        return f"{value_sql} BETWEEN {threshold} AND {rule.max_count}"
+    if rule.mode == "CONS" and comparator == "=":
+        comparator = ">="
+    return f"{value_sql} { _SQL_OPERATOR(comparator)} {threshold}"
+
+
+def _SQL_OPERATOR(op: str) -> str:
+    return {
+        "=": "=",
+        "==": "=",
+        "!=": "!=",
+        "~=": "=",
+        ">": ">",
+        "<": "<",
+        ">=": ">=",
+        "<=": "<=",
+    }[op]
+
+
+def _canonical_count_unit(unit: str) -> str:
+    if unit == "天":
+        return "日"
+    return unit
+
+
+def _parse_count_amount(value: str) -> float:
+    if re.fullmatch(r"\d+(?:\.\d+)?", value):
+        return float(value)
+    return float(_parse_small_count(value))
+
+
+def _normalize_count_amounts(
+    count: float,
+    max_count: Optional[float],
+    unit: str,
+) -> Tuple[int, Optional[int], str]:
+    if float(count).is_integer() and (max_count is None or float(max_count).is_integer()):
+        return int(count), int(max_count) if max_count is not None else None, unit
+    if unit == "年":
+        normalized_count = int(round(count * 12))
+        normalized_max = int(round(max_count * 12)) if max_count is not None else None
+        return max(1, normalized_count), max(1, normalized_max) if normalized_max is not None else None, "月"
+    if unit in {"月", ""}:
+        normalized_count = int(round(count * 31))
+        normalized_max = int(round(max_count * 31)) if max_count is not None else None
+        return max(1, normalized_count), max(1, normalized_max) if normalized_max is not None else None, "日"
+    raise OfficialSlotError("UNSUPPORTED_OFFICIAL_COUNT_EXP", f"Unsupported fractional count_exp unit: {unit}")
 
 
 def _parse_period_day_count(value: str) -> Optional[int]:

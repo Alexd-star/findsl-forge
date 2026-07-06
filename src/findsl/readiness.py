@@ -762,7 +762,7 @@ def _pytest_evidence(pytest_check: Optional[CommandCheck], run_pytest: bool) -> 
 
 
 def _run_pytest(repo_root: Path) -> CommandCheck:
-    command = [sys.executable, "-m", "pytest"]
+    command = _pytest_command(repo_root)
     env = os.environ.copy()
     src_path = str(repo_root / "src")
     env["PYTHONPATH"] = src_path + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
@@ -786,6 +786,11 @@ def _run_pytest(repo_root: Path) -> CommandCheck:
         stdout_tail=_tail(completed.stdout),
         stderr_tail=_tail(completed.stderr),
     )
+
+
+def _pytest_command(repo_root: Path) -> List[str]:
+    basetemp = repo_root / ".pytest_cache" / "readiness_tmp"
+    return [sys.executable, "-m", "pytest", "--basetemp", str(basetemp)]
 
 
 def _check_doris_assets(repo_root: Path, data_dir: Path) -> List[DorisAssetCheck]:

@@ -35,6 +35,26 @@ def main() -> None:
     official_coverage_cmd.add_argument("--report-output", default=None, help="Optional Markdown coverage output path")
     official_coverage_cmd.add_argument("--sample-size", type=int, default=20, help="Number of error/success samples to include")
     official_coverage_cmd.add_argument("--json", action="store_true", help="Print coverage as JSON")
+    official_perf_cmd = sub.add_parser(
+        "official-performance-matrix",
+        help="Build a per-query performance matrix from official Doris evidence",
+    )
+    official_perf_cmd.add_argument(
+        "--evidence",
+        default="reports/official_doris_evidence.json",
+        help="Official Doris evidence JSON path",
+    )
+    official_perf_cmd.add_argument(
+        "--json-output",
+        default="reports/official_query_performance_matrix.json",
+        help="Output JSON matrix path",
+    )
+    official_perf_cmd.add_argument(
+        "--report-output",
+        default="reports/official_query_performance_matrix.md",
+        help="Output Markdown matrix path",
+    )
+    official_perf_cmd.add_argument("--json", action="store_true", help="Print matrix as JSON")
     diagnose_cmd = sub.add_parser("diagnose", help="Diagnose invalid DSL and print repair hints")
     diagnose_cmd.add_argument("dsl", help="DSL expression")
     diagnose_cmd.add_argument("--json", action="store_true", help="Print diagnostics as JSON")
@@ -244,6 +264,21 @@ def main() -> None:
             print(f"Official training rows: {coverage['row_count']}")
             print(f"Parse ok: {coverage['parse_ok']}")
             print(f"Compile ok: {coverage['compile_ok']}")
+    elif args.command == "official-performance-matrix":
+        from .official_performance import write_official_performance_matrix
+
+        matrix = write_official_performance_matrix(
+            evidence_path=Path(args.evidence),
+            json_output=Path(args.json_output) if args.json_output else None,
+            report_output=Path(args.report_output) if args.report_output else None,
+        )
+        if args.json:
+            print(json.dumps(matrix, ensure_ascii=False, indent=2))
+        else:
+            summary = matrix["summary"]
+            print(f"Official query count: {summary['query_count']}")
+            print(f"All queries P95 <= 10s: {summary['all_queries_under_10s']}")
+            print(f"Max P95: {summary['max_p95_ms']} ms")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 

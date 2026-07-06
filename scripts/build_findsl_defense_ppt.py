@@ -394,7 +394,7 @@ def write_slide_modules(data: dict, assets: dict, charts: dict) -> None:
         {
             "type": "speech",
             "title": "1 分钟介绍稿",
-            "paragraph": "FinDSL Forge 面向华泰证券赛题 19，解决行情选股 DSL 到高性能 Doris SQL 的自动化编译问题。项目不是让大模型直接写 SQL，而是采用确定性编译器、语义校验、Doris SQL 安全验证、reference 等价验证和 prefix-sum 长窗口优化。当前证据显示，项目通过 203 个 pytest、官方风格正例 37/37、负例 37/37，readiness blocking gates 为 PASS，warning count 为 0，并在 5,000,000 行 Doris 数据上取得 36.24x 的长窗口加速。",
+            "paragraph": "FinDSL Forge 面向华泰证券赛题 19，解决行情选股 DSL 到高性能 Doris SQL 的自动化编译问题。项目不是让大模型直接写 SQL，而是采用确定性编译器、语义校验、Doris SQL 安全验证、reference 等价验证和 prefix-sum 长窗口优化。当前证据显示，项目通过 311 个 pytest、官方风格正例 37/37、负例 37/37，readiness blocking gates 为 PASS，warning count 为 0，并在 5,000,000 行 Doris 数据上取得 36.24x 的长窗口加速。",
         },
         {
             "type": "qa",

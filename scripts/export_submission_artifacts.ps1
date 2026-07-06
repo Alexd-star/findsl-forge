@@ -20,7 +20,9 @@ $reportFiles = @(
   "official_doris_evidence.md",
   "official_doris_evidence.json",
   "official_slot_coverage.md",
-  "official_slot_coverage.json"
+  "official_slot_coverage.json",
+  "official_query_performance_matrix.md",
+  "official_query_performance_matrix.json"
 )
 
 $status = ""

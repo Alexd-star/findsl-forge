@@ -39,7 +39,7 @@ def _write_minimal_snapshots(
                 "",
                 "## Pytest Regression Suite",
                 "",
-                "192 passed in 11.61s",
+                "311 passed in 28.48s",
             ]
         ),
         encoding="utf-8",
@@ -100,12 +100,34 @@ def _write_minimal_snapshots(
             json.dumps(
                 {
                     "row_count": 5799,
-                    "parse_ok": 5792,
-                    "parse_failed": 7,
-                    "compile_ok": 1682,
-                    "compile_failed": 4110,
-                    "compile_rate_on_all_rows": 0.29005,
-                    "compile_rate_on_parse_ok": 0.290401,
+                    "parse_ok": 5799,
+                    "parse_failed": 0,
+                    "compile_ok": 1882,
+                    "compile_failed": 3917,
+                    "compile_rate_on_all_rows": 0.324539,
+                    "compile_rate_on_parse_ok": 0.324539,
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        (snapshot_dir / "official_query_performance_matrix.json").write_text(
+            json.dumps(
+                {
+                    "summary": {
+                        "query_count": 6,
+                        "all_queries_under_10s": True,
+                        "max_p95_ms": 61.269,
+                        "mean_avg_ms": 45.493,
+                        "prefix_query_count": 1,
+                        "window_query_count": 2,
+                        "baseline_prefix_row_count_match": True,
+                        "baseline_vs_prefix_speedup": 1.173,
+                    },
+                    "queries": [
+                        {"name": "simple_close_price_filter", "execution_target": "PASS"},
+                        {"name": "prefix_optimized_volume_sum_20", "execution_target": "PASS"},
+                    ],
                 },
                 ensure_ascii=False,
             ),
@@ -123,8 +145,8 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
 
     assert metadata["readiness"]["blocking_gates_passed"] is True
     assert metadata["readiness"]["warning_count"] == 0
-    assert metadata["readiness"]["pytest"]["passed"] == 192
-    assert metadata["readiness"]["pytest"]["elapsed_seconds"] == 11.61
+    assert metadata["readiness"]["pytest"]["passed"] == 311
+    assert metadata["readiness"]["pytest"]["elapsed_seconds"] == 28.48
     assert metadata["official_suite"]["positive"] == {"passed": 37, "total": 37}
     assert metadata["official_suite"]["negative"] == {"passed": 37, "total": 37}
     assert metadata["doris_cluster"]["speedup"] == 36.2398279300624
@@ -137,8 +159,13 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["official_real_data"]["doris"]["baseline_prefix_row_count_match"] is True
     assert metadata["official_real_data"]["doris"]["baseline_vs_prefix_speedup_display"] == "1.17x"
     assert metadata["official_real_data"]["slot_coverage"]["row_count"] == 5799
-    assert metadata["official_real_data"]["slot_coverage"]["parse_ok"] == 5792
-    assert metadata["official_real_data"]["slot_coverage"]["compile_ok"] == 1682
+    assert metadata["official_real_data"]["slot_coverage"]["parse_ok"] == 5799
+    assert metadata["official_real_data"]["slot_coverage"]["compile_ok"] == 1882
+    assert metadata["official_real_data"]["performance_matrix"]["available"] is True
+    assert metadata["official_real_data"]["performance_matrix"]["query_count"] == 6
+    assert metadata["official_real_data"]["performance_matrix"]["all_queries_under_10s"] is True
+    assert metadata["official_real_data"]["performance_matrix"]["max_p95_ms"] == 61.269
+    assert metadata["official_real_data"]["performance_matrix"]["baseline_vs_prefix_speedup_display"] == "1.17x"
     assert metadata["git"]["head_at_report_generation"] == "c7a2164"
     assert metadata["git"]["head_at_export"] == "c7a2164"
     assert metadata["warnings"] == []
@@ -161,6 +188,7 @@ def test_evidence_metadata_cli_writes_json(tmp_path: Path) -> None:
     _write_minimal_snapshots(snapshot_dir)
     env = os.environ.copy()
     env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONIOENCODING"] = "utf-8"
 
     subprocess.run(
         [
@@ -175,6 +203,8 @@ def test_evidence_metadata_cli_writes_json(tmp_path: Path) -> None:
         ],
         check=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         env=env,
     )
@@ -195,9 +225,10 @@ def test_render_evidence_summary_markdown_highlights_auditable_metrics(tmp_path:
     assert markdown.startswith("# Evidence Summary")
     assert "| Blocking gates | PASS |" in markdown
     assert "| Warning count | 0 |" in markdown
-    assert "| Pytest regression | 192 passed" in markdown
+    assert "| Pytest regression | 311 passed" in markdown
     assert "| Official positive cases | 37/37 |" in markdown
-    assert "| Official slot coverage | 1682/5799 compiled |" in markdown
+    assert "| Official slot coverage | 1882/5799 compiled |" in markdown
+    assert "| Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |" in markdown
     assert "| Official Doris real data | AVAILABLE |" in markdown
     assert "| Official Doris feature tables | PASS |" in markdown
     assert "| Doris cluster speedup | 36.24x |" in markdown

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from findsl import readiness
 from findsl.readiness import generate_readiness_report
 
 
@@ -158,3 +159,11 @@ def test_readiness_report_requires_real_doris_evidence_markers(tmp_path):
     assert "Doris speedup target met: True" in report.doris_cluster_report.missing_markers
     assert "Optimized plan contains prefix table: True" in report.doris_cluster_report.missing_markers
     assert not warnings["Doris-scale performance proof"].passed
+
+
+def test_readiness_pytest_command_uses_repo_local_basetemp(tmp_path):
+    command = readiness._pytest_command(tmp_path)
+
+    assert command[:3] == [readiness.sys.executable, "-m", "pytest"]
+    assert "--basetemp" in command
+    assert str(tmp_path / ".pytest_cache" / "readiness_tmp") in command

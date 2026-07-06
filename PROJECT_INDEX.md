@@ -102,6 +102,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 | `src/findsl/doris_evidence.py` | Doris 集群证据采集。 | MySQL 客户端配置、DSL。 | Markdown/JSON evidence。 | 需真实 Doris 9030 端口和已加载数据。 |
 | `src/findsl/readiness.py` | 提交前综合门禁。 | 项目目录、报告目录。 | readiness report。 | 评估测试、证据、官方套件和 Git clean 状态。 |
 | `src/findsl/evidence_metadata.py` | 提交证据结构化索引。 | evidence snapshots、manifest。 | `evidence_metadata.json`、`evidence_summary.md`。 | 从已生成证据抽取字段，不重新计算或伪造性能结论。 |
+| `src/findsl/official_performance.py` | 官方真实 Doris 逐问句性能矩阵生成。 | `reports/official_doris_evidence.json`。 | `official_query_performance_matrix.md/json`。 | 只汇总真实 evidence 中已执行查询，不替代原始 SQL/EXPLAIN。 |
 | `src/findsl/defense_package.py` | 答辩证据包生成。 | 样本、报告、配置。 | defense package。 | 映射演示步骤到得分点。 |
 | `src/findsl/official_suite.py` | 官方风格用例套件。 | JSONL 正/负例。 | coverage report。 | 正例和负例均为 required gate。 |
 | `src/findsl/benchmark.py` | prefix-sum 本地基准。 | DSL、样本数据。 | benchmark report。 | 本地 SQLite timing 只作回归信号。 |
@@ -157,7 +158,7 @@ FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融
 
 此前新增 `docs/01_项目简介.md` 到 `docs/17_项目交付说明.md`，作为统一中文文档体系。当前进一步补充 `docs/18_企业级审计与补强报告.md`，记录功能、代码、算法、安全边界和交付成熟度审计结论。编号文档不会覆盖旧文档，而是提供清晰入口、补充中文解释，并引用已有详细资料。
 
-最新官方真实数据复盘见 `docs/22_官方真实数据落库复盘与满分冲刺计划.md`。该文档记录官方 CSV 全量落库、Doris Stream Load 修正、技术特征表分桶构建、官方三表和三张派生特征表行数、官方 workbook 覆盖率以及下一步满分冲刺任务。
+最新官方真实数据复盘见 `docs/22_官方真实数据落库复盘与满分冲刺计划.md`。该文档记录官方 CSV 全量落库、Doris Stream Load 修正、技术特征表分桶构建、官方三表和三张派生特征表行数、官方 workbook 覆盖率以及下一步满分冲刺任务。当前还新增 `docs/34_官方槽位DSL_BNF与ANTLR形式化说明.md`、`docs/35_官方三表缺失数据域不可伪造SQL审计报告.md` 和 `docs/grammar/OfficialSlot.g4`，用于说明形式化语法、不可伪造 SQL 边界和后续 ANTLR 迁移依据。
 
 ## 8. 历史文件说明
 
@@ -217,6 +218,7 @@ $env:PYTHONPATH="src"
 python -m findsl.cli compile 'filter(indicator("close") > 10)'
 python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples
 python -m findsl.cli official-suite --json
+python -m findsl.cli official-performance-matrix --json
 python -m findsl.cli readiness-report --output reports/submission_readiness.md
 python -m findsl.cli evidence-metadata --snapshots-dir submission_artifacts/evidence_snapshots --output submission_artifacts/evidence_metadata.json --summary-output submission_artifacts/evidence_summary.md
 ```
@@ -243,7 +245,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 ```
 
-`export_submission_artifacts.ps1` 会同步生成 `submission_artifacts/evidence_metadata.json` 和 `submission_artifacts/evidence_summary.md`，把 readiness、official suite、Doris cluster evidence 中的关键数值整理为机器可读 JSON 和可读摘要，供答辩 PPT、Web Demo、技术报告或后续自动检查复用。
+`export_submission_artifacts.ps1` 会同步生成 `submission_artifacts/evidence_metadata.json` 和 `submission_artifacts/evidence_summary.md`，把 readiness、official suite、Doris cluster evidence、官方真实数据覆盖率和官方逐问句性能矩阵中的关键数值整理为机器可读 JSON 和可读摘要，供答辩 PPT、Web Demo、技术报告或后续自动检查复用。
 
 ## 13. 项目构建、运行、测试流程
 

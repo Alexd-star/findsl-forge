@@ -2,6 +2,18 @@
 
 本文档记录 FinDSL Forge 的重要变更。详细提交历史以 Git 为准，提交包证据以 `submission_artifacts/evidence_snapshots/` 为准。
 
+## 2026-07-06
+
+### 官方真实数据证据与审计口径刷新
+
+- 刷新官方 workbook 覆盖率：语法解析从 `5,792/5,799` 提升到 `5,799/5,799`，可落地 Doris SQL 编译数从 `1,873` 提升到 `1,882`，`UNSUPPORTED_OFFICIAL_COUNT_EXP` 从 `14` 降到 `3`。
+- 修复并归档官方 Excel 中 7 条文档噪声样例，覆盖边缘引号、前导 `and`、多余右括号和孤立日期字面量等可判定标点问题；原始输入仍保留在覆盖率报告中用于审计。
+- 增强 `count_exp` 解析和 SQL 生成，支持可由日频官方三表解释的区间次数、连续区间、半年度归一到月份桶和 bounded count/run-length 谓词。
+- 新增 `python -m findsl.cli official-performance-matrix`，从真实 `reports/official_doris_evidence.json` 生成逐问句性能矩阵；当前 6 条官方 Doris 查询全部满足 P95 <= 10s，最大 P95 为 `61.269 ms`。
+- `evidence_metadata.json` 和 `evidence_summary.md` 新增官方逐问句性能矩阵摘要，确保代码、报告、截图和 metadata 引用同一份 evidence。
+- 新增 `docs/grammar/OfficialSlot.g4` 与 `docs/34_官方槽位DSL_BNF与ANTLR形式化说明.md`，将官方槽位 DSL 的语法优先级、函数调用、比较、`between`、`limit` 和四则运算形式化。
+- 新增 `docs/35_官方三表缺失数据域不可伪造SQL审计报告.md`，逐条说明剩余 3 条 `count_exp` 和 1 条周期函数为什么不能在缺失数据域下伪造 SQL。
+
 ## 2026-06-10
 
 ### 官方 DSL 语义补强

@@ -24,6 +24,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    official_performance_payload = _read_optional_json(
+        snapshot_dir / "official_query_performance_matrix.json",
+        warnings,
+        warn_missing=False,
+    )
 
     return {
         "schema_version": 1,
@@ -39,6 +44,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         "official_real_data": {
             "doris": _official_doris_metadata(official_doris_payload),
             "slot_coverage": _official_slot_coverage_metadata(official_slot_payload),
+            "performance_matrix": _official_performance_matrix_metadata(official_performance_payload),
         },
         "doris_cluster": _doris_metadata(doris_payload),
         "warnings": warnings,
@@ -67,6 +73,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     official_real = _dict(metadata.get("official_real_data"))
     official_doris = _dict(official_real.get("doris"))
     official_slot = _dict(official_real.get("slot_coverage"))
+    official_perf = _dict(official_real.get("performance_matrix"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
     warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
@@ -87,6 +94,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Official positive cases | {_ratio_display(_dict(official.get('positive')))} |",
         f"| Official negative diagnostics | {_ratio_display(_dict(official.get('negative')))} |",
         f"| Official slot coverage | {_official_slot_coverage_display(official_slot)} |",
+        f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
         f"| Official Doris prefix speedup | {_display(official_doris.get('baseline_vs_prefix_speedup_display'))} |",
@@ -255,12 +263,43 @@ def _official_slot_coverage_metadata(payload: dict[str, Any] | None) -> dict[str
     }
 
 
+def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "query_count": None,
+            "all_queries_under_10s": None,
+            "max_p95_ms": None,
+            "mean_avg_ms": None,
+            "prefix_query_count": None,
+            "window_query_count": None,
+            "baseline_prefix_row_count_match": None,
+            "baseline_vs_prefix_speedup": None,
+            "baseline_vs_prefix_speedup_display": None,
+        }
+    summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+    speedup = _number_or_none(summary.get("baseline_vs_prefix_speedup"))
+    return {
+        "available": True,
+        "query_count": _int_or_none(summary.get("query_count")),
+        "all_queries_under_10s": _bool_or_none(summary.get("all_queries_under_10s")),
+        "max_p95_ms": _number_or_none(summary.get("max_p95_ms")),
+        "mean_avg_ms": _number_or_none(summary.get("mean_avg_ms")),
+        "prefix_query_count": _int_or_none(summary.get("prefix_query_count")),
+        "window_query_count": _int_or_none(summary.get("window_query_count")),
+        "baseline_prefix_row_count_match": _bool_or_none(summary.get("baseline_prefix_row_count_match")),
+        "baseline_vs_prefix_speedup": speedup,
+        "baseline_vs_prefix_speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
+    }
+
+
 def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, str | None]:
     return {
         "submission_readiness": str(snapshot_dir / "submission_readiness.md"),
         "official_suite_report": str(snapshot_dir / "official_suite_report.md"),
         "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
         "official_slot_coverage_json": str(snapshot_dir / "official_slot_coverage.json"),
+        "official_query_performance_matrix_json": str(snapshot_dir / "official_query_performance_matrix.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }
@@ -377,3 +416,14 @@ def _official_slot_coverage_display(slot_coverage: dict[str, Any]) -> str:
     if compile_ok is None or row_count is None:
         return "<unknown>"
     return f"{compile_ok}/{row_count} compiled"
+
+
+def _official_performance_display(performance: dict[str, Any]) -> str:
+    if performance.get("available") is False:
+        return "UNAVAILABLE"
+    status = _pass_fail(performance.get("all_queries_under_10s"))
+    query_count = performance.get("query_count")
+    max_p95 = performance.get("max_p95_ms")
+    if query_count is None or max_p95 is None:
+        return status
+    return f"{status}, {query_count} queries, max P95 {max_p95} ms"

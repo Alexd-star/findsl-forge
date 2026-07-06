@@ -38,6 +38,24 @@ def test_parse_official_slot_supports_single_quotes_percent_and_word_logic():
     assert payload["right"]["right"]["value"] is True
 
 
+@pytest.mark.parametrize(
+    "dirty_dsl",
+    [
+        "rank('', '', '现金储备率', 'desc', '', '', '', '') <= 20 and record_high('', '', '', '200天', '今日', '', '', '') = True and indicator('', '', '回调', '昨天', '', '', '') = True and indicator('', '', '十字星', 昨天'', '', '', 'EXIST>0') = True",
+        "indicator('', '', '成分股', '', '', '', '') = '光伏ETF基金515790' and indicator('', '', '有息负债', '', '', '', '') between [500000000,700000000]'",
+        "indicator('沪|深', '', '外盘', '昨天', '', '', '') != indicator('沪|深', '', '外盘', '昨天的前1日', '', '', '')\"",
+        "indicator('', '人工智能', '成交量', '今天', '', 'GROWTH_RISE', '') = 400% and reset('', '人工智能', '', '20日均线', '今天', '', '') = True and indicator('', '人工智能', '十字星', '今天', '', '', '') = True then rank('', '人工智能', '营业收入同比增长率', 'desc', '今天', '', '', '') <= 10)",
+        "rank('其他&法', '', '市盈率', 'desc', '', '', '', '') > 0\"",
+        "and indicator('', '', '涨停未封板', '前天', '', '', '') = True",
+        "\"indicator('', '', '涨幅', '', '', '', '') between '[3%,9%]' and indicator('', '', '成交量', '', '', '', '') >= indicator('', '', '成交量', '近5日', '', 'AVG', '') * 1.5 and indicator('', '', '大单净流入', '', '', '', '') >= 0.5% and indicator('', '', 'RSI(6)', '', '', '', '') < 20",
+    ],
+)
+def test_parse_official_slot_tolerates_documented_workbook_punctuation_noise(dirty_dsl):
+    ast = parse_official_slot(dirty_dsl)
+
+    assert ast.to_dict()["type"] in {"BinaryOp", "Comparison"}
+
+
 def test_compile_indicator_to_official_doris_sql_with_market_and_date_filters():
     result = OfficialSlotCompiler().compile(
         "indicator('深', '', '最新价', '2026-04-14', '', '', '') > 10.5"
@@ -653,6 +671,39 @@ def test_compile_aggregate_count_exp_inside_arithmetic_expression_uses_bucket_ro
     assert "(bucketed.agg_0 / bucketed.value_0) < 80000" in result.sql
     assert "SUM(CASE WHEN (bucketed.agg_0 / bucketed.value_0) < 80000 THEN 1 ELSE 0 END) = COUNT(*)" in result.sql
     assert "wb.bizdate BETWEEN '2026-04-12' AND '2026-04-14'" in result.sql
+
+
+def test_compile_count_exp_range_exist_uses_bounded_match_count():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '涨停', '过去20天', '', '', 'EXIST=2-5') = True"
+    )
+
+    assert "COUNT(*)" in result.sql
+    assert "BETWEEN 2 AND 5" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert result.warnings == []
+
+
+def test_compile_daily_cons_count_exp_range_uses_bounded_run_length():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('', '', '阳线', '近10日', '', '', 'CONS=3-4日') = True"
+    )
+
+    assert "MAX(run_length) BETWEEN 3 AND 4" in result.sql
+    assert "DATEDIFF(matched.bizdate, '1970-01-01')" in result.sql
+    assert "base.bizdate = '2026-04-14'" in result.sql
+    assert result.warnings == []
+
+
+def test_compile_half_year_aggregate_count_exp_normalizes_to_month_buckets():
+    result = OfficialSlotCompiler(anchor_date="2026-04-14").compile(
+        "indicator('沪主板', '', '涨跌幅', '', '', 'SUM', 'CONS=0.5年') > 3.5%"
+    )
+
+    assert "DATE_TRUNC(wb.bizdate, 'month')" in result.sql
+    assert "SUM(((wb.lastPx - wb.preClosePx) * 100.0 / NULLIF(wb.preClosePx, 0))) AS agg_value" in result.sql
+    assert ">= 6" in result.sql
+    assert "base.mktcode IN (1)" in result.sql
 
 
 def test_compile_official_daily_growth_count_exp_uses_lag_pairs():

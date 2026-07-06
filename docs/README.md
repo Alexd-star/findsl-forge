@@ -27,6 +27,8 @@
 | `20_官方真实数据适配分析与开发计划.md` | 说明官方真实 CSV、官方槽位 DSL、覆盖率结果、已完成语义修复和当前缺口。 |
 | `21_官方真实数据冲刺计划与验收闭环.md` | 说明拿到官方真实数据后的冲刺路线、Doris 验收闭环、风险口径和后续执行顺序。 |
 | `22_官方真实数据落库复盘与满分冲刺计划.md` | 说明官方 CSV 全量落库、Doris 特征表构建、证据结果、根因修复和下一步满分冲刺计划。 |
+| `34_官方槽位DSL_BNF与ANTLR形式化说明.md` | 说明官方槽位 DSL 的 BNF/ANTLR 形式化语法、优先级、运行时解析器关系和答辩口径。 |
+| `35_官方三表缺失数据域不可伪造SQL审计报告.md` | 说明官方三表缺失数据域、剩余不支持样例和“不伪造 SQL”的审计边界。 |
 
 ## 既有专项文档
 
@@ -45,4 +47,4 @@
 
 ## 阅读建议
 
-首次接触项目时，建议按 `README.md`、`PROJECT_INDEX.md`、`docs/01_项目简介.md`、`docs/03_操作手册.md` 的顺序阅读。准备比赛答辩时，建议重点阅读 `docs/17_项目交付说明.md`、`docs/18_企业级审计与补强报告.md`、`docs/20_官方真实数据适配分析与开发计划.md`、`docs/21_官方真实数据冲刺计划与验收闭环.md`、`docs/22_官方真实数据落库复盘与满分冲刺计划.md`、`docs/requirement_mapping.md`、`docs/defense_walkthrough.md` 和 `submission_artifacts/evidence_snapshots/` 下的证据文件。继续开发时，建议先阅读 `docs/04_开发者文档.md`、`docs/05_项目架构说明.md`、`docs/07_核心模块说明.md` 和 `docs/13_测试说明.md`，再修改源码或配置。
+首次接触项目时，建议按 `README.md`、`PROJECT_INDEX.md`、`docs/01_项目简介.md`、`docs/03_操作手册.md` 的顺序阅读。准备比赛答辩时，建议重点阅读 `docs/17_项目交付说明.md`、`docs/18_企业级审计与补强报告.md`、`docs/20_官方真实数据适配分析与开发计划.md`、`docs/21_官方真实数据冲刺计划与验收闭环.md`、`docs/22_官方真实数据落库复盘与满分冲刺计划.md`、`docs/34_官方槽位DSL_BNF与ANTLR形式化说明.md`、`docs/35_官方三表缺失数据域不可伪造SQL审计报告.md`、`docs/requirement_mapping.md`、`docs/defense_walkthrough.md` 和 `submission_artifacts/evidence_snapshots/` 下的证据文件。继续开发时，建议先阅读 `docs/04_开发者文档.md`、`docs/05_项目架构说明.md`、`docs/07_核心模块说明.md` 和 `docs/13_测试说明.md`，再修改源码或配置。
