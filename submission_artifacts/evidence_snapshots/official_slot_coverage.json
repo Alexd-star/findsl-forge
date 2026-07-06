@@ -3,17 +3,17 @@
   "row_count": 5799,
   "parse_ok": 5792,
   "parse_failed": 7,
-  "compile_ok": 1872,
-  "compile_failed": 3920,
-  "compile_rate_on_all_rows": 0.322814,
-  "compile_rate_on_parse_ok": 0.323204,
+  "compile_ok": 1873,
+  "compile_failed": 3919,
+  "compile_rate_on_all_rows": 0.322987,
+  "compile_rate_on_parse_ok": 0.323377,
   "parse_errors": {
     "OFFICIAL_PARSE_ERROR": 3,
     "OFFICIAL_LEX_ERROR": 4
   },
   "compile_errors": {
     "UNSUPPORTED_OFFICIAL_INDICATOR": 3904,
-    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 15,
+    "UNSUPPORTED_OFFICIAL_COUNT_EXP": 14,
     "UNSUPPORTED_OFFICIAL_PERIOD_FUNCTION": 1
   },
   "compile_error_details": {
@@ -59,7 +59,7 @@
     "用户账户与自选股数据缺失": 89,
     "龙虎榜与交易异动数据缺失": 54,
     "交易规则与跨市场标的属性缺失": 53,
-    "出现次数/连续次数时间语义待特征表增强": 15,
+    "出现次数/连续次数时间语义待特征表增强": 14,
     "创新高低/位置函数复杂周期待增强": 1
   },
   "parse_error_samples": [
