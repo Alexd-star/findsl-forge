@@ -199,6 +199,10 @@ class OfficialCompileResult:
     sql: str
     requires_tables: List[str]
     warnings: List[str]
+    normalized_source: str = ""
+    repairs: Tuple[SourceRepair, ...] = ()
+    strict_success: bool = True
+    degraded: bool = False
 
 
 OPERATORS = {">=", "<=", "!=", "~=", ">", "<", "=", "+", "-", "*", "/", "(", ")", "[", "]", ","}
@@ -1001,25 +1005,77 @@ def parse_official_slot(source: str, mode: str = CompileMode.RECOVERY.value) -> 
 
 
 class OfficialSlotCompiler:
-    def __init__(self, anchor_date: str = "2026-04-14", trading_dates: Optional[Sequence[str]] = None):
+    def __init__(
+        self,
+        anchor_date: str = "2026-04-14",
+        trading_dates: Optional[Sequence[str]] = None,
+        mode: str = CompileMode.RECOVERY.value,
+    ):
         self.anchor_date = anchor_date
         self.trading_dates = list(trading_dates or [])
+        self.mode = CompileMode.parse(mode)
         self.technical_pattern_config = _load_technical_pattern_config()
 
     def compile(self, source: str) -> OfficialCompileResult:
-        ast = parse_official_slot(source)
+        parsed = self._parse_for_compile(source)
+        ast = parsed.ast
         from .official.semantics import OfficialSemanticAnalyzer
 
         OfficialSemanticAnalyzer(_resolve_indicator_meta).validate(ast)
         warnings: List[str] = []
         sql, tables = self._compile_query(ast, warnings)
+        degraded = bool(parsed.repairs or warnings)
+        if self.mode is CompileMode.STRICT and degraded:
+            reasons: List[str] = []
+            if parsed.repairs:
+                reasons.append(f"source repairs={len(parsed.repairs)}")
+            if warnings:
+                reasons.append(f"warnings={len(warnings)}")
+            raise OfficialSlotError(
+                "OFFICIAL_DEGRADED_SEMANTICS",
+                "Strict official compilation rejected degraded semantics: " + ", ".join(reasons),
+            )
         return OfficialCompileResult(
             source=source,
+            normalized_source=parsed.normalized_source,
             ast=ast.to_dict(),
             sql=sql,
             requires_tables=tables,
             warnings=warnings,
+            repairs=parsed.repairs,
+            strict_success=not degraded,
+            degraded=degraded,
         )
+
+    def _parse_for_compile(self, source: str) -> OfficialParseResult:
+        if self.mode is CompileMode.RECOVERY:
+            return parse_official_slot_with_diagnostics(source, mode=self.mode.value)
+        try:
+            return parse_official_slot_with_diagnostics(source, mode=self.mode.value)
+        except OfficialSlotError as strict_error:
+            try:
+                recovered = parse_official_slot_with_diagnostics(
+                    source,
+                    mode=CompileMode.RECOVERY.value,
+                )
+            except OfficialSlotError:
+                raise strict_error
+            if recovered.repairs:
+                repair_codes = ", ".join(repair.code for repair in recovered.repairs)
+                semantic_detail = ""
+                try:
+                    from .official.semantics import OfficialSemanticAnalyzer
+
+                    OfficialSemanticAnalyzer(_resolve_indicator_meta).validate(recovered.ast)
+                except OfficialSlotError as semantic_error:
+                    semantic_detail = (
+                        f"; recovered semantic error={semantic_error.code}: {semantic_error}"
+                    )
+                raise OfficialSlotError(
+                    "OFFICIAL_DEGRADED_SEMANTICS",
+                    f"Strict official compilation rejected source repairs: {repair_codes}{semantic_detail}",
+                ) from strict_error
+            raise strict_error
 
     def _compile_query(self, node: OfficialNode, warnings: List[str]) -> Tuple[str, List[str]]:
         if isinstance(node, OfficialLimit):
@@ -3581,11 +3637,16 @@ def profile_training_workbook(path: str, sample_size: int = 100) -> Dict[str, An
     }
 
 
-def compile_training_workbook(path: str, sample_size: int = 20) -> Dict[str, Any]:
+def compile_training_workbook(
+    path: str,
+    sample_size: int = 20,
+    mode: str = CompileMode.RECOVERY.value,
+) -> Dict[str, Any]:
     import pandas as pd
 
     df = pd.read_excel(path, sheet_name="训练语料")
-    compiler = OfficialSlotCompiler()
+    compile_mode = CompileMode.parse(mode)
+    compiler = OfficialSlotCompiler(mode=compile_mode.value)
     parse_ok = 0
     compile_ok = 0
     parse_errors: Counter[str] = Counter()
@@ -3598,7 +3659,7 @@ def compile_training_workbook(path: str, sample_size: int = 20) -> Dict[str, Any
     for row_index, row in df.iterrows():
         dsl = str(row["slot_dsl"])
         try:
-            parse_official_slot(dsl)
+            parse_official_slot(dsl, mode=compile_mode.value)
             parse_ok += 1
         except OfficialSlotError as exc:
             parse_errors[exc.code] += 1
@@ -3626,6 +3687,7 @@ def compile_training_workbook(path: str, sample_size: int = 20) -> Dict[str, Any
                 compile_error_samples.append(_workbook_error_sample(row_index, row, exc))
     return {
         "path": path,
+        "mode": compile_mode.value,
         "row_count": int(len(df)),
         "parse_ok": parse_ok,
         "parse_failed": int(len(df) - parse_ok),
@@ -3747,6 +3809,8 @@ def write_coverage_report(coverage: Dict[str, Any], output: str) -> None:
         "本报告逐条读取官方 `选股提槽实例.xlsx`，先做语法解析，再尝试把可落地槽位编译为 `newzl` 三表上的 Doris SQL。它用于区分三类情况：语法可解析、可在本批官方三表落地、以及规范存在但当前官方数据没有对应字段。",
         "",
         "## 覆盖率总览",
+        "",
+        f"- 编译模式：{coverage.get('mode', CompileMode.RECOVERY.value)}",
         "",
         "| 指标 | 数值 |",
         "|---|---:|",

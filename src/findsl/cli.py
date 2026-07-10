@@ -2,11 +2,27 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import asdict
 from pathlib import Path
 
 from .compiler import Compiler
 from .evaluation import evaluate_file
+
+
+def _exit_official_error(exc: Exception, as_json: bool) -> None:
+    code = str(getattr(exc, "code", "OFFICIAL_ERROR"))
+    if as_json:
+        print(
+            json.dumps(
+                {"ok": False, "error": {"code": code, "message": str(exc)}},
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    else:
+        print(f"{code}: {exc}", file=sys.stderr)
+    raise SystemExit(2)
 
 
 def main() -> None:
@@ -18,9 +34,11 @@ def main() -> None:
     compile_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
     official_parse_cmd = sub.add_parser("official-slot-parse", help="Parse official slot DSL into an AST")
     official_parse_cmd.add_argument("dsl", help="Official slot DSL expression")
+    official_parse_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
     official_parse_cmd.add_argument("--json", action="store_true", help="Print AST as JSON")
     official_compile_cmd = sub.add_parser("official-slot-compile", help="Compile official slot DSL to Doris SQL")
     official_compile_cmd.add_argument("dsl", help="Official slot DSL expression")
+    official_compile_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
     official_compile_cmd.add_argument("--json", action="store_true", help="Print full JSON result")
     official_profile_cmd = sub.add_parser("official-data-profile", help="Profile official CSV data and slot DSL workbook")
     official_profile_cmd.add_argument("--root", required=True, help="Official data package root directory")
@@ -34,6 +52,7 @@ def main() -> None:
     official_coverage_cmd.add_argument("--json-output", default=None, help="Optional JSON coverage output path")
     official_coverage_cmd.add_argument("--report-output", default=None, help="Optional Markdown coverage output path")
     official_coverage_cmd.add_argument("--sample-size", type=int, default=20, help="Number of error/success samples to include")
+    official_coverage_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
     official_coverage_cmd.add_argument("--json", action="store_true", help="Print coverage as JSON")
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
@@ -195,18 +214,24 @@ def main() -> None:
                 print(f"- {item}")
             print(f"Elapsed: {result.elapsed_ms:.3f} ms")
     elif args.command == "official-slot-parse":
-        from .official_slot import parse_official_slot
+        from .official_slot import OfficialSlotError, parse_official_slot_with_diagnostics
 
-        ast = parse_official_slot(args.dsl)
-        payload = ast.to_dict()
+        try:
+            parsed = parse_official_slot_with_diagnostics(args.dsl, mode=args.mode)
+        except OfficialSlotError as exc:
+            _exit_official_error(exc, args.json)
+        payload = parsed.ast.to_dict()
         if args.json:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
         else:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
     elif args.command == "official-slot-compile":
-        from .official_slot import OfficialSlotCompiler
+        from .official_slot import OfficialSlotCompiler, OfficialSlotError
 
-        result = OfficialSlotCompiler().compile(args.dsl)
+        try:
+            result = OfficialSlotCompiler(mode=args.mode).compile(args.dsl)
+        except OfficialSlotError as exc:
+            _exit_official_error(exc, args.json)
         payload = asdict(result)
         if args.json:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -253,7 +278,11 @@ def main() -> None:
     elif args.command == "official-slot-coverage":
         from .official_slot import compile_training_workbook, profile_to_json, write_coverage_report
 
-        coverage = compile_training_workbook(args.workbook, sample_size=args.sample_size)
+        coverage = compile_training_workbook(
+            args.workbook,
+            sample_size=args.sample_size,
+            mode=args.mode,
+        )
         if args.json_output:
             profile_to_json(coverage, args.json_output)
         if args.report_output:
@@ -261,6 +290,7 @@ def main() -> None:
         if args.json:
             print(json.dumps(coverage, ensure_ascii=False, indent=2))
         else:
+            print(f"Compile mode: {coverage['mode']}")
             print(f"Official training rows: {coverage['row_count']}")
             print(f"Parse ok: {coverage['parse_ok']}")
             print(f"Compile ok: {coverage['compile_ok']}")

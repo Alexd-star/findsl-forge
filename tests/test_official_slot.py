@@ -7,6 +7,7 @@ import os
 import pytest
 
 from findsl.official_slot import (
+    OfficialCompileResult,
     OfficialSlotCompiler,
     OfficialSlotError,
     OfficialSlotParser,
@@ -1117,6 +1118,86 @@ def test_compile_official_slot_keeps_sql_comment_free_and_reports_warnings():
     assert "market '港' is not present in official A-share CSV tables" in result.warnings
 
 
+def test_strict_compile_rejects_runtime_date_fallback():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler(mode="strict").compile(
+            "indicator('', '', '收盘价', '收盘后', '', '', '') > 1"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_DEGRADED_SEMANTICS"
+
+
+def test_strict_compile_classifies_repairable_source_as_degraded():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler(mode="strict").compile(
+            "and indicator('', '', '涨停', '', '', '', '') = True"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_DEGRADED_SEMANTICS"
+    assert "LEADING_BOOLEAN_OPERATOR" in str(excinfo.value)
+
+
+def test_recovery_compile_exposes_repairs_and_warnings():
+    result = OfficialSlotCompiler(mode="recovery").compile(
+        "and indicator('港', '', '收盘价', '收盘后', '', '', '') > 1"
+    )
+
+    assert result.repairs
+    assert result.repairs[0].code == "LEADING_BOOLEAN_OPERATOR"
+    assert result.warnings
+    assert result.normalized_source.startswith("indicator(")
+    assert result.strict_success is False
+    assert result.degraded is True
+
+
+def test_clean_recovery_compile_is_also_a_strict_success():
+    result = OfficialSlotCompiler(mode="recovery").compile(
+        "indicator('沪', '', '成交量', '2026-04-14', '', '', '') > 1000"
+    )
+
+    assert result.repairs == ()
+    assert result.warnings == []
+    assert result.strict_success is True
+    assert result.degraded is False
+
+
+def test_strict_compile_does_not_treat_structural_true_predicate_as_fallback():
+    result = OfficialSlotCompiler(mode="strict").compile(
+        "rank('', '', '成交量', 'desc', '', '', '', '') <= 10"
+    )
+
+    assert "WHERE 1=1" in result.sql
+    assert result.strict_success is True
+    assert result.degraded is False
+
+
+def test_recovery_compile_does_not_scan_string_literals_for_fallbacks():
+    result = OfficialSlotCompiler(mode="recovery").compile(
+        "indicator('', '1=0', '收盘价', '2026-04-14', '', '', '') > 1"
+    )
+
+    assert "'1=0'" in result.sql
+    assert result.strict_success is True
+    assert result.degraded is False
+
+
+def test_strict_repair_diagnostic_preserves_recovered_semantic_error():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler(mode="strict").compile("and unknown() = True")
+
+    assert excinfo.value.code == "OFFICIAL_DEGRADED_SEMANTICS"
+    assert "UNSUPPORTED_OFFICIAL_FUNCTION" in str(excinfo.value)
+
+
+def test_official_compile_result_keeps_legacy_positional_constructor():
+    result = OfficialCompileResult("source", {}, "SELECT 1", [], [])
+
+    assert result.source == "source"
+    assert result.sql == "SELECT 1"
+    assert result.strict_success is True
+    assert result.degraded is False
+
+
 def test_compile_unsupported_indicator_fails_with_stable_code():
     with pytest.raises(OfficialSlotError) as excinfo:
         OfficialSlotCompiler().compile(
@@ -1205,6 +1286,8 @@ def test_official_slot_coverage_cli_writes_json_and_markdown(tmp_path):
             str(report_output),
             "--sample-size",
             "3",
+            "--mode",
+            "recovery",
             "--json",
         ],
         check=True,
@@ -1214,6 +1297,8 @@ def test_official_slot_coverage_cli_writes_json_and_markdown(tmp_path):
     )
 
     assert '"compile_ok"' in proc.stdout
+    assert '"mode": "recovery"' in proc.stdout
     assert json_output.exists()
     assert report_output.exists()
     assert "官方槽位 DSL 编译覆盖率报告" in report_output.read_text(encoding="utf-8")
+    assert "编译模式：recovery" in report_output.read_text(encoding="utf-8")

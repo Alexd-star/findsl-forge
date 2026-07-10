@@ -97,3 +97,91 @@ def test_cli_official_performance_matrix_writes_json_and_markdown(tmp_path):
     assert payload["queries"][0]["plan_kind"] == "prefix"
     assert json_output.exists()
     assert "# 官方真实数据逐问句性能矩阵" in report_output.read_text(encoding="utf-8")
+
+
+def test_cli_official_parse_recovery_preserves_ast_json_contract():
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "findsl.cli",
+            "official-slot-parse",
+            "and indicator('', '', '涨停', '', '', '', '') = True",
+            "--mode",
+            "recovery",
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=env,
+        check=False,
+    )
+
+    assert completed.returncode == 0
+    payload = json.loads(completed.stdout)
+    assert payload["type"] == "Comparison"
+    assert payload["left"]["name"] == "indicator"
+
+
+def test_cli_official_compile_strict_reports_strict_success():
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "findsl.cli",
+            "official-slot-compile",
+            "indicator('沪', '', '成交量', '2026-04-14', '', '', '') > 1000",
+            "--mode",
+            "strict",
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=env,
+        check=False,
+    )
+
+    assert completed.returncode == 0
+    payload = json.loads(completed.stdout)
+    assert payload["strict_success"] is True
+    assert payload["degraded"] is False
+    assert payload["repairs"] == []
+
+
+def test_cli_official_compile_strict_json_error_is_structured():
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "findsl.cli",
+            "official-slot-compile",
+            "indicator('', '', '收盘价', '收盘后', '', '', '') > 1",
+            "--mode",
+            "strict",
+            "--json",
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=env,
+        check=False,
+    )
+
+    assert completed.returncode == 2
+    payload = json.loads(completed.stdout)
+    assert payload["ok"] is False
+    assert payload["error"]["code"] == "OFFICIAL_DEGRADED_SEMANTICS"
