@@ -2,6 +2,19 @@
 
 本文档记录 FinDSL Forge 的重要变更。详细提交历史以 Git 为准，提交包证据以 `submission_artifacts/evidence_snapshots/` 为准。
 
+## 2026-07-11
+
+### 严格官方编译基线
+
+- 新增 strict/recovery 双模式。strict 不静默修复源码，recovery 返回结构化 repair、warning、fallback 和 degraded 状态。
+- 为官方 12 类函数建立精确签名，禁止额外参数被切片忽略，禁止数字、布尔值或表达式冒充字符串槽位。
+- 新增官方 AST 类型分析，覆盖数值/布尔/字符串/时间、百分比、四则运算、比较、`between`、`~=` 和裸标识符检查。
+- strict compiler 对 repair、warning 和结构化 fallback 统一使用 `OFFICIAL_DEGRADED_SEMANTICS`，CLI JSON 错误路径返回稳定错误码和退出码 2。
+- 重建官方 5,799 条工作簿覆盖率：strict parse `5,792`、recovery parse `5,799`、strict compile `1,097`、recovery compile `1,830`、degraded `733`。
+- `1=0/1=1` 改为编译器结构化记录，当前分别为 `472/328` 条，不再扫描 SQL 文本，避免误判合法 `WHERE 1=1` 和字符串 `'1=0'`。
+- 修正官方 CSV 日期画像，`first_date/last_date` 使用全文件真实最小值和最大值，不再假设 CSV 已按日期排序。
+- 新增 `docs/36_严格官方编译基线与口径说明.md`，明确历史 `compile_ok=1,882` 是 recovery 返回口径，不能作为 SQL 正确率。
+
 ## 2026-07-06
 
 ### 官方真实数据证据与审计口径刷新
