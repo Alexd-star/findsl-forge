@@ -1391,9 +1391,17 @@ class OfficialSlotCompiler:
             and isinstance(node.value, str)
             and _is_numeric_percent_literal(node.value)
         ):
-            percent = node.value.strip()[:-1]
+            percent = node.value[:-1]
             return f"CEIL(({partition_count_sql} * {percent}) / 100.0)"
-        return self._expr_sql(node, []).sql
+        if isinstance(node, OfficialLiteral) and not isinstance(node.value, bool):
+            if isinstance(node.value, (int, float)):
+                return self._literal_sql(node)
+            if isinstance(node.value, str) and _is_numeric_percent_literal(node.value):
+                return node.value[:-1]
+        raise OfficialSlotError(
+            "OFFICIAL_RANK_BOUND_ERROR",
+            "rank comparison bound must be a numeric or percentage literal",
+        )
 
     def _condition_sql(self, node: OfficialNode, warnings: List[str]) -> SqlExpr:
         if isinstance(node, OfficialBinaryOp) and node.op == "then":
@@ -4072,10 +4080,28 @@ def write_coverage_report(coverage: Dict[str, Any], output: str) -> None:
                 f"| {item['excel_row']} | {item['code']} | {_md_escape(item['message'])} | `{_md_escape(item['slot_dsl'])}` |"
             )
     if coverage.get("selected_compiled_samples"):
-        lines.extend(["", "## 可落地编译样本", "", "| Excel 行 | 依赖表 | SQL 预览 |", "|---:|---|---|"])
+        sample_heading = (
+            "strict 编译成功样本"
+            if coverage.get("mode") == CompileMode.STRICT.value
+            else "recovery 编译返回样本（含降级状态）"
+        )
+        lines.extend(
+            [
+                "",
+                f"## {sample_heading}",
+                "",
+                "| Excel 行 | 严格成功 | repair | warning 数 | 依赖表 | SQL 预览 |",
+                "|---:|---|---|---:|---|---|",
+            ]
+        )
         for item in coverage["selected_compiled_samples"]:
             tables = ", ".join(item["requires_tables"])
-            lines.append(f"| {item['excel_row']} | {tables} | `{_md_escape(item['sql_preview'])}` |")
+            repairs = ", ".join(item.get("repair_codes", [])) or "无"
+            strict_success = "true" if item.get("strict_success") else "false"
+            lines.append(
+                f"| {item['excel_row']} | {strict_success} | {repairs} | "
+                f"{len(item.get('warnings', []))} | {tables} | `{_md_escape(item['sql_preview'])}` |"
+            )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")
 

@@ -1174,6 +1174,16 @@ def test_strict_compile_does_not_treat_structural_true_predicate_as_fallback():
     assert result.degraded is False
 
 
+def test_rank_filter_rejects_nonliteral_bound_before_sql_generation():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler(mode="strict").compile(
+            "rank('', '', '成交量', 'desc', '', '', '', '') <= "
+            "indicator('', '', '收盘价', '收盘后', '', '', '')"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_RANK_BOUND_ERROR"
+
+
 def test_recovery_compile_does_not_scan_string_literals_for_fallbacks():
     result = OfficialSlotCompiler(mode="recovery").compile(
         "indicator('', '1=0', '收盘价', '2026-04-14', '', '', '') > 1"
@@ -1302,6 +1312,12 @@ def test_workbook_coverage_mode_selects_primary_metrics(tmp_path):
     assert strict["selected_compile_errors"]["OFFICIAL_DEGRADED_SEMANTICS"] == 1
     assert len(recovery["selected_compiled_samples"]) == 2
     assert len(strict["selected_compiled_samples"]) == 1
+
+    recovery_report = tmp_path / "recovery_coverage.md"
+    write_coverage_report(recovery, str(recovery_report))
+    report_text = recovery_report.read_text(encoding="utf-8")
+    assert "recovery 编译返回样本（含降级状态）" in report_text
+    assert "严格成功" in report_text
 
 
 def test_classify_official_indicator_domains_for_audit_report():

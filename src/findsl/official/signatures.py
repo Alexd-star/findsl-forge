@@ -170,4 +170,3 @@ _SIGNATURES = (
 OFFICIAL_FUNCTION_SIGNATURES: Mapping[str, FunctionSignature] = MappingProxyType(
     {signature.name: signature for signature in _SIGNATURES}
 )
-

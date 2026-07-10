@@ -221,10 +221,27 @@ def main() -> None:
         except OfficialSlotError as exc:
             _exit_official_error(exc, args.json)
         payload = parsed.ast.to_dict()
+        payload.update(
+            {
+                "source": parsed.source,
+                "normalized_source": parsed.normalized_source,
+                "repairs": [repair.to_dict() for repair in parsed.repairs],
+                "mode": args.mode,
+            }
+        )
         if args.json:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
         else:
-            print(json.dumps(payload, ensure_ascii=False, indent=2))
+            print(json.dumps(parsed.ast.to_dict(), ensure_ascii=False, indent=2))
+            print()
+            print(f"Mode: {args.mode}")
+            print(f"Normalized source: {parsed.normalized_source}")
+            print("Repairs:")
+            if parsed.repairs:
+                for repair in parsed.repairs:
+                    print(f"- {repair.code} at {repair.position}: {repair.message}")
+            else:
+                print("- <none>")
     elif args.command == "official-slot-compile":
         from .official_slot import OfficialSlotCompiler, OfficialSlotError
 
@@ -237,6 +254,21 @@ def main() -> None:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
         else:
             print(result.sql)
+            print()
+            print(f"Mode: {args.mode}")
+            print(f"Strict success: {result.strict_success}")
+            print(f"Degraded: {result.degraded}")
+            print(f"Normalized source: {result.normalized_source}")
+            print("Repairs:")
+            if result.repairs:
+                for repair in result.repairs:
+                    print(f"- {repair.code} at {repair.position}: {repair.message}")
+            else:
+                print("- <none>")
+            print(
+                "Fallback predicates: "
+                + (", ".join(result.fallback_predicates) if result.fallback_predicates else "<none>")
+            )
             print()
             print("Requires tables:")
             for table in result.requires_tables:

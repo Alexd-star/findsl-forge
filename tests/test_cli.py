@@ -126,6 +126,9 @@ def test_cli_official_parse_recovery_preserves_ast_json_contract():
     payload = json.loads(completed.stdout)
     assert payload["type"] == "Comparison"
     assert payload["left"]["name"] == "indicator"
+    assert payload["repairs"][0]["code"] == "LEADING_BOOLEAN_OPERATOR"
+    assert payload["normalized_source"].startswith("indicator(")
+    assert payload["mode"] == "recovery"
 
 
 def test_cli_official_compile_strict_reports_strict_success():
@@ -185,3 +188,32 @@ def test_cli_official_compile_strict_json_error_is_structured():
     payload = json.loads(completed.stdout)
     assert payload["ok"] is False
     assert payload["error"]["code"] == "OFFICIAL_DEGRADED_SEMANTICS"
+
+
+def test_cli_official_compile_recovery_text_exposes_degraded_status():
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "src" + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env["PYTHONIOENCODING"] = "utf-8"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "findsl.cli",
+            "official-slot-compile",
+            "and indicator('港', '', '收盘价', '收盘后', '', '', '') > 1",
+            "--mode",
+            "recovery",
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=env,
+        check=False,
+    )
+
+    assert completed.returncode == 0
+    assert "Strict success: False" in completed.stdout
+    assert "Degraded: True" in completed.stdout
+    assert "LEADING_BOOLEAN_OPERATOR" in completed.stdout
+    assert "Fallback predicates: 1=0, 1=1" in completed.stdout
