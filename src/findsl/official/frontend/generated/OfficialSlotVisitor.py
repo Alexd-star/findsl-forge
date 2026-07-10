@@ -94,6 +94,11 @@ class OfficialSlotVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by OfficialSlotParser#signedPercent.
+    def visitSignedPercent(self, ctx:OfficialSlotParser.SignedPercentContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by OfficialSlotParser#comparisonOperator.
     def visitComparisonOperator(self, ctx:OfficialSlotParser.ComparisonOperatorContext):
         return self.visitChildren(ctx)

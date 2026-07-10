@@ -21,9 +21,10 @@ rangeLiteral
     ;
 rangeBracketOpen: LBRACK | LPAREN;
 rangeBracketClose: RBRACK | RPAREN;
-literal: STRING | PERCENT | signedNumber | TRUE | FALSE;
+literal: STRING | signedPercent | signedNumber | TRUE | FALSE;
 signedInteger: (PLUS | MINUS)? NUMBER;
 signedNumber: (PLUS | MINUS)? NUMBER;
+signedPercent: (PLUS | MINUS)? PERCENT;
 comparisonOperator: GTE | LTE | NEQ | APPROX | EQ | GT | LT;
 
 AND: [aA][nN][dD];

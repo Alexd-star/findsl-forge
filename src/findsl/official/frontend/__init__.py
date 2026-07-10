@@ -4,6 +4,7 @@ from .protocol import (
     OfficialFrontend,
     ParseOutcome,
     Severity,
+    SourceMap,
     SourceSpan,
 )
 
@@ -13,5 +14,6 @@ __all__ = [
     "OfficialFrontend",
     "ParseOutcome",
     "Severity",
+    "SourceMap",
     "SourceSpan",
 ]

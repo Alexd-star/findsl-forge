@@ -38,6 +38,18 @@ class SourceSpan:
         return asdict(self)
 
 
+class SourceMap:
+    def __init__(self) -> None:
+        self._spans: Dict[int, SourceSpan] = {}
+
+    def record(self, node: Any, span: SourceSpan) -> Any:
+        self._spans[id(node)] = span
+        return node
+
+    def span_for(self, node: Any) -> SourceSpan:
+        return self._spans[id(node)]
+
+
 @dataclass(frozen=True)
 class FrontendDiagnostic:
     code: str
@@ -61,6 +73,7 @@ class ParseOutcome:
     repairs: Tuple[SourceRepair, ...]
     frontend: str
     elapsed_ns: int
+    source_map: Optional[SourceMap] = None
 
     @property
     def ok(self) -> bool:
