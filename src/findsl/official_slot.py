@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
+from .official import CompileMode, SourceRepair
 from .official_time import normalize_official_date
 
 
@@ -27,6 +28,38 @@ class Token:
 class OfficialNode:
     def to_dict(self) -> Dict[str, Any]:
         raise NotImplementedError
+
+
+@dataclass(frozen=True)
+class OfficialParseResult:
+    source: str
+    normalized_source: str
+    ast: OfficialNode
+    repairs: Tuple[SourceRepair, ...]
+
+
+@dataclass(frozen=True)
+class _MappedSource:
+    text: str
+    positions: Tuple[int, ...]
+
+    @classmethod
+    def from_source(cls, source: str) -> "_MappedSource":
+        return cls(source, tuple(range(len(source))))
+
+    def replace(
+        self,
+        start: int,
+        end: int,
+        replacement: str = "",
+        replacement_positions: Sequence[int] = (),
+    ) -> "_MappedSource":
+        if len(replacement) != len(replacement_positions):
+            raise ValueError("replacement text and source positions must have equal lengths")
+        return _MappedSource(
+            self.text[:start] + replacement + self.text[end:],
+            self.positions[:start] + tuple(replacement_positions) + self.positions[end:],
+        )
 
 
 @dataclass(frozen=True)
@@ -582,33 +615,94 @@ def _dynamic_prefix_average_expr(
     return f"({average_sql} / {scale_divisor:.1f})"
 
 
-def _sanitize_official_slot_source(source: str) -> str:
-    text = str(source or "").strip()
-    text = re.sub(r"^\s*(and|or|then)\b\s+", "", text, flags=re.IGNORECASE)
-    text = _strip_dangling_edge_quotes(text)
-    text = _quote_orphan_literal_before_empty_string(text)
-    text = _strip_unmatched_closing_parens(text)
-    return text.strip()
+def _normalize_official_slot_source(source: str) -> Tuple[str, Tuple[SourceRepair, ...]]:
+    mapped = _MappedSource.from_source(str(source or ""))
+    repairs: List[SourceRepair] = []
 
+    leading = re.match(r"^\s*(and|or|then)\b\s+", mapped.text, flags=re.IGNORECASE)
+    if leading:
+        repairs.append(
+            SourceRepair(
+                code="LEADING_BOOLEAN_OPERATOR",
+                message=f"removed leading {leading.group(1).lower()} operator",
+                position=mapped.positions[leading.start(1)],
+            )
+        )
+        mapped = mapped.replace(0, leading.end())
 
-def _strip_dangling_edge_quotes(text: str) -> str:
-    result = text
     for quote in ("'", '"'):
-        if result.count(quote) % 2 == 0:
+        if mapped.text.count(quote) % 2 == 0:
             continue
-        stripped = result.strip()
-        if stripped.startswith(quote) and re.match(rf"^\s*{re.escape(quote)}\s*[A-Za-z_]", result):
-            result = re.sub(rf"^\s*{re.escape(quote)}\s*", "", result, count=1)
+        stripped = mapped.text.strip()
+        match: Optional[re.Match[str]] = None
+        if stripped.startswith(quote):
+            match = re.match(
+                rf"^\s*(?P<quote>{re.escape(quote)})\s*(?=[A-Za-z_])",
+                mapped.text,
+            )
         elif stripped.endswith(quote):
-            result = re.sub(rf"\s*{re.escape(quote)}\s*$", "", result, count=1)
-    return result
+            match = re.search(
+                rf"\s*(?P<quote>{re.escape(quote)})\s*$",
+                mapped.text,
+            )
+        if match is None:
+            continue
+        repairs.append(
+            SourceRepair(
+                code="DANGLING_EDGE_QUOTE",
+                message="removed dangling quote at the source boundary",
+                position=mapped.positions[match.start("quote")],
+            )
+        )
+        mapped = mapped.replace(match.start(), match.end())
+
+    orphan_pattern = re.compile(r"(,\s*)([^,'\"\(\)\[\]\s]+)''(?=\s*,)")
+    orphan_matches = list(orphan_pattern.finditer(mapped.text))
+    for match in orphan_matches:
+        repairs.append(
+            SourceRepair(
+                code="ORPHAN_LITERAL_QUOTED",
+                message="quoted an orphan slot literal before an empty string",
+                position=mapped.positions[match.start(2)],
+            )
+        )
+    for match in reversed(orphan_matches):
+        literal_start = match.start(2)
+        literal_end = match.end(2)
+        literal = mapped.text[literal_start:literal_end]
+        replacement = f"'{literal}'"
+        replacement_positions = (
+            mapped.positions[literal_start],
+            *mapped.positions[literal_start:literal_end],
+            mapped.positions[literal_end],
+        )
+        mapped = mapped.replace(
+            literal_start,
+            literal_end + 2,
+            replacement,
+            replacement_positions,
+        )
+
+    _, removed_positions = _strip_unmatched_closing_parens_with_positions(mapped.text)
+    for position in removed_positions:
+        repairs.append(
+            SourceRepair(
+                code="UNMATCHED_CLOSING_PAREN",
+                message="removed an unmatched closing parenthesis",
+                position=mapped.positions[position],
+            )
+        )
+    for position in reversed(removed_positions):
+        mapped = mapped.replace(position, position + 1)
+    return mapped.text.strip(), tuple(repairs)
 
 
-def _quote_orphan_literal_before_empty_string(text: str) -> str:
-    return re.sub(r"(,\s*)([^,'\"\(\)\[\]\s]+)''(?=\s*,)", r"\1'\2'", text)
+def _sanitize_official_slot_source(source: str) -> str:
+    normalized, _ = _normalize_official_slot_source(source)
+    return normalized
 
 
-def _strip_unmatched_closing_parens(text: str) -> str:
+def _strip_unmatched_closing_parens_with_positions(text: str) -> Tuple[str, List[int]]:
     depth = 0
     remove_positions = set()
     quote: Optional[str] = None
@@ -633,8 +727,9 @@ def _strip_unmatched_closing_parens(text: str) -> str:
             else:
                 depth -= 1
     if not remove_positions:
-        return text
-    return "".join(ch for index, ch in enumerate(text) if index not in remove_positions)
+        return text, []
+    ordered = sorted(remove_positions)
+    return "".join(ch for index, ch in enumerate(text) if index not in remove_positions), ordered
 
 
 def lex_official_slot(source: str) -> List[Token]:
@@ -706,9 +801,13 @@ def lex_official_slot(source: str) -> List[Token]:
 
 
 class OfficialSlotParser:
-    def __init__(self, source: str):
+    def __init__(self, source: str, normalized_source: Optional[str] = None):
         self.source = source
-        self.normalized_source = _sanitize_official_slot_source(source)
+        self.normalized_source = (
+            _sanitize_official_slot_source(source)
+            if normalized_source is None
+            else normalized_source
+        )
         self.tokens = lex_official_slot(self.normalized_source)
         self.index = 0
 
@@ -878,8 +977,27 @@ class OfficialSlotParser:
             return OfficialFunctionCall(name, args)
 
 
-def parse_official_slot(source: str) -> OfficialNode:
-    return OfficialSlotParser(source).parse()
+def parse_official_slot_with_diagnostics(
+    source: str,
+    mode: str = CompileMode.RECOVERY.value,
+) -> OfficialParseResult:
+    compile_mode = CompileMode.parse(mode)
+    if compile_mode is CompileMode.STRICT:
+        normalized_source = str(source or "")
+        repairs: Tuple[SourceRepair, ...] = ()
+    else:
+        normalized_source, repairs = _normalize_official_slot_source(source)
+    ast = OfficialSlotParser(source, normalized_source=normalized_source).parse()
+    return OfficialParseResult(
+        source=source,
+        normalized_source=normalized_source,
+        ast=ast,
+        repairs=repairs,
+    )
+
+
+def parse_official_slot(source: str, mode: str = CompileMode.RECOVERY.value) -> OfficialNode:
+    return parse_official_slot_with_diagnostics(source, mode=mode).ast
 
 
 class OfficialSlotCompiler:

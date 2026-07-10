@@ -9,9 +9,11 @@ import pytest
 from findsl.official_slot import (
     OfficialSlotCompiler,
     OfficialSlotError,
+    OfficialSlotParser,
     classify_official_indicator_domain,
     compile_training_workbook,
     parse_official_slot,
+    parse_official_slot_with_diagnostics,
     profile_training_workbook,
     write_coverage_report,
 )
@@ -36,6 +38,100 @@ def test_parse_official_slot_supports_single_quotes_percent_and_word_logic():
     assert payload["left"]["op"] == ">"
     assert payload["left"]["right"]["value"] == "5%"
     assert payload["right"]["right"]["value"] is True
+
+
+def test_strict_parse_rejects_leading_boolean_operator():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        parse_official_slot(
+            "and indicator('', '', '涨停', '', '', '', '') = True",
+            mode="strict",
+        )
+
+    assert excinfo.value.code == "OFFICIAL_PARSE_ERROR"
+
+
+def test_recovery_parse_reports_leading_operator_repair():
+    parsed = parse_official_slot_with_diagnostics(
+        "and indicator('', '', '涨停', '', '', '', '') = True",
+        mode="recovery",
+    )
+
+    assert parsed.repairs[0].code == "LEADING_BOOLEAN_OPERATOR"
+    assert parsed.normalized_source.startswith("indicator(")
+
+
+def test_strict_parse_preserves_source_verbatim():
+    source = "  indicator('', '', '涨停', '', '', '', '') = True  "
+
+    parsed = parse_official_slot_with_diagnostics(source, mode="strict")
+
+    assert parsed.source == source
+    assert parsed.normalized_source == source
+    assert parsed.repairs == ()
+
+
+def test_direct_parser_keeps_legacy_recovery_normalization():
+    ast = OfficialSlotParser(
+        "and indicator('', '', '涨停', '', '', '', '') = True"
+    ).parse()
+
+    assert ast.to_dict()["op"] == "="
+
+
+def test_recovery_repairs_use_original_source_positions():
+    source = "and indicator('', '', '涨停', '', '', '', '') = True)"
+
+    parsed = parse_official_slot_with_diagnostics(source, mode="recovery")
+
+    positions = {repair.code: repair.position for repair in parsed.repairs}
+    assert positions == {
+        "LEADING_BOOLEAN_OPERATOR": source.index("and"),
+        "UNMATCHED_CLOSING_PAREN": source.rindex(")"),
+    }
+
+
+def test_recovery_reports_each_orphan_literal_repair():
+    source = (
+        "reset('', '', '', 20日均线'', '', '', '') = True and "
+        "reset('', '', '', 30日均线'', '', '', '') = True"
+    )
+
+    parsed = parse_official_slot_with_diagnostics(source, mode="recovery")
+
+    orphan_repairs = [
+        repair for repair in parsed.repairs if repair.code == "ORPHAN_LITERAL_QUOTED"
+    ]
+    assert [repair.position for repair in orphan_repairs] == [
+        source.index("20日均线"),
+        source.index("30日均线"),
+    ]
+
+
+def test_recovery_reports_each_dangling_edge_quote():
+    source = '"indicator(\'\', \'\', \'涨停\', \'\', \'\', \'\', \'\') = True\''
+
+    parsed = parse_official_slot_with_diagnostics(source, mode="recovery")
+
+    quote_repairs = [
+        repair for repair in parsed.repairs if repair.code == "DANGLING_EDGE_QUOTE"
+    ]
+    assert [repair.position for repair in quote_repairs] == [len(source) - 1, 0]
+
+
+@pytest.mark.parametrize("source", ["'涨停", "'123"])
+def test_recovery_does_not_hide_unterminated_string_literals(source):
+    with pytest.raises(OfficialSlotError) as excinfo:
+        parse_official_slot_with_diagnostics(source, mode="recovery")
+
+    assert excinfo.value.code == "OFFICIAL_LEX_ERROR"
+
+
+def test_recovery_normalized_source_keeps_legacy_outer_whitespace_cleanup():
+    source = "  indicator('', '', '涨停', '', '', '', '') = True  "
+
+    parsed = parse_official_slot_with_diagnostics(source, mode="recovery")
+
+    assert parsed.normalized_source == source.strip()
 
 
 @pytest.mark.parametrize(
