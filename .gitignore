@@ -18,3 +18,4 @@ reports/
 external_references/
 outputs/**/node_modules/
 outputs/**/presentations/runtime-check/
+.worktrees/
