@@ -3931,10 +3931,10 @@ def _profile_csv(path: Path) -> Dict[str, Any]:
                 sample_rows.append(dict(row))
             if row.get("mktcode"):
                 markets[row["mktcode"]] += 1
-            if row.get("bizdate"):
-                if not first_date:
-                    first_date = row["bizdate"]
-                last_date = row["bizdate"]
+            date_value = str(row.get("bizdate") or "").strip()
+            if date_value:
+                first_date = date_value if not first_date else min(first_date, date_value)
+                last_date = date_value if not last_date else max(last_date, date_value)
     return {
         "path": str(path),
         "bytes": path.stat().st_size,

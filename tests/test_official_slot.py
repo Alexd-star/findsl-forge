@@ -11,6 +11,7 @@ from findsl.official_slot import (
     OfficialSlotCompiler,
     OfficialSlotError,
     OfficialSlotParser,
+    _profile_csv,
     classify_official_indicator_domain,
     compile_training_workbook,
     parse_official_slot,
@@ -1221,6 +1222,19 @@ def test_profile_training_workbook_reads_official_examples():
     assert "CONS=每日" not in profile["indicator_counts"]
     assert profile["count_exp_counts"]["CONS=每日"] > 100
     assert profile["indicator_counts"]["涨跌幅"] > 0
+
+
+def test_csv_profile_uses_true_min_and_max_dates(tmp_path):
+    path = tmp_path / "sample.csv"
+    path.write_text(
+        "mktcode,bizdate\n0,2020-02-01\n0,2019-01-01\n0,2021-03-01\n",
+        encoding="utf-8",
+    )
+
+    profile = _profile_csv(path)
+
+    assert profile["first_date"] == "2019-01-01"
+    assert profile["last_date"] == "2021-03-01"
 
 
 def test_compile_training_workbook_reports_real_parse_and_compile_coverage(tmp_path):
