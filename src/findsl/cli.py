@@ -292,8 +292,13 @@ def main() -> None:
         else:
             print(f"Compile mode: {coverage['mode']}")
             print(f"Official training rows: {coverage['row_count']}")
-            print(f"Parse ok: {coverage['parse_ok']}")
-            print(f"Compile ok: {coverage['compile_ok']}")
+            print(f"Selected parse ok: {coverage['selected_parse_ok']}")
+            print(f"Selected compile ok: {coverage['selected_compile_ok']}")
+            print(f"Strict parse ok: {coverage['strict_parse_ok']}")
+            print(f"Recovery parse ok: {coverage['recovery_parse_ok']}")
+            print(f"Strict compile ok: {coverage['strict_compile_ok']}")
+            print(f"Recovery compile ok: {coverage['recovery_compile_ok']}")
+            print(f"Degraded rows: {coverage['degraded_rows']}")
     elif args.command == "official-performance-matrix":
         from .official_performance import write_official_performance_matrix
 

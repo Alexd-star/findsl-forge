@@ -203,6 +203,22 @@ class OfficialCompileResult:
     repairs: Tuple[SourceRepair, ...] = ()
     strict_success: bool = True
     degraded: bool = False
+    fallback_predicates: Tuple[str, ...] = ()
+
+
+class _CompilationWarnings(list):
+    def __init__(self) -> None:
+        super().__init__()
+        self.fallback_predicates: set[str] = set()
+
+    def mark_fallback(self, predicate: Optional[str]) -> None:
+        if predicate:
+            self.fallback_predicates.add(predicate)
+
+
+def _mark_fallback(warnings: List[str], predicate: Optional[str]) -> None:
+    if isinstance(warnings, _CompilationWarnings):
+        warnings.mark_fallback(predicate)
 
 
 OPERATORS = {">=", "<=", "!=", "~=", ">", "<", "=", "+", "-", "*", "/", "(", ")", "[", "]", ","}
@@ -1022,15 +1038,18 @@ class OfficialSlotCompiler:
         from .official.semantics import OfficialSemanticAnalyzer
 
         OfficialSemanticAnalyzer(_resolve_indicator_meta).validate(ast)
-        warnings: List[str] = []
+        warnings = _CompilationWarnings()
         sql, tables = self._compile_query(ast, warnings)
-        degraded = bool(parsed.repairs or warnings)
+        fallback_predicates = tuple(sorted(warnings.fallback_predicates))
+        degraded = bool(parsed.repairs or warnings or fallback_predicates)
         if self.mode is CompileMode.STRICT and degraded:
             reasons: List[str] = []
             if parsed.repairs:
                 reasons.append(f"source repairs={len(parsed.repairs)}")
             if warnings:
                 reasons.append(f"warnings={len(warnings)}")
+            if fallback_predicates:
+                reasons.append(f"fallbacks={','.join(fallback_predicates)}")
             raise OfficialSlotError(
                 "OFFICIAL_DEGRADED_SEMANTICS",
                 "Strict official compilation rejected degraded semantics: " + ", ".join(reasons),
@@ -1041,10 +1060,11 @@ class OfficialSlotCompiler:
             ast=ast.to_dict(),
             sql=sql,
             requires_tables=tables,
-            warnings=warnings,
+            warnings=list(warnings),
             repairs=parsed.repairs,
             strict_success=not degraded,
             degraded=degraded,
+            fallback_predicates=fallback_predicates,
         )
 
     def _parse_for_compile(self, source: str) -> OfficialParseResult:
@@ -3047,6 +3067,7 @@ class OfficialSlotCompiler:
             )
             where_parts.extend(normalized.constraints)
             warnings.extend(normalized.warnings)
+            _mark_fallback(warnings, normalized.fallback_predicate)
         return where_parts
 
     def _lag_event_window_where(
@@ -3073,6 +3094,7 @@ class OfficialSlotCompiler:
             field=source_field,
         )
         warnings.extend(normalized.warnings)
+        _mark_fallback(warnings, normalized.fallback_predicate)
 
         event_where: List[str] = []
         for constraint in normalized.constraints:
@@ -3176,6 +3198,7 @@ class OfficialSlotCompiler:
             # The official CSV has stock-focused data only. Keep the constraint visible instead of fabricating fund rows.
             constraints.append("1=0")
             warnings.append(f"select_type {select_type!r} is not present in official A-share CSV tables")
+            _mark_fallback(warnings, "1=0")
         if date:
             normalized = normalize_official_date(
                 date,
@@ -3185,6 +3208,7 @@ class OfficialSlotCompiler:
             )
             constraints.extend(normalized.constraints)
             warnings.extend(normalized.warnings)
+            _mark_fallback(warnings, normalized.fallback_predicate)
         return constraints
 
     def _market_constraints(self, market: str, warnings: List[str]) -> List[str]:
@@ -3214,6 +3238,7 @@ class OfficialSlotCompiler:
             else:
                 flag_constraints.append("1=0")
                 warnings.append(f"market {name!r} is not present in official A-share CSV tables")
+                _mark_fallback(warnings, "1=0")
         constraints = []
         if positives:
             constraints.append(f"base.mktcode IN ({', '.join(str(v) for v in sorted(set(positives)))})")
@@ -3646,29 +3671,119 @@ def compile_training_workbook(
 
     df = pd.read_excel(path, sheet_name="训练语料")
     compile_mode = CompileMode.parse(mode)
-    compiler = OfficialSlotCompiler(mode=compile_mode.value)
-    parse_ok = 0
-    compile_ok = 0
+    recovery_compiler = OfficialSlotCompiler(mode=CompileMode.RECOVERY.value)
+    strict_compiler = OfficialSlotCompiler(mode=CompileMode.STRICT.value)
+    strict_parse_ok = 0
+    recovery_parse_ok = 0
+    repaired_rows = 0
+    recovery_compile_ok = 0
+    strict_compile_ok = 0
+    warning_rows = 0
+    degraded_rows = 0
+    sql_false_fallback_rows = 0
+    sql_true_fallback_rows = 0
+    strict_parse_errors: Counter[str] = Counter()
     parse_errors: Counter[str] = Counter()
     compile_errors: Counter[str] = Counter()
+    recovery_compile_errors: Counter[str] = Counter()
+    strict_compile_errors: Counter[str] = Counter()
+    repair_counts: Counter[str] = Counter()
     compile_error_details: Counter[str] = Counter()
     compile_error_domains: Counter[str] = Counter()
+    recovery_compile_error_details: Counter[str] = Counter()
+    recovery_compile_error_domains: Counter[str] = Counter()
+    strict_compile_error_details: Counter[str] = Counter()
+    strict_compile_error_domains: Counter[str] = Counter()
+    strict_parse_error_samples: List[Dict[str, Any]] = []
     parse_error_samples: List[Dict[str, Any]] = []
+    repair_samples: List[Dict[str, Any]] = []
     compile_error_samples: List[Dict[str, Any]] = []
+    recovery_compile_error_samples: List[Dict[str, Any]] = []
+    strict_compile_error_samples: List[Dict[str, Any]] = []
+    degraded_samples: List[Dict[str, Any]] = []
     compiled_samples: List[Dict[str, Any]] = []
+    strict_compiled_samples: List[Dict[str, Any]] = []
     for row_index, row in df.iterrows():
         dsl = str(row["slot_dsl"])
+        strict_parse_error: Optional[OfficialSlotError] = None
         try:
-            parse_official_slot(dsl, mode=compile_mode.value)
-            parse_ok += 1
+            parse_official_slot_with_diagnostics(dsl, mode=CompileMode.STRICT.value)
+        except OfficialSlotError as exc:
+            strict_parse_error = exc
+            strict_parse_errors[exc.code] += 1
+            if len(strict_parse_error_samples) < sample_size:
+                strict_parse_error_samples.append(_workbook_error_sample(row_index, row, exc))
+        else:
+            strict_parse_ok += 1
+
+        try:
+            strict_result = strict_compiler.compile(dsl)
+            strict_compile_ok += 1
+            if len(strict_compiled_samples) < sample_size:
+                strict_compiled_samples.append(
+                    {
+                        "excel_row": int(row_index + 2),
+                        "query": str(row.get("query", "")),
+                        "slot_dsl": dsl,
+                        "requires_tables": strict_result.requires_tables,
+                        "strict_success": True,
+                        "repair_codes": [],
+                        "warnings": [],
+                        "sql_preview": strict_result.sql[:600],
+                    }
+                )
+        except OfficialSlotError as exc:
+            strict_compile_errors[exc.code] += 1
+            strict_compile_error_details[_compile_error_detail(exc)] += 1
+            strict_compile_error_domains[classify_official_compile_error_domain(exc)] += 1
+            if len(strict_compile_error_samples) < sample_size:
+                strict_compile_error_samples.append(_workbook_error_sample(row_index, row, exc))
+
+        parsed: Optional[OfficialParseResult] = None
+        try:
+            parsed = parse_official_slot_with_diagnostics(
+                dsl,
+                mode=CompileMode.RECOVERY.value,
+            )
+            recovery_parse_ok += 1
         except OfficialSlotError as exc:
             parse_errors[exc.code] += 1
             if len(parse_error_samples) < sample_size:
                 parse_error_samples.append(_workbook_error_sample(row_index, row, exc))
-            continue
+        if parsed is not None and parsed.repairs:
+            repaired_rows += 1
+            repair_counts.update(repair.code for repair in parsed.repairs)
+            if len(repair_samples) < sample_size:
+                repair_samples.append(
+                    {
+                        "excel_row": int(row_index + 2),
+                        "query": str(row.get("query", "")),
+                        "slot_dsl": dsl,
+                        "normalized_source": parsed.normalized_source,
+                        "repairs": [repair.to_dict() for repair in parsed.repairs],
+                    }
+                )
         try:
-            result = compiler.compile(dsl)
-            compile_ok += 1
+            result = recovery_compiler.compile(dsl)
+            recovery_compile_ok += 1
+            if result.warnings:
+                warning_rows += 1
+            if result.degraded:
+                degraded_rows += 1
+                if len(degraded_samples) < sample_size:
+                    degraded_samples.append(
+                        {
+                            "excel_row": int(row_index + 2),
+                            "query": str(row.get("query", "")),
+                            "slot_dsl": dsl,
+                            "repair_codes": [repair.code for repair in result.repairs],
+                            "warnings": result.warnings,
+                        }
+                    )
+            if "1=0" in result.fallback_predicates:
+                sql_false_fallback_rows += 1
+            if "1=1" in result.fallback_predicates:
+                sql_true_fallback_rows += 1
             if len(compiled_samples) < sample_size:
                 compiled_samples.append(
                     {
@@ -3676,32 +3791,117 @@ def compile_training_workbook(
                         "query": str(row.get("query", "")),
                         "slot_dsl": dsl,
                         "requires_tables": result.requires_tables,
+                        "strict_success": result.strict_success and strict_parse_error is None,
+                        "repair_codes": [repair.code for repair in result.repairs],
+                        "warnings": result.warnings,
                         "sql_preview": result.sql[:600],
                     }
                 )
         except OfficialSlotError as exc:
-            compile_errors[exc.code] += 1
-            compile_error_details[_compile_error_detail(exc)] += 1
-            compile_error_domains[classify_official_compile_error_domain(exc)] += 1
-            if len(compile_error_samples) < sample_size:
-                compile_error_samples.append(_workbook_error_sample(row_index, row, exc))
+            recovery_compile_errors[exc.code] += 1
+            recovery_compile_error_details[_compile_error_detail(exc)] += 1
+            recovery_compile_error_domains[classify_official_compile_error_domain(exc)] += 1
+            if len(recovery_compile_error_samples) < sample_size:
+                recovery_compile_error_samples.append(_workbook_error_sample(row_index, row, exc))
+            if parsed is not None:
+                compile_errors[exc.code] += 1
+                compile_error_details[_compile_error_detail(exc)] += 1
+                compile_error_domains[classify_official_compile_error_domain(exc)] += 1
+                if len(compile_error_samples) < sample_size:
+                    compile_error_samples.append(_workbook_error_sample(row_index, row, exc))
+    row_count = int(len(df))
+    selected_parse_ok = strict_parse_ok if compile_mode is CompileMode.STRICT else recovery_parse_ok
+    selected_compile_ok = strict_compile_ok if compile_mode is CompileMode.STRICT else recovery_compile_ok
+    selected_compile_errors = (
+        strict_compile_errors if compile_mode is CompileMode.STRICT else recovery_compile_errors
+    )
+    selected_compile_error_details = (
+        strict_compile_error_details
+        if compile_mode is CompileMode.STRICT
+        else recovery_compile_error_details
+    )
+    selected_compile_error_domains = (
+        strict_compile_error_domains
+        if compile_mode is CompileMode.STRICT
+        else recovery_compile_error_domains
+    )
+    selected_compile_error_samples = (
+        strict_compile_error_samples
+        if compile_mode is CompileMode.STRICT
+        else recovery_compile_error_samples
+    )
+    selected_parse_error_samples = (
+        strict_parse_error_samples
+        if compile_mode is CompileMode.STRICT
+        else parse_error_samples
+    )
+    selected_compiled_samples = (
+        strict_compiled_samples if compile_mode is CompileMode.STRICT else compiled_samples
+    )
     return {
         "path": path,
         "mode": compile_mode.value,
-        "row_count": int(len(df)),
-        "parse_ok": parse_ok,
-        "parse_failed": int(len(df) - parse_ok),
-        "compile_ok": compile_ok,
-        "compile_failed": int(parse_ok - compile_ok),
-        "compile_rate_on_all_rows": round(compile_ok / len(df), 6) if len(df) else 0,
-        "compile_rate_on_parse_ok": round(compile_ok / parse_ok, 6) if parse_ok else 0,
+        "row_count": row_count,
+        "strict_parse_ok": strict_parse_ok,
+        "strict_parse_failed": row_count - strict_parse_ok,
+        "recovery_parse_ok": recovery_parse_ok,
+        "recovery_parse_failed": row_count - recovery_parse_ok,
+        "repaired_rows": repaired_rows,
+        "repair_counts": dict(repair_counts),
+        "strict_compile_ok": strict_compile_ok,
+        "strict_compile_failed": row_count - strict_compile_ok,
+        "recovery_compile_ok": recovery_compile_ok,
+        "recovery_compile_failed": row_count - recovery_compile_ok,
+        "warning_rows": warning_rows,
+        "degraded_rows": degraded_rows,
+        "sql_false_fallback_rows": sql_false_fallback_rows,
+        "sql_true_fallback_rows": sql_true_fallback_rows,
+        "selected_parse_ok": selected_parse_ok,
+        "selected_parse_failed": row_count - selected_parse_ok,
+        "selected_compile_ok": selected_compile_ok,
+        "selected_compile_failed": row_count - selected_compile_ok,
+        "selected_compile_rate_on_all_rows": (
+            round(selected_compile_ok / row_count, 6) if row_count else 0
+        ),
+        "selected_compile_errors": dict(selected_compile_errors),
+        "selected_compile_error_details": dict(selected_compile_error_details.most_common(30)),
+        "selected_compile_error_domains": dict(selected_compile_error_domains.most_common(30)),
+        "selected_compile_error_samples": selected_compile_error_samples,
+        "selected_parse_error_samples": selected_parse_error_samples,
+        "selected_compiled_samples": selected_compiled_samples,
+        "strict_compile_rate_on_all_rows": round(strict_compile_ok / row_count, 6) if row_count else 0,
+        "recovery_compile_rate_on_all_rows": round(recovery_compile_ok / row_count, 6) if row_count else 0,
+        "recovery_compile_rate_on_parse_ok": (
+            round(recovery_compile_ok / recovery_parse_ok, 6) if recovery_parse_ok else 0
+        ),
+        "parse_ok": recovery_parse_ok,
+        "parse_failed": row_count - recovery_parse_ok,
+        "compile_ok": recovery_compile_ok,
+        "compile_failed": recovery_parse_ok - recovery_compile_ok,
+        "compile_rate_on_all_rows": round(recovery_compile_ok / row_count, 6) if row_count else 0,
+        "compile_rate_on_parse_ok": (
+            round(recovery_compile_ok / recovery_parse_ok, 6) if recovery_parse_ok else 0
+        ),
+        "strict_parse_errors": dict(strict_parse_errors),
         "parse_errors": dict(parse_errors),
         "compile_errors": dict(compile_errors),
+        "recovery_compile_errors": dict(recovery_compile_errors),
+        "strict_compile_errors": dict(strict_compile_errors),
         "compile_error_details": dict(compile_error_details.most_common(30)),
         "compile_error_domains": dict(compile_error_domains.most_common(30)),
+        "recovery_compile_error_details": dict(recovery_compile_error_details.most_common(30)),
+        "recovery_compile_error_domains": dict(recovery_compile_error_domains.most_common(30)),
+        "strict_compile_error_details": dict(strict_compile_error_details.most_common(30)),
+        "strict_compile_error_domains": dict(strict_compile_error_domains.most_common(30)),
+        "strict_parse_error_samples": strict_parse_error_samples,
         "parse_error_samples": parse_error_samples,
+        "repair_samples": repair_samples,
         "compile_error_samples": compile_error_samples,
+        "recovery_compile_error_samples": recovery_compile_error_samples,
+        "strict_compile_error_samples": strict_compile_error_samples,
+        "degraded_samples": degraded_samples,
         "compiled_samples": compiled_samples,
+        "strict_compiled_samples": strict_compiled_samples,
     }
 
 
@@ -3815,24 +4015,37 @@ def write_coverage_report(coverage: Dict[str, Any], output: str) -> None:
         "| 指标 | 数值 |",
         "|---|---:|",
         f"| 官方样例总数 | {coverage['row_count']} |",
-        f"| 语法解析成功 | {coverage['parse_ok']} |",
-        f"| 语法解析失败 | {coverage['parse_failed']} |",
-        f"| Doris SQL 编译成功 | {coverage['compile_ok']} |",
-        f"| Doris SQL 编译失败 | {coverage['compile_failed']} |",
-        f"| 全量样例可落地编译率 | {coverage['compile_rate_on_all_rows']:.2%} |",
-        f"| 解析成功样例可落地编译率 | {coverage['compile_rate_on_parse_ok']:.2%} |",
+        f"| 主展示模式解析成功 | {coverage['selected_parse_ok']} |",
+        f"| 主展示模式编译成功 | {coverage['selected_compile_ok']} |",
+        f"| 严格解析成功 | {coverage['strict_parse_ok']} |",
+        f"| 严格解析失败 | {coverage['strict_parse_failed']} |",
+        f"| 恢复解析成功 | {coverage['recovery_parse_ok']} |",
+        f"| 恢复解析失败 | {coverage['recovery_parse_failed']} |",
+        f"| 发生源码修复 | {coverage['repaired_rows']} |",
+        f"| 严格编译成功 | {coverage['strict_compile_ok']} |",
+        f"| 严格编译失败 | {coverage['strict_compile_failed']} |",
+        f"| 恢复编译成功 | {coverage['recovery_compile_ok']} |",
+        f"| 恢复编译失败 | {coverage['recovery_compile_failed']} |",
+        f"| 含 warning 的恢复结果 | {coverage['warning_rows']} |",
+        f"| 降级恢复结果 | {coverage['degraded_rows']} |",
+        f"| 含 1=0 降级谓词 | {coverage['sql_false_fallback_rows']} |",
+        f"| 含 1=1 降级谓词 | {coverage['sql_true_fallback_rows']} |",
+        f"| 严格全量编译率 | {coverage['strict_compile_rate_on_all_rows']:.2%} |",
+        f"| 恢复全量编译率 | {coverage['recovery_compile_rate_on_all_rows']:.2%} |",
         "",
-        "## 编译失败错误码",
+        "兼容字段 `parse_ok/compile_ok` 暂时保留，均指 recovery 口径，不代表严格正确率。",
+        "",
+        f"## {coverage.get('mode', CompileMode.RECOVERY.value)} 模式编译失败错误码",
         "",
         "| 错误码 | 次数 |",
         "|---|---:|",
     ]
-    for code, count in coverage.get("compile_errors", {}).items():
+    for code, count in coverage.get("selected_compile_errors", {}).items():
         lines.append(f"| {code} | {count} |")
     lines.extend(["", "## 编译失败细分原因 TopN", "", "| 原因 | 次数 |", "|---|---:|"])
-    for detail, count in coverage.get("compile_error_details", {}).items():
+    for detail, count in coverage.get("selected_compile_error_details", {}).items():
         lines.append(f"| {_md_escape(detail)} | {count} |")
-    if coverage.get("compile_error_domains"):
+    if coverage.get("selected_compile_error_domains"):
         lines.extend(
             [
                 "",
@@ -3844,23 +4057,23 @@ def write_coverage_report(coverage: Dict[str, Any], output: str) -> None:
                 "|---|---:|",
             ]
         )
-        for domain, count in coverage["compile_error_domains"].items():
+        for domain, count in coverage["selected_compile_error_domains"].items():
             lines.append(f"| {_md_escape(domain)} | {count} |")
-    if coverage.get("parse_error_samples"):
+    if coverage.get("selected_parse_error_samples"):
         lines.extend(["", "## 语法解析失败样本", "", "| Excel 行 | 错误码 | 原因 | DSL |", "|---:|---|---|---|"])
-        for item in coverage["parse_error_samples"]:
+        for item in coverage["selected_parse_error_samples"]:
             lines.append(
                 f"| {item['excel_row']} | {item['code']} | {_md_escape(item['message'])} | `{_md_escape(item['slot_dsl'])}` |"
             )
-    if coverage.get("compile_error_samples"):
+    if coverage.get("selected_compile_error_samples"):
         lines.extend(["", "## 编译失败样本", "", "| Excel 行 | 错误码 | 原因 | DSL |", "|---:|---|---|---|"])
-        for item in coverage["compile_error_samples"]:
+        for item in coverage["selected_compile_error_samples"]:
             lines.append(
                 f"| {item['excel_row']} | {item['code']} | {_md_escape(item['message'])} | `{_md_escape(item['slot_dsl'])}` |"
             )
-    if coverage.get("compiled_samples"):
+    if coverage.get("selected_compiled_samples"):
         lines.extend(["", "## 可落地编译样本", "", "| Excel 行 | 依赖表 | SQL 预览 |", "|---:|---|---|"])
-        for item in coverage["compiled_samples"]:
+        for item in coverage["selected_compiled_samples"]:
             tables = ", ".join(item["requires_tables"])
             lines.append(f"| {item['excel_row']} | {tables} | `{_md_escape(item['sql_preview'])}` |")
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -1146,6 +1146,7 @@ def test_recovery_compile_exposes_repairs_and_warnings():
     assert result.repairs[0].code == "LEADING_BOOLEAN_OPERATOR"
     assert result.warnings
     assert result.normalized_source.startswith("indicator(")
+    assert set(result.fallback_predicates) == {"1=0", "1=1"}
     assert result.strict_success is False
     assert result.degraded is True
 
@@ -1167,6 +1168,7 @@ def test_strict_compile_does_not_treat_structural_true_predicate_as_fallback():
     )
 
     assert "WHERE 1=1" in result.sql
+    assert result.fallback_predicates == ()
     assert result.strict_success is True
     assert result.degraded is False
 
@@ -1177,6 +1179,7 @@ def test_recovery_compile_does_not_scan_string_literals_for_fallbacks():
     )
 
     assert "'1=0'" in result.sql
+    assert result.fallback_predicates == ()
     assert result.strict_success is True
     assert result.degraded is False
 
@@ -1227,7 +1230,19 @@ def test_compile_training_workbook_reports_real_parse_and_compile_coverage(tmp_p
     write_coverage_report(coverage, str(output))
 
     assert coverage["row_count"] == 5799
-    assert coverage["parse_ok"] >= 5790
+    assert coverage["recovery_parse_ok"] == 5799
+    assert coverage["strict_parse_failed"] >= 7
+    assert coverage["repaired_rows"] >= 7
+    assert coverage["strict_compile_ok"] < coverage["recovery_compile_ok"]
+    assert coverage["warning_rows"] > 0
+    assert coverage["degraded_rows"] > 0
+    assert coverage["sql_true_fallback_rows"] > 0
+    assert coverage["sql_false_fallback_rows"] > 0
+    assert coverage["strict_compile_errors"].get("OFFICIAL_LEX_ERROR", 0) == 0
+    assert coverage["strict_compile_errors"].get("OFFICIAL_PARSE_ERROR", 0) == 0
+    assert coverage["strict_compile_errors"]["OFFICIAL_DEGRADED_SEMANTICS"] >= coverage["repaired_rows"]
+    assert coverage["parse_ok"] == coverage["recovery_parse_ok"]
+    assert coverage["compile_ok"] == coverage["recovery_compile_ok"]
     assert coverage["compile_ok"] > 900
     assert coverage["compile_failed"] > 0
     assert coverage["compile_errors"]["UNSUPPORTED_OFFICIAL_INDICATOR"] > 0
@@ -1235,7 +1250,44 @@ def test_compile_training_workbook_reports_real_parse_and_compile_coverage(tmp_p
     assert coverage["compile_error_domains"]["财务报表数据缺失"] > 0
     assert coverage["compile_error_domains"]["指数成分与权重数据缺失"] > 0
     assert "官方槽位 DSL 编译覆盖率报告" in output.read_text(encoding="utf-8")
+    assert "严格解析成功" in output.read_text(encoding="utf-8")
+    assert "恢复编译成功" in output.read_text(encoding="utf-8")
+    assert "兼容字段 `parse_ok/compile_ok`" in output.read_text(encoding="utf-8")
     assert "缺失数据域分层" in output.read_text(encoding="utf-8")
+
+
+def test_workbook_coverage_mode_selects_primary_metrics(tmp_path):
+    import pandas as pd
+
+    workbook = tmp_path / "coverage_modes.xlsx"
+    pd.DataFrame(
+        {
+            "query": ["clean", "repairable", "unrecoverable"],
+            "slot_dsl": [
+                "indicator('沪', '', '成交量', '2026-04-14', '', '', '') > 1000",
+                "and indicator('沪', '', '成交量', '2026-04-14', '', '', '') > 1000",
+                "@",
+            ],
+        }
+    ).to_excel(workbook, sheet_name="训练语料", index=False)
+
+    recovery = compile_training_workbook(str(workbook), mode="recovery")
+    strict = compile_training_workbook(str(workbook), mode="strict")
+
+    assert recovery["strict_compile_ok"] == strict["strict_compile_ok"] == 1
+    assert recovery["recovery_compile_ok"] == strict["recovery_compile_ok"] == 2
+    assert recovery["selected_compile_ok"] == 2
+    assert strict["selected_compile_ok"] == 1
+    assert recovery["recovery_compile_failed"] == 1
+    assert recovery["compile_failed"] == 0
+    assert strict["strict_compile_failed"] == 2
+    assert "OFFICIAL_LEX_ERROR" not in recovery["compile_errors"]
+    assert recovery["recovery_compile_errors"]["OFFICIAL_LEX_ERROR"] == 1
+    assert strict["strict_compile_errors"]["OFFICIAL_LEX_ERROR"] == 1
+    assert recovery["selected_compile_errors"]["OFFICIAL_LEX_ERROR"] == 1
+    assert strict["selected_compile_errors"]["OFFICIAL_DEGRADED_SEMANTICS"] == 1
+    assert len(recovery["selected_compiled_samples"]) == 2
+    assert len(strict["selected_compiled_samples"]) == 1
 
 
 def test_classify_official_indicator_domains_for_audit_report():

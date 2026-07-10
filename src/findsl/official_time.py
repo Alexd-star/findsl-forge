@@ -10,6 +10,7 @@ from typing import Iterable, List, Optional, Sequence
 class DateNormalization:
     constraints: List[str]
     warnings: List[str]
+    fallback_predicate: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -57,10 +58,14 @@ def normalize_official_date(
         interval, clip_warnings = _clip_future_interval(text, interval, anchor)
         warnings = warnings + clip_warnings
         if interval is None:
-            return DateNormalization(["1=0"], warnings)
+            return DateNormalization(["1=0"], warnings, fallback_predicate="1=0")
         return DateNormalization([_interval_constraint(field, interval)], warnings)
 
-    return DateNormalization(["1=1"], [f"date slot requires runtime normalization: {text}"])
+    return DateNormalization(
+        ["1=1"],
+        [f"date slot requires runtime normalization: {text}"],
+        fallback_predicate="1=1",
+    )
 
 
 def _normalize_interval(text: str, anchor: date, calendar: List[date]) -> Optional[tuple[_DateInterval, List[str]]]:
