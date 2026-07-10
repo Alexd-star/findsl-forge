@@ -6,6 +6,7 @@ from findsl.official import (
     FunctionSignature,
     SourceRepair,
 )
+from findsl.official_slot import OfficialSlotCompiler, OfficialSlotError
 
 
 def test_compile_mode_parses_cli_values():
@@ -175,3 +176,106 @@ def test_official_signature_registry_is_immutable():
             slots=(),
             result_kind="dynamic",
         )
+
+
+def test_semantics_rejects_extra_indicator_argument():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            "indicator('', '', '收盘价', '', '', '', '', 'EXTRA') > 1"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_SLOT_ARITY_ERROR"
+
+
+def test_semantics_rejects_non_string_slot_argument():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            "indicator('', '', '收盘价', '', '', '', 1) > 1"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_SLOT_ARG_ERROR"
+
+
+@pytest.mark.parametrize("operator", [">", "="])
+def test_semantics_rejects_numeric_string_comparison(operator):
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            f"indicator('', '', '收盘价', '', '', '', '') {operator} 'abc'"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_TYPE_ERROR"
+
+
+def test_semantics_rejects_string_arithmetic():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            "indicator('', '', '股票名称', '', '', '', '') + 1 > 2"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_TYPE_ERROR"
+
+
+def test_semantics_accepts_grounded_numeric_boolean_string_and_time_comparisons():
+    compiler = OfficialSlotCompiler()
+
+    compiler.compile("indicator('', '', '收盘价', '', '', '', '') >= 10")
+    compiler.compile("indicator('', '', '涨停', '', '', '', '') = True")
+    compiler.compile("indicator('', '', '股票名称', '', '', '', '') = '平安银行'")
+    compiler.compile("indicator('', '', '涨停时间', '', '', '', '') >= '09:30'")
+
+
+def test_semantics_leaves_unknown_indicator_to_grounding_diagnostic():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            "indicator('', '', '不存在的官方指标', '', '', '', '') > 1"
+        )
+
+    assert excinfo.value.code == "UNSUPPORTED_OFFICIAL_INDICATOR"
+
+
+@pytest.mark.parametrize("source", ["foo + 1 > 2", "foo > 'abc'", "foo = 1"])
+def test_semantics_rejects_bare_identifiers(source):
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(source)
+
+    assert excinfo.value.code == "OFFICIAL_TYPE_ERROR"
+
+
+def test_semantics_rejects_between_without_range_literal():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            "indicator('', '', '收盘价', '', '', '', '') between 10"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_TYPE_ERROR"
+
+
+def test_semantics_rejects_approximate_boolean_comparison():
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(
+            "indicator('', '', '涨停', '', '', '', '') ~= True"
+        )
+
+    assert excinfo.value.code == "OFFICIAL_TYPE_ERROR"
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "indicator('', '', '收盘价', '', '', '', '') > ' 5% '",
+        "indicator('', '', '涨停时间', '', '', '', '') > ' 09:30 '",
+    ],
+)
+def test_semantics_rejects_whitespace_padded_numeric_or_time_literals(source):
+    with pytest.raises(OfficialSlotError) as excinfo:
+        OfficialSlotCompiler().compile(source)
+
+    assert excinfo.value.code == "OFFICIAL_TYPE_ERROR"
+
+
+def test_whitespace_padded_percent_remains_a_quoted_string_pattern():
+    result = OfficialSlotCompiler().compile(
+        "indicator('', '', '股票名称', '', '', '', '') = ' 5% '"
+    )
+
+    assert "LIKE ' 5% '" in result.sql

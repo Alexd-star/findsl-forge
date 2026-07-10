@@ -1008,6 +1008,9 @@ class OfficialSlotCompiler:
 
     def compile(self, source: str) -> OfficialCompileResult:
         ast = parse_official_slot(source)
+        from .official.semantics import OfficialSemanticAnalyzer
+
+        OfficialSemanticAnalyzer(_resolve_indicator_meta).validate(ast)
         warnings: List[str] = []
         sql, tables = self._compile_query(ast, warnings)
         return OfficialCompileResult(
@@ -4027,7 +4030,7 @@ def _sql_quote(value: str) -> str:
 
 
 def _is_numeric_percent_literal(value: str) -> bool:
-    return bool(re.fullmatch(r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)%", value.strip()))
+    return bool(re.fullmatch(r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)%", value))
 
 
 def _dedupe(items: Iterable[str]) -> List[str]:
