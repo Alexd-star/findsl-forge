@@ -5,7 +5,7 @@
   "sheet": "训练语料",
   "row_count": 5799,
   "antlr_runtime": "4.13.2",
-  "git_head": "e7fa2eb8e663a19110515eee7e8e005f443bffbd",
+  "git_head": "a76ac80f28f5303a2e8a500ba246fd01e3b32f58",
   "migration_gate": {
     "passed": true,
     "blocking_divergences": 0,
@@ -22,12 +22,12 @@
     "antlr_parse_ok": 5792,
     "latency_ms": {
       "handwritten": {
-        "p50": 0.092,
-        "p95": 0.244
+        "p50": 0.0937,
+        "p95": 0.2454
       },
       "antlr": {
-        "p50": 2.2477,
-        "p95": 6.1363
+        "p50": 2.3652,
+        "p95": 6.5797
       }
     },
     "samples": {
@@ -38,8 +38,8 @@
           "input_sha256": "37710ffe10148de83585fcb4bd44876b3afee54e9830ae4820177e930a831e11",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 269600,
-          "antlr_elapsed_ns": 3557600,
+          "handwritten_elapsed_ns": 455200,
+          "antlr_elapsed_ns": 6177000,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_PARSE_ERROR",
@@ -99,8 +99,8 @@
           "input_sha256": "bb45362a3c4424c70ac88d0d78f7b6cc5bc57cffa72eed18c617b6b0f3f17a69",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 66600,
-          "antlr_elapsed_ns": 2071700,
+          "handwritten_elapsed_ns": 68000,
+          "antlr_elapsed_ns": 2135100,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_LEX_ERROR",
@@ -143,8 +143,8 @@
           "input_sha256": "9f5fc8a896027eb04197146affe9f1abd50581414af3de9b637bac7f33c00a5d",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 49800,
-          "antlr_elapsed_ns": 1926400,
+          "handwritten_elapsed_ns": 115100,
+          "antlr_elapsed_ns": 4186500,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_LEX_ERROR",
@@ -187,8 +187,8 @@
           "input_sha256": "34742025c67bf79ec7c3143065453c54b406b0af1834252b04340ef65a27528d",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 192000,
-          "antlr_elapsed_ns": 4237300,
+          "handwritten_elapsed_ns": 185000,
+          "antlr_elapsed_ns": 4232000,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_PARSE_ERROR",
@@ -231,8 +231,8 @@
           "input_sha256": "f2f4d79684a69be244906b8beae89bcb83b692df0b35f8a058b2318401c5b5ce",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 44700,
-          "antlr_elapsed_ns": 1190000,
+          "handwritten_elapsed_ns": 63700,
+          "antlr_elapsed_ns": 1819900,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_LEX_ERROR",
@@ -275,8 +275,8 @@
           "input_sha256": "d59fad020df720ec26058fe80032a066fcf619349558c7675bc261caf64ca4a2",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 50400,
-          "antlr_elapsed_ns": 1029700,
+          "handwritten_elapsed_ns": 60600,
+          "antlr_elapsed_ns": 1389600,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_PARSE_ERROR",
@@ -319,8 +319,8 @@
           "input_sha256": "896df305254abaac9d5f37e8c79088702ff542708c7cef7decfe39407d4d9c4f",
           "source": null,
           "normalized_source": null,
-          "handwritten_elapsed_ns": 68000,
-          "antlr_elapsed_ns": 2095600,
+          "handwritten_elapsed_ns": 49700,
+          "antlr_elapsed_ns": 1849600,
           "handwritten_diagnostics": [
             {
               "code": "OFFICIAL_LEX_ERROR",
@@ -384,12 +384,12 @@
     "antlr_parse_ok": 5799,
     "latency_ms": {
       "handwritten": {
-        "p50": 0.0912,
-        "p95": 0.2439
+        "p50": 0.0952,
+        "p95": 0.2709
       },
       "antlr": {
-        "p50": 2.247,
-        "p95": 5.9056
+        "p50": 2.4321,
+        "p95": 7.0124
       }
     },
     "samples": {
