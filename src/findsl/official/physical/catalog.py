@@ -22,8 +22,10 @@ class PhysicalResource:
     database: str
     table: str
     logical_entity: str
-    partition_key: str
+    partition_key: Optional[str]
     distribution_key: str
+    stable_keys: Tuple[str, ...]
+    anchor_resource_id: Optional[str]
     capabilities: Tuple[str, ...]
     priority: int
 
@@ -89,7 +91,7 @@ def _validate_identifier(value: str, label: str) -> str:
 
 
 def _resource(item) -> PhysicalResource:
-    expected = {"resource_id", "database", "table", "logical_entity", "partition_key", "distribution_key", "capabilities", "priority"}
+    expected = {"resource_id", "database", "table", "logical_entity", "partition_key", "distribution_key", "stable_keys", "anchor_resource_id", "capabilities", "priority"}
     if set(item) != expected:
         raise PhysicalCatalogError("invalid physical resource fields")
     return PhysicalResource(
@@ -97,8 +99,10 @@ def _resource(item) -> PhysicalResource:
         _validate_identifier(item["database"], "database"),
         _validate_identifier(item["table"], "table"),
         str(item["logical_entity"]),
-        _validate_identifier(item["partition_key"], "partition_key"),
+        None if item["partition_key"] is None else _validate_identifier(item["partition_key"], "partition_key"),
         _validate_identifier(item["distribution_key"], "distribution_key"),
+        tuple(_validate_identifier(value, "stable_key") for value in item["stable_keys"]),
+        None if item["anchor_resource_id"] is None else _validate_identifier(item["anchor_resource_id"], "anchor_resource_id"),
         tuple(sorted(set(item["capabilities"]))),
         int(item["priority"]),
     )

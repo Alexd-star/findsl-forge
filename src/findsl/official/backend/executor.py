@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import hashlib
 import subprocess
 from dataclasses import dataclass
 from time import perf_counter
@@ -33,6 +34,13 @@ class DorisExecutionResult:
     elapsed_ms: float
     ordered_hash: str
     unordered_hash: str
+
+
+@dataclass(frozen=True)
+class DorisDigestResult:
+    row_count: int
+    elapsed_ms: float
+    sha256: str
 
 
 def execute_doris_query(
@@ -85,3 +93,51 @@ def execute_doris_query(
         ordered_hash=hash_result_rows(rows, ordered=True),
         unordered_hash=hash_result_rows(rows, ordered=False),
     )
+
+
+def execute_doris_query_digest(
+    config: DorisExecutionConfig,
+    sql: str,
+    *,
+    popen_factory=subprocess.Popen,
+) -> DorisDigestResult:
+    statements = sqlglot.parse(sql, read="doris")
+    if len(statements) != 1 or not isinstance(statements[0], exp.Select):
+        raise DorisExecutionError("only one Doris SELECT statement may be executed")
+    command = [
+        config.mysql_executable,
+        "--batch",
+        "--raw",
+        "--skip-column-names",
+        "--host", config.host,
+        "--port", str(config.port),
+        "--user", config.user,
+        "--database", config.database,
+        "--execute", sql,
+    ]
+    environment = os.environ.copy()
+    if config.password:
+        environment["MYSQL_PWD"] = config.password
+    started = perf_counter()
+    process = popen_factory(
+        command,
+        env=environment,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    digest = hashlib.sha256()
+    row_count = 0
+    for line in process.stdout:
+        normalized = line.rstrip("\r\n")
+        digest.update(normalized.encode("utf-8"))
+        digest.update(b"\n")
+        row_count += 1
+    process.wait(timeout=config.timeout_seconds)
+    elapsed_ms = (perf_counter() - started) * 1000.0
+    if process.returncode != 0:
+        detail = "".join(process.stderr).strip() or "Doris client failed"
+        if config.password:
+            detail = detail.replace(config.password, "<redacted>")
+        raise DorisExecutionError(f"Doris client exited with {process.returncode}: {detail}")
+    return DorisDigestResult(row_count=row_count, elapsed_ms=elapsed_ms, sha256=digest.hexdigest())

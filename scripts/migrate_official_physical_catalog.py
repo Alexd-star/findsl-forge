@@ -23,8 +23,10 @@ def main() -> None:
             capabilities.append("technical")
         resources.append({
             "resource_id": resource_id, "database": "newzl", "table": table,
-            "logical_entity": "market_observation", "partition_key": "bizdate",
+            "logical_entity": "market_observation", "partition_key": None if resource_id == "official_security" else "bizdate",
             "distribution_key": "tgtcode", "capabilities": capabilities,
+            "stable_keys": ["mktcode", "tgtcode"] if resource_id == "official_security" else ["mktcode", "tgtcode", "bizdate"],
+            "anchor_resource_id": None if resource_id == "official_basic" else "official_basic",
             "priority": 10 if resource_id == "official_basic" else 20,
         })
     fields = []

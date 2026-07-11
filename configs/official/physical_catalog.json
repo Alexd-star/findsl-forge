@@ -10,6 +10,12 @@
       "capabilities": [
         "scan"
       ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": null,
       "priority": 10
     },
     {
@@ -22,6 +28,12 @@
       "capabilities": [
         "scan"
       ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": "official_basic",
       "priority": 20
     },
     {
@@ -29,11 +41,16 @@
       "database": "newzl",
       "table": "hsj_stock_code_info",
       "logical_entity": "market_observation",
-      "partition_key": "bizdate",
+      "partition_key": null,
       "distribution_key": "tgtcode",
       "capabilities": [
         "scan"
       ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode"
+      ],
+      "anchor_resource_id": "official_basic",
       "priority": 20
     },
     {
@@ -47,6 +64,12 @@
         "scan",
         "technical"
       ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": "official_basic",
       "priority": 20
     }
   ],

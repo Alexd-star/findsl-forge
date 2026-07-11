@@ -107,6 +107,14 @@ def main() -> None:
     official_backend_evidence_cmd.add_argument("--report-output", required=True)
     official_backend_evidence_cmd.add_argument("--sample-size", type=int, default=20)
     official_backend_evidence_cmd.add_argument("--json", action="store_true")
+    official_backend_evidence_cmd.add_argument("--execute-doris", action="store_true")
+    official_backend_evidence_cmd.add_argument("--host", default="127.0.0.1")
+    official_backend_evidence_cmd.add_argument("--port", type=int, default=9030)
+    official_backend_evidence_cmd.add_argument("--user", default="root")
+    official_backend_evidence_cmd.add_argument("--password-env", default="DORIS_PASSWORD")
+    official_backend_evidence_cmd.add_argument("--database", default="newzl")
+    official_backend_evidence_cmd.add_argument("--client", default="mysql")
+    official_backend_evidence_cmd.add_argument("--query-timeout", type=float, default=180.0)
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -474,14 +482,32 @@ def main() -> None:
         }
         print(json.dumps(payload, ensure_ascii=False, indent=2) if args.json else result.sql)
     elif args.command == "official-backend-evidence":
+        import os
+
+        from .official.backend.executor import DorisExecutionConfig
         from .official_backend_evidence import build_official_backend_evidence, write_official_backend_evidence
 
-        evidence = build_official_backend_evidence(args.workbook, sample_size=args.sample_size)
+        config = None
+        if args.execute_doris:
+            config = DorisExecutionConfig(
+                host=args.host,
+                port=args.port,
+                user=args.user,
+                password=os.environ.get(args.password_env, ""),
+                database=args.database,
+                mysql_executable=args.client,
+                timeout_seconds=args.query_timeout,
+            )
+        evidence = build_official_backend_evidence(
+            args.workbook,
+            sample_size=args.sample_size,
+            doris_config=config,
+        )
         write_official_backend_evidence(evidence, args.json_output, args.report_output)
         if args.json:
             print(json.dumps(evidence, ensure_ascii=False, indent=2))
         else:
-            print(f"Backend gate: {'PASS' if evidence['static_gate']['passed'] else 'FAIL'}")
+            print(f"Phase 5 gate: {evidence['gates']['phase5_completion']['status']}")
             print(f"Safe Doris SQL: {evidence['safety_ok']}/{evidence['row_count']}")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception

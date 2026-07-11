@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 from sqlglot import exp
 
@@ -75,30 +76,67 @@ def render_doris(plan: PhysicalPlan, catalog: PhysicalCatalog) -> DorisRenderRes
 def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
     if isinstance(plan, PhysicalScan):
         resource = catalog.resource(plan.resource_id)
-        projections = tuple(exp.column(name, table="q", quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
-        table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q")
-        query = exp.select(*projections).from_(table)
+        anchor = catalog.resource(plan.anchor_resource_id) if plan.anchor_resource_id else None
+        projections = tuple(
+            exp.column(
+                name,
+                table="anchor" if anchor is not None else "q",
+                quoted=True,
+            )
+            for name in ("mktcode", "tgtcode", "bizdate")
+        )
+        resource_table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q")
+        query = exp.select(*projections)
+        if anchor is not None:
+            join_keys = tuple(key for key in resource.stable_keys if key in anchor.stable_keys)
+            if not join_keys:
+                raise DorisBackendError(
+                    "DORIS_ANCHOR_JOIN_UNAVAILABLE",
+                    f"resource {resource.resource_id} has no stable join key with {anchor.resource_id}",
+                )
+            predicate = exp.and_(
+                *(
+                    exp.EQ(
+                        this=exp.column(key, table="q", quoted=True),
+                        expression=exp.column(key, table="anchor", quoted=True),
+                    )
+                    for key in join_keys
+                )
+            )
+            anchor_table = exp.table_(anchor.table, db=anchor.database, quoted=True, alias="anchor")
+            query = query.from_(anchor_table).join(resource_table, on=predicate, join_type="LEFT")
+        else:
+            query = query.from_(resource_table)
         if plan.partition_predicate is not None:
-            query = query.where(_render_expr(plan.partition_predicate, catalog))
+            query = query.where(_render_expr(plan.partition_predicate, catalog, plan))
         return query
     if isinstance(plan, PhysicalFilter):
-        return _render_plan(plan.input, catalog).where(_render_expr(plan.predicate, catalog))
+        return _render_plan(plan.input, catalog).where(
+            _render_expr(plan.predicate, catalog, _find_scan(plan.input))
+        )
     if isinstance(plan, PhysicalLimit):
         query = _render_plan(plan.input, catalog).limit(plan.count)
         return query.offset(plan.offset) if plan.offset else query
     if isinstance(plan, PhysicalRank):
         inner = _render_plan(plan.input, catalog)
+        scan = _find_scan(plan.input)
+        stable_alias = "anchor" if scan.anchor_resource_id else "q"
         order = exp.Order(
             expressions=[
                 exp.Ordered(
-                    this=_render_expr(plan.expression, catalog),
+                    this=_render_expr(plan.expression, catalog, scan),
                     desc=plan.direction == "desc",
-                )
+                ),
+                exp.Ordered(
+                    this=exp.column("tgtcode", table=stable_alias, quoted=True),
+                    desc=False,
+                    nulls_first=True,
+                ),
             ]
         )
         window = exp.Window(
             this=exp.RowNumber(),
-            partition_by=[exp.column("bizdate", table="q", quoted=True)],
+            partition_by=[exp.column("bizdate", table=stable_alias, quoted=True)],
             order=order,
         ).as_("__rank_value")
         inner = inner.select(window, append=True)
@@ -108,19 +146,32 @@ def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
         ).from_(ranked)
         comparator = _COMPARISON[plan.comparator](
             this=exp.column("__rank_value", table="ranked", quoted=True),
-            expression=_render_expr(plan.bound, catalog),
+            expression=_render_expr(plan.bound, catalog, scan),
         )
         return outer.where(comparator)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
 
 
-def _render_expr(expression, catalog: PhysicalCatalog):
+def _find_scan(plan: PhysicalPlan) -> PhysicalScan:
+    current = plan
+    while isinstance(current, (PhysicalFilter, PhysicalLimit)):
+        current = current.input
+    if not isinstance(current, PhysicalScan):
+        raise DorisBackendError("DORIS_SCAN_UNAVAILABLE", "rank plan has no physical scan input")
+    return current
+
+
+def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalScan] = None):
     if isinstance(expression, PhysicalColumn):
-        return exp.column(expression.column, table="q", quoted=True)
+        table_alias = "anchor" if scan and expression.resource_id == scan.anchor_resource_id else "q"
+        return exp.column(expression.column, table=table_alias, quoted=True)
     if isinstance(expression, PhysicalLiteral):
         return exp.convert(expression.value)
     if isinstance(expression, PhysicalIn):
-        return exp.In(this=_render_expr(expression.expression, catalog), expressions=[_render_expr(value, catalog) for value in expression.values])
+        return exp.In(
+            this=_render_expr(expression.expression, catalog, scan),
+            expressions=[_render_expr(value, catalog, scan) for value in expression.values],
+        )
     if isinstance(expression, PhysicalLatestValue):
         resource = catalog.resource(expression.resource_id)
         table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q_latest")
@@ -131,11 +182,17 @@ def _render_expr(expression, catalog: PhysicalCatalog):
             operator = _BINARY[expression.op.lower()]
         except KeyError as exc:
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported binary operator {expression.op}") from exc
-        return operator(this=_render_expr(expression.left, catalog), expression=_render_expr(expression.right, catalog))
+        return operator(
+            this=_render_expr(expression.left, catalog, scan),
+            expression=_render_expr(expression.right, catalog, scan),
+        )
     if isinstance(expression, PhysicalComparison):
         try:
             operator = _COMPARISON[expression.op]
         except KeyError as exc:
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported comparison operator {expression.op}") from exc
-        return operator(this=_render_expr(expression.left, catalog), expression=_render_expr(expression.right, catalog))
+        return operator(
+            this=_render_expr(expression.left, catalog, scan),
+            expression=_render_expr(expression.right, catalog, scan),
+        )
     raise DorisBackendError("DORIS_EXPRESSION_UNSUPPORTED", f"unsupported physical expression {type(expression).__name__}")

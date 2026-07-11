@@ -84,6 +84,15 @@ def plan_physical(lowering: LoweringResult, catalog: PhysicalCatalog) -> Physica
 
     selected = resource_ids[0]
     resource = catalog.resource(selected)
+    required_keys = {"mktcode", "tgtcode", "bizdate"}
+    available_keys = set(resource.stable_keys)
+    if resource.anchor_resource_id:
+        available_keys.update(catalog.resource(resource.anchor_resource_id).stable_keys)
+    if not required_keys.issubset(available_keys):
+        raise PhysicalPlanningError(
+            "PHYSICAL_STABLE_KEY_UNAVAILABLE",
+            f"resource {selected} cannot directly produce stable result keys",
+        )
     plan = _lower_plan(lowering.plan, catalog, selected, fields)
     validate_physical_plan(plan, catalog)
     decision = PhysicalDecision(
@@ -168,7 +177,8 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
             PhysicalColumn(field.resource_id, field.column, _physical_type(field))
             for field in _deduplicate_fields(fields)
         )
-        return PhysicalScan(resource_id, columns, None)
+        resource = catalog.resource(resource_id)
+        return PhysicalScan(resource_id, columns, None, resource.anchor_resource_id)
     if isinstance(plan, LogicalFilter):
         return PhysicalFilter(
             _lower_plan(plan.input, catalog, resource_id, fields),
@@ -189,7 +199,7 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
             )
         for constraint in _call_constraints(plan.order_by, catalog, resource_id):
             input_plan = PhysicalFilter(input_plan, constraint)
-        expression = _lower_expr(plan.order_by, catalog, resource_id)
+        expression = _lower_expr(plan.order_by, catalog, resource_id, allow_rank=True)
         bound = _lower_expr(plan.bound, catalog, resource_id)
         if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
@@ -199,12 +209,17 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
     raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical node {type(plan).__name__}")
 
 
-def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
+def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str, *, allow_rank: bool = False):
     if isinstance(expression, LiteralExpr):
         return PhysicalLiteral(expression.value, expression.type)
     if isinstance(expression, CallExpr):
         if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
             raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {expression.name}")
+        if expression.name == "rank" and not allow_rank:
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+                "rank inside a scalar expression requires an explicit window plan",
+            )
         indicator_id = expression.binding.slots.get("indicator_name", "")
         try:
             field = catalog.indicator(indicator_id)
@@ -216,8 +231,8 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
     if isinstance(expression, BinaryExpr):
         return PhysicalBinary(
             expression.op,
-            _lower_expr(expression.left, catalog, resource_id),
-            _lower_expr(expression.right, catalog, resource_id),
+            _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank),
+            _lower_expr(expression.right, catalog, resource_id, allow_rank=allow_rank),
             expression.type,
         )
     if isinstance(expression, ComparisonExpr):
@@ -227,9 +242,9 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
                 "approximate comparison requires catalog-provided absolute and relative tolerances",
             )
         if isinstance(expression.right, RangeExpr) and expression.op == "between":
-            value = _lower_expr(expression.left, catalog, resource_id)
-            lower = _lower_expr(expression.right.lower, catalog, resource_id)
-            upper = _lower_expr(expression.right.upper, catalog, resource_id)
+            value = _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank)
+            lower = _lower_expr(expression.right.lower, catalog, resource_id, allow_rank=allow_rank)
+            upper = _lower_expr(expression.right.upper, catalog, resource_id, allow_rank=allow_rank)
             lower_op = ">=" if expression.right.lower_inclusive else ">"
             upper_op = "<=" if expression.right.upper_inclusive else "<"
             result = PhysicalBinary(
@@ -241,8 +256,8 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
         else:
             result = PhysicalComparison(
                 expression.op,
-                _lower_expr(expression.left, catalog, resource_id),
-                _lower_expr(expression.right, catalog, resource_id),
+                _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank),
+                _lower_expr(expression.right, catalog, resource_id, allow_rank=allow_rank),
             )
         return _apply_call_constraints(result, expression, catalog, resource_id)
     raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported expression {type(expression).__name__}")
@@ -273,21 +288,28 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
     if call.binding is None:
         return ()
     constraints = []
+    resource = catalog.resource(resource_id)
+    stable_resource_id = resource.anchor_resource_id or resource_id
     market = str(call.binding.slots.get("market", "")).strip()
     if market:
         codes = _market_codes(market)
         constraints.append(
             PhysicalIn(
-                PhysicalColumn(resource_id, "mktcode", NUMERIC),
+                PhysicalColumn(stable_resource_id, "mktcode", NUMERIC),
                 tuple(PhysicalLiteral(code, NUMERIC) for code in codes),
             )
         )
     date = str(call.binding.slots.get("date", "")).strip()
     if date:
-        partition_key = catalog.resource(resource_id).partition_key
-        column = PhysicalColumn(resource_id, partition_key, TIME)
+        partition_key = catalog.resource(stable_resource_id).partition_key
+        if partition_key is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+                f"resource {resource_id} has no catalog-declared date column",
+            )
+        column = PhysicalColumn(stable_resource_id, partition_key, TIME)
         if date in {"今日", "今天", "当前", "最新"}:
-            value = PhysicalLatestValue(resource_id, partition_key, TIME)
+            value = PhysicalLatestValue(stable_resource_id, partition_key, TIME)
         elif re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
             value = PhysicalLiteral(date, TIME)
         else:
@@ -300,7 +322,7 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
 
 
 def _market_codes(value: str) -> Tuple[int, ...]:
-    mapping = {"沪": (0,), "深": (1,), "京": (103,), "沪深": (0, 1), "A股": (0, 1), "沪深京": (0, 1, 103)}
+    mapping = {"深": (0,), "沪": (1,), "京": (103,), "沪深": (0, 1), "A股": (0, 1), "沪深京": (0, 1, 103)}
     codes = []
     for item in (part.strip() for part in re.split(r"[|&,，]", value) if part.strip()):
         if item.startswith("^") or item not in mapping:

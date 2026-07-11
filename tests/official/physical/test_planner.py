@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalLimit, PhysicalRank
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
 from findsl.official.registry import default_official_registry
@@ -84,6 +84,36 @@ def test_latest_date_and_market_constraints_are_materialized_in_predicate():
     assert "mktcode" in result.plan.canonical_json()
 
 
+@pytest.mark.parametrize("market,expected", [("深", 0), ("沪", 1), ("京", 103)])
+def test_market_codes_follow_official_doris_protocol(market, expected):
+    result = plan_physical(
+        _lower(f"indicator('{market}', '', '成交量', '', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+    market_constraint = result.plan.predicate.right
+    assert isinstance(market_constraint, PhysicalIn)
+    assert [item.value for item in market_constraint.values] == [expected]
+
+
+def test_security_resource_uses_basic_anchor_for_stable_date_key():
+    result = plan_physical(
+        _lower("indicator('', '', '股票名称', '', '', '', '') = '华泰%'"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    assert result.plan.input.anchor_resource_id == "official_basic"
+
+
+def test_resource_without_date_column_uses_anchor_date_constraint():
+    result = plan_physical(
+        _lower("indicator('', '', '股票名称', '今日', '', '', '') = '华泰%'"),
+        default_physical_catalog(),
+    )
+
+    assert "official_basic" in result.plan.canonical_json()
+
+
 def test_direct_numeric_rank_lowers_with_comparison_contract():
     result = plan_physical(
         _lower("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10"),
@@ -104,6 +134,25 @@ def test_query_data_uses_the_same_controlled_direct_field_mapping():
 
     assert isinstance(result.plan, PhysicalFilter)
     assert result.selected_resource == "official_basic"
+
+
+def test_ext_scan_is_anchored_to_official_basic_universe():
+    result = plan_physical(
+        _lower("indicator('', '', '主力净流入', '', '', '', '') > 0"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    assert result.plan.input.anchor_resource_id == "official_basic"
+
+
+def test_ext_market_constraint_binds_to_stable_anchor_resource():
+    result = plan_physical(
+        _lower("indicator('深', '', '主力净流入', '', '', '', '') > 0"),
+        default_physical_catalog(),
+    )
+
+    assert result.plan.predicate.right.expression.resource_id == "official_basic"
 
 
 def test_filter_then_rank_stage_lowers_operation_chain_once():
@@ -130,3 +179,14 @@ def test_chained_rank_is_rejected_until_stage_alias_propagation_is_implemented()
         plan_physical(_lower(source), default_physical_catalog())
 
     assert excinfo.value.code == "PHYSICAL_CHAINED_RANK_UNSUPPORTED"
+
+
+def test_rank_call_inside_scalar_expression_is_not_lowered_as_a_column():
+    source = (
+        "rank('', '', '连板天数', 'desc', '', '', '', '') + "
+        "rank('', '', '跌停天数', 'desc', '', '', '', '') = 1"
+    )
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(_lower(source), default_physical_catalog())
+
+    assert excinfo.value.code == "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED"

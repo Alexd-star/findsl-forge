@@ -16,7 +16,13 @@ def validate_physical_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> Phys
 
 def _validate_plan(plan, catalog):
     if isinstance(plan, PhysicalScan):
-        catalog.resource(plan.resource_id)
+        resource = catalog.resource(plan.resource_id)
+        if plan.anchor_resource_id != resource.anchor_resource_id:
+            raise PhysicalCatalogError("physical scan anchor does not match catalog")
+        if plan.anchor_resource_id:
+            anchor = catalog.resource(plan.anchor_resource_id)
+            if anchor.logical_entity != resource.logical_entity:
+                raise PhysicalCatalogError("physical scan anchor entity mismatch")
         for column in plan.columns:
             _validate_expr(column, catalog)
         if plan.partition_predicate:

@@ -4,7 +4,7 @@
   "additionalProperties": false,
   "required": ["resources", "fields"],
   "properties": {
-    "resources": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["resource_id", "database", "table", "logical_entity", "partition_key", "distribution_key", "capabilities", "priority"]}},
+    "resources": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["resource_id", "database", "table", "logical_entity", "partition_key", "distribution_key", "stable_keys", "anchor_resource_id", "capabilities", "priority"], "properties": {"resource_id": {"type": "string"}, "database": {"type": "string"}, "table": {"type": "string"}, "logical_entity": {"type": "string"}, "partition_key": {"type": ["string", "null"]}, "distribution_key": {"type": "string"}, "stable_keys": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "anchor_resource_id": {"type": ["string", "null"]}, "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "priority": {"type": "integer"}}}},
     "fields": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["indicator_id", "resource_id", "column", "value_type", "scale", "nullable"]}}
   }
 }

@@ -37,7 +37,7 @@ def test_direct_filter_and_limit_render_as_stable_doris_select_ast():
 def test_backend_uses_sqlglot_literal_escaping():
     column = PhysicalColumn("official_security", "name", STRING)
     plan = PhysicalFilter(
-        PhysicalScan("official_security", (column,), None),
+        PhysicalScan("official_security", (column,), None, "official_basic"),
         PhysicalComparison("=", column, PhysicalLiteral("O'Reilly", STRING)),
     )
     result = render_doris(
@@ -47,6 +47,7 @@ def test_backend_uses_sqlglot_literal_escaping():
 
     assert "O''Reilly" in result.sql
     assert result.validation.passed is True
+    assert "`anchor`.`bizdate`" in result.sql
 
 
 def test_between_is_lowered_to_auditable_bounded_comparisons():
@@ -83,6 +84,9 @@ def test_rank_renders_window_in_subquery_and_filters_outer_query():
     assert len(list(parsed.find_all(exp.RowNumber))) == 1
     assert len(list(parsed.find_all(exp.Window))) == 1
     assert "`ranked`.`__rank_value` <= 10" in result.sql
+    assert "`q`.`volume` DESC, `q`.`tgtcode` ASC" in result.sql
+    outer_order = parsed.args.get("order")
+    assert outer_order is None
     assert result.validation.passed is True
 
 
@@ -99,3 +103,28 @@ def test_filter_then_rank_stage_scans_one_resource_once():
     tables = [table.name for table in parsed.find_all(exp.Table)]
     assert tables == ["hsj_stock_hq_basic"]
     assert "`q`.`volume` > 0" in result.sql
+
+
+def test_ext_scan_preserves_official_basic_universe_with_left_join():
+    result = render_doris(
+        _physical("indicator('', '', '主力净流入', '', '', '', '') > 0"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert [table.name for table in parsed.find_all(exp.Table)] == [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext",
+    ]
+    assert "LEFT JOIN" in result.sql
+    assert "`q`.`bizdate` = `anchor`.`bizdate`" in result.sql
+    assert [item.table for item in parsed.expressions] == ["anchor", "anchor", "anchor"]
+
+
+def test_ext_market_constraint_renders_against_anchor_universe():
+    result = render_doris(
+        _physical("rank('沪|深', '', '连涨天数', 'desc', '', '', '', '') <= 10"),
+        default_physical_catalog(),
+    )
+
+    assert "`anchor`.`mktcode` IN (0, 1)" in result.sql

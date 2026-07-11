@@ -81,9 +81,10 @@ class PhysicalScan(PhysicalPlan):
     resource_id: str
     columns: Tuple[PhysicalColumn, ...]
     partition_predicate: Optional[PhysicalExpr]
+    anchor_resource_id: Optional[str] = None
 
     def to_dict(self):
-        return {"kind": "PhysicalScan", "resource_id": self.resource_id, "columns": [item.to_dict() for item in self.columns], "partition_predicate": self.partition_predicate.to_dict() if self.partition_predicate else None}
+        return {"kind": "PhysicalScan", "resource_id": self.resource_id, "columns": [item.to_dict() for item in self.columns], "partition_predicate": self.partition_predicate.to_dict() if self.partition_predicate else None, "anchor_resource_id": self.anchor_resource_id}
 
 
 @dataclass(frozen=True)
