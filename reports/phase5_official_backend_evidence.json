@@ -1,0 +1,1496 @@
+{
+  "schema_version": 1,
+  "row_count": 5799,
+  "typed_ok": 5695,
+  "logical_ok": 1322,
+  "physical_ok": 33,
+  "sqlglot_ok": 33,
+  "safety_ok": 33,
+  "resources": {
+    "official_security": 16,
+    "official_ext": 10,
+    "official_basic": 5,
+    "official_technical": 2
+  },
+  "errors": {
+    "DOMAIN_DATA_UNAVAILABLE": 3819,
+    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 661,
+    "PHYSICAL_PLAN_UNAVAILABLE": 445,
+    "DOMAIN_CAPABILITY_UNSUPPORTED": 430,
+    "UNSUPPORTED_LOGICAL_LOWERING": 124,
+    "OFFICIAL_TYPE_ERROR": 97,
+    "PHYSICAL_EXPRESSION_UNSUPPORTED": 92,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 37,
+    "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED": 26,
+    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 15,
+    "PHYSICAL_APPROXIMATION_POLICY_MISSING": 5,
+    "OFFICIAL_ANTLR_LEX_ERROR": 5,
+    "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 4,
+    "PHYSICAL_RANK_BOUND_UNSUPPORTED": 4,
+    "OFFICIAL_ANTLR_PARSE_ERROR": 2
+  },
+  "latency_ms": {
+    "p50": 3.6625,
+    "p95": 10.2284
+  },
+  "samples": [
+    {
+      "excel_row": 2,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 个人持有比例"
+    },
+    {
+      "excel_row": 3,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 基本每股收益"
+    },
+    {
+      "excel_row": 4,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 资产回报率"
+    },
+    {
+      "excel_row": 5,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 上市日期"
+    },
+    {
+      "excel_row": 6,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 预测市盈率"
+    },
+    {
+      "excel_row": 7,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 基本每股收益同比增长率"
+    },
+    {
+      "excel_row": 8,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净利润率"
+    },
+    {
+      "excel_row": 9,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: KDJ底背离"
+    },
+    {
+      "excel_row": 10,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 除权除息日"
+    },
+    {
+      "excel_row": 11,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 90%筹码集中度"
+    },
+    {
+      "excel_row": 12,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 资产总计"
+    },
+    {
+      "excel_row": 13,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 3分钟涨速"
+    },
+    {
+      "excel_row": 14,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 股息率TTM"
+    },
+    {
+      "excel_row": 15,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 除权除息日"
+    },
+    {
+      "excel_row": 16,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 17,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 销售净利率"
+    },
+    {
+      "excel_row": 18,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): select_type"
+    },
+    {
+      "excel_row": 19,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 复牌日期"
+    },
+    {
+      "excel_row": 20,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 3分钟涨速"
+    },
+    {
+      "excel_row": 21,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净资产收益率"
+    },
+    {
+      "excel_row": 22,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 主营业务"
+    },
+    {
+      "excel_row": 23,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 复牌日期"
+    },
+    {
+      "excel_row": 24,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的持仓股"
+    },
+    {
+      "excel_row": 25,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 总资产净利率"
+    },
+    {
+      "excel_row": 26,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的持仓股"
+    },
+    {
+      "excel_row": 27,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 龙虎榜净流入"
+    },
+    {
+      "excel_row": 28,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 个人持有比例"
+    },
+    {
+      "excel_row": 29,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): filter_scope"
+    },
+    {
+      "excel_row": 30,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净资产"
+    },
+    {
+      "excel_row": 31,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 累计净值"
+    },
+    {
+      "excel_row": 32,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 复牌日期"
+    },
+    {
+      "excel_row": 33,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 规模"
+    },
+    {
+      "excel_row": 34,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 中盘股"
+    },
+    {
+      "excel_row": 35,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 36,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净利润率"
+    },
+    {
+      "excel_row": 37,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 上影线"
+    },
+    {
+      "excel_row": 38,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 归母净利润"
+    },
+    {
+      "excel_row": 39,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): select_type"
+    },
+    {
+      "excel_row": 40,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 融资净流入"
+    },
+    {
+      "excel_row": 41,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 分红金额"
+    },
+    {
+      "excel_row": 42,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的自选股"
+    },
+    {
+      "excel_row": 43,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 均线粘合"
+    },
+    {
+      "excel_row": 44,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 预测每股收益"
+    },
+    {
+      "excel_row": 45,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 预测每股收益"
+    },
+    {
+      "excel_row": 46,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: ETF净流入份额"
+    },
+    {
+      "excel_row": 47,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 阳包阴"
+    },
+    {
+      "excel_row": 48,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: MACD金叉"
+    },
+    {
+      "excel_row": 49,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 每股分红"
+    },
+    {
+      "excel_row": 50,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 股息率TTM"
+    },
+    {
+      "excel_row": 51,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 科创成长层标识"
+    },
+    {
+      "excel_row": 52,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 跳空低开"
+    },
+    {
+      "excel_row": 53,
+      "stage": "logical",
+      "code": "DOMAIN_CAPABILITY_UNSUPPORTED",
+      "message": "empty indicator slot cannot be bound"
+    },
+    {
+      "excel_row": 54,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 分红日期"
+    },
+    {
+      "excel_row": 55,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的持仓股"
+    },
+    {
+      "excel_row": 56,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 动态市盈率"
+    },
+    {
+      "excel_row": 57,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的自选股"
+    },
+    {
+      "excel_row": 58,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 静态市盈率"
+    },
+    {
+      "excel_row": 59,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的自选股"
+    },
+    {
+      "excel_row": 60,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 头肩顶"
+    },
+    {
+      "excel_row": 61,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 研发费用"
+    },
+    {
+      "excel_row": 62,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的持仓股"
+    },
+    {
+      "excel_row": 63,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 股息率"
+    },
+    {
+      "excel_row": 64,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 营业收入同比增长率"
+    },
+    {
+      "excel_row": 65,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): filter_scope, select_type"
+    },
+    {
+      "excel_row": 66,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净资产收益率"
+    },
+    {
+      "excel_row": 67,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 个人持有比例"
+    },
+    {
+      "excel_row": 68,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净利润同比增长率"
+    },
+    {
+      "excel_row": 69,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: KDJ底背离"
+    },
+    {
+      "excel_row": 70,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 研发费用"
+    },
+    {
+      "excel_row": 71,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): filter_scope"
+    },
+    {
+      "excel_row": 72,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 分红日期"
+    },
+    {
+      "excel_row": 73,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 74,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净利润同比增长率"
+    },
+    {
+      "excel_row": 75,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: KDJ底背离"
+    },
+    {
+      "excel_row": 76,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 单位净值"
+    },
+    {
+      "excel_row": 77,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 跌破支撑位"
+    },
+    {
+      "excel_row": 78,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 79,
+      "stage": "logical",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unsupported rank comparison ="
+    },
+    {
+      "excel_row": 80,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 营业总成本"
+    },
+    {
+      "excel_row": 81,
+      "stage": "physical",
+      "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+      "message": "date constraint requires normalization before physical planning: 一八年"
+    },
+    {
+      "excel_row": 82,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 归母净利润同比增长率"
+    },
+    {
+      "excel_row": 83,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): filter_scope"
+    },
+    {
+      "excel_row": 84,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 市净率"
+    },
+    {
+      "excel_row": 85,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 我的持仓股"
+    },
+    {
+      "excel_row": 86,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 累计净值"
+    },
+    {
+      "excel_row": 87,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 净利润同比增长率"
+    },
+    {
+      "excel_row": 88,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 股权质押总占比"
+    },
+    {
+      "excel_row": 89,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 周均线多头排列"
+    },
+    {
+      "excel_row": 90,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: WR金叉"
+    },
+    {
+      "excel_row": 91,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 跌破所有均线"
+    },
+    {
+      "excel_row": 92,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 头肩顶"
+    },
+    {
+      "excel_row": 93,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 头肩顶"
+    },
+    {
+      "excel_row": 94,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 资产总计"
+    },
+    {
+      "excel_row": 95,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 基本每股收益同比增长率"
+    },
+    {
+      "excel_row": 96,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 头肩底"
+    },
+    {
+      "excel_row": 97,
+      "stage": "physical",
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): filter_scope"
+    },
+    {
+      "excel_row": 98,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 龙虎榜上榜日期"
+    },
+    {
+      "excel_row": 99,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 动态市盈率"
+    },
+    {
+      "excel_row": 100,
+      "stage": "logical",
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "message": "indicator data is unavailable: 上市日期"
+    },
+    {
+      "excel_row": 101,
+      "stage": "physical",
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "message": "no controlled physical mapping for indicator 委比"
+    }
+  ],
+  "static_gate": {
+    "passed": true,
+    "policy": "Every emitted SQL must round-trip in SQLGlot Doris dialect and pass the existing SELECT safety lint."
+  },
+  "real_doris_execution": {
+    "status": "PASS",
+    "passed": true,
+    "eligible": 33,
+    "deterministic_eligible": 30,
+    "compared": 30,
+    "matched": 30,
+    "mismatched": 0,
+    "errors": 0,
+    "skipped": 3,
+    "skipped_reasons": {
+      "NONDETERMINISTIC_LIMIT": 3
+    },
+    "legacy_p95_ms": 12248.8166,
+    "shadow_p95_ms": 11814.995,
+    "results": [
+      {
+        "excel_row": 270,
+        "source": "indicator('', '', '外盘', '', '', '', '') > 20 or indicator('', '', '内盘', '', '', '', '') < 10 limit 0,200",
+        "status": "SKIPPED",
+        "reason": "NONDETERMINISTIC_LIMIT"
+      },
+      {
+        "excel_row": 279,
+        "source": "indicator('', '', '深股通标识', '', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 58.8459,
+        "shadow_elapsed_ms": 39.321
+      },
+      {
+        "excel_row": 334,
+        "source": "indicator('', '', '股票名称', '', '', '', '') != '%南京%'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 13650347,
+        "shadow_rows": 13650347,
+        "legacy_hash": "f01a09dfbff986736f9d1dcfc7c3cec690de98f9155b7e5f3c4297ce1458ff1f",
+        "shadow_hash": "f01a09dfbff986736f9d1dcfc7c3cec690de98f9155b7e5f3c4297ce1458ff1f",
+        "legacy_elapsed_ms": 12248.8166,
+        "shadow_elapsed_ms": 11814.995
+      },
+      {
+        "excel_row": 354,
+        "source": "indicator('', '', '主力净流入', '', '', '', '') > 0",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 2075724,
+        "shadow_rows": 2075724,
+        "legacy_hash": "b6e139a3a3fbed356dcc0f077cbfa25efa7e2f9af5df38ceae88c78e84898398",
+        "shadow_hash": "b6e139a3a3fbed356dcc0f077cbfa25efa7e2f9af5df38ceae88c78e84898398",
+        "legacy_elapsed_ms": 1898.8847,
+        "shadow_elapsed_ms": 1783.3964
+      },
+      {
+        "excel_row": 389,
+        "source": "indicator('', '', 'ST股票标识', '', '', '', '') = False",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 13650347,
+        "shadow_rows": 13650347,
+        "legacy_hash": "f01a09dfbff986736f9d1dcfc7c3cec690de98f9155b7e5f3c4297ce1458ff1f",
+        "shadow_hash": "f01a09dfbff986736f9d1dcfc7c3cec690de98f9155b7e5f3c4297ce1458ff1f",
+        "legacy_elapsed_ms": 13022.5471,
+        "shadow_elapsed_ms": 12095.4925
+      },
+      {
+        "excel_row": 402,
+        "source": "indicator('', '', '股票名称', '', '', '', '') = '%43%'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 52.6103,
+        "shadow_elapsed_ms": 46.8149
+      },
+      {
+        "excel_row": 567,
+        "source": "indicator('沪|深|京', '', '主力净流入', '今天', '', '', '') > 0",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 2247,
+        "shadow_rows": 2247,
+        "legacy_hash": "f175d7257a5517b15a5561f351534cb7376f9d9908bb5bd60b3a251e3dc7b20b",
+        "shadow_hash": "f175d7257a5517b15a5561f351534cb7376f9d9908bb5bd60b3a251e3dc7b20b",
+        "legacy_elapsed_ms": 49.9591,
+        "shadow_elapsed_ms": 51.4884
+      },
+      {
+        "excel_row": 640,
+        "source": "indicator('', '', '深股通标识', '', '', '', '') = True limit 0,10",
+        "status": "SKIPPED",
+        "reason": "NONDETERMINISTIC_LIMIT"
+      },
+      {
+        "excel_row": 670,
+        "source": "indicator('', '', '股票名称', '', '', '', '') = '建国' or indicator('', '', '股票名称', '', '', '', '') = '中宇'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 40.8885,
+        "shadow_elapsed_ms": 42.2196
+      },
+      {
+        "excel_row": 681,
+        "source": "indicator('', '', '股票名称', '', '', '', '') = '建国'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 41.6691,
+        "shadow_elapsed_ms": 42.5262
+      },
+      {
+        "excel_row": 695,
+        "source": "indicator('深', '', 'A股港股同时上市标识', '', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 41.8402,
+        "shadow_elapsed_ms": 44.6715
+      },
+      {
+        "excel_row": 852,
+        "source": "indicator('', '', '外盘', '今天', '', '', '') = indicator('', '', '内盘', '今天', '', '', '') * 3 or indicator('', '', '外盘', '今天', '', '', '') > indicator('', '', '内盘', '今天', '', '', '') * 3",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 45.8251,
+        "shadow_elapsed_ms": 47.0678
+      },
+      {
+        "excel_row": 1566,
+        "source": "indicator('', '', '跌停天数', '', '', '', '') = 3",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 851,
+        "shadow_rows": 851,
+        "legacy_hash": "bd7ebcac484f738aba5878a50be64e2cdd8002bdd9bc24680c7cf5f5b3879c1d",
+        "shadow_hash": "bd7ebcac484f738aba5878a50be64e2cdd8002bdd9bc24680c7cf5f5b3879c1d",
+        "legacy_elapsed_ms": 44.6352,
+        "shadow_elapsed_ms": 50.4129
+      },
+      {
+        "excel_row": 1730,
+        "source": "rank('沪|深', '', '连涨天数', 'desc', '', '', '', '') <= 10",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 46284,
+        "shadow_rows": 46284,
+        "legacy_hash": "b29297bb916b25fb7e9ea3e4c190180b100d7518fbea22d6dbfed409056d22f0",
+        "shadow_hash": "b29297bb916b25fb7e9ea3e4c190180b100d7518fbea22d6dbfed409056d22f0",
+        "legacy_elapsed_ms": 1120.6604,
+        "shadow_elapsed_ms": 1186.0396
+      },
+      {
+        "excel_row": 1798,
+        "source": "indicator('', '', '深港通标识', '', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 45.1979,
+        "shadow_elapsed_ms": 43.309
+      },
+      {
+        "excel_row": 1826,
+        "source": "indicator('沪', '', '沪股通标识', '', '', '', '') = True and indicator('沪', '', 'ST股票标识', '', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 45.3402,
+        "shadow_elapsed_ms": 42.145
+      },
+      {
+        "excel_row": 1828,
+        "source": "indicator('沪|深', '', '陆股通标识', '', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 45.8425,
+        "shadow_elapsed_ms": 43.5183
+      },
+      {
+        "excel_row": 2159,
+        "source": "indicator('', '', '主力净流入', '今天', '', '', '') > 0 or indicator('', '', '主力净流入', '今天', '', '', '') < 0",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 5210,
+        "shadow_rows": 5210,
+        "legacy_hash": "770f0898a89d642ad12de8503f1e39e5db73e9ed27b74ea78b75b4f91c7dfea0",
+        "shadow_hash": "770f0898a89d642ad12de8503f1e39e5db73e9ed27b74ea78b75b4f91c7dfea0",
+        "legacy_elapsed_ms": 108.4991,
+        "shadow_elapsed_ms": 789.816
+      },
+      {
+        "excel_row": 2326,
+        "source": "indicator('', '', '所属行业', '', '', '', '') = 'all'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 47.1647,
+        "shadow_elapsed_ms": 44.5954
+      },
+      {
+        "excel_row": 3322,
+        "source": "indicator('深', '', '主力主动卖出数量', '', '', '', '') > 1000",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 1016495,
+        "shadow_rows": 1016495,
+        "legacy_hash": "507ad3a8910b0b57a3d14bf67380b1a28e761513ff0c05a6da0e1a31a309089f",
+        "shadow_hash": "507ad3a8910b0b57a3d14bf67380b1a28e761513ff0c05a6da0e1a31a309089f",
+        "legacy_elapsed_ms": 898.7795,
+        "shadow_elapsed_ms": 952.6431
+      },
+      {
+        "excel_row": 3451,
+        "source": "indicator('', '', '散户净流入', '今天', '', '', '') = indicator('', '', '主力连续净流出金额', '今天', '', '', '') * 3 or indicator('', '', '散户净流入', '今天', '', '', '') > indicator('', '', '主力连续净流出金额', '今天', '', '', '') * 3",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 2964,
+        "shadow_rows": 2964,
+        "legacy_hash": "5d925e04b370076abff7ce6552b719bee6a1ae1b11ff6362204fe0c89d106368",
+        "shadow_hash": "5d925e04b370076abff7ce6552b719bee6a1ae1b11ff6362204fe0c89d106368",
+        "legacy_elapsed_ms": 68.8305,
+        "shadow_elapsed_ms": 46.4899
+      },
+      {
+        "excel_row": 3554,
+        "source": "indicator('', '', '破板次数', '', '', '', '') < 3 then rank('', '', '破板次数', 'desc', '', '', '', '') <= 5 limit 0,2",
+        "status": "SKIPPED",
+        "reason": "NONDETERMINISTIC_LIMIT"
+      },
+      {
+        "excel_row": 4372,
+        "source": "rank('', '', '主力净流入', 'desc', '', '', '', '') <= 5",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 23149,
+        "shadow_rows": 23149,
+        "legacy_hash": "e618707e67b43e8b63b3bee581502f1775891a4912a3823fac0eadd7bb5a92b5",
+        "shadow_hash": "e618707e67b43e8b63b3bee581502f1775891a4912a3823fac0eadd7bb5a92b5",
+        "legacy_elapsed_ms": 1077.3512,
+        "shadow_elapsed_ms": 1053.0059
+      },
+      {
+        "excel_row": 4407,
+        "source": "indicator('', '', '股票代码', '', '', '', '') = 'REIE%'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 49.7333,
+        "shadow_elapsed_ms": 46.5375
+      },
+      {
+        "excel_row": 4921,
+        "source": "rank('', '', '超大单净流入', 'desc', '', '', '', '') <= 30",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 138732,
+        "shadow_rows": 138732,
+        "legacy_hash": "155acb311d857975889e0516a429296c6c177ba884018e28fca91f56206286a1",
+        "shadow_hash": "155acb311d857975889e0516a429296c6c177ba884018e28fca91f56206286a1",
+        "legacy_elapsed_ms": 1155.7182,
+        "shadow_elapsed_ms": 1237.446
+      },
+      {
+        "excel_row": 4978,
+        "source": "indicator('沪', '', '股票名称', '', '', '', '') = '海%'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 44.3085,
+        "shadow_elapsed_ms": 45.466
+      },
+      {
+        "excel_row": 4981,
+        "source": "indicator('', '', '股票名称', '', '', '', '') = '光%'",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 42.793,
+        "shadow_elapsed_ms": 42.7359
+      },
+      {
+        "excel_row": 5003,
+        "source": "rank('', '', '成交量', 'desc', '今天', '', '', '') <= 10",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 10,
+        "shadow_rows": 10,
+        "legacy_hash": "81e0759dc9da5d24fca86054bc59f99bba37d27b9c47978a6108c56b5fca7da8",
+        "shadow_hash": "81e0759dc9da5d24fca86054bc59f99bba37d27b9c47978a6108c56b5fca7da8",
+        "legacy_elapsed_ms": 80.2387,
+        "shadow_elapsed_ms": 40.1983
+      },
+      {
+        "excel_row": 5199,
+        "source": "indicator('', '', '外盘', '今天', '', '', '') >= indicator('', '', '内盘', '今天', '', '', '') * 3",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 42.9956,
+        "shadow_elapsed_ms": 85.3945
+      },
+      {
+        "excel_row": 5619,
+        "source": "(indicator('沪|深', '', '沪股通标识', '', '', '', '') = True and indicator('沪|深', '', '深股通标识', '', '', '', '') = False) or (indicator('沪|深', '', '沪股通标识', '', '', '', '') = False and indicator('沪|深', '', '深股通标识', '', '', '', '') = True)",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 42.963,
+        "shadow_elapsed_ms": 42.7012
+      },
+      {
+        "excel_row": 5719,
+        "source": "indicator('', '', '5日均线', '', '', '', '') > indicator('', '', '10日均线', '', '', '', '') and indicator('', '', '10日均线', '', '', '', '') > indicator('', '', '20日均线', '', '', '', '') and indicator('', '', '20日均线', '', '', '', '') > indicator('', '', '30日均线', '', '', '', '') and indicator('', '', '60日均线', '', '', '', '') > indicator('', '', '5日均线', '', '', '', '') and indicator('', '', '60日均线', '', '', '', '') < indicator('', '', '30日均线', '', '', '', '') and indicator('', '', '120日均线', '', '', '', '') > indicator('', '', '5日均线', '', '', '', '') and indicator('', '', '120日均线', '', '', '', '') < indicator('', '', '30日均线', '', '', '', '')",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 0,
+        "shadow_rows": 0,
+        "legacy_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "shadow_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "legacy_elapsed_ms": 39.3467,
+        "shadow_elapsed_ms": 37.7725
+      },
+      {
+        "excel_row": 5720,
+        "source": "indicator('', '', '10日均量线', '', '', '', '') >= indicator('', '', '5日均量线', '', '', '', '') and indicator('', '', '10日均量线', '', '', '', '') <= indicator('', '', '30日均量线', '', '', '', '')",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 4538495,
+        "shadow_rows": 4538495,
+        "legacy_hash": "bf4145f3e6255bd12de08aa63e3da36831251ba6465de43f7b87ff12a286b0b3",
+        "shadow_hash": "bf4145f3e6255bd12de08aa63e3da36831251ba6465de43f7b87ff12a286b0b3",
+        "legacy_elapsed_ms": 4354.7018,
+        "shadow_elapsed_ms": 4093.1636
+      },
+      {
+        "excel_row": 5790,
+        "source": "indicator('', '', '涨停开板次数', '今天', '', '', '') > 3",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 22,
+        "shadow_rows": 22,
+        "legacy_hash": "88e2c510ba71cc0f3796ad92bf2ab377f7520598df8e29064c898ed41b08a551",
+        "shadow_hash": "88e2c510ba71cc0f3796ad92bf2ab377f7520598df8e29064c898ed41b08a551",
+        "legacy_elapsed_ms": 39.6309,
+        "shadow_elapsed_ms": 38.1341
+      }
+    ]
+  },
+  "structural_diff": {
+    "status": "PASS",
+    "passed": true,
+    "eligible": 33,
+    "compared": 33,
+    "equivalent": 0,
+    "classified_differences": 33,
+    "difference_fields": {
+      "projections": 33,
+      "operators": 24,
+      "predicate": 23,
+      "tables": 17
+    },
+    "errors": 0
+  },
+  "eligible_queries": [
+    {
+      "excel_row": 270,
+      "source": "indicator('', '', '外盘', '', '', '', '') > 20 or indicator('', '', '内盘', '', '', '', '') < 10 limit 0,200",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (base.outerVol > 20 OR base.innerVol < 10)\nLIMIT 200",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`outerVol` > 20 OR `q`.`innerVol` < 10 LIMIT 200",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 279,
+      "source": "indicator('', '', '深股通标识', '', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.szConnFlag = TRUE",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`szConnFlag` = TRUE",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 334,
+      "source": "indicator('', '', '股票名称', '', '', '', '') != '%南京%'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.name NOT LIKE '%南京%'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`name` <> '%南京%'",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 354,
+      "source": "indicator('', '', '主力净流入', '', '', '', '') > 0",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ext.ZJLXMainNetTur > 0",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`ZJLXMainNetTur` > 0",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators"
+      ]
+    },
+    {
+      "excel_row": 389,
+      "source": "indicator('', '', 'ST股票标识', '', '', '', '') = False",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE NOT (code.stFlag = TRUE)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`stFlag` = FALSE",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 402,
+      "source": "indicator('', '', '股票名称', '', '', '', '') = '%43%'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.name LIKE '%43%'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`name` = '%43%'",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 567,
+      "source": "indicator('沪|深|京', '', '主力净流入', '今天', '', '', '') > 0",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ext.ZJLXMainNetTur > 0 AND base.mktcode IN (0, 1, 103) AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`ZJLXMainNetTur` > 0 AND `anchor`.`mktcode` IN (0, 1, 103) AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 640,
+      "source": "indicator('', '', '深股通标识', '', '', '', '') = True limit 0,10",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.szConnFlag = TRUE\nLIMIT 10",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`szConnFlag` = TRUE LIMIT 10",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 670,
+      "source": "indicator('', '', '股票名称', '', '', '', '') = '建国' or indicator('', '', '股票名称', '', '', '', '') = '中宇'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (code.name = '建国' OR code.name = '中宇')",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`name` = '建国' OR `q`.`name` = '中宇'",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 681,
+      "source": "indicator('', '', '股票名称', '', '', '', '') = '建国'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.name = '建国'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`name` = '建国'",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 695,
+      "source": "indicator('深', '', 'A股港股同时上市标识', '', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.ahFlag = TRUE AND base.mktcode IN (0)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`ahFlag` = TRUE AND `anchor`.`mktcode` IN (0)",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 852,
+      "source": "indicator('', '', '外盘', '今天', '', '', '') = indicator('', '', '内盘', '今天', '', '', '') * 3 or indicator('', '', '外盘', '今天', '', '', '') > indicator('', '', '内盘', '今天', '', '', '') * 3",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.outerVol = (base.innerVol * 3) AND base.bizdate = '2026-04-14') OR (base.outerVol > (base.innerVol * 3) AND base.bizdate = '2026-04-14'))",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`outerVol` = `q`.`innerVol` * 3 AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) OR `q`.`outerVol` > `q`.`innerVol` * 3 AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 1566,
+      "source": "indicator('', '', '跌停天数', '', '', '', '') = 3",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE base.downCount = 3",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`downCount` = 3",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators"
+      ]
+    },
+    {
+      "excel_row": 1730,
+      "source": "rank('沪|深', '', '连涨天数', 'desc', '', '', '', '') <= 10",
+      "legacy_sql": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ext.pxMkIncDays DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE base.mktcode IN (0, 1)\n) AS ranked\nWHERE ranked.rank_no <= 10",
+      "shadow_sql": "SELECT `ranked`.`mktcode`, `ranked`.`tgtcode`, `ranked`.`bizdate` FROM (SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate`, ROW_NUMBER() OVER (PARTITION BY `anchor`.`bizdate` ORDER BY `q`.`pxMkIncDays` DESC, `anchor`.`tgtcode` ASC) AS __rank_value FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `anchor`.`mktcode` IN (0, 1)) AS ranked WHERE `ranked`.`__rank_value` <= 10",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 1798,
+      "source": "indicator('', '', '深港通标识', '', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.szConnFlag = TRUE",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`szConnFlag` = TRUE",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 1826,
+      "source": "indicator('沪', '', '沪股通标识', '', '', '', '') = True and indicator('沪', '', 'ST股票标识', '', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (code.shConnFlag = TRUE AND code.stFlag = TRUE) AND base.mktcode IN (1)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`shConnFlag` = TRUE AND `anchor`.`mktcode` IN (1) AND `q`.`stFlag` = TRUE AND `anchor`.`mktcode` IN (1)",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 1828,
+      "source": "indicator('沪|深', '', '陆股通标识', '', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.hkConnFlag = TRUE AND base.mktcode IN (0, 1)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`hkConnFlag` = TRUE AND `anchor`.`mktcode` IN (0, 1)",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 2159,
+      "source": "indicator('', '', '主力净流入', '今天', '', '', '') > 0 or indicator('', '', '主力净流入', '今天', '', '', '') < 0",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ((ext.ZJLXMainNetTur > 0 AND base.bizdate = '2026-04-14') OR (ext.ZJLXMainNetTur < 0 AND base.bizdate = '2026-04-14'))",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`ZJLXMainNetTur` > 0 AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) OR `q`.`ZJLXMainNetTur` < 0 AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 2326,
+      "source": "indicator('', '', '所属行业', '', '', '', '') = 'all'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.hyBlkRefName = 'all'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`hyBlkRefName` = 'all'",
+      "ordered": false,
+      "structural_differences": [
+        "projections"
+      ]
+    },
+    {
+      "excel_row": 3322,
+      "source": "indicator('深', '', '主力主动卖出数量', '', '', '', '') > 1000",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ext.ZJLXMainActSellCnt > 1000 AND base.mktcode IN (0)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`ZJLXMainActSellCnt` > 1000 AND `anchor`.`mktcode` IN (0)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators"
+      ]
+    },
+    {
+      "excel_row": 3451,
+      "source": "indicator('', '', '散户净流入', '今天', '', '', '') = indicator('', '', '主力连续净流出金额', '今天', '', '', '') * 3 or indicator('', '', '散户净流入', '今天', '', '', '') > indicator('', '', '主力连续净流出金额', '今天', '', '', '') * 3",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ((ext.ZJLXMidAndSmNetTur = (ext.ZJLXMainNetTurOutSeries * 3) AND base.bizdate = '2026-04-14') OR (ext.ZJLXMidAndSmNetTur > (ext.ZJLXMainNetTurOutSeries * 3) AND base.bizdate = '2026-04-14'))",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`ZJLXMidAndSmNetTur` = `q`.`ZJLXMainNetTurOutSeries` * 3 AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) OR `q`.`ZJLXMidAndSmNetTur` > `q`.`ZJLXMainNetTurOutSeries` * 3 AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 3554,
+      "source": "indicator('', '', '破板次数', '', '', '', '') < 3 then rank('', '', '破板次数', 'desc', '', '', '', '') <= 5 limit 0,2",
+      "legacy_sql": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ext.boardBreaks DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE ext.boardBreaks < 3\n) AS ranked\nWHERE ranked.rank_no <= 5\nLIMIT 2",
+      "shadow_sql": "SELECT `ranked`.`mktcode`, `ranked`.`tgtcode`, `ranked`.`bizdate` FROM (SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate`, ROW_NUMBER() OVER (PARTITION BY `anchor`.`bizdate` ORDER BY `q`.`boardBreaks` DESC, `anchor`.`tgtcode` ASC) AS __rank_value FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`boardBreaks` < 3) AS ranked WHERE `ranked`.`__rank_value` <= 5 LIMIT 2",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 4372,
+      "source": "rank('', '', '主力净流入', 'desc', '', '', '', '') <= 5",
+      "legacy_sql": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ext.ZJLXMainNetTur DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE 1=1\n) AS ranked\nWHERE ranked.rank_no <= 5",
+      "shadow_sql": "SELECT `ranked`.`mktcode`, `ranked`.`tgtcode`, `ranked`.`bizdate` FROM (SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate`, ROW_NUMBER() OVER (PARTITION BY `anchor`.`bizdate` ORDER BY `q`.`ZJLXMainNetTur` DESC, `anchor`.`tgtcode` ASC) AS __rank_value FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate`) AS ranked WHERE `ranked`.`__rank_value` <= 5",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 4407,
+      "source": "indicator('', '', '股票代码', '', '', '', '') = 'REIE%'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.tgtcode LIKE 'REIE%'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`tgtcode` = 'REIE%'",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 4921,
+      "source": "rank('', '', '超大单净流入', 'desc', '', '', '', '') <= 30",
+      "legacy_sql": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY ext.ZJLXSupNetTur DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\n  WHERE 1=1\n) AS ranked\nWHERE ranked.rank_no <= 30",
+      "shadow_sql": "SELECT `ranked`.`mktcode`, `ranked`.`tgtcode`, `ranked`.`bizdate` FROM (SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate`, ROW_NUMBER() OVER (PARTITION BY `anchor`.`bizdate` ORDER BY `q`.`ZJLXSupNetTur` DESC, `anchor`.`tgtcode` ASC) AS __rank_value FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate`) AS ranked WHERE `ranked`.`__rank_value` <= 30",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 4978,
+      "source": "indicator('沪', '', '股票名称', '', '', '', '') = '海%'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.name LIKE '海%' AND base.mktcode IN (1)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`name` = '海%' AND `anchor`.`mktcode` IN (1)",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 4981,
+      "source": "indicator('', '', '股票名称', '', '', '', '') = '光%'",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE code.name LIKE '光%'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`name` = '光%'",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 5003,
+      "source": "rank('', '', '成交量', 'desc', '今天', '', '', '') <= 10",
+      "legacy_sql": "SELECT * FROM (\n  SELECT base.mktcode, base.tgtcode, base.bizdate, code.name,\n         ROW_NUMBER() OVER (PARTITION BY base.bizdate ORDER BY base.volume DESC, base.tgtcode ASC) AS rank_no,\n         COUNT(*) OVER (PARTITION BY base.bizdate) AS partition_count\n  FROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\n  WHERE base.bizdate = '2026-04-14'\n) AS ranked\nWHERE ranked.rank_no <= 10",
+      "shadow_sql": "SELECT `ranked`.`mktcode`, `ranked`.`tgtcode`, `ranked`.`bizdate` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, ROW_NUMBER() OVER (PARTITION BY `q`.`bizdate` ORDER BY `q`.`volume` DESC, `q`.`tgtcode` ASC) AS __rank_value FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AS ranked WHERE `ranked`.`__rank_value` <= 10",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 5199,
+      "source": "indicator('', '', '外盘', '今天', '', '', '') >= indicator('', '', '内盘', '今天', '', '', '') * 3",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE base.outerVol >= (base.innerVol * 3) AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`outerVol` >= `q`.`innerVol` * 3 AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 5619,
+      "source": "(indicator('沪|深', '', '沪股通标识', '', '', '', '') = True and indicator('沪|深', '', '深股通标识', '', '', '', '') = False) or (indicator('沪|深', '', '沪股通标识', '', '', '', '') = False and indicator('沪|深', '', '深股通标识', '', '', '', '') = True)",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (((code.shConnFlag = TRUE AND NOT (code.szConnFlag = TRUE)) AND base.mktcode IN (0, 1)) OR ((NOT (code.shConnFlag = TRUE) AND code.szConnFlag = TRUE) AND base.mktcode IN (0, 1)))",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_code_info` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` WHERE `q`.`shConnFlag` = TRUE AND `anchor`.`mktcode` IN (0, 1) AND `q`.`szConnFlag` = FALSE AND `anchor`.`mktcode` IN (0, 1) OR `q`.`shConnFlag` = FALSE AND `anchor`.`mktcode` IN (0, 1) AND `q`.`szConnFlag` = TRUE AND `anchor`.`mktcode` IN (0, 1)",
+      "ordered": false,
+      "structural_differences": [
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 5719,
+      "source": "indicator('', '', '5日均线', '', '', '', '') > indicator('', '', '10日均线', '', '', '', '') and indicator('', '', '10日均线', '', '', '', '') > indicator('', '', '20日均线', '', '', '', '') and indicator('', '', '20日均线', '', '', '', '') > indicator('', '', '30日均线', '', '', '', '') and indicator('', '', '60日均线', '', '', '', '') > indicator('', '', '5日均线', '', '', '', '') and indicator('', '', '60日均线', '', '', '', '') < indicator('', '', '30日均线', '', '', '', '') and indicator('', '', '120日均线', '', '', '', '') > indicator('', '', '5日均线', '', '', '', '') and indicator('', '', '120日均线', '', '', '', '') < indicator('', '', '30日均线', '', '', '', '')",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE ((((((tech.ma5 > tech.ma10 AND tech.ma10 > tech.ma20) AND tech.ma20 > tech.ma30) AND tech.ma60 > tech.ma5) AND tech.ma60 < tech.ma30) AND tech.ma120 > tech.ma5) AND tech.ma120 < tech.ma30)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`ma5` > `q`.`ma10` AND `q`.`ma10` > `q`.`ma20` AND `q`.`ma20` > `q`.`ma30` AND `q`.`ma60` > `q`.`ma5` AND `q`.`ma60` < `q`.`ma30` AND `q`.`ma120` > `q`.`ma5` AND `q`.`ma120` < `q`.`ma30`",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 5720,
+      "source": "indicator('', '', '10日均量线', '', '', '', '') >= indicator('', '', '5日均量线', '', '', '', '') and indicator('', '', '10日均量线', '', '', '', '') <= indicator('', '', '30日均量线', '', '', '', '')",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_basic_technical AS tech ON tech.mktcode = base.mktcode AND tech.tgtcode = base.tgtcode AND tech.bizdate = base.bizdate\nWHERE (tech.volume_avg_10 >= tech.volume_avg_5 AND tech.volume_avg_10 <= tech.volume_avg_30)",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`volume_avg_10` >= `q`.`volume_avg_5` AND `q`.`volume_avg_10` <= `q`.`volume_avg_30`",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    },
+    {
+      "excel_row": 5790,
+      "source": "indicator('', '', '涨停开板次数', '今天', '', '', '') > 3",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE ext.lmtUpNum > 3 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE `q`.`lmtUpNum` > 3 AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false,
+      "structural_differences": [
+        "tables",
+        "projections",
+        "operators",
+        "predicate"
+      ]
+    }
+  ],
+  "gates": {
+    "static_backend": {
+      "status": "PASS",
+      "passed": true
+    },
+    "compile_latency": {
+      "status": "PASS",
+      "passed": true,
+      "p95_ms": 10.2284,
+      "target_ms": 50.0
+    },
+    "phase1_4_baseline": {
+      "status": "PASS",
+      "passed": true,
+      "strict_parse_ok": 5792,
+      "strict_compile_ok": 1097,
+      "phase3_lowering_ok": 2034,
+      "domain_lowering_ok": 1322,
+      "optimized_validated": 1322
+    },
+    "structural_diff": {
+      "status": "PASS",
+      "passed": true,
+      "eligible": 33,
+      "compared": 33,
+      "equivalent": 0,
+      "classified_differences": 33,
+      "difference_fields": {
+        "projections": 33,
+        "operators": 24,
+        "predicate": 23,
+        "tables": 17
+      },
+      "errors": 0
+    },
+    "real_doris_equivalence": {
+      "status": "PASS",
+      "passed": true
+    },
+    "phase5_completion": {
+      "status": "PASS",
+      "passed": true
+    }
+  },
+  "workbook": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
+  "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
+  "git_head": "0bb80a6da29bdd70843f6092a6681a2fddc2149b"
+}
