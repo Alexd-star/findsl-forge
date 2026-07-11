@@ -724,6 +724,7 @@ def _sanitize_official_slot_source(source: str) -> str:
 
 def _strip_unmatched_closing_parens_with_positions(text: str) -> Tuple[str, List[int]]:
     depth = 0
+    square_range_depth = 0
     remove_positions = set()
     quote: Optional[str] = None
     escaped = False
@@ -741,8 +742,14 @@ def _strip_unmatched_closing_parens_with_positions(text: str) -> Tuple[str, List
             continue
         if ch == "(":
             depth += 1
+        elif ch == "[":
+            square_range_depth += 1
+        elif ch == "]" and square_range_depth:
+            square_range_depth -= 1
         elif ch == ")":
-            if depth == 0:
+            if square_range_depth:
+                square_range_depth -= 1
+            elif depth == 0:
                 remove_positions.add(index)
             else:
                 depth -= 1
@@ -1000,6 +1007,7 @@ class OfficialSlotParser:
 def parse_official_slot_with_diagnostics(
     source: str,
     mode: str = CompileMode.RECOVERY.value,
+    frontend: str = "handwritten",
 ) -> OfficialParseResult:
     compile_mode = CompileMode.parse(mode)
     if compile_mode is CompileMode.STRICT:
@@ -1007,17 +1015,37 @@ def parse_official_slot_with_diagnostics(
         repairs: Tuple[SourceRepair, ...] = ()
     else:
         normalized_source, repairs = _normalize_official_slot_source(source)
-    ast = OfficialSlotParser(source, normalized_source=normalized_source).parse()
+    if frontend == "handwritten":
+        from .official.frontend.handwritten import HandwrittenOfficialFrontend
+
+        outcome = HandwrittenOfficialFrontend().parse(
+            normalized_source, original_source=source, repairs=repairs
+        )
+    elif frontend == "antlr":
+        from .official.frontend.antlr_frontend import AntlrOfficialFrontend
+
+        outcome = AntlrOfficialFrontend().parse(
+            normalized_source, original_source=source, repairs=repairs
+        )
+    else:
+        raise ValueError(f"Unsupported official frontend: {frontend}")
+    if not outcome.ok:
+        diagnostic = outcome.diagnostics[0]
+        raise OfficialSlotError(diagnostic.code, diagnostic.message)
     return OfficialParseResult(
         source=source,
         normalized_source=normalized_source,
-        ast=ast,
+        ast=outcome.ast,
         repairs=repairs,
     )
 
 
-def parse_official_slot(source: str, mode: str = CompileMode.RECOVERY.value) -> OfficialNode:
-    return parse_official_slot_with_diagnostics(source, mode=mode).ast
+def parse_official_slot(
+    source: str,
+    mode: str = CompileMode.RECOVERY.value,
+    frontend: str = "handwritten",
+) -> OfficialNode:
+    return parse_official_slot_with_diagnostics(source, mode=mode, frontend=frontend).ast
 
 
 class OfficialSlotCompiler:
