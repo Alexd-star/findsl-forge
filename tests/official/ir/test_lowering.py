@@ -40,3 +40,12 @@ def test_unknown_indicator_cannot_enter_strict_logical_plan():
     with pytest.raises(OfficialLoweringError) as excinfo:
         lower_official_ast(typed, strict=True)
     assert excinfo.value.code == "UNSUPPORTED_LOGICAL_LOWERING"
+
+
+def test_rank_lowering_preserves_comparison_contract():
+    upper = _lower("rank('', '', '涨幅', 'desc', '', '', '', '') <= 10").plan
+    lower = _lower("rank('', '', '涨幅', 'desc', '', '', '', '') >= 10").plan
+
+    assert upper.comparator == "<="
+    assert lower.comparator == ">="
+    assert upper.node_id != lower.node_id

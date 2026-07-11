@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalLimit
+from findsl.official.physical import PhysicalFilter, PhysicalLimit, PhysicalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
 from findsl.official.registry import default_official_registry
@@ -82,3 +82,25 @@ def test_latest_date_and_market_constraints_are_materialized_in_predicate():
     assert payload["kind"] == "PhysicalFilter"
     assert "PhysicalLatestValue" in result.plan.canonical_json()
     assert "mktcode" in result.plan.canonical_json()
+
+
+def test_direct_numeric_rank_lowers_with_comparison_contract():
+    result = plan_physical(
+        _lower("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRank)
+    assert result.plan.direction == "desc"
+    assert result.plan.comparator == "<="
+    assert result.plan.bound.value == 10
+
+
+def test_query_data_uses_the_same_controlled_direct_field_mapping():
+    result = plan_physical(
+        _lower("queryData('', '', '成交量', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    assert result.selected_resource == "official_basic"

@@ -71,3 +71,16 @@ def test_latest_date_and_market_constraints_render_as_sqlglot_ast():
     assert len(list(parsed.find_all(exp.Max))) == 1
     assert "`q`.`mktcode` IN (0, 1)" in result.sql
     assert result.validation.passed is True
+
+
+def test_rank_renders_window_in_subquery_and_filters_outer_query():
+    result = render_doris(
+        _physical("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.RowNumber))) == 1
+    assert len(list(parsed.find_all(exp.Window))) == 1
+    assert "`ranked`.`__rank_value` <= 10" in result.sql
+    assert result.validation.passed is True

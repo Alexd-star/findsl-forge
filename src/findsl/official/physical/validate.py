@@ -44,6 +44,8 @@ def _validate_plan(plan, catalog):
     elif isinstance(plan, PhysicalRank):
         if plan.direction not in {"asc", "desc"}:
             raise ValueError("physical rank direction is invalid")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            raise ValueError("physical rank comparator is invalid")
         if not isinstance(plan.bound.value, (int, float)) or plan.bound.value <= 0:
             raise ValueError("physical rank bound is invalid")
         _validate_expr(plan.expression, catalog)

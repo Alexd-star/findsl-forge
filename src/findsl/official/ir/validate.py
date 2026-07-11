@@ -78,6 +78,8 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
     elif isinstance(plan, LogicalRank):
         if plan.direction not in {"asc", "desc"}:
             _fail("IR_RANK_DIRECTION", "rank direction must be asc or desc", f"{path}.direction")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            _fail("IR_RANK_COMPARATOR", "rank comparator is unsupported", f"{path}.comparator")
         if not _positive_bound(plan.bound):
             _fail("IR_RANK_BOUND", "rank bound must be a positive numeric or percentage literal", f"{path}.bound")
         _validate_expr(plan.order_by, f"{path}.order_by", strict, names)

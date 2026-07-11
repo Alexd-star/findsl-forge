@@ -12,6 +12,7 @@ from ..ir import (
     LogicalDomainScan,
     LogicalFilter,
     LogicalLimit,
+    LogicalRank,
     RangeExpr,
 )
 from ..lowering import LoweringResult
@@ -27,6 +28,7 @@ from .ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalPlan,
+    PhysicalRank,
     PhysicalScan,
 )
 from .validate import validate_physical_plan
@@ -68,6 +70,7 @@ _TYPE_MAP = {
     "string": STRING,
     "time": TIME,
 }
+_DIRECT_FIELD_CALLS = {"indicator", "queryData", "rank"}
 
 
 def plan_physical(lowering: LoweringResult, catalog: PhysicalCatalog) -> PhysicalPlanningResult:
@@ -96,9 +99,11 @@ def plan_physical(lowering: LoweringResult, catalog: PhysicalCatalog) -> Physica
 def _collect_fields(plan, catalog: PhysicalCatalog) -> Tuple[PhysicalField, ...]:
     expressions = []
     current = plan
-    while isinstance(current, (LogicalFilter, LogicalLimit)):
+    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank)):
         if isinstance(current, LogicalFilter):
             expressions.append(current.predicate)
+        elif isinstance(current, LogicalRank):
+            expressions.append(current.order_by)
         current = current.input
     if not isinstance(current, LogicalDomainScan):
         raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical root {type(current).__name__}")
@@ -106,7 +111,7 @@ def _collect_fields(plan, catalog: PhysicalCatalog) -> Tuple[PhysicalField, ...]
     fields = []
     for expression in expressions:
         for call in _walk_calls(expression):
-            if call.name != "indicator" or call.binding is None:
+            if call.name not in _DIRECT_FIELD_CALLS or call.binding is None:
                 raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {call.name}")
             _reject_unmaterialized_constraints(call)
             indicator_id = call.binding.slots.get("indicator_name", "")
@@ -146,7 +151,7 @@ def _reject_unmaterialized_constraints(call: CallExpr) -> None:
     ignored = {
         slot: value
         for slot, value in call.binding.slots.items()
-        if slot not in {"indicator_name", "market", "date"} and str(value).strip()
+        if slot not in {"indicator_name", "market", "date", "direction"} and str(value).strip()
     }
     if ignored:
         names = ", ".join(sorted(ignored))
@@ -174,6 +179,15 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
             plan.offset,
             plan.count,
         )
+    if isinstance(plan, LogicalRank):
+        input_plan = _lower_plan(plan.input, catalog, resource_id, fields)
+        for constraint in _call_constraints(plan.order_by, catalog, resource_id):
+            input_plan = PhysicalFilter(input_plan, constraint)
+        expression = _lower_expr(plan.order_by, catalog, resource_id)
+        bound = _lower_expr(plan.bound, catalog, resource_id)
+        if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
+            raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
+        return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
     raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical node {type(plan).__name__}")
 
 
@@ -181,7 +195,7 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
     if isinstance(expression, LiteralExpr):
         return PhysicalLiteral(expression.value, expression.type)
     if isinstance(expression, CallExpr):
-        if expression.name != "indicator" or expression.binding is None:
+        if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
             raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {expression.name}")
         indicator_id = expression.binding.slots.get("indicator_name", "")
         try:

@@ -15,6 +15,7 @@ from ..physical.ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalPlan,
+    PhysicalRank,
     PhysicalScan,
 )
 from ..physical.validate import validate_physical_plan
@@ -85,6 +86,31 @@ def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
     if isinstance(plan, PhysicalLimit):
         query = _render_plan(plan.input, catalog).limit(plan.count)
         return query.offset(plan.offset) if plan.offset else query
+    if isinstance(plan, PhysicalRank):
+        inner = _render_plan(plan.input, catalog)
+        order = exp.Order(
+            expressions=[
+                exp.Ordered(
+                    this=_render_expr(plan.expression, catalog),
+                    desc=plan.direction == "desc",
+                )
+            ]
+        )
+        window = exp.Window(
+            this=exp.RowNumber(),
+            partition_by=[exp.column("bizdate", table="q", quoted=True)],
+            order=order,
+        ).as_("__rank_value")
+        inner = inner.select(window, append=True)
+        ranked = inner.subquery(alias="ranked")
+        outer = exp.select(
+            *(exp.column(name, table="ranked", quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
+        ).from_(ranked)
+        comparator = _COMPARISON[plan.comparator](
+            this=exp.column("__rank_value", table="ranked", quoted=True),
+            expression=_render_expr(plan.bound, catalog),
+        )
+        return outer.where(comparator)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
 
 

@@ -133,9 +133,10 @@ class PhysicalRank(PhysicalPlan):
     expression: PhysicalExpr
     direction: str
     bound: PhysicalLiteral
+    comparator: str = "<="
 
     def to_dict(self):
-        return {"kind": "PhysicalRank", "input": self.input.to_dict(), "expression": self.expression.to_dict(), "direction": self.direction, "bound": self.bound.to_dict()}
+        return {"kind": "PhysicalRank", "input": self.input.to_dict(), "expression": self.expression.to_dict(), "direction": self.direction, "bound": self.bound.to_dict(), "comparator": self.comparator}
 
 
 @dataclass(frozen=True)

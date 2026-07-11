@@ -145,7 +145,7 @@ def _lower_stage(typed: TypedNode, input_plan: LogicalPlan) -> LogicalPlan:
         call = typed.children[0]
         bound = _lower_expr(typed.children[1])
         direction = call.binding.slots["direction"].lower() if call.binding else ""
-        return LogicalRank(input_plan, _lower_expr(call), direction, bound, input_plan.schema)
+        return LogicalRank(input_plan, _lower_expr(call), direction, bound, input_plan.schema, comparator=node.op)
     if typed.type is UNKNOWN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "top-level expression has unknown type")
     predicate = _lower_expr(typed)

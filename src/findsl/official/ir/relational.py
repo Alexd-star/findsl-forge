@@ -167,9 +167,10 @@ class LogicalRank(LogicalPlan):
     direction: str
     bound: LogicalExpr
     schema: Schema
+    comparator: str = "<="
 
     def to_dict(self):
-        return _plan("LogicalRank", self.schema, input=self.input.to_dict(), order_by=self.order_by.to_dict(), direction=self.direction, bound=self.bound.to_dict())
+        return _plan("LogicalRank", self.schema, input=self.input.to_dict(), order_by=self.order_by.to_dict(), direction=self.direction, bound=self.bound.to_dict(), comparator=self.comparator)
 
 
 @dataclass(frozen=True)
