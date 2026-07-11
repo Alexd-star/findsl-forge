@@ -47,3 +47,15 @@ def test_backend_uses_sqlglot_literal_escaping():
 
     assert "O''Reilly" in result.sql
     assert result.validation.passed is True
+
+
+def test_between_is_lowered_to_auditable_bounded_comparisons():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '今日', '', '', '') between [1, 5]"),
+        default_physical_catalog(),
+    )
+
+    where = sqlglot.parse_one(result.sql, read="doris").args["where"].this
+    assert isinstance(where, exp.And)
+    assert isinstance(where.this, exp.GTE)
+    assert isinstance(where.expression, exp.LTE)

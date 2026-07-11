@@ -11,6 +11,7 @@ from ..ir import (
     LogicalDomainScan,
     LogicalFilter,
     LogicalLimit,
+    RangeExpr,
 )
 from ..lowering import LoweringResult
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
@@ -132,6 +133,9 @@ def _walk_calls(expression):
     elif isinstance(expression, (BinaryExpr, ComparisonExpr)):
         yield from _walk_calls(expression.left)
         yield from _walk_calls(expression.right)
+    elif isinstance(expression, RangeExpr):
+        yield from _walk_calls(expression.lower)
+        yield from _walk_calls(expression.upper)
 
 
 def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[PhysicalField, ...]) -> PhysicalPlan:
@@ -177,6 +181,18 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
             expression.type,
         )
     if isinstance(expression, ComparisonExpr):
+        if isinstance(expression.right, RangeExpr) and expression.op == "between":
+            value = _lower_expr(expression.left, catalog, resource_id)
+            lower = _lower_expr(expression.right.lower, catalog, resource_id)
+            upper = _lower_expr(expression.right.upper, catalog, resource_id)
+            lower_op = ">=" if expression.right.lower_inclusive else ">"
+            upper_op = "<=" if expression.right.upper_inclusive else "<"
+            return PhysicalBinary(
+                "and",
+                PhysicalComparison(lower_op, value, lower),
+                PhysicalComparison(upper_op, value, upper),
+                BOOLEAN,
+            )
         return PhysicalComparison(
             expression.op,
             _lower_expr(expression.left, catalog, resource_id),
