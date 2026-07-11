@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "passed": true,
+  "case_count": 2,
+  "matched": 2,
+  "errors": 0,
+  "git_head": "6d03085fb73bf4fbfac7ac700fac5be8421ebb6e",
+  "catalog_sha256": "49105ff346331b7066bc1d2a2f5ae700f91ecf550984c0daef81f1ca858b0c94",
+  "results": [
+    {
+      "source": "indicator('', '', '5日均线', '', '', '', '') > 10",
+      "status": "PASS",
+      "default_strategy": "direct_column",
+      "shadow_strategy": "ma5_prefix_average",
+      "row_count": 7714221,
+      "legacy_hash": "80951a1c1ed3c53c6c422c15d3ce8ec9fd08db918f4884db87b2837b0861555d",
+      "shadow_hash": "80951a1c1ed3c53c6c422c15d3ce8ec9fd08db918f4884db87b2837b0861555d",
+      "legacy_elapsed_ms": 7791.2303,
+      "shadow_elapsed_ms": 9805.6376,
+      "legacy_over_shadow_ratio": 0.794566,
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (SELECT (`p`.`close_prefix` - COALESCE(`p_prev`.`close_prefix`, 0)) * 1.0 / NULLIF(`p`.`close_count_prefix` - COALESCE(`p_prev`.`close_count_prefix`, 0), 0) / 10000.0 FROM `newzl`.`hsj_stock_hq_basic_prefix` AS p LEFT JOIN `newzl`.`hsj_stock_hq_basic_prefix` AS p_prev ON `p_prev`.`mktcode` = `p`.`mktcode` AND `p_prev`.`tgtcode` = `p`.`tgtcode` AND `p_prev`.`row_no` = `p`.`row_no` - 5 WHERE `p`.`mktcode` = `q`.`mktcode` AND `p`.`tgtcode` = `q`.`tgtcode` AND `p`.`bizdate` = `q`.`bizdate`) > 10"
+    },
+    {
+      "source": "indicator('', '', '5日均量线', '', '', '', '') > 1000",
+      "status": "PASS",
+      "default_strategy": "direct_column",
+      "shadow_strategy": "volume_avg_5_prefix_average",
+      "row_count": 13649137,
+      "legacy_hash": "653708b1c3b546bcd30b9cf31db822127ae88ab5cdf9104d99b493418eb8c824",
+      "shadow_hash": "653708b1c3b546bcd30b9cf31db822127ae88ab5cdf9104d99b493418eb8c824",
+      "legacy_elapsed_ms": 11211.1545,
+      "shadow_elapsed_ms": 15270.3276,
+      "legacy_over_shadow_ratio": 0.734179,
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (SELECT (`p`.`volume_prefix` - COALESCE(`p_prev`.`volume_prefix`, 0)) * 1.0 / NULLIF(`p`.`volume_count_prefix` - COALESCE(`p_prev`.`volume_count_prefix`, 0), 0) FROM `newzl`.`hsj_stock_hq_basic_prefix` AS p LEFT JOIN `newzl`.`hsj_stock_hq_basic_prefix` AS p_prev ON `p_prev`.`mktcode` = `p`.`mktcode` AND `p_prev`.`tgtcode` = `p`.`tgtcode` AND `p_prev`.`row_no` = `p`.`row_no` - 5 WHERE `p`.`mktcode` = `q`.`mktcode` AND `p`.`tgtcode` = `q`.`tgtcode` AND `p`.`bizdate` = `q`.`bizdate`) > 1000"
+    }
+  ]
+}
