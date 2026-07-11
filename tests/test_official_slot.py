@@ -5,6 +5,7 @@ import sys
 import os
 
 import pytest
+from pathlib import Path
 
 from findsl.official_slot import (
     OfficialCompileResult,
@@ -24,6 +25,9 @@ OFFICIAL_WORKBOOK = (
     r"D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统"
     r"\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统"
     r"\选股 DSL 规范文档\选股提槽实例.xlsx"
+)
+official_workbook_required = pytest.mark.skipif(
+    not Path(OFFICIAL_WORKBOOK).is_file(), reason="official workbook is external"
 )
 
 
@@ -1222,6 +1226,7 @@ def test_compile_unsupported_indicator_fails_with_stable_code():
     assert "相似K线" in str(excinfo.value)
 
 
+@official_workbook_required
 def test_profile_training_workbook_reads_official_examples():
     profile = profile_training_workbook(OFFICIAL_WORKBOOK, sample_size=20)
 
@@ -1247,6 +1252,7 @@ def test_csv_profile_uses_true_min_and_max_dates(tmp_path):
     assert profile["last_date"] == "2021-03-01"
 
 
+@official_workbook_required
 def test_compile_training_workbook_reports_real_parse_and_compile_coverage(tmp_path):
     coverage = compile_training_workbook(OFFICIAL_WORKBOOK, sample_size=5)
     output = tmp_path / "coverage.md"
@@ -1350,6 +1356,7 @@ def test_official_slot_compile_cli_prints_json_payload():
     assert "base.volume > 1000" in proc.stdout
 
 
+@official_workbook_required
 def test_official_slot_coverage_cli_writes_json_and_markdown(tmp_path):
     json_output = tmp_path / "official_slot_coverage.json"
     report_output = tmp_path / "official_slot_coverage.md"

@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import pytest
+
 from findsl.official_frontend_evidence import build_frontend_evidence
 
 
@@ -8,6 +12,7 @@ OFFICIAL_WORKBOOK = (
 )
 
 
+@pytest.mark.skipif(not Path(OFFICIAL_WORKBOOK).is_file(), reason="official workbook is external")
 def test_evidence_counts_all_official_rows_and_latency_percentiles():
     report = build_frontend_evidence(OFFICIAL_WORKBOOK, sample_size=3)
 
