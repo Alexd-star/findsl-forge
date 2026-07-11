@@ -46,3 +46,13 @@ def test_technical_indicator_selects_controlled_technical_resource_deterministic
     assert first.selected_resource == "official_technical"
     assert first.decisions == second.decisions
     assert first.decisions[0].cost == 20.0
+
+
+def test_approximate_comparison_without_catalog_tolerance_is_rejected_before_backend():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower("indicator('', '', '成交量', '今日', '', '', '') ~= 100"),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_APPROXIMATION_POLICY_MISSING"

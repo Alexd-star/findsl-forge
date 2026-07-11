@@ -25,6 +25,20 @@ def _exit_official_error(exc: Exception, as_json: bool) -> None:
     raise SystemExit(2)
 
 
+def _build_official_physical(dsl: str):
+    from .official.lowering import lower_official_ast
+    from .official.physical.catalog import default_physical_catalog
+    from .official.physical.planner import plan_physical
+    from .official.registry import default_official_registry
+    from .official.semantics import OfficialSemanticAnalyzer
+    from .official_slot import _resolve_indicator_meta, parse_official_slot_with_diagnostics
+
+    parsed = parse_official_slot_with_diagnostics(dsl, mode="strict", frontend="antlr")
+    typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(parsed.ast)
+    logical = lower_official_ast(typed, strict=True, domain_registry=default_official_registry())
+    return plan_physical(logical, default_physical_catalog())
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Compile financial DSL to Doris SQL")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -81,6 +95,18 @@ def main() -> None:
     official_domain_cmd.add_argument("--json-output", required=True)
     official_domain_cmd.add_argument("--report-output", required=True)
     official_domain_cmd.add_argument("--sample-size", type=int, default=20)
+    official_physical_cmd = sub.add_parser("official-slot-physical", help="Build a validated Doris physical plan")
+    official_physical_cmd.add_argument("dsl")
+    official_physical_cmd.add_argument("--json", action="store_true")
+    official_backend_cmd = sub.add_parser("official-slot-backend", help="Render validated SQLGlot Doris SQL")
+    official_backend_cmd.add_argument("dsl")
+    official_backend_cmd.add_argument("--json", action="store_true")
+    official_backend_evidence_cmd = sub.add_parser("official-backend-evidence", help="Audit the Doris backend on the official workbook")
+    official_backend_evidence_cmd.add_argument("--workbook", required=True)
+    official_backend_evidence_cmd.add_argument("--json-output", required=True)
+    official_backend_evidence_cmd.add_argument("--report-output", required=True)
+    official_backend_evidence_cmd.add_argument("--sample-size", type=int, default=20)
+    official_backend_evidence_cmd.add_argument("--json", action="store_true")
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -424,6 +450,39 @@ def main() -> None:
         write_official_domain_evidence(evidence, args.json_output, args.report_output)
         print(f"Domain gate: {'PASS' if evidence['gate']['passed'] else 'FAIL'}")
         print(f"Domain lowering: {evidence['domain_lowering_ok']}/{evidence['row_count']}")
+    elif args.command == "official-slot-physical":
+        result = _build_official_physical(args.dsl)
+        payload = {
+            "selected_resource": result.selected_resource,
+            "plan": result.plan.to_dict(),
+            "plan_id": result.plan.node_id,
+            "decisions": [asdict(decision) for decision in result.decisions],
+        }
+        print(json.dumps(payload, ensure_ascii=False, indent=2) if args.json else result.plan.canonical_json())
+    elif args.command == "official-slot-backend":
+        from .official.backend.doris import render_doris
+        from .official.physical.catalog import default_physical_catalog
+
+        physical = _build_official_physical(args.dsl)
+        result = render_doris(physical.plan, default_physical_catalog())
+        payload = {
+            "sql": result.sql,
+            "round_trip_stable": result.round_trip_stable,
+            "validation_passed": result.validation.passed,
+            "table_references": result.validation.table_references,
+            "physical_plan_id": physical.plan.node_id,
+        }
+        print(json.dumps(payload, ensure_ascii=False, indent=2) if args.json else result.sql)
+    elif args.command == "official-backend-evidence":
+        from .official_backend_evidence import build_official_backend_evidence, write_official_backend_evidence
+
+        evidence = build_official_backend_evidence(args.workbook, sample_size=args.sample_size)
+        write_official_backend_evidence(evidence, args.json_output, args.report_output)
+        if args.json:
+            print(json.dumps(evidence, ensure_ascii=False, indent=2))
+        else:
+            print(f"Backend gate: {'PASS' if evidence['static_gate']['passed'] else 'FAIL'}")
+            print(f"Safe Doris SQL: {evidence['safety_ok']}/{evidence['row_count']}")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 

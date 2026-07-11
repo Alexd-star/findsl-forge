@@ -181,6 +181,11 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
             expression.type,
         )
     if isinstance(expression, ComparisonExpr):
+        if expression.op == "~=":
+            raise PhysicalPlanningError(
+                "PHYSICAL_APPROXIMATION_POLICY_MISSING",
+                "approximate comparison requires catalog-provided absolute and relative tolerances",
+            )
         if isinstance(expression.right, RangeExpr) and expression.op == "between":
             value = _lower_expr(expression.left, catalog, resource_id)
             lower = _lower_expr(expression.right.lower, catalog, resource_id)
