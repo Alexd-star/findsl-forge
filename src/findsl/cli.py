@@ -63,6 +63,16 @@ def main() -> None:
     official_frontend_cmd.add_argument("--report-output", required=True, help="Output Markdown evidence path")
     official_frontend_cmd.add_argument("--sample-size", type=int, default=20)
     official_frontend_cmd.add_argument("--json", action="store_true", help="Print evidence as JSON")
+    official_ir_cmd = sub.add_parser("official-slot-ir", help="Build validated logical IR for one official DSL query")
+    official_ir_cmd.add_argument("dsl")
+    official_ir_cmd.add_argument("--mode", choices=("strict", "recovery"), default="strict")
+    official_ir_cmd.add_argument("--frontend", choices=("handwritten", "antlr"), default="antlr")
+    official_ir_cmd.add_argument("--json", action="store_true")
+    official_ir_evidence_cmd = sub.add_parser("official-ir-evidence", help="Audit Typed AST and Logical IR on the official workbook")
+    official_ir_evidence_cmd.add_argument("--workbook", required=True)
+    official_ir_evidence_cmd.add_argument("--json-output", required=True)
+    official_ir_evidence_cmd.add_argument("--report-output", required=True)
+    official_ir_evidence_cmd.add_argument("--sample-size", type=int, default=20)
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -369,6 +379,23 @@ def main() -> None:
         else:
             print(f"Official rows: {evidence['row_count']}")
             print(f"Recovery classifications: {evidence['recovery']['classifications']}")
+    elif args.command == "official-slot-ir":
+        from .official.lowering import lower_official_ast
+        from .official.semantics import OfficialSemanticAnalyzer
+        from .official_slot import _resolve_indicator_meta, parse_official_slot_with_diagnostics
+
+        parsed = parse_official_slot_with_diagnostics(args.dsl, mode=args.mode, frontend=args.frontend)
+        typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(parsed.ast)
+        result = lower_official_ast(typed, strict=args.mode == "strict")
+        payload = {"typed_ast": typed.to_dict(), **result.to_dict()}
+        print(json.dumps(payload, ensure_ascii=False, indent=2) if args.json else result.plan.canonical_json())
+    elif args.command == "official-ir-evidence":
+        from .official_ir_evidence import build_official_ir_evidence, write_official_ir_evidence
+
+        evidence = build_official_ir_evidence(args.workbook, sample_size=args.sample_size)
+        write_official_ir_evidence(evidence, args.json_output, args.report_output)
+        print(f"IR gate: {'PASS' if evidence['gate']['passed'] else 'FAIL'}")
+        print(f"Lowering: {evidence['lowering_ok']}/{evidence['row_count']}")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 
