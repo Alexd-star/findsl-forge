@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "workbook": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
+  "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
+  "sheet": "训练语料",
+  "row_count": 5799,
+  "antlr_runtime": "4.13.2",
+  "git_head": "d3215996abb3878e8d7074f9c119f57f1492dd3b",
+  "migration_gate": {
+    "passed": true,
+    "blocking_divergences": 0,
+    "diagnostic_only_divergences": 1,
+    "policy": "AST differences and one-sided acceptance block migration; dual rejection with different first-error stages is audited but non-blocking."
+  },
+  "strict": {
+    "classifications": {
+      "ERROR_MATCH": 6,
+      "ERROR_MISMATCH": 1,
+      "MATCH": 5792
+    },
+    "handwritten_parse_ok": 5792,
+    "antlr_parse_ok": 5792,
+    "latency_ms": {
+      "handwritten": {
+        "p50": 0.0949,
+        "p95": 0.2649
+      },
+      "antlr": {
+        "p50": 2.3353,
+        "p95": 6.5364
+      }
+    },
+    "samples": {
+      "MATCH": [],
+      "ERROR_MISMATCH": [
+        {
+          "classification": "ERROR_MISMATCH",
+          "input_sha256": "37710ffe10148de83585fcb4bd44876b3afee54e9830ae4820177e930a831e11",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 317700,
+          "antlr_elapsed_ns": 6343300,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_PARSE_ERROR",
+              "severity": "error",
+              "message": "Expected ), got STRING at 197",
+              "span": {
+                "start_offset": 197,
+                "end_offset": 198,
+                "start_line": 1,
+                "start_column": 198,
+                "end_line": 1,
+                "end_column": 199,
+                "fragment": "'"
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_LEX_ERROR",
+              "severity": "error",
+              "message": "token recognition error at: '昨'",
+              "span": {
+                "start_offset": 195,
+                "end_offset": 196,
+                "start_line": 1,
+                "start_column": 196,
+                "end_line": 1,
+                "end_column": 197,
+                "fragment": "昨"
+              },
+              "frontend": "antlr"
+            },
+            {
+              "code": "OFFICIAL_ANTLR_LEX_ERROR",
+              "severity": "error",
+              "message": "token recognition error at: '天'",
+              "span": {
+                "start_offset": 196,
+                "end_offset": 197,
+                "start_line": 1,
+                "start_column": 197,
+                "end_line": 1,
+                "end_column": 198,
+                "fragment": "天"
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 2122
+        }
+      ],
+      "ERROR_MATCH": [
+        {
+          "classification": "ERROR_MATCH",
+          "input_sha256": "bb45362a3c4424c70ac88d0d78f7b6cc5bc57cffa72eed18c617b6b0f3f17a69",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 66800,
+          "antlr_elapsed_ns": 3368100,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_LEX_ERROR",
+              "severity": "error",
+              "message": "Unclosed string starting at 134",
+              "span": {
+                "start_offset": 134,
+                "end_offset": 135,
+                "start_line": 1,
+                "start_column": 135,
+                "end_line": 1,
+                "end_column": 136,
+                "fragment": "'"
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_LEX_ERROR",
+              "severity": "error",
+              "message": "token recognition error at: '''",
+              "span": {
+                "start_offset": 134,
+                "end_offset": 135,
+                "start_line": 1,
+                "start_column": 135,
+                "end_line": 1,
+                "end_column": 136,
+                "fragment": "'"
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 2194
+        },
+        {
+          "classification": "ERROR_MATCH",
+          "input_sha256": "9f5fc8a896027eb04197146affe9f1abd50581414af3de9b637bac7f33c00a5d",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 82900,
+          "antlr_elapsed_ns": 2079500,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_LEX_ERROR",
+              "severity": "error",
+              "message": "Unclosed string starting at 96",
+              "span": {
+                "start_offset": 96,
+                "end_offset": 97,
+                "start_line": 1,
+                "start_column": 97,
+                "end_line": 1,
+                "end_column": 98,
+                "fragment": "\""
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_LEX_ERROR",
+              "severity": "error",
+              "message": "token recognition error at: '\"'",
+              "span": {
+                "start_offset": 96,
+                "end_offset": 97,
+                "start_line": 1,
+                "start_column": 97,
+                "end_line": 1,
+                "end_column": 98,
+                "fragment": "\""
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 2466
+        },
+        {
+          "classification": "ERROR_MATCH",
+          "input_sha256": "34742025c67bf79ec7c3143065453c54b406b0af1834252b04340ef65a27528d",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 187900,
+          "antlr_elapsed_ns": 4425600,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_PARSE_ERROR",
+              "severity": "error",
+              "message": "Expected EOF, got ) at 245",
+              "span": {
+                "start_offset": 245,
+                "end_offset": 246,
+                "start_line": 1,
+                "start_column": 246,
+                "end_line": 1,
+                "end_column": 247,
+                "fragment": ")"
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_PARSE_ERROR",
+              "severity": "error",
+              "message": "extraneous input ')' expecting <EOF>",
+              "span": {
+                "start_offset": 245,
+                "end_offset": 246,
+                "start_line": 1,
+                "start_column": 246,
+                "end_line": 1,
+                "end_column": 247,
+                "fragment": ")"
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 3785
+        },
+        {
+          "classification": "ERROR_MATCH",
+          "input_sha256": "f2f4d79684a69be244906b8beae89bcb83b692df0b35f8a058b2318401c5b5ce",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 33300,
+          "antlr_elapsed_ns": 1110500,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_LEX_ERROR",
+              "severity": "error",
+              "message": "Unclosed string starting at 51",
+              "span": {
+                "start_offset": 51,
+                "end_offset": 52,
+                "start_line": 1,
+                "start_column": 52,
+                "end_line": 1,
+                "end_column": 53,
+                "fragment": "\""
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_LEX_ERROR",
+              "severity": "error",
+              "message": "token recognition error at: '\"'",
+              "span": {
+                "start_offset": 51,
+                "end_offset": 52,
+                "start_line": 1,
+                "start_column": 52,
+                "end_line": 1,
+                "end_column": 53,
+                "fragment": "\""
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 5328
+        },
+        {
+          "classification": "ERROR_MATCH",
+          "input_sha256": "d59fad020df720ec26058fe80032a066fcf619349558c7675bc261caf64ca4a2",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 55200,
+          "antlr_elapsed_ns": 1258400,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_PARSE_ERROR",
+              "severity": "error",
+              "message": "Unexpected token AND at 0",
+              "span": {
+                "start_offset": 0,
+                "end_offset": 1,
+                "start_line": 1,
+                "start_column": 1,
+                "end_line": 1,
+                "end_column": 2,
+                "fragment": "a"
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_PARSE_ERROR",
+              "severity": "error",
+              "message": "extraneous input 'and' expecting {TRUE, FALSE, '+', '-', '(', PERCENT, NUMBER, IDENT, STRING}",
+              "span": {
+                "start_offset": 0,
+                "end_offset": 3,
+                "start_line": 1,
+                "start_column": 1,
+                "end_line": 1,
+                "end_column": 4,
+                "fragment": "and"
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 5521
+        },
+        {
+          "classification": "ERROR_MATCH",
+          "input_sha256": "896df305254abaac9d5f37e8c79088702ff542708c7cef7decfe39407d4d9c4f",
+          "source": null,
+          "normalized_source": null,
+          "handwritten_elapsed_ns": 46700,
+          "antlr_elapsed_ns": 1870600,
+          "handwritten_diagnostics": [
+            {
+              "code": "OFFICIAL_LEX_ERROR",
+              "severity": "error",
+              "message": "Unclosed string starting at 0",
+              "span": {
+                "start_offset": 0,
+                "end_offset": 1,
+                "start_line": 1,
+                "start_column": 1,
+                "end_line": 1,
+                "end_column": 2,
+                "fragment": "\""
+              },
+              "frontend": "handwritten"
+            }
+          ],
+          "antlr_diagnostics": [
+            {
+              "code": "OFFICIAL_ANTLR_LEX_ERROR",
+              "severity": "error",
+              "message": "token recognition error at: '\"indicator('', '', '涨幅', '', '', '', '') between '[3%,9%]' and indicator('', '', '成交量', '', '', '', '') >= indicator('', '', '成交量', '近5日', '', 'AVG', '') * 1.5 and indicator('', '', '大单净流入', '', '', '', '') >= 0.5% and indicator('', '', 'RSI(6)', '', '', '', '') < 20'",
+              "span": {
+                "start_offset": 0,
+                "end_offset": 1,
+                "start_line": 1,
+                "start_column": 1,
+                "end_line": 1,
+                "end_column": 2,
+                "fragment": "\""
+              },
+              "frontend": "antlr"
+            },
+            {
+              "code": "OFFICIAL_ANTLR_PARSE_ERROR",
+              "severity": "error",
+              "message": "mismatched input '<EOF>' expecting {TRUE, FALSE, '+', '-', '(', PERCENT, NUMBER, IDENT, STRING}",
+              "span": {
+                "start_offset": 267,
+                "end_offset": 267,
+                "start_line": 1,
+                "start_column": 268,
+                "end_line": 1,
+                "end_column": 268,
+                "fragment": "<EOF>"
+              },
+              "frontend": "antlr"
+            }
+          ],
+          "difference": null,
+          "excel_row": 5753
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "classifications": {
+      "MATCH": 5799
+    },
+    "handwritten_parse_ok": 5799,
+    "antlr_parse_ok": 5799,
+    "latency_ms": {
+      "handwritten": {
+        "p50": 0.1029,
+        "p95": 0.2968
+      },
+      "antlr": {
+        "p50": 2.5951,
+        "p95": 7.3643
+      }
+    },
+    "samples": {
+      "MATCH": []
+    }
+  }
+}
