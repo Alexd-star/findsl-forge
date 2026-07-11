@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FinDSL official indicator registry",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["canonical_name", "aliases", "value_type", "domain", "logical_field", "unit", "scale", "nullable", "availability", "capabilities"],
+    "properties": {
+      "canonical_name": {"type": "string", "minLength": 1},
+      "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+      "value_type": {"enum": ["numeric", "boolean", "string", "time"]},
+      "domain": {"type": "string", "minLength": 1},
+      "logical_field": {"type": "string", "minLength": 1},
+      "unit": {"type": "string", "minLength": 1},
+      "scale": {"type": ["number", "null"]},
+      "nullable": {"type": "boolean"},
+      "availability": {"enum": ["official_provided", "derived", "missing"]},
+      "capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+      "physical_hint": {"type": ["string", "null"]}
+    }
+  }
+}

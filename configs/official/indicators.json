@@ -1,0 +1,3104 @@
+[
+  {
+    "canonical_name": "10分钟涨速",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_c86f1f208762",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "10日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma10",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "10日均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_10",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "120日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma120",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "200日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma200",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "20日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma20",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "20日均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_20",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "250日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma250",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "30日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma30",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "30日均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_30",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "3分钟涨速",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_ae401e1fffff",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "3日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma3",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "5分钟涨速",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_1c4084ac0483",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "5日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma5",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "5日均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_5",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "60日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma60",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "60日均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_60",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "A股港股同时上市标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "ahFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "B股标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "bShareFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "MA角度",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "maAngle",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "ST标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "stFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "ST股票标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "stFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "TTM市盈率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_a98e2b8b6229",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一个季度均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma60",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一个季度均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_60",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一个月均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma20",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一个月均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_20",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一周均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma5",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一周均量线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "volume_avg_5",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "一年均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma250",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "三分钟涨速",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_a1081de14cb4",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "三日均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma3",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "上影线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_f30f8b49ba3a",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "上涨趋势",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_7f83880c8cbf",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "下影线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_3f5bf9396de4",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "中单买入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "midBuyTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "中单净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMidNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "中单卖出",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "midSellTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力主动买入占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_5f77237a08ce",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力主动买入数量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainActBuyCnt",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力主动卖出占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_5452836f8a40",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力主动卖出数量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainActSellCnt",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力买入占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_5ad8ae7c2c85",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力买入手数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainBuyCnt",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力买入金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainBuyTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力净占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_4d5171f69b00",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力净流出",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_ceb05bbb68c4",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力分歧度",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "MPResExt",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力卖出占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_532b66714ecb",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力卖出手数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainSellCnt",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力卖出金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainSellTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力成交量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainCnt",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力成交量占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_6db0f984d17a",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力成本",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_8fc45859f02e",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力连续净流入天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainNetTurInDays",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力连续净流入金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainNetTurInSeries",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力连续净流出天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainNetTurOutDays",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "主力连续净流出金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainNetTurOutSeries",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "买方未匹配量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "callAucBid2Vol",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "五分钟涨速",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_cf90298cccc2",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "今日主力增仓占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_abfcf60c5ebb",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "内盘",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "innerVol",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "创N日新低",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "pxMkBotDays",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "创N日新高",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "pxMkTopDays",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "创业板标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "gemFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "动态市盈率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_69c888c36899",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "十分钟涨速",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_3036cc60d17a",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "十字星",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_46b3bbc9e082",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "半年均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma120",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "卖方未匹配量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "callAucAsk2Vol",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "历史最大回撤",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_1279bc9dc0cf",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "历史最大跌幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_2a168ca60948",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "压力位",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_97bc81f3f714",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "均线多头排列",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_ab09f071a7c8",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "均线空头排列",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_e8198882859f",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "外盘",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "outerVol",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单买入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "bigBuyTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单买入金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "bigBuyTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXBigNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单动向",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXDDX",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单卖出",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "bigSellTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单卖出金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "bigSellTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "大单差分",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXDDZ",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "委买",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "commissionBuy",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "委卖",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "commissionSale",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "委差",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_383ca994817c",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "委比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_c5eecd2cfb4e",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "实际换手率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_1fd36865d954",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "小单买入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "smBuyTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "小单净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXSmNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "小单卖出",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "smSellTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "市净率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_e2bd9c087677",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "市盈率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_e6b3bdf53d4a",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "年均线",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "technical",
+    "logical_field": "ma250",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "开盘价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_360833bb3358",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "总市值",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_443f68162261",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "总股本",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "totalShare",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "成交均价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_e82fc6d14d55",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "成交量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "volume",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "成交额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "turnover",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "所属行业",
+    "aliases": [],
+    "value_type": "string",
+    "domain": "security_master",
+    "logical_field": "hyBlkRefName",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "挂单量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "numOfOrders",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "振幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_f18f28ad51c0",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "换手率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_a071a060fcb2",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "支持位",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_c35cfbb93fb9",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "支撑位",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_2944636a0874",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "收盘价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_f0414f880570",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "放量",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_a303f1bdde85",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "散户买入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXRetailBuyCnt",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "散户买入占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_6b0af8ba00d3",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "散户净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMidAndSmNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "散户卖出",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXRetailSellCnt",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "散户卖出占比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_4739c3e0f672",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "昨收价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_5abd18516640",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "是否T+0",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "quote",
+    "logical_field": "derived_fcd5d6642fd2",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "最低价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_6126a4897fa0",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "最后一次涨停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "lastLimitUpTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "最后一次炸板时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "lastFUpTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "最后一次跌停打开时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "lastFDownTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "最后一次跌停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "lastLimitDownTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "最后涨停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "lastLimitUpTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "最后跌停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "lastLimitDownTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "最大回撤",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_e91c7038654b",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "最新价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_c8e09ceef4a8",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "最高价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_632a5d8a277e",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "最高涨停封单量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "maxUpSealVol",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "最高跌停封单量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "maxDownSealVol",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "每手股数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_993f7bd679db",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "每股净资产",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_b3b13cb06628",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "沪港通标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "shConnFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "沪股通标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "shConnFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "流通市值",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_04a22269ff0e",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "流通股本",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "listedShare",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "quote",
+    "logical_field": "derived_9f18b2d3b96d",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "涨停价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_146ebbbc21f2",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "upCount",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停封单价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_ed6c3dbc5298",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停封单量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "upSealVol",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停开板次数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "lmtUpNum",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停形态",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "limitShape",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停成交额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "upTradeAmt",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "firstLimitUpTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "涨停未封板",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "order_book",
+    "logical_field": "derived_47a2c31b8cc2",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "涨停次数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "upCount",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨停炸板",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "order_book",
+    "logical_field": "derived_80b5791064f6",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "涨幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_5a6dd7d66cea",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨跌停类型",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "limitType",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨跌动因",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXDDY",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "涨跌幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_3b86257cea14",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "深港通标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "szConnFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "深股通标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "szConnFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "港股通标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "hkConnFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "炸板",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "order_book",
+    "logical_field": "derived_b164a2b75636",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "现价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_e8312e1a5b64",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "破板次数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "boardBreaks",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "科创板标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "kcbFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "筹码形态",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "formFlag",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "股票代码",
+    "aliases": [],
+    "value_type": "string",
+    "domain": "security_master",
+    "logical_field": "tgtcode",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "股票名称",
+    "aliases": [],
+    "value_type": "string",
+    "domain": "security_master",
+    "logical_field": "name",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "自由流通股本",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "freeShare",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "自由流通股股本",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "freeShare",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "证券代码",
+    "aliases": [],
+    "value_type": "string",
+    "domain": "security_master",
+    "logical_field": "tztcode",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "资金净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXMainNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "资金净流入创N日新高",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "mainTurMkTopDays",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "超大单买入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "supBuyTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "超大单净流入",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "ZJLXSupNetTur",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "超大单卖出",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "supSellTur",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "quote",
+    "logical_field": "derived_f47568f13217",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "跌停价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_727746e6c78e",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "downCount",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停封单价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_9f70675bf205",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停封单量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "downSealVol",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停成交额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "downTradeAmt",
+    "unit": "amount",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "firstLimitDownTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "跌停次数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "downCount",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌停破板次数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "downBoardBreaks",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "跌幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_3cb9afbda715",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "连板天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "upSerialLb",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "连涨天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "pxMkIncDays",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "连续涨停天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "upSerialLb",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "连跌天数",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "pxMkDescDays",
+    "unit": "count",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "量比",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_0dd819cb0198",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "阳线",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_8fa960014eea",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "阴线",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "technical",
+    "logical_field": "derived_71151fe90d1f",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "陆股通标识",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "security_master",
+    "logical_field": "hkConnFlag",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "集合竞价买方未匹配量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "callAucBid2Vol",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "集合竞价匹配价",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_197020bbd799",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "集合竞价匹配量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "callAucMatchVol",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "集合竞价卖方未匹配量",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "callAucAsk2Vol",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "集合竞价涨幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_c3ef7cb1cf0d",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "集合竞价涨跌幅",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "derived_1035ed3c4012",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "集合竞价金额",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "order_book",
+    "logical_field": "callAucAmt",
+    "unit": "price",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "静态市盈率",
+    "aliases": [],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "derived_10cdb6af5337",
+    "unit": "ratio_percent",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "derived",
+      "ordered"
+    ]
+  },
+  {
+    "canonical_name": "首板涨停",
+    "aliases": [],
+    "value_type": "boolean",
+    "domain": "quote",
+    "logical_field": "derived_66bcd3d9df24",
+    "unit": "flag",
+    "scale": null,
+    "nullable": true,
+    "availability": "derived",
+    "capabilities": [
+      "derived"
+    ]
+  },
+  {
+    "canonical_name": "首次涨停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "firstLimitUpTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  },
+  {
+    "canonical_name": "首次跌停时间",
+    "aliases": [],
+    "value_type": "time",
+    "domain": "quote",
+    "logical_field": "firstLimitDownTime",
+    "unit": "text",
+    "scale": null,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": []
+  }
+]
