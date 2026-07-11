@@ -4,6 +4,9 @@ import re
 from typing import Any, Callable, Optional
 
 from .signatures import OFFICIAL_FUNCTION_SIGNATURES, FunctionSignature
+from .ast import OfficialFunctionCall, OfficialLiteral, iter_child_nodes
+from .typed_ast import FunctionBinding, TypedNode
+from .types import BOOLEAN, NUMERIC, STRING, TIME, UNKNOWN, OfficialType, RangeType
 
 
 IndicatorResolver = Callable[[str], Optional[Any]]
@@ -18,7 +21,45 @@ class OfficialSemanticAnalyzer:
         self._indicator_resolver = indicator_resolver
 
     def validate(self, node: Any) -> str:
-        return self._infer(node)
+        return self.analyze(node).type.legacy_name
+
+    def analyze(self, node: Any) -> TypedNode:
+        return self._build_typed(node)
+
+    def _build_typed(self, node: Any) -> TypedNode:
+        inferred = self._infer(node)
+        children = tuple(self._build_typed(child) for child in iter_child_nodes(node))
+        binding = None
+        if isinstance(node, OfficialFunctionCall):
+            signature = OFFICIAL_FUNCTION_SIGNATURES[node.name]
+            binding = FunctionBinding.create(
+                signature,
+                {
+                    slot: arg.value
+                    for slot, arg in zip(signature.slots, node.args)
+                    if isinstance(arg, OfficialLiteral)
+                },
+            )
+        return TypedNode(node, self._type_from_legacy(inferred), children, binding)
+
+    @staticmethod
+    def _type_from_legacy(value: str) -> OfficialType:
+        basic = {
+            "boolean": BOOLEAN,
+            "numeric": NUMERIC,
+            "string": STRING,
+            "time": TIME,
+            "unknown": UNKNOWN,
+        }
+        if value in basic:
+            return basic[value]
+        if value.startswith("range["):
+            parts = value[6:-1].split(",")
+            element = basic.get(parts[0], UNKNOWN)
+            if any(basic.get(part, UNKNOWN) is not element for part in parts):
+                element = UNKNOWN
+            return RangeType(element)
+        return UNKNOWN
 
     def _infer(self, node: Any) -> str:
         from ..official_slot import (
