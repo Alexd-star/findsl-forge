@@ -112,6 +112,8 @@ The official parser also has a pinned ANTLR4 shadow frontend. Verify generated s
 
 The official compiler now exposes an immutable Typed AST and a SQL-free logical IR shadow pipeline. `python -m findsl.cli official-slot-ir ... --json` shows function-slot bindings, explicit types, validated logical operators, and a deterministic content-derived plan ID without changing the existing SQL compiler. On the current official workbook, 5,695 strict inputs produce Typed ASTs and 2,034 produce validated logical plans; the separate grounded strict SQL baseline remains 1,097. See `docs/38_Typed_AST与Logical_IR实现说明.md` and `reports/phase3_official_ir_evidence.md` for the evidence boundary.
 
+Phase 4 adds a schema-validated official indicator registry, domain binding, SQL-free financial-domain nodes, and a deterministic rule optimizer. The registry distinguishes 197 provided/derived static indicators from workbook indicators whose required data domains are absent, so missing financial/fund/index data reports `DOMAIN_DATA_UNAVAILABLE` instead of becoming fake SQL. `official-slot-optimize` exposes the domain requirements and rewrite trace; `official-domain-evidence` audits all 5,799 official rows. See `docs/39_领域IR注册表与规则优化器说明.md`.
+
 If running from the repository root without installing the package:
 
 ```powershell
