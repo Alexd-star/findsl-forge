@@ -13,3 +13,11 @@ def test_production_grammar_is_owned_outside_documentation():
     root = Path(__file__).resolve().parents[3]
 
     assert (root / "grammar" / "OfficialSlot.g4").is_file()
+
+
+def test_generated_sources_do_not_embed_workspace_absolute_path():
+    root = Path(__file__).resolve().parents[3]
+    generated = root / "src" / "findsl" / "official" / "frontend" / "generated"
+
+    for path in generated.glob("*.py"):
+        assert str(root).replace("\\", "/") not in path.read_text(encoding="utf-8")

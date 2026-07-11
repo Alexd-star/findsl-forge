@@ -1,4 +1,4 @@
-# Generated from D:/Luo_docs/竞赛/研创赛/研究生金融科技创新大赛/findsl-forge/.worktrees/architecture-hardening/grammar/OfficialSlot.g4 by ANTLR 4.13.2
+# Generated from OfficialSlot.g4 by ANTLR 4.13.2
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO

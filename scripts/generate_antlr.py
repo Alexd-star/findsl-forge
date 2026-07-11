@@ -59,9 +59,9 @@ def _generate(destination: Path) -> None:
             "-Xexact-output-dir",
             "-o",
             str(destination),
-            str(GRAMMAR),
+            GRAMMAR.name,
         ],
-        cwd=ROOT,
+        cwd=GRAMMAR.parent,
         check=True,
     )
     (destination / "__init__.py").write_text(
