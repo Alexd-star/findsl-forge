@@ -54,6 +54,13 @@ def test_unknown_indicator_has_precise_diagnostic():
     assert excinfo.value.slot == "indicator_name"
 
 
+def test_declared_missing_indicator_reports_data_unavailable():
+    typed = _typed_call("indicator('', '', '营业收入', '今日', '', '', '')")
+    with pytest.raises(DomainBindingError) as excinfo:
+        bind_function(typed, default_official_registry())
+    assert excinfo.value.code == "DOMAIN_DATA_UNAVAILABLE"
+
+
 def test_invalid_rank_direction_has_precise_diagnostic():
     typed = _typed_call("rank('', '', '涨幅', 'sideways', '今日', '', '', '')")
     with pytest.raises(DomainBindingError) as excinfo:

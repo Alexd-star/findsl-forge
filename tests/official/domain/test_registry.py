@@ -23,6 +23,13 @@ def test_registry_is_cached_and_definitions_are_immutable():
         first.resolve("涨幅").aliases += ("变化",)
 
 
+def test_official_workbook_missing_domain_is_declared_not_unknown():
+    definition = default_official_registry().resolve("营业收入")
+
+    assert definition.availability == "missing"
+    assert definition.domain == "financial"
+
+
 def test_registry_rejects_duplicate_aliases_and_unknown_fields(tmp_path):
     path = tmp_path / "indicators.json"
     path.write_text(
