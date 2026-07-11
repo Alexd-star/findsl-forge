@@ -3,34 +3,35 @@
   "row_count": 5799,
   "typed_ok": 5695,
   "logical_ok": 1322,
-  "physical_ok": 28,
-  "sqlglot_ok": 28,
-  "safety_ok": 28,
+  "physical_ok": 34,
+  "sqlglot_ok": 34,
+  "safety_ok": 34,
   "resources": {
     "official_security": 16,
-    "official_ext": 6,
-    "official_basic": 4,
+    "official_ext": 9,
+    "official_basic": 7,
     "official_technical": 2
   },
   "errors": {
     "DOMAIN_DATA_UNAVAILABLE": 3819,
-    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 512,
+    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 638,
     "DOMAIN_CAPABILITY_UNSUPPORTED": 430,
-    "PHYSICAL_PLAN_UNAVAILABLE": 334,
-    "PHYSICAL_EXPRESSION_UNSUPPORTED": 198,
-    "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED": 188,
+    "PHYSICAL_PLAN_UNAVAILABLE": 410,
     "UNSUPPORTED_LOGICAL_LOWERING": 124,
     "OFFICIAL_TYPE_ERROR": 97,
-    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 30,
-    "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED": 23,
+    "PHYSICAL_EXPRESSION_UNSUPPORTED": 91,
+    "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED": 66,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 39,
+    "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED": 25,
+    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 10,
     "PHYSICAL_APPROXIMATION_POLICY_MISSING": 5,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
-    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 4,
+    "PHYSICAL_RANK_BOUND_UNSUPPORTED": 4,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2
   },
   "latency_ms": {
-    "p50": 2.7253,
-    "p95": 7.4971
+    "p50": 2.5715,
+    "p95": 6.0075
   },
   "samples": [
     {
@@ -164,5 +165,5 @@
   },
   "workbook": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
   "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
-  "git_head": "586e1f86b8732d24226c36ef61a5069745c53d82"
+  "git_head": "1b4b2ae82e08ec5cfb0ac3ae43c551c84acc1bfa"
 }
