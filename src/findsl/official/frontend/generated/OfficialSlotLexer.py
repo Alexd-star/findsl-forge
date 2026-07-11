@@ -123,19 +123,19 @@ class OfficialSlotLexer(Lexer):
     modeNames = [ "DEFAULT_MODE" ]
 
     literalNames = [ "<INVALID>",
-            "'>='", "'<='", "'!='", "'~='", "'='", "'>'", "'<'", "'+'", 
+            "'>='", "'<='", "'!='", "'~='", "'='", "'>'", "'<'", "'+'",
             "'-'", "'*'", "'/'", "'('", "')'", "'['", "']'", "','" ]
 
     symbolicNames = [ "<INVALID>",
-            "AND", "OR", "THEN", "BETWEEN", "LIMIT", "TRUE", "FALSE", "GTE", 
-            "LTE", "NEQ", "APPROX", "EQ", "GT", "LT", "PLUS", "MINUS", "STAR", 
-            "SLASH", "LPAREN", "RPAREN", "LBRACK", "RBRACK", "COMMA", "PERCENT", 
+            "AND", "OR", "THEN", "BETWEEN", "LIMIT", "TRUE", "FALSE", "GTE",
+            "LTE", "NEQ", "APPROX", "EQ", "GT", "LT", "PLUS", "MINUS", "STAR",
+            "SLASH", "LPAREN", "RPAREN", "LBRACK", "RBRACK", "COMMA", "PERCENT",
             "NUMBER", "IDENT", "STRING", "WS" ]
 
-    ruleNames = [ "AND", "OR", "THEN", "BETWEEN", "LIMIT", "TRUE", "FALSE", 
-                  "GTE", "LTE", "NEQ", "APPROX", "EQ", "GT", "LT", "PLUS", 
-                  "MINUS", "STAR", "SLASH", "LPAREN", "RPAREN", "LBRACK", 
-                  "RBRACK", "COMMA", "PERCENT", "NUMBER", "IDENT", "STRING", 
+    ruleNames = [ "AND", "OR", "THEN", "BETWEEN", "LIMIT", "TRUE", "FALSE",
+                  "GTE", "LTE", "NEQ", "APPROX", "EQ", "GT", "LT", "PLUS",
+                  "MINUS", "STAR", "SLASH", "LPAREN", "RPAREN", "LBRACK",
+                  "RBRACK", "COMMA", "PERCENT", "NUMBER", "IDENT", "STRING",
                   "ESC", "DIGIT", "WS" ]
 
     grammarFileName = "OfficialSlot.g4"
@@ -146,5 +146,3 @@ class OfficialSlotLexer(Lexer):
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
-
-

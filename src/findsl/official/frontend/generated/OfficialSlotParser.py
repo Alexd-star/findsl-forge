@@ -76,16 +76,16 @@ class OfficialSlotParser ( Parser ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                     "'>='", "'<='", "'!='", "'~='", "'='", "'>'", "'<'", 
-                     "'+'", "'-'", "'*'", "'/'", "'('", "')'", "'['", "']'", 
+    literalNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>",
+                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>",
+                     "'>='", "'<='", "'!='", "'~='", "'='", "'>'", "'<'",
+                     "'+'", "'-'", "'*'", "'/'", "'('", "')'", "'['", "']'",
                      "','" ]
 
-    symbolicNames = [ "<INVALID>", "AND", "OR", "THEN", "BETWEEN", "LIMIT", 
-                      "TRUE", "FALSE", "GTE", "LTE", "NEQ", "APPROX", "EQ", 
-                      "GT", "LT", "PLUS", "MINUS", "STAR", "SLASH", "LPAREN", 
-                      "RPAREN", "LBRACK", "RBRACK", "COMMA", "PERCENT", 
+    symbolicNames = [ "<INVALID>", "AND", "OR", "THEN", "BETWEEN", "LIMIT",
+                      "TRUE", "FALSE", "GTE", "LTE", "NEQ", "APPROX", "EQ",
+                      "GT", "LT", "PLUS", "MINUS", "STAR", "SLASH", "LPAREN",
+                      "RPAREN", "LBRACK", "RBRACK", "COMMA", "PERCENT",
                       "NUMBER", "IDENT", "STRING", "WS" ]
 
     RULE_program = 0
@@ -108,11 +108,11 @@ class OfficialSlotParser ( Parser ):
     RULE_signedPercent = 17
     RULE_comparisonOperator = 18
 
-    ruleNames =  [ "program", "limitExpression", "thenExpression", "orExpression", 
-                   "andExpression", "comparisonExpression", "additiveExpression", 
-                   "multiplicativeExpression", "primaryExpression", "functionCall", 
-                   "argumentList", "rangeLiteral", "rangeBracketOpen", "rangeBracketClose", 
-                   "literal", "signedInteger", "signedNumber", "signedPercent", 
+    ruleNames =  [ "program", "limitExpression", "thenExpression", "orExpression",
+                   "andExpression", "comparisonExpression", "additiveExpression",
+                   "multiplicativeExpression", "primaryExpression", "functionCall",
+                   "argumentList", "rangeLiteral", "rangeBracketOpen", "rangeBracketClose",
+                   "literal", "signedInteger", "signedNumber", "signedPercent",
                    "comparisonOperator" ]
 
     EOF = Token.EOF
@@ -1386,8 +1386,3 @@ class OfficialSlotParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
-
-
-
-
