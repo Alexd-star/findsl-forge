@@ -35,6 +35,7 @@ def main() -> None:
     official_parse_cmd = sub.add_parser("official-slot-parse", help="Parse official slot DSL into an AST")
     official_parse_cmd.add_argument("dsl", help="Official slot DSL expression")
     official_parse_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
+    official_parse_cmd.add_argument("--frontend", choices=("handwritten", "antlr"), default="handwritten")
     official_parse_cmd.add_argument("--json", action="store_true", help="Print AST as JSON")
     official_compile_cmd = sub.add_parser("official-slot-compile", help="Compile official slot DSL to Doris SQL")
     official_compile_cmd.add_argument("dsl", help="Official slot DSL expression")
@@ -54,6 +55,14 @@ def main() -> None:
     official_coverage_cmd.add_argument("--sample-size", type=int, default=20, help="Number of error/success samples to include")
     official_coverage_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
     official_coverage_cmd.add_argument("--json", action="store_true", help="Print coverage as JSON")
+    official_frontend_cmd = sub.add_parser(
+        "official-frontend-evidence", help="Compare handwritten and ANTLR frontends on the official workbook"
+    )
+    official_frontend_cmd.add_argument("--workbook", required=True, help="Official slot DSL workbook path")
+    official_frontend_cmd.add_argument("--json-output", required=True, help="Output JSON evidence path")
+    official_frontend_cmd.add_argument("--report-output", required=True, help="Output Markdown evidence path")
+    official_frontend_cmd.add_argument("--sample-size", type=int, default=20)
+    official_frontend_cmd.add_argument("--json", action="store_true", help="Print evidence as JSON")
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -217,7 +226,9 @@ def main() -> None:
         from .official_slot import OfficialSlotError, parse_official_slot_with_diagnostics
 
         try:
-            parsed = parse_official_slot_with_diagnostics(args.dsl, mode=args.mode)
+            parsed = parse_official_slot_with_diagnostics(
+                args.dsl, mode=args.mode, frontend=args.frontend
+            )
         except OfficialSlotError as exc:
             _exit_official_error(exc, args.json)
         payload = parsed.ast.to_dict()
@@ -227,6 +238,7 @@ def main() -> None:
                 "normalized_source": parsed.normalized_source,
                 "repairs": [repair.to_dict() for repair in parsed.repairs],
                 "mode": args.mode,
+                "frontend": args.frontend,
             }
         )
         if args.json:
@@ -235,6 +247,7 @@ def main() -> None:
             print(json.dumps(parsed.ast.to_dict(), ensure_ascii=False, indent=2))
             print()
             print(f"Mode: {args.mode}")
+            print(f"Frontend: {args.frontend}")
             print(f"Normalized source: {parsed.normalized_source}")
             print("Repairs:")
             if parsed.repairs:
@@ -346,6 +359,16 @@ def main() -> None:
             print(f"Official query count: {summary['query_count']}")
             print(f"All queries P95 <= 10s: {summary['all_queries_under_10s']}")
             print(f"Max P95: {summary['max_p95_ms']} ms")
+    elif args.command == "official-frontend-evidence":
+        from .official_frontend_evidence import build_frontend_evidence, write_frontend_evidence
+
+        evidence = build_frontend_evidence(args.workbook, sample_size=args.sample_size)
+        write_frontend_evidence(evidence, args.json_output, args.report_output)
+        if args.json:
+            print(json.dumps(evidence, ensure_ascii=False, indent=2))
+        else:
+            print(f"Official rows: {evidence['row_count']}")
+            print(f"Recovery classifications: {evidence['recovery']['classifications']}")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 
