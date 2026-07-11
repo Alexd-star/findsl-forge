@@ -4,7 +4,16 @@ import re
 from typing import Any, Callable, Optional
 
 from .signatures import OFFICIAL_FUNCTION_SIGNATURES, FunctionSignature
-from .ast import OfficialFunctionCall, OfficialLiteral, iter_child_nodes
+from .ast import (
+    OfficialBinaryOp,
+    OfficialComparison,
+    OfficialFunctionCall,
+    OfficialIdentifier,
+    OfficialLimit,
+    OfficialLiteral,
+    OfficialRangeLiteral,
+    iter_child_nodes,
+)
 from .typed_ast import FunctionBinding, TypedNode
 from .types import BOOLEAN, NUMERIC, STRING, TIME, UNKNOWN, OfficialType, RangeType
 
@@ -62,16 +71,7 @@ class OfficialSemanticAnalyzer:
         return UNKNOWN
 
     def _infer(self, node: Any) -> str:
-        from ..official_slot import (
-            OfficialBinaryOp,
-            OfficialComparison,
-            OfficialFunctionCall,
-            OfficialIdentifier,
-            OfficialLimit,
-            OfficialLiteral,
-            OfficialRangeLiteral,
-            OfficialSlotError,
-        )
+        from ..official_slot import OfficialSlotError
 
         if isinstance(node, OfficialLiteral):
             return self._literal_kind(node.value)
@@ -110,7 +110,7 @@ class OfficialSemanticAnalyzer:
         )
 
     def _infer_function(self, node: Any) -> str:
-        from ..official_slot import OfficialLiteral, OfficialSlotError
+        from ..official_slot import OfficialSlotError
 
         signature = OFFICIAL_FUNCTION_SIGNATURES.get(node.name)
         if signature is None:
@@ -144,8 +144,6 @@ class OfficialSemanticAnalyzer:
         return str(getattr(meta, "kind", "unknown"))
 
     def _infer_comparison(self, node: Any) -> str:
-        from ..official_slot import OfficialRangeLiteral
-
         left_kind = self._infer(node.left)
         if node.op == "between":
             if not isinstance(node.right, OfficialRangeLiteral):
