@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
+from dataclasses import asdict
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -59,6 +61,12 @@ class PhysicalCatalog:
             field_index[folded] = field
         self._resources = MappingProxyType(resource_index)
         self._fields = MappingProxyType(field_index)
+        canonical = {
+            "resources": [asdict(resource_index[key]) for key in sorted(resource_index)],
+            "fields": [asdict(field_index[key]) for key in sorted(field_index)],
+        }
+        payload = json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        self._fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
     def resource(self, resource_id: str) -> PhysicalResource:
         return self._resources[resource_id]
@@ -73,6 +81,10 @@ class PhysicalCatalog:
     @property
     def fields(self):
         return tuple(self._fields.values())
+
+    @property
+    def fingerprint(self) -> str:
+        return self._fingerprint
 
     @classmethod
     def load(cls, path: Path) -> "PhysicalCatalog":

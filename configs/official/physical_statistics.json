@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "catalog_sha256": "c6fdb31e9e8f8dee4af42e802eaf477ec60449f47633feabc7760989a1f804d4",
+  "collected_at": "2026-07-11T18:23:47+08:00",
+  "doris_version": "doris-4.1.0-rc03-5960d4cea0e",
+  "resources": [
+    {
+      "resource_id": "official_basic",
+      "row_count": 13650347,
+      "data_size_bytes": 411096318,
+      "row_count_available": true
+    },
+    {
+      "resource_id": "official_ext",
+      "row_count": 6170822,
+      "data_size_bytes": 306901418,
+      "row_count_available": true
+    },
+    {
+      "resource_id": "official_security",
+      "row_count": 5686,
+      "data_size_bytes": 303691,
+      "row_count_available": true
+    },
+    {
+      "resource_id": "official_technical",
+      "row_count": 13650347,
+      "data_size_bytes": 1409823015,
+      "row_count_available": true
+    }
+  ]
+}

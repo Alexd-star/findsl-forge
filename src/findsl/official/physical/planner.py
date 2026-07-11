@@ -33,6 +33,7 @@ from .ir import (
     PhysicalScan,
 )
 from .validate import validate_physical_plan
+from .statistics import PhysicalStatisticsSnapshot
 
 
 @dataclass(frozen=True)
@@ -43,6 +44,8 @@ class PhysicalDecision:
     estimated: bool
     reason_code: str
     reason: str
+    cost_unit: str = "catalog_priority"
+    cost_components: Tuple[Tuple[str, float], ...] = ()
 
 
 class PhysicalPlanningError(ValueError):
@@ -74,7 +77,12 @@ _TYPE_MAP = {
 _DIRECT_FIELD_CALLS = {"indicator", "queryData", "rank"}
 
 
-def plan_physical(lowering: LoweringResult, catalog: PhysicalCatalog) -> PhysicalPlanningResult:
+def plan_physical(
+    lowering: LoweringResult,
+    catalog: PhysicalCatalog,
+    *,
+    statistics: Optional[PhysicalStatisticsSnapshot] = None,
+) -> PhysicalPlanningResult:
     fields = _collect_fields(lowering.plan, catalog)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
@@ -95,15 +103,54 @@ def plan_physical(lowering: LoweringResult, catalog: PhysicalCatalog) -> Physica
         )
     plan = _lower_plan(lowering.plan, catalog, selected, fields)
     validate_physical_plan(plan, catalog)
-    decision = PhysicalDecision(
-        resource_id=selected,
+    decision = _candidate_decision(resource, catalog, statistics)
+    return PhysicalPlanningResult(plan, selected, (decision,))
+
+
+def _candidate_decision(resource, catalog, statistics):
+    required = [resource.resource_id]
+    if resource.anchor_resource_id:
+        required.append(resource.anchor_resource_id)
+    if statistics is not None:
+        components = []
+        missing = []
+        for resource_id in required:
+            try:
+                item = statistics.resource(resource_id)
+            except KeyError:
+                missing.append(resource_id)
+                continue
+            if not item.row_count_available:
+                missing.append(resource_id)
+                continue
+            components.append((resource_id, float(item.data_size_bytes)))
+        if not missing:
+            return PhysicalDecision(
+                resource_id=resource.resource_id,
+                feasible=True,
+                cost=sum(value for _, value in components),
+                estimated=False,
+                reason_code="PHYSICAL_STATISTICS_CANDIDATE_SELECTED",
+                reason="cost is the catalog-declared primary and anchor resource scan bytes",
+                cost_unit="bytes",
+                cost_components=tuple(components),
+            )
+        return PhysicalDecision(
+            resource_id=resource.resource_id,
+            feasible=True,
+            cost=float(resource.priority),
+            estimated=True,
+            reason_code="PHYSICAL_STATISTICS_INCOMPLETE",
+            reason=f"catalog priority fallback; missing available row-count statistics for {', '.join(missing)}",
+        )
+    return PhysicalDecision(
+        resource_id=resource.resource_id,
         feasible=True,
         cost=float(resource.priority),
         estimated=True,
         reason_code="PHYSICAL_CANDIDATE_SELECTED",
         reason="catalog priority used because runtime statistics are unavailable",
     )
-    return PhysicalPlanningResult(plan, selected, (decision,))
 
 
 def _collect_fields(plan, catalog: PhysicalCatalog) -> Tuple[PhysicalField, ...]:

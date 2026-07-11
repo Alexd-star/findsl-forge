@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FinDSL Official Doris Physical Statistics",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_sha256", "collected_at", "doris_version", "resources"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "collected_at": {"type": "string", "format": "date-time"},
+    "doris_version": {"type": "string", "minLength": 1},
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["resource_id", "row_count", "data_size_bytes", "row_count_available"],
+        "properties": {
+          "resource_id": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+          "row_count": {"type": "integer", "minimum": 0},
+          "data_size_bytes": {"type": "integer", "minimum": 0},
+          "row_count_available": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

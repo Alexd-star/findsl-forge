@@ -4,6 +4,7 @@ from findsl.official.lowering import lower_official_ast
 from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
+from findsl.official.physical.statistics import PhysicalStatisticsSnapshot
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
 from findsl.official_slot import _resolve_indicator_meta, parse_official_slot
@@ -14,6 +15,19 @@ def _lower(source):
     return lower_official_ast(typed, domain_registry=default_official_registry())
 
 
+def _statistics(catalog, resources):
+    return PhysicalStatisticsSnapshot.from_dict(
+        {
+            "schema_version": 1,
+            "catalog_sha256": catalog.fingerprint,
+            "collected_at": "2026-07-11T16:00:00+08:00",
+            "doris_version": "4.1.0",
+            "resources": resources,
+        },
+        catalog,
+    )
+
+
 def test_direct_indicator_candidate_is_selected_with_trace():
     result = plan_physical(_lower("indicator('', '', '成交量', '', '', '', '') > 100"), default_physical_catalog())
 
@@ -21,6 +35,80 @@ def test_direct_indicator_candidate_is_selected_with_trace():
     assert result.selected_resource == "official_basic"
     assert result.decisions[0].feasible is True
     assert result.decisions[0].estimated is True
+
+
+def test_real_statistics_replace_priority_with_auditable_scan_bytes():
+    catalog = default_physical_catalog()
+    statistics = _statistics(
+        catalog,
+        [
+            {
+                "resource_id": "official_basic",
+                "row_count": 13650347,
+                "data_size_bytes": 411096137,
+                "row_count_available": True,
+            }
+        ],
+    )
+
+    result = plan_physical(
+        _lower("indicator('', '', '成交量', '', '', '', '') > 100"),
+        catalog,
+        statistics=statistics,
+    )
+
+    decision = result.decisions[0]
+    assert decision.cost == 411096137.0
+    assert decision.cost_unit == "bytes"
+    assert decision.cost_components == (("official_basic", 411096137.0),)
+    assert decision.estimated is False
+    assert decision.reason_code == "PHYSICAL_STATISTICS_CANDIDATE_SELECTED"
+
+
+def test_anchored_resource_cost_includes_primary_and_anchor_scan_bytes():
+    catalog = default_physical_catalog()
+    statistics = _statistics(
+        catalog,
+        [
+            {"resource_id": "official_basic", "row_count": 10, "data_size_bytes": 400, "row_count_available": True},
+            {"resource_id": "official_ext", "row_count": 8, "data_size_bytes": 300, "row_count_available": True},
+        ],
+    )
+
+    result = plan_physical(
+        _lower("indicator('', '', '主力净流入', '', '', '', '') > 0"),
+        catalog,
+        statistics=statistics,
+    )
+
+    assert result.decisions[0].cost == 700.0
+    assert result.decisions[0].cost_components == (
+        ("official_ext", 300.0),
+        ("official_basic", 400.0),
+    )
+
+
+def test_incomplete_statistics_fall_back_to_explicit_estimated_priority():
+    catalog = default_physical_catalog()
+    statistics = _statistics(
+        catalog,
+        [
+            {"resource_id": "official_ext", "row_count": 8, "data_size_bytes": 300, "row_count_available": True},
+        ],
+    )
+
+    result = plan_physical(
+        _lower("indicator('', '', '主力净流入', '', '', '', '') > 0"),
+        catalog,
+        statistics=statistics,
+    )
+
+    decision = result.decisions[0]
+    assert decision.cost == 20.0
+    assert decision.cost_unit == "catalog_priority"
+    assert decision.cost_components == ()
+    assert decision.estimated is True
+    assert decision.reason_code == "PHYSICAL_STATISTICS_INCOMPLETE"
 
 
 def test_limit_is_preserved_in_physical_plan():

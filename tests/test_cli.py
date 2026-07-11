@@ -4,6 +4,67 @@ import subprocess
 import sys
 
 
+def test_cli_official_physical_stats_writes_versioned_snapshot(tmp_path, monkeypatch, capsys):
+    from findsl import cli
+    from findsl.official.physical.catalog import default_physical_catalog
+    from findsl.official.physical.statistics import PhysicalStatisticsSnapshot
+    import findsl.official.physical.statistics as statistics_module
+
+    output = tmp_path / "physical_statistics.json"
+    catalog = default_physical_catalog()
+    snapshot = PhysicalStatisticsSnapshot.from_dict(
+        {
+            "schema_version": 1,
+            "catalog_sha256": catalog.fingerprint,
+            "collected_at": "2026-07-11T16:00:00+08:00",
+            "doris_version": "4.1.0",
+            "resources": [
+                {"resource_id": "official_basic", "row_count": 10, "data_size_bytes": 400, "row_count_available": True},
+            ],
+        },
+        catalog,
+    )
+    seen = {}
+
+    def collect(received_catalog, config):
+        seen["host"] = config.host
+        seen["port"] = config.port
+        return snapshot
+
+    monkeypatch.setattr(statistics_module, "collect_physical_statistics", collect)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "findsl",
+            "official-physical-stats",
+            "--output",
+            str(output),
+            "--host",
+            "doris.local",
+            "--port",
+            "19030",
+            "--json",
+        ],
+    )
+
+    cli.main()
+
+    payload = json.loads(capsys.readouterr().out)
+    assert seen == {"host": "doris.local", "port": 19030}
+    assert payload["schema_version"] == 1
+    assert output.exists()
+
+
+def test_official_physical_cli_path_uses_real_statistics_by_default():
+    from findsl.cli import _build_official_physical
+
+    result = _build_official_physical("indicator('', '', '成交量', '', '', '', '') > 100")
+
+    assert result.decisions[0].estimated is False
+    assert result.decisions[0].cost_unit == "bytes"
+
+
 def test_cli_evaluate_returns_nonzero_when_cases_fail(tmp_path):
     cases = tmp_path / "cases.jsonl"
     cases.write_text(

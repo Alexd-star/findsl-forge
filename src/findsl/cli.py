@@ -29,6 +29,7 @@ def _build_official_physical(dsl: str):
     from .official.lowering import lower_official_ast
     from .official.physical.catalog import default_physical_catalog
     from .official.physical.planner import plan_physical
+    from .official.physical.statistics import default_physical_statistics
     from .official.registry import default_official_registry
     from .official.semantics import OfficialSemanticAnalyzer
     from .official_slot import _resolve_indicator_meta, parse_official_slot_with_diagnostics
@@ -36,7 +37,8 @@ def _build_official_physical(dsl: str):
     parsed = parse_official_slot_with_diagnostics(dsl, mode="strict", frontend="antlr")
     typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(parsed.ast)
     logical = lower_official_ast(typed, strict=True, domain_registry=default_official_registry())
-    return plan_physical(logical, default_physical_catalog())
+    catalog = default_physical_catalog()
+    return plan_physical(logical, catalog, statistics=default_physical_statistics(catalog))
 
 
 def main() -> None:
@@ -98,6 +100,16 @@ def main() -> None:
     official_physical_cmd = sub.add_parser("official-slot-physical", help="Build a validated Doris physical plan")
     official_physical_cmd.add_argument("dsl")
     official_physical_cmd.add_argument("--json", action="store_true")
+    official_stats_cmd = sub.add_parser("official-physical-stats", help="Collect versioned Doris physical statistics")
+    official_stats_cmd.add_argument("--output", required=True)
+    official_stats_cmd.add_argument("--host", default="127.0.0.1")
+    official_stats_cmd.add_argument("--port", type=int, default=9030)
+    official_stats_cmd.add_argument("--user", default="root")
+    official_stats_cmd.add_argument("--password-env", default="DORIS_PASSWORD")
+    official_stats_cmd.add_argument("--database", default="newzl")
+    official_stats_cmd.add_argument("--client", default="mysql")
+    official_stats_cmd.add_argument("--query-timeout", type=float, default=30.0)
+    official_stats_cmd.add_argument("--json", action="store_true")
     official_backend_cmd = sub.add_parser("official-slot-backend", help="Render validated SQLGlot Doris SQL")
     official_backend_cmd.add_argument("dsl")
     official_backend_cmd.add_argument("--json", action="store_true")
@@ -458,6 +470,29 @@ def main() -> None:
         write_official_domain_evidence(evidence, args.json_output, args.report_output)
         print(f"Domain gate: {'PASS' if evidence['gate']['passed'] else 'FAIL'}")
         print(f"Domain lowering: {evidence['domain_lowering_ok']}/{evidence['row_count']}")
+    elif args.command == "official-physical-stats":
+        import os
+
+        from .official.backend.executor import DorisExecutionConfig
+        from .official.physical.catalog import default_physical_catalog
+        from .official.physical.statistics import collect_physical_statistics
+
+        config = DorisExecutionConfig(
+            host=args.host,
+            port=args.port,
+            user=args.user,
+            password=os.environ.get(args.password_env, ""),
+            database=args.database,
+            mysql_executable=args.client,
+            timeout_seconds=args.query_timeout,
+        )
+        snapshot = collect_physical_statistics(default_physical_catalog(), config)
+        snapshot.write(Path(args.output))
+        if args.json:
+            print(json.dumps(snapshot.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(f"Doris version: {snapshot.doris_version}")
+            print(f"Physical resources: {len(snapshot.resources)}")
     elif args.command == "official-slot-physical":
         result = _build_official_physical(args.dsl)
         payload = {

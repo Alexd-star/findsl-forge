@@ -10,7 +10,9 @@ Phase 5 在既有 ANTLR 前端、Typed AST、Logical IR 和领域绑定层之后
 
 物理目录位于 `configs/official/physical_catalog.json`，JSON Schema 位于同目录。目录只保存数据库、表、列、逻辑类型、稳定键、锚资源、资源能力和优先级，不保存可执行 SQL 片段。当前受控资源包括行情基础表、行情扩展表、证券信息表和技术特征表，共映射 125 个直接字段。扩展行情、证券信息和技术特征资源以基础行情表为全集锚点，按实际共有稳定键连接；证券信息表本身没有 `bizdate`，该事实已在目录中显式记录，不再假定不存在的日期列。
 
-`src/findsl/official/physical/planner.py` 负责候选选择。首版规划器只接受单资源、直接指标、标量运算、比较、布尔条件、范围条件和 limit。代价使用物理目录优先级；由于目录尚未接入 Doris 统计信息，决策记录会明确写出 `estimated=True`，不会虚构行数或选择率。
+`src/findsl/official/physical/planner.py` 负责候选选择。当前规划器接受单主资源、目录声明的锚资源、直接指标、标量运算、比较、布尔条件、范围条件和 limit。Phase 6A 已接入 `configs/official/physical_statistics.json`：统计快照由 Doris `SHOW TABLE STATS`、`SHOW DATA` 和 `SHOW FRONTENDS` 生成，并用物理目录 SHA-256 指纹绑定。行数和存储量完整可用时，成本等于主资源和必要锚资源的实际存储字节数之和，决策写为 `estimated=False`；统计缺失时回退到目录优先级并明确写为 `estimated=True`。当前 Doris 的列级分析时间为空，因此快照只声明 `row_count_available`，不声称已经完成列统计 ANALYZE。
+
+当前成本模型刻意不估算未知的过滤选择率、分区数、网络交换、并发和缓存命中，也不把存储字节直接解释为查询时延。这个保守边界使每个数字都能追溯到 Doris 元数据。Phase 6B 引入前缀表与多物理实现后，同一逻辑指标的候选将复用该成本接口排序。
 
 `src/findsl/official/backend/doris.py` 将 Physical IR 转成 SQLGlot 表达式。表名、列名和字面量分别使用 SQLGlot 的标识符与 literal 节点，不接收旧后端 SQL 字符串。生成结果必须经过 Doris 方言 parse-render-parse、单条 SELECT 检查、物理资源白名单和既有安全 lint。
 
@@ -69,6 +71,7 @@ Phase 5 在既有 ANTLR 前端、Typed AST、Logical IR 和领域绑定层之后
 ```powershell
 python -m findsl.cli official-slot-physical "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
 python -m findsl.cli official-slot-backend "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
+python -m findsl.cli official-physical-stats --output configs/official/physical_statistics.json --host 127.0.0.1 --port 9030 --user root --database newzl --json
 python -m findsl.cli official-backend-evidence --workbook "D:\path\to\选股提槽实例.xlsx" --json-output reports/official_backend_evidence.json --report-output reports/official_backend_evidence.md
 python -m findsl.cli official-backend-evidence --workbook "D:\path\to\选股提槽实例.xlsx" --json-output reports/official_backend_evidence.json --report-output reports/official_backend_evidence.md --execute-doris --host 127.0.0.1 --port 9030 --user root --database newzl
 ```
