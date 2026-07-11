@@ -3,31 +3,34 @@
   "row_count": 5799,
   "typed_ok": 5695,
   "logical_ok": 1322,
-  "physical_ok": 151,
-  "sqlglot_ok": 151,
-  "safety_ok": 151,
+  "physical_ok": 28,
+  "sqlglot_ok": 28,
+  "safety_ok": 28,
   "resources": {
-    "official_basic": 55,
-    "official_ext": 44,
-    "official_security": 39,
-    "official_technical": 13
+    "official_security": 16,
+    "official_ext": 6,
+    "official_basic": 4,
+    "official_technical": 2
   },
   "errors": {
     "DOMAIN_DATA_UNAVAILABLE": 3819,
-    "PHYSICAL_PLAN_UNAVAILABLE": 747,
+    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 512,
     "DOMAIN_CAPABILITY_UNSUPPORTED": 430,
-    "PHYSICAL_EXPRESSION_UNSUPPORTED": 215,
+    "PHYSICAL_PLAN_UNAVAILABLE": 334,
+    "PHYSICAL_EXPRESSION_UNSUPPORTED": 198,
     "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED": 188,
     "UNSUPPORTED_LOGICAL_LOWERING": 124,
     "OFFICIAL_TYPE_ERROR": 97,
-    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 15,
-    "PHYSICAL_APPROXIMATION_POLICY_MISSING": 6,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 30,
+    "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED": 23,
+    "PHYSICAL_APPROXIMATION_POLICY_MISSING": 5,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
+    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 4,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2
   },
   "latency_ms": {
-    "p50": 2.4996,
-    "p95": 6.7379
+    "p50": 2.7253,
+    "p95": 7.4971
   },
   "samples": [
     {
@@ -129,8 +132,8 @@
     {
       "excel_row": 18,
       "stage": "physical",
-      "code": "PHYSICAL_PLAN_UNAVAILABLE",
-      "message": "no controlled physical mapping for indicator 最高价"
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "message": "physical planner cannot yet materialize non-empty slot(s): select_type"
     },
     {
       "excel_row": 19,
@@ -161,5 +164,5 @@
   },
   "workbook": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
   "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
-  "git_head": "258f9579424c2a4256d512eb43e58fd7a2c05aa8"
+  "git_head": "586e1f86b8732d24226c36ef61a5069745c53d82"
 }
