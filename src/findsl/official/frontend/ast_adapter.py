@@ -4,7 +4,7 @@ from typing import Any, Iterable
 
 from antlr4 import ParserRuleContext
 
-from ...official_slot import (
+from ..ast import (
     OfficialBinaryOp,
     OfficialComparison,
     OfficialFunctionCall,
@@ -13,8 +13,8 @@ from ...official_slot import (
     OfficialLiteral,
     OfficialNode,
     OfficialRangeLiteral,
-    _parse_range_text,
 )
+from ...official_slot import _parse_range_text
 from .generated.OfficialSlotParser import OfficialSlotParser
 from .generated.OfficialSlotVisitor import OfficialSlotVisitor
 from .protocol import SourceMap, SourceSpan
