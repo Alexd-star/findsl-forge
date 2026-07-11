@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "workbook": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
+  "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
+  "git_head": "e4188c6487778b3f844acc0ecc9ec6f9b12085f5",
+  "row_count": 5799,
+  "strict_parse_ok": 5792,
+  "typed_ok": 5695,
+  "lowering_ok": 2034,
+  "validated_plan_count": 2034,
+  "strict_compile_ok": 1097,
+  "typed_errors": {
+    "OFFICIAL_ANTLR_LEX_ERROR": 5,
+    "OFFICIAL_ANTLR_PARSE_ERROR": 2,
+    "OFFICIAL_TYPE_ERROR": 97
+  },
+  "lowering_errors": {
+    "UNSUPPORTED_LOGICAL_LOWERING": 3661
+  },
+  "node_kinds": {
+    "string": 39567,
+    "LiteralExpr": 33068,
+    "boolean": 6421,
+    "numeric": 5442,
+    "CallExpr": 4111,
+    "ComparisonExpr": 3240,
+    "LogicalScan": 2153,
+    "LogicalFilter": 1893,
+    "BinaryExpr": 1503,
+    "LogicalRank": 379,
+    "RangeExpr": 142,
+    "range": 142,
+    "LogicalLimit": 141,
+    "LogicalStage": 119,
+    "time": 4
+  },
+  "function_coverage": {
+    "indicator": 1475,
+    "rank": 693,
+    "cross_above": 84,
+    "record_high": 65,
+    "queryData": 62,
+    "position": 52,
+    "record_low": 40,
+    "cross_down": 36,
+    "belong_industry": 30,
+    "reset": 28,
+    "golden_cross": 26,
+    "close_together": 17
+  },
+  "deterministic_hash_checks": 100,
+  "deterministic_hash_mismatches": 0,
+  "latency_ms": {
+    "p50": 0.035,
+    "p95": 0.0713
+  },
+  "samples": [
+    {
+      "excel_row": 2,
+      "input_sha256": "c8b57d250e14c6ca3782ec45a8200ee0d87a38b9406ff874e02555c579a58b5e",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 3,
+      "input_sha256": "fe2e059686faccdc06172c5eb2cddedb66b485d056e6a6630e5774b4d3732128",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 4,
+      "input_sha256": "7d6f43ce7a8e1e761eed4b489e5c2a77b978746a9145f3921a8c95f5ea0f5213",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 5,
+      "input_sha256": "5e73658685984e4fdd0529ae29530800119ab9b0a88369c0463b58e3ebe6b039",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 6,
+      "input_sha256": "1b4af1ae0d54ce12fe9848838643704632aeeaf36a827ace180bf1fa409405c4",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 7,
+      "input_sha256": "5434d6d3499cf70b072d3acd79dc18c658ef014ccd0da1f6938365c636f80479",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 8,
+      "input_sha256": "5bd4443e3649d05bef5bda8c2b5c592cd3c75188a6402bf4be3f26c82fbc4e2e",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 9,
+      "input_sha256": "0e46571c6530079b454f1f8e4d449eeffff0b1da400ca61de090968ed680acd0",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 10,
+      "input_sha256": "6bb8c8c3b727fb3019a3ff308dfa50259885fb0bea5c9d0ac5846dc1c35bdfdc",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 11,
+      "input_sha256": "c242ae16d9a16d3cb3e4accc64c8b46890d55744d6d76ff98749245166cd304c",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 12,
+      "input_sha256": "79321ca9f37abed7ed751534d3b85c54010e2534dfe135bf32a6b2094756066c",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 14,
+      "input_sha256": "a42310289589b0489782e4dd453fc86266ceb801b31ecb3c13bba0be95112e14",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 15,
+      "input_sha256": "84b9bb993b800a769cfcc05e6542e697893295aa2ec559e98b82affebfc62a58",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 17,
+      "input_sha256": "ec6ec8d9dfa5ed00789c447df93ffcb1989f24641c17b29b2b31f7ef194dceb4",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 19,
+      "input_sha256": "f30d1cdb42a4a0c5f6dbe7df5511b8d41f2dfd122ef15073b9bb3b62f7c71c41",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 21,
+      "input_sha256": "5796d9d8db22909688d1348fbfc8a30f425f12683713f26d73049169f3b61703",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 22,
+      "input_sha256": "30905f193bbd530f3b9a437260f2bbfddb2efd37697553150c9f3c70b16b7f56",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 23,
+      "input_sha256": "1ce5c7b97818ef96852a83d676f3fbd12146c42b4297a751f7277be3cd26a18c",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 24,
+      "input_sha256": "76cc4781f73f5802429b7fb1f6a838945efe4cc02f31ff820f279953959f1cf1",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    },
+    {
+      "excel_row": 25,
+      "input_sha256": "748bcade97f4e67372f88aa52460e11f3f2609f2338e72013c3c866a16351d1b",
+      "code": "UNSUPPORTED_LOGICAL_LOWERING",
+      "message": "unknown expression type"
+    }
+  ],
+  "gate": {
+    "passed": true,
+    "strict_parse_floor": 5792,
+    "strict_compile_floor": 1097
+  }
+}
