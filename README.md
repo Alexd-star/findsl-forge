@@ -114,6 +114,8 @@ The official compiler now exposes an immutable Typed AST and a SQL-free logical 
 
 Phase 4 adds a schema-validated official indicator registry, domain binding, SQL-free financial-domain nodes, and a deterministic rule optimizer. The registry distinguishes 197 provided/derived static indicators from workbook indicators whose required data domains are absent, so missing financial/fund/index data reports `DOMAIN_DATA_UNAVAILABLE` instead of becoming fake SQL. `official-slot-optimize` exposes the domain requirements and rewrite trace; `official-domain-evidence` audits all 5,799 official rows. See `docs/39_领域IR注册表与规则优化器说明.md`.
 
+Phase 5 adds a schema-validated physical catalog, bounded Doris candidate planner, validated Physical IR, and a SQLGlot-only Doris AST backend. The shadow backend currently produces 151 directly grounded single-resource plans on the 5,799 official rows; all 151 round-trip in the Doris dialect and pass the existing SELECT safety lint. Missing domains, derived expressions without controlled strategies, cross-resource plans, and approximate comparisons without catalog tolerances remain explicit failures rather than fake SQL. Use `official-slot-physical`, `official-slot-backend`, and `official-backend-evidence`; see `docs/40_Doris物理规划与SQL_AST后端说明.md`.
+
 If running from the repository root without installing the package:
 
 ```powershell
