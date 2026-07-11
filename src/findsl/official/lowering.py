@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from time import perf_counter_ns
-from typing import FrozenSet, List
+from typing import FrozenSet, List, Optional, Tuple
 
 from .ast import (
     OfficialBinaryOp,
@@ -22,6 +22,7 @@ from .ir import (
     FieldRef,
     LiteralExpr,
     LogicalFilter,
+    LogicalDomainScan,
     LogicalLimit,
     LogicalRank,
     LogicalScan,
@@ -33,6 +34,9 @@ from .ir.relational import LogicalPlan
 from .ir.validate import OfficialIrError, validate_plan
 from .typed_ast import TypedNode
 from .types import BOOLEAN, STRING, UNKNOWN, RangeType
+from .domain.binder import BoundFunction, DomainBindingError, bind_function
+from .domain.expressions import DataRequirement
+from .registry import OfficialIndicatorRegistry
 
 
 class OfficialLoweringError(ValueError):
@@ -47,6 +51,7 @@ class LoweringResult:
     required_functions: FrozenSet[str]
     validation_passed: bool
     elapsed_ns: int
+    domain_bindings: Tuple[BoundFunction, ...] = ()
 
     def to_dict(self):
         return {
@@ -55,6 +60,7 @@ class LoweringResult:
             "required_functions": sorted(self.required_functions),
             "validation_passed": self.validation_passed,
             "elapsed_ns": self.elapsed_ns,
+            "domain_bindings": [binding.to_dict() for binding in self.domain_bindings],
         }
 
 
@@ -66,20 +72,47 @@ DEFAULT_SCHEMA = Schema(
 )
 
 
-def lower_official_ast(typed: TypedNode, *, strict: bool = True) -> LoweringResult:
+def lower_official_ast(
+    typed: TypedNode,
+    *,
+    strict: bool = True,
+    domain_registry: Optional[OfficialIndicatorRegistry] = None,
+) -> LoweringResult:
     started = perf_counter_ns()
     functions = frozenset(
         item.name for item in walk(typed.node) if isinstance(item, OfficialFunctionCall)
     )
+    bindings: Tuple[BoundFunction, ...] = ()
     try:
-        plan = _lower_root(typed, LogicalScan("market_observation", DEFAULT_SCHEMA))
+        if domain_registry is None:
+            scan = LogicalScan("market_observation", DEFAULT_SCHEMA)
+        else:
+            bindings = tuple(
+                bind_function(node, domain_registry)
+                for node in _walk_typed(typed)
+                if isinstance(node.node, OfficialFunctionCall)
+            )
+            requirement = DataRequirement(
+                frozenset(domain for binding in bindings for domain in binding.requirement.domains),
+                frozenset(capability for binding in bindings for capability in binding.requirement.capabilities),
+            )
+            scan = LogicalDomainScan("market_observation", requirement, DEFAULT_SCHEMA)
+        plan = _lower_root(typed, scan)
         validate_plan(plan, strict=strict)
+    except DomainBindingError as exc:
+        raise OfficialLoweringError(exc.code, str(exc)) from exc
     except (OfficialIrError, KeyError, TypeError, ValueError) as exc:
         if isinstance(exc, OfficialLoweringError):
             raise
         detail = f"{getattr(exc, 'code', type(exc).__name__)}: {exc}"
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", detail) from exc
-    return LoweringResult(plan, functions, True, perf_counter_ns() - started)
+    return LoweringResult(plan, functions, True, perf_counter_ns() - started, bindings)
+
+
+def _walk_typed(node: TypedNode):
+    yield node
+    for child in node.children:
+        yield from _walk_typed(child)
 
 
 def _lower_root(typed: TypedNode, scan: LogicalPlan) -> LogicalPlan:
