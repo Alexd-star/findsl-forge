@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import Optional, Tuple
 
 from ..ir import (
@@ -21,6 +22,8 @@ from .ir import (
     PhysicalColumn,
     PhysicalComparison,
     PhysicalFilter,
+    PhysicalIn,
+    PhysicalLatestValue,
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalPlan,
@@ -105,6 +108,7 @@ def _collect_fields(plan, catalog: PhysicalCatalog) -> Tuple[PhysicalField, ...]
         for call in _walk_calls(expression):
             if call.name != "indicator" or call.binding is None:
                 raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {call.name}")
+            _reject_unmaterialized_constraints(call)
             indicator_id = call.binding.slots.get("indicator_name", "")
             try:
                 fields.append(catalog.indicator(indicator_id))
@@ -136,6 +140,20 @@ def _walk_calls(expression):
     elif isinstance(expression, RangeExpr):
         yield from _walk_calls(expression.lower)
         yield from _walk_calls(expression.upper)
+
+
+def _reject_unmaterialized_constraints(call: CallExpr) -> None:
+    ignored = {
+        slot: value
+        for slot, value in call.binding.slots.items()
+        if slot not in {"indicator_name", "market", "date"} and str(value).strip()
+    }
+    if ignored:
+        names = ", ".join(sorted(ignored))
+        raise PhysicalPlanningError(
+            "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+            f"physical planner cannot yet materialize non-empty slot(s): {names}",
+        )
 
 
 def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[PhysicalField, ...]) -> PhysicalPlan:
@@ -192,17 +210,19 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str):
             upper = _lower_expr(expression.right.upper, catalog, resource_id)
             lower_op = ">=" if expression.right.lower_inclusive else ">"
             upper_op = "<=" if expression.right.upper_inclusive else "<"
-            return PhysicalBinary(
+            result = PhysicalBinary(
                 "and",
                 PhysicalComparison(lower_op, value, lower),
                 PhysicalComparison(upper_op, value, upper),
                 BOOLEAN,
             )
-        return PhysicalComparison(
-            expression.op,
-            _lower_expr(expression.left, catalog, resource_id),
-            _lower_expr(expression.right, catalog, resource_id),
-        )
+        else:
+            result = PhysicalComparison(
+                expression.op,
+                _lower_expr(expression.left, catalog, resource_id),
+                _lower_expr(expression.right, catalog, resource_id),
+            )
+        return _apply_call_constraints(result, expression, catalog, resource_id)
     raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported expression {type(expression).__name__}")
 
 
@@ -211,6 +231,60 @@ def _physical_type(field: PhysicalField) -> OfficialType:
         return _TYPE_MAP[field.value_type]
     except KeyError as exc:
         raise PhysicalPlanningError("PHYSICAL_TYPE_UNSUPPORTED", f"unsupported physical type {field.value_type}") from exc
+
+
+def _apply_call_constraints(predicate, logical_expression, catalog: PhysicalCatalog, resource_id: str):
+    constraints = []
+    seen = set()
+    for call in _walk_calls(logical_expression):
+        for constraint in _call_constraints(call, catalog, resource_id):
+            if constraint.node_id not in seen:
+                constraints.append(constraint)
+                seen.add(constraint.node_id)
+    result = predicate
+    for constraint in constraints:
+        result = PhysicalBinary("and", result, constraint, BOOLEAN)
+    return result
+
+
+def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str):
+    if call.binding is None:
+        return ()
+    constraints = []
+    market = str(call.binding.slots.get("market", "")).strip()
+    if market:
+        codes = _market_codes(market)
+        constraints.append(
+            PhysicalIn(
+                PhysicalColumn(resource_id, "mktcode", NUMERIC),
+                tuple(PhysicalLiteral(code, NUMERIC) for code in codes),
+            )
+        )
+    date = str(call.binding.slots.get("date", "")).strip()
+    if date:
+        partition_key = catalog.resource(resource_id).partition_key
+        column = PhysicalColumn(resource_id, partition_key, TIME)
+        if date in {"今日", "今天", "当前", "最新"}:
+            value = PhysicalLatestValue(resource_id, partition_key, TIME)
+        elif re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+            value = PhysicalLiteral(date, TIME)
+        else:
+            raise PhysicalPlanningError(
+                "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+                f"date constraint requires normalization before physical planning: {date}",
+            )
+        constraints.append(PhysicalComparison("=", column, value))
+    return tuple(constraints)
+
+
+def _market_codes(value: str) -> Tuple[int, ...]:
+    mapping = {"沪": (0,), "深": (1,), "京": (103,), "沪深": (0, 1), "A股": (0, 1), "沪深京": (0, 1, 103)}
+    codes = []
+    for item in (part.strip() for part in re.split(r"[|&,，]", value) if part.strip()):
+        if item.startswith("^") or item not in mapping:
+            raise PhysicalPlanningError("PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED", f"unsupported market constraint: {item}")
+        codes.extend(mapping[item])
+    return tuple(sorted(set(codes)))
 
 
 def _deduplicate_fields(fields: Tuple[PhysicalField, ...]) -> Tuple[PhysicalField, ...]:

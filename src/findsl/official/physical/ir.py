@@ -52,6 +52,26 @@ class PhysicalComparison(PhysicalExpr):
         return {"kind": "PhysicalComparison", "op": self.op, "left": self.left.to_dict(), "right": self.right.to_dict(), "type": self.type.to_dict()}
 
 
+@dataclass(frozen=True)
+class PhysicalIn(PhysicalExpr):
+    expression: PhysicalExpr
+    values: Tuple[PhysicalLiteral, ...]
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {"kind": "PhysicalIn", "expression": self.expression.to_dict(), "values": [value.to_dict() for value in self.values], "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
+class PhysicalLatestValue(PhysicalExpr):
+    resource_id: str
+    column: str
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalLatestValue", "resource_id": self.resource_id, "column": self.column, "type": self.type.to_dict()}
+
+
 class PhysicalPlan(CanonicalIr):
     pass
 

@@ -20,7 +20,7 @@ def _physical(source):
 
 def test_direct_filter_and_limit_render_as_stable_doris_select_ast():
     result = render_doris(
-        _physical("indicator('', '', '成交量', '今日', '', '', '') > 100 limit 0,20"),
+        _physical("indicator('', '', '成交量', '', '', '', '') > 100 limit 0,20"),
         default_physical_catalog(),
     )
 
@@ -51,7 +51,7 @@ def test_backend_uses_sqlglot_literal_escaping():
 
 def test_between_is_lowered_to_auditable_bounded_comparisons():
     result = render_doris(
-        _physical("indicator('', '', '成交量', '今日', '', '', '') between [1, 5]"),
+        _physical("indicator('', '', '成交量', '', '', '', '') between [1, 5]"),
         default_physical_catalog(),
     )
 
@@ -59,3 +59,15 @@ def test_between_is_lowered_to_auditable_bounded_comparisons():
     assert isinstance(where, exp.And)
     assert isinstance(where.this, exp.GTE)
     assert isinstance(where.expression, exp.LTE)
+
+
+def test_latest_date_and_market_constraints_render_as_sqlglot_ast():
+    result = render_doris(
+        _physical("indicator('沪|深', '', '成交量', '今日', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.Max))) == 1
+    assert "`q`.`mktcode` IN (0, 1)" in result.sql
+    assert result.validation.passed is True

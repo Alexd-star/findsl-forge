@@ -10,6 +10,8 @@ from ..physical.ir import (
     PhysicalColumn,
     PhysicalComparison,
     PhysicalFilter,
+    PhysicalIn,
+    PhysicalLatestValue,
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalPlan,
@@ -76,31 +78,38 @@ def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
         table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q")
         query = exp.select(*projections).from_(table)
         if plan.partition_predicate is not None:
-            query = query.where(_render_expr(plan.partition_predicate))
+            query = query.where(_render_expr(plan.partition_predicate, catalog))
         return query
     if isinstance(plan, PhysicalFilter):
-        return _render_plan(plan.input, catalog).where(_render_expr(plan.predicate))
+        return _render_plan(plan.input, catalog).where(_render_expr(plan.predicate, catalog))
     if isinstance(plan, PhysicalLimit):
         query = _render_plan(plan.input, catalog).limit(plan.count)
         return query.offset(plan.offset) if plan.offset else query
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
 
 
-def _render_expr(expression):
+def _render_expr(expression, catalog: PhysicalCatalog):
     if isinstance(expression, PhysicalColumn):
         return exp.column(expression.column, table="q", quoted=True)
     if isinstance(expression, PhysicalLiteral):
         return exp.convert(expression.value)
+    if isinstance(expression, PhysicalIn):
+        return exp.In(this=_render_expr(expression.expression, catalog), expressions=[_render_expr(value, catalog) for value in expression.values])
+    if isinstance(expression, PhysicalLatestValue):
+        resource = catalog.resource(expression.resource_id)
+        table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q_latest")
+        query = exp.select(exp.Max(this=exp.column(expression.column, table="q_latest", quoted=True))).from_(table)
+        return exp.Subquery(this=query)
     if isinstance(expression, PhysicalBinary):
         try:
             operator = _BINARY[expression.op.lower()]
         except KeyError as exc:
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported binary operator {expression.op}") from exc
-        return operator(this=_render_expr(expression.left), expression=_render_expr(expression.right))
+        return operator(this=_render_expr(expression.left, catalog), expression=_render_expr(expression.right, catalog))
     if isinstance(expression, PhysicalComparison):
         try:
             operator = _COMPARISON[expression.op]
         except KeyError as exc:
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported comparison operator {expression.op}") from exc
-        return operator(this=_render_expr(expression.left), expression=_render_expr(expression.right))
+        return operator(this=_render_expr(expression.left, catalog), expression=_render_expr(expression.right, catalog))
     raise DorisBackendError("DORIS_EXPRESSION_UNSUPPORTED", f"unsupported physical expression {type(expression).__name__}")

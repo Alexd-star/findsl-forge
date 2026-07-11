@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalRank, PhysicalScan, PhysicalWindow,
+    PhysicalIn, PhysicalLatestValue, PhysicalRank, PhysicalScan, PhysicalWindow,
 )
 from ..types import BOOLEAN
 
@@ -68,5 +68,15 @@ def _validate_expr(expression, catalog):
         allowed.update({"mktcode", "tgtcode", "bizdate", "name"})
         if expression.column not in allowed:
             raise PhysicalCatalogError(f"unknown column {expression.resource_id}.{expression.column}")
+    elif isinstance(expression, PhysicalLatestValue):
+        resource = catalog.resource(expression.resource_id)
+        if expression.column != resource.partition_key:
+            raise PhysicalCatalogError("latest value is restricted to the resource partition key")
+    elif isinstance(expression, PhysicalIn):
+        _validate_expr(expression.expression, catalog)
+        if not expression.values:
+            raise ValueError("physical IN requires at least one value")
+        for value in expression.values:
+            _validate_expr(value, catalog)
     elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
         _validate_expr(expression.left, catalog); _validate_expr(expression.right, catalog)

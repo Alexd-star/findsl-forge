@@ -4,7 +4,7 @@ import sys
 from findsl.cli import main
 
 
-DSL = "indicator('', '', '成交量', '今日', '', '', '') > 100"
+DSL = "indicator('', '', '成交量', '', '', '', '') > 100"
 
 
 def test_official_slot_physical_cli_outputs_selected_resource(monkeypatch, capsys):
