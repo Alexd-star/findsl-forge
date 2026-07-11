@@ -7,6 +7,8 @@ from .expressions import BinaryExpr, CallExpr, ComparisonExpr, FieldRef, Literal
 from .relational import (
     LogicalAggregate,
     LogicalFilter,
+    LogicalDomainScan,
+    LogicalEmpty,
     LogicalLimit,
     LogicalPlan,
     LogicalProject,
@@ -40,9 +42,12 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
     names = [field.name for field in plan.schema.fields]
     if len(names) != len(set(names)):
         _fail("IR_DUPLICATE_FIELD", "logical schema contains duplicate names", f"{path}.schema")
-    if isinstance(plan, LogicalScan):
+    if isinstance(plan, (LogicalScan, LogicalDomainScan)):
         if "." in plan.entity or plan.entity.lower().startswith("newzl"):
             _fail("IR_PHYSICAL_ENTITY", "logical scan must not name a physical table", f"{path}.entity")
+    elif isinstance(plan, LogicalEmpty):
+        if not plan.reason.startswith("PROVEN_"):
+            _fail("IR_EMPTY_REASON", "empty relation requires a proven logical reason", f"{path}.reason")
     else:
         _validate_plan(plan.input, f"{path}.input", strict, active)
     if isinstance(plan, LogicalFilter):

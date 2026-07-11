@@ -3,6 +3,8 @@ from .relational import (
     Field,
     LogicalAggregate,
     LogicalFilter,
+    LogicalDomainScan,
+    LogicalEmpty,
     LogicalLimit,
     LogicalProject,
     LogicalRank,

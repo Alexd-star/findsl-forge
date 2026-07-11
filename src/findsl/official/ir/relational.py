@@ -50,6 +50,25 @@ class LogicalScan(LogicalPlan):
 
 
 @dataclass(frozen=True)
+class LogicalDomainScan(LogicalPlan):
+    entity: str
+    requirements: Any
+    schema: Schema
+
+    def to_dict(self):
+        return _plan("LogicalDomainScan", self.schema, entity=self.entity, requirements=self.requirements.to_dict())
+
+
+@dataclass(frozen=True)
+class LogicalEmpty(LogicalPlan):
+    schema: Schema
+    reason: str
+
+    def to_dict(self):
+        return _plan("LogicalEmpty", self.schema, reason=self.reason)
+
+
+@dataclass(frozen=True)
 class LogicalFilter(LogicalPlan):
     input: LogicalPlan
     predicate: LogicalExpr
