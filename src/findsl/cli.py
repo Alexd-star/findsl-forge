@@ -73,6 +73,14 @@ def main() -> None:
     official_ir_evidence_cmd.add_argument("--json-output", required=True)
     official_ir_evidence_cmd.add_argument("--report-output", required=True)
     official_ir_evidence_cmd.add_argument("--sample-size", type=int, default=20)
+    official_optimize_cmd = sub.add_parser("official-slot-optimize", help="Bind and optimize one official DSL query")
+    official_optimize_cmd.add_argument("dsl")
+    official_optimize_cmd.add_argument("--json", action="store_true")
+    official_domain_cmd = sub.add_parser("official-domain-evidence", help="Audit domain binding and optimizer rules")
+    official_domain_cmd.add_argument("--workbook", required=True)
+    official_domain_cmd.add_argument("--json-output", required=True)
+    official_domain_cmd.add_argument("--report-output", required=True)
+    official_domain_cmd.add_argument("--sample-size", type=int, default=20)
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -396,6 +404,26 @@ def main() -> None:
         write_official_ir_evidence(evidence, args.json_output, args.report_output)
         print(f"IR gate: {'PASS' if evidence['gate']['passed'] else 'FAIL'}")
         print(f"Lowering: {evidence['lowering_ok']}/{evidence['row_count']}")
+    elif args.command == "official-slot-optimize":
+        from .official.lowering import lower_official_ast
+        from .official.optimizer import DEFAULT_RULES, Optimizer
+        from .official.registry import default_official_registry
+        from .official.semantics import OfficialSemanticAnalyzer
+        from .official_slot import _resolve_indicator_meta, parse_official_slot_with_diagnostics
+
+        parsed = parse_official_slot_with_diagnostics(args.dsl, mode="strict", frontend="antlr")
+        typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(parsed.ast)
+        lowered = lower_official_ast(typed, strict=True, domain_registry=default_official_registry())
+        optimized = Optimizer(DEFAULT_RULES).optimize(lowered.plan)
+        payload = {"lowering": lowered.to_dict(), "optimized": optimized.to_dict()}
+        print(json.dumps(payload, ensure_ascii=False, indent=2) if args.json else optimized.plan.canonical_json())
+    elif args.command == "official-domain-evidence":
+        from .official_domain_evidence import build_official_domain_evidence, write_official_domain_evidence
+
+        evidence = build_official_domain_evidence(args.workbook, sample_size=args.sample_size)
+        write_official_domain_evidence(evidence, args.json_output, args.report_output)
+        print(f"Domain gate: {'PASS' if evidence['gate']['passed'] else 'FAIL'}")
+        print(f"Domain lowering: {evidence['domain_lowering_ok']}/{evidence['row_count']}")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 
