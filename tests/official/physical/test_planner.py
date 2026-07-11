@@ -104,3 +104,29 @@ def test_query_data_uses_the_same_controlled_direct_field_mapping():
 
     assert isinstance(result.plan, PhysicalFilter)
     assert result.selected_resource == "official_basic"
+
+
+def test_filter_then_rank_stage_lowers_operation_chain_once():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > 0 "
+            "then rank('', '', '成交量', 'desc', '', '', '', '') <= 10"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRank)
+    assert isinstance(result.plan.input, PhysicalFilter)
+    assert result.plan.canonical_json().count('"kind":"PhysicalScan"') == 1
+
+
+def test_chained_rank_is_rejected_until_stage_alias_propagation_is_implemented():
+    source = (
+        "indicator('', '', '成交量', '', '', '', '') > 0 "
+        "then rank('', '', '成交量', 'desc', '', '', '', '') <= 10 "
+        "then rank('', '', '成交量', 'asc', '', '', '', '') <= 5"
+    )
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(_lower(source), default_physical_catalog())
+
+    assert excinfo.value.code == "PHYSICAL_CHAINED_RANK_UNSUPPORTED"

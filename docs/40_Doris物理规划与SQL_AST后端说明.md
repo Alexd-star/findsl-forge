@@ -24,15 +24,17 @@ Phase 5 在既有 ANTLR 前端、Typed AST、Logical IR 和领域绑定层之后
 |---|---:|---|
 | Typed AST | 5,695 | 严格 ANTLR 输入完成类型分析 |
 | Logical IR | 1,322 | 完成数据域绑定和逻辑 lowering |
-| Physical IR | 34 | 能由当前受控物理目录和首版单资源规划器准确落地 |
-| SQLGlot round-trip | 34 | 生成 SQL 可由 Doris 方言稳定解析和重绘 |
-| 安全 lint | 34 | 全部生成 SQL 为单条受控 SELECT |
+| Physical IR | 35 | 能由当前受控物理目录和首版单资源规划器准确落地 |
+| SQLGlot round-trip | 35 | 生成 SQL 可由 Doris 方言稳定解析和重绘 |
+| 安全 lint | 35 | 全部生成 SQL 为单条受控 SELECT |
 
-静态门禁为 PASS，因为所有进入 Physical IR 的计划都完整通过 SQLGlot 与安全检查。`34/5799` 不是赛题整体正确率，也不是旧编译器覆盖率，更不代表只有 34 条业务需求可处理；它表示新影子后端当前已经建立端到端、无语义降级的最小可信集合。
+静态门禁为 PASS，因为所有进入 Physical IR 的计划都完整通过 SQLGlot 与安全检查。`35/5799` 不是赛题整体正确率，也不是旧编译器覆盖率，更不代表只有 35 条业务需求可处理；它表示新影子后端当前已经建立端到端、无语义降级的最小可信集合。
 
 首轮审计曾记录 151 条，但复核发现其中多数问句含市场、日期、行业或聚合槽位，而早期规划器没有把这些约束写入 Physical IR。该口径已作废。当前实现会物理化受支持的沪深京市场集合和“今日/当前/最新”最大交易日约束，其他非空槽位统一返回结构化错误。覆盖数字因此下降，但消除了漏条件生成 SQL 的语义风险。
 
 直接数值排名已进入受控子集。Logical IR 会保留原始排名比较符，Physical IR 使用显式 Rank 节点；SQLGlot 后端在子查询中按 `bizdate` 分区生成 `ROW_NUMBER()`，并在外层查询过滤名次，避免窗口函数进入 WHERE。百分位、聚合排名和 count_exp 尚未纳入该子集。
+
+首个 `filter then rank` 阶段已经支持。LogicalStage 的 operation 自身包含完整前序链，物理 lowering 只处理 operation 一次，因此不会重复扫描或重复应用前序过滤。连续两个 rank 仍返回 `PHYSICAL_CHAINED_RANK_UNSUPPORTED`，直到后端能够显式传播上一阶段输出列与别名。
 
 主要拒绝项包括 3,819 条 `DOMAIN_DATA_UNAVAILABLE`、747 条缺少受控直接物理映射、430 条领域能力暂不支持，以及 Logical Stage、事件、聚合、窗口、rank 和跨资源计划尚未进入 Phase 5 首版规划器。它们是后续扩展清单，不应通过常量、假表或旧 SQL 片段绕过。
 

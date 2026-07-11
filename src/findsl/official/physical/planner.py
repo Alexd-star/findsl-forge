@@ -13,6 +13,7 @@ from ..ir import (
     LogicalFilter,
     LogicalLimit,
     LogicalRank,
+    LogicalStage,
     RangeExpr,
 )
 from ..lowering import LoweringResult
@@ -99,12 +100,12 @@ def plan_physical(lowering: LoweringResult, catalog: PhysicalCatalog) -> Physica
 def _collect_fields(plan, catalog: PhysicalCatalog) -> Tuple[PhysicalField, ...]:
     expressions = []
     current = plan
-    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank)):
+    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage)):
         if isinstance(current, LogicalFilter):
             expressions.append(current.predicate)
         elif isinstance(current, LogicalRank):
             expressions.append(current.order_by)
-        current = current.input
+        current = current.operation if isinstance(current, LogicalStage) else current.input
     if not isinstance(current, LogicalDomainScan):
         raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical root {type(current).__name__}")
 
@@ -181,6 +182,11 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
         )
     if isinstance(plan, LogicalRank):
         input_plan = _lower_plan(plan.input, catalog, resource_id, fields)
+        if isinstance(input_plan, PhysicalRank):
+            raise PhysicalPlanningError(
+                "PHYSICAL_CHAINED_RANK_UNSUPPORTED",
+                "chained rank requires explicit stage-output alias propagation",
+            )
         for constraint in _call_constraints(plan.order_by, catalog, resource_id):
             input_plan = PhysicalFilter(input_plan, constraint)
         expression = _lower_expr(plan.order_by, catalog, resource_id)
@@ -188,6 +194,8 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
         if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
         return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
+    if isinstance(plan, LogicalStage):
+        return _lower_plan(plan.operation, catalog, resource_id, fields)
     raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical node {type(plan).__name__}")
 
 

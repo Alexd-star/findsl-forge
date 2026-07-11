@@ -84,3 +84,18 @@ def test_rank_renders_window_in_subquery_and_filters_outer_query():
     assert len(list(parsed.find_all(exp.Window))) == 1
     assert "`ranked`.`__rank_value` <= 10" in result.sql
     assert result.validation.passed is True
+
+
+def test_filter_then_rank_stage_scans_one_resource_once():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', '', '') > 0 "
+            "then rank('', '', '成交量', 'desc', '', '', '', '') <= 10"
+        ),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    tables = [table.name for table in parsed.find_all(exp.Table)]
+    assert tables == ["hsj_stock_hq_basic"]
+    assert "`q`.`volume` > 0" in result.sql
