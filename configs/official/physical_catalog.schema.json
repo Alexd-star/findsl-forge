@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resources", "fields"],
+  "properties": {
+    "resources": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["resource_id", "database", "table", "logical_entity", "partition_key", "distribution_key", "capabilities", "priority"]}},
+    "fields": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["indicator_id", "resource_id", "column", "value_type", "scale", "nullable"]}}
+  }
+}

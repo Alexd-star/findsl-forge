@@ -1,0 +1,1055 @@
+{
+  "resources": [
+    {
+      "resource_id": "official_basic",
+      "database": "newzl",
+      "table": "hsj_stock_hq_basic",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "scan"
+      ],
+      "priority": 10
+    },
+    {
+      "resource_id": "official_ext",
+      "database": "newzl",
+      "table": "hsj_stock_hq_ext",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "scan"
+      ],
+      "priority": 20
+    },
+    {
+      "resource_id": "official_security",
+      "database": "newzl",
+      "table": "hsj_stock_code_info",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "scan"
+      ],
+      "priority": 20
+    },
+    {
+      "resource_id": "official_technical",
+      "database": "newzl",
+      "table": "hsj_stock_hq_basic_technical",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "scan",
+        "technical"
+      ],
+      "priority": 20
+    }
+  ],
+  "fields": [
+    {
+      "indicator_id": "10日均线",
+      "resource_id": "official_technical",
+      "column": "ma10",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "10日均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_10",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "120日均线",
+      "resource_id": "official_technical",
+      "column": "ma120",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "200日均线",
+      "resource_id": "official_technical",
+      "column": "ma200",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "20日均线",
+      "resource_id": "official_technical",
+      "column": "ma20",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "20日均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_20",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "250日均线",
+      "resource_id": "official_technical",
+      "column": "ma250",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "30日均线",
+      "resource_id": "official_technical",
+      "column": "ma30",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "30日均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_30",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "3日均线",
+      "resource_id": "official_technical",
+      "column": "ma3",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "5日均线",
+      "resource_id": "official_technical",
+      "column": "ma5",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "5日均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_5",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "60日均线",
+      "resource_id": "official_technical",
+      "column": "ma60",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "60日均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_60",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "A股港股同时上市标识",
+      "resource_id": "official_security",
+      "column": "ahFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "B股标识",
+      "resource_id": "official_security",
+      "column": "bShareFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "MA角度",
+      "resource_id": "official_ext",
+      "column": "maAngle",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "ST标识",
+      "resource_id": "official_security",
+      "column": "stFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "ST股票标识",
+      "resource_id": "official_security",
+      "column": "stFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一个季度均线",
+      "resource_id": "official_technical",
+      "column": "ma60",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一个季度均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_60",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一个月均线",
+      "resource_id": "official_technical",
+      "column": "ma20",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一个月均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_20",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一周均线",
+      "resource_id": "official_technical",
+      "column": "ma5",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一周均量线",
+      "resource_id": "official_technical",
+      "column": "volume_avg_5",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "一年均线",
+      "resource_id": "official_technical",
+      "column": "ma250",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "三日均线",
+      "resource_id": "official_technical",
+      "column": "ma3",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "中单买入",
+      "resource_id": "official_ext",
+      "column": "midBuyTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "中单净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXMidNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "中单卖出",
+      "resource_id": "official_ext",
+      "column": "midSellTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力主动买入数量",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainActBuyCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力主动卖出数量",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainActSellCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力买入手数",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainBuyCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力买入金额",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainBuyTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力分歧度",
+      "resource_id": "official_ext",
+      "column": "MPResExt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力卖出手数",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainSellCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力卖出金额",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainSellTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力成交量",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力连续净流入天数",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainNetTurInDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力连续净流入金额",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainNetTurInSeries",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力连续净流出天数",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainNetTurOutDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "主力连续净流出金额",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainNetTurOutSeries",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "买方未匹配量",
+      "resource_id": "official_ext",
+      "column": "callAucBid2Vol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "内盘",
+      "resource_id": "official_basic",
+      "column": "innerVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "创N日新低",
+      "resource_id": "official_ext",
+      "column": "pxMkBotDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "创N日新高",
+      "resource_id": "official_ext",
+      "column": "pxMkTopDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "创业板标识",
+      "resource_id": "official_security",
+      "column": "gemFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "半年均线",
+      "resource_id": "official_technical",
+      "column": "ma120",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "卖方未匹配量",
+      "resource_id": "official_ext",
+      "column": "callAucAsk2Vol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "外盘",
+      "resource_id": "official_basic",
+      "column": "outerVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单买入",
+      "resource_id": "official_ext",
+      "column": "bigBuyTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单买入金额",
+      "resource_id": "official_ext",
+      "column": "bigBuyTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXBigNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单动向",
+      "resource_id": "official_ext",
+      "column": "ZJLXDDX",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单卖出",
+      "resource_id": "official_ext",
+      "column": "bigSellTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单卖出金额",
+      "resource_id": "official_ext",
+      "column": "bigSellTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "大单差分",
+      "resource_id": "official_ext",
+      "column": "ZJLXDDZ",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "委买",
+      "resource_id": "official_basic",
+      "column": "commissionBuy",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "委卖",
+      "resource_id": "official_basic",
+      "column": "commissionSale",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "小单买入",
+      "resource_id": "official_ext",
+      "column": "smBuyTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "小单净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXSmNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "小单卖出",
+      "resource_id": "official_ext",
+      "column": "smSellTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "年均线",
+      "resource_id": "official_technical",
+      "column": "ma250",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "总股本",
+      "resource_id": "official_basic",
+      "column": "totalShare",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "成交量",
+      "resource_id": "official_basic",
+      "column": "volume",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "成交额",
+      "resource_id": "official_basic",
+      "column": "turnover",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "所属行业",
+      "resource_id": "official_security",
+      "column": "hyBlkRefName",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "挂单量",
+      "resource_id": "official_basic",
+      "column": "numOfOrders",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "散户买入",
+      "resource_id": "official_ext",
+      "column": "ZJLXRetailBuyCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "散户净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXMidAndSmNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "散户卖出",
+      "resource_id": "official_ext",
+      "column": "ZJLXRetailSellCnt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最后一次涨停时间",
+      "resource_id": "official_basic",
+      "column": "lastLimitUpTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最后一次炸板时间",
+      "resource_id": "official_basic",
+      "column": "lastFUpTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最后一次跌停打开时间",
+      "resource_id": "official_basic",
+      "column": "lastFDownTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最后一次跌停时间",
+      "resource_id": "official_basic",
+      "column": "lastLimitDownTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最后涨停时间",
+      "resource_id": "official_basic",
+      "column": "lastLimitUpTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最后跌停时间",
+      "resource_id": "official_basic",
+      "column": "lastLimitDownTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最高涨停封单量",
+      "resource_id": "official_basic",
+      "column": "maxUpSealVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "最高跌停封单量",
+      "resource_id": "official_basic",
+      "column": "maxDownSealVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "沪港通标识",
+      "resource_id": "official_security",
+      "column": "shConnFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "沪股通标识",
+      "resource_id": "official_security",
+      "column": "shConnFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "流通股本",
+      "resource_id": "official_basic",
+      "column": "listedShare",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停天数",
+      "resource_id": "official_basic",
+      "column": "upCount",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停封单量",
+      "resource_id": "official_basic",
+      "column": "upSealVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停开板次数",
+      "resource_id": "official_ext",
+      "column": "lmtUpNum",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停形态",
+      "resource_id": "official_basic",
+      "column": "limitShape",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停成交额",
+      "resource_id": "official_basic",
+      "column": "upTradeAmt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停时间",
+      "resource_id": "official_basic",
+      "column": "firstLimitUpTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨停次数",
+      "resource_id": "official_basic",
+      "column": "upCount",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨跌停类型",
+      "resource_id": "official_basic",
+      "column": "limitType",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "涨跌动因",
+      "resource_id": "official_ext",
+      "column": "ZJLXDDY",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "深港通标识",
+      "resource_id": "official_security",
+      "column": "szConnFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "深股通标识",
+      "resource_id": "official_security",
+      "column": "szConnFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "港股通标识",
+      "resource_id": "official_security",
+      "column": "hkConnFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "破板次数",
+      "resource_id": "official_ext",
+      "column": "boardBreaks",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "科创板标识",
+      "resource_id": "official_security",
+      "column": "kcbFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "筹码形态",
+      "resource_id": "official_ext",
+      "column": "formFlag",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "股票代码",
+      "resource_id": "official_security",
+      "column": "tgtcode",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "股票名称",
+      "resource_id": "official_security",
+      "column": "name",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "自由流通股本",
+      "resource_id": "official_basic",
+      "column": "freeShare",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "自由流通股股本",
+      "resource_id": "official_basic",
+      "column": "freeShare",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "证券代码",
+      "resource_id": "official_security",
+      "column": "tztcode",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "资金净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXMainNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "资金净流入创N日新高",
+      "resource_id": "official_ext",
+      "column": "mainTurMkTopDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "超大单买入",
+      "resource_id": "official_ext",
+      "column": "supBuyTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "超大单净流入",
+      "resource_id": "official_ext",
+      "column": "ZJLXSupNetTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "超大单卖出",
+      "resource_id": "official_ext",
+      "column": "supSellTur",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "跌停天数",
+      "resource_id": "official_basic",
+      "column": "downCount",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "跌停封单量",
+      "resource_id": "official_basic",
+      "column": "downSealVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "跌停成交额",
+      "resource_id": "official_basic",
+      "column": "downTradeAmt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "跌停时间",
+      "resource_id": "official_basic",
+      "column": "firstLimitDownTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "跌停次数",
+      "resource_id": "official_basic",
+      "column": "downCount",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "跌停破板次数",
+      "resource_id": "official_ext",
+      "column": "downBoardBreaks",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "连板天数",
+      "resource_id": "official_basic",
+      "column": "upSerialLb",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "连涨天数",
+      "resource_id": "official_ext",
+      "column": "pxMkIncDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "连续涨停天数",
+      "resource_id": "official_basic",
+      "column": "upSerialLb",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "连跌天数",
+      "resource_id": "official_ext",
+      "column": "pxMkDescDays",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "陆股通标识",
+      "resource_id": "official_security",
+      "column": "hkConnFlag",
+      "value_type": "boolean",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "集合竞价买方未匹配量",
+      "resource_id": "official_ext",
+      "column": "callAucBid2Vol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "集合竞价匹配量",
+      "resource_id": "official_ext",
+      "column": "callAucMatchVol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "集合竞价卖方未匹配量",
+      "resource_id": "official_ext",
+      "column": "callAucAsk2Vol",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "集合竞价金额",
+      "resource_id": "official_ext",
+      "column": "callAucAmt",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "首次涨停时间",
+      "resource_id": "official_basic",
+      "column": "firstLimitUpTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "首次跌停时间",
+      "resource_id": "official_basic",
+      "column": "firstLimitDownTime",
+      "value_type": "time",
+      "scale": 1.0,
+      "nullable": true
+    }
+  ]
+}
