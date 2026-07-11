@@ -16,6 +16,7 @@ from ..physical.ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalPlan,
+    PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
 )
@@ -176,6 +177,52 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalSc
         resource = catalog.resource(expression.resource_id)
         table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q_latest")
         query = exp.select(exp.Max(this=exp.column(expression.column, table="q_latest", quoted=True))).from_(table)
+        return exp.Subquery(this=query)
+    if isinstance(expression, PhysicalPrefixAverage):
+        if scan is None:
+            raise DorisBackendError("DORIS_PREFIX_CONTEXT_MISSING", "prefix average requires a scan context")
+        resource = catalog.resource(expression.resource_id)
+        current = exp.table_(resource.table, db=resource.database, quoted=True, alias="p")
+        previous = exp.table_(resource.table, db=resource.database, quoted=True, alias="p_prev")
+        previous_join = exp.and_(
+            exp.EQ(this=exp.column("mktcode", table="p_prev", quoted=True), expression=exp.column("mktcode", table="p", quoted=True)),
+            exp.EQ(this=exp.column("tgtcode", table="p_prev", quoted=True), expression=exp.column("tgtcode", table="p", quoted=True)),
+            exp.EQ(
+                this=exp.column("row_no", table="p_prev", quoted=True),
+                expression=exp.Sub(this=exp.column("row_no", table="p", quoted=True), expression=exp.convert(expression.window)),
+            ),
+        )
+        scan_alias = "anchor" if scan.anchor_resource_id else "q"
+        correlation = exp.and_(
+            *(
+                exp.EQ(
+                    this=exp.column(key, table="p", quoted=True),
+                    expression=exp.column(key, table=scan_alias, quoted=True),
+                )
+                for key in ("mktcode", "tgtcode", "bizdate")
+            )
+        )
+        sum_delta = exp.Sub(
+            this=exp.column(expression.sum_column, table="p", quoted=True),
+            expression=exp.Coalesce(
+                this=exp.column(expression.sum_column, table="p_prev", quoted=True),
+                expressions=[exp.convert(0)],
+            ),
+        )
+        count_delta = exp.Sub(
+            this=exp.column(expression.count_column, table="p", quoted=True),
+            expression=exp.Coalesce(
+                this=exp.column(expression.count_column, table="p_prev", quoted=True),
+                expressions=[exp.convert(0)],
+            ),
+        )
+        average = exp.Div(
+            this=exp.Mul(this=exp.Paren(this=sum_delta), expression=exp.convert(1.0)),
+            expression=exp.Nullif(this=count_delta, expression=exp.convert(0)),
+        )
+        if expression.scale_divisor != 1.0:
+            average = exp.Div(this=average, expression=exp.convert(expression.scale_divisor))
+        query = exp.select(average).from_(current).join(previous, on=previous_join, join_type="LEFT").where(correlation)
         return exp.Subquery(this=query)
     if isinstance(expression, PhysicalBinary):
         try:

@@ -30,6 +30,7 @@ def _build_official_physical(dsl: str):
     from .official.physical.catalog import default_physical_catalog
     from .official.physical.planner import plan_physical
     from .official.physical.statistics import default_physical_statistics
+    from .official.physical.strategies import default_physical_strategies
     from .official.registry import default_official_registry
     from .official.semantics import OfficialSemanticAnalyzer
     from .official_slot import _resolve_indicator_meta, parse_official_slot_with_diagnostics
@@ -38,7 +39,12 @@ def _build_official_physical(dsl: str):
     typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(parsed.ast)
     logical = lower_official_ast(typed, strict=True, domain_registry=default_official_registry())
     catalog = default_physical_catalog()
-    return plan_physical(logical, catalog, statistics=default_physical_statistics(catalog))
+    return plan_physical(
+        logical,
+        catalog,
+        statistics=default_physical_statistics(catalog),
+        strategies=default_physical_strategies(catalog),
+    )
 
 
 def main() -> None:
@@ -110,6 +116,16 @@ def main() -> None:
     official_stats_cmd.add_argument("--client", default="mysql")
     official_stats_cmd.add_argument("--query-timeout", type=float, default=30.0)
     official_stats_cmd.add_argument("--json", action="store_true")
+    official_prefix_cmd = sub.add_parser("official-prefix-evidence", help="Compare direct and prefix physical strategies")
+    official_prefix_cmd.add_argument("--json-output", required=True)
+    official_prefix_cmd.add_argument("--report-output", required=True)
+    official_prefix_cmd.add_argument("--host", default="127.0.0.1")
+    official_prefix_cmd.add_argument("--port", type=int, default=9030)
+    official_prefix_cmd.add_argument("--user", default="root")
+    official_prefix_cmd.add_argument("--password-env", default="DORIS_PASSWORD")
+    official_prefix_cmd.add_argument("--database", default="newzl")
+    official_prefix_cmd.add_argument("--client", default="mysql")
+    official_prefix_cmd.add_argument("--query-timeout", type=float, default=180.0)
     official_backend_cmd = sub.add_parser("official-slot-backend", help="Render validated SQLGlot Doris SQL")
     official_backend_cmd.add_argument("dsl")
     official_backend_cmd.add_argument("--json", action="store_true")
@@ -493,6 +509,25 @@ def main() -> None:
         else:
             print(f"Doris version: {snapshot.doris_version}")
             print(f"Physical resources: {len(snapshot.resources)}")
+    elif args.command == "official-prefix-evidence":
+        import os
+
+        from .official.backend.executor import DorisExecutionConfig
+        from .official_prefix_evidence import build_official_prefix_evidence, write_official_prefix_evidence
+
+        config = DorisExecutionConfig(
+            host=args.host,
+            port=args.port,
+            user=args.user,
+            password=os.environ.get(args.password_env, ""),
+            database=args.database,
+            mysql_executable=args.client,
+            timeout_seconds=args.query_timeout,
+        )
+        evidence = build_official_prefix_evidence(config=config)
+        write_official_prefix_evidence(evidence, args.json_output, args.report_output)
+        print(f"Prefix gate: {evidence['status']}")
+        print(f"Prefix matches: {evidence['matched']}/{evidence['case_count']}")
     elif args.command == "official-slot-physical":
         result = _build_official_physical(args.dsl)
         payload = {

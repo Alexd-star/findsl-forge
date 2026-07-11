@@ -128,3 +128,30 @@ def test_ext_market_constraint_renders_against_anchor_universe():
     )
 
     assert "`anchor`.`mktcode` IN (0, 1)" in result.sql
+
+
+def test_prefix_average_candidate_renders_as_controlled_correlated_subquery():
+    catalog = default_physical_catalog()
+    typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(
+        parse_official_slot("indicator('', '', '5日均线', '', '', '', '') > 10", mode="strict")
+    )
+    logical = lower_official_ast(typed, domain_registry=default_official_registry())
+    from findsl.official.physical.statistics import default_physical_statistics
+    from findsl.official.physical.strategies import default_physical_strategies
+
+    physical = plan_physical(
+        logical,
+        catalog,
+        statistics=default_physical_statistics(catalog),
+        strategies=default_physical_strategies(catalog),
+        allow_shadow_strategies=True,
+    )
+    result = render_doris(physical.plan, catalog)
+
+    assert physical.selected_strategy == "ma5_prefix_average"
+    assert result.sql.count("`hsj_stock_hq_basic_prefix`") == 2
+    assert "`p_prev`.`row_no` = `p`.`row_no` - 5" in result.sql
+    assert "`p`.`close_prefix`" in result.sql
+    assert "`p`.`close_count_prefix`" in result.sql
+    assert "(`p`.`close_prefix` - COALESCE(`p_prev`.`close_prefix`, 0)) * 1.0" in result.sql
+    assert result.validation.passed is True

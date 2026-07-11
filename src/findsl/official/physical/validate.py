@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalIn, PhysicalLatestValue, PhysicalRank, PhysicalScan, PhysicalWindow,
+    PhysicalIn, PhysicalLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalScan, PhysicalWindow,
 )
 from ..types import BOOLEAN
 
@@ -80,6 +80,15 @@ def _validate_expr(expression, catalog):
         resource = catalog.resource(expression.resource_id)
         if expression.column != resource.partition_key:
             raise PhysicalCatalogError("latest value is restricted to the resource partition key")
+    elif isinstance(expression, PhysicalPrefixAverage):
+        resource = catalog.resource(expression.resource_id)
+        if "prefix" not in resource.capabilities:
+            raise PhysicalCatalogError("prefix average requires a prefix resource")
+        if expression.window <= 0 or expression.scale_divisor <= 0:
+            raise ValueError("prefix average window and scale must be positive")
+        for column in (expression.sum_column, expression.count_column):
+            if not column or not column.replace("_", "a").isalnum():
+                raise PhysicalCatalogError("invalid prefix average column")
     elif isinstance(expression, PhysicalIn):
         _validate_expr(expression.expression, catalog)
         if not expression.values:

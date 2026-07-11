@@ -19,6 +19,7 @@ from .official.lowering import lower_official_ast
 from .official.physical.catalog import default_physical_catalog
 from .official.physical.planner import plan_physical
 from .official.physical.statistics import default_physical_statistics
+from .official.physical.strategies import default_physical_strategies
 from .official.registry import default_official_registry
 from .official.semantics import OfficialSemanticAnalyzer
 from .official_slot import _resolve_indicator_meta, parse_official_slot_with_diagnostics
@@ -37,6 +38,7 @@ def audit_official_backend_sources(
     registry = default_official_registry()
     catalog = default_physical_catalog()
     statistics = default_physical_statistics(catalog)
+    strategies = default_physical_strategies(catalog)
     typed_ok = logical_ok = physical_ok = sqlglot_ok = safety_ok = 0
     errors: Counter[str] = Counter()
     resources: Counter[str] = Counter()
@@ -59,7 +61,7 @@ def audit_official_backend_sources(
             logical = lower_official_ast(typed, strict=True, domain_registry=registry)
             logical_ok += 1
             stage = "physical"
-            physical = plan_physical(logical, catalog, statistics=statistics)
+            physical = plan_physical(logical, catalog, statistics=statistics, strategies=strategies)
             physical_ok += 1
             resources[physical.selected_resource] += 1
             stage = "sqlglot"

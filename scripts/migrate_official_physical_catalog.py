@@ -12,6 +12,8 @@ RESOURCE_IDS = {
     "hsj_stock_hq_ext": "official_ext",
     "hsj_stock_code_info": "official_security",
     "hsj_stock_hq_basic_technical": "official_technical",
+    "hsj_stock_hq_basic_prefix": "official_basic_prefix",
+    "hsj_stock_hq_ext_prefix": "official_ext_prefix",
 }
 
 
@@ -21,6 +23,8 @@ def main() -> None:
         capabilities = ["scan"]
         if "technical" in table:
             capabilities.append("technical")
+        if "prefix" in table:
+            capabilities.append("prefix")
         resources.append({
             "resource_id": resource_id, "database": "newzl", "table": table,
             "logical_entity": "market_observation", "partition_key": None if resource_id == "official_security" else "bizdate",

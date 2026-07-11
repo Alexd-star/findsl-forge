@@ -65,6 +65,42 @@ def test_official_physical_cli_path_uses_real_statistics_by_default():
     assert result.decisions[0].cost_unit == "bytes"
 
 
+def test_cli_official_prefix_evidence_wires_doris_config_and_outputs(tmp_path, monkeypatch, capsys):
+    from findsl import cli
+    import findsl.official_prefix_evidence as evidence_module
+
+    json_output = tmp_path / "prefix.json"
+    report_output = tmp_path / "prefix.md"
+    seen = {}
+
+    def build(*, config):
+        seen["host"] = config.host
+        return {"status": "PASS", "case_count": 2, "matched": 2, "errors": 0, "results": []}
+
+    def write(report, json_path, markdown_path):
+        json_output.write_text(json.dumps(report), encoding="utf-8")
+        report_output.write_text("# PASS", encoding="utf-8")
+
+    monkeypatch.setattr(evidence_module, "build_official_prefix_evidence", build)
+    monkeypatch.setattr(evidence_module, "write_official_prefix_evidence", write)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "findsl", "official-prefix-evidence",
+            "--json-output", str(json_output),
+            "--report-output", str(report_output),
+            "--host", "doris.local",
+        ],
+    )
+
+    cli.main()
+
+    assert seen["host"] == "doris.local"
+    assert "Prefix gate: PASS" in capsys.readouterr().out
+    assert json_output.exists() and report_output.exists()
+
+
 def test_cli_evaluate_returns_nonzero_when_cases_fail(tmp_path):
     cases = tmp_path / "cases.jsonl"
     cases.write_text(

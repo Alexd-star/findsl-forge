@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import re
 from typing import Optional, Tuple
 
@@ -29,11 +29,13 @@ from .ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalPlan,
+    PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
 )
 from .validate import validate_physical_plan
 from .statistics import PhysicalStatisticsSnapshot
+from .strategies import PhysicalStrategyRegistry
 
 
 @dataclass(frozen=True)
@@ -46,6 +48,9 @@ class PhysicalDecision:
     reason: str
     cost_unit: str = "catalog_priority"
     cost_components: Tuple[Tuple[str, float], ...] = ()
+    strategy_id: str = "direct_column"
+    selected: bool = False
+    selection_eligible: bool = True
 
 
 class PhysicalPlanningError(ValueError):
@@ -66,6 +71,7 @@ class PhysicalPlanningResult:
     plan: PhysicalPlan
     selected_resource: str
     decisions: Tuple[PhysicalDecision, ...]
+    selected_strategy: str = "direct_column"
 
 
 _TYPE_MAP = {
@@ -82,6 +88,8 @@ def plan_physical(
     catalog: PhysicalCatalog,
     *,
     statistics: Optional[PhysicalStatisticsSnapshot] = None,
+    strategies: Optional[PhysicalStrategyRegistry] = None,
+    allow_shadow_strategies: bool = False,
 ) -> PhysicalPlanningResult:
     fields = _collect_fields(lowering.plan, catalog)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
@@ -103,8 +111,46 @@ def plan_physical(
         )
     plan = _lower_plan(lowering.plan, catalog, selected, fields)
     validate_physical_plan(plan, catalog)
-    decision = _candidate_decision(resource, catalog, statistics)
-    return PhysicalPlanningResult(plan, selected, (decision,))
+    direct_decision = _candidate_decision(resource, catalog, statistics)
+    candidates = [(plan, selected, "direct_column", direct_decision)]
+
+    indicator_ids = {field.indicator_id.casefold() for field in fields}
+    if strategies is not None and len(indicator_ids) == 1:
+        indicator_id = fields[0].indicator_id
+        for strategy in strategies.strategies_for(indicator_id):
+            expression = PhysicalPrefixAverage(
+                strategy.prefix_resource_id,
+                strategy.sum_column,
+                strategy.count_column,
+                strategy.window,
+                strategy.scale_divisor,
+                NUMERIC,
+            )
+            prefix_plan = _lower_plan(
+                lowering.plan,
+                catalog,
+                strategy.scan_resource_id,
+                (),
+                expression_overrides={indicator_id.casefold(): expression},
+            )
+            validate_physical_plan(prefix_plan, catalog)
+            decision = _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strategies)
+            candidates.append((prefix_plan, strategy.scan_resource_id, strategy.strategy_id, decision))
+
+    candidates.sort(
+        key=lambda item: (
+            not item[3].selection_eligible,
+            item[3].estimated,
+            float("inf") if item[3].cost is None else item[3].cost,
+            item[2],
+        )
+    )
+    chosen_plan, chosen_resource, chosen_strategy, _ = candidates[0]
+    decisions = tuple(
+        replace(item[3], strategy_id=item[2], selected=index == 0)
+        for index, item in enumerate(candidates)
+    )
+    return PhysicalPlanningResult(chosen_plan, chosen_resource, decisions, chosen_strategy)
 
 
 def _candidate_decision(resource, catalog, statistics):
@@ -150,6 +196,50 @@ def _candidate_decision(resource, catalog, statistics):
         estimated=True,
         reason_code="PHYSICAL_CANDIDATE_SELECTED",
         reason="catalog priority used because runtime statistics are unavailable",
+    )
+
+
+def _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strategies):
+    scan = catalog.resource(strategy.scan_resource_id)
+    prefix = catalog.resource(strategy.prefix_resource_id)
+    if statistics is not None:
+        try:
+            scan_stats = statistics.resource(scan.resource_id)
+            prefix_stats = statistics.resource(prefix.resource_id)
+        except KeyError:
+            pass
+        else:
+            if scan_stats.row_count_available and prefix_stats.row_count_available:
+                components = (
+                    (scan.resource_id, float(scan_stats.data_size_bytes)),
+                    (prefix.resource_id, float(prefix_stats.data_size_bytes * 2)),
+                )
+                return PhysicalDecision(
+                    resource_id=prefix.resource_id,
+                    feasible=True,
+                    cost=sum(value for _, value in components),
+                    estimated=False,
+                    reason_code=(
+                        "PHYSICAL_PREFIX_CANDIDATE_SELECTED"
+                        if strategy.selection_mode == "active" or allow_shadow_strategies
+                        else "PHYSICAL_PREFIX_SHADOW_CANDIDATE"
+                    ),
+                    reason=(
+                        "cost is scan bytes plus two conservative prefix resource accesses; "
+                        f"selection mode is {strategy.selection_mode}"
+                    ),
+                    cost_unit="bytes",
+                    cost_components=components,
+                    selection_eligible=strategy.selection_mode == "active" or allow_shadow_strategies,
+                )
+    return PhysicalDecision(
+        resource_id=prefix.resource_id,
+        feasible=True,
+        cost=float(scan.priority + prefix.priority * 2),
+        estimated=True,
+        reason_code="PHYSICAL_PREFIX_STATISTICS_INCOMPLETE",
+        reason="catalog priority fallback for prefix candidate",
+        selection_eligible=strategy.selection_mode == "active" or allow_shadow_strategies,
     )
 
 
@@ -218,7 +308,13 @@ def _reject_unmaterialized_constraints(call: CallExpr) -> None:
         )
 
 
-def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[PhysicalField, ...]) -> PhysicalPlan:
+def _lower_plan(
+    plan,
+    catalog: PhysicalCatalog,
+    resource_id: str,
+    fields: Tuple[PhysicalField, ...],
+    expression_overrides=None,
+) -> PhysicalPlan:
     if isinstance(plan, LogicalDomainScan):
         columns = tuple(
             PhysicalColumn(field.resource_id, field.column, _physical_type(field))
@@ -228,17 +324,17 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
         return PhysicalScan(resource_id, columns, None, resource.anchor_resource_id)
     if isinstance(plan, LogicalFilter):
         return PhysicalFilter(
-            _lower_plan(plan.input, catalog, resource_id, fields),
-            _lower_expr(plan.predicate, catalog, resource_id),
+            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
+            _lower_expr(plan.predicate, catalog, resource_id, expression_overrides=expression_overrides),
         )
     if isinstance(plan, LogicalLimit):
         return PhysicalLimit(
-            _lower_plan(plan.input, catalog, resource_id, fields),
+            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
             plan.offset,
             plan.count,
         )
     if isinstance(plan, LogicalRank):
-        input_plan = _lower_plan(plan.input, catalog, resource_id, fields)
+        input_plan = _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides)
         if isinstance(input_plan, PhysicalRank):
             raise PhysicalPlanningError(
                 "PHYSICAL_CHAINED_RANK_UNSUPPORTED",
@@ -246,17 +342,24 @@ def _lower_plan(plan, catalog: PhysicalCatalog, resource_id: str, fields: Tuple[
             )
         for constraint in _call_constraints(plan.order_by, catalog, resource_id):
             input_plan = PhysicalFilter(input_plan, constraint)
-        expression = _lower_expr(plan.order_by, catalog, resource_id, allow_rank=True)
-        bound = _lower_expr(plan.bound, catalog, resource_id)
+        expression = _lower_expr(plan.order_by, catalog, resource_id, allow_rank=True, expression_overrides=expression_overrides)
+        bound = _lower_expr(plan.bound, catalog, resource_id, expression_overrides=expression_overrides)
         if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
         return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
     if isinstance(plan, LogicalStage):
-        return _lower_plan(plan.operation, catalog, resource_id, fields)
+        return _lower_plan(plan.operation, catalog, resource_id, fields, expression_overrides)
     raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical node {type(plan).__name__}")
 
 
-def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str, *, allow_rank: bool = False):
+def _lower_expr(
+    expression,
+    catalog: PhysicalCatalog,
+    resource_id: str,
+    *,
+    allow_rank: bool = False,
+    expression_overrides=None,
+):
     if isinstance(expression, LiteralExpr):
         return PhysicalLiteral(expression.value, expression.type)
     if isinstance(expression, CallExpr):
@@ -268,6 +371,8 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str, *, allow
                 "rank inside a scalar expression requires an explicit window plan",
             )
         indicator_id = expression.binding.slots.get("indicator_name", "")
+        if expression_overrides and indicator_id.casefold() in expression_overrides:
+            return expression_overrides[indicator_id.casefold()]
         try:
             field = catalog.indicator(indicator_id)
         except KeyError as exc:
@@ -278,8 +383,8 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str, *, allow
     if isinstance(expression, BinaryExpr):
         return PhysicalBinary(
             expression.op,
-            _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank),
-            _lower_expr(expression.right, catalog, resource_id, allow_rank=allow_rank),
+            _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides),
+            _lower_expr(expression.right, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides),
             expression.type,
         )
     if isinstance(expression, ComparisonExpr):
@@ -289,9 +394,9 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str, *, allow
                 "approximate comparison requires catalog-provided absolute and relative tolerances",
             )
         if isinstance(expression.right, RangeExpr) and expression.op == "between":
-            value = _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank)
-            lower = _lower_expr(expression.right.lower, catalog, resource_id, allow_rank=allow_rank)
-            upper = _lower_expr(expression.right.upper, catalog, resource_id, allow_rank=allow_rank)
+            value = _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides)
+            lower = _lower_expr(expression.right.lower, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides)
+            upper = _lower_expr(expression.right.upper, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides)
             lower_op = ">=" if expression.right.lower_inclusive else ">"
             upper_op = "<=" if expression.right.upper_inclusive else "<"
             result = PhysicalBinary(
@@ -303,8 +408,8 @@ def _lower_expr(expression, catalog: PhysicalCatalog, resource_id: str, *, allow
         else:
             result = PhysicalComparison(
                 expression.op,
-                _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank),
-                _lower_expr(expression.right, catalog, resource_id, allow_rank=allow_rank),
+                _lower_expr(expression.left, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides),
+                _lower_expr(expression.right, catalog, resource_id, allow_rank=allow_rank, expression_overrides=expression_overrides),
             )
         return _apply_call_constraints(result, expression, catalog, resource_id)
     raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported expression {type(expression).__name__}")

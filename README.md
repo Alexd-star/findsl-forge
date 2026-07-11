@@ -118,6 +118,8 @@ Phase 5 adds a schema-validated physical catalog, bounded Doris candidate planne
 
 Phase 6A replaces the shadow planner's fixed priority cost with a versioned Doris statistics snapshot. `official-physical-stats` collects real row counts, stored sizes, and the FE version through controlled metadata commands; the snapshot is bound to the physical catalog fingerprint. Complete statistics produce an auditable primary-plus-anchor scan-byte cost with `estimated=false`, while missing statistics fall back explicitly to catalog priority. The model does not invent selectivity or equate stored bytes with latency. Prefix and hot-materialization alternatives will enter the same interface as multiple candidates in Phase 6B.
 
+Phase 6B adds 14 schema-validated prefix-average strategies for fixed moving-price and moving-volume averages. The planner now enumerates direct materialized columns and controlled prefix-difference expressions, records both decisions, and keeps uncalibrated alternatives in `shadow` mode. SQLGlot renders the prefix path from typed AST nodes using current/previous prefix rows; no legacy SQL fragments enter the backend. Real Doris evidence matches both representative result sets exactly (`2/2`, zero errors), but the correlated prefix path is currently slower than the technical feature table (`0.787x` and `0.835x` legacy-over-prefix ratios), so the default remains `direct_column`. Use `official-prefix-evidence` to reproduce the result hashes and timing before changing any strategy to `active`.
+
 If running from the repository root without installing the package:
 
 ```powershell

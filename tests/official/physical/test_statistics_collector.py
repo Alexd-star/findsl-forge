@@ -34,12 +34,16 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         "hsj_stock_hq_ext": "292.684 MB",
         "hsj_stock_code_info": "296.573 KB",
         "hsj_stock_hq_basic_technical": "1.313 GB",
+        "hsj_stock_hq_basic_prefix": "375.350 MB",
+        "hsj_stock_hq_ext_prefix": "135.735 MB",
     }
     rows = {
         "hsj_stock_hq_basic": 13650347,
         "hsj_stock_hq_ext": 6170822,
         "hsj_stock_code_info": 5686,
         "hsj_stock_hq_basic_technical": 13650347,
+        "hsj_stock_hq_basic_prefix": 13650347,
+        "hsj_stock_hq_ext_prefix": 13650347,
     }
 
     def runner(command, **kwargs):
@@ -74,7 +78,7 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
     assert snapshot.doris_version == "doris-4.1.0-rc03-5960d4cea0e"
     assert all("secret" not in part for command, _ in calls for part in command)
     assert all(kwargs["env"]["MYSQL_PWD"] == "secret" for _, kwargs in calls)
-    assert len(calls) == 6
+    assert len(calls) == 8
 
 
 def test_collector_rejects_missing_show_data_resource():

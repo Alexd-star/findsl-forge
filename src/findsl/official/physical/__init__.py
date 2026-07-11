@@ -8,6 +8,12 @@ from .statistics import (
     collect_physical_statistics,
     default_physical_statistics,
 )
+from .strategies import (
+    PhysicalPrefixAverageStrategy,
+    PhysicalStrategyError,
+    PhysicalStrategyRegistry,
+    default_physical_strategies,
+)
 from .validate import validate_physical_plan
 
 __all__ = [name for name in globals() if not name.startswith("_")]

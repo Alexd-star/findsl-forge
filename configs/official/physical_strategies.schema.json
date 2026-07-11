@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FinDSL Official Physical Strategies",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_sha256", "strategies"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "strategies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["strategy_id", "indicator_id", "kind", "scan_resource_id", "prefix_resource_id", "sum_column", "count_column", "window", "scale_divisor", "value_type", "selection_mode"],
+        "properties": {
+          "strategy_id": {"type": "string"},
+          "indicator_id": {"type": "string", "minLength": 1},
+          "kind": {"const": "prefix_average"},
+          "scan_resource_id": {"type": "string"},
+          "prefix_resource_id": {"type": "string"},
+          "sum_column": {"type": "string"},
+          "count_column": {"type": "string"},
+          "window": {"type": "integer", "minimum": 1},
+          "scale_divisor": {"type": "number", "exclusiveMinimum": 0},
+          "value_type": {"const": "numeric"},
+          "selection_mode": {"enum": ["shadow", "active"]}
+        }
+      }
+    }
+  }
+}

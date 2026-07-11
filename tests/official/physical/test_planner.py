@@ -1,10 +1,11 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalRank
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
-from findsl.official.physical.statistics import PhysicalStatisticsSnapshot
+from findsl.official.physical.statistics import PhysicalStatisticsSnapshot, default_physical_statistics
+from findsl.official.physical.strategies import default_physical_strategies
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
 from findsl.official_slot import _resolve_indicator_meta, parse_official_slot
@@ -134,6 +135,44 @@ def test_technical_indicator_selects_controlled_technical_resource_deterministic
     assert first.selected_resource == "official_technical"
     assert first.decisions == second.decisions
     assert first.decisions[0].cost == 20.0
+
+
+def test_statistics_rank_prefix_candidate_but_keep_uncalibrated_strategy_in_shadow():
+    catalog = default_physical_catalog()
+    statistics = default_physical_statistics(catalog)
+
+    result = plan_physical(
+        _lower("indicator('', '', '5日均线', '', '', '', '') > 10"),
+        catalog,
+        statistics=statistics,
+        strategies=default_physical_strategies(catalog),
+    )
+
+    assert result.selected_resource == "official_technical"
+    assert result.selected_strategy == "direct_column"
+    assert isinstance(result.plan, PhysicalFilter)
+    assert [decision.strategy_id for decision in result.decisions] == [
+        "direct_column",
+        "ma5_prefix_average",
+    ]
+    assert result.decisions[0].selected is True
+    assert result.decisions[1].selection_eligible is False
+    assert result.decisions[1].cost < result.decisions[0].cost
+
+
+def test_shadow_prefix_candidate_can_be_selected_for_explicit_validation():
+    catalog = default_physical_catalog()
+    result = plan_physical(
+        _lower("indicator('', '', '5日均线', '', '', '', '') > 10"),
+        catalog,
+        statistics=default_physical_statistics(catalog),
+        strategies=default_physical_strategies(catalog),
+        allow_shadow_strategies=True,
+    )
+
+    assert result.selected_strategy == "ma5_prefix_average"
+    assert isinstance(result.plan.predicate.left, PhysicalPrefixAverage)
+    assert result.plan.predicate.left.window == 5
 
 
 def test_approximate_comparison_without_catalog_tolerance_is_rejected_before_backend():

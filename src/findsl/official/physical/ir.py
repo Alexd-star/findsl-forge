@@ -72,6 +72,27 @@ class PhysicalLatestValue(PhysicalExpr):
         return {"kind": "PhysicalLatestValue", "resource_id": self.resource_id, "column": self.column, "type": self.type.to_dict()}
 
 
+@dataclass(frozen=True)
+class PhysicalPrefixAverage(PhysicalExpr):
+    resource_id: str
+    sum_column: str
+    count_column: str
+    window: int
+    scale_divisor: float
+    type: OfficialType
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalPrefixAverage",
+            "resource_id": self.resource_id,
+            "sum_column": self.sum_column,
+            "count_column": self.count_column,
+            "window": self.window,
+            "scale_divisor": self.scale_divisor,
+            "type": self.type.to_dict(),
+        }
+
+
 class PhysicalPlan(CanonicalIr):
     pass
 

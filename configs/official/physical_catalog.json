@@ -71,6 +71,44 @@
       ],
       "anchor_resource_id": "official_basic",
       "priority": 20
+    },
+    {
+      "resource_id": "official_basic_prefix",
+      "database": "newzl",
+      "table": "hsj_stock_hq_basic_prefix",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "scan",
+        "prefix"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": "official_basic",
+      "priority": 20
+    },
+    {
+      "resource_id": "official_ext_prefix",
+      "database": "newzl",
+      "table": "hsj_stock_hq_ext_prefix",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "scan",
+        "prefix"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": "official_basic",
+      "priority": 20
     }
   ],
   "fields": [
