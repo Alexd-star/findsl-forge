@@ -69,6 +69,57 @@ class LogicalEmpty(LogicalPlan):
 
 
 @dataclass(frozen=True)
+class LogicalEvent(LogicalPlan):
+    input: LogicalPlan
+    event: Any
+    schema: Schema
+
+    def to_dict(self):
+        return _plan("LogicalEvent", self.schema, input=self.input.to_dict(), event=self.event.to_dict())
+
+
+@dataclass(frozen=True)
+class LogicalConsecutive(LogicalPlan):
+    input: LogicalPlan
+    spec: Any
+    schema: Schema
+
+    def to_dict(self):
+        return _plan("LogicalConsecutive", self.schema, input=self.input.to_dict(), spec=self.spec.to_dict())
+
+
+@dataclass(frozen=True)
+class LogicalExist(LogicalPlan):
+    input: LogicalPlan
+    spec: Any
+    schema: Schema
+
+    def to_dict(self):
+        return _plan("LogicalExist", self.schema, input=self.input.to_dict(), spec=self.spec.to_dict())
+
+
+@dataclass(frozen=True)
+class LogicalDomainRank(LogicalPlan):
+    input: LogicalPlan
+    spec: Any
+    schema: Schema
+
+    def to_dict(self):
+        return _plan("LogicalDomainRank", self.schema, input=self.input.to_dict(), spec=self.spec.to_dict())
+
+
+@dataclass(frozen=True)
+class LogicalConstraint(LogicalPlan):
+    input: LogicalPlan
+    market_scope: Any
+    date_constraint: Any
+    schema: Schema
+
+    def to_dict(self):
+        return _plan("LogicalConstraint", self.schema, input=self.input.to_dict(), market_scope=self.market_scope.to_dict(), date_constraint=self.date_constraint.to_dict())
+
+
+@dataclass(frozen=True)
 class LogicalFilter(LogicalPlan):
     input: LogicalPlan
     predicate: LogicalExpr

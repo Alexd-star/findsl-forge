@@ -3,7 +3,7 @@ from __future__ import annotations
 import operator
 from dataclasses import replace
 
-from ..ir import BinaryExpr, ComparisonExpr, LiteralExpr, LogicalEmpty, LogicalFilter, LogicalLimit
+from ..ir import BinaryExpr, ComparisonExpr, LiteralExpr, LogicalConstraint, LogicalEmpty, LogicalFilter, LogicalLimit, LogicalRank
 from ..ir.expressions import CallExpr, LogicalExpr, RangeExpr
 from ..ir.relational import LogicalPlan, LogicalStage
 from ..types import BOOLEAN, NUMERIC
@@ -98,4 +98,115 @@ class LimitNormalizeRule:
             if available == 0:
                 return LogicalEmpty(plan.schema, "PROVEN_LIMIT_INTERSECTION_EMPTY")
             return LogicalLimit(inner.input, inner.offset + plan.offset, min(plan.count, available), plan.schema)
+        return plan
+
+
+class BoolFlattenRule:
+    rule_id = "BOOL_FLATTEN"
+    version = "1"
+    proof_obligation = "Associativity permits canonical regrouping without reordering operands."
+
+    def apply(self, plan):
+        plan = _rewrite_inputs(plan, self.apply)
+        if isinstance(plan, LogicalFilter):
+            return replace(plan, predicate=self._normalize(plan.predicate))
+        return plan
+
+    def _normalize(self, expression):
+        expression = _rewrite_expr(expression, self._normalize)
+        if not isinstance(expression, BinaryExpr) or expression.op not in {"and", "or"}:
+            return expression
+        operands = []
+        def collect(value):
+            if isinstance(value, BinaryExpr) and value.op == expression.op:
+                collect(value.left); collect(value.right)
+            else:
+                operands.append(value)
+        collect(expression)
+        result = operands[0]
+        for operand in operands[1:]:
+            result = BinaryExpr(expression.op, result, operand, expression.type)
+        return result
+
+
+class ConstraintMergeRule:
+    rule_id = "CONSTRAINT_MERGE"
+    version = "1"
+    proof_obligation = "Intersection of explicit market sets and exact/unspecified dates preserves conjunction semantics."
+
+    def apply(self, plan):
+        plan = _rewrite_inputs(plan, self.apply)
+        if not isinstance(plan, LogicalConstraint) or not isinstance(plan.input, LogicalConstraint):
+            return plan
+        inner = plan.input
+        left = set(inner.market_scope.markets)
+        right = set(plan.market_scope.markets)
+        markets = left if right == {"ALL"} else right if left == {"ALL"} else left & right
+        if not markets:
+            return LogicalEmpty(plan.schema, "PROVEN_MARKET_INTERSECTION_EMPTY")
+        first, second = inner.date_constraint, plan.date_constraint
+        if first.kind == "unspecified":
+            date = second
+        elif second.kind == "unspecified":
+            date = first
+        elif first.to_dict() == second.to_dict():
+            date = first
+        elif first.kind == second.kind == "exact":
+            return LogicalEmpty(plan.schema, "PROVEN_DATE_INTERSECTION_EMPTY")
+        else:
+            return plan
+        from ..domain import MarketScope
+        return LogicalConstraint(inner.input, MarketScope(tuple(sorted(markets))), date, plan.schema)
+
+
+class FilterPushDownRule:
+    rule_id = "FILTER_PUSH_DOWN"
+    version = "1"
+    proof_obligation = "A row-local predicate commutes with declarative market/date restriction."
+
+    def apply(self, plan):
+        plan = _rewrite_inputs(plan, self.apply)
+        if isinstance(plan, LogicalFilter) and isinstance(plan.input, LogicalConstraint) and self._row_local(plan.predicate):
+            constraint = plan.input
+            pushed = LogicalFilter(constraint.input, plan.predicate, plan.schema)
+            return LogicalConstraint(pushed, constraint.market_scope, constraint.date_constraint, plan.schema)
+        return plan
+
+    def _row_local(self, expression):
+        if isinstance(expression, (LiteralExpr,)):
+            return True
+        from ..ir import FieldRef
+        if isinstance(expression, FieldRef):
+            return True
+        if isinstance(expression, (BinaryExpr, ComparisonExpr)):
+            return self._row_local(expression.left) and self._row_local(expression.right)
+        return False
+
+
+class StageNormalizeRule:
+    rule_id = "STAGE_NORMALIZE"
+    version = "1"
+    proof_obligation = "Stage indexes are metadata and may be renumbered without changing operations."
+
+    def apply(self, plan):
+        plan = _rewrite_inputs(plan, self.apply)
+        if isinstance(plan, LogicalStage):
+            expected = plan.input.stage_index + 1 if isinstance(plan.input, LogicalStage) else 1
+            return replace(plan, stage_index=expected)
+        return plan
+
+
+class RankContractNormalizeRule:
+    rule_id = "RANK_CONTRACT_NORMALIZE"
+    version = "1"
+    proof_obligation = "Case normalization and removal of unary plus preserve rank direction and bound."
+
+    def apply(self, plan):
+        plan = _rewrite_inputs(plan, self.apply)
+        if isinstance(plan, LogicalRank):
+            direction = plan.direction.lower()
+            bound = plan.bound
+            if isinstance(bound, LiteralExpr) and isinstance(bound.value, str) and bound.value.startswith("+"):
+                bound = replace(bound, value=bound.value[1:])
+            return replace(plan, direction=direction, bound=bound)
         return plan
