@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalDynamicDateRange, PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -722,6 +722,54 @@ def test_calendar_temporal_windows_preserve_amount_and_unit(date, amount, unit):
     assert result.plan.window.kind == "recent_calendar"
     assert result.plan.window.calendar_amount == amount
     assert result.plan.window.calendar_unit == unit
+
+
+@pytest.mark.parametrize(
+    "date,range_kind,unit,amount,offset,month,day",
+    [
+        ("本月", "period", "month", 1, 0, None, None),
+        ("上周", "period", "week", 1, -1, None, None),
+        ("前年", "period", "year", 1, -2, None, None),
+        ("近五周", "recent", "week", 5, 0, None, None),
+        ("7月", "anchor_calendar", "month", 1, 0, 7, None),
+        ("3月2号", "anchor_calendar", "day", 1, 0, 3, 2),
+    ],
+)
+def test_scalar_dynamic_dates_lower_to_typed_physical_range(
+    date, range_kind, unit, amount, offset, month, day
+):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    assert "PhysicalDynamicDateRange" in payload
+    assert f'"range_kind":"{range_kind}"' in payload
+    assert f'"unit":"{unit}"' in payload
+    assert f'"amount":{amount}' in payload
+    assert f'"offset":{offset}' in payload
+    if month is not None:
+        assert f'"month":{month}' in payload
+    if day is not None:
+        assert f'"day":{day}' in payload
+
+
+@pytest.mark.parametrize(
+    "date,kind,offset",
+    [("本季度", "dynamic_period", 0), ("上周", "dynamic_period", -1), ("昨日", "session_slice", 1)],
+)
+def test_temporal_dynamic_dates_reach_explicit_window_contract(date, kind, offset):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', 'EXIST>0') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert result.plan.window.kind == kind
+    if kind == "session_slice":
+        assert result.plan.window.session_offset == offset
+    else:
+        assert result.plan.window.calendar_offset == offset
 
 
 def test_same_scope_temporal_arithmetic_lowers_all_required_columns_once():

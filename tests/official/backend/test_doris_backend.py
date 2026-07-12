@@ -169,6 +169,68 @@ def test_recent_sessions_use_distinct_exchange_calendar_membership():
     assert result.validation.passed is True
 
 
+@pytest.mark.parametrize(
+    "date,required",
+    [
+        ("本月", ("DATE_TRUNC", "MONTH")),
+        ("本季度", ("DATE_TRUNC", "QUARTER")),
+        ("上周", ("DATE_TRUNC", "WEEK", "DATE_SUB")),
+        ("前年", ("DATE_TRUNC", "YEAR", "INTERVAL '2' YEAR")),
+        ("近五周", ("DATE_SUB", "INTERVAL '34' DAY")),
+        ("近两个月", ("DATE_SUB", "INTERVAL '2' MONTH", "DATE_ADD")),
+        ("3月2号", ("DATE_TRUNC", "INTERVAL '2' MONTH", "INTERVAL '1' DAY")),
+    ],
+)
+def test_dynamic_calendar_ranges_render_from_latest_data_anchor(date, required):
+    result = render_doris(
+        _physical(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert "MAX(`calendar_anchor`.`bizdate`)" in result.sql
+    for fragment in required:
+        assert fragment in result.sql
+    assert result.validation.passed is True
+
+
+def test_preceding_session_slice_uses_distinct_calendar_limit_and_offset():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交额', '最近三天的前3日', '', '', '') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "GROUP BY `calendar_sessions`.`bizdate`" in result.sql
+    assert "ORDER BY `calendar_sessions`.`bizdate` DESC" in result.sql
+    assert "LIMIT 3 OFFSET 3" in result.sql
+    assert result.validation.passed is True
+
+
+@pytest.mark.parametrize(
+    "date,comparison,order,limit",
+    [
+        ("本周的前3天", "< DATE_TRUNC", "DESC", 3),
+        ("2024年3月10号的后5日", "> '2024-03-10'", "", 5),
+    ],
+)
+def test_boundary_session_ranges_select_real_exchange_dates(date, comparison, order, limit):
+    result = render_doris(
+        _physical(f"indicator('', '', '成交量', '{date}', '', '', 'EXIST>0') > 10"),
+        default_physical_catalog(),
+    )
+
+    assert comparison in result.sql
+    ordered = next(
+        item
+        for item in result.ast.find_all(exp.Ordered)
+        if isinstance(item.this, exp.Column) and item.this.table == "boundary_sessions"
+    )
+    assert bool(ordered.args.get("desc")) is (order == "DESC")
+    assert f"LIMIT {limit}" in result.sql
+    assert result.validation.passed is True
+
+
 def test_grouped_sum_uses_set_plan_and_latest_snapshot_join():
     result = render_doris(
         _physical(
@@ -542,7 +604,8 @@ def test_recent_calendar_temporal_window_uses_latest_data_anchor_and_date_sub():
     )
 
     assert "DATE_SUB" in result.sql
-    assert "INTERVAL '2' YEAR" in result.sql
+    assert "INTERVAL '1' YEAR" in result.sql
+    assert "DATE_TRUNC" in result.sql
     assert result.sql.count("MAX(`calendar_anchor`.`bizdate`)") == 2
     assert result.validation.passed is True
 

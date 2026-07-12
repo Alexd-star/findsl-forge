@@ -40,6 +40,7 @@ from .ir import (
     PhysicalComparison,
     PhysicalCompositeAggregate,
     PhysicalCoalesce,
+    PhysicalDynamicDateRange,
     PhysicalFilter,
     PhysicalGroupedAggregate,
     PhysicalIn,
@@ -55,6 +56,7 @@ from .ir import (
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalRecentSessions,
+    PhysicalSessionBoundaryRange,
     PhysicalScan,
     PhysicalTableScan,
     PhysicalTemporal,
@@ -1228,11 +1230,55 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
         return PhysicalTemporalWindow("calendar_range", start=window.start, end=window.end)
     if window.kind == "recent_sessions" and window.amount:
         return PhysicalTemporalWindow("recent_sessions", lookback_sessions=window.amount)
+    if window.kind == "relative_session" and window.amount:
+        return PhysicalTemporalWindow(
+            "session_slice",
+            lookback_sessions=1,
+            session_offset=window.amount,
+        )
+    if window.kind == "session_slice" and window.amount:
+        return PhysicalTemporalWindow(
+            "session_slice",
+            lookback_sessions=window.amount,
+            session_offset=window.offset,
+        )
+    if window.kind == "before_period_sessions" and window.amount and window.unit:
+        return PhysicalTemporalWindow(
+            "boundary_sessions",
+            lookback_sessions=window.amount,
+            calendar_unit=window.unit,
+            calendar_offset=window.offset,
+            boundary_direction="before",
+            boundary_kind="period",
+        )
+    if window.kind == "after_date_sessions" and window.amount and window.start:
+        return PhysicalTemporalWindow(
+            "boundary_sessions",
+            lookback_sessions=window.amount,
+            boundary_direction="after",
+            boundary_kind="date",
+            boundary_date=window.start,
+        )
     if window.kind == "recent_calendar" and window.amount and window.unit:
         return PhysicalTemporalWindow(
             "recent_calendar",
             calendar_amount=window.amount,
             calendar_unit=window.unit,
+        )
+    if window.kind == "dynamic_period" and window.unit:
+        return PhysicalTemporalWindow(
+            "dynamic_period",
+            calendar_amount=1,
+            calendar_unit=window.unit,
+            calendar_offset=window.offset,
+        )
+    if window.kind == "anchor_calendar" and window.unit:
+        return PhysicalTemporalWindow(
+            "anchor_calendar",
+            calendar_amount=1,
+            calendar_unit=window.unit,
+            anchor_month=window.month,
+            anchor_day=window.day,
         )
     if window.kind == "expression" and window.anchor:
         text = str(window.anchor).strip()
@@ -1530,6 +1576,69 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     stable_resource_id,
                     partition_key,
                     typed_date.amount,
+                )
+            )
+        elif typed_date.kind == "session_slice" and typed_date.amount:
+            constraints.append(
+                PhysicalRecentSessions(
+                    stable_resource_id,
+                    partition_key,
+                    typed_date.amount,
+                    offset=typed_date.offset,
+                )
+            )
+        elif typed_date.kind == "before_period_sessions" and typed_date.amount and typed_date.unit:
+            constraints.append(
+                PhysicalSessionBoundaryRange(
+                    stable_resource_id,
+                    partition_key,
+                    "before",
+                    "period",
+                    typed_date.amount,
+                    unit=typed_date.unit,
+                    offset=typed_date.offset,
+                )
+            )
+        elif typed_date.kind == "after_date_sessions" and typed_date.amount and typed_date.start:
+            constraints.append(
+                PhysicalSessionBoundaryRange(
+                    stable_resource_id,
+                    partition_key,
+                    "after",
+                    "date",
+                    typed_date.amount,
+                    boundary_date=typed_date.start,
+                )
+            )
+        elif typed_date.kind == "dynamic_period" and typed_date.unit:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "period",
+                    typed_date.unit,
+                    offset=typed_date.offset,
+                )
+            )
+        elif typed_date.kind == "recent_calendar" and typed_date.amount and typed_date.unit:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "recent",
+                    typed_date.unit,
+                    amount=typed_date.amount,
+                )
+            )
+        elif typed_date.kind == "anchor_calendar" and typed_date.unit:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "anchor_calendar",
+                    typed_date.unit,
+                    month=typed_date.month,
+                    day=typed_date.day,
                 )
             )
         elif typed_date.kind == "calendar_range" and typed_date.start and typed_date.end:

@@ -153,7 +153,7 @@ def parse_date_constraint(value: str) -> DateConstraint:
         return DateConstraint("unspecified")
     if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
         return DateConstraint("exact", value, value)
-    if value in {"今日", "今天", "当天", "当前", "现在", "最新"}:
+    if value in {"今日", "今天", "当天", "当前", "目前", "当日", "本日", "现在", "最新"}:
         return DateConstraint("relative", anchor="today")
     relative_sessions = {
         "昨天": 1,
@@ -172,6 +172,133 @@ def parse_date_constraint(value: str) -> DateConstraint:
         )
     number = r"\d+|[零〇一二两三四五六七八九十百]+"
     year_token = r"\d{2,4}|[零〇一二两三四五六七八九]{2,4}"
+    dynamic_periods = {
+        "本周": ("week", 0),
+        "本月": ("month", 0),
+        "这个月": ("month", 0),
+        "本季度": ("quarter", 0),
+        "这个季度": ("quarter", 0),
+        "今年": ("year", 0),
+        "本年": ("year", 0),
+        "本年度": ("year", 0),
+        "今年以来": ("year", 0),
+        "年初至今": ("year", 0),
+        "上周": ("week", -1),
+        "上月": ("month", -1),
+        "上个月": ("month", -1),
+        "去年": ("year", -1),
+        "上一年": ("year", -1),
+        "前年": ("year", -2),
+    }
+    if value in dynamic_periods:
+        unit, offset = dynamic_periods[value]
+        return DateConstraint(
+            "dynamic_period",
+            anchor="latest",
+            unit=unit,
+            trading_day_based=False,
+            offset=offset,
+        )
+    ordinal_year = re.fullmatch(
+        rf"(?P<base>.+)的第(?P<count>{number})年",
+        value,
+    )
+    if ordinal_year:
+        base = parse_date_constraint(ordinal_year.group("base"))
+        count = parse_count_token(ordinal_year.group("count"), value)
+        if base.kind == "calendar_range" and base.start:
+            year_value = int(base.start[:4]) + count - 1
+            return DateConstraint(
+                "calendar_range",
+                f"{year_value:04d}-01-01",
+                f"{year_value:04d}-12-31",
+                unit="year",
+                trading_day_based=False,
+            )
+    shifted_month = re.fullmatch(
+        rf"(?P<base>.+)的前(?P<count>{number})月",
+        value,
+    )
+    if shifted_month:
+        base = parse_date_constraint(shifted_month.group("base"))
+        count = parse_count_token(shifted_month.group("count"), value)
+        if base.kind == "anchor_calendar" and base.unit == "month":
+            return DateConstraint(
+                "anchor_calendar",
+                anchor="latest",
+                unit="month",
+                trading_day_based=False,
+                offset=base.offset - count,
+                month=base.month,
+            )
+    previous_sessions = re.fullmatch(
+        rf"(?P<base>.+)的前(?P<count>{number})(?:个交易日|日|天)",
+        value,
+    )
+    if previous_sessions:
+        base = parse_date_constraint(previous_sessions.group("base"))
+        count = parse_count_token(previous_sessions.group("count"), value)
+        if base.kind == "relative_session" and base.amount:
+            return DateConstraint(
+                "session_slice",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                offset=base.amount + 1,
+            )
+        if base.kind == "recent_sessions" and base.amount:
+            return DateConstraint(
+                "session_slice",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                offset=base.amount,
+            )
+        if base.kind == "dynamic_period" and base.unit:
+            return DateConstraint(
+                "before_period_sessions",
+                anchor="latest",
+                amount=count,
+                unit=base.unit,
+                trading_day_based=True,
+                offset=base.offset,
+            )
+    following_sessions = re.fullmatch(
+        rf"(?P<base>.+)的后(?P<count>{number})(?:个交易日|日|天)",
+        value,
+    )
+    if following_sessions:
+        base = parse_date_constraint(following_sessions.group("base"))
+        count = parse_count_token(following_sessions.group("count"), value)
+        if base.kind == "exact" and base.start:
+            return DateConstraint(
+                "after_date_sessions",
+                start=base.start,
+                anchor="explicit",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+            )
+    ordinal_session = re.fullmatch(
+        rf"(?P<base>.+)的第(?P<count>{number})(?:个交易日|日|天)",
+        value,
+    )
+    if ordinal_session:
+        base = parse_date_constraint(ordinal_session.group("base"))
+        count = parse_count_token(ordinal_session.group("count"), value)
+        if base.kind == "relative_session" and base.amount:
+            target_offset = base.amount - count + 1
+            if target_offset >= 0:
+                return (
+                    DateConstraint("relative", anchor="today")
+                    if target_offset == 0
+                    else DateConstraint(
+                        "relative_session",
+                        anchor="latest",
+                        amount=target_offset,
+                        unit="session",
+                    )
+                )
     full_date = re.fullmatch(
         rf"(?P<year>{year_token})年(?P<month>{number})月(?P<day>{number})(?:日|号)",
         value,
@@ -193,6 +320,51 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 value=value,
             ) from exc
         return DateConstraint("exact", normalized, normalized)
+    anchor_date = re.fullmatch(
+        rf"(?:(?P<month>{number})月)?(?P<day>{number})(?:日|号)",
+        value,
+    )
+    if anchor_date:
+        month_value = (
+            parse_count_token(anchor_date.group("month"), value)
+            if anchor_date.group("month")
+            else None
+        )
+        day_value = parse_count_token(anchor_date.group("day"), value)
+        if (month_value is not None and not 1 <= month_value <= 12) or not 1 <= day_value <= 31:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid anchor-relative calendar date {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "anchor_calendar",
+            anchor="latest",
+            unit="day",
+            trading_day_based=False,
+            month=month_value,
+            day=day_value,
+        )
+    anchor_month = re.fullmatch(rf"(?P<month>{number})月", value)
+    if anchor_month:
+        month_value = parse_count_token(anchor_month.group("month"), value)
+        if not 1 <= month_value <= 12:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid anchor-relative calendar month {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "anchor_calendar",
+            anchor="latest",
+            unit="month",
+            trading_day_based=False,
+            month=month_value,
+        )
     month = re.fullmatch(
         rf"(?P<year>{year_token})年(?P<month>{number})月",
         value,
@@ -218,26 +390,15 @@ def parse_date_constraint(value: str) -> DateConstraint:
             trading_day_based=False,
         )
     recent_sessions = re.fullmatch(
-        rf"(?:最近|近|过去|这)(?P<count>{number})(?:个)?(?:交易)?(?:日|天)",
+        rf"(?:最近|近|过去|这)(?P<count>{number})(?:个)?(?:交易)?(?:日|天)(?:内|以内|之内)?",
         value,
     ) or re.fullmatch(
-        rf"(?P<count>{number})(?:个)?(?:交易)?(?:日|天)(?:内|以内)",
+        rf"(?P<count>{number})(?:个)?(?:交易)?(?:日|天)(?:内|以内|之内)?",
         value,
     )
     if recent_sessions:
         amount = parse_count_token(recent_sessions.group("count"), value)
         return DateConstraint("recent_sessions", anchor="latest", amount=amount, unit="session")
-    recent_calendar = re.fullmatch(
-        rf"(?:最近|近|过去)(?P<count>{number})(?:个)?(?P<unit>年|月)(?:内|以内)?",
-        value,
-    ) or re.fullmatch(
-        rf"(?P<count>{number})(?:个)?(?P<unit>年|月)(?:内|以内)",
-        value,
-    )
-    if recent_calendar:
-        amount = parse_count_token(recent_calendar.group("count"), value)
-        unit = {"年": "year", "月": "month"}[recent_calendar.group("unit")]
-        return DateConstraint("recent_calendar", anchor="latest", amount=amount, unit=unit, trading_day_based=False)
     year = re.fullmatch(rf"(?P<year>{year_token})年", value)
     if year:
         token = year.group("year")
@@ -251,6 +412,17 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 unit="year",
                 trading_day_based=False,
             )
+    recent_calendar = re.fullmatch(
+        rf"(?:最近|近|过去|这)(?P<count>{number})(?:个)?(?P<unit>年|月|周)(?:内|以内|之内|至今)?",
+        value,
+    ) or re.fullmatch(
+        rf"(?P<count>{number})(?:个)?(?P<unit>年|月|周)(?:内|以内|之内)?",
+        value,
+    )
+    if recent_calendar:
+        amount = parse_count_token(recent_calendar.group("count"), value)
+        unit = {"年": "year", "月": "month", "周": "week"}[recent_calendar.group("unit")]
+        return DateConstraint("recent_calendar", anchor="latest", amount=amount, unit=unit, trading_day_based=False)
     return DateConstraint("expression", anchor=value)
 
 

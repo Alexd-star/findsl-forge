@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
+    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
     PhysicalSetOperation,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -158,16 +158,38 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("invalid physical temporal comparator")
         if plan.unit not in {"", "日", "周", "月", "季度", "年"}:
             raise ValueError("physical temporal bucket unit is not implemented")
-        if plan.window.kind not in {"all_history", "recent_sessions", "recent_calendar", "calendar_range", "exact_date", "latest_session"}:
+        if plan.window.kind not in {"all_history", "recent_sessions", "session_slice", "boundary_sessions", "recent_calendar", "dynamic_period", "anchor_calendar", "calendar_range", "exact_date", "latest_session"}:
             raise ValueError("invalid physical temporal window")
-        if plan.window.kind == "recent_sessions" and (plan.window.lookback_sessions is None or plan.window.lookback_sessions <= 0):
+        if plan.window.kind in {"recent_sessions", "session_slice"} and (plan.window.lookback_sessions is None or plan.window.lookback_sessions <= 0):
             raise ValueError("recent temporal window requires positive trading sessions")
+        if plan.window.session_offset < 0:
+            raise ValueError("session window offset cannot be negative")
+        if plan.window.kind == "boundary_sessions" and (
+            plan.window.lookback_sessions is None
+            or plan.window.lookback_sessions <= 0
+            or plan.window.boundary_direction not in {"before", "after"}
+            or plan.window.boundary_kind not in {"period", "date"}
+            or (plan.window.boundary_kind == "period" and plan.window.calendar_unit not in {"week", "month", "quarter", "year"})
+            or (plan.window.boundary_kind == "date" and not plan.window.boundary_date)
+        ):
+            raise ValueError("session boundary window is incomplete")
         if plan.window.kind == "recent_calendar" and (
             plan.window.calendar_amount is None
             or plan.window.calendar_amount <= 0
             or plan.window.calendar_unit not in {"day", "week", "month", "year"}
         ):
             raise ValueError("recent calendar window requires a positive typed interval")
+        if plan.window.kind == "dynamic_period" and (
+            plan.window.calendar_unit not in {"week", "month", "quarter", "year"}
+            or plan.window.calendar_offset > 0
+        ):
+            raise ValueError("dynamic period requires a supported non-future calendar contract")
+        if plan.window.kind == "anchor_calendar" and (
+            plan.window.calendar_unit not in {"day", "month"}
+            or (plan.window.anchor_month is not None and not 1 <= plan.window.anchor_month <= 12)
+            or (plan.window.anchor_day is not None and not 1 <= plan.window.anchor_day <= 31)
+        ):
+            raise ValueError("anchor calendar window has invalid components")
         if plan.window.kind in {"calendar_range", "exact_date"} and (
             not plan.window.start or not plan.window.end
         ):
@@ -221,6 +243,39 @@ def _validate_expr(expression, catalog, expressions=None):
             raise PhysicalCatalogError("recent sessions are restricted to the resource partition key")
         if expression.amount <= 0:
             raise ValueError("recent sessions require a positive amount")
+        if expression.offset < 0:
+            raise ValueError("recent sessions offset cannot be negative")
+    elif isinstance(expression, PhysicalDynamicDateRange):
+        resource = catalog.resource(expression.resource_id)
+        if expression.column != resource.partition_key:
+            raise PhysicalCatalogError("dynamic date ranges are restricted to the resource partition key")
+        if expression.range_kind not in {"period", "recent", "anchor_calendar"}:
+            raise ValueError("unsupported dynamic date range kind")
+        if expression.amount <= 0 or expression.offset > 0:
+            raise ValueError("dynamic date range cannot be empty or future-relative")
+        allowed_units = {
+            "period": {"week", "month", "quarter", "year"},
+            "recent": {"week", "month", "year"},
+            "anchor_calendar": {"day", "month"},
+        }
+        if expression.unit not in allowed_units[expression.range_kind]:
+            raise ValueError("dynamic date range unit does not match its kind")
+        if expression.month is not None and not 1 <= expression.month <= 12:
+            raise ValueError("dynamic date month is invalid")
+        if expression.day is not None and not 1 <= expression.day <= 31:
+            raise ValueError("dynamic date day is invalid")
+    elif isinstance(expression, PhysicalSessionBoundaryRange):
+        resource = catalog.resource(expression.resource_id)
+        if expression.column != resource.partition_key:
+            raise PhysicalCatalogError("session boundary ranges require the partition key")
+        if expression.direction not in {"before", "after"} or expression.boundary_kind not in {"period", "date"}:
+            raise ValueError("invalid session boundary range contract")
+        if expression.amount <= 0 or expression.offset > 0:
+            raise ValueError("session boundary range cannot be empty or future-relative")
+        if expression.boundary_kind == "period" and expression.unit not in {"week", "month", "quarter", "year"}:
+            raise ValueError("session period boundary has no supported unit")
+        if expression.boundary_kind == "date" and not expression.boundary_date:
+            raise ValueError("explicit session boundary requires a date")
     elif isinstance(expression, PhysicalPrefixAverage):
         resource = catalog.resource(expression.resource_id)
         if "prefix" not in resource.capabilities:

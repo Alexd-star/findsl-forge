@@ -149,12 +149,18 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("近3个交易日", "recent_sessions", 3, "session"),
         ("两年内", "recent_calendar", 2, "year"),
         ("近两月", "recent_calendar", 2, "month"),
+        ("近五周", "recent_calendar", 5, "week"),
+        ("本季度", "dynamic_period", None, "quarter"),
+        ("上个月", "dynamic_period", None, "month"),
+        ("前年", "dynamic_period", None, "year"),
         ("一八年", "calendar_range", None, "year"),
         ("2024年8月", "calendar_range", None, "month"),
         ("2011年3月25日", "exact", None, None),
         ("昨天", "relative_session", 1, "session"),
         ("前天", "relative_session", 2, "session"),
         ("当天", "relative", None, None),
+        ("目前", "relative", None, None),
+        ("四天", "recent_sessions", 4, "session"),
     ],
 )
 def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
@@ -181,6 +187,57 @@ def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
             "2011-03-25",
             "2011-03-25",
         )
+
+
+@pytest.mark.parametrize(
+    "date,kind,offset,month,day",
+    [
+        ("本月", "dynamic_period", 0, None, None),
+        ("上周", "dynamic_period", -1, None, None),
+        ("去年", "dynamic_period", -1, None, None),
+        ("前年", "dynamic_period", -2, None, None),
+        ("7月", "anchor_calendar", 0, 7, None),
+        ("3月2号", "anchor_calendar", 0, 3, 2),
+        ("8号", "anchor_calendar", 0, None, 8),
+    ],
+)
+def test_dynamic_date_contract_preserves_anchor_components(date, kind, offset, month, day):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == kind
+    assert bound.date_constraint.offset == offset
+    assert bound.date_constraint.month == month
+    assert bound.date_constraint.day == day
+
+
+@pytest.mark.parametrize(
+    "date,kind,start,offset,amount",
+    [
+        ("一二年的第4年", "calendar_range", "2015-01-01", 0, None),
+        ("7月的前1月", "anchor_calendar", None, -1, None),
+        ("昨日的第二天", "relative", None, 0, None),
+        ("昨日的前1日", "session_slice", None, 2, 1),
+        ("最近三天的前3日", "session_slice", None, 3, 3),
+        ("过去10个交易日内", "recent_sessions", None, 0, 10),
+        ("本周的前3天", "before_period_sessions", None, 0, 3),
+        ("2024年3月10号的后5日", "after_date_sessions", "2024-03-10", 0, 5),
+    ],
+)
+def test_composite_date_phrases_preserve_relative_session_semantics(
+    date, kind, start, offset, amount
+):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == kind
+    assert bound.date_constraint.start == start
+    assert bound.date_constraint.offset == offset
+    assert bound.date_constraint.amount == amount
 
 
 @pytest.mark.parametrize("date", ["2024年13月", "2024年2月30日"])

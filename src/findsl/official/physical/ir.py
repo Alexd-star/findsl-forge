@@ -136,6 +136,7 @@ class PhysicalRecentSessions(PhysicalExpr):
     resource_id: str
     column: str
     amount: int
+    offset: int = 0
     type: OfficialType = BOOLEAN
 
     def to_dict(self):
@@ -144,6 +145,61 @@ class PhysicalRecentSessions(PhysicalExpr):
             "resource_id": self.resource_id,
             "column": self.column,
             "amount": self.amount,
+            "offset": self.offset,
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalDynamicDateRange(PhysicalExpr):
+    resource_id: str
+    column: str
+    range_kind: str
+    unit: str
+    amount: int = 1
+    offset: int = 0
+    month: Optional[int] = None
+    day: Optional[int] = None
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalDynamicDateRange",
+            "resource_id": self.resource_id,
+            "column": self.column,
+            "range_kind": self.range_kind,
+            "unit": self.unit,
+            "amount": self.amount,
+            "offset": self.offset,
+            "month": self.month,
+            "day": self.day,
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalSessionBoundaryRange(PhysicalExpr):
+    resource_id: str
+    column: str
+    direction: str
+    boundary_kind: str
+    amount: int
+    unit: Optional[str] = None
+    offset: int = 0
+    boundary_date: Optional[str] = None
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalSessionBoundaryRange",
+            "resource_id": self.resource_id,
+            "column": self.column,
+            "direction": self.direction,
+            "boundary_kind": self.boundary_kind,
+            "amount": self.amount,
+            "unit": self.unit,
+            "offset": self.offset,
+            "boundary_date": self.boundary_date,
             "type": self.type.to_dict(),
         }
 
@@ -181,9 +237,16 @@ class PhysicalTemporalWindow(CanonicalIr):
     end: Optional[str] = None
     calendar_amount: Optional[int] = None
     calendar_unit: Optional[str] = None
+    calendar_offset: int = 0
+    session_offset: int = 0
+    anchor_month: Optional[int] = None
+    anchor_day: Optional[int] = None
+    boundary_direction: Optional[str] = None
+    boundary_kind: Optional[str] = None
+    boundary_date: Optional[str] = None
 
     def to_dict(self):
-        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit}
+        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit, "calendar_offset": self.calendar_offset, "session_offset": self.session_offset, "anchor_month": self.anchor_month, "anchor_day": self.anchor_day, "boundary_direction": self.boundary_direction, "boundary_kind": self.boundary_kind, "boundary_date": self.boundary_date}
 
 
 @dataclass(frozen=True)

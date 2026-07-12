@@ -16,6 +16,7 @@ from ..physical.ir import (
     PhysicalComparison,
     PhysicalCompositeAggregate,
     PhysicalFilter,
+    PhysicalDynamicDateRange,
     PhysicalGroupedAggregate,
     PhysicalIn,
     PhysicalJoin,
@@ -30,6 +31,7 @@ from ..physical.ir import (
     PhysicalRank,
     PhysicalRecentSessions,
     PhysicalScan,
+    PhysicalSessionBoundaryRange,
     PhysicalTableScan,
     PhysicalSetOperation,
     PhysicalTemporal,
@@ -589,7 +591,7 @@ def _render_temporal(
     ).as_("matched", quoted=True)
     source = source.select(matched, append=True)
 
-    needs_session_limit = plan.window.kind in {"recent_sessions", "latest_session"}
+    needs_session_limit = plan.window.kind in {"recent_sessions", "session_slice", "latest_session"}
     if needs_session_limit:
         source = source.select(
             _row_number(
@@ -620,6 +622,23 @@ def _render_temporal(
                 ),
             )
         )
+    elif plan.window.kind == "boundary_sessions":
+        source = source.where(
+            _render_expr(
+                PhysicalSessionBoundaryRange(
+                    scan.anchor_resource_id or scan.resource_id,
+                    "bizdate",
+                    plan.window.boundary_direction,
+                    plan.window.boundary_kind,
+                    plan.window.lookback_sessions or 1,
+                    unit=plan.window.calendar_unit,
+                    offset=plan.window.calendar_offset,
+                    boundary_date=plan.window.boundary_date,
+                ),
+                catalog,
+                scan,
+            )
+        )
     elif plan.window.kind == "recent_calendar":
         amount = plan.window.calendar_amount
         unit = plan.window.calendar_unit
@@ -628,12 +647,15 @@ def _render_temporal(
                 "DORIS_TEMPORAL_WINDOW_INVALID",
                 "recent calendar window is missing amount or unit",
             )
-        lower_anchor = _latest_calendar_anchor(catalog, scan)
-        upper_anchor = _latest_calendar_anchor(catalog, scan)
-        lower = exp.DateSub(
-            this=lower_anchor,
-            expression=exp.Literal.string(str(amount)),
-            unit=exp.Var(this=unit.upper()),
+        lower, upper, _ = _dynamic_date_bounds(
+            catalog,
+            scan.anchor_resource_id or scan.resource_id,
+            "recent",
+            unit,
+            amount,
+            0,
+            None,
+            None,
         )
         source = source.where(
             exp.and_(
@@ -643,21 +665,58 @@ def _render_temporal(
                 ),
                 exp.LTE(
                     this=exp.column("bizdate", table=stable_alias, quoted=True),
-                    expression=upper_anchor,
+                    expression=upper,
                 ),
             )
         )
+    elif plan.window.kind in {"dynamic_period", "anchor_calendar"}:
+        amount = plan.window.calendar_amount or 1
+        unit = plan.window.calendar_unit
+        if unit is None:
+            raise DorisBackendError(
+                "DORIS_TEMPORAL_WINDOW_INVALID",
+                "dynamic calendar window is missing its unit",
+            )
+        lower, upper, validity = _dynamic_date_bounds(
+            catalog,
+            scan.anchor_resource_id or scan.resource_id,
+            "period" if plan.window.kind == "dynamic_period" else "anchor_calendar",
+            unit,
+            amount,
+            plan.window.calendar_offset,
+            plan.window.anchor_month,
+            plan.window.anchor_day,
+        )
+        bounds = exp.and_(
+            exp.GTE(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                expression=lower,
+            ),
+            exp.LTE(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                expression=upper,
+            ),
+        )
+        source = source.where(exp.and_(bounds, validity) if validity is not None else bounds)
 
     ctes = [(source_rows_name, source)]
     relation_name = source_rows_name
     if needs_session_limit:
         lookback = plan.window.lookback_sessions or 1
-        eligible = exp.select(exp.Star()).from_(exp.table_(source_rows_name, quoted=True)).where(
-            exp.LTE(
+        offset = plan.window.session_offset
+        session_bounds = exp.LTE(
                 this=exp.column("lookback_row", table=source_rows_name, quoted=True),
-                expression=exp.convert(lookback),
-            )
+                expression=exp.convert(offset + lookback),
         )
+        if offset:
+            session_bounds = exp.and_(
+                exp.GT(
+                    this=exp.column("lookback_row", table=source_rows_name, quoted=True),
+                    expression=exp.convert(offset),
+                ),
+                session_bounds,
+            )
+        eligible = exp.select(exp.Star()).from_(exp.table_(source_rows_name, quoted=True)).where(session_bounds)
         ctes.append((eligible_rows_name, eligible))
         relation_name = eligible_rows_name
 
@@ -900,6 +959,114 @@ def _latest_calendar_anchor(catalog: PhysicalCatalog, scan: PhysicalScan) -> exp
     return exp.Subquery(this=query)
 
 
+def _latest_resource_anchor(catalog: PhysicalCatalog, resource_id: str) -> exp.Subquery:
+    resource = catalog.resource(resource_id)
+    if resource.partition_key is None:
+        raise DorisBackendError(
+            "DORIS_DATE_ANCHOR_UNAVAILABLE",
+            f"resource {resource_id} has no partition key",
+        )
+    query = exp.select(
+        exp.Max(this=exp.column(resource.partition_key, table="calendar_anchor", quoted=True))
+    ).from_(
+        exp.table_(
+            resource.table,
+            db=resource.database,
+            quoted=True,
+            alias="calendar_anchor",
+        )
+    )
+    return exp.Subquery(this=query)
+
+
+def _date_shift(value, amount: int, unit: str):
+    if amount == 0:
+        return value
+    operator = exp.DateAdd if amount > 0 else exp.DateSub
+    return operator(
+        this=value,
+        expression=exp.Literal.string(str(abs(amount))),
+        unit=exp.Var(this=unit.upper()),
+    )
+
+
+def _date_trunc(value, unit: str):
+    return exp.DateTrunc(this=value, unit=exp.Literal.string(unit.upper()))
+
+
+def _dynamic_date_bounds(
+    catalog: PhysicalCatalog,
+    resource_id: str,
+    range_kind: str,
+    unit: str,
+    amount: int,
+    offset: int,
+    month: Optional[int],
+    day: Optional[int],
+):
+    anchor = _latest_resource_anchor(catalog, resource_id)
+    validity = None
+    if range_kind == "period":
+        current_start = _date_trunc(anchor.copy(), unit)
+        lower = _date_shift(current_start.copy(), offset, unit)
+        upper = (
+            anchor.copy()
+            if offset == 0
+            else _date_shift(
+                _date_shift(current_start.copy(), offset + 1, unit),
+                -1,
+                "day",
+            )
+        )
+        return lower, upper, validity
+    if range_kind == "recent":
+        if unit == "week":
+            lower = _date_shift(anchor.copy(), -(amount * 7 - 1), "day")
+        elif unit == "month":
+            lower = _date_shift(_date_shift(anchor.copy(), -amount, "month"), 1, "day")
+        elif unit == "year":
+            lower = _date_trunc(
+                _date_shift(anchor.copy(), -(amount - 1), "year"),
+                "year",
+            )
+        else:
+            raise DorisBackendError(
+                "DORIS_DATE_RANGE_UNSUPPORTED",
+                f"unsupported recent calendar unit {unit}",
+            )
+        return lower, anchor.copy(), validity
+    if range_kind == "anchor_calendar":
+        base = (
+            _date_trunc(anchor.copy(), "month")
+            if month is None
+            else _date_shift(
+                _date_trunc(anchor.copy(), "year"),
+                month - 1 + offset,
+                "month",
+            )
+        )
+        if day is not None:
+            lower = _date_shift(base.copy(), day - 1, "day")
+            upper = lower.copy()
+            expected_month = (
+                exp.convert(month)
+                if month is not None
+                else exp.func("MONTH", anchor.copy())
+            )
+            validity = exp.EQ(
+                this=exp.func("MONTH", lower.copy()),
+                expression=expected_month,
+            )
+        else:
+            lower = base.copy()
+            upper = _date_shift(_date_shift(base.copy(), 1, "month"), -1, "day")
+        return lower, upper, validity
+    raise DorisBackendError(
+        "DORIS_DATE_RANGE_UNSUPPORTED",
+        f"unsupported dynamic date range kind {range_kind}",
+    )
+
+
 def _row_number(table: str, keys, order_column: str, descending: bool = False) -> exp.Window:
     return exp.Window(
         this=exp.RowNumber(),
@@ -1031,6 +1198,83 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             .from_(table)
             .group_by(column.copy())
             .order_by(exp.Ordered(this=column.copy(), desc=True))
+            .limit(expression.amount)
+        )
+        if expression.offset:
+            query = query.offset(expression.offset)
+        return exp.In(
+            this=exp.column(
+                expression.column,
+                table=_expression_alias(expression.resource_id, scan),
+                quoted=True,
+            ),
+            query=exp.Subquery(this=query),
+        )
+    if isinstance(expression, PhysicalDynamicDateRange):
+        if scan is None:
+            raise DorisBackendError(
+                "DORIS_DATE_CONTEXT_MISSING",
+                "dynamic date range requires a scan context",
+            )
+        column = exp.column(
+            expression.column,
+            table=_expression_alias(expression.resource_id, scan),
+            quoted=True,
+        )
+        lower, upper, validity = _dynamic_date_bounds(
+            catalog,
+            expression.resource_id,
+            expression.range_kind,
+            expression.unit,
+            expression.amount,
+            expression.offset,
+            expression.month,
+            expression.day,
+        )
+        predicate = exp.and_(
+            exp.GTE(this=column.copy(), expression=lower),
+            exp.LTE(this=column.copy(), expression=upper),
+        )
+        return exp.and_(predicate, validity) if validity is not None else predicate
+    if isinstance(expression, PhysicalSessionBoundaryRange):
+        if scan is None:
+            raise DorisBackendError(
+                "DORIS_DATE_CONTEXT_MISSING",
+                "session boundary range requires a scan context",
+            )
+        resource = catalog.resource(expression.resource_id)
+        alias = "boundary_sessions"
+        calendar_column = exp.column(expression.column, table=alias, quoted=True)
+        if expression.boundary_kind == "period":
+            boundary = _date_shift(
+                _date_trunc(
+                    _latest_resource_anchor(catalog, expression.resource_id),
+                    expression.unit,
+                ),
+                expression.offset,
+                expression.unit,
+            )
+        else:
+            boundary = exp.convert(expression.boundary_date)
+        comparator = exp.LT if expression.direction == "before" else exp.GT
+        query = (
+            exp.select(calendar_column.copy())
+            .from_(
+                exp.table_(
+                    resource.table,
+                    db=resource.database,
+                    quoted=True,
+                    alias=alias,
+                )
+            )
+            .where(comparator(this=calendar_column.copy(), expression=boundary))
+            .group_by(calendar_column.copy())
+            .order_by(
+                exp.Ordered(
+                    this=calendar_column.copy(),
+                    desc=expression.direction == "before",
+                )
+            )
             .limit(expression.amount)
         )
         return exp.In(
