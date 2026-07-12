@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank, PhysicalTemporal
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank, PhysicalSetOperation, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -424,3 +424,35 @@ def test_same_scope_temporal_arithmetic_lowers_all_required_columns_once():
     assert isinstance(result.plan, PhysicalTemporal)
     assert {column.column for column in result.plan.input.columns} == {"volume", "turnover"}
     assert "PhysicalBinary" in result.plan.predicate.canonical_json()
+
+
+def test_temporal_boolean_branches_lower_to_physical_set_operation():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 and "
+            "indicator('', '', '成交额', '最近10日', '', '', 'CONS=3日') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalSetOperation)
+    assert result.plan.operation == "intersect"
+    assert isinstance(result.plan.left, PhysicalTemporal)
+    assert isinstance(result.plan.right, PhysicalTemporal)
+
+
+def test_temporal_set_operation_supports_independent_physical_resources():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 or "
+            "indicator('', '', '主力净流入', '最近5日', '', '', 'EXIST>0') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalSetOperation)
+    assert result.plan.operation == "union"
+    assert {result.plan.left.input.resource_id, result.plan.right.input.resource_id} == {
+        "official_basic",
+        "official_ext",
+    }

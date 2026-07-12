@@ -5,12 +5,18 @@ from dataclasses import replace
 
 from ..ir import BinaryExpr, ComparisonExpr, LiteralExpr, LogicalConstraint, LogicalEmpty, LogicalFilter, LogicalLimit, LogicalRank
 from ..ir.expressions import CallExpr, LogicalExpr, RangeExpr
-from ..ir.relational import LogicalPlan, LogicalStage
+from ..ir.relational import LogicalPlan, LogicalSetOperation, LogicalStage
 from ..types import BOOLEAN, NUMERIC
 
 
 def _rewrite_inputs(plan: LogicalPlan, callback):
     result = plan
+    if isinstance(plan, LogicalSetOperation):
+        return replace(
+            result,
+            left=callback(plan.left),
+            right=callback(plan.right),
+        )
     if hasattr(plan, "input"):
         result = replace(result, input=callback(plan.input))
     if isinstance(result, LogicalStage):

@@ -19,6 +19,7 @@ from .relational import (
     LogicalRank,
     LogicalScan,
     LogicalStage,
+    LogicalSetOperation,
     LogicalWindow,
 )
 
@@ -52,6 +53,13 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
     elif isinstance(plan, LogicalEmpty):
         if not plan.reason.startswith("PROVEN_"):
             _fail("IR_EMPTY_REASON", "empty relation requires a proven logical reason", f"{path}.reason")
+    elif isinstance(plan, LogicalSetOperation):
+        if plan.operation not in {"intersect", "union"}:
+            _fail("IR_SET_OPERATION", "logical set operation is unsupported", f"{path}.operation")
+        if plan.left.schema.to_dict() != plan.right.schema.to_dict() or plan.schema.to_dict() != plan.left.schema.to_dict():
+            _fail("IR_SET_SCHEMA", "set-operation branch schemas must match", f"{path}.schema")
+        _validate_plan(plan.left, f"{path}.left", strict, active)
+        _validate_plan(plan.right, f"{path}.right", strict, active)
     else:
         _validate_plan(plan.input, f"{path}.input", strict, active)
     if isinstance(plan, LogicalFilter):

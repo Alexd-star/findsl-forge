@@ -3,7 +3,7 @@ import pytest
 from findsl.official.physical import (
     PhysicalCatalogError, PhysicalColumn, PhysicalComparison, PhysicalFilter,
     PhysicalLimit, PhysicalLiteral, PhysicalScan, PhysicalTemporal,
-    PhysicalTemporalWindow, validate_physical_plan,
+    PhysicalTemporalWindow, PhysicalSetOperation, validate_physical_plan,
 )
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.types import BOOLEAN, NUMERIC
@@ -46,3 +46,24 @@ def test_temporal_plan_is_explicit_deterministic_and_trading_sequence_based():
     assert validate_physical_plan(plan, default_physical_catalog()) is plan
     assert plan.node_id == plan.node_id
     assert plan.to_dict()["window"]["lookback_sessions"] == 10
+
+
+def test_set_operation_validates_two_independent_temporal_relations():
+    column = PhysicalColumn("official_basic", "volume", NUMERIC)
+    scan = PhysicalScan("official_basic", (column,), None)
+    predicate = PhysicalComparison(">", column, PhysicalLiteral(100, NUMERIC))
+    branch = PhysicalTemporal(
+        scan,
+        predicate,
+        "EXIST",
+        ">",
+        0,
+        None,
+        "日",
+        False,
+        PhysicalTemporalWindow("recent_sessions", lookback_sessions=5),
+    )
+    plan = PhysicalSetOperation(branch, branch, "intersect")
+
+    assert validate_physical_plan(plan, default_physical_catalog()) is plan
+    assert plan.to_dict()["operation"] == "intersect"

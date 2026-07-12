@@ -16,6 +16,7 @@ from ..ir import (
     LogicalLimit,
     LogicalRank,
     LogicalStage,
+    LogicalSetOperation,
     RangeExpr,
 )
 from ..lowering import LoweringResult
@@ -39,6 +40,7 @@ from .ir import (
     PhysicalScan,
     PhysicalTemporal,
     PhysicalTemporalWindow,
+    PhysicalSetOperation,
     PhysicalUnary,
 )
 from .validate import validate_physical_plan
@@ -116,6 +118,39 @@ def plan_physical(
     expressions: Optional[PhysicalExpressionRegistry] = None,
     allow_shadow_strategies: bool = False,
 ) -> PhysicalPlanningResult:
+    if isinstance(lowering.plan, LogicalSetOperation):
+        left = plan_physical(
+            replace(lowering, plan=lowering.plan.left),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        right = plan_physical(
+            replace(lowering, plan=lowering.plan.right),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        plan = PhysicalSetOperation(left.plan, right.plan, lowering.plan.operation)
+        validate_physical_plan(plan, catalog, expressions)
+        decisions = tuple(
+            replace(item, strategy_id=f"left:{item.strategy_id}")
+            for item in left.decisions
+        ) + tuple(
+            replace(item, strategy_id=f"right:{item.strategy_id}")
+            for item in right.decisions
+        )
+        resources = "+".join(sorted({left.selected_resource, right.selected_resource}))
+        return PhysicalPlanningResult(
+            plan,
+            resources,
+            decisions,
+            f"set_{lowering.plan.operation}",
+        )
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:

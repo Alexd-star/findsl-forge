@@ -286,3 +286,55 @@ def test_recent_calendar_temporal_window_uses_latest_data_anchor_and_date_sub():
     assert "INTERVAL '2' YEAR" in result.sql
     assert result.sql.count("MAX(`calendar_anchor`.`bizdate`)") == 2
     assert result.validation.passed is True
+
+
+def test_temporal_and_branches_render_as_set_intersection_with_isolated_ctes():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 and "
+            "indicator('', '', '成交额', '最近10日', '', '', 'CONS=3日') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.Intersect))) == 1
+    assert "left_source_rows" in result.sql
+    assert "right_source_rows" in result.sql
+    assert result.validation.passed is True
+
+
+def test_temporal_or_branches_render_as_distinct_union_across_resources():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 or "
+            "indicator('', '', '主力净流入', '最近5日', '', '', 'EXIST>0') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.Union))) == 1
+    assert {table.name for table in parsed.find_all(exp.Table)} >= {
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_ext",
+    }
+    assert result.validation.passed is True
+
+
+def test_nested_temporal_or_chain_has_unique_cte_names_and_two_unions():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近10日', '', '', 'EXIST=1') > 100 or "
+            "indicator('', '', '成交量', '最近10日', '', '', 'EXIST=2') > 100 or "
+            "indicator('', '', '成交量', '最近10日', '', '', 'EXIST=3') > 100"
+        ),
+        default_physical_catalog(),
+        default_physical_expressions(default_physical_catalog()),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    cte_names = [cte.alias_or_name for cte in parsed.find_all(exp.CTE)]
+    assert len(list(parsed.find_all(exp.Union))) == 2
+    assert len(cte_names) == len(set(cte_names))
+    assert result.validation.passed is True

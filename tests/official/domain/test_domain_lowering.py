@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.domain import ConsecutiveSpec, EventSpec, IndicatorRef
-from findsl.official.ir import LogicalConsecutive
+from findsl.official.ir import LogicalConsecutive, LogicalExist, LogicalSetOperation
 from findsl.official.lowering import OfficialLoweringError, lower_official_ast
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
@@ -79,3 +79,34 @@ def test_temporal_arithmetic_rejects_mismatched_date_scopes():
         )
 
     assert excinfo.value.code == "TEMPORAL_SCOPE_MISMATCH"
+
+
+def test_independent_temporal_and_branches_lower_to_relational_intersection():
+    result = lower_official_ast(
+        _typed(
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 and "
+            "indicator('', '', '成交额', '最近10日', '', '', 'CONS=3日') > 0"
+        ),
+        domain_registry=default_official_registry(),
+    )
+
+    assert isinstance(result.plan, LogicalSetOperation)
+    assert result.plan.operation == "intersect"
+    assert isinstance(result.plan.left, LogicalExist)
+    assert isinstance(result.plan.right, LogicalConsecutive)
+
+
+def test_independent_temporal_or_chain_preserves_nested_union_tree():
+    result = lower_official_ast(
+        _typed(
+            "indicator('', '', '涨幅', '最近10日', '', '', 'EXIST=1') > 9 or "
+            "indicator('', '', '涨幅', '最近10日', '', '', 'EXIST=2') > 9 or "
+            "indicator('', '', '涨幅', '最近10日', '', '', 'EXIST=3') > 9"
+        ),
+        domain_registry=default_official_registry(),
+    )
+
+    assert isinstance(result.plan, LogicalSetOperation)
+    assert result.plan.operation == "union"
+    assert isinstance(result.plan.left, LogicalSetOperation)
+    assert result.plan.left.operation == "union"

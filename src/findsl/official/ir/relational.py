@@ -99,6 +99,23 @@ class LogicalExist(LogicalPlan):
 
 
 @dataclass(frozen=True)
+class LogicalSetOperation(LogicalPlan):
+    left: LogicalPlan
+    right: LogicalPlan
+    operation: str
+    schema: Schema
+
+    def to_dict(self):
+        return _plan(
+            "LogicalSetOperation",
+            self.schema,
+            left=self.left.to_dict(),
+            right=self.right.to_dict(),
+            operation=self.operation,
+        )
+
+
+@dataclass(frozen=True)
 class LogicalDomainRank(LogicalPlan):
     input: LogicalPlan
     spec: Any

@@ -6,6 +6,7 @@ from .ir import (
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
     PhysicalIn, PhysicalLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalScan, PhysicalWindow,
     PhysicalTemporal,
+    PhysicalSetOperation,
     PhysicalCoalesce, PhysicalNullIf, PhysicalUnary,
 )
 from ..types import BOOLEAN, NUMERIC
@@ -33,6 +34,12 @@ def _validate_plan(plan, catalog, expressions):
     if isinstance(plan, PhysicalEmpty):
         if not plan.proven_reason.startswith("PROVEN_"):
             raise ValueError("physical empty requires a proven reason")
+        return
+    if isinstance(plan, PhysicalSetOperation):
+        if plan.operation not in {"intersect", "union"}:
+            raise ValueError("unsupported physical set operation")
+        _validate_plan(plan.left, catalog, expressions)
+        _validate_plan(plan.right, catalog, expressions)
         return
     if isinstance(plan, PhysicalJoin):
         _validate_plan(plan.left, catalog, expressions); _validate_plan(plan.right, catalog, expressions)

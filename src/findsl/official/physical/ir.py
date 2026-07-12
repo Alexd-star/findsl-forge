@@ -233,6 +233,21 @@ class PhysicalTemporal(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalSetOperation(PhysicalPlan):
+    left: PhysicalPlan
+    right: PhysicalPlan
+    operation: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalSetOperation",
+            "left": self.left.to_dict(),
+            "right": self.right.to_dict(),
+            "operation": self.operation,
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalLimit(PhysicalPlan):
     input: PhysicalPlan
     offset: int

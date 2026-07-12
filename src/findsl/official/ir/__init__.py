@@ -14,6 +14,7 @@ from .relational import (
     LogicalProject,
     LogicalRank,
     LogicalScan,
+    LogicalSetOperation,
     LogicalStage,
     LogicalWindow,
     Schema,

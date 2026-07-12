@@ -21,6 +21,7 @@ from ..physical.ir import (
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
+    PhysicalSetOperation,
     PhysicalTemporal,
     PhysicalUnary,
 )
@@ -78,7 +79,11 @@ def render_doris(plan: PhysicalPlan, catalog: PhysicalCatalog, expressions=None)
     return DorisRenderResult(ast, sql, validation.round_trip_stable, validation.safety, validation)
 
 
-def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
+def _render_plan(
+    plan: PhysicalPlan,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
     if isinstance(plan, PhysicalScan):
         resource = catalog.resource(plan.resource_id)
         anchor = catalog.resource(plan.anchor_resource_id) if plan.anchor_resource_id else None
@@ -116,14 +121,14 @@ def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
             query = query.where(_render_expr(plan.partition_predicate, catalog, plan))
         return query
     if isinstance(plan, PhysicalFilter):
-        return _render_plan(plan.input, catalog).where(
+        return _render_plan(plan.input, catalog, cte_prefix).where(
             _render_expr(plan.predicate, catalog, _find_scan(plan.input))
         )
     if isinstance(plan, PhysicalLimit):
-        query = _render_plan(plan.input, catalog).limit(plan.count)
+        query = _render_plan(plan.input, catalog, cte_prefix).limit(plan.count)
         return query.offset(plan.offset) if plan.offset else query
     if isinstance(plan, PhysicalRank):
-        inner = _render_plan(plan.input, catalog)
+        inner = _render_plan(plan.input, catalog, cte_prefix)
         scan = _find_scan(plan.input)
         stable_alias = "anchor" if scan.anchor_resource_id else "q"
         order = exp.Order(
@@ -155,11 +160,17 @@ def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
         )
         return outer.where(comparator)
     if isinstance(plan, PhysicalTemporal):
-        return _render_temporal(plan, catalog)
+        return _render_temporal(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalSetOperation):
+        return _render_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
 
 
-def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Select:
+def _render_temporal(
+    plan: PhysicalTemporal,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
     scan = _find_scan(plan.input)
     if not isinstance(plan.input, PhysicalScan):
         raise DorisBackendError(
@@ -168,7 +179,14 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
         )
     stable_alias = "anchor" if scan.anchor_resource_id else "q"
     keys = ("mktcode", "tgtcode")
-    source = _render_plan(scan, catalog)
+    source_rows_name = f"{cte_prefix}source_rows"
+    eligible_rows_name = f"{cte_prefix}eligible_rows"
+    sequenced_rows_name = f"{cte_prefix}sequenced_rows"
+    matched_rows_name = f"{cte_prefix}matched_rows"
+    runs_name = f"{cte_prefix}runs"
+    metrics_name = f"{cte_prefix}temporal_metrics"
+    qualified_name = f"{cte_prefix}qualified"
+    source = _render_plan(scan, catalog, cte_prefix)
     matched = exp.Case(
         ifs=[
             exp.If(
@@ -239,18 +257,18 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
             )
         )
 
-    ctes = [("source_rows", source)]
-    relation_name = "source_rows"
+    ctes = [(source_rows_name, source)]
+    relation_name = source_rows_name
     if needs_session_limit:
         lookback = plan.window.lookback_sessions or 1
-        eligible = exp.select(exp.Star()).from_(exp.table_("source_rows", quoted=True)).where(
+        eligible = exp.select(exp.Star()).from_(exp.table_(source_rows_name, quoted=True)).where(
             exp.LTE(
-                this=exp.column("lookback_row", table="source_rows", quoted=True),
+                this=exp.column("lookback_row", table=source_rows_name, quoted=True),
                 expression=exp.convert(lookback),
             )
         )
-        ctes.append(("eligible_rows", eligible))
-        relation_name = "eligible_rows"
+        ctes.append((eligible_rows_name, eligible))
+        relation_name = eligible_rows_name
 
     if plan.every or plan.mode == "EXIST":
         metrics = _render_exist_metrics(relation_name, keys)
@@ -267,27 +285,27 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
             _row_number(relation_name, keys, "bizdate").as_("matched_seq", quoted=True),
             append=True,
         )
-        ctes.append(("matched_rows", matched_rows))
+        ctes.append((matched_rows_name, matched_rows))
 
         island = exp.Sub(
-            this=exp.column("all_seq", table="matched_rows", quoted=True),
-            expression=exp.column("matched_seq", table="matched_rows", quoted=True),
+            this=exp.column("all_seq", table=matched_rows_name, quoted=True),
+            expression=exp.column("matched_seq", table=matched_rows_name, quoted=True),
         )
         runs = exp.select(
-            *(exp.column(name, table="matched_rows", quoted=True) for name in keys),
+            *(exp.column(name, table=matched_rows_name, quoted=True) for name in keys),
             island.as_("run_group", quoted=True),
             exp.Count(this=exp.Star()).as_("run_length", quoted=True),
-        ).from_(exp.table_("matched_rows", quoted=True)).group_by(
-            *(exp.column(name, table="matched_rows", quoted=True) for name in keys),
+        ).from_(exp.table_(matched_rows_name, quoted=True)).group_by(
+            *(exp.column(name, table=matched_rows_name, quoted=True) for name in keys),
             island,
         )
-        ctes.append(("runs", runs))
+        ctes.append((runs_name, runs))
         metrics = exp.select(
-            *(exp.column(name, table="runs", quoted=True) for name in keys),
-            exp.Max(this=exp.column("run_length", table="runs", quoted=True)).as_("metric_value", quoted=True),
+            *(exp.column(name, table=runs_name, quoted=True) for name in keys),
+            exp.Max(this=exp.column("run_length", table=runs_name, quoted=True)).as_("metric_value", quoted=True),
             exp.Count(this=exp.Star()).as_("total_buckets", quoted=True),
-        ).from_(exp.table_("runs", quoted=True)).group_by(
-            *(exp.column(name, table="runs", quoted=True) for name in keys)
+        ).from_(exp.table_(runs_name, quoted=True)).group_by(
+            *(exp.column(name, table=runs_name, quoted=True) for name in keys)
         )
 
     if plan.mode == "CONS" and not plan.every:
@@ -297,18 +315,18 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
             _row_number(sequence_relation, keys, "bizdate").as_("all_seq", quoted=True),
         ).from_(exp.table_(sequence_relation, quoted=True))
         insert_at = 2 if needs_session_limit else 1
-        ctes.insert(insert_at, ("sequenced_rows", sequence))
+        ctes.insert(insert_at, (sequenced_rows_name, sequence))
         for index, (name, query) in enumerate(ctes):
-            if name == "matched_rows":
-                ctes[index] = (name, _replace_table(query, relation_name, "sequenced_rows"))
-        relation_name = "sequenced_rows"
+            if name == matched_rows_name:
+                ctes[index] = (name, _replace_table(query, relation_name, sequenced_rows_name))
+        relation_name = sequenced_rows_name
 
-    ctes.append(("temporal_metrics", metrics))
-    qualified_predicate = _temporal_metric_predicate(plan)
+    ctes.append((metrics_name, metrics))
+    qualified_predicate = _temporal_metric_predicate(plan, metrics_name)
     qualified = exp.select(
-        *(exp.column(name, table="temporal_metrics", quoted=True) for name in keys)
-    ).from_(exp.table_("temporal_metrics", quoted=True)).where(qualified_predicate)
-    ctes.append(("qualified", qualified))
+        *(exp.column(name, table=metrics_name, quoted=True) for name in keys)
+    ).from_(exp.table_(metrics_name, quoted=True)).where(qualified_predicate)
+    ctes.append((qualified_name, qualified))
 
     anchor_resource = catalog.resource(scan.anchor_resource_id or scan.resource_id)
     anchor = exp.table_(
@@ -317,12 +335,13 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
         quoted=True,
         alias="anchor_out",
     )
-    qualified_table = exp.table_("qualified", quoted=True, alias="qualified")
+    qualified_alias = f"{cte_prefix}qualified_result"
+    qualified_table = exp.table_(qualified_name, quoted=True, alias=qualified_alias)
     join_predicate = exp.and_(
         *(
             exp.EQ(
                 this=exp.column(name, table="anchor_out", quoted=True),
-                expression=exp.column(name, table="qualified", quoted=True),
+                expression=exp.column(name, table=qualified_alias, quoted=True),
             )
             for name in keys
         )
@@ -349,6 +368,36 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
     for name, query in ctes:
         final = final.with_(name, as_=query)
     return final
+
+
+def _render_set_operation(
+    plan: PhysicalSetOperation,
+    catalog: PhysicalCatalog,
+    cte_prefix: str,
+) -> exp.Select:
+    left = _render_plan(plan.left, catalog, f"{cte_prefix}left_")
+    right = _render_plan(plan.right, catalog, f"{cte_prefix}right_")
+    left_body, left_ctes = _detach_ctes(left)
+    right_body, right_ctes = _detach_ctes(right)
+    if plan.operation == "intersect":
+        combined = exp.Intersect(this=left_body, expression=right_body, distinct=True)
+    else:
+        combined = exp.Union(this=left_body, expression=right_body, distinct=True)
+    alias = f"{cte_prefix}set_rows"
+    result = exp.select(
+        *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
+    ).from_(combined.subquery(alias=alias))
+    for cte in (*left_ctes, *right_ctes):
+        result = result.with_(cte.alias_or_name, as_=cte.this)
+    return result
+
+
+def _detach_ctes(query: exp.Select):
+    result = query.copy()
+    with_clause = result.args.get("with_")
+    ctes = tuple(with_clause.expressions) if with_clause is not None else ()
+    result.set("with_", None)
+    return result, ctes
 
 
 def _render_exist_metrics(relation_name: str, keys) -> exp.Select:
@@ -391,9 +440,9 @@ def _row_number(table: str, keys, order_column: str, descending: bool = False) -
     )
 
 
-def _temporal_metric_predicate(plan: PhysicalTemporal):
-    metric = exp.column("metric_value", table="temporal_metrics", quoted=True)
-    total = exp.column("total_buckets", table="temporal_metrics", quoted=True)
+def _temporal_metric_predicate(plan: PhysicalTemporal, metrics_name: str):
+    metric = exp.column("metric_value", table=metrics_name, quoted=True)
+    total = exp.column("total_buckets", table=metrics_name, quoted=True)
     non_empty = exp.GT(this=total, expression=exp.convert(0))
     if plan.every:
         comparison = (exp.EQ if plan.comparator == "=" else exp.NEQ)(this=metric, expression=total)

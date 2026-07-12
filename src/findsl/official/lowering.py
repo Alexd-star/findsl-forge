@@ -28,6 +28,7 @@ from .ir import (
     LogicalLimit,
     LogicalRank,
     LogicalScan,
+    LogicalSetOperation,
     LogicalStage,
     RangeExpr,
     Schema,
@@ -144,6 +145,15 @@ def _lower_stage(
     bindings: Dict[int, BoundFunction],
 ) -> LogicalPlan:
     node = typed.node
+    if (
+        isinstance(node, OfficialBinaryOp)
+        and node.op in {"and", "or"}
+        and _contains_temporal_binding(typed, bindings)
+    ):
+        left = _lower_stage(typed.children[0], input_plan, bindings)
+        right = _lower_stage(typed.children[1], input_plan, bindings)
+        operation = "intersect" if node.op == "and" else "union"
+        return LogicalSetOperation(left, right, operation, input_plan.schema)
     temporal_binding = _temporal_binding_for_stage(typed, bindings)
     if temporal_binding is not None:
         predicate = _lower_expr(typed, strip_count_exp=True)
@@ -270,3 +280,15 @@ def _temporal_binding_for_stage(
                 "all functions in a temporal arithmetic predicate must share market, date, filter and security scopes",
             )
     return temporal[0]
+
+
+def _contains_temporal_binding(
+    typed: TypedNode,
+    bindings: Dict[int, BoundFunction],
+) -> bool:
+    return any(
+        isinstance(node.node, OfficialFunctionCall)
+        and id(node.node) in bindings
+        and bindings[id(node.node)].temporal is not None
+        for node in _walk_typed(typed)
+    )
