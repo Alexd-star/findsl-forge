@@ -2,23 +2,23 @@
 
 ## Decision Summary
 
-- Generated at: 2026-07-12T19:28:07+00:00
+- Generated at: 2026-07-12T19:31:04+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening`
-- Git HEAD at report generation: `c34bb57` test: audit period scalar materialization
+- Git HEAD at report generation: `acc4fde` docs: add Phase 24 execution evidence
 - Git branch: `feat/antlr-calcite-architecture`
 - Blocking gates passed: True
-- Warning count: 1
+- Warning count: 0
 
 ## Gate Matrix
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 132598.7 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.301 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 132389.8 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.254 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.823 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.783 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -28,21 +28,21 @@
 | Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
-| Git rollback cleanliness | warning | WARN | 1 dirty entries before commit |
+| Git rollback cleanliness | warning | PASS | clean working tree |
 | Doris-scale performance proof | warning | PASS | cluster EXPLAIN/latency and 10x speedup evidence captured |
 
 ## Competition Metrics
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.301 ms
+- Compile P95 latency: 1.254 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.40x
+- Local SQLite prefix benchmark speedup smoke: 1.19x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.823 ms
+- Compile latency: 0.783 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -170,15 +170,14 @@
 ## Git Rollback State
 
 - Repository detected: True
-- Clean working tree: False
-- Dirty entries:
-  - `?? indicator`
+- Clean working tree: True
+- Dirty entries: none
 
 ## Pytest Evidence
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest --basetemp D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\.pytest_cache\readiness_tmp`
 - Exit code: 0
-- Elapsed: 132598.7 ms
+- Elapsed: 132389.8 ms
 
 ```text
 ........................................................................ [  8%]
@@ -193,7 +192,7 @@
 ........................................................................ [ 86%]
 ........................................................................ [ 94%]
 .............................................                            [100%]
-837 passed in 131.97s (0:02:11)
+837 passed in 131.74s (0:02:11)
 ```
 
 ## Award-Readiness Differentiators
