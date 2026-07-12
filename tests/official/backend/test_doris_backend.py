@@ -110,6 +110,20 @@ def test_yesterday_uses_distinct_trading_calendar_offset_not_date_sub():
     assert result.validation.passed is True
 
 
+def test_recent_sessions_use_distinct_exchange_calendar_membership():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '近5日', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert "`q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate`" in result.sql
+    assert "GROUP BY `calendar_sessions`.`bizdate`" in result.sql
+    assert "ORDER BY `calendar_sessions`.`bizdate` DESC" in result.sql
+    assert "LIMIT 5" in result.sql
+    assert "ROW_NUMBER" not in result.sql
+    assert result.validation.passed is True
+
+
 def test_rank_renders_window_in_subquery_and_filters_outer_query():
     result = render_doris(
         _physical("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10"),

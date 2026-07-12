@@ -119,6 +119,23 @@ class PhysicalNthLatestValue(PhysicalExpr):
 
 
 @dataclass(frozen=True)
+class PhysicalRecentSessions(PhysicalExpr):
+    resource_id: str
+    column: str
+    amount: int
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalRecentSessions",
+            "resource_id": self.resource_id,
+            "column": self.column,
+            "amount": self.amount,
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalPrefixAverage(PhysicalExpr):
     resource_id: str
     sum_column: str

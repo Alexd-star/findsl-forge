@@ -22,6 +22,7 @@ from ..physical.ir import (
     PhysicalPlan,
     PhysicalPrefixAverage,
     PhysicalRank,
+    PhysicalRecentSessions,
     PhysicalScan,
     PhysicalTableScan,
     PhysicalSetOperation,
@@ -703,6 +704,26 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             .offset(expression.offset)
         )
         return exp.Subquery(this=query)
+    if isinstance(expression, PhysicalRecentSessions):
+        resource = catalog.resource(expression.resource_id)
+        alias = "calendar_sessions"
+        column = exp.column(expression.column, table=alias, quoted=True)
+        table = exp.table_(resource.table, db=resource.database, quoted=True, alias=alias)
+        query = (
+            exp.select(column.copy())
+            .from_(table)
+            .group_by(column.copy())
+            .order_by(exp.Ordered(this=column.copy(), desc=True))
+            .limit(expression.amount)
+        )
+        return exp.In(
+            this=exp.column(
+                expression.column,
+                table=_expression_alias(expression.resource_id, scan),
+                quoted=True,
+            ),
+            query=exp.Subquery(this=query),
+        )
     if isinstance(expression, PhysicalPrefixAverage):
         if scan is None:
             raise DorisBackendError("DORIS_PREFIX_CONTEXT_MISSING", "prefix average requires a scan context")

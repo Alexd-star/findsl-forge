@@ -40,6 +40,7 @@ from .ir import (
     PhysicalPlan,
     PhysicalPrefixAverage,
     PhysicalRank,
+    PhysicalRecentSessions,
     PhysicalScan,
     PhysicalTableScan,
     PhysicalTemporal,
@@ -836,6 +837,14 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                         typed_date.amount,
                         TIME,
                     ),
+                )
+            )
+        elif typed_date.kind == "recent_sessions" and typed_date.amount:
+            constraints.append(
+                PhysicalRecentSessions(
+                    stable_resource_id,
+                    partition_key,
+                    typed_date.amount,
                 )
             )
         elif typed_date.kind == "calendar_range" and typed_date.start and typed_date.end:

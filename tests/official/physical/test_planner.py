@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -272,6 +272,18 @@ def test_relative_session_date_lowers_to_trading_calendar_offset(date, offset):
     date_predicate = result.plan.predicate.right
     assert isinstance(date_predicate.right, PhysicalNthLatestValue)
     assert date_predicate.right.offset == offset
+
+
+@pytest.mark.parametrize("date,amount", [("近5日", 5), ("最近十个交易日", 10), ("30个交易日内", 30)])
+def test_recent_session_range_lowers_to_typed_calendar_membership(date, amount):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    date_predicate = result.plan.predicate.right
+    assert isinstance(date_predicate, PhysicalRecentSessions)
+    assert date_predicate.amount == amount
 
 
 def test_direct_numeric_rank_lowers_with_comparison_contract():

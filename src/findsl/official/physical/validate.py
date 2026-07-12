@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalScan, PhysicalTableScan, PhysicalWindow,
+    PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
     PhysicalSetOperation,
     PhysicalCoalesce, PhysicalNullIf, PhysicalUnary,
@@ -145,6 +145,12 @@ def _validate_expr(expression, catalog, expressions=None):
             raise PhysicalCatalogError("nth latest value is restricted to the resource partition key")
         if expression.offset <= 0:
             raise ValueError("nth latest value requires a positive offset")
+    elif isinstance(expression, PhysicalRecentSessions):
+        resource = catalog.resource(expression.resource_id)
+        if expression.column != resource.partition_key:
+            raise PhysicalCatalogError("recent sessions are restricted to the resource partition key")
+        if expression.amount <= 0:
+            raise ValueError("recent sessions require a positive amount")
     elif isinstance(expression, PhysicalPrefixAverage):
         resource = catalog.resource(expression.resource_id)
         if "prefix" not in resource.capabilities:
