@@ -12,6 +12,7 @@ from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRe
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 from .temporal import parse_count_token
 from .market import MarketParseError, parse_market_expression
+from .scope import ScopeParseError, parse_scope_expression
 
 
 class DomainBindingError(ValueError):
@@ -30,6 +31,7 @@ class BoundFunction:
     indicators: Tuple[IndicatorRef, ...]
     market_scope: MarketScope
     market_expression: object
+    scope_expression: object
     date_constraint: DateConstraint
     requirement: DataRequirement
     aggregate: Optional[str]
@@ -42,6 +44,7 @@ class BoundFunction:
             "indicators": [item.to_dict() for item in self.indicators],
             "market_scope": self.market_scope.to_dict(),
             "market_expression": self.market_expression.to_dict() if self.market_expression else None,
+            "scope_expression": self.scope_expression.to_dict() if self.scope_expression else None,
             "date_constraint": self.date_constraint.to_dict(),
             "requirement": self.requirement.to_dict(),
             "aggregate": self.aggregate,
@@ -84,6 +87,17 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
             value=market_value,
         ) from exc
     market = _bind_market(name, market_value)
+    scope_value = slots.get("filter_scope", slots.get("keywords", ""))
+    try:
+        scope_expression = parse_scope_expression(scope_value)
+    except ScopeParseError as exc:
+        raise DomainBindingError(
+            exc.code,
+            str(exc),
+            function=name,
+            slot="filter_scope" if "filter_scope" in slots else "keywords",
+            value=scope_value,
+        ) from exc
     date = parse_date_constraint(slots.get("date", slots.get("period", "")))
     aggregate = slots.get("agg_func", "").strip().upper() or None
     if aggregate and aggregate not in {"AVG", "SUM", "MAX", "MIN", "GROWTH", "GROWTH_RISE", "GROWTH_FALL"}:
@@ -117,6 +131,7 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
         indicators,
         market,
         market_expression,
+        scope_expression,
         date,
         requirement,
         aggregate,

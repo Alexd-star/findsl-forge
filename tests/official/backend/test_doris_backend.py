@@ -131,6 +131,55 @@ def test_universe_selector_materializes_market_and_date_without_placeholder_sql(
     assert result.validation.passed is True
 
 
+def test_security_name_scope_renders_catalog_join_and_exact_name_predicate():
+    result = render_doris(
+        _physical("indicator('', '华泰证券', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    assert "LEFT JOIN `newzl`.`hsj_stock_code_info` AS q" in result.sql
+    assert "`q`.`name` = '华泰证券'" in result.sql
+    assert "hyBlkRefName" not in result.sql
+    assert result.validation.passed is True
+
+
+def test_querydata_aggregate_uses_global_scalar_group_with_security_join():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', 'AVG', '') > "
+            "queryData('', '贵州茅台', '成交量', '', 'AVG')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "CROSS JOIN" in result.sql
+    assert "LEFT JOIN `newzl`.`hsj_stock_code_info` AS official_security" in result.sql
+    assert "`official_security`.`name` = '贵州茅台'" in result.sql
+    assert "SELECT AVG(`official_basic`.`volume`) AS `metric_1`" in result.sql
+    assert "GROUP BY `official_security`" not in result.sql
+    assert "`q`.`name`" not in result.sql
+    assert result.validation.passed is True
+
+
+def test_querydata_direct_value_uses_singleton_named_relation_not_global_filter():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', '', '') > "
+            "queryData('', '贵州茅台', '成交量', '', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "CROSS JOIN" in result.sql
+    assert "AS scalar_0" in result.sql
+    assert "`official_security`.`name` = '贵州茅台'" in result.sql
+    assert "`official_basic`.`bizdate` = (SELECT MAX(" in result.sql
+    outer_where = result.sql.rsplit(" WHERE ", 1)[-1]
+    assert "贵州茅台" not in outer_where
+    assert "`q`.`volume` > `scalar_0`.`scalar_value_0`" in result.sql
+    assert result.validation.passed is True
+
+
 def test_typed_year_range_renders_bounded_partition_predicate():
     result = render_doris(
         _physical("indicator('', '', '成交量', '一八年', '', '', '') > 100"),

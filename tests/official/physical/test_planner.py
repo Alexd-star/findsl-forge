@@ -187,17 +187,23 @@ def test_approximate_comparison_without_catalog_tolerance_is_rejected_before_bac
 
 
 @pytest.mark.parametrize(
-    "source",
+    "source,code",
     [
-        "indicator('', '软件开发', '成交量', '', '', '', '') > 100",
-        "indicator('', '', '成交量', '', 'AVG', '', '') > 100",
+        (
+            "indicator('', '软件开发', '成交量', '', '', '', '') > 100",
+            "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+        ),
+        (
+            "indicator('', '', '成交量', '', 'AVG', '', '') > 100",
+            "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+        ),
     ],
 )
-def test_unmaterialized_function_constraints_are_never_silently_dropped(source):
+def test_unmaterialized_function_constraints_are_never_silently_dropped(source, code):
     with pytest.raises(PhysicalPlanningError) as excinfo:
         plan_physical(_lower(source), default_physical_catalog())
 
-    assert excinfo.value.code == "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+    assert excinfo.value.code == code
 
 
 @pytest.mark.parametrize("aggregate", ["SUM", "AVG", "MAX", "MIN"])
@@ -525,7 +531,49 @@ def test_universe_selector_does_not_claim_unavailable_filter_scope_membership():
             default_physical_catalog(),
         )
 
-    assert excinfo.value.code == "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+    assert excinfo.value.code == "PHYSICAL_SCOPE_DATA_UNAVAILABLE"
+
+
+def test_known_security_name_scope_adds_typed_security_master_join():
+    result = plan_physical(
+        _lower("indicator('', '华泰证券', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    assert result.selected_resource == "official_security"
+    payload = result.plan.canonical_json()
+    assert "official_security" in payload
+    assert '"column":"name"' in payload
+    assert '"value":"华泰证券"' in payload
+
+
+def test_explicit_name_and_code_scope_preserves_both_stable_identifiers():
+    result = plan_physical(
+        _lower("indicator('', '珀莱雅(603605)', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    assert '"value":"珀莱雅"' in payload
+    assert '"value":"603605"' in payload
+    assert '"value":1' in payload
+
+
+def test_nonaggregate_querydata_lowers_to_named_global_scalar_relation():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > "
+            "queryData('', '贵州茅台', '成交量', '', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.scalars) == 1
+    payload = result.plan.canonical_json()
+    assert "PhysicalNamedScalar" in payload
+    assert '"value":"贵州茅台"' in payload
+    assert "PhysicalLatestValue" in payload
 
 
 def test_ext_scan_is_anchored_to_official_basic_universe():

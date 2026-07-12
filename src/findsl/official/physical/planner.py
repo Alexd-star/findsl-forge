@@ -28,6 +28,7 @@ from ..domain.market import (
     MarketOr,
     parse_market_expression,
 )
+from ..domain.scope import ScopeAnd, ScopeAtom, ScopeNot, ScopeOr
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .catalog import PhysicalCatalog
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
@@ -50,6 +51,7 @@ from .ir import (
     PhysicalLiteral,
     PhysicalNullIf,
     PhysicalNamedAggregate,
+    PhysicalNamedScalar,
     PhysicalNot,
     PhysicalNthLatestValue,
     PhysicalPlan,
@@ -67,6 +69,7 @@ from .ir import (
 from .validate import validate_physical_plan
 from .statistics import PhysicalStatisticsSnapshot
 from .strategies import PhysicalStrategyRegistry
+from .scopes import SecurityScopeCatalog, default_security_scope_catalog
 
 
 @dataclass(frozen=True)
@@ -201,6 +204,7 @@ def plan_physical(
         )
     _validate_universe_contract(lowering.plan)
     aggregate_calls = _aggregate_calls(lowering.plan)
+    querydata_scalar_calls = _querydata_scalar_calls(lowering.plan)
     aggregate_contract = _aggregate_contract(lowering.plan, aggregate_calls)
     aggregate_rank_contract = _aggregate_rank_contract(lowering.plan)
     fields = _collect_fields(lowering.plan, catalog, expressions)
@@ -228,10 +232,11 @@ def plan_physical(
             expressions,
             statistics,
         )
-    if aggregate_calls:
+    if aggregate_calls or querydata_scalar_calls:
         return _plan_composite_aggregate(
             lowering.plan,
             aggregate_calls,
+            querydata_scalar_calls,
             catalog,
             fields,
             expressions,
@@ -321,6 +326,18 @@ def _aggregate_calls(plan) -> Tuple[CallExpr, ...]:
         for call in _walk_calls(expression)
         if call.binding is not None
         and str(call.binding.slots.get("agg_func", "")).strip()
+    )
+
+
+def _querydata_scalar_calls(plan) -> Tuple[CallExpr, ...]:
+    return tuple(
+        call
+        for expression in _logical_expressions(plan)
+        for call in _walk_calls(expression)
+        if call.name == "queryData"
+        and call.binding is not None
+        and call.scope_expression is not None
+        and not str(call.binding.slots.get("agg_func", "")).strip()
     )
 
 
@@ -515,6 +532,7 @@ def _plan_aggregate_rank(
 def _plan_composite_aggregate(
     logical_plan,
     aggregate_calls: Tuple[CallExpr, ...],
+    querydata_scalar_calls: Tuple[CallExpr, ...],
     catalog: PhysicalCatalog,
     fields: Tuple[_ResolvedIndicator, ...],
     expressions: Optional[PhysicalExpressionRegistry],
@@ -541,6 +559,7 @@ def _plan_composite_aggregate(
 
     refs = {}
     groups = []
+    scalars = []
     aggregate_resource_ids = set()
     for index, call in enumerate(unique_aggregates):
         function = str(call.binding.slots.get("agg_func", "")).strip().lower()
@@ -552,14 +571,31 @@ def _plan_composite_aggregate(
         indicator_id = call.binding.slots.get("indicator_name", "")
         field = _field_for_indicator(fields, indicator_id)
         aggregate_resource_ids.add(field.resource_id)
-        resource = catalog.resource(field.resource_id)
-        aggregate_input: PhysicalPlan = PhysicalScan(
-            field.resource_id,
-            _scan_columns((field,)),
-            None,
-            resource.anchor_resource_id,
+        aggregate_fields = [field]
+        if call.scope_expression is not None:
+            aggregate_fields.append(
+                next(item for item in fields if item.indicator_id == "__security_scope_name")
+            )
+        aggregate_resource_ids_for_call = tuple(
+            sorted({item.resource_id for item in aggregate_fields})
         )
-        for constraint in _call_constraints(call, catalog, field.resource_id):
+        if len(aggregate_resource_ids_for_call) == 1:
+            aggregate_root_id = field.resource_id
+            resource = catalog.resource(aggregate_root_id)
+            aggregate_input = PhysicalScan(
+                aggregate_root_id,
+                _scan_columns(tuple(aggregate_fields)),
+                None,
+                resource.anchor_resource_id,
+            )
+        else:
+            aggregate_input, aggregate_root_id, _ = _build_join_relation(
+                tuple(aggregate_fields),
+                aggregate_resource_ids_for_call,
+                catalog,
+            )
+        aggregate_resource_ids.update(aggregate_resource_ids_for_call)
+        for constraint in _call_constraints(call, catalog, aggregate_root_id):
             aggregate_input = PhysicalFilter(aggregate_input, constraint)
         relation_alias = f"aggregate_{index}"
         measure_alias = f"metric_{index}"
@@ -568,15 +604,101 @@ def _plan_composite_aggregate(
             function,
             _physical_field_expression(field),
         )
-        groups.append(PhysicalAggregateGroup(relation_alias, aggregate_input, (measure,)))
+        groups.append(
+            PhysicalAggregateGroup(
+                relation_alias,
+                aggregate_input,
+                (measure,),
+                group_by_security=call.name != "queryData",
+            )
+        )
         refs[call.node_id] = PhysicalAggregateRef(
             relation_alias,
             measure_alias,
             _type_from_name(field.value_type),
         )
 
+    for index, call in enumerate(querydata_scalar_calls):
+        if not isinstance(call.scope_expression, ScopeAtom):
+            raise PhysicalPlanningError(
+                "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
+                "queryData scalar requires one exact security identity",
+            )
+        resolved_scope = default_security_scope_catalog().resolve(
+            call.scope_expression.name
+        )
+        if len(resolved_scope.identities) != 1:
+            raise PhysicalPlanningError(
+                "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
+                "queryData scalar scope resolves to multiple securities",
+            )
+        indicator_id = call.binding.slots.get("indicator_name", "")
+        field = _field_for_indicator(fields, indicator_id)
+        scope_field = next(
+            item for item in fields if item.indicator_id == "__security_scope_name"
+        )
+        relation_fields = (field, scope_field)
+        relation_resource_ids = tuple(
+            sorted({item.resource_id for item in relation_fields})
+        )
+        if len(relation_resource_ids) == 1:
+            scalar_root_id = field.resource_id
+            resource = catalog.resource(scalar_root_id)
+            scalar_input: PhysicalPlan = PhysicalScan(
+                scalar_root_id,
+                _scan_columns(relation_fields),
+                None,
+                resource.anchor_resource_id,
+            )
+        else:
+            scalar_input, scalar_root_id, _ = _build_join_relation(
+                relation_fields,
+                relation_resource_ids,
+                catalog,
+            )
+        date = str(call.binding.slots.get("date", "")).strip()
+        if date:
+            typed_date = call.date_constraint or parse_date_constraint(date)
+            if typed_date.kind not in {"relative", "exact", "relative_session"}:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_QUERYDATA_SCALAR_UNBOUNDED",
+                    f"queryData scalar requires a singleton date, got {date}",
+                )
+        constraints = list(_call_constraints(call, catalog, scalar_root_id))
+        if not date:
+            stable_id = catalog.resource(scalar_root_id).anchor_resource_id or scalar_root_id
+            partition_key = catalog.resource(stable_id).partition_key
+            constraints.append(
+                PhysicalComparison(
+                    "=",
+                    PhysicalColumn(stable_id, partition_key, TIME),
+                    PhysicalLatestValue(stable_id, partition_key, TIME),
+                )
+            )
+        for constraint in constraints:
+            scalar_input = PhysicalFilter(scalar_input, constraint)
+        relation_alias = f"scalar_{index}"
+        value_alias = f"scalar_value_{index}"
+        scalars.append(
+            PhysicalNamedScalar(
+                relation_alias,
+                scalar_input,
+                _physical_field_expression(field),
+                value_alias,
+            )
+        )
+        refs[call.node_id] = PhysicalAggregateRef(
+            relation_alias,
+            value_alias,
+            _type_from_name(field.value_type),
+        )
+        aggregate_resource_ids.update(relation_resource_ids)
+
+    named_relation_ids = seen_aggregates | {
+        call.node_id for call in querydata_scalar_calls
+    }
     scalar_calls = tuple(
-        call for call in all_calls if call.node_id not in seen_aggregates
+        call for call in all_calls if call.node_id not in named_relation_ids
     )
     scalar_fields = []
     for call in scalar_calls:
@@ -606,6 +728,7 @@ def _plan_composite_aggregate(
     plan: PhysicalPlan = PhysicalCompositeAggregate(
         anchor_input,
         tuple(groups),
+        tuple(scalars),
         physical_predicate,
         "official_basic",
     )
@@ -995,10 +1118,15 @@ def _collect_fields(
         raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical root {type(current).__name__}")
 
     fields = []
+    scope_required = False
+    scope_catalog = default_security_scope_catalog()
     for expression in logical_expressions:
         for call in _walk_calls(expression):
             if call.name not in _DIRECT_FIELD_CALLS or call.binding is None:
                 raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {call.name}")
+            if call.scope_expression is not None:
+                _resolve_scope_atoms(call.scope_expression, scope_catalog)
+                scope_required = True
             _reject_unmaterialized_constraints(call)
             indicator_id = call.binding.slots.get("indicator_name", "")
             if _is_universe_call(call):
@@ -1019,6 +1147,15 @@ def _collect_fields(
                     f"no controlled physical mapping for indicator {indicator_id}",
                     decisions=(decision,),
                 ) from exc
+    if scope_required:
+        fields.append(
+            _ResolvedIndicator(
+                "__security_scope_name",
+                "official_security",
+                "string",
+                direct_column="name",
+            )
+        )
     return tuple(fields)
 
 
@@ -1111,10 +1248,13 @@ def _contains_universe_call(expression) -> bool:
 
 
 def _reject_unmaterialized_constraints(call: CallExpr) -> None:
+    materialized = {"indicator_name", "market", "date", "direction", "agg_func"}
+    if call.scope_expression is not None:
+        materialized.update({"filter_scope", "keywords"})
     ignored = {
         slot: value
         for slot, value in call.binding.slots.items()
-        if slot not in {"indicator_name", "market", "date", "direction", "agg_func"} and str(value).strip()
+        if slot not in materialized and str(value).strip()
     }
     if ignored:
         names = ", ".join(sorted(ignored))
@@ -1535,6 +1675,13 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
     if market:
         market_expression = call.market_expression or parse_market_expression(market)
         constraints.append(_lower_market_expression(market_expression, stable_resource_id))
+    if call.scope_expression is not None:
+        constraints.append(
+            _lower_scope_expression(
+                call.scope_expression,
+                default_security_scope_catalog(),
+            )
+        )
     date = str(call.binding.slots.get("date", "")).strip()
     if date:
         partition_key = catalog.resource(stable_resource_id).partition_key
@@ -1656,6 +1803,71 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                 f"typed date constraint is not materialized for scalar planning: {date}",
             )
     return tuple(constraints)
+
+
+def _resolve_scope_atoms(expression, catalog: SecurityScopeCatalog):
+    resolved = []
+    for atom in expression.atoms:
+        try:
+            resolved.append(catalog.resolve(atom))
+        except KeyError as exc:
+            raise PhysicalPlanningError(
+                "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+                f"scope membership is unavailable in the official security master: {atom}",
+            ) from exc
+    return tuple(resolved)
+
+
+def _lower_scope_expression(expression, catalog: SecurityScopeCatalog):
+    if isinstance(expression, ScopeAtom):
+        resolved = catalog.resolve(expression.name)
+        name_predicate = PhysicalComparison(
+            "=",
+            PhysicalColumn("official_security", "name", STRING),
+            PhysicalLiteral(resolved.name, STRING),
+        )
+        if not resolved.explicit_code:
+            return name_predicate
+        identity = resolved.identities[0]
+        return PhysicalBinary(
+            "and",
+            name_predicate,
+            PhysicalBinary(
+                "and",
+                PhysicalComparison(
+                    "=",
+                    PhysicalColumn("official_security", "mktcode", NUMERIC),
+                    PhysicalLiteral(identity.mktcode, NUMERIC),
+                ),
+                PhysicalComparison(
+                    "=",
+                    PhysicalColumn("official_security", "tgtcode", STRING),
+                    PhysicalLiteral(identity.tgtcode, STRING),
+                ),
+                BOOLEAN,
+            ),
+            BOOLEAN,
+        )
+    if isinstance(expression, ScopeNot):
+        return PhysicalNot(_lower_scope_expression(expression.operand, catalog))
+    if isinstance(expression, ScopeAnd):
+        return PhysicalBinary(
+            "and",
+            _lower_scope_expression(expression.left, catalog),
+            _lower_scope_expression(expression.right, catalog),
+            BOOLEAN,
+        )
+    if isinstance(expression, ScopeOr):
+        return PhysicalBinary(
+            "or",
+            _lower_scope_expression(expression.left, catalog),
+            _lower_scope_expression(expression.right, catalog),
+            BOOLEAN,
+        )
+    raise PhysicalPlanningError(
+        "PHYSICAL_SCOPE_EXPRESSION_UNSUPPORTED",
+        f"unsupported scope expression {type(expression).__name__}",
+    )
 
 
 _MARKET_CODES = {

@@ -410,6 +410,7 @@ class PhysicalAggregateGroup(CanonicalIr):
     alias: str
     input: PhysicalPlan
     measures: Tuple[PhysicalNamedAggregate, ...]
+    group_by_security: bool = True
 
     def to_dict(self):
         return {
@@ -417,6 +418,24 @@ class PhysicalAggregateGroup(CanonicalIr):
             "alias": self.alias,
             "input": self.input.to_dict(),
             "measures": [measure.to_dict() for measure in self.measures],
+            "group_by_security": self.group_by_security,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalNamedScalar(CanonicalIr):
+    alias: str
+    input: PhysicalPlan
+    expression: PhysicalExpr
+    value_alias: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalNamedScalar",
+            "alias": self.alias,
+            "input": self.input.to_dict(),
+            "expression": self.expression.to_dict(),
+            "value_alias": self.value_alias,
         }
 
 
@@ -424,6 +443,7 @@ class PhysicalAggregateGroup(CanonicalIr):
 class PhysicalCompositeAggregate(PhysicalPlan):
     input: PhysicalPlan
     groups: Tuple[PhysicalAggregateGroup, ...]
+    scalars: Tuple[PhysicalNamedScalar, ...]
     predicate: PhysicalExpr
     anchor_resource_id: str
 
@@ -432,6 +452,7 @@ class PhysicalCompositeAggregate(PhysicalPlan):
             "kind": "PhysicalCompositeAggregate",
             "input": self.input.to_dict(),
             "groups": [group.to_dict() for group in self.groups],
+            "scalars": [scalar.to_dict() for scalar in self.scalars],
             "predicate": self.predicate.to_dict(),
             "anchor_resource_id": self.anchor_resource_id,
         }

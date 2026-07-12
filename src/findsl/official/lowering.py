@@ -250,6 +250,7 @@ def _lower_expr(
         domain_binding = bindings.get(id(node)) if bindings else None
         date_constraint = None
         market_expression = domain_binding.market_expression if domain_binding else None
+        scope_expression = domain_binding.scope_expression if domain_binding else None
         if domain_binding is not None and not strip_count_exp:
             date_constraint = domain_binding.date_constraint
         return CallExpr(
@@ -266,6 +267,7 @@ def _lower_expr(
             binding,
             date_constraint,
             market_expression,
+            scope_expression,
         )
     if isinstance(node, OfficialBinaryOp):
         return BinaryExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp, bindings=bindings), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp, bindings=bindings), typed.type)

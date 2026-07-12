@@ -450,16 +450,24 @@ def _render_composite_aggregate(
         aggregate_rows = _render_aggregate_group(group, catalog, cte_prefix).subquery(
             alias=group.alias
         )
-        join_predicate = exp.and_(
-            *(
-                exp.EQ(
-                    this=exp.column(key, table=anchor_alias, quoted=True),
-                    expression=exp.column(key, table=group.alias, quoted=True),
+        if group.group_by_security:
+            join_predicate = exp.and_(
+                *(
+                    exp.EQ(
+                        this=exp.column(key, table=anchor_alias, quoted=True),
+                        expression=exp.column(key, table=group.alias, quoted=True),
+                    )
+                    for key in keys
                 )
-                for key in keys
             )
+            query = query.join(aggregate_rows, on=join_predicate, join_type="INNER")
+        else:
+            query = query.join(aggregate_rows, join_type="CROSS")
+    for scalar in plan.scalars:
+        scalar_rows = _render_named_scalar(scalar, catalog, cte_prefix).subquery(
+            alias=scalar.alias
         )
-        query = query.join(aggregate_rows, on=join_predicate, join_type="INNER")
+        query = query.join(scalar_rows, join_type="CROSS")
     return query.where(_render_expr(plan.predicate, catalog, anchor_relation))
 
 
@@ -484,16 +492,28 @@ def _render_aggregate_group(
         ).as_(measure.alias, quoted=True)
         for measure in group.measures
     ]
+    group_keys = (
+        [exp.column(key, table=stable_alias, quoted=True) for key in keys]
+        if group.group_by_security
+        else []
+    )
+    source.set("expressions", [*group_keys, *measures])
+    return source.group_by(*group_keys) if group_keys else source
+
+
+def _render_named_scalar(scalar, catalog: PhysicalCatalog, cte_prefix: str = "") -> exp.Select:
+    source = _render_plan(scalar.input, catalog, cte_prefix)
+    relation = _find_relation(scalar.input)
     source.set(
         "expressions",
         [
-            *(exp.column(key, table=stable_alias, quoted=True) for key in keys),
-            *measures,
+            _render_expr(scalar.expression, catalog, relation).as_(
+                scalar.value_alias,
+                quoted=True,
+            )
         ],
     )
-    return source.group_by(
-        *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
-    )
+    return source
 
 
 def _render_join(plan: PhysicalJoin, catalog: PhysicalCatalog) -> exp.Select:

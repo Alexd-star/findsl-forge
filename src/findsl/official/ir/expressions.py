@@ -39,6 +39,7 @@ class CallExpr(LogicalExpr):
     binding: Optional[FunctionBinding] = None
     date_constraint: Optional[Any] = None
     market_expression: Optional[Any] = None
+    scope_expression: Optional[Any] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -49,6 +50,7 @@ class CallExpr(LogicalExpr):
             "binding": self.binding.to_dict() if self.binding else None,
             "date_constraint": self.date_constraint.to_dict() if self.date_constraint else None,
             "market_expression": self.market_expression.to_dict() if self.market_expression else None,
+            "scope_expression": self.scope_expression.to_dict() if self.scope_expression else None,
         }
 
 

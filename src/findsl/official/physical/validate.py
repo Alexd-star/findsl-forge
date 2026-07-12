@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
+    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedScalar, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
     PhysicalSetOperation,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -116,8 +116,8 @@ def _validate_plan(plan, catalog, expressions):
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.bound, catalog, expressions)
     elif isinstance(plan, PhysicalCompositeAggregate):
-        if not plan.groups or plan.predicate.type is not BOOLEAN:
-            raise ValueError("composite aggregate requires groups and a boolean predicate")
+        if (not plan.groups and not plan.scalars) or plan.predicate.type is not BOOLEAN:
+            raise ValueError("composite named relation plan requires relations and a boolean predicate")
         anchor = catalog.resource(plan.anchor_resource_id)
         if anchor.partition_key is None:
             raise PhysicalCatalogError("composite aggregate anchor requires a partition key")
@@ -141,6 +141,19 @@ def _validate_plan(plan, catalog, expressions):
                 measure_aliases.add(measure.alias)
                 declared_refs.add((group.alias, measure.alias))
                 _validate_expr(measure.expression, catalog, expressions)
+        scalar_aliases = set()
+        for scalar in plan.scalars:
+            if (
+                not scalar.alias.isidentifier()
+                or scalar.alias in relation_aliases
+                or scalar.alias in scalar_aliases
+                or not scalar.value_alias.isidentifier()
+            ):
+                raise ValueError("composite scalar relation alias is invalid or duplicated")
+            scalar_aliases.add(scalar.alias)
+            declared_refs.add((scalar.alias, scalar.value_alias))
+            _validate_plan(scalar.input, catalog, expressions)
+            _validate_expr(scalar.expression, catalog, expressions)
         used_refs = {
             (item.relation_alias, item.measure_alias)
             for item in _walk_aggregate_refs(plan.predicate)
