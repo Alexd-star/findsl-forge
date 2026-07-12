@@ -266,6 +266,27 @@ class PhysicalRank(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalGroupedAggregate(PhysicalPlan):
+    input: PhysicalPlan
+    measure: PhysicalExpr
+    function: str
+    comparator: str
+    bound: PhysicalLiteral
+    anchor_resource_id: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalGroupedAggregate",
+            "input": self.input.to_dict(),
+            "measure": self.measure.to_dict(),
+            "function": self.function,
+            "comparator": self.comparator,
+            "bound": self.bound.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalTemporal(PhysicalPlan):
     input: PhysicalPlan
     predicate: PhysicalExpr

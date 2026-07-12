@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
+    PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
     PhysicalSetOperation,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -81,6 +81,16 @@ def _validate_plan(plan, catalog, expressions):
         if not isinstance(plan.bound.value, (int, float)) or plan.bound.value <= 0:
             raise ValueError("physical rank bound is invalid")
         _validate_expr(plan.expression, catalog, expressions)
+    elif isinstance(plan, PhysicalGroupedAggregate):
+        if plan.function not in {"sum", "avg", "max", "min"}:
+            raise ValueError("unsupported grouped aggregate function")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            raise ValueError("unsupported grouped aggregate comparator")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if anchor.partition_key is None:
+            raise PhysicalCatalogError("grouped aggregate anchor requires a partition key")
+        _validate_expr(plan.measure, catalog, expressions)
+        _validate_expr(plan.bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporal):
         _validate_expr(plan.predicate, catalog, expressions)
         if plan.predicate.type is not BOOLEAN:

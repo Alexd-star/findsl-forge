@@ -144,6 +144,37 @@ def test_recent_sessions_use_distinct_exchange_calendar_membership():
     assert result.validation.passed is True
 
 
+def test_grouped_sum_uses_set_plan_and_latest_snapshot_join():
+    result = render_doris(
+        _physical(
+            "indicator('沪', '', '成交量', '近5日', '', 'SUM', '') > 100000000"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "SUM(`q`.`volume`) AS `metric_value`" in result.sql
+    assert "GROUP BY `q`.`mktcode`, `q`.`tgtcode`" in result.sql
+    assert "`aggregate_rows`.`metric_value` > 100000000" in result.sql
+    assert "INNER JOIN" in result.sql
+    assert "`anchor_out`.`bizdate` = (SELECT MAX(" in result.sql
+    assert result.sql.count("SELECT SUM(") == 0
+    assert result.validation.passed is True
+
+
+def test_grouped_aggregate_preserves_ext_anchor_join_keys():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '主力净流入', '近5日', '', 'AVG', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q" in result.sql
+    assert "AVG(`q`.`ZJLXMainNetTur`) AS `metric_value`" in result.sql
+    assert "GROUP BY `anchor`.`mktcode`, `anchor`.`tgtcode`" in result.sql
+    assert result.validation.passed is True
+
+
 def test_rank_renders_window_in_subquery_and_filters_outer_query():
     result = render_doris(
         _physical("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10"),

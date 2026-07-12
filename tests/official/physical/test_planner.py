@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -198,6 +198,34 @@ def test_unmaterialized_function_constraints_are_never_silently_dropped(source):
         plan_physical(_lower(source), default_physical_catalog())
 
     assert excinfo.value.code == "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+
+
+@pytest.mark.parametrize("aggregate", ["SUM", "AVG", "MAX", "MIN"])
+def test_single_aggregate_lowers_to_grouped_set_plan(aggregate):
+    result = plan_physical(
+        _lower(
+            f"indicator('沪', '', '成交量', '近5日', '', '{aggregate}', '') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalGroupedAggregate)
+    assert result.plan.function == aggregate.lower()
+    assert result.plan.comparator == ">"
+    assert result.plan.bound.value == 100
+    assert result.selected_strategy == "grouped_aggregate"
+
+
+def test_growth_aggregate_is_not_approximated_as_sum_or_scalar_field():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower(
+                "indicator('', '', '成交量', '近5日', '', 'GROWTH_RISE', '') > 10"
+            ),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED"
 
 
 def test_latest_date_and_market_constraints_are_materialized_in_predicate():

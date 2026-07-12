@@ -37,6 +37,7 @@ from .ir import (
     PhysicalComparison,
     PhysicalCoalesce,
     PhysicalFilter,
+    PhysicalGroupedAggregate,
     PhysicalIn,
     PhysicalJoin,
     PhysicalLatestValue,
@@ -164,10 +165,21 @@ def plan_physical(
             decisions,
             f"set_{lowering.plan.operation}",
         )
+    aggregate_contract = _aggregate_contract(lowering.plan)
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
         raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
+    if aggregate_contract is not None:
+        return _plan_grouped_aggregate(
+            lowering.plan,
+            aggregate_contract,
+            catalog,
+            fields,
+            resource_ids,
+            expressions,
+            statistics,
+        )
     if len(resource_ids) > 1:
         return _plan_multi_resource(lowering, catalog, fields, resource_ids, expressions)
 
@@ -225,6 +237,134 @@ def plan_physical(
         for index, item in enumerate(candidates)
     )
     return PhysicalPlanningResult(chosen_plan, chosen_resource, decisions, chosen_strategy)
+
+
+@dataclass(frozen=True)
+class _AggregateContract:
+    call: CallExpr
+    comparator: str
+    bound: LiteralExpr
+    function: str
+    limit: Optional[Tuple[int, int]] = None
+
+
+def _aggregate_contract(plan) -> Optional[_AggregateContract]:
+    limit = None
+    current = plan
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    calls = []
+    if isinstance(current, LogicalFilter):
+        calls = [
+            call
+            for call in _walk_calls(current.predicate)
+            if call.binding is not None
+            and str(call.binding.slots.get("agg_func", "")).strip()
+        ]
+    if not calls:
+        return None
+    functions = {
+        str(call.binding.slots.get("agg_func", "")).strip().upper()
+        for call in calls
+    }
+    unsupported = sorted(functions - {"SUM", "AVG", "MAX", "MIN"})
+    if unsupported:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+            f"aggregate function requires a dedicated contract: {', '.join(unsupported)}",
+        )
+    if len(calls) != 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
+            "multiple aggregate calls require named measure propagation",
+        )
+    if not isinstance(current, LogicalFilter) or not isinstance(current.predicate, ComparisonExpr):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
+            "aggregate must currently govern one comparison",
+        )
+    predicate = current.predicate
+    if predicate.left is not calls[0] or not isinstance(predicate.right, LiteralExpr):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
+            "aggregate comparison currently requires aggregate(call) op literal",
+        )
+    return _AggregateContract(
+        calls[0],
+        predicate.op,
+        predicate.right,
+        next(iter(functions)).lower(),
+        limit,
+    )
+
+
+def _plan_grouped_aggregate(
+    logical_plan,
+    contract: _AggregateContract,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+) -> PhysicalPlanningResult:
+    if len(resource_ids) != 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_MULTI_RESOURCE_UNSUPPORTED",
+            "grouped aggregate currently requires one measure resource",
+        )
+    selected = resource_ids[0]
+    resource = catalog.resource(selected)
+    anchor_id = resource.anchor_resource_id or selected
+    anchor = catalog.resource(anchor_id)
+    if anchor.partition_key is None or not {"mktcode", "tgtcode", "bizdate"}.issubset(anchor.stable_keys):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_ANCHOR_UNAVAILABLE",
+            f"resource {selected} has no dated stable security anchor",
+        )
+    scan = PhysicalScan(
+        selected,
+        _scan_columns(fields),
+        None,
+        resource.anchor_resource_id,
+    )
+    input_plan: PhysicalPlan = scan
+    for constraint in _call_constraints(contract.call, catalog, selected):
+        input_plan = PhysicalFilter(input_plan, constraint)
+    indicator_id = contract.call.binding.slots.get("indicator_name", "")
+    field = _field_for_indicator(fields, indicator_id)
+    if field.direct_column is not None:
+        measure = PhysicalColumn(
+            field.resource_id,
+            field.direct_column,
+            _type_from_name(field.value_type),
+        )
+    else:
+        assert field.expression is not None
+        measure = _lower_declared_expression(field.expression, field.resource_id)
+    bound = PhysicalLiteral(contract.bound.value, contract.bound.type)
+    plan: PhysicalPlan = PhysicalGroupedAggregate(
+        input_plan,
+        measure,
+        contract.function,
+        contract.comparator,
+        bound,
+        anchor_id,
+    )
+    if contract.limit is not None:
+        plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    decision = replace(
+        _candidate_decision(resource, catalog, statistics),
+        strategy_id="grouped_aggregate",
+        selected=True,
+    )
+    return PhysicalPlanningResult(
+        plan,
+        selected,
+        (decision,),
+        "grouped_aggregate",
+    )
 
 
 def _plan_multi_resource(
@@ -471,7 +611,7 @@ def _reject_unmaterialized_constraints(call: CallExpr) -> None:
     ignored = {
         slot: value
         for slot, value in call.binding.slots.items()
-        if slot not in {"indicator_name", "market", "date", "direction"} and str(value).strip()
+        if slot not in {"indicator_name", "market", "date", "direction", "agg_func"} and str(value).strip()
     }
     if ignored:
         names = ", ".join(sorted(ignored))

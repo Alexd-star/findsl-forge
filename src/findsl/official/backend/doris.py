@@ -12,6 +12,7 @@ from ..physical.ir import (
     PhysicalColumn,
     PhysicalComparison,
     PhysicalFilter,
+    PhysicalGroupedAggregate,
     PhysicalIn,
     PhysicalJoin,
     PhysicalLatestValue,
@@ -179,11 +180,94 @@ def _render_plan(
             expression=_render_expr(plan.bound, catalog, relation),
         )
         return outer.where(comparator)
+    if isinstance(plan, PhysicalGroupedAggregate):
+        return _render_grouped_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporal):
         return _render_temporal(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalSetOperation):
         return _render_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
+
+
+def _render_grouped_aggregate(
+    plan: PhysicalGroupedAggregate,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(plan.input, catalog, cte_prefix)
+    relation = _find_relation(plan.input)
+    stable_alias = _stable_alias(relation)
+    keys = ("mktcode", "tgtcode")
+    aggregate = {
+        "sum": exp.Sum,
+        "avg": exp.Avg,
+        "max": exp.Max,
+        "min": exp.Min,
+    }[plan.function](
+        this=_render_expr(plan.measure, catalog, relation)
+    ).as_("metric_value", quoted=True)
+    source.set(
+        "expressions",
+        [
+            *(exp.column(key, table=stable_alias, quoted=True) for key in keys),
+            aggregate,
+        ],
+    )
+    source = source.group_by(
+        *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
+    )
+    aggregate_rows = source.subquery(alias="aggregate_rows")
+    qualified = exp.select(
+        *(exp.column(key, table="aggregate_rows", quoted=True) for key in keys)
+    ).from_(aggregate_rows).where(
+        _COMPARISON[plan.comparator](
+            this=exp.column("metric_value", table="aggregate_rows", quoted=True),
+            expression=_render_expr(plan.bound, catalog, relation),
+        )
+    )
+    qualified_rows = qualified.subquery(alias="qualified_result")
+    anchor = catalog.resource(plan.anchor_resource_id)
+    anchor_table = exp.table_(
+        anchor.table,
+        db=anchor.database,
+        quoted=True,
+        alias="anchor_out",
+    )
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table="anchor_out", quoted=True),
+                expression=exp.column(key, table="qualified_result", quoted=True),
+            )
+            for key in keys
+        )
+    )
+    latest_table = exp.table_(
+        anchor.table,
+        db=anchor.database,
+        quoted=True,
+        alias="latest_anchor",
+    )
+    latest = exp.Subquery(
+        this=exp.select(
+            exp.Max(
+                this=exp.column(anchor.partition_key, table="latest_anchor", quoted=True)
+            )
+        ).from_(latest_table)
+    )
+    return (
+        exp.select(
+            *(exp.column(key, table="anchor_out", quoted=True) for key in (*keys, "bizdate"))
+        )
+        .from_(anchor_table)
+        .join(qualified_rows, on=join_predicate, join_type="INNER")
+        .where(
+            exp.EQ(
+                this=exp.column(anchor.partition_key, table="anchor_out", quoted=True),
+                expression=latest,
+            )
+        )
+    )
 
 
 def _render_join(plan: PhysicalJoin, catalog: PhysicalCatalog) -> exp.Select:
