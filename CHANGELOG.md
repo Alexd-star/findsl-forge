@@ -2,6 +2,19 @@
 
 本文档记录 FinDSL Forge 的重要变更。详细提交历史以 Git 为准，提交包证据以 `submission_artifacts/evidence_snapshots/` 为准。
 
+## 2026-07-12
+
+### ANTLR/IR 新后端时序语义
+
+- 新增 SQL 无关的 `TemporalQuantifier`，严格解析 `CONS/EXIST`、比较符、范围、中文数字、`每年/每月/每日`、单位归一和默认阈值，非法合同返回稳定错误码。
+- `BoundFunction` 不再把 `count_exp` 作为裸字符串保存；原子时序比较会降低为 `LogicalConsecutive` 或 `LogicalExist`，行谓词保留在时序节点内部，避免先过滤后错误拼接连续段。
+- 新增 `PhysicalTemporal` 与交易窗口合同。日粒度 `EXIST` 使用集合聚合，`CONS` 使用完整交易序号与匹配序号之差的岛屿法，不使用自然日 `DATEDIFF`，也不把连续次数近似为窗口总次数。
+- SQLGlot Doris 后端新增集合式 CTE 计划：`source_rows/eligible_rows/sequenced_rows/matched_rows/runs/temporal_metrics/qualified`，最终按稳定股票键连接最新行情快照。
+- 新增独立 Python 时序 oracle 和 `scripts/collect_phase9_temporal_evidence.py`。官方 13,650,347 行基础表上，最近 10 个交易记录的 `CONS=3日` 与 `EXIST>=5` 均实现 Doris/独立 oracle 行集哈希一致 `2/2`，P95 分别低于 0.7 秒和 0.6 秒（以提交快照实际值为准）。
+- 新后端迁移覆盖从 `72/1097（6.56%）` 提升至 `87/1097（7.93%）`。Logical IR 数量按严格时序口径重新计算为 `1149`；复合及多时序谓词在独立关系分支完成前明确拒绝，不再以裸字符串进入后续阶段。
+- 官方领域证据生成改为隔离 Phase 3 基线并按 750 条分块执行 Phase 4，全量 5,799 条门禁保持不变，同时限制 Windows 开发机和 CI 的峰值内存。
+- Doris 版本证据改从 `SHOW FRONTENDS` 获取真实 FE build；`SELECT VERSION()` 的 `5.7.99` 仅标注为 MySQL 协议兼容版本。
+
 ## 2026-07-11
 
 ### 严格官方编译基线

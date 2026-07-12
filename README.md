@@ -12,6 +12,19 @@ DSL -> Lexer/Parser -> Typed AST -> Semantic Validation -> SQL Plan -> Doris SQL
 
 AI/NL2DSL is implemented as an assistant layer that proposes DSL candidates. Every candidate still flows through the deterministic compiler and SQL/reference equivalence check, so the core remains auditable, reproducible, and testable.
 
+## ANTLR/IR Migration Status
+
+The production-hardening branch now contains a second, strictly typed compiler path:
+
+```text
+ANTLR4 -> Typed AST -> Domain/Logical IR -> Rule Optimizer
+       -> Physical IR -> SQLGlot Doris AST -> Doris validation/execution
+```
+
+On the official 5,799-row workbook, the current strict baseline remains 1,097 grounded legacy-backend queries. The new Physical IR/SQLGlot backend compiles 87 of that strict success set (`7.93%`). This is a migration metric, not an overall SQL accuracy claim. Missing data domains still return `DOMAIN_DATA_UNAVAILABLE`; unsupported semantics return stage-specific diagnostics rather than placeholder SQL.
+
+Phase 9 introduces typed trading-sequence semantics for atomic daily `CONS/EXIST` predicates. The generated Doris plan is set based and uses CTE/window islands instead of correlated scalar subqueries or calendar-day `DATEDIFF`. On the official `13,650,347`-row basic quote table, independent raw-row oracle evidence matches Doris result hashes for `CONS=3日` and `EXIST>=5` (`2/2`); both measured P95 values are below 10 seconds. See `submission_artifacts/evidence_snapshots/phase9_temporal_doris.md` and `phase9_temporal_funnel.md` for the versioned evidence and remaining migration gaps.
+
 ## Implemented Scope
 
 - Parse nested stock-screening DSL expressions.

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "git_head": "f121041f24503bae0f1741edce35db02c6687cc2",
+  "doris_versions": [
+    "doris-4.1.0-rc03-5960d4cea0e"
+  ],
+  "mysql_protocol_version": "5.7.99",
+  "official_basic_rows": 13650347,
+  "latest_date": "2026-04-14",
+  "oracle_rows": 56149,
+  "latest_universe": 5614,
+  "repeats": 5,
+  "status": "PASS",
+  "matched": 2,
+  "total": 2,
+  "cases": [
+    {
+      "name": "volume_recent_10_cons_3",
+      "source": "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') > 100",
+      "sql": "WITH source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 100 THEN 1 ELSE 0 END AS `matched`, ROW_NUMBER() OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` DESC) AS `lookback_row` FROM `newzl`.`hsj_stock_hq_basic` AS q), eligible_rows AS (SELECT * FROM `source_rows` WHERE `source_rows`.`lookback_row` <= 10), sequenced_rows AS (SELECT `eligible_rows`.`mktcode`, `eligible_rows`.`tgtcode`, `eligible_rows`.`bizdate`, `eligible_rows`.`matched`, ROW_NUMBER() OVER (PARTITION BY `eligible_rows`.`mktcode`, `eligible_rows`.`tgtcode` ORDER BY CASE WHEN `eligible_rows`.`bizdate` IS NULL THEN 1 ELSE 0 END, `eligible_rows`.`bizdate` ASC) AS `all_seq` FROM `eligible_rows`), matched_rows AS (SELECT `sequenced_rows`.`mktcode`, `sequenced_rows`.`tgtcode`, `sequenced_rows`.`bizdate`, `sequenced_rows`.`all_seq`, ROW_NUMBER() OVER (PARTITION BY `sequenced_rows`.`mktcode`, `sequenced_rows`.`tgtcode` ORDER BY CASE WHEN `sequenced_rows`.`bizdate` IS NULL THEN 1 ELSE 0 END, `sequenced_rows`.`bizdate` ASC) AS `matched_seq` FROM `sequenced_rows` WHERE `sequenced_rows`.`matched` = 1), runs AS (SELECT `matched_rows`.`mktcode`, `matched_rows`.`tgtcode`, `matched_rows`.`all_seq` - `matched_rows`.`matched_seq` AS `run_group`, COUNT(*) AS `run_length` FROM `matched_rows` GROUP BY `matched_rows`.`mktcode`, `matched_rows`.`tgtcode`, `matched_rows`.`all_seq` - `matched_rows`.`matched_seq`), temporal_metrics AS (SELECT `runs`.`mktcode`, `runs`.`tgtcode`, MAX(`runs`.`run_length`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `runs` GROUP BY `runs`.`mktcode`, `runs`.`tgtcode`), qualified AS (SELECT `temporal_metrics`.`mktcode`, `temporal_metrics`.`tgtcode` FROM `temporal_metrics` WHERE `temporal_metrics`.`metric_value` >= 3) SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `qualified` AS qualified ON `anchor_out`.`mktcode` = `qualified`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "expected_count": 5590,
+      "actual_count": 5590,
+      "expected_sha256": "e119981b04ef7e814f2e67717e5a7282d0519c9e9de663cc762a403b88270a29",
+      "actual_sha256": "e119981b04ef7e814f2e67717e5a7282d0519c9e9de663cc762a403b88270a29",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        439.1944,
+        452.9241,
+        492.059,
+        485.4699,
+        473.5199
+      ],
+      "p95_ms": 492.059
+    },
+    {
+      "name": "volume_recent_10_exist_5",
+      "source": "indicator('', '', '成交量', '最近10日', '', '', 'EXIST>=5') > 100",
+      "sql": "WITH source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 100 THEN 1 ELSE 0 END AS `matched`, ROW_NUMBER() OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` DESC) AS `lookback_row` FROM `newzl`.`hsj_stock_hq_basic` AS q), eligible_rows AS (SELECT * FROM `source_rows` WHERE `source_rows`.`lookback_row` <= 10), temporal_metrics AS (SELECT `eligible_rows`.`mktcode`, `eligible_rows`.`tgtcode`, SUM(`eligible_rows`.`matched`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `eligible_rows` GROUP BY `eligible_rows`.`mktcode`, `eligible_rows`.`tgtcode`), qualified AS (SELECT `temporal_metrics`.`mktcode`, `temporal_metrics`.`tgtcode` FROM `temporal_metrics` WHERE `temporal_metrics`.`metric_value` >= 5) SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `qualified` AS qualified ON `anchor_out`.`mktcode` = `qualified`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "expected_count": 5570,
+      "actual_count": 5570,
+      "expected_sha256": "dc0e7e6d1b80ef5a3221b86cd82a38a0a004530549a90a5f33fe95c50d00f7cc",
+      "actual_sha256": "dc0e7e6d1b80ef5a3221b86cd82a38a0a004530549a90a5f33fe95c50d00f7cc",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        437.8995,
+        454.409,
+        456.1389,
+        418.2342,
+        498.9177
+      ],
+      "p95_ms": 498.9177
+    }
+  ]
+}
