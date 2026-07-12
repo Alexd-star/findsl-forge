@@ -90,3 +90,30 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
 
     assert excinfo.value.code == "TEMPORAL_CONSECUTIVE_THRESHOLD_INVALID"
     assert excinfo.value.slot == "count_exp"
+
+
+@pytest.mark.parametrize(
+    "date,kind,amount,unit",
+    [
+        ("这五天", "recent_sessions", 5, "session"),
+        ("过去6天", "recent_sessions", 6, "session"),
+        ("近3个交易日", "recent_sessions", 3, "session"),
+        ("两年内", "recent_calendar", 2, "year"),
+        ("近两月", "recent_calendar", 2, "month"),
+        ("一八年", "calendar_range", None, "year"),
+    ],
+)
+def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == kind
+    assert bound.date_constraint.amount == amount
+    assert bound.date_constraint.unit == unit
+    if date == "一八年":
+        assert (bound.date_constraint.start, bound.date_constraint.end) == (
+            "2018-01-01",
+            "2018-12-31",
+        )

@@ -67,10 +67,20 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("invalid physical temporal comparator")
         if plan.unit not in {"", "日"}:
             raise ValueError("physical temporal bucket unit is not implemented")
-        if plan.window.kind not in {"all_history", "recent_sessions", "exact_date", "latest_session"}:
+        if plan.window.kind not in {"all_history", "recent_sessions", "recent_calendar", "calendar_range", "exact_date", "latest_session"}:
             raise ValueError("invalid physical temporal window")
         if plan.window.kind == "recent_sessions" and (plan.window.lookback_sessions is None or plan.window.lookback_sessions <= 0):
             raise ValueError("recent temporal window requires positive trading sessions")
+        if plan.window.kind == "recent_calendar" and (
+            plan.window.calendar_amount is None
+            or plan.window.calendar_amount <= 0
+            or plan.window.calendar_unit not in {"day", "week", "month", "year"}
+        ):
+            raise ValueError("recent calendar window requires a positive typed interval")
+        if plan.window.kind in {"calendar_range", "exact_date"} and (
+            not plan.window.start or not plan.window.end
+        ):
+            raise ValueError("calendar range requires explicit bounds")
         if plan.every:
             if plan.threshold is not None or plan.comparator not in {"=", "!="}:
                 raise ValueError("invalid every-session temporal contract")

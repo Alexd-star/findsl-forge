@@ -406,6 +406,16 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
         return PhysicalTemporalWindow("latest_session", lookback_sessions=1)
     if window.kind == "exact" and window.start and window.end:
         return PhysicalTemporalWindow("exact_date", start=window.start, end=window.end)
+    if window.kind == "calendar_range" and window.start and window.end:
+        return PhysicalTemporalWindow("calendar_range", start=window.start, end=window.end)
+    if window.kind == "recent_sessions" and window.amount:
+        return PhysicalTemporalWindow("recent_sessions", lookback_sessions=window.amount)
+    if window.kind == "recent_calendar" and window.amount and window.unit:
+        return PhysicalTemporalWindow(
+            "recent_calendar",
+            calendar_amount=window.amount,
+            calendar_unit=window.unit,
+        )
     if window.kind == "expression" and window.anchor:
         text = str(window.anchor).strip()
         match = re.fullmatch(r"(?:最近|近)(\d+)(?:日|天)|(?:(\d+)(?:日|天)(?:内|以内))", text)

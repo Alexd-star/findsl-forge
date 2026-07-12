@@ -93,12 +93,12 @@ def parse_temporal_quantifier(source: str) -> TemporalQuantifier:
         return TemporalQuantifier(mode, comparator, None, None, unit, True, text)
 
     if raw_value:
-        threshold = _parse_count(raw_value, text)
+        threshold = parse_count_token(raw_value, text)
     else:
         threshold = 1 if mode == "CONS" else 0
 
     raw_maximum = match.group("maximum")
-    maximum = _parse_count(raw_maximum, text) if raw_maximum else None
+    maximum = parse_count_token(raw_maximum, text) if raw_maximum else None
     if mode == "CONS" and threshold <= 0:
         raise TemporalParseError(
             "TEMPORAL_CONSECUTIVE_THRESHOLD_INVALID",
@@ -169,7 +169,7 @@ def _canonical_unit(unit: str) -> str:
     return "日" if unit == "天" else unit
 
 
-def _parse_count(value: str, source: str) -> int:
+def parse_count_token(value: str, source: str = "") -> int:
     if re.fullmatch(r"\d+(?:\.\d+)?", value):
         number = float(value)
         if not number.is_integer():
@@ -179,7 +179,7 @@ def _parse_count(value: str, source: str) -> int:
                 source,
             )
         return int(number)
-    return _parse_chinese_integer(value, source)
+    return _parse_chinese_integer(value, source or value)
 
 
 def _parse_chinese_integer(value: str, source: str) -> int:

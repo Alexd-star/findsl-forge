@@ -37,10 +37,12 @@ class DateConstraint(CanonicalIr):
     start: Optional[str] = None
     end: Optional[str] = None
     anchor: Optional[str] = None
+    amount: Optional[int] = None
+    unit: Optional[str] = None
     trading_day_based: bool = True
 
     def to_dict(self):
-        return {"kind": "DateConstraint", "constraint_kind": self.kind, "start": self.start, "end": self.end, "anchor": self.anchor, "trading_day_based": self.trading_day_based}
+        return {"kind": "DateConstraint", "constraint_kind": self.kind, "start": self.start, "end": self.end, "anchor": self.anchor, "amount": self.amount, "unit": self.unit, "trading_day_based": self.trading_day_based}
 
 
 @dataclass(frozen=True)

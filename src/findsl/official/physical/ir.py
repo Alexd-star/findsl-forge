@@ -132,9 +132,11 @@ class PhysicalTemporalWindow(CanonicalIr):
     lookback_sessions: Optional[int] = None
     start: Optional[str] = None
     end: Optional[str] = None
+    calendar_amount: Optional[int] = None
+    calendar_unit: Optional[str] = None
 
     def to_dict(self):
-        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end}
+        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit}
 
 
 @dataclass(frozen=True)

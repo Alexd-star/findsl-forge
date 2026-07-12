@@ -274,3 +274,15 @@ def test_same_scope_temporal_arithmetic_renders_inside_source_row_predicate():
     assert "`q`.`volume` / `q`.`turnover` > 0" in result.sql
     assert result.sql.count("`hsj_stock_hq_basic`") == 3
     assert result.validation.passed is True
+
+
+def test_recent_calendar_temporal_window_uses_latest_data_anchor_and_date_sub():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '两年内', '', '', 'EXIST>0') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert "DATE_SUB" in result.sql
+    assert "INTERVAL '2' YEAR" in result.sql
+    assert result.sql.count("MAX(`calendar_anchor`.`bizdate`)") == 2
+    assert result.validation.passed is True

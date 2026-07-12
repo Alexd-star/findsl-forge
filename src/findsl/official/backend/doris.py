@@ -198,6 +198,46 @@ def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Se
                 expression=exp.convert(plan.window.start),
             )
         )
+    elif plan.window.kind == "calendar_range":
+        source = source.where(
+            exp.and_(
+                exp.GTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=exp.convert(plan.window.start),
+                ),
+                exp.LTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=exp.convert(plan.window.end),
+                ),
+            )
+        )
+    elif plan.window.kind == "recent_calendar":
+        amount = plan.window.calendar_amount
+        unit = plan.window.calendar_unit
+        if amount is None or unit is None:
+            raise DorisBackendError(
+                "DORIS_TEMPORAL_WINDOW_INVALID",
+                "recent calendar window is missing amount or unit",
+            )
+        lower_anchor = _latest_calendar_anchor(catalog, scan)
+        upper_anchor = _latest_calendar_anchor(catalog, scan)
+        lower = exp.DateSub(
+            this=lower_anchor,
+            expression=exp.Literal.string(str(amount)),
+            unit=exp.Var(this=unit.upper()),
+        )
+        source = source.where(
+            exp.and_(
+                exp.GTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=lower,
+                ),
+                exp.LTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=upper_anchor,
+                ),
+            )
+        )
 
     ctes = [("source_rows", source)]
     relation_name = "source_rows"
@@ -319,6 +359,21 @@ def _render_exist_metrics(relation_name: str, keys) -> exp.Select:
     ).from_(exp.table_(relation_name, quoted=True)).group_by(
         *(exp.column(name, table=relation_name, quoted=True) for name in keys)
     )
+
+
+def _latest_calendar_anchor(catalog: PhysicalCatalog, scan: PhysicalScan) -> exp.Subquery:
+    resource = catalog.resource(scan.anchor_resource_id or scan.resource_id)
+    query = exp.select(
+        exp.Max(this=exp.column("bizdate", table="calendar_anchor", quoted=True))
+    ).from_(
+        exp.table_(
+            resource.table,
+            db=resource.database,
+            quoted=True,
+            alias="calendar_anchor",
+        )
+    )
+    return exp.Subquery(this=query)
 
 
 def _row_number(table: str, keys, order_column: str, descending: bool = False) -> exp.Window:

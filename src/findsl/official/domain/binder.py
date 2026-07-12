@@ -9,6 +9,7 @@ from ..typed_ast import TypedNode
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRef, MarketScope
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
+from .temporal import parse_count_token
 
 
 class DomainBindingError(ValueError):
@@ -110,4 +111,41 @@ def _bind_date(function: str, value: str) -> DateConstraint:
         return DateConstraint("exact", value, value)
     if value in {"今日", "今天", "当前", "最新"}:
         return DateConstraint("relative", anchor="today")
+    number = r"\d+|[零〇一二两三四五六七八九十百]+"
+    recent_sessions = re.fullmatch(
+        rf"(?:最近|近|过去|这)(?P<count>{number})(?:个)?(?:交易)?(?:日|天)",
+        value,
+    ) or re.fullmatch(
+        rf"(?P<count>{number})(?:个)?(?:交易)?(?:日|天)(?:内|以内)",
+        value,
+    )
+    if recent_sessions:
+        amount = parse_count_token(recent_sessions.group("count"), value)
+        return DateConstraint("recent_sessions", anchor="latest", amount=amount, unit="session")
+    recent_calendar = re.fullmatch(
+        rf"(?:最近|近|过去)(?P<count>{number})(?:个)?(?P<unit>年|月)(?:内|以内)?",
+        value,
+    ) or re.fullmatch(
+        rf"(?P<count>{number})(?:个)?(?P<unit>年|月)(?:内|以内)",
+        value,
+    )
+    if recent_calendar:
+        amount = parse_count_token(recent_calendar.group("count"), value)
+        unit = {"年": "year", "月": "month"}[recent_calendar.group("unit")]
+        return DateConstraint("recent_calendar", anchor="latest", amount=amount, unit=unit, trading_day_based=False)
+    year = re.fullmatch(r"(?P<year>\d{4}|[零〇一二两三四五六七八九]{2,4})年", value)
+    if year:
+        token = year.group("year")
+        number_value = parse_count_token(token, value)
+        if len(token) == 2:
+            number_value = 2000 + number_value if number_value <= 26 else 1900 + number_value
+        if 1990 <= number_value <= 2100:
+            return DateConstraint(
+                "calendar_range",
+                f"{number_value:04d}-01-01",
+                f"{number_value:04d}-12-31",
+                amount=None,
+                unit="year",
+                trading_day_based=False,
+            )
     return DateConstraint("expression", anchor=value)

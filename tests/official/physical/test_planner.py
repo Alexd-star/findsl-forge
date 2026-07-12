@@ -389,6 +389,29 @@ def test_recent_days_temporal_window_is_normalized_to_trading_sessions():
     assert result.plan.window.lookback_sessions == 10
 
 
+@pytest.mark.parametrize("date,sessions", [("这五天", 5), ("过去6天", 6), ("近3个交易日", 3)])
+def test_colloquial_trading_windows_are_typed_before_physical_planning(date, sessions):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', 'EXIST>0') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert result.plan.window.kind == "recent_sessions"
+    assert result.plan.window.lookback_sessions == sessions
+
+
+@pytest.mark.parametrize("date,amount,unit", [("两年内", 2, "year"), ("近两月", 2, "month")])
+def test_calendar_temporal_windows_preserve_amount_and_unit(date, amount, unit):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', 'EXIST>0') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert result.plan.window.kind == "recent_calendar"
+    assert result.plan.window.calendar_amount == amount
+    assert result.plan.window.calendar_unit == unit
+
+
 def test_same_scope_temporal_arithmetic_lowers_all_required_columns_once():
     result = plan_physical(
         _lower(
