@@ -284,6 +284,56 @@ def test_scalar_snapshot_and_window_aggregate_use_one_typed_composite_plan():
     assert "PhysicalRecentSessions" in payload
 
 
+def test_period_scalar_beside_aggregate_becomes_named_security_relation():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '近5日', '', '', '') > "
+            "indicator('', '', '成交量', '近5日', '', 'AVG', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.groups) == 1
+    assert len(result.plan.scalars) == 1
+    scalar = result.plan.scalars[0]
+    assert scalar.group_by_security is True
+    assert scalar.collapse_latest is True
+    assert "PhysicalAggregateRef" in result.plan.predicate.canonical_json()
+
+
+def test_period_scalar_beside_rank_arithmetic_is_named_and_joined_by_security():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '上周', '', '', '') > 0 and "
+            "rank('', '', '成交量', 'desc', '', '', '', '') / "
+            "rank('', '', '成交额', 'desc', '', '', '', '') <= 1"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRankExpression)
+    assert len(result.plan.scalars) == 1
+    assert result.plan.scalars[0].group_by_security is True
+    assert result.plan.scalars[0].collapse_latest is True
+
+
+def test_period_querydata_scalar_collapses_to_one_cross_join_value():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '今日', '', '', '') > "
+            "queryData('', '比亚迪', '成交量', '上周', '') and "
+            "indicator('', '', '成交量', '近5日', '', 'AVG', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.scalars) == 1
+    assert result.plan.scalars[0].group_by_security is False
+    assert result.plan.scalars[0].collapse_latest is True
+
+
 def test_composite_aggregate_rejects_conflicting_scalar_snapshot_dates():
     with pytest.raises(PhysicalPlanningError) as excinfo:
         plan_physical(

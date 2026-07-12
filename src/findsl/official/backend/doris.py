@@ -728,7 +728,23 @@ def _render_composite_aggregate(
         scalar_rows = _render_named_scalar(scalar, catalog, cte_prefix).subquery(
             alias=scalar.alias
         )
-        query = query.join(scalar_rows, join_type="CROSS")
+        if scalar.group_by_security:
+            join_predicate = exp.and_(
+                *(
+                    exp.EQ(
+                        this=exp.column(key, table=anchor_alias, quoted=True),
+                        expression=exp.column(key, table=scalar.alias, quoted=True),
+                    )
+                    for key in keys
+                )
+            )
+            query = query.join(
+                scalar_rows,
+                on=join_predicate,
+                join_type="INNER",
+            )
+        else:
+            query = query.join(scalar_rows, join_type="CROSS")
     return query.where(_render_expr(plan.predicate, catalog, anchor_relation))
 
 
@@ -756,6 +772,29 @@ def _render_rank_expression(
             )
         )
         query = query.join(rank_rows, on=join_predicate, join_type="INNER")
+    for scalar in plan.scalars:
+        scalar_rows = _render_named_scalar(
+            scalar,
+            catalog,
+            cte_prefix,
+        ).subquery(alias=scalar.alias)
+        if scalar.group_by_security:
+            join_predicate = exp.and_(
+                *(
+                    exp.EQ(
+                        this=exp.column(key, table=anchor_alias, quoted=True),
+                        expression=exp.column(key, table=scalar.alias, quoted=True),
+                    )
+                    for key in keys
+                )
+            )
+            query = query.join(
+                scalar_rows,
+                on=join_predicate,
+                join_type="INNER",
+            )
+        else:
+            query = query.join(scalar_rows, join_type="CROSS")
     query = query.where(_render_expr(plan.predicate, catalog))
     for cte in anchor_ctes:
         query = query.with_(cte.alias_or_name, as_=cte.this)
@@ -997,10 +1036,36 @@ def _render_aggregate_group(
 def _render_named_scalar(scalar, catalog: PhysicalCatalog, cte_prefix: str = "") -> exp.Select:
     source = _render_plan(scalar.input, catalog, cte_prefix)
     relation = _find_relation(scalar.input)
+    stable_alias = _stable_alias(relation)
+    value = _render_expr(scalar.expression, catalog, relation)
+    if scalar.collapse_latest:
+        metric = exp.func(
+            "MAX_BY",
+            value,
+            exp.column("bizdate", table=stable_alias, quoted=True),
+        ).as_(scalar.value_alias, quoted=True)
+        expressions = [metric]
+        if scalar.group_by_security:
+            expressions = [
+                *(
+                    exp.column(key, table=stable_alias, quoted=True)
+                    for key in ("mktcode", "tgtcode")
+                ),
+                metric,
+            ]
+        source.set("expressions", expressions)
+        if scalar.group_by_security:
+            source = source.group_by(
+                *(
+                    exp.column(key, table=stable_alias, quoted=True)
+                    for key in ("mktcode", "tgtcode")
+                )
+            )
+        return source
     source.set(
         "expressions",
         [
-            _render_expr(scalar.expression, catalog, relation).as_(
+            value.as_(
                 scalar.value_alias,
                 quoted=True,
             )

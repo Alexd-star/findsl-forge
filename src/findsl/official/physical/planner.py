@@ -957,6 +957,125 @@ def _plan_aggregate_rank(
     )
 
 
+def _requires_period_scalar(call: CallExpr) -> bool:
+    if call.binding is None:
+        return False
+    if str(call.binding.slots.get("agg_func", "")).strip() or str(
+        call.binding.slots.get("count_exp", "")
+    ).strip():
+        return False
+    date = str(call.binding.slots.get("date", "")).strip()
+    if not date:
+        return False
+    typed_date = call.date_constraint or parse_date_constraint(date)
+    return typed_date.kind not in {"relative", "exact", "relative_session"}
+
+
+def _build_named_scalar_relations(
+    calls: Tuple[CallExpr, ...],
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    *,
+    alias_prefix: str,
+):
+    scalars = []
+    refs = {}
+    resource_ids = set()
+    seen = set()
+    for call in calls:
+        if call.node_id in seen:
+            continue
+        seen.add(call.node_id)
+        if call.binding is None or call.name not in {"indicator", "queryData"}:
+            raise PhysicalPlanningError(
+                "PHYSICAL_SCALAR_RELATION_UNSUPPORTED",
+                "named scalar relation requires a bound indicator or queryData call",
+            )
+        if call.name == "queryData":
+            if not isinstance(call.scope_expression, ScopeAtom):
+                raise PhysicalPlanningError(
+                    "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
+                    "queryData scalar requires one exact security identity",
+                )
+            resolved_scope = default_security_scope_catalog().resolve(
+                call.scope_expression.name
+            )
+            if len(resolved_scope.identities) != 1:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
+                    "queryData scalar scope resolves to multiple securities",
+                )
+        indicator_id = call.binding.slots.get("indicator_name", "")
+        field = _field_for_indicator(fields, indicator_id)
+        relation_fields = [field]
+        if call.scope_expression is not None:
+            relation_fields.append(
+                next(
+                    item
+                    for item in fields
+                    if item.indicator_id == "__security_scope_name"
+                )
+            )
+        relation_fields_tuple = tuple(relation_fields)
+        relation_resource_ids = tuple(
+            sorted({item.resource_id for item in relation_fields_tuple})
+        )
+        if len(relation_resource_ids) == 1:
+            scalar_root_id = field.resource_id
+            resource = catalog.resource(scalar_root_id)
+            scalar_input: PhysicalPlan = PhysicalScan(
+                scalar_root_id,
+                _scan_columns(relation_fields_tuple),
+                None,
+                resource.anchor_resource_id,
+            )
+        else:
+            scalar_input, scalar_root_id, _ = _build_join_relation(
+                relation_fields_tuple,
+                relation_resource_ids,
+                catalog,
+            )
+        date = str(call.binding.slots.get("date", "")).strip()
+        collapse_latest = _requires_period_scalar(call)
+        constraints = list(_call_constraints(call, catalog, scalar_root_id))
+        if not date:
+            stable_id = (
+                catalog.resource(scalar_root_id).anchor_resource_id
+                or scalar_root_id
+            )
+            partition_key = catalog.resource(stable_id).partition_key
+            constraints.append(
+                PhysicalComparison(
+                    "=",
+                    PhysicalColumn(stable_id, partition_key, TIME),
+                    PhysicalLatestValue(stable_id, partition_key, TIME),
+                )
+            )
+        for constraint in constraints:
+            scalar_input = PhysicalFilter(scalar_input, constraint)
+        index = len(scalars)
+        relation_alias = f"{alias_prefix}_{index}"
+        value_alias = f"{alias_prefix}_value_{index}"
+        group_by_security = call.name == "indicator"
+        scalars.append(
+            PhysicalNamedScalar(
+                relation_alias,
+                scalar_input,
+                _physical_field_expression(field),
+                value_alias,
+                group_by_security,
+                collapse_latest,
+            )
+        )
+        refs[call.node_id] = PhysicalAggregateRef(
+            relation_alias,
+            value_alias,
+            _type_from_name(field.value_type),
+        )
+        resource_ids.update(relation_resource_ids)
+    return tuple(scalars), refs, resource_ids
+
+
 def _plan_composite_aggregate(
     logical_plan,
     aggregate_calls: Tuple[CallExpr, ...],
@@ -1046,84 +1165,31 @@ def _plan_composite_aggregate(
             _type_from_name(field.value_type),
         )
 
-    for index, call in enumerate(querydata_scalar_calls):
-        if not isinstance(call.scope_expression, ScopeAtom):
-            raise PhysicalPlanningError(
-                "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
-                "queryData scalar requires one exact security identity",
-            )
-        resolved_scope = default_security_scope_catalog().resolve(
-            call.scope_expression.name
-        )
-        if len(resolved_scope.identities) != 1:
-            raise PhysicalPlanningError(
-                "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
-                "queryData scalar scope resolves to multiple securities",
-            )
-        indicator_id = call.binding.slots.get("indicator_name", "")
-        field = _field_for_indicator(fields, indicator_id)
-        scope_field = next(
-            item for item in fields if item.indicator_id == "__security_scope_name"
-        )
-        relation_fields = (field, scope_field)
-        relation_resource_ids = tuple(
-            sorted({item.resource_id for item in relation_fields})
-        )
-        if len(relation_resource_ids) == 1:
-            scalar_root_id = field.resource_id
-            resource = catalog.resource(scalar_root_id)
-            scalar_input: PhysicalPlan = PhysicalScan(
-                scalar_root_id,
-                _scan_columns(relation_fields),
-                None,
-                resource.anchor_resource_id,
-            )
-        else:
-            scalar_input, scalar_root_id, _ = _build_join_relation(
-                relation_fields,
-                relation_resource_ids,
-                catalog,
-            )
-        date = str(call.binding.slots.get("date", "")).strip()
-        if date:
-            typed_date = call.date_constraint or parse_date_constraint(date)
-            if typed_date.kind not in {"relative", "exact", "relative_session"}:
-                raise PhysicalPlanningError(
-                    "PHYSICAL_QUERYDATA_SCALAR_UNBOUNDED",
-                    f"queryData scalar requires a singleton date, got {date}",
-                )
-        constraints = list(_call_constraints(call, catalog, scalar_root_id))
-        if not date:
-            stable_id = catalog.resource(scalar_root_id).anchor_resource_id or scalar_root_id
-            partition_key = catalog.resource(stable_id).partition_key
-            constraints.append(
-                PhysicalComparison(
-                    "=",
-                    PhysicalColumn(stable_id, partition_key, TIME),
-                    PhysicalLatestValue(stable_id, partition_key, TIME),
-                )
-            )
-        for constraint in constraints:
-            scalar_input = PhysicalFilter(scalar_input, constraint)
-        relation_alias = f"scalar_{index}"
-        value_alias = f"scalar_value_{index}"
-        scalars.append(
-            PhysicalNamedScalar(
-                relation_alias,
-                scalar_input,
-                _physical_field_expression(field),
-                value_alias,
-            )
-        )
-        refs[call.node_id] = PhysicalAggregateRef(
-            relation_alias,
-            value_alias,
-            _type_from_name(field.value_type),
-        )
-        aggregate_resource_ids.update(relation_resource_ids)
+    aggregate_ids = {call.node_id for call in unique_aggregates}
+    period_indicator_calls = tuple(
+        call
+        for call in all_calls
+        if call.node_id not in aggregate_ids
+        and call.name == "indicator"
+        and _requires_period_scalar(call)
+    )
+    named_scalar_calls = tuple(querydata_scalar_calls) + period_indicator_calls
+    (
+        named_scalars,
+        scalar_refs,
+        scalar_resource_ids,
+    ) = _build_named_scalar_relations(
+        named_scalar_calls,
+        catalog,
+        fields,
+        alias_prefix="scalar",
+    )
+    scalars.extend(named_scalars)
+    refs.update(scalar_refs)
+    aggregate_resource_ids.update(scalar_resource_ids)
 
     named_relation_ids = seen_aggregates | {
-        call.node_id for call in querydata_scalar_calls
+        call.node_id for call in named_scalar_calls
     }
     scalar_calls = tuple(
         call for call in all_calls if call.node_id not in named_relation_ids
@@ -1275,6 +1341,24 @@ def _plan_rank_expression(
 
     all_calls = tuple(_walk_calls(contract.predicate))
     scalar_calls = tuple(call for call in all_calls if call.node_id not in seen)
+    period_scalar_calls = tuple(
+        call
+        for call in scalar_calls
+        if call.name in {"indicator", "queryData"}
+        and _requires_period_scalar(call)
+    )
+    period_scalars, scalar_refs, scalar_resources = _build_named_scalar_relations(
+        period_scalar_calls,
+        catalog,
+        fields,
+        alias_prefix="rank_scalar",
+    )
+    refs.update(scalar_refs)
+    rank_resources.update(scalar_resources)
+    period_scalar_ids = {call.node_id for call in period_scalar_calls}
+    scalar_calls = tuple(
+        call for call in scalar_calls if call.node_id not in period_scalar_ids
+    )
     if isinstance(contract.input_plan, LogicalDomainScan):
         scalar_fields = tuple(
             {
@@ -1324,6 +1408,7 @@ def _plan_rank_expression(
         tuple(ranks),
         predicate,
         "official_basic",
+        period_scalars,
     )
     if contract.limit is not None:
         plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])

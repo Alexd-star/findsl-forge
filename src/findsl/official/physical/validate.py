@@ -238,6 +238,17 @@ def _validate_plan(plan, catalog, expressions):
             declared_refs.add((rank.alias, rank.value_alias))
             _validate_plan(rank.input, catalog, expressions)
             _validate_expr(rank.expression, catalog, expressions)
+        for scalar in plan.scalars:
+            if (
+                not scalar.alias.isidentifier()
+                or not scalar.value_alias.isidentifier()
+                or scalar.alias in aliases
+            ):
+                raise ValueError("named rank scalar alias is invalid or duplicated")
+            aliases.add(scalar.alias)
+            declared_refs.add((scalar.alias, scalar.value_alias))
+            _validate_plan(scalar.input, catalog, expressions)
+            _validate_expr(scalar.expression, catalog, expressions)
         used_refs = {
             (item.relation_alias, item.measure_alias)
             for item in _walk_aggregate_refs(plan.predicate)

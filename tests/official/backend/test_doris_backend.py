@@ -578,6 +578,55 @@ def test_named_rank_period_uses_one_latest_value_per_security():
     assert result.validation.passed is True
 
 
+def test_period_scalar_aggregate_composition_collapses_before_security_join():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '近5日', '', '', '') > "
+            "indicator('', '', '成交量', '近5日', '', 'AVG', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "MAX_BY(`q`.`volume`, `q`.`bizdate`) AS `scalar_value_0`" in result.sql
+    assert "GROUP BY `q`.`mktcode`, `q`.`tgtcode`" in result.sql
+    assert "`q`.`mktcode` = `scalar_0`.`mktcode`" in result.sql
+    assert "`q`.`tgtcode` = `scalar_0`.`tgtcode`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_period_scalar_rank_composition_collapses_before_rank_joins():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '上周', '', '', '') > 0 and "
+            "rank('', '', '成交量', 'desc', '', '', '', '') / "
+            "rank('', '', '成交额', 'desc', '', '', '', '') <= 1"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "MAX_BY(`q`.`volume`, `q`.`bizdate`) AS `rank_scalar_value_0`" in result.sql
+    assert "`rank_anchor_input`.`mktcode` = `rank_scalar_0`.`mktcode`" in result.sql
+    assert "`rank_anchor_input`.`tgtcode` = `rank_scalar_0`.`tgtcode`" in result.sql
+    assert result.sql.count("ROW_NUMBER() OVER") == 2
+    assert result.validation.passed is True
+
+
+def test_period_querydata_scalar_collapses_to_one_cross_join_row():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '今日', '', '', '') > "
+            "queryData('', '比亚迪', '成交量', '上周', '') and "
+            "indicator('', '', '成交量', '近5日', '', 'AVG', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "CROSS JOIN (SELECT MAX_BY(" in result.sql
+    assert "`official_security`.`name` = '比亚迪'" in result.sql
+    assert "AS `scalar_value_0`" in result.sql
+    assert result.validation.passed is True
+
+
 def test_chained_rank_materializes_previous_candidates_before_next_rank():
     result = render_doris(
         _physical(

@@ -580,6 +580,8 @@ class PhysicalNamedScalar(CanonicalIr):
     input: PhysicalPlan
     expression: PhysicalExpr
     value_alias: str
+    group_by_security: bool = False
+    collapse_latest: bool = False
 
     def to_dict(self):
         return {
@@ -588,6 +590,8 @@ class PhysicalNamedScalar(CanonicalIr):
             "input": self.input.to_dict(),
             "expression": self.expression.to_dict(),
             "value_alias": self.value_alias,
+            "group_by_security": self.group_by_security,
+            "collapse_latest": self.collapse_latest,
         }
 
 
@@ -752,6 +756,7 @@ class PhysicalRankExpression(PhysicalPlan):
     ranks: Tuple[PhysicalNamedRank, ...]
     predicate: PhysicalExpr
     anchor_resource_id: str
+    scalars: Tuple[PhysicalNamedScalar, ...] = ()
 
     def to_dict(self):
         return {
@@ -760,6 +765,7 @@ class PhysicalRankExpression(PhysicalPlan):
             "ranks": [rank.to_dict() for rank in self.ranks],
             "predicate": self.predicate.to_dict(),
             "anchor_resource_id": self.anchor_resource_id,
+            "scalars": [scalar.to_dict() for scalar in self.scalars],
         }
 
 
