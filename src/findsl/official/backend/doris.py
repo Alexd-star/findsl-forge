@@ -181,6 +181,7 @@ def _render_temporal(
     keys = ("mktcode", "tgtcode")
     source_rows_name = f"{cte_prefix}source_rows"
     eligible_rows_name = f"{cte_prefix}eligible_rows"
+    bucket_rows_name = f"{cte_prefix}bucket_rows"
     sequenced_rows_name = f"{cte_prefix}sequenced_rows"
     matched_rows_name = f"{cte_prefix}matched_rows"
     runs_name = f"{cte_prefix}runs"
@@ -270,11 +271,40 @@ def _render_temporal(
         ctes.append((eligible_rows_name, eligible))
         relation_name = eligible_rows_name
 
+    calendar_bucket = plan.unit in {"周", "月", "季度", "年"}
+    if calendar_bucket:
+        bucket_key = _calendar_bucket_key(relation_name, plan.unit)
+        bucket_ordinal = _calendar_bucket_ordinal(bucket_key, plan.unit)
+        bucket_rows = exp.select(
+            *(exp.column(name, table=relation_name, quoted=True) for name in keys),
+            bucket_key.as_("bucket_key", quoted=True),
+            exp.Max(this=exp.column("matched", table=relation_name, quoted=True)).as_("matched", quoted=True),
+            bucket_ordinal.as_("bucket_ordinal", quoted=True),
+        ).from_(exp.table_(relation_name, quoted=True)).group_by(
+            *(exp.column(name, table=relation_name, quoted=True) for name in keys),
+            bucket_key,
+            bucket_ordinal,
+        )
+        ctes.append((bucket_rows_name, bucket_rows))
+        relation_name = bucket_rows_name
+
     if plan.every or plan.mode == "EXIST":
-        metrics = _render_exist_metrics(relation_name, keys)
+        metrics = _render_exist_metrics(
+            relation_name,
+            keys,
+            gap_aware=calendar_bucket and plan.every,
+        )
     else:
+        if calendar_bucket:
+            matched_projection = (*keys, "bucket_key", "bucket_ordinal")
+            order_column = "bucket_key"
+            sequence_column = "bucket_ordinal"
+        else:
+            matched_projection = (*keys, "bizdate", "all_seq")
+            order_column = "bizdate"
+            sequence_column = "all_seq"
         matched_rows = exp.select(
-            *(exp.column(name, table=relation_name, quoted=True) for name in (*keys, "bizdate", "all_seq"))
+            *(exp.column(name, table=relation_name, quoted=True) for name in matched_projection)
         ).from_(exp.table_(relation_name, quoted=True)).where(
             exp.EQ(
                 this=exp.column("matched", table=relation_name, quoted=True),
@@ -282,13 +312,13 @@ def _render_temporal(
             )
         )
         matched_rows = matched_rows.select(
-            _row_number(relation_name, keys, "bizdate").as_("matched_seq", quoted=True),
+            _row_number(relation_name, keys, order_column).as_("matched_seq", quoted=True),
             append=True,
         )
         ctes.append((matched_rows_name, matched_rows))
 
         island = exp.Sub(
-            this=exp.column("all_seq", table=matched_rows_name, quoted=True),
+            this=exp.column(sequence_column, table=matched_rows_name, quoted=True),
             expression=exp.column("matched_seq", table=matched_rows_name, quoted=True),
         )
         runs = exp.select(
@@ -308,7 +338,7 @@ def _render_temporal(
             *(exp.column(name, table=runs_name, quoted=True) for name in keys)
         )
 
-    if plan.mode == "CONS" and not plan.every:
+    if plan.mode == "CONS" and not plan.every and not calendar_bucket:
         sequence_relation = relation_name
         sequence = exp.select(
             *(exp.column(name, table=sequence_relation, quoted=True) for name in (*keys, "bizdate", "matched")),
@@ -400,13 +430,68 @@ def _detach_ctes(query: exp.Select):
     return result, ctes
 
 
-def _render_exist_metrics(relation_name: str, keys) -> exp.Select:
+def _render_exist_metrics(
+    relation_name: str,
+    keys,
+    *,
+    gap_aware: bool = False,
+) -> exp.Select:
+    if gap_aware:
+        total_buckets = exp.Add(
+            this=exp.Sub(
+                this=exp.Max(this=exp.column("bucket_ordinal", table=relation_name, quoted=True)),
+                expression=exp.Min(this=exp.column("bucket_ordinal", table=relation_name, quoted=True)),
+            ),
+            expression=exp.convert(1),
+        )
+    else:
+        total_buckets = exp.Count(this=exp.Star())
     return exp.select(
         *(exp.column(name, table=relation_name, quoted=True) for name in keys),
         exp.Sum(this=exp.column("matched", table=relation_name, quoted=True)).as_("metric_value", quoted=True),
-        exp.Count(this=exp.Star()).as_("total_buckets", quoted=True),
+        total_buckets.as_("total_buckets", quoted=True),
     ).from_(exp.table_(relation_name, quoted=True)).group_by(
         *(exp.column(name, table=relation_name, quoted=True) for name in keys)
+    )
+
+
+def _calendar_bucket_key(relation_name: str, unit: str):
+    granularity = {
+        "周": "WEEK",
+        "月": "MONTH",
+        "季度": "QUARTER",
+        "年": "YEAR",
+    }[unit]
+    return exp.DateTrunc(
+        this=exp.column("bizdate", table=relation_name, quoted=True),
+        unit=exp.Literal.string(granularity),
+    )
+
+
+def _calendar_bucket_ordinal(bucket_key, unit: str):
+    if unit == "年":
+        return exp.func("YEAR", bucket_key.copy())
+    if unit == "月":
+        return exp.Add(
+            this=exp.Mul(
+                this=exp.func("YEAR", bucket_key.copy()),
+                expression=exp.convert(12),
+            ),
+            expression=exp.func("MONTH", bucket_key.copy()),
+        )
+    if unit == "季度":
+        return exp.Add(
+            this=exp.Mul(
+                this=exp.func("YEAR", bucket_key.copy()),
+                expression=exp.convert(4),
+            ),
+            expression=exp.func("QUARTER", bucket_key.copy()),
+        )
+    return exp.Floor(
+        this=exp.Div(
+            this=exp.func("UNIX_TIMESTAMP", bucket_key.copy()),
+            expression=exp.convert(604800),
+        )
     )
 
 

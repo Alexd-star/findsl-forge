@@ -1,4 +1,5 @@
 import sqlglot
+import pytest
 from sqlglot import exp
 
 from findsl.official.backend.doris import render_doris
@@ -338,3 +339,41 @@ def test_nested_temporal_or_chain_has_unique_cte_names_and_two_unions():
     assert len(list(parsed.find_all(exp.Union))) == 2
     assert len(cte_names) == len(set(cte_names))
     assert result.validation.passed is True
+
+
+@pytest.mark.parametrize(
+    "count_exp,granularity,ordinal_signal",
+    [
+        ("CONS=每年", "YEAR", "YEAR("),
+        ("EXIST>=2月", "MONTH", "MONTH("),
+        ("CONS=3季度", "QUARTER", "QUARTER("),
+        ("CONS=每周", "WEEK", "UNIX_TIMESTAMP("),
+    ],
+)
+def test_calendar_bucket_temporal_sql_uses_date_trunc_and_gap_aware_ordinal(
+    count_exp, granularity, ordinal_signal
+):
+    result = render_doris(
+        _physical(
+            f"indicator('', '', '成交量', '两年内', '', '', '{count_exp}') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert f"DATE_TRUNC(`source_rows`.`bizdate`, '{granularity}')" in result.sql
+    assert "bucket_rows" in result.sql
+    assert ordinal_signal in result.sql
+    assert "DATEDIFF" not in result.sql.upper()
+    assert result.validation.passed is True
+
+
+def test_every_calendar_bucket_requires_non_empty_gap_free_bucket_span():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '两年内', '', '', 'CONS=每年') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert "MAX(`bucket_rows`.`bucket_ordinal`)" in result.sql
+    assert "MIN(`bucket_rows`.`bucket_ordinal`)" in result.sql
+    assert "`temporal_metrics`.`total_buckets` > 0" in result.sql
+    assert "`temporal_metrics`.`metric_value` = `temporal_metrics`.`total_buckets`" in result.sql

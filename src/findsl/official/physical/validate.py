@@ -72,7 +72,7 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("invalid physical temporal mode or sequence semantics")
         if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             raise ValueError("invalid physical temporal comparator")
-        if plan.unit not in {"", "日"}:
+        if plan.unit not in {"", "日", "周", "月", "季度", "年"}:
             raise ValueError("physical temporal bucket unit is not implemented")
         if plan.window.kind not in {"all_history", "recent_sessions", "recent_calendar", "calendar_range", "exact_date", "latest_session"}:
             raise ValueError("invalid physical temporal window")

@@ -412,11 +412,6 @@ def _lower_plan(
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
         return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
     if isinstance(plan, (LogicalConsecutive, LogicalExist)):
-        if plan.spec.unit not in {"", "日"}:
-            raise PhysicalPlanningError(
-                "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
-                f"temporal unit {plan.spec.unit} requires calendar bucket materialization",
-            )
         return PhysicalTemporal(
             _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
             _lower_expr(plan.spec.predicate, catalog, resource_id, fields, expression_overrides=expression_overrides),

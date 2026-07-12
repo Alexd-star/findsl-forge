@@ -456,3 +456,23 @@ def test_temporal_set_operation_supports_independent_physical_resources():
         "official_basic",
         "official_ext",
     }
+
+
+@pytest.mark.parametrize(
+    "count_exp,unit",
+    [
+        ("CONS=每年", "年"),
+        ("EXIST>=2月", "月"),
+        ("CONS=3季度", "季度"),
+        ("CONS=每周", "周"),
+    ],
+)
+def test_calendar_bucket_temporal_units_reach_physical_ir(count_exp, unit):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '两年内', '', '', '{count_exp}') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporal)
+    assert result.plan.unit == unit
+    assert result.plan.window.kind == "recent_calendar"
