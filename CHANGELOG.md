@@ -4,6 +4,15 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端 Typed Date 物理化
+
+- `DateConstraint` 现在随 `CallExpr` 进入 Logical IR，物理规划器直接消费已绑定日期合同；原始字符串解析仅保留为旧 IR 兼容路径。
+- 日期绑定新增中文/数字年份、明确年月、明确年月日、`当天/现在`、`昨天/昨日/前一个交易日` 和 `前天`，非法月份或日期返回 `DOMAIN_DATE_INVALID`。
+- 新增 `PhysicalNthLatestValue`。昨天和前天通过基础行情表的去重交易日倒序序列解析为 offset 1/2，不用 `DATE_SUB` 近似交易日。
+- SQLGlot 后端为交易日偏移生成受控 `GROUP BY bizdate ORDER BY bizdate DESC LIMIT 1 OFFSET n` 子查询，验证器限制它只能访问 catalog 声明的分区日期列且 offset 必须为正数。
+- 新增 `scripts/collect_phase11_date_evidence.py`。年份、月份、日期、昨天和前天五组场景与独立显式日期 reference SQL 的完整 Doris 行集哈希一致 `5/5`，当前五次重复快照最高 P95 约 0.23 秒。
+- 新后端迁移覆盖从 `135/1097（12.31%）` 提升到 `163/1097（14.86%）`，新后端总成功数为 `164`；物理日期终止项从 95 条下降到 68 条。
+
 ### ANTLR/IR 新后端多资源稳定键连接
 
 - 新增 `PhysicalTableScan` 和可执行的左深 `PhysicalJoin`。规划器以 `official_basic` 为证券行情锚点，只连接相同 `logical_entity` 的资源，连接键从双方 `stable_keys` 交集推导。

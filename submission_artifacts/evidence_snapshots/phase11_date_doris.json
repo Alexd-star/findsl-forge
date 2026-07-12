@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "git_head": "58f031fba7bd614fb34010f635632a7c434641bd",
+  "doris_versions": [
+    "doris-4.1.0-rc03-5960d4cea0e"
+  ],
+  "mysql_protocol_version": "5.7.99",
+  "latest_trading_dates": [
+    "2026-04-14",
+    "2026-04-13",
+    "2026-04-10"
+  ],
+  "repeats": 5,
+  "status": "PASS",
+  "matched": 5,
+  "total": 5,
+  "cases": [
+    {
+      "name": "chinese_year_2024",
+      "source": "indicator('沪', '', '成交量', '二四年', '', '', '') > 100000000",
+      "resolved_start": "2024-01-01",
+      "resolved_end": "2024-12-31",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE ((`q`.`volume` > 100000000 AND `q`.`mktcode` IN (1)) AND `q`.`bizdate` >= '2024-01-01') AND `q`.`bizdate` <= '2024-12-31'",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate>='2024-01-01' AND b.bizdate<='2024-12-31' AND b.volume>100000000",
+      "expected_count": 16734,
+      "actual_count": 16734,
+      "expected_sha256": "2473561c64caa1533b3cdb209257247dd36aa4cdecedeacd852f819edf30973e",
+      "actual_sha256": "2473561c64caa1533b3cdb209257247dd36aa4cdecedeacd852f819edf30973e",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        220.1579,
+        229.0909,
+        192.9164,
+        188.0684,
+        173.8022
+      ],
+      "p95_ms": 229.0909
+    },
+    {
+      "name": "calendar_month_2024_08",
+      "source": "indicator('沪', '', '成交量', '2024年8月', '', '', '') > 100000000",
+      "resolved_start": "2024-08-01",
+      "resolved_end": "2024-08-31",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE ((`q`.`volume` > 100000000 AND `q`.`mktcode` IN (1)) AND `q`.`bizdate` >= '2024-08-01') AND `q`.`bizdate` <= '2024-08-31'",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate>='2024-08-01' AND b.bizdate<='2024-08-31' AND b.volume>100000000",
+      "expected_count": 813,
+      "actual_count": 813,
+      "expected_sha256": "c0afe3824bab581592aa946bf9ef190b9646e4793087ee43b349a3aed37ed170",
+      "actual_sha256": "c0afe3824bab581592aa946bf9ef190b9646e4793087ee43b349a3aed37ed170",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        43.6047,
+        51.4879,
+        46.385,
+        40.3167,
+        40.2214
+      ],
+      "p95_ms": 51.4879
+    },
+    {
+      "name": "calendar_day_2024_08_01",
+      "source": "indicator('沪', '', '成交量', '2024年8月1日', '', '', '') > 100000000",
+      "resolved_start": "2024-08-01",
+      "resolved_end": "2024-08-01",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (`q`.`volume` > 100000000 AND `q`.`mktcode` IN (1)) AND `q`.`bizdate` = '2024-08-01'",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate='2024-08-01' AND b.volume>100000000",
+      "expected_count": 55,
+      "actual_count": 55,
+      "expected_sha256": "72cdd6f7f469b3e27f0da6e0bb6eaf34b48a7b7436a071c156637e55ff8241ac",
+      "actual_sha256": "72cdd6f7f469b3e27f0da6e0bb6eaf34b48a7b7436a071c156637e55ff8241ac",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        45.4626,
+        40.657,
+        42.5618,
+        43.3267,
+        42.3797
+      ],
+      "p95_ms": 45.4626
+    },
+    {
+      "name": "previous_trading_session",
+      "source": "indicator('沪', '', '成交量', '昨天', '', '', '') > 100000000",
+      "resolved_start": "2026-04-13",
+      "resolved_end": "2026-04-13",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (`q`.`volume` > 100000000 AND `q`.`mktcode` IN (1)) AND `q`.`bizdate` = (SELECT `q_session`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q_session GROUP BY `q_session`.`bizdate` ORDER BY `q_session`.`bizdate` DESC LIMIT 1 OFFSET 1)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate='2026-04-13' AND b.volume>100000000",
+      "expected_count": 100,
+      "actual_count": 100,
+      "expected_sha256": "7e461191dfbee4206aeee9f2b2dd6611dc55f639a9b7b144c6f6eef158d6884a",
+      "actual_sha256": "7e461191dfbee4206aeee9f2b2dd6611dc55f639a9b7b144c6f6eef158d6884a",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        43.7369,
+        40.7632,
+        40.1524,
+        38.5977,
+        39.2838
+      ],
+      "p95_ms": 43.7369
+    },
+    {
+      "name": "two_trading_sessions_ago",
+      "source": "indicator('沪', '', '成交量', '前天', '', '', '') > 100000000",
+      "resolved_start": "2026-04-10",
+      "resolved_end": "2026-04-10",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (`q`.`volume` > 100000000 AND `q`.`mktcode` IN (1)) AND `q`.`bizdate` = (SELECT `q_session`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q_session GROUP BY `q_session`.`bizdate` ORDER BY `q_session`.`bizdate` DESC LIMIT 1 OFFSET 2)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate='2026-04-10' AND b.volume>100000000",
+      "expected_count": 109,
+      "actual_count": 109,
+      "expected_sha256": "e6e6a6aa2b0886d67b70e571a4781dd9e155e18043f6fa2b3a703245a621373c",
+      "actual_sha256": "e6e6a6aa2b0886d67b70e571a4781dd9e155e18043f6fa2b3a703245a621373c",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        40.5742,
+        40.713,
+        42.0671,
+        40.8509,
+        41.0337
+      ],
+      "p95_ms": 42.0671
+    }
+  ]
+}
