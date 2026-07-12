@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T13:03:16Z",
+  "generated_at": "2026-07-12T13:25:45Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "14e6441",
-    "head_at_export": "14e6441",
+    "head_at_export": "d5308b1",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
