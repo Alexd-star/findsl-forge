@@ -4,6 +4,14 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端最近交易日集合
+
+- 新增布尔物理表达式 `PhysicalRecentSessions`，把 scalar date slot 的 `recent_sessions` 合同物理化为最近 N 个不同交易日的集合成员判断。
+- SQLGlot 后端生成 `bizdate IN (SELECT bizdate ... GROUP BY bizdate ORDER BY bizdate DESC LIMIT N)`；该路径使用交易所全局交易日集合，不以 `CURRENT_DATE - N` 近似，也不与每只股票最近 N 条记录的时序合同混用。
+- 验证器限制该节点只能读取 catalog 分区日期列，且 N 必须为正数。`近5日`、`最近十个交易日`、`30个交易日内` 均有边界测试。
+- 新增 `scripts/collect_phase12_session_evidence.py`。5/10/30 个交易日三组生成 SQL 与独立显式日期集合 reference SQL 的完整 Doris 行集哈希一致 `3/3`，当前五次重复快照最高 P95 约 0.45 秒。
+- 新后端迁移覆盖从 `163/1097（14.86%）` 提升到 `183/1097（16.68%）`，新后端总成功数为 `184`；物理日期终止项从 68 条下降到 44 条。
+
 ### ANTLR/IR 新后端 Typed Date 物理化
 
 - `DateConstraint` 现在随 `CallExpr` 进入 Logical IR，物理规划器直接消费已绑定日期合同；原始字符串解析仅保留为旧 IR 兼容路径。
