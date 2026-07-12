@@ -4,6 +4,17 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端类型化排名与百分位边界
+
+- 将布尔表达式中的 rank 条件降低为独立证券集合：`and` 使用稳定键交集，`or` 使用去重并集；`then rank` 继续表示前一阶段结果上的排名，不混淆两类语义。
+- `PhysicalRank` 新增百分比边界合同。SQLGlot 后端在同一候选分区中生成 `ROW_NUMBER()` 与 `COUNT(*)`，以 `CEIL(count * percent / 100)` 得到包含至少一只证券的确定性比例边界。
+- 新增 `PhysicalAggregateRank`。聚合 rank 先按 `(mktcode,tgtcode)` 计算 `SUM/AVG/MAX/MIN`，再对命名度量执行窗口排名，最后连接基础行情最新快照；不使用相关标量聚合。
+- 普通排名与聚合排名均以指标方向、`mktcode`、`tgtcode` 形成稳定排序，解决跨市场同代码或指标并列时结果不确定的问题。
+- rank 比较新增 `=`/`!=`，并允许数学上有效的 `rank > 0`/`rank >= 0`；零边界在等值或上界比较中仍被拒绝。
+- 修复 `limit` 或 `LogicalStage` 包裹集合计划时物理入口无法识别的问题；修复 Doris SQL 安全扫描器跨越 `INTERSECT/EXCEPT` 误报 `WINDOW_IN_WHERE` 的边界缺陷。
+- 新增 `scripts/collect_phase17_rank_evidence.py`。绝对 Top 10、Top 10%、五日 AVG Top 10、五日 AVG Top 10% 和 rank/标量交集五组场景在 13,650,347 行 Doris 表上完整行集哈希一致 `5/5`，最高 P95 约 0.54 秒。
+- 新后端迁移覆盖从 `250/1097（22.79%）` 提升到 `317/1097（28.90%）`，新后端总成功数从 `252` 提升到 `319`，没有恢复 Phase 16 已撤销的语义假阳性。
+
 ### ANTLR/IR 新后端命名组合聚合
 
 - 新增 `PhysicalAggregateGroup`、`PhysicalNamedAggregate`、`PhysicalAggregateRef` 和 `PhysicalCompositeAggregate`，以关系代数方式表达“每只证券的多个分组度量，再执行外层算术或布尔比较”。
