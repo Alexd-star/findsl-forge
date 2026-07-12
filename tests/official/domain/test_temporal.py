@@ -1,0 +1,58 @@
+import pytest
+
+from findsl.official.domain.temporal import TemporalParseError, parse_temporal_quantifier
+
+
+@pytest.mark.parametrize(
+    "source,expected",
+    [
+        ("CONS=3日", ("CONS", "=", 3, None, "日", False)),
+        ("EXIST>=5", ("EXIST", ">=", 5, None, "", False)),
+        ("CONS=每年", ("CONS", "=", None, None, "年", True)),
+        ("EXIST=3-8日", ("EXIST", "between", 3, 8, "日", False)),
+        ("CONS=三季度", ("CONS", "=", 3, None, "季度", False)),
+        ("CONS=2天", ("CONS", "=", 2, None, "日", False)),
+        ("CONS>1", ("CONS", ">", 1, None, "", False)),
+        ("EXIST>0", ("EXIST", ">", 0, None, "", False)),
+    ],
+)
+def test_official_count_expression_is_parsed_into_typed_contract(source, expected):
+    result = parse_temporal_quantifier(source)
+
+    assert (
+        result.mode,
+        result.comparator,
+        result.threshold,
+        result.maximum,
+        result.unit,
+        result.every,
+    ) == expected
+    assert result.source == source
+    assert result.trading_sequence is True
+
+
+@pytest.mark.parametrize(
+    "source,code",
+    [
+        ("COUNT=3日", "TEMPORAL_MODE_UNSUPPORTED"),
+        ("CONS=0日", "TEMPORAL_CONSECUTIVE_THRESHOLD_INVALID"),
+        ("EXIST=8-3日", "TEMPORAL_RANGE_INVALID"),
+        ("CONS=每", "TEMPORAL_EVERY_UNIT_REQUIRED"),
+        ("EXIST!=每日", "TEMPORAL_EVERY_COMPARATOR_INVALID"),
+        ("CONS=1.5周", "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED"),
+    ],
+)
+def test_invalid_temporal_contract_has_stable_diagnostic(source, code):
+    with pytest.raises(TemporalParseError) as excinfo:
+        parse_temporal_quantifier(source)
+
+    assert excinfo.value.code == code
+
+
+def test_temporal_contract_is_deterministic_and_sql_free():
+    first = parse_temporal_quantifier("CONS=3日")
+    second = parse_temporal_quantifier("CONS=3日")
+
+    assert first.node_id == second.node_id
+    assert "SELECT" not in first.canonical_json().upper()
+    assert first.to_dict()["semantics"] == "trading_sequence"

@@ -8,6 +8,7 @@ from ..registry import IndicatorDefinition, OfficialIndicatorRegistry
 from ..typed_ast import TypedNode
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRef, MarketScope
+from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 
 
 class DomainBindingError(ValueError):
@@ -28,7 +29,7 @@ class BoundFunction:
     date_constraint: DateConstraint
     requirement: DataRequirement
     aggregate: Optional[str]
-    count_expression: Optional[str]
+    temporal: Optional[TemporalQuantifier]
 
     def to_dict(self):
         return {
@@ -39,7 +40,7 @@ class BoundFunction:
             "date_constraint": self.date_constraint.to_dict(),
             "requirement": self.requirement.to_dict(),
             "aggregate": self.aggregate,
-            "count_expression": self.count_expression,
+            "temporal": self.temporal.to_dict() if self.temporal else None,
         }
 
 
@@ -66,12 +67,16 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
         direction = slots.get("direction", "").lower()
         if direction not in {"asc", "desc"}:
             raise DomainBindingError("DOMAIN_INVALID_ENUM", f"unsupported rank direction {direction}", function=name, slot="direction", value=direction)
-    count_expression = slots.get("count_exp", "").strip() or None
+    count_expression = slots.get("count_exp", "").strip()
+    try:
+        temporal = parse_temporal_quantifier(count_expression) if count_expression else None
+    except TemporalParseError as exc:
+        raise DomainBindingError(exc.code, str(exc), function=name, slot="count_exp", value=count_expression) from exc
     domains = frozenset(item.domain for item in indicators)
     capabilities = frozenset(capability for definition in (_definition(item, registry) for item in indicators) for capability in definition.capabilities)
     requirement = DataRequirement(domains, capabilities)
     expression = EventSpec(name, indicators[0], indicators[1]) if name in _EVENT_FUNCTIONS else indicators[0]
-    return BoundFunction(name, expression, indicators, market, date, requirement, aggregate, count_expression)
+    return BoundFunction(name, expression, indicators, market, date, requirement, aggregate, temporal)
 
 
 def _definition(indicator: IndicatorRef, registry: OfficialIndicatorRegistry) -> IndicatorDefinition:

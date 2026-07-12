@@ -9,5 +9,6 @@ from .expressions import (
     MarketScope,
     RankSpec,
 )
+from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 
 __all__ = [name for name in globals() if not name.startswith("_")]

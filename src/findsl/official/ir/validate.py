@@ -64,11 +64,9 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
         if plan.offset < 0 or plan.count <= 0:
             _fail("IR_LIMIT_BOUNDS", "limit offset must be non-negative and count positive", path)
     elif isinstance(plan, LogicalConsecutive):
-        if plan.spec.count <= 0:
-            _fail("IR_CONSECUTIVE_COUNT", "consecutive count must be positive", f"{path}.spec.count")
+        _validate_temporal_spec(plan.spec, path, "CONS")
     elif isinstance(plan, LogicalExist):
-        if plan.spec.minimum < 0 or (plan.spec.maximum is not None and plan.spec.maximum < plan.spec.minimum):
-            _fail("IR_EXIST_BOUNDS", "exist bounds are invalid", f"{path}.spec")
+        _validate_temporal_spec(plan.spec, path, "EXIST")
     elif isinstance(plan, LogicalDomainRank):
         if plan.spec.direction not in {"asc", "desc"}:
             _fail("IR_RANK_DIRECTION", "domain rank direction must be asc or desc", f"{path}.spec.direction")
@@ -96,6 +94,24 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
         for index, (_, expression) in enumerate(plan.measures):
             _validate_expr(expression, f"{path}.measures[{index}]", strict, names)
     active.remove(id(plan))
+
+
+def _validate_temporal_spec(spec, path: str, mode: str) -> None:
+    if spec.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
+        _fail("IR_TEMPORAL_COMPARATOR", "temporal comparator is unsupported", f"{path}.spec.comparator")
+    if not spec.trading_sequence:
+        _fail("IR_TEMPORAL_SEQUENCE", "official temporal semantics require trading sequence order", f"{path}.spec")
+    if spec.every:
+        if spec.threshold is not None or spec.maximum is not None or not spec.unit or spec.comparator != "=":
+            _fail("IR_TEMPORAL_EVERY", "invalid every-bucket temporal contract", f"{path}.spec")
+    else:
+        if spec.threshold is None or spec.threshold < 0:
+            _fail("IR_TEMPORAL_THRESHOLD", "temporal threshold is invalid", f"{path}.spec.threshold")
+        if mode == "CONS" and spec.threshold <= 0:
+            _fail("IR_CONSECUTIVE_COUNT", "consecutive count must be positive", f"{path}.spec.threshold")
+        if spec.maximum is not None and spec.maximum < spec.threshold:
+            _fail("IR_TEMPORAL_RANGE", "temporal range is invalid", f"{path}.spec")
+    _validate_expr(spec.predicate, f"{path}.spec.predicate", True, [])
 
 
 def _positive_bound(expression: LogicalExpr) -> bool:

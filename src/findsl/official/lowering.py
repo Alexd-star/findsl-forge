@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from time import perf_counter_ns
-from typing import FrozenSet, List, Optional, Tuple
+from typing import Dict, FrozenSet, List, Optional, Tuple
 
 from .ast import (
     OfficialBinaryOp,
@@ -22,7 +22,9 @@ from .ir import (
     FieldRef,
     LiteralExpr,
     LogicalFilter,
+    LogicalConsecutive,
     LogicalDomainScan,
+    LogicalExist,
     LogicalLimit,
     LogicalRank,
     LogicalScan,
@@ -35,7 +37,7 @@ from .ir.validate import OfficialIrError, validate_plan
 from .typed_ast import TypedNode
 from .types import BOOLEAN, STRING, UNKNOWN, RangeType
 from .domain.binder import BoundFunction, DomainBindingError, bind_function
-from .domain.expressions import DataRequirement
+from .domain.expressions import ConsecutiveSpec, DataRequirement, ExistSpec
 from .registry import OfficialIndicatorRegistry
 
 
@@ -83,21 +85,24 @@ def lower_official_ast(
         item.name for item in walk(typed.node) if isinstance(item, OfficialFunctionCall)
     )
     bindings: Tuple[BoundFunction, ...] = ()
+    binding_by_node: Dict[int, BoundFunction] = {}
     try:
         if domain_registry is None:
             scan = LogicalScan("market_observation", DEFAULT_SCHEMA)
         else:
-            bindings = tuple(
-                bind_function(node, domain_registry)
+            bound_nodes = tuple(
+                (node, bind_function(node, domain_registry))
                 for node in _walk_typed(typed)
                 if isinstance(node.node, OfficialFunctionCall)
             )
+            bindings = tuple(binding for _, binding in bound_nodes)
+            binding_by_node = {id(node.node): binding for node, binding in bound_nodes}
             requirement = DataRequirement(
                 frozenset(domain for binding in bindings for domain in binding.requirement.domains),
                 frozenset(capability for binding in bindings for capability in binding.requirement.capabilities),
             )
             scan = LogicalDomainScan("market_observation", requirement, DEFAULT_SCHEMA)
-        plan = _lower_root(typed, scan)
+        plan = _lower_root(typed, scan, binding_by_node)
         validate_plan(plan, strict=strict)
     except DomainBindingError as exc:
         raise OfficialLoweringError(exc.code, str(exc)) from exc
@@ -115,14 +120,14 @@ def _walk_typed(node: TypedNode):
         yield from _walk_typed(child)
 
 
-def _lower_root(typed: TypedNode, scan: LogicalPlan) -> LogicalPlan:
+def _lower_root(typed: TypedNode, scan: LogicalPlan, bindings: Dict[int, BoundFunction]) -> LogicalPlan:
     if isinstance(typed.node, OfficialLimit):
-        inner = _lower_root(typed.children[0], scan)
+        inner = _lower_root(typed.children[0], scan, bindings)
         return LogicalLimit(inner, typed.node.lower, typed.node.upper, inner.schema)
     stages = _flatten_then(typed)
-    current = _lower_stage(stages[0], scan)
+    current = _lower_stage(stages[0], scan, bindings)
     for index, stage in enumerate(stages[1:], start=1):
-        operation = _lower_stage(stage, current)
+        operation = _lower_stage(stage, current, bindings)
         current = LogicalStage(current, index, operation, operation.schema)
     return current
 
@@ -133,8 +138,41 @@ def _flatten_then(typed: TypedNode) -> List[TypedNode]:
     return [typed]
 
 
-def _lower_stage(typed: TypedNode, input_plan: LogicalPlan) -> LogicalPlan:
+def _lower_stage(
+    typed: TypedNode,
+    input_plan: LogicalPlan,
+    bindings: Dict[int, BoundFunction],
+) -> LogicalPlan:
     node = typed.node
+    temporal_binding = _temporal_binding_for_stage(typed, bindings)
+    if temporal_binding is not None:
+        predicate = _lower_expr(typed, strip_count_exp=True)
+        temporal = temporal_binding.temporal
+        if temporal is None:
+            raise OfficialLoweringError("TEMPORAL_BINDING_MISSING", "temporal stage has no typed quantifier")
+        if temporal.mode == "CONS":
+            spec = ConsecutiveSpec(
+                predicate,
+                temporal.comparator,
+                temporal.threshold,
+                temporal.maximum,
+                temporal.unit,
+                temporal.every,
+                temporal.source,
+                temporal.trading_sequence,
+            )
+            return LogicalConsecutive(input_plan, spec, input_plan.schema)
+        spec = ExistSpec(
+            predicate,
+            temporal.comparator,
+            temporal.threshold,
+            temporal.maximum,
+            temporal.unit,
+            temporal.every,
+            temporal.source,
+            temporal.trading_sequence,
+        )
+        return LogicalExist(input_plan, spec, input_plan.schema)
     if (
         isinstance(node, OfficialComparison)
         and isinstance(node.left, OfficialFunctionCall)
@@ -154,7 +192,7 @@ def _lower_stage(typed: TypedNode, input_plan: LogicalPlan) -> LogicalPlan:
     return LogicalFilter(input_plan, predicate, input_plan.schema)
 
 
-def _lower_expr(typed: TypedNode):
+def _lower_expr(typed: TypedNode, *, strip_count_exp: bool = False):
     node = typed.node
     if typed.type is UNKNOWN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "unknown expression type")
@@ -163,18 +201,56 @@ def _lower_expr(typed: TypedNode):
     if isinstance(node, OfficialIdentifier):
         return FieldRef(node.name, typed.type)
     if isinstance(node, OfficialFunctionCall):
-        return CallExpr(node.name, tuple(_lower_expr(child) for child in typed.children), typed.type, typed.binding)
+        binding = typed.binding
+        if strip_count_exp and binding is not None and "count_exp" in binding.slots:
+            from .typed_ast import FunctionBinding
+
+            slots = dict(binding.slots)
+            slots["count_exp"] = ""
+            binding = FunctionBinding.create(binding.signature, slots)
+        return CallExpr(node.name, tuple(_lower_expr(child, strip_count_exp=strip_count_exp) for child in typed.children), typed.type, binding)
     if isinstance(node, OfficialBinaryOp):
-        return BinaryExpr(node.op, _lower_expr(typed.children[0]), _lower_expr(typed.children[1]), typed.type)
+        return BinaryExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp), typed.type)
     if isinstance(node, OfficialComparison):
-        return ComparisonExpr(node.op, _lower_expr(typed.children[0]), _lower_expr(typed.children[1]))
+        return ComparisonExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp))
     if isinstance(node, OfficialRangeLiteral):
         element = typed.type.element_type if isinstance(typed.type, RangeType) else typed.children[0].type
         return RangeExpr(
-            _lower_expr(typed.children[0]),
-            _lower_expr(typed.children[1]),
+            _lower_expr(typed.children[0], strip_count_exp=strip_count_exp),
+            _lower_expr(typed.children[1], strip_count_exp=strip_count_exp),
             node.lower_inclusive,
             node.upper_inclusive,
             element,
         )
     raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", f"unsupported AST node {type(node).__name__}")
+
+
+def _temporal_binding_for_stage(
+    typed: TypedNode,
+    bindings: Dict[int, BoundFunction],
+) -> Optional[BoundFunction]:
+    temporal = [
+        bindings[id(node.node)]
+        for node in _walk_typed(typed)
+        if isinstance(node.node, OfficialFunctionCall)
+        and id(node.node) in bindings
+        and bindings[id(node.node)].temporal is not None
+    ]
+    if not temporal:
+        return None
+    if len(temporal) != 1:
+        raise OfficialLoweringError(
+            "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+            "multiple count_exp functions require independent temporal relation branches",
+        )
+    if not (
+        isinstance(typed.node, OfficialComparison)
+        and isinstance(typed.node.left, OfficialFunctionCall)
+        and id(typed.node.left) in bindings
+        and bindings[id(typed.node.left)] is temporal[0]
+    ):
+        raise OfficialLoweringError(
+            "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+            "count_exp is currently materialized only for an atomic function comparison",
+        )
+    return temporal[0]

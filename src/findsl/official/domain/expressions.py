@@ -67,22 +67,31 @@ class EventSpec(CanonicalIr):
 @dataclass(frozen=True)
 class ConsecutiveSpec(CanonicalIr):
     predicate: Any
-    count: int
+    comparator: str
+    threshold: Optional[int]
+    maximum: Optional[int]
     unit: str
+    every: bool
+    source: str
+    trading_sequence: bool = True
 
     def to_dict(self):
-        return {"kind": "ConsecutiveSpec", "predicate": self.predicate.to_dict(), "count": self.count, "unit": self.unit}
+        return {"kind": "ConsecutiveSpec", "predicate": self.predicate.to_dict(), "comparator": self.comparator, "threshold": self.threshold, "maximum": self.maximum, "unit": self.unit, "every": self.every, "source": self.source, "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence"}
 
 
 @dataclass(frozen=True)
 class ExistSpec(CanonicalIr):
     predicate: Any
-    minimum: int
+    comparator: str
+    threshold: Optional[int]
     maximum: Optional[int]
-    bucket: str
+    unit: str
+    every: bool
+    source: str
+    trading_sequence: bool = True
 
     def to_dict(self):
-        return {"kind": "ExistSpec", "predicate": self.predicate.to_dict(), "minimum": self.minimum, "maximum": self.maximum, "bucket": self.bucket}
+        return {"kind": "ExistSpec", "predicate": self.predicate.to_dict(), "comparator": self.comparator, "threshold": self.threshold, "maximum": self.maximum, "unit": self.unit, "every": self.every, "source": self.source, "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence"}
 
 
 @dataclass(frozen=True)

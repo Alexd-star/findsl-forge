@@ -66,3 +66,27 @@ def test_invalid_rank_direction_has_precise_diagnostic():
     with pytest.raises(DomainBindingError) as excinfo:
         bind_function(typed, default_official_registry())
     assert excinfo.value.code == "DOMAIN_INVALID_ENUM"
+
+
+def test_count_expression_binds_as_typed_temporal_contract():
+    bound = bind_function(
+        _typed_call("indicator('', '', '涨幅', '最近10日', '', '', 'CONS=3日')"),
+        default_official_registry(),
+    )
+
+    assert bound.temporal is not None
+    assert bound.temporal.mode == "CONS"
+    assert bound.temporal.threshold == 3
+    assert bound.temporal.unit == "日"
+    assert bound.to_dict()["temporal"]["semantics"] == "trading_sequence"
+
+
+def test_invalid_count_expression_preserves_temporal_diagnostic():
+    with pytest.raises(DomainBindingError) as excinfo:
+        bind_function(
+            _typed_call("indicator('', '', '涨幅', '最近10日', '', '', 'CONS=0日')"),
+            default_official_registry(),
+        )
+
+    assert excinfo.value.code == "TEMPORAL_CONSECUTIVE_THRESHOLD_INVALID"
+    assert excinfo.value.slot == "count_exp"
