@@ -23,6 +23,11 @@ def main() -> int:
         action="store_true",
         help="Require every newly successful query to materialize a period-end scalar",
     )
+    parser.add_argument(
+        "--require-event-candidates",
+        action="store_true",
+        help="Require every newly successful query to use keyed event candidates",
+    )
     args = parser.parse_args()
 
     baseline = _rows(args.baseline)
@@ -47,6 +52,11 @@ def main() -> int:
             for node in _walk_dicts(physical_plan)
             if node.get("kind") == "PhysicalNamedScalar"
         ]
+        candidate_sets = [
+            node
+            for node in _walk_dicts(physical_plan)
+            if node.get("kind") == "PhysicalCandidateSetOperation"
+        ]
         checks = {
             "backend_validation": payload["backend"]["validation_passed"],
             "no_placeholder_predicate": not re.search(r"\b1\s*=\s*[01]\b", sql),
@@ -55,6 +65,7 @@ def main() -> int:
             "temporal_materialized": True,
             "rank_materialized": True,
             "period_scalar_materialized": True,
+            "event_candidate_materialized": True,
         }
         if "~=" in source:
             checks["approximation_materialized"] = "ABS(" in sql and "GREATEST(" in sql
@@ -101,6 +112,17 @@ def main() -> int:
             checks["period_scalar_materialized"] = bool(period_scalars) and all(
                 bool(scalar.get("value_alias")) for scalar in period_scalars
             ) and "MAX_BY(" in sql
+        if args.require_event_candidates or candidate_sets:
+            checks["event_candidate_materialized"] = bool(candidate_sets) and all(
+                candidate.get("key_semantics") == "security"
+                and candidate.get("output_date_policy") == "latest_anchor"
+                and candidate.get("operation") in {"intersect", "union", "except"}
+                for candidate in candidate_sets
+            ) and any(token in sql for token in (" INTERSECT ", " UNION ", " EXCEPT "))
+            if any(candidate.get("operation") == "except" for candidate in candidate_sets):
+                checks["event_candidate_materialized"] &= (
+                    " EXCEPT " in sql and "`event_rows`.`event_0` = TRUE" in sql
+                )
         passed = all(checks.values())
         results.append(
             {
@@ -118,6 +140,7 @@ def main() -> int:
         "baseline": args.baseline,
         "current": args.current,
         "require_period_scalars": args.require_period_scalars,
+        "require_event_candidates": args.require_event_candidates,
         "new_successes": len(results),
         "passed": sum(item["passed"] for item in results),
         "failed": sum(not item["passed"] for item in results),
@@ -170,7 +193,7 @@ def _write(report, json_output: str, report_output: str) -> None:
             "",
             "## 审计合同",
             "",
-            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名；命名周期标量显式携带 `collapse_latest` 合同并生成 `MAX_BY`。",
+            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名；命名周期标量显式携带 `collapse_latest` 合同并生成 `MAX_BY`；事件组合显式声明证券键集合与最新快照输出策略，事件否定使用可判定集合上的 `EXCEPT`。",
         ]
     )
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

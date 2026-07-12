@@ -3,7 +3,7 @@ from __future__ import annotations
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
-    PhysicalEventFilter, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
+    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
     PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
@@ -47,6 +47,15 @@ def _validate_plan(plan, catalog, expressions):
     if isinstance(plan, PhysicalSetOperation):
         if plan.operation not in {"intersect", "union"}:
             raise ValueError("unsupported physical set operation")
+        _validate_plan(plan.left, catalog, expressions)
+        _validate_plan(plan.right, catalog, expressions)
+        return
+    if isinstance(plan, PhysicalCandidateSetOperation):
+        if plan.operation not in {"intersect", "union", "except"}:
+            raise ValueError("unsupported physical candidate-set operation")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if not anchor.partition_key:
+            raise ValueError("candidate-set anchor requires a partition key")
         _validate_plan(plan.left, catalog, expressions)
         _validate_plan(plan.right, catalog, expressions)
         return

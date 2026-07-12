@@ -224,14 +224,93 @@ def test_pipeline_projects_scalar_indicators_next_to_window_events():
     assert "`event_rows`.`event_0` = TRUE AND `event_rows`.`projected_0` > 0" in sql
 
 
-def test_pipeline_rejects_conflicting_dates_inside_window_event_projection():
-    with pytest.raises(OfficialPipelineError) as excinfo:
-        compile_official(
-            "cross_above('', '', '5日均线', '20日均线', '今日', '', '') = True "
-            "and indicator('', '', '成交量', '昨日', '', '', '') > 0"
-        )
+def test_pipeline_composes_conflicting_event_and_scalar_dates_by_security_key():
+    result = compile_official(
+        "cross_above('', '', '5日均线', '20日均线', '今日', '', '') = True "
+        "and indicator('', '', '成交量', '昨日', '', '', '') > 0"
+    ).to_dict()
+    sql = result["backend"]["sql"]
 
-    assert excinfo.value.code == "PHYSICAL_EVENT_DATE_SCOPE_MISMATCH"
+    assert result["physical"]["selected_strategy"] == "event_candidate_intersect"
+    assert "INTERSECT" in sql
+    assert "SELECT DISTINCT `candidate_left_rows`.`mktcode`" in sql
+    assert "SELECT DISTINCT `candidate_right_rows`.`mktcode`" in sql
+    assert "MAX(`candidate_latest`.`bizdate`)" in sql
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        (
+            "record_high('深', '', '成交量', '20日', '近1日', '', '', '') = True "
+            "and indicator('深', '', '成交量', '近1日', '', 'SUM', '') > 0"
+        ),
+        (
+            "reset('', '', '5日均线', '10日均线', '30日内', '', '') = True "
+            "and indicator('', '', '5日均线', '30日内', '', 'GROWTH_RISE', '') > 0"
+        ),
+        (
+            "position('', '', '量比', '', '', '', '', '') = '高' and "
+            "indicator('', '', '最新价', '', '', '', '') ~= "
+            "queryData('', '思源电气', '最新价', '', '')"
+        ),
+        (
+            "(cross_above('', '', '20日均线', '60日均线', '近五天', '', '') = True "
+            "or cross_down('', '', '20日均线', '60日均线', '近五天', '', '') = True) "
+            "and indicator('', '', '20日均线', '近五天', '', 'GROWTH_RISE', '') > 0"
+        ),
+    ],
+)
+def test_pipeline_composes_event_and_relational_candidates(source):
+    result = compile_official(source).to_dict()
+
+    assert result["physical"]["selected_strategy"] == "event_candidate_intersect"
+    assert result["physical"]["plan"]["kind"] == "PhysicalCandidateSetOperation"
+    assert "INTERSECT" in result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
+
+
+def test_pipeline_unions_event_and_aggregate_candidate_branches():
+    result = compile_official(
+        "cross_above('', '', '5日均线', '20日均线', '今日', '', '') = True or "
+        "indicator('', '', '成交量', '近5日', '', 'AVG', '') > 100"
+    ).to_dict()
+
+    assert result["physical"]["selected_strategy"] == "event_candidate_union"
+    assert result["physical"]["plan"]["operation"] == "union"
+    assert " UNION " in result["backend"]["sql"]
+
+
+def test_pipeline_event_false_means_no_true_event_in_eligible_period():
+    result = compile_official(
+        "cross_down('', '', '最新价', '10日均线', '近三天', '', '') = False"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window_absence"
+    assert result["physical"]["plan"]["operation"] == "except"
+    assert " EXCEPT " in sql
+    assert "`event_rows`.`event_0` = TRUE" in sql
+    eligible_sql, occurred_sql = sql.split(" EXCEPT ", 1)
+    assert "`event_rows`.`event_0` = FALSE" in eligible_sql
+    assert "`event_rows`.`event_0` = FALSE" not in occurred_sql
+    assert "LIMIT 3" in sql
+
+
+def test_pipeline_undated_event_is_evaluated_at_latest_session():
+    result = compile_official(
+        "cross_down('', '', '成交量', '10日均量线', '', '', '') = True"
+    ).to_dict()
+
+    assert "MAX(`q_latest`.`bizdate`)" in result["backend"]["sql"]
+
+
+def test_pipeline_position_ratio_preserves_fraction_parentheses():
+    result = compile_official(
+        "position('', '', '量比', '', '', '', '', '') = '高'"
+    ).to_dict()
+
+    assert "WHEN (`q`.`quantRatio` / 10000.0 - MIN(" in result["backend"]["sql"]
 
 
 def test_pipeline_never_ignores_non_empty_window_event_slots():

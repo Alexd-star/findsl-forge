@@ -1,12 +1,12 @@
 import pytest
 
 from findsl.official.physical import (
-    PhysicalCatalogError, PhysicalColumn, PhysicalComparison, PhysicalFilter,
+    PhysicalCandidateSetOperation, PhysicalCatalogError, PhysicalColumn, PhysicalComparison, PhysicalFilter,
     PhysicalLimit, PhysicalLiteral, PhysicalScan, PhysicalTemporal,
     PhysicalTemporalWindow, PhysicalSetOperation, validate_physical_plan,
 )
 from findsl.official.physical.catalog import default_physical_catalog
-from findsl.official.types import BOOLEAN, NUMERIC
+from findsl.official.types import NUMERIC
 
 
 def test_direct_scan_filter_limit_plan_is_deterministic_and_valid():
@@ -67,3 +67,17 @@ def test_set_operation_validates_two_independent_temporal_relations():
 
     assert validate_physical_plan(plan, default_physical_catalog()) is plan
     assert plan.to_dict()["operation"] == "intersect"
+
+
+def test_candidate_set_operation_declares_security_keys_and_latest_output_policy():
+    branch = PhysicalScan("official_basic", (), None)
+    plan = PhysicalCandidateSetOperation(
+        branch,
+        branch,
+        "except",
+        "official_basic",
+    )
+
+    assert validate_physical_plan(plan, default_physical_catalog()) is plan
+    assert plan.to_dict()["key_semantics"] == "security"
+    assert plan.to_dict()["output_date_policy"] == "latest_anchor"

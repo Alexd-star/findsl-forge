@@ -40,6 +40,7 @@ from .ir import (
     PhysicalAggregateRef,
     PhysicalColumn,
     PhysicalComparison,
+    PhysicalCandidateSetOperation,
     PhysicalCompositeAggregate,
     PhysicalCoalesce,
     PhysicalDynamicDateRange,
@@ -233,6 +234,52 @@ def plan_physical(
             f"set_{lowering.plan.operation}",
         )
     _validate_universe_contract(lowering.plan)
+    event_composition = _event_composition_contract(lowering.plan)
+    if event_composition is not None:
+        input_plan, event_predicate, other_predicate, operation, limit = event_composition
+        event_logical = LogicalFilter(input_plan, event_predicate, input_plan.schema)
+        other_logical = LogicalFilter(input_plan, other_predicate, input_plan.schema)
+        event_result = plan_physical(
+            replace(lowering, plan=event_logical),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        other_result = plan_physical(
+            replace(lowering, plan=other_logical),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        plan: PhysicalPlan = PhysicalCandidateSetOperation(
+            event_result.plan,
+            other_result.plan,
+            operation,
+            "official_basic",
+        )
+        if limit is not None:
+            plan = PhysicalLimit(plan, limit[0], limit[1])
+        validate_physical_plan(plan, catalog, expressions)
+        decisions = tuple(
+            replace(item, strategy_id=f"event:{item.strategy_id}")
+            for item in event_result.decisions
+        ) + tuple(
+            replace(item, strategy_id=f"candidate:{item.strategy_id}")
+            for item in other_result.decisions
+        )
+        resources = "+".join(
+            sorted({event_result.selected_resource, other_result.selected_resource})
+        )
+        return PhysicalPlanningResult(
+            plan,
+            resources,
+            decisions,
+            f"event_candidate_{operation}",
+        )
     aggregate_calls = _aggregate_calls(lowering.plan)
     querydata_scalar_calls = _querydata_scalar_calls(lowering.plan)
     aggregate_contract = _aggregate_contract(lowering.plan, aggregate_calls)
@@ -1633,6 +1680,102 @@ def _crossing_calls(plan) -> Tuple[CallExpr, ...]:
     )
 
 
+def _event_composition_contract(plan):
+    current = plan
+    limit = None
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, LogicalFilter):
+        return None
+    predicate = current.predicate
+    if not isinstance(predicate, BinaryExpr) or predicate.op not in {
+        "and",
+        "or",
+        "&",
+        "|",
+    }:
+        return None
+    logical_op = "and" if predicate.op in {"and", "&"} else "or"
+    terms = _flatten_boolean_terms(predicate, logical_op)
+    event_terms = tuple(term for term in terms if _contains_window_event_call(term))
+    other_terms = tuple(term for term in terms if not _contains_window_event_call(term))
+    if not event_terms or not other_terms:
+        return None
+    event_calls = tuple(
+        call for term in event_terms for call in _walk_calls(term)
+    )
+    other_calls = tuple(
+        call for term in other_terms for call in _walk_calls(term)
+    )
+    projection_compatible = all(
+        call.name == "indicator"
+        and not str(call.binding.slots.get("agg_func", "")).strip()
+        and not str(call.binding.slots.get("count_exp", "")).strip()
+        for call in other_calls
+    )
+    date_scopes = {
+        str(call.binding.slots.get("date", "")).strip()
+        for call in (*event_calls, *other_calls)
+        if str(call.binding.slots.get("date", "")).strip()
+    }
+    if projection_compatible and len(date_scopes) <= 1:
+        return None
+    return (
+        current.input,
+        _combine_boolean_terms(event_terms, logical_op),
+        _combine_boolean_terms(other_terms, logical_op),
+        "intersect" if logical_op == "and" else "union",
+        limit,
+    )
+
+
+def _flatten_boolean_terms(expression, logical_op: str):
+    matching_ops = {"and", "&"} if logical_op == "and" else {"or", "|"}
+    if isinstance(expression, BinaryExpr) and expression.op in matching_ops:
+        return (
+            *_flatten_boolean_terms(expression.left, logical_op),
+            *_flatten_boolean_terms(expression.right, logical_op),
+        )
+    return (expression,)
+
+
+def _combine_boolean_terms(terms, logical_op: str):
+    result = terms[0]
+    for term in terms[1:]:
+        result = BinaryExpr(logical_op, result, term, BOOLEAN)
+    return result
+
+
+def _contains_window_event_call(expression) -> bool:
+    return any(call.name in _WINDOW_EVENT_CALLS for call in _walk_calls(expression))
+
+
+def _normalize_direct_event_absence(expression):
+    if not isinstance(expression, ComparisonExpr) or expression.op not in {"=", "!="}:
+        return expression, False
+    pairs = ((expression.left, expression.right), (expression.right, expression.left))
+    for call, literal in pairs:
+        if (
+            isinstance(call, CallExpr)
+            and call.name in (_WINDOW_EVENT_CALLS - _POSITION_CALLS)
+            and isinstance(literal, LiteralExpr)
+            and isinstance(literal.value, bool)
+        ):
+            desired = literal.value if expression.op == "=" else not literal.value
+            if not desired:
+                return (
+                    ComparisonExpr(
+                        "=",
+                        call,
+                        LiteralExpr(True, BOOLEAN),
+                        BOOLEAN,
+                    ),
+                    True,
+                )
+    return expression, False
+
+
 def _plan_crossing_events(
     lowering: LoweringResult,
     calls: Tuple[CallExpr, ...],
@@ -1651,7 +1794,10 @@ def _plan_crossing_events(
             "PHYSICAL_EVENT_PLAN_UNSUPPORTED",
             "crossing events currently require one filter stage",
         )
-    all_calls = tuple(_walk_calls(current.predicate))
+    event_predicate, event_absence = _normalize_direct_event_absence(
+        current.predicate
+    )
+    all_calls = tuple(_walk_calls(event_predicate))
     if any(call.name not in _WINDOW_EVENT_CALLS | {"indicator"} for call in all_calls):
         raise PhysicalPlanningError(
             "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
@@ -1837,8 +1983,19 @@ def _plan_crossing_events(
                 constraints.append(constraint)
                 seen_constraints.add(constraint.node_id)
 
+    if not date_scopes:
+        stable_resource_id = catalog.resource(root_id).anchor_resource_id or root_id
+        partition_key = catalog.resource(stable_resource_id).partition_key
+        latest_constraint = PhysicalComparison(
+            "=",
+            PhysicalColumn(stable_resource_id, partition_key, TIME),
+            PhysicalLatestValue(stable_resource_id, partition_key, TIME),
+        )
+        if latest_constraint.node_id not in seen_constraints:
+            constraints.append(latest_constraint)
+
     predicate = _lower_crossing_predicate(
-        current.predicate,
+        event_predicate,
         {**event_refs, **projected_refs},
     )
     plan: PhysicalPlan = PhysicalEventFilter(
@@ -1848,6 +2005,31 @@ def _plan_crossing_events(
         predicate,
         tuple(constraints),
     )
+    if event_absence:
+        event_ref = next(iter(event_refs.values()))
+        eligible_predicate = PhysicalBinary(
+            "or",
+            PhysicalComparison(
+                "=", event_ref, PhysicalLiteral(True, BOOLEAN)
+            ),
+            PhysicalComparison(
+                "=", event_ref, PhysicalLiteral(False, BOOLEAN)
+            ),
+            BOOLEAN,
+        )
+        eligible: PhysicalPlan = PhysicalEventFilter(
+            relation,
+            tuple(event_defs),
+            tuple(projections),
+            eligible_predicate,
+            tuple(constraints),
+        )
+        plan = PhysicalCandidateSetOperation(
+            eligible,
+            plan,
+            "except",
+            root_id,
+        )
     if limit is not None:
         plan = PhysicalLimit(plan, limit[0], limit[1])
     validate_physical_plan(plan, catalog, expressions)
@@ -1859,10 +2041,17 @@ def _plan_crossing_events(
         estimated=True,
         reason_code="PHYSICAL_EVENT_WINDOW_SELECTED",
         reason="set-based LAG event relation on stable security and trading-date keys",
-        strategy_id="crossing_window",
+        strategy_id=(
+            "crossing_window_absence" if event_absence else "crossing_window"
+        ),
         selected=True,
     )
-    return PhysicalPlanningResult(plan, selected_resource, (decision,), "crossing_window")
+    return PhysicalPlanningResult(
+        plan,
+        selected_resource,
+        (decision,),
+        "crossing_window_absence" if event_absence else "crossing_window",
+    )
 
 
 def _lower_resolved_indicator(field: _ResolvedIndicator):

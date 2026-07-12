@@ -15,6 +15,7 @@ from ..physical.ir import (
     PhysicalCoalesce,
     PhysicalColumn,
     PhysicalComparison,
+    PhysicalCandidateSetOperation,
     PhysicalCompositeAggregate,
     PhysicalFilter,
     PhysicalDynamicDateRange,
@@ -240,6 +241,8 @@ def _render_plan(
         return _render_stage_rank(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalSetOperation):
         return _render_set_operation(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalCandidateSetOperation):
+        return _render_candidate_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
 
 
@@ -315,7 +318,9 @@ def _render_event_filter(
                 ),
             )
             ratio = exp.Div(
-                this=exp.Sub(this=value.copy(), expression=minimum.copy()),
+                this=exp.Paren(
+                    this=exp.Sub(this=value.copy(), expression=minimum.copy())
+                ),
                 expression=exp.Nullif(
                     this=exp.Sub(this=maximum.copy(), expression=minimum.copy()),
                     expression=exp.convert(0),
@@ -1913,6 +1918,87 @@ def _render_set_operation(
     result = exp.select(
         *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
     ).from_(combined.subquery(alias=alias))
+    for cte in (*left_ctes, *right_ctes):
+        result = result.with_(cte.alias_or_name, as_=cte.this)
+    return result
+
+
+def _render_candidate_set_operation(
+    plan: PhysicalCandidateSetOperation,
+    catalog: PhysicalCatalog,
+    cte_prefix: str,
+) -> exp.Select:
+    keys = ("mktcode", "tgtcode")
+    left = _render_plan(plan.left, catalog, f"{cte_prefix}candidate_left_")
+    right = _render_plan(plan.right, catalog, f"{cte_prefix}candidate_right_")
+    left_body, left_ctes = _detach_ctes(left)
+    right_body, right_ctes = _detach_ctes(right)
+    left_alias = f"{cte_prefix}candidate_left_rows"
+    right_alias = f"{cte_prefix}candidate_right_rows"
+    left_keys = (
+        exp.select(
+            *(exp.column(key, table=left_alias, quoted=True) for key in keys)
+        )
+        .distinct()
+        .from_(left_body.subquery(alias=left_alias))
+    )
+    right_keys = (
+        exp.select(
+            *(exp.column(key, table=right_alias, quoted=True) for key in keys)
+        )
+        .distinct()
+        .from_(right_body.subquery(alias=right_alias))
+    )
+    if plan.operation == "intersect":
+        combined = exp.Intersect(this=left_keys, expression=right_keys, distinct=True)
+    elif plan.operation == "union":
+        combined = exp.Union(this=left_keys, expression=right_keys, distinct=True)
+    else:
+        combined = exp.Except(this=left_keys, expression=right_keys, distinct=True)
+
+    candidate_alias = f"{cte_prefix}candidate_keys"
+    anchor_alias = f"{cte_prefix}candidate_anchor"
+    latest_alias = f"{cte_prefix}candidate_latest"
+    anchor = catalog.resource(plan.anchor_resource_id)
+    anchor_table = exp.table_(
+        anchor.table,
+        db=anchor.database,
+        quoted=True,
+        alias=anchor_alias,
+    )
+    latest_table = exp.table_(
+        anchor.table,
+        db=anchor.database,
+        quoted=True,
+        alias=latest_alias,
+    )
+    latest = exp.select(
+        exp.Max(
+            this=exp.column(anchor.partition_key, table=latest_alias, quoted=True)
+        )
+    ).from_(latest_table)
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table=anchor_alias, quoted=True),
+                expression=exp.column(key, table=candidate_alias, quoted=True),
+            )
+            for key in keys
+        )
+    )
+    result = (
+        exp.select(
+            *(exp.column(key, table=anchor_alias, quoted=True) for key in (*keys, "bizdate"))
+        )
+        .from_(anchor_table)
+        .join(combined.subquery(alias=candidate_alias), on=join_predicate, join_type="INNER")
+        .where(
+            exp.EQ(
+                this=exp.column(anchor.partition_key, table=anchor_alias, quoted=True),
+                expression=exp.Subquery(this=latest),
+            )
+        )
+    )
     for cte in (*left_ctes, *right_ctes):
         result = result.with_(cte.alias_or_name, as_=cte.this)
     return result

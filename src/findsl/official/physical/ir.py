@@ -820,6 +820,25 @@ class PhysicalSetOperation(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalCandidateSetOperation(PhysicalPlan):
+    left: PhysicalPlan
+    right: PhysicalPlan
+    operation: str
+    anchor_resource_id: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalCandidateSetOperation",
+            "left": self.left.to_dict(),
+            "right": self.right.to_dict(),
+            "operation": self.operation,
+            "anchor_resource_id": self.anchor_resource_id,
+            "key_semantics": "security",
+            "output_date_policy": "latest_anchor",
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalLimit(PhysicalPlan):
     input: PhysicalPlan
     offset: int
