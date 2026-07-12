@@ -288,12 +288,15 @@ def test_pipeline_event_false_means_no_true_event_in_eligible_period():
     sql = result["backend"]["sql"]
 
     assert result["physical"]["selected_strategy"] == "crossing_window_absence"
-    assert result["physical"]["plan"]["operation"] == "except"
-    assert " EXCEPT " in sql
+    assert result["physical"]["plan"]["quantifier"] == "none"
+    assert result["physical"]["plan"]["eligibility_predicate"] is not None
+    assert " EXCEPT " not in sql
     assert "`event_rows`.`event_0` = TRUE" in sql
-    eligible_sql, occurred_sql = sql.split(" EXCEPT ", 1)
-    assert "`event_rows`.`event_0` = FALSE" in eligible_sql
-    assert "`event_rows`.`event_0` = FALSE" not in occurred_sql
+    assert "`event_rows`.`event_0` = FALSE" in sql
+    assert "GROUP BY `event_rows`.`mktcode`, `event_rows`.`tgtcode`" in sql
+    assert "HAVING MAX(CASE WHEN" in sql
+    assert "= 1 AND MAX(CASE WHEN" in sql
+    assert "= 0" in sql
     assert "LIMIT 3" in sql
 
 

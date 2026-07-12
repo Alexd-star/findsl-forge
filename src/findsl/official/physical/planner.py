@@ -1998,13 +1998,6 @@ def _plan_crossing_events(
         event_predicate,
         {**event_refs, **projected_refs},
     )
-    plan: PhysicalPlan = PhysicalEventFilter(
-        relation,
-        tuple(event_defs),
-        tuple(projections),
-        predicate,
-        tuple(constraints),
-    )
     if event_absence:
         event_ref = next(iter(event_refs.values()))
         eligible_predicate = PhysicalBinary(
@@ -2017,18 +2010,23 @@ def _plan_crossing_events(
             ),
             BOOLEAN,
         )
-        eligible: PhysicalPlan = PhysicalEventFilter(
+        plan: PhysicalPlan = PhysicalEventFilter(
             relation,
             tuple(event_defs),
             tuple(projections),
-            eligible_predicate,
+            predicate,
             tuple(constraints),
-        )
-        plan = PhysicalCandidateSetOperation(
-            eligible,
-            plan,
-            "except",
+            "none",
+            eligible_predicate,
             root_id,
+        )
+    else:
+        plan = PhysicalEventFilter(
+            relation,
+            tuple(event_defs),
+            tuple(projections),
+            predicate,
+            tuple(constraints),
         )
     if limit is not None:
         plan = PhysicalLimit(plan, limit[0], limit[1])

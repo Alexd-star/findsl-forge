@@ -372,6 +372,8 @@ def _render_event_filter(
 
     alias = "event_rows"
     rows = source.subquery(alias=alias)
+    if plan.quantifier == "none":
+        return _render_event_absence(plan, rows, relation, catalog)
     outer = exp.select(
         *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
     ).from_(rows)
@@ -383,6 +385,108 @@ def _render_event_filter(
             _retarget_event_result_columns(rendered, alias, catalog),
         )
     return outer.where(predicate)
+
+
+def _render_event_absence(
+    plan: PhysicalEventFilter,
+    rows: exp.Subquery,
+    relation,
+    catalog: PhysicalCatalog,
+) -> exp.Select:
+    keys = ("mktcode", "tgtcode")
+    eligibility = _render_expr(plan.eligibility_predicate, catalog)
+    occurred = _render_expr(plan.predicate, catalog)
+    for constraint in plan.result_constraints:
+        rendered = _retarget_event_result_columns(
+            _render_expr(constraint, catalog, relation),
+            "event_rows",
+            catalog,
+        )
+        eligibility = exp.and_(eligibility, rendered.copy())
+        occurred = exp.and_(occurred, rendered)
+    eligible_count = exp.Max(
+        this=exp.Case(
+            ifs=[exp.If(this=eligibility, true=exp.convert(1))],
+            default=exp.convert(0),
+        )
+    )
+    occurred_count = exp.Max(
+        this=exp.Case(
+            ifs=[exp.If(this=occurred, true=exp.convert(1))],
+            default=exp.convert(0),
+        )
+    )
+    qualified = (
+        exp.select(
+            *(exp.column(key, table="event_rows", quoted=True) for key in keys)
+        )
+        .from_(rows)
+        .group_by(
+            *(exp.column(key, table="event_rows", quoted=True) for key in keys)
+        )
+        .having(
+            exp.and_(
+                exp.EQ(this=eligible_count, expression=exp.convert(1)),
+                exp.EQ(this=occurred_count, expression=exp.convert(0)),
+            )
+        )
+    )
+    candidate_alias = "event_absence_keys"
+    anchor_alias = "event_absence_anchor"
+    latest_alias = "event_absence_latest"
+    anchor = catalog.resource(plan.anchor_resource_id)
+    latest = exp.select(
+        exp.Max(
+            this=exp.column(anchor.partition_key, table=latest_alias, quoted=True)
+        )
+    ).from_(
+        exp.table_(
+            anchor.table,
+            db=anchor.database,
+            quoted=True,
+            alias=latest_alias,
+        )
+    )
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table=anchor_alias, quoted=True),
+                expression=exp.column(key, table=candidate_alias, quoted=True),
+            )
+            for key in keys
+        )
+    )
+    return (
+        exp.select(
+            *(
+                exp.column(key, table=anchor_alias, quoted=True)
+                for key in (*keys, "bizdate")
+            )
+        )
+        .from_(
+            exp.table_(
+                anchor.table,
+                db=anchor.database,
+                quoted=True,
+                alias=anchor_alias,
+            )
+        )
+        .join(
+            qualified.subquery(alias=candidate_alias),
+            on=join_predicate,
+            join_type="INNER",
+        )
+        .where(
+            exp.EQ(
+                this=exp.column(
+                    anchor.partition_key,
+                    table=anchor_alias,
+                    quoted=True,
+                ),
+                expression=exp.Subquery(this=latest),
+            )
+        )
+    )
 
 
 def _event_window_aggregate(value, aggregate, partition, order, lookback_sessions):

@@ -515,6 +515,9 @@ class PhysicalEventFilter(PhysicalPlan):
     projections: Tuple[PhysicalProjection, ...]
     predicate: PhysicalExpr
     result_constraints: Tuple[PhysicalExpr, ...] = ()
+    quantifier: str = "rows"
+    eligibility_predicate: Optional[PhysicalExpr] = None
+    anchor_resource_id: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -524,6 +527,13 @@ class PhysicalEventFilter(PhysicalPlan):
             "projections": [item.to_dict() for item in self.projections],
             "predicate": self.predicate.to_dict(),
             "result_constraints": [item.to_dict() for item in self.result_constraints],
+            "quantifier": self.quantifier,
+            "eligibility_predicate": (
+                self.eligibility_predicate.to_dict()
+                if self.eligibility_predicate
+                else None
+            ),
+            "anchor_resource_id": self.anchor_resource_id,
         }
 
 

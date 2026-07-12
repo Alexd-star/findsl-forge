@@ -63,6 +63,16 @@ def _validate_plan(plan, catalog, expressions):
         _validate_plan(plan.input, catalog, expressions)
         if not plan.events or plan.predicate.type is not BOOLEAN:
             raise ValueError("physical event filter requires events and a boolean predicate")
+        if plan.quantifier not in {"rows", "none"}:
+            raise ValueError("physical event quantifier is invalid")
+        if plan.quantifier == "none":
+            if plan.eligibility_predicate is None or not plan.anchor_resource_id:
+                raise ValueError("event absence requires eligibility and anchor contracts")
+            if plan.eligibility_predicate.type is not BOOLEAN:
+                raise ValueError("event eligibility predicate must be boolean")
+            catalog.resource(plan.anchor_resource_id)
+        elif plan.eligibility_predicate is not None or plan.anchor_resource_id is not None:
+            raise ValueError("row event filter cannot declare absence-only contracts")
         aliases = set()
         for event in plan.events:
             if not event.alias.isidentifier() or event.alias in aliases:
@@ -106,6 +116,13 @@ def _validate_plan(plan, catalog, expressions):
         if not projected_refs.issubset(projection_aliases):
             raise ValueError("physical event predicate references an undeclared projection")
         _validate_expr(plan.predicate, catalog, expressions)
+        if plan.eligibility_predicate is not None:
+            eligibility_refs = {
+                item.alias for item in _walk_event_refs(plan.eligibility_predicate)
+            }
+            if not eligibility_refs or not eligibility_refs.issubset(aliases):
+                raise ValueError("event eligibility references an undeclared event")
+            _validate_expr(plan.eligibility_predicate, catalog, expressions)
         for constraint in plan.result_constraints:
             _validate_expr(constraint, catalog, expressions)
             if constraint.type is not BOOLEAN:
