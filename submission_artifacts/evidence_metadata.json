@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T13:55:36Z",
+  "generated_at": "2026-07-12T14:39:35Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "94bc247",
-    "head_at_export": "94bc247",
+    "head_at_export": "d34d5e4",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
@@ -79,6 +79,24 @@
       "baseline_vs_prefix_speedup_display": "1.17x"
     }
   },
+  "official_migration": {
+    "available": true,
+    "git_head": "d34d5e443e861f33538e3a6feb7ad85d7f1ba3fe",
+    "legacy_strict_success": 1097,
+    "legacy_to_new_migrated": 393,
+    "migration_coverage": 0.35825,
+    "new_backend_success": 400,
+    "physical_date_gap": 0,
+    "dynamic_date_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 9,
+      "total": 9,
+      "latest_data_date": "2026-04-14",
+      "trading_date_count": 4631,
+      "max_p95_ms": 181.0921
+    }
+  },
   "doris_cluster": {
     "available": true,
     "passed": true,
@@ -101,6 +119,8 @@
     "official_doris_evidence_json": "submission_artifacts\\evidence_snapshots\\official_doris_evidence.json",
     "official_slot_coverage_json": "submission_artifacts\\evidence_snapshots\\official_slot_coverage.json",
     "official_query_performance_matrix_json": "submission_artifacts\\evidence_snapshots\\official_query_performance_matrix.json",
+    "phase18_dynamic_date_funnel_json": "submission_artifacts\\evidence_snapshots\\phase18_dynamic_date_funnel.json",
+    "phase18_dynamic_date_doris_json": "submission_artifacts\\evidence_snapshots\\phase18_dynamic_date_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }

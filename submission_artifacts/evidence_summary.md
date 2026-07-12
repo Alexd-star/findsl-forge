@@ -12,6 +12,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1873/5799 compiled |
+| ANTLR/IR legacy migration | 393/1097 (35.83%) |
+| Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
 | Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
@@ -21,7 +23,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
 | Git HEAD at report generation | 94bc247 |
-| Git HEAD at export | 94bc247 |
+| Git HEAD at export | d34d5e4 |
 
 ## Source Files
 
@@ -32,6 +34,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | official_doris_evidence_json | `submission_artifacts\evidence_snapshots\official_doris_evidence.json` |
 | official_slot_coverage_json | `submission_artifacts\evidence_snapshots\official_slot_coverage.json` |
 | official_query_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_query_performance_matrix.json` |
+| phase18_dynamic_date_funnel_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_funnel.json` |
+| phase18_dynamic_date_doris_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_doris.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
 
