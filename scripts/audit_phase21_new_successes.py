@@ -18,6 +18,11 @@ def main() -> int:
     parser.add_argument("--current", default="reports/phase21_capability_funnel.json")
     parser.add_argument("--json-output", default="reports/phase21_new_success_audit.json")
     parser.add_argument("--report-output", default="reports/phase21_new_success_audit.md")
+    parser.add_argument(
+        "--require-period-scalars",
+        action="store_true",
+        help="Require every newly successful query to materialize a period-end scalar",
+    )
     args = parser.parse_args()
 
     baseline = _rows(args.baseline)
@@ -34,8 +39,14 @@ def main() -> int:
     for row in gained:
         source = row["source"]
         payload = compile_official(source).to_dict()
-        physical = json.dumps(payload["physical"]["plan"], ensure_ascii=False, sort_keys=True)
+        physical_plan = payload["physical"]["plan"]
+        physical = json.dumps(physical_plan, ensure_ascii=False, sort_keys=True)
         sql = payload["backend"]["sql"]
+        named_scalars = [
+            node
+            for node in _walk_dicts(physical_plan)
+            if node.get("kind") == "PhysicalNamedScalar"
+        ]
         checks = {
             "backend_validation": payload["backend"]["validation_passed"],
             "no_placeholder_predicate": not re.search(r"\b1\s*=\s*[01]\b", sql),
@@ -43,6 +54,7 @@ def main() -> int:
             "aggregate_materialized": True,
             "temporal_materialized": True,
             "rank_materialized": True,
+            "period_scalar_materialized": True,
         }
         if "~=" in source:
             checks["approximation_materialized"] = "ABS(" in sql and "GREATEST(" in sql
@@ -82,6 +94,13 @@ def main() -> int:
                 )
                 and "ROW_NUMBER() OVER" in sql
             )
+        period_scalars = [
+            scalar for scalar in named_scalars if scalar.get("collapse_latest") is True
+        ]
+        if args.require_period_scalars or period_scalars:
+            checks["period_scalar_materialized"] = bool(period_scalars) and all(
+                bool(scalar.get("value_alias")) for scalar in period_scalars
+            ) and "MAX_BY(" in sql
         passed = all(checks.values())
         results.append(
             {
@@ -98,6 +117,7 @@ def main() -> int:
         "schema_version": 1,
         "baseline": args.baseline,
         "current": args.current,
+        "require_period_scalars": args.require_period_scalars,
         "new_successes": len(results),
         "passed": sum(item["passed"] for item in results),
         "failed": sum(not item["passed"] for item in results),
@@ -112,6 +132,16 @@ def main() -> int:
 
 def _rows(path: str):
     return json.loads(Path(path).read_text(encoding="utf-8"))["rows"]
+
+
+def _walk_dicts(value):
+    if isinstance(value, dict):
+        yield value
+        for item in value.values():
+            yield from _walk_dicts(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _walk_dicts(item)
 
 
 def _write(report, json_output: str, report_output: str) -> None:
@@ -140,7 +170,7 @@ def _write(report, json_output: str, report_output: str) -> None:
             "",
             "## 审计合同",
             "",
-            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名。",
+            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名；命名周期标量显式携带 `collapse_latest` 合同并生成 `MAX_BY`。",
         ]
     )
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
