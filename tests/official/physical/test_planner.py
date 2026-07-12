@@ -387,3 +387,17 @@ def test_recent_days_temporal_window_is_normalized_to_trading_sessions():
 
     assert result.plan.window.kind == "recent_sessions"
     assert result.plan.window.lookback_sessions == 10
+
+
+def test_same_scope_temporal_arithmetic_lowers_all_required_columns_once():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+            "indicator('', '', '成交额', '最近10日', '', '', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporal)
+    assert {column.column for column in result.plan.input.columns} == {"volume", "turnover"}
+    assert "PhysicalBinary" in result.plan.predicate.canonical_json()

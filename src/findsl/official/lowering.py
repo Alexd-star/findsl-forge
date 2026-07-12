@@ -233,13 +233,13 @@ def _temporal_binding_for_stage(
     typed: TypedNode,
     bindings: Dict[int, BoundFunction],
 ) -> Optional[BoundFunction]:
-    temporal = [
-        bindings[id(node.node)]
+    calls = [
+        node
         for node in _walk_typed(typed)
-        if isinstance(node.node, OfficialFunctionCall)
-        and id(node.node) in bindings
-        and bindings[id(node.node)].temporal is not None
+        if isinstance(node.node, OfficialFunctionCall) and id(node.node) in bindings
     ]
+    temporal_nodes = [node for node in calls if bindings[id(node.node)].temporal is not None]
+    temporal = [bindings[id(node.node)] for node in temporal_nodes]
     if not temporal:
         return None
     if len(temporal) != 1:
@@ -247,14 +247,26 @@ def _temporal_binding_for_stage(
             "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
             "multiple count_exp functions require independent temporal relation branches",
         )
-    if not (
-        isinstance(typed.node, OfficialComparison)
-        and isinstance(typed.node.left, OfficialFunctionCall)
-        and id(typed.node.left) in bindings
-        and bindings[id(typed.node.left)] is temporal[0]
-    ):
+    if not isinstance(typed.node, OfficialComparison):
         raise OfficialLoweringError(
             "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-            "count_exp is currently materialized only for an atomic function comparison",
+            "a single temporal contract must govern one comparison expression",
         )
+    temporal_node = temporal_nodes[0]
+    temporal_scope = temporal[0]
+    reference_slots = temporal_node.binding.slots if temporal_node.binding else {}
+    for call in calls:
+        binding = bindings[id(call.node)]
+        slots = call.binding.slots if call.binding else {}
+        same_scope = (
+            binding.market_scope.to_dict() == temporal_scope.market_scope.to_dict()
+            and binding.date_constraint.to_dict() == temporal_scope.date_constraint.to_dict()
+            and slots.get("filter_scope", "") == reference_slots.get("filter_scope", "")
+            and slots.get("select_type", "") == reference_slots.get("select_type", "")
+        )
+        if not same_scope:
+            raise OfficialLoweringError(
+                "TEMPORAL_SCOPE_MISMATCH",
+                "all functions in a temporal arithmetic predicate must share market, date, filter and security scopes",
+            )
     return temporal[0]

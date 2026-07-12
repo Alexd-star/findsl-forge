@@ -51,3 +51,31 @@ def test_domain_lowering_materializes_count_expression_as_logical_temporal_plan(
     assert result.plan.spec.threshold == 3
     assert result.plan.spec.unit == "日"
     assert result.plan.spec.predicate.to_dict()["kind"] == "ComparisonExpr"
+
+
+def test_single_temporal_contract_can_govern_same_scope_arithmetic_predicate():
+    result = lower_official_ast(
+        _typed(
+            "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+            "indicator('', '', '成交额', '最近10日', '', '', '') > 0"
+        ),
+        domain_registry=default_official_registry(),
+    )
+
+    assert isinstance(result.plan, LogicalConsecutive)
+    predicate = result.plan.spec.predicate.to_dict()
+    assert predicate["kind"] == "ComparisonExpr"
+    assert predicate["left"]["kind"] == "BinaryExpr"
+
+
+def test_temporal_arithmetic_rejects_mismatched_date_scopes():
+    with pytest.raises(OfficialLoweringError) as excinfo:
+        lower_official_ast(
+            _typed(
+                "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+                "indicator('', '', '成交额', '最近5日', '', '', '') > 0"
+            ),
+            domain_registry=default_official_registry(),
+        )
+
+    assert excinfo.value.code == "TEMPORAL_SCOPE_MISMATCH"

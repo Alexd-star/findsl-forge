@@ -260,3 +260,17 @@ def test_consecutive_temporal_plan_uses_trading_row_islands_not_calendar_day_dif
     assert "`run_length`" in result.sql
     assert "`metric_value` >= 3" in result.sql
     assert result.validation.passed is True
+
+
+def test_same_scope_temporal_arithmetic_renders_inside_source_row_predicate():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+            "indicator('', '', '成交额', '最近10日', '', '', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "`q`.`volume` / `q`.`turnover` > 0" in result.sql
+    assert result.sql.count("`hsj_stock_hq_basic`") == 3
+    assert result.validation.passed is True
