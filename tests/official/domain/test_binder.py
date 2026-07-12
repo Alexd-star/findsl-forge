@@ -46,6 +46,17 @@ def test_cross_function_binds_event_operands():
     assert isinstance(bound.expression.left, IndicatorRef)
 
 
+def test_market_expression_is_carried_as_typed_domain_contract():
+    bound = bind_function(
+        _typed_call("indicator('沪|深&^创业板', '', '成交量', '', '', '', '')"),
+        default_official_registry(),
+    )
+
+    payload = bound.to_dict()
+    assert payload["market_expression"]["kind"] == "MarketOr"
+    assert "创业板" in str(payload["market_expression"])
+
+
 def test_unknown_indicator_has_precise_diagnostic():
     typed = _typed_call("indicator('', '', '不存在指标', '今日', '', '', '')")
     with pytest.raises(DomainBindingError) as excinfo:

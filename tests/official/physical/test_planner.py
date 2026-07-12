@@ -223,6 +223,39 @@ def test_market_codes_follow_official_doris_protocol(market, expected):
     assert [item.value for item in market_constraint.values] == [expected]
 
 
+@pytest.mark.parametrize(
+    "market,prefixes",
+    [
+        ("科创板", ("688",)),
+        ("创业板", ("300", "301")),
+        ("沪主板", ("600", "601", "603", "605")),
+        ("深主板", ("000", "001", "002", "003")),
+    ],
+)
+def test_board_market_constraints_use_controlled_code_ranges(market, prefixes):
+    result = plan_physical(
+        _lower(f"indicator('{market}', '', '成交量', '', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    for prefix in prefixes:
+        assert f'{prefix}000' in payload
+        assert f'{prefix}999' in payload
+    assert "kcbFlag" not in payload
+    assert "gemFlag" not in payload
+
+
+def test_unavailable_official_market_is_not_compiled_as_empty_result():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower("indicator('港', '', '成交量', '', '', '', '') > 100"),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_MARKET_DATA_UNAVAILABLE"
+
+
 def test_security_resource_uses_basic_anchor_for_stable_date_key():
     result = plan_physical(
         _lower("indicator('', '', '股票名称', '', '', '', '') = '华泰%'"),

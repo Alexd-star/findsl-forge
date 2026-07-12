@@ -41,6 +41,19 @@ class PhysicalUnary(PhysicalExpr):
 
 
 @dataclass(frozen=True)
+class PhysicalNot(PhysicalExpr):
+    operand: PhysicalExpr
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalNot",
+            "operand": self.operand.to_dict(),
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalNullIf(PhysicalExpr):
     expression: PhysicalExpr
     null_value: PhysicalExpr

@@ -7,7 +7,7 @@ from .ir import (
     PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
     PhysicalSetOperation,
-    PhysicalCoalesce, PhysicalNullIf, PhysicalUnary,
+    PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
 )
 from ..types import BOOLEAN, NUMERIC
 
@@ -171,6 +171,10 @@ def _validate_expr(expression, catalog, expressions=None):
     elif isinstance(expression, PhysicalUnary):
         if expression.op != "negate" or expression.type is not NUMERIC:
             raise ValueError("unsupported physical unary expression")
+        _validate_expr(expression.operand, catalog, expressions)
+    elif isinstance(expression, PhysicalNot):
+        if expression.operand.type is not BOOLEAN:
+            raise ValueError("physical NOT requires a boolean operand")
         _validate_expr(expression.operand, catalog, expressions)
     elif isinstance(expression, PhysicalNullIf):
         if expression.expression.type is not expression.null_value.type or expression.type is not expression.expression.type:

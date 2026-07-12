@@ -86,6 +86,26 @@ def test_latest_date_and_market_constraints_render_as_sqlglot_ast():
     assert result.validation.passed is True
 
 
+def test_market_set_algebra_renders_typed_code_ranges_and_not():
+    result = render_doris(
+        _physical(
+            "indicator('沪|深&^创业板', '', '成交量', '今日', '', '', '') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "`q`.`mktcode` IN (1)" in result.sql
+    assert "`q`.`mktcode` IN (0)" in result.sql
+    assert "NOT" in result.sql
+    assert "`q`.`tgtcode` >= '300000'" in result.sql
+    assert "`q`.`tgtcode` <= '300999'" in result.sql
+    assert "`q`.`tgtcode` >= '301000'" in result.sql
+    assert "`q`.`tgtcode` <= '301999'" in result.sql
+    assert "kcbFlag" not in result.sql
+    assert "gemFlag" not in result.sql
+    assert result.validation.passed is True
+
+
 def test_typed_year_range_renders_bounded_partition_predicate():
     result = render_doris(
         _physical("indicator('', '', '成交量', '一八年', '', '', '') > 100"),

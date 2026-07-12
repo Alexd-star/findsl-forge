@@ -18,6 +18,7 @@ from ..physical.ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalNullIf,
+    PhysicalNot,
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
@@ -672,6 +673,8 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
         if expression.op != "negate":
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported unary operator {expression.op}")
         return exp.Neg(this=_render_expr(expression.operand, catalog, scan))
+    if isinstance(expression, PhysicalNot):
+        return exp.Not(this=exp.Paren(this=_render_expr(expression.operand, catalog, scan)))
     if isinstance(expression, PhysicalNullIf):
         return exp.Nullif(
             this=_render_expr(expression.expression, catalog, scan),

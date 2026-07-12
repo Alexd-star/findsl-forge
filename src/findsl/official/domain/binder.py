@@ -11,6 +11,7 @@ from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRef, MarketScope
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 from .temporal import parse_count_token
+from .market import MarketParseError, parse_market_expression
 
 
 class DomainBindingError(ValueError):
@@ -28,6 +29,7 @@ class BoundFunction:
     expression: object
     indicators: Tuple[IndicatorRef, ...]
     market_scope: MarketScope
+    market_expression: object
     date_constraint: DateConstraint
     requirement: DataRequirement
     aggregate: Optional[str]
@@ -39,6 +41,7 @@ class BoundFunction:
             "expression": self.expression.to_dict(),
             "indicators": [item.to_dict() for item in self.indicators],
             "market_scope": self.market_scope.to_dict(),
+            "market_expression": self.market_expression.to_dict() if self.market_expression else None,
             "date_constraint": self.date_constraint.to_dict(),
             "requirement": self.requirement.to_dict(),
             "aggregate": self.aggregate,
@@ -60,7 +63,18 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
     indicators = tuple(_bind_indicator(name, slot, slots.get(slot, ""), registry) for slot in indicator_slots)
     if not indicators:
         raise DomainBindingError("DOMAIN_CAPABILITY_UNSUPPORTED", f"{name} has no bindable indicator slot", function=name, slot="indicator_name", value="")
-    market = _bind_market(name, slots.get("market", ""))
+    market_value = slots.get("market", "")
+    try:
+        market_expression = parse_market_expression(market_value)
+    except MarketParseError as exc:
+        raise DomainBindingError(
+            exc.code,
+            str(exc),
+            function=name,
+            slot="market",
+            value=market_value,
+        ) from exc
+    market = _bind_market(name, market_value)
     date = parse_date_constraint(slots.get("date", slots.get("period", "")))
     aggregate = slots.get("agg_func", "").strip().upper() or None
     if aggregate and aggregate not in {"AVG", "SUM", "MAX", "MIN", "GROWTH", "GROWTH_RISE", "GROWTH_FALL"}:
@@ -78,7 +92,17 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
     capabilities = frozenset(capability for definition in (_definition(item, registry) for item in indicators) for capability in definition.capabilities)
     requirement = DataRequirement(domains, capabilities)
     expression = EventSpec(name, indicators[0], indicators[1]) if name in _EVENT_FUNCTIONS else indicators[0]
-    return BoundFunction(name, expression, indicators, market, date, requirement, aggregate, temporal)
+    return BoundFunction(
+        name,
+        expression,
+        indicators,
+        market,
+        market_expression,
+        date,
+        requirement,
+        aggregate,
+        temporal,
+    )
 
 
 def _definition(indicator: IndicatorRef, registry: OfficialIndicatorRegistry) -> IndicatorDefinition:

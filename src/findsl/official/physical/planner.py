@@ -21,6 +21,13 @@ from ..ir import (
 )
 from ..lowering import LoweringResult
 from ..domain.binder import parse_date_constraint
+from ..domain.market import (
+    MarketAnd,
+    MarketAtom,
+    MarketNot,
+    MarketOr,
+    parse_market_expression,
+)
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .catalog import PhysicalCatalog
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
@@ -36,6 +43,7 @@ from .ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalNullIf,
+    PhysicalNot,
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
@@ -797,13 +805,8 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
     stable_resource_id = resource.anchor_resource_id or resource_id
     market = str(call.binding.slots.get("market", "")).strip()
     if market:
-        codes = _market_codes(market)
-        constraints.append(
-            PhysicalIn(
-                PhysicalColumn(stable_resource_id, "mktcode", NUMERIC),
-                tuple(PhysicalLiteral(code, NUMERIC) for code in codes),
-            )
-        )
+        market_expression = call.market_expression or parse_market_expression(market)
+        constraints.append(_lower_market_expression(market_expression, stable_resource_id))
     date = str(call.binding.slots.get("date", "")).strip()
     if date:
         partition_key = catalog.resource(stable_resource_id).partition_key
@@ -864,11 +867,99 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
     return tuple(constraints)
 
 
-def _market_codes(value: str) -> Tuple[int, ...]:
-    mapping = {"深": (0,), "沪": (1,), "京": (103,), "沪深": (0, 1), "A股": (0, 1), "沪深京": (0, 1, 103)}
-    codes = []
-    for item in (part.strip() for part in re.split(r"[|&,，]", value) if part.strip()):
-        if item.startswith("^") or item not in mapping:
-            raise PhysicalPlanningError("PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED", f"unsupported market constraint: {item}")
-        codes.extend(mapping[item])
-    return tuple(sorted(set(codes)))
+_MARKET_CODES = {
+    "深": (0,),
+    "沪": (1,),
+    "京": (103,),
+    "沪深": (0, 1),
+    "A股": (0, 1),
+    "沪深京": (0, 1, 103),
+}
+
+_BOARD_PREFIXES = {
+    "科创板": (1, ("688",)),
+    "创业板": (0, ("300", "301")),
+    "沪主板": (1, ("600", "601", "603", "605")),
+    "深主板": (0, ("000", "001", "002", "003")),
+}
+
+
+def _lower_market_expression(expression, resource_id: str):
+    union_codes = _union_market_codes(expression)
+    if union_codes is not None:
+        return PhysicalIn(
+            PhysicalColumn(resource_id, "mktcode", NUMERIC),
+            tuple(PhysicalLiteral(code, NUMERIC) for code in union_codes),
+        )
+    if isinstance(expression, MarketAtom):
+        if expression.name in _MARKET_CODES:
+            column = PhysicalColumn(resource_id, "mktcode", NUMERIC)
+            return PhysicalIn(
+                column,
+                tuple(
+                    PhysicalLiteral(code, NUMERIC)
+                    for code in _MARKET_CODES[expression.name]
+                ),
+            )
+        if expression.name in _BOARD_PREFIXES:
+            market_code, prefixes = _BOARD_PREFIXES[expression.name]
+            market = PhysicalIn(
+                PhysicalColumn(resource_id, "mktcode", NUMERIC),
+                (PhysicalLiteral(market_code, NUMERIC),),
+            )
+            ranges = tuple(
+                PhysicalBinary(
+                    "and",
+                    PhysicalComparison(
+                        ">=",
+                        PhysicalColumn(resource_id, "tgtcode", STRING),
+                        PhysicalLiteral(f"{prefix}000", STRING),
+                    ),
+                    PhysicalComparison(
+                        "<=",
+                        PhysicalColumn(resource_id, "tgtcode", STRING),
+                        PhysicalLiteral(f"{prefix}999", STRING),
+                    ),
+                    BOOLEAN,
+                )
+                for prefix in prefixes
+            )
+            codes = ranges[0]
+            for item in ranges[1:]:
+                codes = PhysicalBinary("or", codes, item, BOOLEAN)
+            return PhysicalBinary("and", market, codes, BOOLEAN)
+        raise PhysicalPlanningError(
+            "PHYSICAL_MARKET_DATA_UNAVAILABLE",
+            f"official dataset does not contain market {expression.name}",
+        )
+    if isinstance(expression, MarketNot):
+        return PhysicalNot(_lower_market_expression(expression.operand, resource_id))
+    if isinstance(expression, MarketAnd):
+        return PhysicalBinary(
+            "and",
+            _lower_market_expression(expression.left, resource_id),
+            _lower_market_expression(expression.right, resource_id),
+            BOOLEAN,
+        )
+    if isinstance(expression, MarketOr):
+        return PhysicalBinary(
+            "or",
+            _lower_market_expression(expression.left, resource_id),
+            _lower_market_expression(expression.right, resource_id),
+            BOOLEAN,
+        )
+    raise PhysicalPlanningError(
+        "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
+        f"unsupported typed market expression {type(expression).__name__}",
+    )
+
+
+def _union_market_codes(expression):
+    if isinstance(expression, MarketAtom) and expression.name in _MARKET_CODES:
+        return _MARKET_CODES[expression.name]
+    if isinstance(expression, MarketOr):
+        left = _union_market_codes(expression.left)
+        right = _union_market_codes(expression.right)
+        if left is not None and right is not None:
+            return tuple(sorted(set((*left, *right))))
+    return None
