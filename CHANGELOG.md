@@ -4,6 +4,15 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端多资源稳定键连接
+
+- 新增 `PhysicalTableScan` 和可执行的左深 `PhysicalJoin`。规划器以 `official_basic` 为证券行情锚点，只连接相同 `logical_entity` 的资源，连接键从双方 `stable_keys` 交集推导。
+- 静态证券维表使用 `(mktcode,tgtcode)`，行情、资金流与技术指标表使用 `(mktcode,tgtcode,bizdate)`；缺少证券稳定键、逻辑实体不一致或无法确定唯一锚点时返回稳定错误，不生成猜测性 Join。
+- SQLGlot 后端新增多资源星型 Join 渲染和资源别名校验，表达式列只能引用当前关系树中实际存在的资源。多资源时序继续显式返回 `PHYSICAL_TEMPORAL_MULTI_RESOURCE_UNSUPPORTED`，没有用普通 Join 近似时序合同。
+- 物理谓词归一器会展开 `AND` 并按规范节点 ID 去重，多个函数共享“今日”约束时只生成一个 `MAX(bizdate)` 子查询。
+- 新增 `scripts/collect_phase10_join_evidence.py`。在官方 Doris 数据快照上，basic/ext/security/technical 的五个两表或三表案例与独立 reference SQL 完整行集哈希一致 `5/5`；基础行情表为 13,650,347 行，本轮最高 P95 约 1.81 秒。
+- 新后端迁移覆盖从 `107/1097（9.75%）` 提升到 `135/1097（12.31%）`，新后端总成功数为 `136`。原多资源终止项中 28 条完成迁移，其余问句暴露出的日期、rank、近似比较和表达式缺口继续单独统计。
+
 ### ANTLR/IR 新后端时序语义
 
 - 新增 SQL 无关的 `TemporalQuantifier`，严格解析 `CONS/EXIST`、比较符、范围、中文数字、`每年/每月/每日`、单位归一和默认阈值，非法合同返回稳定错误码。

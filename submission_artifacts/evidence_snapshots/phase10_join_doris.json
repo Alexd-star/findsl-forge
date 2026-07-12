@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "git_head": "94b84d1a0a7eec9d7f6c6d53962d08eb392b1dcc",
+  "doris_versions": [
+    "doris-4.1.0-rc03-5960d4cea0e"
+  ],
+  "mysql_protocol_version": "5.7.99",
+  "latest_date": "2026-04-14",
+  "row_counts": {
+    "hsj_stock_hq_basic": 13650347,
+    "hsj_stock_hq_ext": 6170822,
+    "hsj_stock_code_info": 5686,
+    "hsj_stock_hq_basic_technical": 13650347
+  },
+  "repeats": 5,
+  "status": "PASS",
+  "matched": 5,
+  "total": 5,
+  "cases": [
+    {
+      "name": "basic_ext_latest",
+      "source": "indicator('', '', '成交量', '今日', '', '', '') > 100 and indicator('', '', '主力净流入', '今日', '', '', '') > 0",
+      "resources": [
+        "official_basic",
+        "official_ext"
+      ],
+      "generated_sql": "SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS official_ext ON `official_basic`.`mktcode` = `official_ext`.`mktcode` AND `official_basic`.`tgtcode` = `official_ext`.`tgtcode` AND `official_basic`.`bizdate` = `official_ext`.`bizdate` WHERE (`official_basic`.`volume` > 100 AND `official_basic`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `official_ext`.`ZJLXMainNetTur` > 0",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_hq_ext` AS e ON e.mktcode=b.mktcode AND e.tgtcode=b.tgtcode AND e.bizdate=b.bizdate WHERE b.bizdate='2026-04-14' AND b.volume > 100 AND e.ZJLXMainNetTur > 0",
+      "expected_count": 2247,
+      "actual_count": 2247,
+      "expected_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
+      "actual_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        944.1888,
+        63.0292,
+        50.0238,
+        55.3517,
+        67.9364
+      ],
+      "p95_ms": 944.1888
+    },
+    {
+      "name": "basic_security_latest",
+      "source": "indicator('', '', '成交量', '今日', '', '', '') > 100 and indicator('', '', 'ST股票标识', '今日', '', '', '') = False",
+      "resources": [
+        "official_basic",
+        "official_security"
+      ],
+      "generated_sql": "SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_code_info` AS official_security ON `official_basic`.`mktcode` = `official_security`.`mktcode` AND `official_basic`.`tgtcode` = `official_security`.`tgtcode` WHERE (`official_basic`.`volume` > 100 AND `official_basic`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `official_security`.`stFlag` = FALSE",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_code_info` AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode WHERE b.bizdate='2026-04-14' AND b.volume > 100 AND s.stFlag = FALSE",
+      "expected_count": 5573,
+      "actual_count": 5573,
+      "expected_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
+      "actual_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        448.6873,
+        399.3439,
+        370.1502,
+        389.7252,
+        343.3616
+      ],
+      "p95_ms": 448.6873
+    },
+    {
+      "name": "ext_security_latest",
+      "source": "indicator('', '', '主力净流入', '今日', '', '', '') > 0 and indicator('', '', 'ST股票标识', '今日', '', '', '') = False",
+      "resources": [
+        "official_basic",
+        "official_ext",
+        "official_security"
+      ],
+      "generated_sql": "SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS official_ext ON `official_basic`.`mktcode` = `official_ext`.`mktcode` AND `official_basic`.`tgtcode` = `official_ext`.`tgtcode` AND `official_basic`.`bizdate` = `official_ext`.`bizdate` LEFT JOIN `newzl`.`hsj_stock_code_info` AS official_security ON `official_basic`.`mktcode` = `official_security`.`mktcode` AND `official_basic`.`tgtcode` = `official_security`.`tgtcode` WHERE (`official_ext`.`ZJLXMainNetTur` > 0 AND `official_basic`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `official_security`.`stFlag` = FALSE",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_hq_ext` AS e ON e.mktcode=b.mktcode AND e.tgtcode=b.tgtcode AND e.bizdate=b.bizdate INNER JOIN `newzl`.`hsj_stock_code_info` AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode WHERE b.bizdate='2026-04-14' AND e.ZJLXMainNetTur > 0 AND s.stFlag = FALSE",
+      "expected_count": 2247,
+      "actual_count": 2247,
+      "expected_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
+      "actual_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        652.9388,
+        46.1805,
+        41.5292,
+        41.5235,
+        40.7419
+      ],
+      "p95_ms": 652.9388
+    },
+    {
+      "name": "basic_ext_security_latest",
+      "source": "indicator('', '', '成交量', '今日', '', '', '') > 100 and indicator('', '', '主力净流入', '今日', '', '', '') > 0 and indicator('', '', 'ST股票标识', '今日', '', '', '') = False",
+      "resources": [
+        "official_basic",
+        "official_ext",
+        "official_security"
+      ],
+      "generated_sql": "SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS official_ext ON `official_basic`.`mktcode` = `official_ext`.`mktcode` AND `official_basic`.`tgtcode` = `official_ext`.`tgtcode` AND `official_basic`.`bizdate` = `official_ext`.`bizdate` LEFT JOIN `newzl`.`hsj_stock_code_info` AS official_security ON `official_basic`.`mktcode` = `official_security`.`mktcode` AND `official_basic`.`tgtcode` = `official_security`.`tgtcode` WHERE ((`official_basic`.`volume` > 100 AND `official_basic`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `official_ext`.`ZJLXMainNetTur` > 0) AND `official_security`.`stFlag` = FALSE",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_hq_ext` AS e ON e.mktcode=b.mktcode AND e.tgtcode=b.tgtcode AND e.bizdate=b.bizdate INNER JOIN `newzl`.`hsj_stock_code_info` AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode WHERE b.bizdate='2026-04-14' AND b.volume > 100 AND e.ZJLXMainNetTur > 0 AND s.stFlag = FALSE",
+      "expected_count": 2247,
+      "actual_count": 2247,
+      "expected_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
+      "actual_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        662.1033,
+        48.5969,
+        49.8467,
+        45.2178,
+        48.2339
+      ],
+      "p95_ms": 662.1033
+    },
+    {
+      "name": "basic_technical_latest",
+      "source": "indicator('', '', '成交量', '今日', '', '', '') > 100 and indicator('', '', '5日均线', '今日', '', '', '') > 0",
+      "resources": [
+        "official_basic",
+        "official_technical"
+      ],
+      "generated_sql": "SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS official_technical ON `official_basic`.`mktcode` = `official_technical`.`mktcode` AND `official_basic`.`tgtcode` = `official_technical`.`tgtcode` AND `official_basic`.`bizdate` = `official_technical`.`bizdate` WHERE (`official_basic`.`volume` > 100 AND `official_basic`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `official_technical`.`ma5` > 0",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_hq_basic_technical` AS t ON t.mktcode=b.mktcode AND t.tgtcode=b.tgtcode AND t.bizdate=b.bizdate WHERE b.bizdate='2026-04-14' AND b.volume > 100 AND t.ma5 > 0",
+      "expected_count": 5573,
+      "actual_count": 5573,
+      "expected_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
+      "actual_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        1723.6419,
+        1286.4389,
+        1791.5766,
+        1656.7933,
+        1807.9418
+      ],
+      "p95_ms": 1807.9418
+    }
+  ]
+}
