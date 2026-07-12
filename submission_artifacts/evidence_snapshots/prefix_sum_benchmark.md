@@ -6,7 +6,7 @@
 - Baseline matches reference: True
 - Optimized matches reference: True
 - Optimized matches baseline: True
-- Local SQLite speedup smoke: 1.19x
+- Local SQLite speedup smoke: 1.25x
 - Baseline window frame count: 1
 - Optimized prefix table references: 4
 
@@ -23,8 +23,8 @@ filter(SUM(indicator("volume"), 3) > 300)
 
 | Variant | Compile ms | Avg execute ms | P50 execute ms | P95 execute ms | Rows |
 |---|---:|---:|---:|---:|---:|
-| baseline_window | 0.344 | 0.031 | 0.029 | 0.036 | 7 |
-| optimized_prefix_sum | 0.461 | 0.026 | 0.022 | 0.032 | 7 |
+| baseline_window | 0.358 | 0.032 | 0.029 | 0.036 | 7 |
+| optimized_prefix_sum | 0.442 | 0.025 | 0.022 | 0.031 | 7 |
 
 ## Generated SQL
 

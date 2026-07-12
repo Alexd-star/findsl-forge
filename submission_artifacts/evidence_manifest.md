@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-13 03:31:05 +08:00
-- Git HEAD at export: acc4fde
+- Generated at: 2026-07-13 04:02:44 +08:00
+- Git HEAD at export: fac732b
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -87,6 +87,12 @@
 - `phase24_new_success_audit.md` (659 bytes)
 - `phase24_period_scalar_doris.json` (27987 bytes)
 - `phase24_period_scalar_doris.md` (1012 bytes)
+- `phase25_capability_funnel.json` (3257747 bytes)
+- `phase25_capability_funnel.md` (1556 bytes)
+- `phase25_event_candidate_doris.json` (40615 bytes)
+- `phase25_event_candidate_doris.md` (1192 bytes)
+- `phase25_new_success_audit.json` (7025 bytes)
+- `phase25_new_success_audit.md` (742 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase9_temporal_doris.json` (27830 bytes)
