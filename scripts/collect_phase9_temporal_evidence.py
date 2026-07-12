@@ -16,26 +16,46 @@ CASES = (
     {
         "name": "volume_recent_10_cons_3",
         "source": "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') > 100",
-        "count_exp": "CONS=3日",
-        "lookback_sessions": 10,
+        "branches": (("volume", 100, "CONS=3日", 10),),
     },
     {
         "name": "volume_recent_10_exist_5",
         "source": "indicator('', '', '成交量', '最近10日', '', '', 'EXIST>=5') > 100",
-        "count_exp": "EXIST>=5",
-        "lookback_sessions": 10,
+        "branches": (("volume", 100, "EXIST>=5", 10),),
     },
     {
         "name": "volume_this_5_exist",
         "source": "indicator('', '', '成交量', '这五天', '', '', 'EXIST>0') > 100",
-        "count_exp": "EXIST>0",
-        "lookback_sessions": 5,
+        "branches": (("volume", 100, "EXIST>0", 5),),
     },
     {
         "name": "volume_this_5_every",
         "source": "indicator('', '', '成交量', '这五天', '', '', 'CONS=每日') > 100",
-        "count_exp": "CONS=每日",
-        "lookback_sessions": 5,
+        "branches": (("volume", 100, "CONS=每日", 5),),
+    },
+    {
+        "name": "volume_turnover_temporal_intersection",
+        "source": (
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 and "
+            "indicator('', '', '成交额', '最近10日', '', '', 'CONS=3日') > 0"
+        ),
+        "operation": "intersect",
+        "branches": (
+            ("volume", 100, "EXIST>0", 5),
+            ("turnover", 0, "CONS=3日", 10),
+        ),
+    },
+    {
+        "name": "volume_main_inflow_temporal_union",
+        "source": (
+            "indicator('', '', '成交量', '最近5日', '', '', 'EXIST>0') > 100 or "
+            "indicator('', '', '主力净流入', '最近5日', '', '', 'EXIST>0') > 0"
+        ),
+        "operation": "union",
+        "branches": (
+            ("volume", 100, "EXIST>0", 5),
+            ("main_inflow", 0, "EXIST>0", 5),
+        ),
     },
 )
 
@@ -82,17 +102,30 @@ def main() -> int:
             f"SELECT mktcode,tgtcode FROM `{args.database}`.`hsj_stock_hq_basic` WHERE bizdate='{latest_date}'",
         )
     }
-    grouped = _group_matches(rows)
+    grouped = _group_records(rows)
 
     results = []
     for case in CASES:
-        quantifier = parse_temporal_quantifier(case["count_exp"])
-        expected_stocks = {
-            key
-            for key, matches in grouped.items()
-            if key in latest_universe
-            and evaluate_temporal_matches(matches[-case["lookback_sessions"] :], quantifier)
-        }
+        branch_sets = []
+        for field, threshold, count_exp, lookback_sessions in case["branches"]:
+            quantifier = parse_temporal_quantifier(count_exp)
+            branch_sets.append(
+                {
+                    key
+                    for key, records in grouped.items()
+                    if key in latest_universe
+                    and evaluate_temporal_matches(
+                        [record[field] > threshold for record in records[-lookback_sessions:]],
+                        quantifier,
+                    )
+                }
+            )
+        if case.get("operation") == "intersect":
+            expected_stocks = set.intersection(*branch_sets)
+        elif case.get("operation") == "union":
+            expected_stocks = set.union(*branch_sets)
+        else:
+            expected_stocks = branch_sets[0]
         expected = {(market, code, latest_date) for market, code in expected_stocks}
         compiled = compile_official(case["source"])
         timings = []
@@ -142,18 +175,26 @@ def main() -> int:
 def _oracle_source_sql(database: str) -> str:
     return (
         "WITH ranked_source AS ("
-        "SELECT mktcode,tgtcode,bizdate,volume,"
-        "ROW_NUMBER() OVER (PARTITION BY mktcode,tgtcode ORDER BY bizdate DESC) AS session_no "
-        f"FROM `{database}`.`hsj_stock_hq_basic`) "
-        "SELECT mktcode,tgtcode,bizdate,volume FROM ranked_source "
+        "SELECT b.mktcode,b.tgtcode,b.bizdate,b.volume,b.turnover,e.ZJLXMainNetTur,"
+        "ROW_NUMBER() OVER (PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate DESC) AS session_no "
+        f"FROM `{database}`.`hsj_stock_hq_basic` AS b "
+        f"LEFT JOIN `{database}`.`hsj_stock_hq_ext` AS e "
+        "ON e.mktcode=b.mktcode AND e.tgtcode=b.tgtcode AND e.bizdate=b.bizdate) "
+        "SELECT mktcode,tgtcode,bizdate,volume,turnover,ZJLXMainNetTur FROM ranked_source "
         "WHERE session_no<=10 ORDER BY mktcode,tgtcode,bizdate"
     )
 
 
-def _group_matches(rows):
+def _group_records(rows):
     grouped = defaultdict(list)
-    for market, code, _date, volume in rows:
-        grouped[(market, code)].append(_numeric(volume) > 100)
+    for market, code, _date, volume, turnover, main_inflow in rows:
+        grouped[(market, code)].append(
+            {
+                "volume": _numeric(volume),
+                "turnover": _numeric(turnover),
+                "main_inflow": _numeric(main_inflow),
+            }
+        )
     return grouped
 
 
