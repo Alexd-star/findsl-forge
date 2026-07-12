@@ -273,6 +273,71 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["warnings"] == []
 
 
+def test_build_evidence_metadata_prefers_phase22_and_indexes_stage_rank_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase22_capability_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase22-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 647,
+                "migration_coverage": 0.58979,
+                "new_backend_success": 663,
+                "migration_gaps": [
+                    {"code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED", "count": 4}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase22_stage_rank_doris.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "matched": 6,
+                "total": 6,
+                "non_empty": 6,
+                "latest_data_date": "2026-04-14",
+                "cases": [{"p95_ms": 535.2768}, {"p95_ms": 426.0784}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase22_new_success_audit.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "new_successes": 16,
+                "passed": 16,
+                "failed": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    assert metadata["official_migration"]["git_head"] == "phase22-head"
+    assert metadata["official_migration"]["legacy_to_new_migrated"] == 647
+    assert metadata["official_migration"]["new_backend_success"] == 663
+    assert metadata["official_migration"]["stage_rank_evidence"] == {
+        "available": True,
+        "status": "PASS",
+        "matched": 6,
+        "total": 6,
+        "non_empty": 6,
+        "latest_data_date": "2026-04-14",
+        "max_p95_ms": 535.2768,
+    }
+    assert metadata["official_migration"]["new_success_audit"]["passed"] == 16
+    assert metadata["source_files"]["phase22_stage_rank_doris_json"].endswith(
+        "phase22_stage_rank_doris.json"
+    )
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)

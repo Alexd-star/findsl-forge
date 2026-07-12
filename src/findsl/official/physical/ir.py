@@ -674,6 +674,9 @@ class PhysicalTemporalRank(PhysicalPlan):
     window: PhysicalTemporalWindow
     anchor_resource_id: str
     trading_sequence: bool = True
+    rank_upper_bound: Optional[PhysicalLiteral] = None
+    rank_lower_inclusive: bool = True
+    rank_upper_inclusive: bool = True
 
     def to_dict(self):
         return {
@@ -685,6 +688,9 @@ class PhysicalTemporalRank(PhysicalPlan):
             "rank_comparator": self.rank_comparator,
             "rank_bound": self.rank_bound.to_dict(),
             "rank_percentage": self.rank_percentage,
+            "rank_upper_bound": self.rank_upper_bound.to_dict() if self.rank_upper_bound else None,
+            "rank_lower_inclusive": self.rank_lower_inclusive,
+            "rank_upper_inclusive": self.rank_upper_inclusive,
             "mode": self.mode,
             "comparator": self.comparator,
             "threshold": self.threshold,
@@ -694,6 +700,75 @@ class PhysicalTemporalRank(PhysicalPlan):
             "window": self.window.to_dict(),
             "anchor_resource_id": self.anchor_resource_id,
             "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence",
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalNamedRank(CanonicalIr):
+    alias: str
+    input: PhysicalPlan
+    expression: PhysicalExpr
+    direction: str
+    value_alias: str
+    aggregate_function: Optional[str] = None
+    collapse_latest: bool = False
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalNamedRank",
+            "alias": self.alias,
+            "input": self.input.to_dict(),
+            "expression": self.expression.to_dict(),
+            "direction": self.direction,
+            "value_alias": self.value_alias,
+            "aggregate_function": self.aggregate_function,
+            "collapse_latest": self.collapse_latest,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalRankExpression(PhysicalPlan):
+    input: PhysicalPlan
+    ranks: Tuple[PhysicalNamedRank, ...]
+    predicate: PhysicalExpr
+    anchor_resource_id: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalRankExpression",
+            "input": self.input.to_dict(),
+            "ranks": [rank.to_dict() for rank in self.ranks],
+            "predicate": self.predicate.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalStageRank(PhysicalPlan):
+    input: PhysicalPlan
+    measure_input: PhysicalPlan
+    measure: PhysicalExpr
+    aggregate_function: Optional[str]
+    direction: str
+    bound: PhysicalLiteral
+    comparator: str
+    percentage: bool
+    stage_index: int = 1
+    collapse_latest: bool = False
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalStageRank",
+            "input": self.input.to_dict(),
+            "measure_input": self.measure_input.to_dict(),
+            "measure": self.measure.to_dict(),
+            "aggregate_function": self.aggregate_function,
+            "direction": self.direction,
+            "bound": self.bound.to_dict(),
+            "comparator": self.comparator,
+            "percentage": self.percentage,
+            "stage_index": self.stage_index,
+            "collapse_latest": self.collapse_latest,
         }
 
 

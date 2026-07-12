@@ -75,3 +75,17 @@ def test_rank_and_scalar_boolean_lower_to_independent_set_intersection():
     assert plan.operation == "intersect"
     assert plan.left.to_dict()["kind"] == "LogicalRank"
     assert plan.right.to_dict()["kind"] == "LogicalFilter"
+
+
+def test_parenthesized_stage_branches_lower_before_set_union():
+    plan = _lower(
+        "(indicator('', '', '成交量', '', '', '', '') > 0 then "
+        "rank('', '', '成交量', 'desc', '', '', '', '') = 1) or "
+        "(indicator('', '', '成交量', '', '', '', '') < 0 then "
+        "rank('', '', '成交量', 'asc', '', '', '', '') = 1)"
+    ).plan
+
+    assert plan.to_dict()["kind"] == "LogicalSetOperation"
+    assert plan.operation == "union"
+    assert plan.left.to_dict()["kind"] == "LogicalStage"
+    assert plan.right.to_dict()["kind"] == "LogicalStage"

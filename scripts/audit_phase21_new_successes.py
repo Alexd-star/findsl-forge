@@ -77,6 +77,7 @@ def main() -> int:
                         "PhysicalRank",
                         "PhysicalAggregateRank",
                         "PhysicalTemporalRank",
+                        "PhysicalStageRank",
                     )
                 )
                 and "ROW_NUMBER() OVER" in sql
@@ -120,7 +121,7 @@ def _write(report, json_output: str, report_output: str) -> None:
     report_path.parent.mkdir(parents=True, exist_ok=True)
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     lines = [
-        "# Phase 21 新增成功集假阳性审计",
+        "# 编译器新增成功集假阳性审计",
         "",
         f"- 状态：`{report['status']}`",
         f"- 新增成功：`{report['new_successes']}`",
@@ -139,7 +140,7 @@ def _write(report, json_output: str, report_output: str) -> None:
             "",
             "## 审计合同",
             "",
-            "逐条重新编译 Phase 20 失败而 Phase 21 成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名。",
+            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名。",
         ]
     )
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

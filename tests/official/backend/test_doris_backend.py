@@ -487,6 +487,135 @@ def test_temporal_direct_rank_collapses_daily_matches_into_calendar_buckets():
     assert result.validation.passed is True
 
 
+def test_temporal_rank_percentage_range_renders_shared_population_bounds():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '近15天', '', '', 'CONS=3日') "
+            "between '[5%,10%]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "`aggregate_ranked`.`rank_value` >= CEIL(`aggregate_ranked`.`rank_population` * 5 / 100.0)" in result.sql
+    assert "`aggregate_ranked`.`rank_value` <= CEIL(`aggregate_ranked`.`rank_population` * 10 / 100.0)" in result.sql
+    assert result.validation.passed is True
+
+
+def test_named_rank_arithmetic_materializes_each_rank_once_and_joins_by_security():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '', '', 'AVG', '') / "
+            "rank('', '', '成交额', 'desc', '本月', '', 'GROWTH_FALL', '') <= 10%"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("ROW_NUMBER() OVER") == 2
+    assert "AS rank_0" in result.sql
+    assert "AS rank_1" in result.sql
+    assert "`rank_0`.`rank_value_0` / NULLIF(`rank_1`.`rank_value_1`, 0)" in result.sql
+    assert "`rank_anchor_input`.`mktcode` = `rank_0`.`mktcode`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_named_rank_expression_preserves_independent_exact_dates():
+    result = render_doris(
+        _physical(
+            "(rank('', '', '成交量', 'desc', '2026年4月1日', '', '', '') - "
+            "rank('', '', '成交额', 'desc', '2026年3月31日', '', '', '')) / "
+            "rank('', '', '成交量', 'asc', '2026年3月31日', '', '', '') = 1"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("ROW_NUMBER() OVER") == 3
+    assert "`q`.`bizdate` = '2026-04-01'" in result.sql
+    assert result.sql.count("`q`.`bizdate` = '2026-03-31'") == 2
+    assert result.validation.passed is True
+
+
+def test_named_rank_period_uses_one_latest_value_per_security():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '上周', '', '', '') / "
+            "rank('', '', '成交额', 'desc', '上周', '', '', '') <= 1"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "MAX_BY(`q`.`volume`, `q`.`bizdate`) AS `metric_value`" in result.sql
+    assert "MAX_BY(`q`.`turnover`, `q`.`bizdate`) AS `metric_value`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_chained_rank_materializes_previous_candidates_before_next_rank():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', '', '') > 0 "
+            "then rank('', '', '成交量', 'desc', '', '', '', '') <= 10 "
+            "then rank('', '', '成交量', 'asc', '', '', '', '') <= 5"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("ROW_NUMBER() OVER") == 2
+    assert "AS stage_input_stage_1_candidates" in result.sql
+    assert "AS stage_2_candidates" in result.sql
+    assert "`stage_2_candidates`.`mktcode` = `stage_2_metric`.`mktcode`" in result.sql
+    assert "`stage_2_ranked`.`stage_rank` <= 5" in result.sql
+    assert result.validation.passed is True
+
+
+def test_aggregate_stage_is_materialized_before_stage_aggregate_rank():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近30日', '', 'SUM', '') between '[40,90]' "
+            "then rank('', '', '成交量', 'desc', '最近30日', '', 'MIN', '') <= 80"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "SUM(`q`.`volume`) AS `metric_0`" in result.sql
+    assert "MIN(`q`.`volume`) AS `metric_value`" in result.sql
+    assert "AS stage_1_candidates" in result.sql
+    assert "ROW_NUMBER() OVER (ORDER BY `stage_1_joined`.`metric_value` DESC" in result.sql
+    assert result.validation.passed is True
+
+
+def test_temporal_then_rank_hoists_candidate_ctes_and_ranks_filtered_set():
+    result = render_doris(
+        _physical(
+            "indicator('沪|深|京', '', '成交量', '近三天', '', '', 'CONS=每天') > 0 "
+            "then rank('沪|深|京', '', '成交额', 'asc', '上周', '', '', '') < 5%"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "WITH stage_input_source_rows AS" in result.sql
+    assert "stage_input_qualified" in result.sql
+    assert "AS stage_1_candidates" in result.sql
+    assert "MAX_BY(`q`.`turnover`, `q`.`bizdate`) AS `metric_value`" in result.sql
+    assert "CEIL(`stage_1_ranked`.`__partition_count` * 5 / 100.0)" not in result.sql
+    assert "CEIL(`stage_1_ranked`.`stage_population` * 5 / 100.0)" in result.sql
+    assert result.validation.passed is True
+
+
+def test_parenthesized_stage_union_never_leaks_then_as_sql_operator():
+    result = render_doris(
+        _physical(
+            "(indicator('', '', '成交量', '', '', '', '') > 0 then "
+            "rank('', '', '成交量', 'desc', '', '', '', '') = 1) or "
+            "(indicator('', '', '成交量', '', '', '', '') < 0 then "
+            "rank('', '', '成交量', 'asc', '', '', '', '') = 1)"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert " UNION " in result.sql
+    assert result.sql.count("ROW_NUMBER() OVER") == 2
+    assert result.validation.passed is True
+
+
 def test_rank_and_scalar_filter_render_as_set_intersection():
     result = render_doris(
         _physical(
@@ -500,7 +629,7 @@ def test_rank_and_scalar_filter_render_as_set_intersection():
     assert result.validation.passed is True
 
 
-def test_filter_then_rank_stage_scans_one_resource_once():
+def test_filter_then_rank_stage_uses_one_data_scan_and_latest_date_anchor():
     result = render_doris(
         _physical(
             "indicator('', '', '成交量', '', '', '', '') > 0 "
@@ -511,7 +640,13 @@ def test_filter_then_rank_stage_scans_one_resource_once():
 
     parsed = sqlglot.parse_one(result.sql, read="doris")
     tables = [table.name for table in parsed.find_all(exp.Table)]
-    assert tables == ["hsj_stock_hq_basic"]
+    assert tables == [
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_basic",
+        "hsj_stock_hq_basic",
+    ]
+    assert "SELECT MAX(`q_latest`.`bizdate`)" in result.sql
+    assert "GROUP BY `stage_1_candidates_raw`.`mktcode`, `stage_1_candidates_raw`.`tgtcode`" in result.sql
     assert "`q`.`volume` > 0" in result.sql
 
 

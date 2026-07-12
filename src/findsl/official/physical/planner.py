@@ -57,6 +57,7 @@ from .ir import (
     PhysicalLiteral,
     PhysicalNullIf,
     PhysicalNamedAggregate,
+    PhysicalNamedRank,
     PhysicalNamedScalar,
     PhysicalNot,
     PhysicalNthLatestValue,
@@ -67,9 +68,11 @@ from .ir import (
     PhysicalProjection,
     PhysicalProjectedRef,
     PhysicalRank,
+    PhysicalRankExpression,
     PhysicalRecentSessions,
     PhysicalSessionBoundaryRange,
     PhysicalScan,
+    PhysicalStageRank,
     PhysicalTableScan,
     PhysicalTemporal,
     PhysicalTemporalAggregate,
@@ -236,6 +239,7 @@ def plan_physical(
     aggregate_rank_contract = _aggregate_rank_contract(lowering.plan)
     temporal_aggregate_contract = _temporal_aggregate_contract(lowering.plan)
     temporal_rank_contract = _temporal_rank_contract(lowering.plan)
+    rank_expression_contract = _rank_expression_contract(lowering.plan)
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
@@ -252,6 +256,31 @@ def plan_physical(
             fields,
             resource_ids,
             expressions,
+        )
+    if _is_top_level_stage_rank(lowering.plan):
+        current = lowering.plan.input if isinstance(lowering.plan, LogicalLimit) else lowering.plan
+        prior = plan_physical(
+            replace(lowering, plan=current.input),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        plan = _build_stage_rank(
+            prior.plan,
+            current.operation,
+            catalog,
+            fields,
+        )
+        if isinstance(lowering.plan, LogicalLimit):
+            plan = PhysicalLimit(plan, lowering.plan.offset, lowering.plan.count)
+        validate_physical_plan(plan, catalog, expressions)
+        return PhysicalPlanningResult(
+            plan,
+            prior.selected_resource,
+            prior.decisions,
+            "stage_rank",
         )
     if temporal_aggregate_contract is not None:
         return _plan_temporal_aggregate(
@@ -270,6 +299,17 @@ def plan_physical(
             resource_ids,
             expressions,
             statistics,
+        )
+    if rank_expression_contract is not None:
+        return _plan_rank_expression(
+            lowering,
+            rank_expression_contract,
+            catalog,
+            fields,
+            expressions,
+            statistics,
+            strategies,
+            allow_shadow_strategies,
         )
     if aggregate_rank_contract is not None:
         return _plan_aggregate_rank(
@@ -393,7 +433,18 @@ class _TemporalRankContract:
     direction: str
     rank_comparator: str
     rank_bound: LiteralExpr
+    rank_upper_bound: Optional[LiteralExpr]
+    rank_lower_inclusive: bool
+    rank_upper_inclusive: bool
     temporal_plan: object
+    limit: Optional[Tuple[int, int]] = None
+
+
+@dataclass(frozen=True)
+class _RankExpressionContract:
+    predicate: object
+    calls: Tuple[CallExpr, ...]
+    input_plan: object
     limit: Optional[Tuple[int, int]] = None
 
 
@@ -535,7 +586,21 @@ def _temporal_rank_contract(plan) -> Optional[_TemporalRankContract]:
         return None
     if not isinstance(predicate.left, CallExpr) or predicate.left.name != "rank":
         return None
-    if not isinstance(predicate.right, LiteralExpr):
+    if isinstance(predicate.right, RangeExpr) and predicate.op == "between":
+        if not isinstance(predicate.right.lower, LiteralExpr) or not isinstance(
+            predicate.right.upper, LiteralExpr
+        ):
+            return None
+        rank_bound = predicate.right.lower
+        rank_upper_bound = predicate.right.upper
+        lower_inclusive = predicate.right.lower_inclusive
+        upper_inclusive = predicate.right.upper_inclusive
+    elif isinstance(predicate.right, LiteralExpr):
+        rank_bound = predicate.right
+        rank_upper_bound = None
+        lower_inclusive = True
+        upper_inclusive = True
+    else:
         return None
     call = predicate.left
     if call.binding is None:
@@ -546,7 +611,7 @@ def _temporal_rank_contract(plan) -> Optional[_TemporalRankContract]:
             "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
             f"temporal rank aggregate requires a dedicated contract: {function}",
         )
-    if predicate.op not in {"<", "<=", "=", "!=", ">", ">="}:
+    if predicate.op not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
         raise PhysicalPlanningError(
             "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
             "temporal rank requires one scalar rank bound",
@@ -562,9 +627,42 @@ def _temporal_rank_contract(plan) -> Optional[_TemporalRankContract]:
         function.lower() if function else None,
         direction,
         predicate.op,
-        predicate.right,
+        rank_bound,
+        rank_upper_bound,
+        lower_inclusive,
+        upper_inclusive,
         current,
         limit,
+    )
+
+
+def _rank_expression_contract(plan) -> Optional[_RankExpressionContract]:
+    limit = None
+    current = plan
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if isinstance(current, LogicalStage):
+        current = current.operation
+    if not isinstance(current, LogicalFilter):
+        return None
+    calls = tuple(
+        call for call in _walk_calls(current.predicate) if call.name == "rank"
+    )
+    if not calls:
+        return None
+    return _RankExpressionContract(
+        current.predicate,
+        calls,
+        current.input,
+        limit,
+    )
+
+
+def _is_top_level_stage_rank(plan) -> bool:
+    current = plan.input if isinstance(plan, LogicalLimit) else plan
+    return isinstance(current, LogicalStage) and isinstance(
+        current.operation, LogicalRank
     )
 
 
@@ -600,25 +698,42 @@ def _plan_temporal_rank(
     )
     for constraint in _call_constraints(contract.call, catalog, selected):
         input_plan = PhysicalFilter(input_plan, constraint)
-    bound, percentage = _rank_bound(contract.rank_bound, contract.rank_comparator)
+    bound, percentage = _rank_bound(
+        contract.rank_bound,
+        ">=" if contract.rank_comparator == "between" else contract.rank_comparator,
+    )
+    upper_bound = None
+    if contract.rank_upper_bound is not None:
+        upper_bound, upper_percentage = _rank_bound(
+            contract.rank_upper_bound,
+            "<=",
+        )
+        if upper_percentage != percentage:
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+                "temporal rank range bounds must use the same numeric or percentage unit",
+            )
     temporal = contract.temporal_plan
     plan: PhysicalPlan = PhysicalTemporalRank(
-        input_plan,
-        _physical_field_expression(field),
-        contract.aggregate_function,
-        contract.direction,
-        contract.rank_comparator,
-        bound,
-        percentage,
-        "CONS" if isinstance(temporal, LogicalConsecutive) else "EXIST",
-        temporal.spec.comparator,
-        temporal.spec.threshold,
-        temporal.spec.maximum,
-        temporal.spec.unit,
-        temporal.spec.every,
-        _lower_temporal_window(temporal.spec.window),
-        anchor_id,
-        temporal.spec.trading_sequence,
+        input=input_plan,
+        measure=_physical_field_expression(field),
+        aggregate_function=contract.aggregate_function,
+        direction=contract.direction,
+        rank_comparator=contract.rank_comparator,
+        rank_bound=bound,
+        rank_percentage=percentage,
+        mode="CONS" if isinstance(temporal, LogicalConsecutive) else "EXIST",
+        comparator=temporal.spec.comparator,
+        threshold=temporal.spec.threshold,
+        maximum=temporal.spec.maximum,
+        unit=temporal.spec.unit,
+        every=temporal.spec.every,
+        window=_lower_temporal_window(temporal.spec.window),
+        anchor_resource_id=anchor_id,
+        trading_sequence=temporal.spec.trading_sequence,
+        rank_upper_bound=upper_bound,
+        rank_lower_inclusive=contract.rank_lower_inclusive,
+        rank_upper_inclusive=contract.rank_upper_inclusive,
     )
     if contract.limit is not None:
         plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
@@ -1046,6 +1161,169 @@ def _plan_composite_aggregate(
         selected_resource,
         (decision,),
         "composite_grouped_aggregate",
+    )
+
+
+def _plan_rank_expression(
+    lowering: LoweringResult,
+    contract: _RankExpressionContract,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+    strategies: Optional[PhysicalStrategyRegistry],
+    allow_shadow_strategies: bool,
+) -> PhysicalPlanningResult:
+    unique_calls = []
+    seen = set()
+    for call in contract.calls:
+        if call.node_id not in seen:
+            seen.add(call.node_id)
+            unique_calls.append(call)
+
+    refs = {}
+    ranks = []
+    rank_resources = set()
+    for index, call in enumerate(unique_calls):
+        if call.binding is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+                "rank expression contains an unbound rank call",
+            )
+        direction = str(call.binding.slots.get("direction", "")).strip().lower()
+        if direction not in {"asc", "desc"}:
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_DIRECTION_UNSUPPORTED",
+                f"unsupported rank direction: {direction}",
+            )
+        function = str(call.binding.slots.get("agg_func", "")).strip().upper() or None
+        if function is not None and function not in _SET_AGGREGATE_FUNCTIONS:
+            raise PhysicalPlanningError(
+                "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+                f"rank expression aggregate requires a dedicated contract: {function}",
+            )
+        indicator_id = call.binding.slots.get("indicator_name", "")
+        field = _field_for_indicator(fields, indicator_id)
+        resource = catalog.resource(field.resource_id)
+        rank_resources.add(field.resource_id)
+        rank_input: PhysicalPlan = PhysicalScan(
+            field.resource_id,
+            _scan_columns((field,)),
+            None,
+            resource.anchor_resource_id,
+        )
+        constraints = list(_call_constraints(call, catalog, field.resource_id))
+        date = str(call.binding.slots.get("date", "")).strip()
+        collapse_latest = False
+        if not date and function is None:
+            stable_id = resource.anchor_resource_id or field.resource_id
+            partition_key = catalog.resource(stable_id).partition_key
+            constraints.append(
+                PhysicalComparison(
+                    "=",
+                    PhysicalColumn(stable_id, partition_key, TIME),
+                    PhysicalLatestValue(stable_id, partition_key, TIME),
+                )
+            )
+        elif date and function is None:
+            typed_date = call.date_constraint or parse_date_constraint(date)
+            collapse_latest = typed_date.kind not in {
+                "relative",
+                "exact",
+                "relative_session",
+            }
+        for constraint in constraints:
+            rank_input = PhysicalFilter(rank_input, constraint)
+        relation_alias = f"rank_{index}"
+        value_alias = f"rank_value_{index}"
+        ranks.append(
+            PhysicalNamedRank(
+                relation_alias,
+                rank_input,
+                _physical_field_expression(field),
+                direction,
+                value_alias,
+                function.lower() if function else None,
+                collapse_latest,
+            )
+        )
+        refs[call.node_id] = PhysicalAggregateRef(
+            relation_alias,
+            value_alias,
+            NUMERIC,
+        )
+
+    all_calls = tuple(_walk_calls(contract.predicate))
+    scalar_calls = tuple(call for call in all_calls if call.node_id not in seen)
+    if isinstance(contract.input_plan, LogicalDomainScan):
+        scalar_fields = tuple(
+            {
+                call.binding.slots.get("indicator_name", "").casefold(): _field_for_indicator(
+                    fields,
+                    call.binding.slots.get("indicator_name", ""),
+                )
+                for call in scalar_calls
+                if call.name in _DIRECT_FIELD_CALLS and call.binding is not None
+            }.values()
+        )
+        anchor_input, anchor_resource_id, allowed_resource_ids = _composite_anchor_relation(
+            scalar_fields,
+            scalar_calls,
+            catalog,
+        )
+        anchor_decisions = ()
+    else:
+        if scalar_calls:
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+                "stage rank expressions cannot mix new scalar projections before named stage projection",
+            )
+        anchor_result = plan_physical(
+            replace(lowering, plan=contract.input_plan),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        anchor_input = anchor_result.plan
+        anchor_resource_id = "official_basic"
+        allowed_resource_ids = ("official_basic",)
+        anchor_decisions = anchor_result.decisions
+
+    predicate = _lower_composite_expr(
+        contract.predicate,
+        catalog,
+        anchor_resource_id,
+        fields,
+        refs,
+        frozenset(allowed_resource_ids),
+    )
+    plan: PhysicalPlan = PhysicalRankExpression(
+        anchor_input,
+        tuple(ranks),
+        predicate,
+        "official_basic",
+    )
+    if contract.limit is not None:
+        plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    selected = "+".join(sorted(rank_resources | set(allowed_resource_ids)))
+    decision = PhysicalDecision(
+        resource_id=selected,
+        feasible=True,
+        cost=float(sum(catalog.resource(item).priority for item in rank_resources)),
+        estimated=True,
+        reason_code="PHYSICAL_NAMED_RANK_SELECTED",
+        reason="independent rank relations joined on stable security keys",
+        strategy_id="named_rank_expression",
+        selected=True,
+    )
+    return PhysicalPlanningResult(
+        plan,
+        selected,
+        (*anchor_decisions, decision),
+        "named_rank_expression",
     )
 
 
@@ -1915,6 +2193,75 @@ def _reject_unmaterialized_constraints(call: CallExpr) -> None:
         )
 
 
+def _build_stage_rank(
+    input_plan: PhysicalPlan,
+    logical_rank: LogicalRank,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+) -> PhysicalStageRank:
+    if not isinstance(logical_rank.order_by, CallExpr) or logical_rank.order_by.binding is None:
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+            "stage rank requires one bound rank call",
+        )
+    indicator_id = logical_rank.order_by.binding.slots.get("indicator_name", "")
+    field = _field_for_indicator(fields, indicator_id)
+    measure_resource = catalog.resource(field.resource_id)
+    measure_input: PhysicalPlan = PhysicalScan(
+        field.resource_id,
+        _scan_columns((field,)),
+        None,
+        measure_resource.anchor_resource_id,
+    )
+    constraints = list(
+        _call_constraints(logical_rank.order_by, catalog, field.resource_id)
+    )
+    function = str(
+        logical_rank.order_by.binding.slots.get("agg_func", "")
+    ).strip().upper() or None
+    if function is not None and function not in _SET_AGGREGATE_FUNCTIONS:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+            f"stage rank aggregate requires a dedicated contract: {function}",
+        )
+    date = str(logical_rank.order_by.binding.slots.get("date", "")).strip()
+    collapse_latest = False
+    if not date and function is None:
+        stable_id = measure_resource.anchor_resource_id or field.resource_id
+        partition_key = catalog.resource(stable_id).partition_key
+        constraints.append(
+            PhysicalComparison(
+                "=",
+                PhysicalColumn(stable_id, partition_key, TIME),
+                PhysicalLatestValue(stable_id, partition_key, TIME),
+            )
+        )
+    elif date and function is None:
+        typed_date = logical_rank.order_by.date_constraint or parse_date_constraint(date)
+        collapse_latest = typed_date.kind not in {
+            "relative",
+            "exact",
+            "relative_session",
+        }
+    for constraint in constraints:
+        measure_input = PhysicalFilter(measure_input, constraint)
+    bound, percentage = _rank_bound(logical_rank.bound, logical_rank.comparator)
+    return PhysicalStageRank(
+        input_plan,
+        measure_input,
+        _physical_field_expression(field),
+        function.lower() if function else None,
+        logical_rank.direction,
+        bound,
+        logical_rank.comparator,
+        percentage,
+        input_plan.stage_index + 1
+        if isinstance(input_plan, PhysicalStageRank)
+        else 1,
+        collapse_latest,
+    )
+
+
 def _lower_plan(
     plan,
     catalog: PhysicalCatalog,
@@ -1951,12 +2298,25 @@ def _lower_plan(
         )
     if isinstance(plan, LogicalRank):
         input_plan = _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids)
-        if isinstance(input_plan, PhysicalRank):
-            raise PhysicalPlanningError(
-                "PHYSICAL_CHAINED_RANK_UNSUPPORTED",
-                "chained rank requires explicit stage-output alias propagation",
-            )
-        for constraint in _call_constraints(plan.order_by, catalog, resource_id):
+        if not isinstance(input_plan, (PhysicalScan, PhysicalFilter, PhysicalJoin, PhysicalTableScan)):
+            return _build_stage_rank(input_plan, plan, catalog, fields)
+        rank_constraints = list(
+            _call_constraints(plan.order_by, catalog, resource_id)
+        )
+        if isinstance(plan.order_by, CallExpr) and plan.order_by.binding is not None:
+            date = str(plan.order_by.binding.slots.get("date", "")).strip()
+            if not date:
+                resource = catalog.resource(resource_id)
+                stable_id = resource.anchor_resource_id or resource_id
+                partition_key = catalog.resource(stable_id).partition_key
+                rank_constraints.append(
+                    PhysicalComparison(
+                        "=",
+                        PhysicalColumn(stable_id, partition_key, TIME),
+                        PhysicalLatestValue(stable_id, partition_key, TIME),
+                    )
+                )
+        for constraint in rank_constraints:
             input_plan = PhysicalFilter(input_plan, constraint)
         expression = _lower_expr(plan.order_by, catalog, resource_id, fields, allow_rank=True, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
         bound, percentage = _rank_bound(plan.bound, plan.comparator)

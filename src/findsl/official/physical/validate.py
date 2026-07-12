@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
     PhysicalEventFilter, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
-    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
+    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -215,17 +215,80 @@ def _validate_plan(plan, catalog, expressions):
         if not used_refs or not used_refs.issubset(declared_refs):
             raise ValueError("composite aggregate predicate references an undeclared measure")
         _validate_expr(plan.predicate, catalog, expressions)
+    elif isinstance(plan, PhysicalRankExpression):
+        if not plan.ranks or plan.predicate.type is not BOOLEAN:
+            raise ValueError("named rank expression requires ranks and a boolean predicate")
+        _validate_plan(plan.input, catalog, expressions)
+        aliases = set()
+        declared_refs = set()
+        for rank in plan.ranks:
+            if (
+                not isinstance(rank, PhysicalNamedRank)
+                or not rank.alias.isidentifier()
+                or not rank.value_alias.isidentifier()
+                or rank.alias in aliases
+            ):
+                raise ValueError("named rank relation alias is invalid or duplicated")
+            if rank.direction not in {"asc", "desc"}:
+                raise ValueError("named rank direction is invalid")
+            if rank.aggregate_function is not None and rank.aggregate_function not in {
+                "sum", "avg", "max", "min", "growth_rise", "growth_fall"
+            }:
+                raise ValueError("named rank aggregate function is unsupported")
+            if rank.aggregate_function is not None and rank.expression.type is not NUMERIC:
+                raise ValueError("named aggregate rank requires a numeric expression")
+            aliases.add(rank.alias)
+            declared_refs.add((rank.alias, rank.value_alias))
+            _validate_plan(rank.input, catalog, expressions)
+            _validate_expr(rank.expression, catalog, expressions)
+        used_refs = {
+            (item.relation_alias, item.measure_alias)
+            for item in _walk_aggregate_refs(plan.predicate)
+        }
+        if not used_refs or not used_refs.issubset(declared_refs):
+            raise ValueError("named rank predicate references an undeclared rank value")
+        _validate_expr(plan.predicate, catalog, expressions)
+    elif isinstance(plan, PhysicalStageRank):
+        _validate_plan(plan.input, catalog, expressions)
+        _validate_plan(plan.measure_input, catalog, expressions)
+        if plan.direction not in {"asc", "desc"}:
+            raise ValueError("stage rank direction is invalid")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            raise ValueError("stage rank comparator is invalid")
+        if plan.stage_index <= 0:
+            raise ValueError("stage rank index must be positive")
+        if plan.aggregate_function is not None and plan.aggregate_function not in {
+            "sum", "avg", "max", "min", "growth_rise", "growth_fall"
+        }:
+            raise ValueError("stage rank aggregate function is unsupported")
+        if plan.aggregate_function is not None and plan.measure.type is not NUMERIC:
+            raise ValueError("stage aggregate rank requires a numeric measure")
+        if plan.bound.type is not NUMERIC or plan.bound.value < 0:
+            raise ValueError("stage rank bound is invalid")
+        if plan.percentage and plan.bound.value > 100:
+            raise ValueError("stage percentage rank bound exceeds 100")
+        _validate_expr(plan.measure, catalog, expressions)
+        _validate_expr(plan.bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporalRank):
         if plan.aggregate_function is not None and plan.aggregate_function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
             raise ValueError("unsupported temporal rank aggregate function")
-        if plan.rank_bound.type is not NUMERIC:
+        if plan.rank_bound.type is not NUMERIC or plan.rank_bound.value < 0:
             raise ValueError("temporal rank bound must be numeric")
         if plan.aggregate_function is not None and plan.measure.type is not NUMERIC:
             raise ValueError("temporal aggregate rank measure must be numeric")
         if plan.direction not in {"asc", "desc"}:
             raise ValueError("invalid temporal rank direction")
-        if plan.rank_comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+        if plan.rank_comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             raise ValueError("unsupported temporal rank comparator")
+        if (plan.rank_comparator == "between") != (plan.rank_upper_bound is not None):
+            raise ValueError("temporal rank range bound contract is incomplete")
+        if plan.rank_upper_bound is not None:
+            if plan.rank_upper_bound.type is not NUMERIC:
+                raise ValueError("temporal rank upper bound must be numeric")
+            if plan.rank_upper_bound.value < plan.rank_bound.value:
+                raise ValueError("temporal rank upper bound is below lower bound")
+            if plan.rank_percentage and plan.rank_upper_bound.value > 100:
+                raise ValueError("temporal percentage rank upper bound exceeds 100")
         if plan.rank_percentage and plan.rank_bound.value > 100:
             raise ValueError("temporal percentage rank bound exceeds 100")
         if plan.mode not in {"CONS", "EXIST"} or not plan.trading_sequence:
@@ -244,6 +307,8 @@ def _validate_plan(plan, catalog, expressions):
             raise PhysicalCatalogError("temporal rank anchor requires a partition key")
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.rank_bound, catalog, expressions)
+        if plan.rank_upper_bound is not None:
+            _validate_expr(plan.rank_upper_bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporalAggregate):
         if plan.function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
             raise ValueError("unsupported temporal aggregate function")

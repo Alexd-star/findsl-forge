@@ -145,6 +145,13 @@ def _lower_stage(
     bindings: Dict[int, BoundFunction],
 ) -> LogicalPlan:
     node = typed.node
+    if isinstance(node, OfficialBinaryOp) and node.op == "then":
+        stages = _flatten_then(typed)
+        current = _lower_stage(stages[0], input_plan, bindings)
+        for index, stage in enumerate(stages[1:], start=1):
+            operation = _lower_stage(stage, current, bindings)
+            current = LogicalStage(current, index, operation, operation.schema)
+        return current
     if (
         isinstance(node, OfficialBinaryOp)
         and node.op in {"and", "or"}

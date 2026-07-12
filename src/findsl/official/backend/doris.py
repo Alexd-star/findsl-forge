@@ -29,6 +29,7 @@ from ..physical.ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalNullIf,
+    PhysicalNamedRank,
     PhysicalNot,
     PhysicalNthLatestValue,
     PhysicalPlan,
@@ -37,10 +38,12 @@ from ..physical.ir import (
     PhysicalPosition,
     PhysicalProjectedRef,
     PhysicalRank,
+    PhysicalRankExpression,
     PhysicalRecentSessions,
     PhysicalScan,
     PhysicalSessionBoundaryRange,
     PhysicalTableScan,
+    PhysicalStageRank,
     PhysicalSetOperation,
     PhysicalTemporal,
     PhysicalTemporalAggregate,
@@ -223,6 +226,10 @@ def _render_plan(
         return _render_temporal_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporalRank):
         return _render_temporal_aggregate(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalRankExpression):
+        return _render_rank_expression(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalStageRank):
+        return _render_stage_rank(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalSetOperation):
         return _render_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
@@ -676,6 +683,231 @@ def _render_composite_aggregate(
         )
         query = query.join(scalar_rows, join_type="CROSS")
     return query.where(_render_expr(plan.predicate, catalog, anchor_relation))
+
+
+def _render_rank_expression(
+    plan: PhysicalRankExpression,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    anchor_query = _render_plan(plan.input, catalog, cte_prefix)
+    anchor_body, anchor_ctes = _detach_ctes(anchor_query)
+    anchor_alias = f"{cte_prefix}rank_anchor_input"
+    query = exp.select(
+        *(exp.column(name, table=anchor_alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
+    ).from_(anchor_body.subquery(alias=anchor_alias))
+    keys = ("mktcode", "tgtcode")
+    for rank in plan.ranks:
+        rank_rows = _render_named_rank(rank, catalog, cte_prefix).subquery(alias=rank.alias)
+        join_predicate = exp.and_(
+            *(
+                exp.EQ(
+                    this=exp.column(key, table=anchor_alias, quoted=True),
+                    expression=exp.column(key, table=rank.alias, quoted=True),
+                )
+                for key in keys
+            )
+        )
+        query = query.join(rank_rows, on=join_predicate, join_type="INNER")
+    query = query.where(_render_expr(plan.predicate, catalog))
+    for cte in anchor_ctes:
+        query = query.with_(cte.alias_or_name, as_=cte.this)
+    return query
+
+
+def _render_named_rank(
+    rank: PhysicalNamedRank,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(rank.input, catalog, cte_prefix)
+    relation = _find_relation(rank.input)
+    stable_alias = _stable_alias(relation)
+    keys = ("mktcode", "tgtcode")
+    value = _render_expr(rank.expression, catalog, relation)
+    if rank.aggregate_function is not None or rank.collapse_latest:
+        metric = (
+            _render_set_aggregate(
+                rank.aggregate_function,
+                value,
+                exp.column("bizdate", table=stable_alias, quoted=True),
+            )
+            if rank.aggregate_function is not None
+            else exp.func(
+                "MAX_BY",
+                value,
+                exp.column("bizdate", table=stable_alias, quoted=True),
+            )
+        ).as_("metric_value", quoted=True)
+        source.set(
+            "expressions",
+            [
+                *(exp.column(key, table=stable_alias, quoted=True) for key in keys),
+                metric,
+            ],
+        )
+        source = source.group_by(
+            *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
+        )
+    else:
+        source = source.select(value.as_("metric_value", quoted=True), append=True)
+    metric_alias = f"{rank.alias}_metric"
+    metrics = source.subquery(alias=metric_alias)
+    order = exp.Order(
+        expressions=[
+            exp.Ordered(
+                this=exp.column("metric_value", table=metric_alias, quoted=True),
+                desc=rank.direction == "desc",
+            ),
+            exp.Ordered(
+                this=exp.column("mktcode", table=metric_alias, quoted=True),
+                desc=False,
+                nulls_first=True,
+            ),
+            exp.Ordered(
+                this=exp.column("tgtcode", table=metric_alias, quoted=True),
+                desc=False,
+                nulls_first=True,
+            ),
+        ]
+    )
+    return exp.select(
+        *(exp.column(key, table=metric_alias, quoted=True) for key in keys),
+        exp.Window(this=exp.RowNumber(), order=order).as_(rank.value_alias, quoted=True),
+    ).from_(metrics)
+
+
+def _render_stage_rank(
+    plan: PhysicalStageRank,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    candidate_query = _render_plan(plan.input, catalog, f"{cte_prefix}stage_input_")
+    candidate_body, candidate_ctes = _detach_ctes(candidate_query)
+    candidate_alias = f"{cte_prefix}stage_{plan.stage_index}_candidates"
+    candidate_raw_alias = f"{candidate_alias}_raw"
+    candidate_distinct = exp.select(
+        *(exp.column(key, table=candidate_raw_alias, quoted=True) for key in ("mktcode", "tgtcode")),
+        exp.Max(
+            this=exp.column("bizdate", table=candidate_raw_alias, quoted=True)
+        ).as_("bizdate", quoted=True),
+    ).from_(candidate_body.subquery(alias=candidate_raw_alias)).group_by(
+        *(exp.column(key, table=candidate_raw_alias, quoted=True) for key in ("mktcode", "tgtcode"))
+    )
+
+    metric_query = _render_plan(
+        plan.measure_input,
+        catalog,
+        f"{cte_prefix}stage_metric_",
+    )
+    metric_relation = _find_relation(plan.measure_input)
+    stable_alias = _stable_alias(metric_relation)
+    keys = ("mktcode", "tgtcode")
+    metric_value = _render_expr(plan.measure, catalog, metric_relation)
+    if plan.aggregate_function is not None or plan.collapse_latest:
+        metric = (
+            _render_set_aggregate(
+                plan.aggregate_function,
+                metric_value,
+                exp.column("bizdate", table=stable_alias, quoted=True),
+            )
+            if plan.aggregate_function is not None
+            else exp.func(
+                "MAX_BY",
+                metric_value,
+                exp.column("bizdate", table=stable_alias, quoted=True),
+            )
+        ).as_("metric_value", quoted=True)
+        metric_query.set(
+            "expressions",
+            [
+                *(exp.column(key, table=stable_alias, quoted=True) for key in keys),
+                metric,
+            ],
+        )
+        metric_query = metric_query.group_by(
+            *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
+        )
+    else:
+        metric_query = metric_query.select(
+            metric_value.as_("metric_value", quoted=True),
+            append=True,
+        )
+    metric_alias = f"{cte_prefix}stage_{plan.stage_index}_metric"
+    candidate_table = candidate_distinct.subquery(alias=candidate_alias)
+    metric_table = metric_query.subquery(alias=metric_alias)
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table=candidate_alias, quoted=True),
+                expression=exp.column(key, table=metric_alias, quoted=True),
+            )
+            for key in keys
+        )
+    )
+    joined = exp.select(
+        *(exp.column(name, table=candidate_alias, quoted=True) for name in (*keys, "bizdate")),
+        exp.column("metric_value", table=metric_alias, quoted=True),
+    ).from_(candidate_table).join(metric_table, on=join_predicate, join_type="INNER")
+    joined_alias = f"{cte_prefix}stage_{plan.stage_index}_joined"
+    joined_rows = joined.subquery(alias=joined_alias)
+    order = exp.Order(
+        expressions=[
+            exp.Ordered(
+                this=exp.column("metric_value", table=joined_alias, quoted=True),
+                desc=plan.direction == "desc",
+            ),
+            exp.Ordered(
+                this=exp.column("mktcode", table=joined_alias, quoted=True),
+                desc=False,
+                nulls_first=True,
+            ),
+            exp.Ordered(
+                this=exp.column("tgtcode", table=joined_alias, quoted=True),
+                desc=False,
+                nulls_first=True,
+            ),
+        ]
+    )
+    ranked = exp.select(
+        *(exp.column(name, table=joined_alias, quoted=True) for name in (*keys, "bizdate")),
+        exp.Window(this=exp.RowNumber(), order=order).as_("stage_rank", quoted=True),
+    ).from_(joined_rows)
+    if plan.percentage:
+        ranked = ranked.select(
+            exp.Window(this=exp.Count(this=exp.Star())).as_(
+                "stage_population", quoted=True
+            ),
+            append=True,
+        )
+    ranked_alias = f"{cte_prefix}stage_{plan.stage_index}_ranked"
+    ranked_rows = ranked.subquery(alias=ranked_alias)
+    bound = (
+        exp.Ceil(
+            this=exp.Div(
+                this=exp.Mul(
+                    this=exp.column(
+                        "stage_population", table=ranked_alias, quoted=True
+                    ),
+                    expression=exp.convert(plan.bound.value),
+                ),
+                expression=exp.convert(100.0),
+            )
+        )
+        if plan.percentage
+        else exp.convert(plan.bound.value)
+    )
+    result = exp.select(
+        *(exp.column(name, table=ranked_alias, quoted=True) for name in (*keys, "bizdate"))
+    ).from_(ranked_rows).where(
+        _COMPARISON[plan.comparator](
+            this=exp.column("stage_rank", table=ranked_alias, quoted=True),
+            expression=bound,
+        )
+    )
+    for cte in candidate_ctes:
+        result = result.with_(cte.alias_or_name, as_=cte.this)
+    return result
 
 
 def _render_aggregate_group(
@@ -1355,28 +1587,52 @@ def _render_temporal_aggregate(
         projection = (*projection, "rank_value")
         ctes.append((names["aggregate_ranked"], ranked))
         metric_name = names["aggregate_ranked"]
-        rank_bound = (
-            exp.Ceil(
-                this=exp.Div(
-                    this=exp.Mul(
-                        this=exp.column("rank_population", table=metric_name, quoted=True),
-                        expression=exp.convert(value_bound.value),
-                    ),
-                    expression=exp.convert(100.0),
+        def render_temporal_rank_bound(bound):
+            return (
+                exp.Ceil(
+                    this=exp.Div(
+                        this=exp.Mul(
+                            this=exp.column(
+                                "rank_population", table=metric_name, quoted=True
+                            ),
+                            expression=exp.convert(bound.value),
+                        ),
+                        expression=exp.convert(100.0),
+                    )
                 )
+                if plan.rank_percentage
+                else exp.convert(bound.value)
             )
-            if plan.rank_percentage
-            else exp.convert(value_bound.value)
-        )
+
+        rank_bound = render_temporal_rank_bound(value_bound)
         predicate_left = exp.column("rank_value", table=metric_name, quoted=True)
         predicate_right = rank_bound
     else:
         predicate_left = exp.column("metric_value", table=metric_name, quoted=True)
         predicate_right = exp.convert(value_bound.value)
-    value_predicate = _COMPARISON[value_comparator](
-        this=predicate_left,
-        expression=predicate_right,
-    )
+    if is_rank and value_comparator == "between":
+        if plan.rank_upper_bound is None:
+            raise DorisBackendError(
+                "DORIS_RANK_BOUND_INVALID",
+                "temporal rank between requires an upper bound",
+            )
+        lower_operator = exp.GTE if plan.rank_lower_inclusive else exp.GT
+        upper_operator = exp.LTE if plan.rank_upper_inclusive else exp.LT
+        value_predicate = exp.and_(
+            lower_operator(
+                this=predicate_left.copy(),
+                expression=predicate_right,
+            ),
+            upper_operator(
+                this=predicate_left.copy(),
+                expression=render_temporal_rank_bound(plan.rank_upper_bound),
+            ),
+        )
+    else:
+        value_predicate = _COMPARISON[value_comparator](
+            this=predicate_left,
+            expression=predicate_right,
+        )
     matched = exp.select(
         *(exp.column(name, table=metric_name, quoted=True) for name in projection),
         exp.Case(

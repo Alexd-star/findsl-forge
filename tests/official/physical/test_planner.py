@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
+from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalSetOperation, PhysicalStageRank, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -369,6 +369,65 @@ def test_temporal_rank_lowers_to_bucket_rank_then_quantifier(source, function, u
     assert result.selected_strategy == "temporal_rank"
 
 
+def test_temporal_rank_percentage_range_preserves_both_bounds():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '近15天', '', '', 'CONS=3日') "
+            "between '[5%,10%]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporalRank)
+    assert result.plan.rank_comparator == "between"
+    assert result.plan.rank_bound.value == 5
+    assert result.plan.rank_upper_bound.value == 10
+    assert result.plan.rank_percentage is True
+
+
+@pytest.mark.parametrize(
+    "source,rank_count",
+    [
+        (
+            "rank('', '', '成交量', 'desc', '', '', 'AVG', '') / "
+            "rank('', '', '成交额', 'desc', '本月', '', 'GROWTH_FALL', '') <= 10%",
+            2,
+        ),
+        (
+            "rank('', '', '连板天数', 'desc', '', '', '', '') + "
+            "rank('', '', '跌停天数', 'desc', '', '', '', '') = 1",
+            2,
+        ),
+        (
+            "(rank('', '', '成交量', 'desc', '2026年4月1日', '', '', '') - "
+            "rank('', '', '成交额', 'desc', '2026年3月31日', '', '', '')) / "
+            "rank('', '', '成交量', 'asc', '2026年3月31日', '', '', '') = 1",
+            3,
+        ),
+    ],
+)
+def test_rank_arithmetic_lowers_to_named_rank_relations(source, rank_count):
+    result = plan_physical(_lower(source), default_physical_catalog())
+    plan = result.plan.input if isinstance(result.plan, PhysicalLimit) else result.plan
+
+    assert isinstance(plan, PhysicalRankExpression)
+    assert len(plan.ranks) == rank_count
+    assert result.selected_strategy == "named_rank_expression"
+
+
+def test_named_rank_range_collapses_each_security_to_its_period_end_value():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '上周', '', '', '') / "
+            "rank('', '', '成交额', 'desc', '上周', '', '', '') <= 1"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRankExpression)
+    assert all(rank.collapse_latest for rank in result.plan.ranks)
+
+
 def test_latest_date_and_market_constraints_are_materialized_in_predicate():
     result = plan_physical(
         _lower("indicator('沪|深', '', '成交量', '今日', '', '', '') > 100"),
@@ -716,32 +775,60 @@ def test_filter_then_rank_stage_lowers_operation_chain_once():
         default_physical_catalog(),
     )
 
-    assert isinstance(result.plan, PhysicalRank)
+    assert isinstance(result.plan, PhysicalStageRank)
     assert isinstance(result.plan.input, PhysicalFilter)
-    assert result.plan.canonical_json().count('"kind":"PhysicalScan"') == 1
+    assert result.plan.canonical_json().count('"kind":"PhysicalScan"') == 2
 
 
-def test_chained_rank_is_rejected_until_stage_alias_propagation_is_implemented():
+def test_chained_rank_lowers_to_candidate_set_stage_rank():
     source = (
         "indicator('', '', '成交量', '', '', '', '') > 0 "
         "then rank('', '', '成交量', 'desc', '', '', '', '') <= 10 "
         "then rank('', '', '成交量', 'asc', '', '', '', '') <= 5"
     )
-    with pytest.raises(PhysicalPlanningError) as excinfo:
-        plan_physical(_lower(source), default_physical_catalog())
+    result = plan_physical(_lower(source), default_physical_catalog())
 
-    assert excinfo.value.code == "PHYSICAL_CHAINED_RANK_UNSUPPORTED"
+    assert isinstance(result.plan, PhysicalStageRank)
+    assert isinstance(result.plan.input, PhysicalStageRank)
+    assert result.plan.input.stage_index == 1
+    assert result.plan.stage_index == 2
 
 
-def test_rank_call_inside_scalar_expression_is_not_lowered_as_a_column():
+def test_aggregate_filter_then_aggregate_rank_materializes_both_stages():
+    source = (
+        "indicator('', '', '成交量', '最近30日', '', 'SUM', '') between '[40,90]' "
+        "then rank('', '', '成交量', 'desc', '最近30日', '', 'MIN', '') <= 80"
+    )
+    result = plan_physical(_lower(source), default_physical_catalog())
+
+    assert isinstance(result.plan, PhysicalStageRank)
+    assert isinstance(result.plan.input, PhysicalCompositeAggregate)
+    assert result.plan.aggregate_function == "min"
+    assert result.selected_strategy == "stage_rank"
+
+
+def test_temporal_then_rank_lowers_to_stage_candidate_relation():
+    source = (
+        "indicator('沪|深|京', '', '成交量', '近三天', '', '', 'CONS=每天') > 0 "
+        "then rank('沪|深|京', '', '成交额', 'asc', '上周', '', '', '') < 5%"
+    )
+    result = plan_physical(_lower(source), default_physical_catalog())
+
+    assert isinstance(result.plan, PhysicalStageRank)
+    assert isinstance(result.plan.input, PhysicalTemporal)
+    assert result.plan.percentage is True
+    assert result.plan.collapse_latest is True
+
+
+def test_rank_call_inside_scalar_expression_uses_named_rank_relations():
     source = (
         "rank('', '', '连板天数', 'desc', '', '', '', '') + "
         "rank('', '', '跌停天数', 'desc', '', '', '', '') = 1"
     )
-    with pytest.raises(PhysicalPlanningError) as excinfo:
-        plan_physical(_lower(source), default_physical_catalog())
+    result = plan_physical(_lower(source), default_physical_catalog())
 
-    assert excinfo.value.code == "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED"
+    assert isinstance(result.plan, PhysicalRankExpression)
+    assert len(result.plan.ranks) == 2
 
 
 @pytest.mark.parametrize(
