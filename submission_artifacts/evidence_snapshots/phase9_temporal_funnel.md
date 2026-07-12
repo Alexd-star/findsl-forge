@@ -1,10 +1,10 @@
 # 官方编译器迁移覆盖漏斗
 
-- Git HEAD：`f121041f24503bae0f1741edce35db02c6687cc2`
+- Git HEAD：`a508dcb4cc2bbf15c38ac37bd236dbde08f40e41`
 - 官方语料：`5799`
 - 旧严格后端成功集：`1097`
-- 新后端成功：`87`
-- 旧严格后端成功集已迁移：`87/1097`（`7.93%`）
+- 新后端成功：`96`
+- 旧严格后端成功集已迁移：`95/1097`（`8.66%`）
 
 ## 阶段漏斗
 
@@ -12,19 +12,19 @@
 |---|---:|---:|
 | frontend | 5792 | 99.88% |
 | typed | 5695 | 98.21% |
-| logical | 1149 | 19.81% |
-| optimizer | 1149 | 19.81% |
-| physical | 87 | 1.50% |
-| backend | 87 | 1.50% |
+| logical | 1144 | 19.73% |
+| optimizer | 1144 | 19.73% |
+| physical | 96 | 1.66% |
+| backend | 96 | 1.66% |
 
 ## 迁移缺口优先级
 
 | 错误码 | 旧后端成功但新后端失败 |
 |---|---:|
 | `DOMAIN_CAPABILITY_UNSUPPORTED` | 230 |
-| `PHYSICAL_CONSTRAINT_UNSUPPORTED` | 213 |
-| `PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED` | 79 |
+| `PHYSICAL_CONSTRAINT_UNSUPPORTED` | 212 |
 | `PHYSICAL_MULTI_RESOURCE_UNSUPPORTED` | 79 |
+| `PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED` | 71 |
 | `PHYSICAL_EXPRESSION_UNSUPPORTED` | 71 |
 | `PHYSICAL_PLAN_UNAVAILABLE` | 68 |
 | `TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED` | 68 |
@@ -37,6 +37,7 @@
 | `PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED` | 14 |
 | `PHYSICAL_RANK_BOUND_UNSUPPORTED` | 9 |
 | `TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED` | 1 |
+| `TEMPORAL_SCOPE_MISMATCH` | 1 |
 
 ## 口径说明
 

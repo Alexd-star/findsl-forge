@@ -2,26 +2,26 @@
   "schema_version": 1,
   "row_count": 5799,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "git_head": "f121041f24503bae0f1741edce35db02c6687cc2",
+  "git_head": "a508dcb4cc2bbf15c38ac37bd236dbde08f40e41",
   "legacy_strict_success": 1097,
-  "new_backend_success": 87,
-  "legacy_to_new_migrated": 87,
-  "migration_coverage": 0.079307,
+  "new_backend_success": 96,
+  "legacy_to_new_migrated": 95,
+  "migration_coverage": 0.0866,
   "stage_success": {
     "frontend": 5792,
     "typed": 5695,
-    "logical": 1149,
-    "optimizer": 1149,
-    "physical": 87,
-    "backend": 87
+    "logical": 1144,
+    "optimizer": 1144,
+    "physical": 96,
+    "backend": 96
   },
   "terminal_errors": {
     "DOMAIN_DATA_UNAVAILABLE": 3819,
-    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 495,
+    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 491,
     "DOMAIN_CAPABILITY_UNSUPPORTED": 430,
-    "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED": 125,
-    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 125,
+    "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED": 124,
     "UNSUPPORTED_LOGICAL_LOWERING": 123,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 116,
     "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 110,
     "PHYSICAL_EXPRESSION_UNSUPPORTED": 98,
     "OFFICIAL_TYPE_ERROR": 97,
@@ -30,8 +30,9 @@
     "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED": 48,
     "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 26,
     "PHYSICAL_APPROXIMATION_POLICY_MISSING": 18,
-    "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED": 18,
+    "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED": 17,
     "PHYSICAL_RANK_BOUND_UNSUPPORTED": 9,
+    "TEMPORAL_SCOPE_MISMATCH": 6,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2,
     "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED": 1
@@ -43,15 +44,15 @@
     },
     {
       "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-      "count": 213
-    },
-    {
-      "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "count": 79
+      "count": 212
     },
     {
       "code": "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
       "count": 79
+    },
+    {
+      "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+      "count": 71
     },
     {
       "code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
@@ -100,6 +101,10 @@
     {
       "code": "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED",
       "count": 1
+    },
+    {
+      "code": "TEMPORAL_SCOPE_MISMATCH",
+      "count": 1
     }
   ],
   "function_families": {
@@ -131,7 +136,7 @@
     "indicator": {
       "rows": 5030,
       "legacy_strict_success": 867,
-      "new_backend_success": 78
+      "new_backend_success": 87
     },
     "position": {
       "rows": 131,
@@ -4734,11 +4739,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 323,
@@ -4986,11 +4991,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 341,
@@ -5299,11 +5304,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 363,
@@ -7577,11 +7582,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 525,
@@ -8198,11 +8203,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 569,
@@ -8226,11 +8231,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 571,
@@ -14215,11 +14220,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 993,
@@ -20217,8 +20222,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_stage": "logical",
+      "terminal_code": "TEMPORAL_SCOPE_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20302,8 +20307,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_stage": "logical",
+      "terminal_code": "TEMPORAL_SCOPE_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20331,8 +20336,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_stage": "logical",
+      "terminal_code": "TEMPORAL_SCOPE_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20490,8 +20495,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_stage": "logical",
+      "terminal_code": "TEMPORAL_SCOPE_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -35028,8 +35033,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
+      "terminal_stage": "logical",
+      "terminal_code": "TEMPORAL_SCOPE_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -36026,7 +36031,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_code": "TEMPORAL_SCOPE_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -66383,11 +66388,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 4626,
@@ -76400,11 +76405,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 5325,
