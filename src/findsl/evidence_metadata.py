@@ -29,13 +29,23 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
-    migration_funnel_payload = _read_optional_json(
+    phase19_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase19_security_scope_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
+    migration_funnel_payload = phase19_funnel_payload or _read_optional_json(
         snapshot_dir / "phase18_dynamic_date_funnel.json",
         warnings,
         warn_missing=False,
     )
     dynamic_date_payload = _read_optional_json(
         snapshot_dir / "phase18_dynamic_date_doris.json",
+        warnings,
+        warn_missing=False,
+    )
+    security_scope_payload = _read_optional_json(
+        snapshot_dir / "phase19_security_scope_doris.json",
         warnings,
         warn_missing=False,
     )
@@ -59,6 +69,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         "official_migration": _official_migration_metadata(
             migration_funnel_payload,
             dynamic_date_payload,
+            security_scope_payload,
         ),
         "doris_cluster": _doris_metadata(doris_payload),
         "warnings": warnings,
@@ -90,6 +101,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     official_perf = _dict(official_real.get("performance_matrix"))
     official_migration = _dict(metadata.get("official_migration"))
     dynamic_date = _dict(official_migration.get("dynamic_date_evidence"))
+    security_scope = _dict(official_migration.get("security_scope_evidence"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
     warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
@@ -112,6 +124,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Official slot coverage | {_official_slot_coverage_display(official_slot)} |",
         f"| ANTLR/IR legacy migration | {_official_migration_display(official_migration)} |",
         f"| Phase 18 dynamic date evidence | {_dynamic_date_display(dynamic_date)} |",
+        f"| Phase 19 security scope evidence | {_security_scope_display(security_scope)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
@@ -314,6 +327,7 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
 def _official_migration_metadata(
     funnel: dict[str, Any] | None,
     dynamic_date: dict[str, Any] | None,
+    security_scope: dict[str, Any] | None,
 ) -> dict[str, Any]:
     gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
     date_gap = None
@@ -328,6 +342,15 @@ def _official_migration_metadata(
         p95_values = [
             value
             for item in dynamic_date["cases"]
+            if isinstance(item, dict)
+            for value in [_number_or_none(item.get("p95_ms"))]
+            if value is not None
+        ]
+    scope_p95_values = []
+    if isinstance(security_scope, dict) and isinstance(security_scope.get("cases"), list):
+        scope_p95_values = [
+            value
+            for item in security_scope["cases"]
             if isinstance(item, dict)
             for value in [_number_or_none(item.get("p95_ms"))]
             if value is not None
@@ -349,6 +372,15 @@ def _official_migration_metadata(
             "trading_date_count": _int_or_none(dynamic_date.get("trading_date_count")) if isinstance(dynamic_date, dict) else None,
             "max_p95_ms": max(p95_values) if p95_values else None,
         },
+        "security_scope_evidence": {
+            "available": security_scope is not None,
+            "status": security_scope.get("status") if isinstance(security_scope, dict) else None,
+            "matched": _int_or_none(security_scope.get("matched")) if isinstance(security_scope, dict) else None,
+            "total": _int_or_none(security_scope.get("total")) if isinstance(security_scope, dict) else None,
+            "catalog_rows": _int_or_none(security_scope.get("security_catalog_rows")) if isinstance(security_scope, dict) else None,
+            "catalog_source_match": _bool_or_none(security_scope.get("security_catalog_source_match")) if isinstance(security_scope, dict) else None,
+            "max_p95_ms": max(scope_p95_values) if scope_p95_values else None,
+        },
     }
 
 
@@ -361,6 +393,8 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "official_query_performance_matrix_json": str(snapshot_dir / "official_query_performance_matrix.json"),
         "phase18_dynamic_date_funnel_json": str(snapshot_dir / "phase18_dynamic_date_funnel.json"),
         "phase18_dynamic_date_doris_json": str(snapshot_dir / "phase18_dynamic_date_doris.json"),
+        "phase19_security_scope_funnel_json": str(snapshot_dir / "phase19_security_scope_funnel.json"),
+        "phase19_security_scope_doris_json": str(snapshot_dir / "phase19_security_scope_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }
@@ -501,6 +535,20 @@ def _dynamic_date_display(evidence: dict[str, Any]) -> str:
         return str(status)
     suffix = f", max P95 {max_p95:.4f} ms" if isinstance(max_p95, (int, float)) else ""
     return f"{status}, {matched}/{total}{suffix}"
+
+
+def _security_scope_display(evidence: dict[str, Any]) -> str:
+    if evidence.get("available") is False:
+        return "UNAVAILABLE"
+    status = evidence.get("status") or "<unknown>"
+    matched = evidence.get("matched")
+    total = evidence.get("total")
+    catalog_match = _pass_fail(evidence.get("catalog_source_match"))
+    max_p95 = evidence.get("max_p95_ms")
+    if matched is None or total is None:
+        return str(status)
+    suffix = f", max P95 {max_p95:.4f} ms" if isinstance(max_p95, (int, float)) else ""
+    return f"{status}, {matched}/{total}, catalog {catalog_match}{suffix}"
 
 
 def _official_performance_display(performance: dict[str, Any]) -> str:

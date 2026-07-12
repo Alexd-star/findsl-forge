@@ -4,6 +4,17 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端证券名称范围与 queryData 命名关系
+
+- 新增 Typed Scope Set IR，正式定义范围表达式的补集、交集、并集优先级；范围原子不再作为无法审计的裸字符串进入物理层。
+- 从真实 Doris `hsj_stock_code_info` 生成 5,686 行版本化证券目录 `configs/official/security_scopes.json`，记录源数据 SHA-256。生成器提供 `--check`，可验证目录与实时官方主数据是否一致。
+- 精确证券名称和“名称(六位代码)”通过 `official_security` 稳定键 Join 物理化；名称、市场、日期和指标谓词均保留在各自关系中。概念、行业、指数和自定义板块没有成员表时返回 `PHYSICAL_SCOPE_DATA_UNAVAILABLE`。
+- 新增 `PhysicalNamedScalar`，把直接 `queryData` 值建成单行命名关系；无日期时取最新数据日，非单值日期拒绝。候选全集通过 Cross Join 使用该值，不会被 benchmark 证券名称错误过滤。
+- `PhysicalAggregateGroup` 新增按证券分组/全局标量两种合同。`queryData(...,AVG/SUM/MAX/MIN)` 使用全局聚合关系，不再按候选证券键错误连接。
+- 修复组合聚合中范围名称被映射到行情表别名的假阳性；聚合组现在显式连接证券主数据，SQL 不会引用不存在的 `basic.name` 列。
+- 新增 `scripts/collect_phase19_security_scope_evidence.py`。证券全集、市场叠加、名称代码、直接标量、全局聚合、范围排名和名称并集七类非空结果与独立 reference SQL 完整行集哈希一致 `7/7`，目录源哈希与实时 Doris 一致，最高 P95 约 0.62 秒。
+- 原 `PHYSICAL_CONSTRAINT_UNSUPPORTED` 259 条归零：13 条问句获得真实执行能力，244 条缺失成员关系被准确归入 `PHYSICAL_SCOPE_DATA_UNAVAILABLE`。迁移覆盖由 `393/1097` 提升至 `406/1097（37.01%）`，新后端总成功数达到 413。
+
 ### ANTLR/IR 新后端动态日期与交易日边界集合
 
 - `DateConstraint` 新增动态周期、锚定年月日、交易日切片和边界交易日集合合同。`本周/本月/本季度/今年`、`上周/上个月/去年/前年` 均以 Doris 最新数据日为锚点，不读取开发机当前日期。
