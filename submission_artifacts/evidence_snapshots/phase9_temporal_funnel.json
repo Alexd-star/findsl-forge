@@ -2,36 +2,36 @@
   "schema_version": 1,
   "row_count": 5799,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "git_head": "a508dcb4cc2bbf15c38ac37bd236dbde08f40e41",
+  "git_head": "68633028de4b13af9f60b6964532ac7b4f822171",
   "legacy_strict_success": 1097,
-  "new_backend_success": 96,
-  "legacy_to_new_migrated": 95,
-  "migration_coverage": 0.0866,
+  "new_backend_success": 102,
+  "legacy_to_new_migrated": 101,
+  "migration_coverage": 0.092069,
   "stage_success": {
     "frontend": 5792,
     "typed": 5695,
-    "logical": 1144,
-    "optimizer": 1144,
-    "physical": 96,
-    "backend": 96
+    "logical": 1303,
+    "optimizer": 1303,
+    "physical": 102,
+    "backend": 102
   },
   "terminal_errors": {
     "DOMAIN_DATA_UNAVAILABLE": 3819,
-    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 491,
+    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 530,
     "DOMAIN_CAPABILITY_UNSUPPORTED": 430,
-    "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED": 124,
-    "UNSUPPORTED_LOGICAL_LOWERING": 123,
-    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 116,
-    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 110,
-    "PHYSICAL_EXPRESSION_UNSUPPORTED": 98,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 147,
+    "UNSUPPORTED_LOGICAL_LOWERING": 126,
+    "PHYSICAL_PLAN_UNAVAILABLE": 121,
+    "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED": 113,
+    "PHYSICAL_EXPRESSION_UNSUPPORTED": 109,
     "OFFICIAL_TYPE_ERROR": 97,
-    "PHYSICAL_PLAN_UNAVAILABLE": 95,
-    "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED": 68,
-    "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED": 48,
-    "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 26,
-    "PHYSICAL_APPROXIMATION_POLICY_MISSING": 18,
-    "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED": 17,
+    "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED": 83,
+    "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 30,
+    "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED": 29,
+    "PHYSICAL_APPROXIMATION_POLICY_MISSING": 22,
+    "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED": 10,
     "PHYSICAL_RANK_BOUND_UNSUPPORTED": 9,
+    "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED": 8,
     "TEMPORAL_SCOPE_MISMATCH": 6,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2,
@@ -39,64 +39,64 @@
   },
   "migration_gaps": [
     {
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "count": 234
+    },
+    {
       "code": "DOMAIN_CAPABILITY_UNSUPPORTED",
       "count": 230
     },
     {
-      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-      "count": 212
-    },
-    {
-      "code": "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
-      "count": 79
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "count": 87
     },
     {
       "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "count": 71
+      "count": 86
+    },
+    {
+      "code": "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
+      "count": 82
     },
     {
       "code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
-      "count": 71
-    },
-    {
-      "code": "PHYSICAL_PLAN_UNAVAILABLE",
-      "count": 68
-    },
-    {
-      "code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-      "count": 68
+      "count": 76
     },
     {
       "code": "UNSUPPORTED_LOGICAL_LOWERING",
-      "count": 55
+      "count": 57
     },
     {
       "code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
-      "count": 37
-    },
-    {
-      "code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
-      "count": 31
+      "count": 42
     },
     {
       "code": "DOMAIN_DATA_UNAVAILABLE",
       "count": 22
     },
     {
+      "code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
+      "count": 20
+    },
+    {
       "code": "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
-      "count": 17
+      "count": 19
     },
     {
       "code": "PHYSICAL_APPROXIMATION_POLICY_MISSING",
-      "count": 16
-    },
-    {
-      "code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
-      "count": 14
+      "count": 19
     },
     {
       "code": "PHYSICAL_RANK_BOUND_UNSUPPORTED",
       "count": 9
+    },
+    {
+      "code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "count": 7
+    },
+    {
+      "code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
+      "count": 4
     },
     {
       "code": "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED",
@@ -136,7 +136,7 @@
     "indicator": {
       "rows": 5030,
       "legacy_strict_success": 867,
-      "new_backend_success": 87
+      "new_backend_success": 93
     },
     "position": {
       "rows": 131,
@@ -955,8 +955,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -1700,8 +1700,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -1757,8 +1757,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -2141,8 +2141,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -2184,8 +2184,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -2901,8 +2901,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -3070,8 +3070,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -3313,8 +3313,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -4950,8 +4950,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5349,7 +5349,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_code": "UNSUPPORTED_LOGICAL_LOWERING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5362,8 +5362,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5404,8 +5404,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5434,7 +5434,7 @@
       "legacy_code": "PASS",
       "new_backend_success": false,
       "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_code": "UNSUPPORTED_LOGICAL_LOWERING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -6655,8 +6655,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -6950,8 +6950,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -7723,8 +7723,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10887,8 +10887,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14024,8 +14024,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14192,8 +14192,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14249,8 +14249,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14376,8 +14376,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14447,8 +14447,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14601,8 +14601,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14629,8 +14629,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14715,8 +14715,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14955,8 +14955,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14984,8 +14984,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14997,11 +14997,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security+official_security",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1048,
@@ -15039,11 +15039,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1051,
@@ -15068,8 +15068,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15096,8 +15096,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15110,8 +15110,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15167,8 +15167,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_APPROXIMATION_POLICY_MISSING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15181,8 +15181,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15266,8 +15266,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15295,8 +15295,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15351,8 +15351,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15420,11 +15420,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1078,
@@ -16433,8 +16433,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16726,8 +16726,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16828,8 +16828,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16898,8 +16898,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -17164,8 +17164,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -18545,8 +18545,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -18779,8 +18779,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20393,8 +20393,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20422,8 +20422,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20465,8 +20465,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20954,8 +20954,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21992,8 +21992,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25355,8 +25355,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25453,8 +25453,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26142,8 +26142,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26254,8 +26254,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26779,8 +26779,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26980,8 +26980,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26994,8 +26994,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -27205,8 +27205,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -27233,8 +27233,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -27503,8 +27503,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -28081,8 +28081,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -29824,8 +29824,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -30763,8 +30763,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -31041,8 +31041,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -31100,8 +31100,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -31128,8 +31128,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32181,8 +32181,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32905,8 +32905,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32990,8 +32990,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33079,8 +33079,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33282,8 +33282,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33941,8 +33941,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34714,8 +34714,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -36619,8 +36619,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -36705,8 +36705,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -40646,8 +40646,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -41871,8 +41871,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -42104,8 +42104,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -42817,8 +42817,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_APPROXIMATION_POLICY_MISSING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -43751,8 +43751,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -43779,8 +43779,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -43838,8 +43838,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44113,8 +44113,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44156,8 +44156,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44184,8 +44184,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44241,8 +44241,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44269,8 +44269,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44773,8 +44773,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -45999,8 +45999,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -49699,8 +49699,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -54175,8 +54175,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_APPROXIMATION_POLICY_MISSING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -55849,8 +55849,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56077,8 +56077,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56192,8 +56192,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -57119,8 +57119,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58021,8 +58021,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58048,11 +58048,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 4042,
@@ -58077,8 +58077,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59079,8 +59079,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59109,8 +59109,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59552,8 +59552,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59951,8 +59951,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60650,8 +60650,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61848,8 +61848,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62247,8 +62247,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62261,8 +62261,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62275,8 +62275,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62376,8 +62376,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63032,8 +63032,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63403,8 +63403,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63746,8 +63746,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63944,8 +63944,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -64360,8 +64360,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_APPROXIMATION_POLICY_MISSING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -64517,8 +64517,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -64788,8 +64788,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -65432,8 +65432,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -65872,8 +65872,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -66660,8 +66660,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -66773,8 +66773,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -68573,8 +68573,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -69537,8 +69537,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -69565,8 +69565,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -69654,8 +69654,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -69741,8 +69741,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -70168,11 +70168,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 4890,
@@ -70667,8 +70667,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71099,8 +71099,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71142,8 +71142,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71186,8 +71186,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71928,8 +71928,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -72678,8 +72678,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -72849,8 +72849,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -73207,8 +73207,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -73222,8 +73222,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -73866,8 +73866,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -74239,8 +74239,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75062,8 +75062,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75564,8 +75564,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -76350,8 +76350,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -76436,7 +76436,7 @@
       "legacy_code": "PASS",
       "new_backend_success": false,
       "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_code": "UNSUPPORTED_LOGICAL_LOWERING",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -76649,8 +76649,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -76706,8 +76706,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -76878,8 +76878,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -76992,8 +76992,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77049,8 +77049,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77206,8 +77206,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77537,8 +77537,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77566,8 +77566,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77909,8 +77909,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -78413,8 +78413,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -78787,8 +78787,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -78987,8 +78987,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -79443,8 +79443,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -79718,8 +79718,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_EXPRESSION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -79831,11 +79831,11 @@
       ],
       "legacy_strict_success": true,
       "legacy_code": "PASS",
-      "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 5564,
@@ -79935,8 +79935,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MARKET_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -80208,8 +80208,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -80928,8 +80928,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -81771,8 +81771,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -82337,8 +82337,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_COMPOSITE_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -82943,8 +82943,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -82971,8 +82971,8 @@
       "legacy_strict_success": true,
       "legacy_code": "PASS",
       "new_backend_success": false,
-      "terminal_stage": "logical",
-      "terminal_code": "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_PLAN_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
