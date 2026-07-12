@@ -24,6 +24,7 @@ DEFAULT_NL_REQUEST = "筛选A股连续3天主力净流入为正的股票，并�
 DEMO_REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_REAL_MARKET_CASES = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample/queries.jsonl"
 DEFAULT_REAL_MARKET_DATA_DIR = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample"
+DEFAULT_OFFICIAL_DEMO_CASES = DEMO_REPO_ROOT / "data/samples/official_slot_demo.jsonl"
 
 
 def doris_evidence_summary(report_path: Path = Path("reports/doris_cluster_evidence.md")) -> Dict[str, Any]:
@@ -163,6 +164,12 @@ def demo_examples(
     ]
 
 
+def official_demo_examples(
+    cases_path: Path = DEFAULT_OFFICIAL_DEMO_CASES,
+) -> List[Dict[str, Any]]:
+    return _safe_load_cases(_resolve_demo_path(cases_path))
+
+
 def suggest_from_text(
     text: str,
     data_dir: Path = Path("data/samples"),
@@ -214,6 +221,9 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
                 return
             if self.path == "/api/examples":
                 self._send_json({"ok": True, "examples": demo_examples(cases_path)})
+                return
+            if self.path == "/api/official/examples":
+                self._send_json({"ok": True, "examples": official_demo_examples()})
                 return
             if self.path == "/api/evidence":
                 self._send_json({"ok": True, "evidence": doris_evidence_summary()})

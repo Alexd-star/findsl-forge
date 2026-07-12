@@ -14,6 +14,7 @@ from findsl.demo import (
     demo_examples,
     doris_evidence_summary,
     make_demo_handler,
+    official_demo_examples,
     render_demo_html,
     suggest_from_text,
 )
@@ -58,6 +59,48 @@ def test_official_demo_api_returns_success_and_structured_pipeline_failure():
         assert error["stage"] == "physical"
         assert error["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
         assert error["partial"]["optimized"]["diagnostics"] == []
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_versioned_official_demo_cases_match_declared_pipeline_outcomes():
+    examples = official_demo_examples()
+
+    assert {item["scenario"] for item in examples} >= {
+        "basic_filter",
+        "security_join",
+        "ext_join",
+        "rank",
+        "market_date_constraint",
+        "technical_feature",
+        "missing_data_domain",
+    }
+    for item in examples:
+        if item["expected_status"] == "success":
+            result = analyze_official_dsl(item["dsl"])
+            assert result["ok"] is True
+            assert result["physical"]["selected_resource"] == item["expected_resource"]
+        else:
+            with pytest.raises(Exception) as excinfo:
+                analyze_official_dsl(item["dsl"])
+            assert getattr(excinfo.value, "code", "") == item["expected_code"]
+
+
+def test_official_examples_endpoint_returns_expectation_metadata():
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_demo_handler(DATA_DIR))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        with urlopen(
+            f"http://127.0.0.1:{server.server_port}/api/official/examples",
+            timeout=10,
+        ) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        assert payload["ok"] is True
+        assert payload["examples"]
+        assert all("expected_status" in item for item in payload["examples"])
     finally:
         server.shutdown()
         server.server_close()

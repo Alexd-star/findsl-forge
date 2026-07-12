@@ -1,0 +1,7 @@
+{"name":"基础行情成交量过滤","scenario":"basic_filter","dsl":"indicator('', '', '成交量', '', '', '', '') > 100","expected_status":"success","expected_resource":"official_basic"}
+{"name":"证券信息精确名称过滤","scenario":"security_join","dsl":"indicator('', '', '股票名称', '', '', '', '') = '华泰证券'","expected_status":"success","expected_resource":"official_security"}
+{"name":"衍生行情主力净流入过滤","scenario":"ext_join","dsl":"indicator('', '', '主力净流入', '', '', '', '') > 0","expected_status":"success","expected_resource":"official_ext"}
+{"name":"当日成交量前十排名","scenario":"rank","dsl":"rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10","expected_status":"success","expected_resource":"official_basic"}
+{"name":"沪深市场最新日过滤","scenario":"market_date_constraint","dsl":"indicator('沪|深', '', '成交量', '今日', '', '', '') > 100","expected_status":"success","expected_resource":"official_basic"}
+{"name":"十日均线技术特征过滤","scenario":"technical_feature","dsl":"indicator('', '', '10日均线', '', '', '', '') > 10","expected_status":"success","expected_resource":"official_technical"}
+{"name":"缺失财务数据域拒绝","scenario":"missing_data_domain","dsl":"indicator('', '', '营业收入', '', '', '', '') > 1","expected_status":"error","expected_code":"DOMAIN_DATA_UNAVAILABLE"}
