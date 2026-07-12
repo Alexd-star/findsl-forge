@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "baseline": "submission_artifacts/evidence_snapshots/phase26_capability_funnel.json",
+  "current": "reports/phase27_capability_funnel.json",
+  "require_period_scalars": false,
+  "require_event_candidates": false,
+  "require_date_algebra": false,
+  "require_event_semantics": true,
+  "new_successes": 4,
+  "passed": 4,
+  "failed": 0,
+  "status": "PASS",
+  "strategies": {
+    "event_candidate_intersect": 2,
+    "temporal_event_projection": 2
+  },
+  "results": [
+    {
+      "excel_row": 359,
+      "source": "record_low('^创业板', '', '最低价', '历史', '今日', '', '', '') = True and record_high('^创业板', '', '最高价', '历史', '昨日', '', '', '') = True and indicator('^创业板', '', 'ST股票标识', '昨日', '', '', '') = False",
+      "strategy": "event_candidate_intersect",
+      "plan_kind": "PhysicalCandidateSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true,
+        "event_semantics_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 3762,
+      "source": "golden_cross('科创板', '', '3日均线', '30日均线', '17年', '', 'CONS=每月') = True",
+      "strategy": "temporal_event_projection",
+      "plan_kind": "PhysicalTemporal",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true,
+        "event_semantics_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 3763,
+      "source": "golden_cross('京|深', '', '20日均线', '200日均线', '', '', 'CONS=5日') = True",
+      "strategy": "temporal_event_projection",
+      "plan_kind": "PhysicalTemporal",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true,
+        "event_semantics_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 5008,
+      "source": "record_high('', '', '收盘价', '80内', '三日内', '', '', '') = True and indicator('', '', '收盘价', '', '', '', '') < 10",
+      "strategy": "event_candidate_intersect",
+      "plan_kind": "PhysicalCandidateSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true,
+        "event_semantics_materialized": true
+      },
+      "passed": true
+    }
+  ]
+}

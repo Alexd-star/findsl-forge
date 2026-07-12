@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T20:29:38Z",
+  "generated_at": "2026-07-12T21:03:31Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "aedc700",
-    "head_at_export": "aedc700",
+    "head_at_report_generation": "0386df2",
+    "head_at_export": "0386df2",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-12T20:29:36+00:00",
+    "generated_at": "2026-07-12T21:02:47+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.236,
+    "compile_p95_latency_ms": 1.574,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 866,
-      "elapsed_seconds": 132.81
+      "passed": 874,
+      "elapsed_seconds": 130.63
     }
   },
   "official_suite": {
@@ -59,12 +59,12 @@
     "slot_coverage": {
       "available": true,
       "row_count": 5799,
-      "parse_ok": 5792,
-      "parse_failed": 7,
-      "compile_ok": 1873,
-      "compile_failed": 3919,
-      "compile_rate_on_all_rows": 0.322987,
-      "compile_rate_on_parse_ok": 0.323377
+      "parse_ok": 5799,
+      "parse_failed": 0,
+      "compile_ok": 1830,
+      "compile_failed": 3969,
+      "compile_rate_on_all_rows": 0.315572,
+      "compile_rate_on_parse_ok": 0.315572
     },
     "performance_matrix": {
       "available": true,
@@ -81,11 +81,11 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "aedc7006956a29209acc64d59ff0926dc6ebdf54",
+    "git_head": "0386df26d7abff608551001c6fe545b3ea9386b6",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 686,
-    "migration_coverage": 0.625342,
-    "new_backend_success": 709,
+    "legacy_to_new_migrated": 690,
+    "migration_coverage": 0.628988,
+    "new_backend_success": 713,
     "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
@@ -168,11 +168,21 @@
       "latest_data_date": "2026-04-14",
       "max_p95_ms": 732.5326
     },
+    "event_semantics_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 4,
+      "total": 4,
+      "non_empty": 4,
+      "latest_data_date": "2026-04-14",
+      "structural_contracts": 4,
+      "max_p95_ms": 2090.4077
+    },
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 14,
-      "total": 14,
+      "passed": 4,
+      "total": 4,
       "failed": 0
     }
   },
@@ -222,6 +232,9 @@
     "phase26_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase26_capability_funnel.json",
     "phase26_date_limit_doris_json": "submission_artifacts\\evidence_snapshots\\phase26_date_limit_doris.json",
     "phase26_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase26_new_success_audit.json",
+    "phase27_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase27_capability_funnel.json",
+    "phase27_event_semantics_doris_json": "submission_artifacts\\evidence_snapshots\\phase27_event_semantics_doris.json",
+    "phase27_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase27_new_success_audit.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }

@@ -1,8 +1,9 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-13 04:29:37 +08:00
-- Git HEAD at export: aedc700
-- Git status when exported, excluding evidence snapshots and this export script: clean
+- Generated at: 2026-07-13 05:03:30 +08:00
+- Git HEAD at export: 0386df2
+- Git status when exported, excluding evidence snapshots and this export script:  M submission_artifacts/evidence_metadata.json
+ M submission_artifacts/evidence_summary.md
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
@@ -16,8 +17,8 @@
 - `official_doris_evidence.md` (19990 bytes)
 - `official_query_performance_matrix.json` (3656 bytes)
 - `official_query_performance_matrix.md` (1792 bytes)
-- `official_slot_coverage.json` (114283 bytes)
-- `official_slot_coverage.md` (71606 bytes)
+- `official_slot_coverage.json` (439394 bytes)
+- `official_slot_coverage.md` (71770 bytes)
 - `official_suite_report.md` (7549 bytes)
 - `phase10_join_doris.json` (9434 bytes)
 - `phase10_join_doris.md` (1001 bytes)
@@ -99,6 +100,12 @@
 - `phase26_date_limit_doris.md` (1195 bytes)
 - `phase26_new_success_audit.json` (11706 bytes)
 - `phase26_new_success_audit.md` (987 bytes)
+- `phase27_capability_funnel.json` (3257492 bytes)
+- `phase27_capability_funnel.md` (1286 bytes)
+- `phase27_event_semantics_doris.json` (27940 bytes)
+- `phase27_event_semantics_doris.md` (794 bytes)
+- `phase27_new_success_audit.json` (3592 bytes)
+- `phase27_new_success_audit.md` (827 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase9_temporal_doris.json` (27830 bytes)
@@ -109,7 +116,7 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `real_market_sample_report.md` (957 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13130 bytes)
+- `submission_readiness.md` (13122 bytes)
 
 ## Excluded By Design
 
