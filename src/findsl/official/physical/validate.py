@@ -3,7 +3,7 @@ from __future__ import annotations
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
-    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
+    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
     PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
@@ -58,6 +58,26 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("candidate-set anchor requires a partition key")
         _validate_plan(plan.left, catalog, expressions)
         _validate_plan(plan.right, catalog, expressions)
+        return
+    if isinstance(plan, PhysicalPrefixJoin):
+        _validate_plan(plan.input, catalog, expressions)
+        if not plan.projections:
+            raise ValueError("physical prefix join requires projections")
+        if plan.predicate is not None and plan.predicate.type is not BOOLEAN:
+            raise ValueError("physical prefix predicate must be boolean")
+        aliases = set()
+        for projection in plan.projections:
+            if not projection.alias.isidentifier() or projection.alias in aliases:
+                raise ValueError("physical prefix projection alias is invalid or duplicated")
+            if not isinstance(projection.expression, PhysicalPrefixAverage):
+                raise ValueError("physical prefix join requires prefix-average projections")
+            aliases.add(projection.alias)
+            _validate_expr(projection.expression, catalog, expressions)
+        if plan.predicate is not None:
+            refs = {item.alias for item in _walk_prefix_refs(plan.predicate)}
+            if not refs or not refs.issubset(aliases):
+                raise ValueError("physical prefix predicate references an undeclared projection")
+            _validate_expr(plan.predicate, catalog, expressions)
         return
     if isinstance(plan, PhysicalEventProjection):
         _validate_plan(plan.input, catalog, expressions)
@@ -495,7 +515,10 @@ def _validate_rank_bounds(bound, comparator, percentage, upper_bound):
 
 
 def _validate_expr(expression, catalog, expressions=None):
-    if isinstance(expression, PhysicalProjectedRef):
+    if isinstance(expression, PhysicalPrefixRef):
+        if not expression.alias.isidentifier():
+            raise ValueError("physical prefix reference alias is invalid")
+    elif isinstance(expression, PhysicalProjectedRef):
         if not expression.alias.isidentifier():
             raise ValueError("physical projected reference alias is invalid")
     elif isinstance(expression, PhysicalEventRef):
@@ -682,3 +705,26 @@ def _walk_projected_refs(expression):
             yield from _walk_projected_refs(item)
     elif isinstance(expression, PhysicalIn):
         yield from _walk_projected_refs(expression.expression)
+
+
+def _walk_prefix_refs(expression):
+    if isinstance(expression, PhysicalPrefixRef):
+        yield expression
+    elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
+        yield from _walk_prefix_refs(expression.left)
+        yield from _walk_prefix_refs(expression.right)
+    elif isinstance(expression, (PhysicalUnary, PhysicalNot)):
+        yield from _walk_prefix_refs(expression.operand)
+    elif isinstance(expression, PhysicalNullIf):
+        yield from _walk_prefix_refs(expression.expression)
+        yield from _walk_prefix_refs(expression.null_value)
+    elif isinstance(expression, PhysicalCoalesce):
+        for item in expression.expressions:
+            yield from _walk_prefix_refs(item)
+    elif isinstance(expression, PhysicalAbs):
+        yield from _walk_prefix_refs(expression.expression)
+    elif isinstance(expression, PhysicalGreatest):
+        for item in expression.expressions:
+            yield from _walk_prefix_refs(item)
+    elif isinstance(expression, PhysicalIn):
+        yield from _walk_prefix_refs(expression.expression)

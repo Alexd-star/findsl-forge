@@ -65,6 +65,8 @@ from .ir import (
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
+    PhysicalPrefixJoin,
+    PhysicalPrefixRef,
     PhysicalPattern,
     PhysicalPosition,
     PhysicalProjection,
@@ -435,12 +437,18 @@ def plan_physical(
                 strategy.scale_divisor,
                 NUMERIC,
             )
+            prefix_alias = "prefix_value"
             prefix_plan = _lower_plan(
                 lowering.plan,
                 catalog,
                 strategy.scan_resource_id,
                 (),
-                expression_overrides={indicator_id.casefold(): expression},
+                expression_overrides={
+                    indicator_id.casefold(): PhysicalPrefixRef(
+                        prefix_alias,
+                        NUMERIC,
+                    )
+                },
             )
             if _needs_implicit_latest_snapshot(lowering.plan):
                 prefix_plan = _with_latest_snapshot(
@@ -448,8 +456,18 @@ def plan_physical(
                     catalog,
                     strategy.scan_resource_id,
                 )
+            prefix_plan = _materialize_prefix_join(
+                prefix_plan,
+                PhysicalProjection(prefix_alias, expression),
+            )
             validate_physical_plan(prefix_plan, catalog, expressions)
-            decision = _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strategies)
+            decision = _prefix_candidate_decision(
+                strategy,
+                catalog,
+                statistics,
+                allow_shadow_strategies,
+                default_eligible=_is_prefix_filter_plan(prefix_plan),
+            )
             candidates.append((prefix_plan, strategy.scan_resource_id, strategy.strategy_id, decision))
 
     candidates.sort(
@@ -466,6 +484,41 @@ def plan_physical(
         for index, item in enumerate(candidates)
     )
     return PhysicalPlanningResult(chosen_plan, chosen_resource, decisions, chosen_strategy)
+
+
+def _materialize_prefix_join(
+    plan: PhysicalPlan,
+    projection: PhysicalProjection,
+) -> PhysicalPlan:
+    if isinstance(plan, PhysicalLimit):
+        return replace(
+            plan,
+            input=_materialize_prefix_join(plan.input, projection),
+        )
+    if isinstance(plan, PhysicalFilter):
+        return PhysicalPrefixJoin(
+            plan.input,
+            (projection,),
+            plan.predicate,
+        )
+    if isinstance(plan, PhysicalRank):
+        return replace(
+            plan,
+            input=PhysicalPrefixJoin(
+                plan.input,
+                (projection,),
+                None,
+            ),
+        )
+    raise PhysicalPlanningError(
+        "PHYSICAL_PREFIX_RELATION_UNAVAILABLE",
+        "prefix strategy requires a filter or rank relation",
+    )
+
+
+def _is_prefix_filter_plan(plan: PhysicalPlan) -> bool:
+    current = plan.input if isinstance(plan, PhysicalLimit) else plan
+    return isinstance(current, PhysicalPrefixJoin) and current.predicate is not None
 
 
 @dataclass(frozen=True)
@@ -2482,9 +2535,19 @@ def _candidate_decision(resource, catalog, statistics):
     )
 
 
-def _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strategies):
+def _prefix_candidate_decision(
+    strategy,
+    catalog,
+    statistics,
+    allow_shadow_strategies,
+    *,
+    default_eligible=True,
+):
     scan = catalog.resource(strategy.scan_resource_id)
     prefix = catalog.resource(strategy.prefix_resource_id)
+    selection_eligible = (
+        strategy.selection_mode == "active" and default_eligible
+    ) or allow_shadow_strategies
     if statistics is not None:
         try:
             scan_stats = statistics.resource(scan.resource_id)
@@ -2504,16 +2567,17 @@ def _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strat
                     estimated=False,
                     reason_code=(
                         "PHYSICAL_PREFIX_CANDIDATE_SELECTED"
-                        if strategy.selection_mode == "active" or allow_shadow_strategies
+                        if selection_eligible
                         else "PHYSICAL_PREFIX_SHADOW_CANDIDATE"
                     ),
                     reason=(
                         "cost is scan bytes plus two conservative prefix resource accesses; "
-                        f"selection mode is {strategy.selection_mode}"
+                        f"selection mode is {strategy.selection_mode}; "
+                        f"plan-shape calibration is {'eligible' if default_eligible else 'shadow'}"
                     ),
                     cost_unit="bytes",
                     cost_components=components,
-                    selection_eligible=strategy.selection_mode == "active" or allow_shadow_strategies,
+                    selection_eligible=selection_eligible,
                 )
     return PhysicalDecision(
         resource_id=prefix.resource_id,
@@ -2522,7 +2586,7 @@ def _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strat
         estimated=True,
         reason_code="PHYSICAL_PREFIX_STATISTICS_INCOMPLETE",
         reason="catalog priority fallback for prefix candidate",
-        selection_eligible=strategy.selection_mode == "active" or allow_shadow_strategies,
+        selection_eligible=selection_eligible,
     )
 
 

@@ -37,7 +37,7 @@ def _strategy(indicator_id, strategy_id, prefix, window, scale_divisor):
         "window": window,
         "scale_divisor": scale_divisor,
         "value_type": "numeric",
-        "selection_mode": "shadow",
+        "selection_mode": "active",
     }
 
 

@@ -20,4 +20,7 @@ def test_prefix_evidence_requires_default_direct_and_shadow_hash_equivalence():
     assert report["results"][0]["default_strategy"] == "direct_column"
     assert report["results"][0]["shadow_strategy"] == "ma5_prefix_average"
     assert report["results"][0]["row_count"] == 3
+    assert report["results"][0]["direct_hash"] == "same"
+    assert report["results"][0]["prefix_hash"] == "same"
+    assert "legacy_hash" not in report["results"][0]
     assert len(calls) == 2

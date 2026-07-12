@@ -22,7 +22,7 @@ def test_default_registry_exposes_controlled_prefix_average_candidate():
     assert strategy.count_column == "close_count_prefix"
     assert strategy.window == 5
     assert strategy.scale_divisor == 10000.0
-    assert strategy.selection_mode == "shadow"
+    assert strategy.selection_mode == "active"
 
 
 def test_strategy_registry_is_cached_and_orders_candidates_deterministically():

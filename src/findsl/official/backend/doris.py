@@ -36,6 +36,8 @@ from ..physical.ir import (
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
+    PhysicalPrefixJoin,
+    PhysicalPrefixRef,
     PhysicalPattern,
     PhysicalPosition,
     PhysicalProjectedRef,
@@ -256,6 +258,8 @@ def _render_plan(
         return _render_set_operation(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalCandidateSetOperation):
         return _render_candidate_set_operation(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalPrefixJoin):
+        return _render_prefix_join(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
 
 
@@ -398,6 +402,129 @@ def _render_event_filter(
             _retarget_event_result_columns(rendered, alias, catalog),
         )
     return outer.where(predicate)
+
+
+def _render_prefix_join(
+    plan: PhysicalPrefixJoin,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    anchor_name = f"{cte_prefix}prefix_anchor_rows"
+    values_name = f"{cte_prefix}prefix_values"
+    anchor_alias = "prefix_anchor"
+    anchor = _render_plan(plan.input, catalog, cte_prefix)
+    values = exp.select(
+        *(
+            exp.column(key, table=anchor_alias, quoted=True)
+            for key in ("mktcode", "tgtcode", "bizdate")
+        )
+    ).from_(exp.table_(anchor_name, alias=anchor_alias, quoted=True))
+
+    for index, projection in enumerate(plan.projections):
+        expression = projection.expression
+        if not isinstance(expression, PhysicalPrefixAverage):
+            raise DorisBackendError(
+                "DORIS_PREFIX_PROJECTION_UNSUPPORTED",
+                "prefix join projections must be prefix averages",
+            )
+        resource = catalog.resource(expression.resource_id)
+        current_alias = f"prefix_current_{index}"
+        previous_alias = f"prefix_previous_{index}"
+        current = exp.table_(
+            resource.table,
+            db=resource.database,
+            quoted=True,
+            alias=current_alias,
+        )
+        previous = exp.table_(
+            resource.table,
+            db=resource.database,
+            quoted=True,
+            alias=previous_alias,
+        )
+        current_join = exp.and_(
+            *(
+                exp.EQ(
+                    this=exp.column(key, table=current_alias, quoted=True),
+                    expression=exp.column(key, table=anchor_alias, quoted=True),
+                )
+                for key in ("mktcode", "tgtcode", "bizdate")
+            )
+        )
+        previous_join = exp.and_(
+            exp.EQ(
+                this=exp.column("mktcode", table=previous_alias, quoted=True),
+                expression=exp.column("mktcode", table=current_alias, quoted=True),
+            ),
+            exp.EQ(
+                this=exp.column("tgtcode", table=previous_alias, quoted=True),
+                expression=exp.column("tgtcode", table=current_alias, quoted=True),
+            ),
+            exp.EQ(
+                this=exp.column("row_no", table=previous_alias, quoted=True),
+                expression=exp.Sub(
+                    this=exp.column("row_no", table=current_alias, quoted=True),
+                    expression=exp.convert(expression.window),
+                ),
+            ),
+        )
+        average = _prefix_average_expression(
+            expression,
+            current_alias,
+            previous_alias,
+        )
+        values = values.join(current, on=current_join, join_type="INNER")
+        values = values.join(previous, on=previous_join, join_type="LEFT")
+        values = values.select(
+            average.as_(projection.alias, quoted=True),
+            append=True,
+        )
+
+    result = (
+        exp.select(
+            *(
+                exp.column(key, table=values_name, quoted=True)
+                for key in ("mktcode", "tgtcode", "bizdate")
+            )
+        )
+        .from_(exp.table_(values_name, quoted=True))
+        .with_(anchor_name, as_=anchor)
+        .with_(values_name, as_=values)
+    )
+    if plan.predicate is not None:
+        result = result.where(_render_expr(plan.predicate, catalog))
+    return result
+
+
+def _prefix_average_expression(
+    expression: PhysicalPrefixAverage,
+    current_alias: str,
+    previous_alias: str,
+):
+    sum_delta = exp.Sub(
+        this=exp.column(expression.sum_column, table=current_alias, quoted=True),
+        expression=exp.Coalesce(
+            this=exp.column(expression.sum_column, table=previous_alias, quoted=True),
+            expressions=[exp.convert(0)],
+        ),
+    )
+    count_delta = exp.Sub(
+        this=exp.column(expression.count_column, table=current_alias, quoted=True),
+        expression=exp.Coalesce(
+            this=exp.column(expression.count_column, table=previous_alias, quoted=True),
+            expressions=[exp.convert(0)],
+        ),
+    )
+    average = exp.Div(
+        this=exp.Mul(this=exp.Paren(this=sum_delta), expression=exp.convert(1.0)),
+        expression=exp.Nullif(this=count_delta, expression=exp.convert(0)),
+    )
+    if expression.scale_divisor != 1.0:
+        average = exp.Div(
+            this=average,
+            expression=exp.convert(expression.scale_divisor),
+        )
+    return average
 
 
 def _render_event_projection(
@@ -2446,7 +2573,10 @@ def _find_relation(plan: PhysicalPlan):
     current = plan
     while isinstance(current, (PhysicalFilter, PhysicalLimit)):
         current = current.input
-    if isinstance(current, (PhysicalScan, PhysicalTableScan, PhysicalJoin)):
+    if isinstance(
+        current,
+        (PhysicalScan, PhysicalTableScan, PhysicalJoin, PhysicalPrefixJoin),
+    ):
         return current
     raise DorisBackendError("DORIS_RELATION_UNAVAILABLE", "plan has no renderable physical relation")
 
@@ -2459,10 +2589,14 @@ def _stable_alias(relation) -> str:
     if isinstance(relation, PhysicalJoin):
         root, _ = _flatten_join(relation)
         return root.resource_id
+    if isinstance(relation, PhysicalPrefixJoin):
+        return "prefix_values"
     raise DorisBackendError("DORIS_RELATION_UNAVAILABLE", "plan has no stable output alias")
 
 
 def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPlan] = None):
+    if isinstance(expression, PhysicalPrefixRef):
+        return exp.column(expression.alias, table="prefix_values", quoted=True)
     if isinstance(expression, PhysicalProjectedRef):
         return exp.column(expression.alias, table="event_rows", quoted=True)
     if isinstance(expression, PhysicalEventRef):
@@ -2662,26 +2796,7 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
                 for key in ("mktcode", "tgtcode", "bizdate")
             )
         )
-        sum_delta = exp.Sub(
-            this=exp.column(expression.sum_column, table="p", quoted=True),
-            expression=exp.Coalesce(
-                this=exp.column(expression.sum_column, table="p_prev", quoted=True),
-                expressions=[exp.convert(0)],
-            ),
-        )
-        count_delta = exp.Sub(
-            this=exp.column(expression.count_column, table="p", quoted=True),
-            expression=exp.Coalesce(
-                this=exp.column(expression.count_column, table="p_prev", quoted=True),
-                expressions=[exp.convert(0)],
-            ),
-        )
-        average = exp.Div(
-            this=exp.Mul(this=exp.Paren(this=sum_delta), expression=exp.convert(1.0)),
-            expression=exp.Nullif(this=count_delta, expression=exp.convert(0)),
-        )
-        if expression.scale_divisor != 1.0:
-            average = exp.Div(this=average, expression=exp.convert(expression.scale_divisor))
+        average = _prefix_average_expression(expression, "p", "p_prev")
         query = exp.select(average).from_(current).join(previous, on=previous_join, join_type="LEFT").where(correlation)
         return exp.Subquery(this=query)
     if isinstance(expression, PhysicalBinary):

@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalSetOperation, PhysicalStageRank, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
+from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalPrefixJoin, PhysicalPrefixRef, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalSetOperation, PhysicalStageRank, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -138,7 +138,7 @@ def test_technical_indicator_selects_controlled_technical_resource_deterministic
     assert first.decisions[0].cost == 20.0
 
 
-def test_statistics_rank_prefix_candidate_but_keep_uncalibrated_strategy_in_shadow():
+def test_statistics_select_calibrated_set_prefix_candidate():
     catalog = default_physical_catalog()
     statistics = default_physical_statistics(catalog)
 
@@ -149,16 +149,16 @@ def test_statistics_rank_prefix_candidate_but_keep_uncalibrated_strategy_in_shad
         strategies=default_physical_strategies(catalog),
     )
 
-    assert result.selected_resource == "official_technical"
-    assert result.selected_strategy == "direct_column"
-    assert isinstance(result.plan, PhysicalFilter)
+    assert result.selected_resource == "official_basic"
+    assert result.selected_strategy == "ma5_prefix_average"
+    assert isinstance(result.plan, PhysicalPrefixJoin)
     assert [decision.strategy_id for decision in result.decisions] == [
-        "direct_column",
         "ma5_prefix_average",
+        "direct_column",
     ]
     assert result.decisions[0].selected is True
-    assert result.decisions[1].selection_eligible is False
-    assert result.decisions[1].cost < result.decisions[0].cost
+    assert result.decisions[0].selection_eligible is True
+    assert result.decisions[0].cost < result.decisions[1].cost
 
 
 def test_shadow_prefix_candidate_can_be_selected_for_explicit_validation():
@@ -172,8 +172,27 @@ def test_shadow_prefix_candidate_can_be_selected_for_explicit_validation():
     )
 
     assert result.selected_strategy == "ma5_prefix_average"
-    assert isinstance(result.plan.predicate.left, PhysicalPrefixAverage)
-    assert result.plan.predicate.left.window == 5
+    assert isinstance(result.plan, PhysicalPrefixJoin)
+    assert isinstance(result.plan.predicate.left, PhysicalPrefixRef)
+    assert isinstance(result.plan.projections[0].expression, PhysicalPrefixAverage)
+    assert result.plan.projections[0].expression.window == 5
+
+
+def test_uncalibrated_prefix_rank_remains_shadow_candidate():
+    catalog = default_physical_catalog()
+    result = plan_physical(
+        _lower("rank('', '', '5日均线', 'desc', '', '', '', '') <= 10%"),
+        catalog,
+        statistics=default_physical_statistics(catalog),
+        strategies=default_physical_strategies(catalog),
+    )
+
+    assert result.selected_strategy == "direct_column"
+    assert isinstance(result.plan, PhysicalRank)
+    prefix = next(
+        item for item in result.decisions if item.strategy_id == "ma5_prefix_average"
+    )
+    assert prefix.selection_eligible is False
 
 
 def test_approximate_comparison_uses_typed_hybrid_tolerance_expression():

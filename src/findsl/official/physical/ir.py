@@ -141,6 +141,19 @@ class PhysicalProjectedRef(PhysicalExpr):
 
 
 @dataclass(frozen=True)
+class PhysicalPrefixRef(PhysicalExpr):
+    alias: str
+    type: OfficialType
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalPrefixRef",
+            "alias": self.alias,
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalLatestValue(PhysicalExpr):
     resource_id: str
     column: str
@@ -862,6 +875,22 @@ class PhysicalCandidateSetOperation(PhysicalPlan):
             "anchor_resource_id": self.anchor_resource_id,
             "key_semantics": "security",
             "output_date_policy": "latest_anchor",
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalPrefixJoin(PhysicalPlan):
+    input: PhysicalPlan
+    projections: Tuple[PhysicalProjection, ...]
+    predicate: Optional[PhysicalExpr]
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalPrefixJoin",
+            "input": self.input.to_dict(),
+            "projections": [item.to_dict() for item in self.projections],
+            "predicate": self.predicate.to_dict() if self.predicate is not None else None,
+            "join_semantics": "stable_observation",
         }
 
 
