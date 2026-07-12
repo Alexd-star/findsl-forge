@@ -4,6 +4,15 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端市场集合代数
+
+- 新增 SQL 无关的 `MarketAtom/MarketNot/MarketAnd/MarketOr`，正式定义 `^ > & > |` 优先级；非法连续运算符、尾随运算符和未知市场返回稳定诊断。
+- `BoundFunction` 与 `CallExpr` 现在携带 Typed Market Set 合同，物理层不再把 `|`、`&` 都用字符串 split 后混为同一种约束。
+- 新增布尔 `PhysicalNot` 及 SQLGlot `NOT` 渲染。纯交易所并集会规范化为单个 `IN`，板块交并补保留显式布尔树。
+- 官方代码表 5,686 行中的 `kcbFlag/gemFlag/bShareFlag` 真值均为 0。项目不修改原始数据，改以受控代码区间物理化：科创板 688、创业板 300/301、沪主板 600/601/603/605、深主板 000/001/002/003、北交所 920。
+- 新增 `scripts/collect_phase13_market_evidence.py`。科创板、创业板、主板并集、混合优先级和双重排除五组 reference SQL 与生成 SQL 的完整 Doris 行集哈希一致 `5/5`，当前五次重复快照最高 P95 约 0.36 秒。
+- 新后端迁移覆盖从 `183/1097（16.68%）` 提升到 `218/1097（19.87%）`，新后端总成功数为 `220`；原市场约束不支持项已清零，境外市场改为 `PHYSICAL_MARKET_DATA_UNAVAILABLE`。
+
 ### ANTLR/IR 新后端最近交易日集合
 
 - 新增布尔物理表达式 `PhysicalRecentSessions`，把 scalar date slot 的 `recent_sessions` 合同物理化为最近 N 个不同交易日的集合成员判断。
