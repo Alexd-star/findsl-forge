@@ -12,6 +12,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1873/5799 compiled |
+| Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
 | Official Doris prefix speedup | 1.17x |
@@ -20,7 +21,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
 | Git HEAD at report generation | 7920701 |
-| Git HEAD at export | 7920701 |
+| Git HEAD at export | 70e91d1 |
 
 ## Source Files
 
@@ -30,6 +31,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | official_suite_report | `submission_artifacts\evidence_snapshots\official_suite_report.md` |
 | official_doris_evidence_json | `submission_artifacts\evidence_snapshots\official_doris_evidence.json` |
 | official_slot_coverage_json | `submission_artifacts\evidence_snapshots\official_slot_coverage.json` |
+| official_query_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_query_performance_matrix.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
 

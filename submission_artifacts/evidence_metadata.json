@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-06T08:26:08Z",
+  "generated_at": "2026-07-12T12:57:49Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "7920701",
-    "head_at_export": "7920701",
+    "head_at_export": "70e91d1",
     "branch": "main"
   },
   "readiness": {
@@ -65,6 +65,18 @@
       "compile_failed": 3919,
       "compile_rate_on_all_rows": 0.322987,
       "compile_rate_on_parse_ok": 0.323377
+    },
+    "performance_matrix": {
+      "available": true,
+      "query_count": 6,
+      "all_queries_under_10s": true,
+      "max_p95_ms": 61.269,
+      "mean_avg_ms": 45.492,
+      "prefix_query_count": 1,
+      "window_query_count": 2,
+      "baseline_prefix_row_count_match": true,
+      "baseline_vs_prefix_speedup": 1.173,
+      "baseline_vs_prefix_speedup_display": "1.17x"
     }
   },
   "doris_cluster": {
@@ -88,6 +100,7 @@
     "official_suite_report": "submission_artifacts\\evidence_snapshots\\official_suite_report.md",
     "official_doris_evidence_json": "submission_artifacts\\evidence_snapshots\\official_doris_evidence.json",
     "official_slot_coverage_json": "submission_artifacts\\evidence_snapshots\\official_slot_coverage.json",
+    "official_query_performance_matrix_json": "submission_artifacts\\evidence_snapshots\\official_query_performance_matrix.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }

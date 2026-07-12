@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "git_head": "70e91d1daacc9ff49945ad32a54456f7d3fcf878",
+  "doris_versions": [
+    "doris-4.1.0-rc03-5960d4cea0e"
+  ],
+  "mysql_protocol_version": "5.7.99",
+  "latest_five_sessions": [
+    "2026-04-14",
+    "2026-04-13",
+    "2026-04-10",
+    "2026-04-09",
+    "2026-04-08"
+  ],
+  "repeats": 5,
+  "status": "PASS",
+  "matched": 4,
+  "no_boolean_placeholder": 4,
+  "explicit_all_selector": 4,
+  "total": 4,
+  "cases": [
+    {
+      "name": "full_latest_universe",
+      "source": "indicator('', '', '', '今日', '', '', '') = 'all'",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE 'all' = 'all' AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate='2026-04-14'",
+      "expected_count": 5614,
+      "actual_count": 5614,
+      "expected_sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
+      "actual_sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        288.9052,
+        187.6873,
+        201.1015,
+        166.169,
+        190.1507
+      ],
+      "p95_ms": 288.9052,
+      "no_boolean_placeholder": true,
+      "explicit_all_selector": true
+    },
+    {
+      "name": "shanghai_main_latest_universe",
+      "source": "indicator('沪主板', '', '', '今日', '', '', '') = 'all'",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (('all' = 'all' AND `q`.`mktcode` IN (1)) AND ((((`q`.`tgtcode` >= '600000' AND `q`.`tgtcode` <= '600999') OR (`q`.`tgtcode` >= '601000' AND `q`.`tgtcode` <= '601999')) OR (`q`.`tgtcode` >= '603000' AND `q`.`tgtcode` <= '603999')) OR (`q`.`tgtcode` >= '605000' AND `q`.`tgtcode` <= '605999'))) AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate='2026-04-14' AND b.mktcode=1 AND (LEFT(b.tgtcode,3) IN ('600','601','603','605'))",
+      "expected_count": 1718,
+      "actual_count": 1718,
+      "expected_sha256": "ddb7f66902a6318021426eabe6b402f9d8bc389ef81006a80dd1d0f50a831f56",
+      "actual_sha256": "ddb7f66902a6318021426eabe6b402f9d8bc389ef81006a80dd1d0f50a831f56",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        72.6734,
+        58.663,
+        55.5408,
+        48.5629,
+        43.3197
+      ],
+      "p95_ms": 72.6734,
+      "no_boolean_placeholder": true,
+      "explicit_all_selector": true
+    },
+    {
+      "name": "exclude_chinext_latest_universe",
+      "source": "indicator('^创业板', '', '', '今日', '', '', '') = 'all'",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE ('all' = 'all' AND NOT (`q`.`mktcode` IN (0) AND ((`q`.`tgtcode` >= '300000' AND `q`.`tgtcode` <= '300999') OR (`q`.`tgtcode` >= '301000' AND `q`.`tgtcode` <= '301999')))) AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate='2026-04-14' AND NOT (b.mktcode=0 AND (LEFT(b.tgtcode,3) IN ('300','301')))",
+      "expected_count": 4213,
+      "actual_count": 4213,
+      "expected_sha256": "fa183b103f9e826824a5842ce9b8b328caf6efe91813ff144e52a59a11f2624a",
+      "actual_sha256": "fa183b103f9e826824a5842ce9b8b328caf6efe91813ff144e52a59a11f2624a",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        177.9478,
+        163.281,
+        155.097,
+        154.8248,
+        176.512
+      ],
+      "p95_ms": 177.9478,
+      "no_boolean_placeholder": true,
+      "explicit_all_selector": true
+    },
+    {
+      "name": "recent_five_session_universe",
+      "source": "indicator('', '', '', '近5日', '', '', '') = 'all'",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE 'all' = 'all' AND `q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS calendar_sessions GROUP BY `calendar_sessions`.`bizdate` ORDER BY `calendar_sessions`.`bizdate` DESC LIMIT 5)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate IN ('2026-04-14','2026-04-13','2026-04-10','2026-04-09','2026-04-08')",
+      "expected_count": 28061,
+      "actual_count": 28061,
+      "expected_sha256": "e9d3abe9507aa01856f39b752c49b73a6ac37e14f4edef018a6bc039db754951",
+      "actual_sha256": "e9d3abe9507aa01856f39b752c49b73a6ac37e14f4edef018a6bc039db754951",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        158.2505,
+        145.6882,
+        174.7272,
+        143.5744,
+        169.8904
+      ],
+      "p95_ms": 174.7272,
+      "no_boolean_placeholder": true,
+      "explicit_all_selector": true
+    }
+  ]
+}

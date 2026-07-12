@@ -1,27 +1,59 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-06 16:26:07 +08:00
-- Git HEAD at export: 7920701
+- Generated at: 2026-07-12 20:57:49 +08:00
+- Git HEAD at export: 70e91d1
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `submission_readiness.md` (11929 bytes)
-- `doris_cluster_evidence.md` (6947 bytes)
-- `doris_cluster_evidence.json` (6537 bytes)
 - `defense_package.md` (9652 bytes)
-- `official_suite_report.md` (7549 bytes)
-- `real_market_sample_report.md` (923 bytes)
+- `doris_cluster_evidence.json` (6537 bytes)
+- `doris_cluster_evidence.md` (6947 bytes)
 - `evaluation_report.md` (12366 bytes)
-- `sql_equivalence_report.md` (1365 bytes)
+- `official_doris_evidence.json` (21914 bytes)
+- `official_doris_evidence.md` (19990 bytes)
+- `official_query_performance_matrix.json` (3656 bytes)
+- `official_query_performance_matrix.md` (1792 bytes)
+- `official_slot_coverage.json` (114283 bytes)
+- `official_slot_coverage.md` (71606 bytes)
+- `official_suite_report.md` (7549 bytes)
+- `phase10_join_doris.json` (9434 bytes)
+- `phase10_join_doris.md` (1001 bytes)
+- `phase10_join_funnel.json` (3254648 bytes)
+- `phase10_join_funnel.md` (1708 bytes)
+- `phase11_date_doris.json` (6174 bytes)
+- `phase11_date_doris.md` (1081 bytes)
+- `phase11_date_funnel.json` (3254633 bytes)
+- `phase11_date_funnel.md` (1752 bytes)
+- `phase12_session_doris.json` (5282 bytes)
+- `phase12_session_doris.md` (876 bytes)
+- `phase12_session_funnel.json` (3254561 bytes)
+- `phase12_session_funnel.md` (1752 bytes)
+- `phase13_market_doris.json` (7645 bytes)
+- `phase13_market_doris.md` (1321 bytes)
+- `phase13_market_funnel.json` (3253974 bytes)
+- `phase13_market_funnel.md` (1701 bytes)
+- `phase14_aggregate_doris.json` (8557 bytes)
+- `phase14_aggregate_doris.md` (808 bytes)
+- `phase14_aggregate_funnel.json` (3255898 bytes)
+- `phase14_aggregate_funnel.md` (1808 bytes)
+- `phase15_universe_doris.json` (5452 bytes)
+- `phase15_universe_doris.md` (959 bytes)
+- `phase15_universe_funnel.json` (3256285 bytes)
+- `phase15_universe_funnel.md` (1808 bytes)
+- `phase5_official_backend_evidence.json` (5431 bytes)
+- `phase5_official_backend_evidence.md` (984 bytes)
+- `phase9_temporal_doris.json` (27830 bytes)
+- `phase9_temporal_doris.md` (1418 bytes)
+- `phase9_temporal_funnel.json` (3254312 bytes)
+- `phase9_temporal_funnel.md` (1753 bytes)
 - `prefix_sum_benchmark.md` (2870 bytes)
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
-- `official_doris_evidence.md` (19875 bytes)
-- `official_doris_evidence.json` (21914 bytes)
-- `official_slot_coverage.md` (71606 bytes)
-- `official_slot_coverage.json` (114283 bytes)
+- `real_market_sample_report.md` (923 bytes)
+- `sql_equivalence_report.md` (1365 bytes)
+- `submission_readiness.md` (11929 bytes)
 
 ## Excluded By Design
 
