@@ -311,6 +311,27 @@ def test_grouped_aggregate_preserves_ext_anchor_join_keys():
     assert result.validation.passed is True
 
 
+@pytest.mark.parametrize(
+    ("function", "delta"),
+    [
+        ("GROWTH_RISE", "MAX_BY(`q`.`volume`, `q`.`bizdate`) - MIN_BY(`q`.`volume`, `q`.`bizdate`)"),
+        ("GROWTH_FALL", "MIN_BY(`q`.`volume`, `q`.`bizdate`) - MAX_BY(`q`.`volume`, `q`.`bizdate`)"),
+    ],
+)
+def test_growth_aggregate_uses_ordered_first_last_values_and_zero_guard(function, delta):
+    result = render_doris(
+        _physical(
+            f"indicator('', '', '成交量', '近5日', '', '{function}', '') > 10"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert delta in result.sql
+    assert "NULLIF(ABS(MIN_BY(`q`.`volume`, `q`.`bizdate`)), 0)" in result.sql
+    assert "AS `metric_value`" in result.sql
+    assert result.validation.passed is True
+
+
 def test_composite_aggregate_ratio_renders_named_set_relations_and_safe_division():
     result = render_doris(
         _physical(
@@ -388,6 +409,81 @@ def test_aggregate_rank_renders_group_then_window_without_correlated_aggregate()
     assert "`aggregate_ranked`.`__rank_value` <= 10" in result.sql
     assert result.sql.count("SELECT AVG(") == 0
     assert len(list(parsed.find_all(exp.RowNumber))) == 1
+    assert result.validation.passed is True
+
+
+def test_growth_rank_reuses_ordered_growth_measure_before_ranking():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '近10日', '', 'GROWTH_RISE', '') <= 10"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "MAX_BY(`q`.`volume`, `q`.`bizdate`)" in result.sql
+    assert "MIN_BY(`q`.`volume`, `q`.`bizdate`)" in result.sql
+    assert "ROW_NUMBER() OVER (ORDER BY `aggregate_rows`.`metric_value` DESC" in result.sql
+    assert result.validation.passed is True
+
+
+def test_temporal_growth_uses_one_lag_stage_and_parenthesized_rate():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '近10个交易日内', '', "
+            "'GROWTH_RISE', 'EXIST>0') > 50%"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("LAG(") == 1
+    assert "(`aggregate_lag`.`daily_value` - `aggregate_lag`.`previous_value`) * 100" in result.sql
+    assert "NULLIF(ABS(`aggregate_lag`.`previous_value`), 0)" in result.sql
+    assert "SUM(`aggregate_matched`.`matched`) AS `metric_value`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_temporal_calendar_aggregate_groups_before_consecutive_evaluation():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交额', '近3月', '', 'AVG', 'CONS>=2月') > 30000"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "DATE_TRUNC(`aggregate_source`.`bizdate`, 'MONTH')" in result.sql
+    assert "AVG(`aggregate_source`.`measure_value`) AS `metric_value`" in result.sql
+    assert "AS `run_group`" in result.sql
+    assert "MAX(`aggregate_runs`.`run_length`) AS `metric_value`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_temporal_growth_rank_orders_metric_before_percentage_count():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '', '', 'GROWTH_RISE', 'CONS=10日') <= 20%"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "AS `previous_value`" in result.sql
+    assert "ROW_NUMBER() OVER (PARTITION BY `aggregate_metric`.`bizdate`" in result.sql
+    assert "`aggregate_metric`.`metric_value` DESC" in result.sql
+    assert "COUNT(*) OVER (PARTITION BY `aggregate_metric`.`bizdate`) AS `rank_population`" in result.sql
+    assert "CEIL(`aggregate_ranked`.`rank_population` * 20 / 100.0)" in result.sql
+    assert result.validation.passed is True
+
+
+def test_temporal_direct_rank_collapses_daily_matches_into_calendar_buckets():
+    result = render_doris(
+        _physical(
+            "rank('', '', '涨停时间', 'asc', '最近一周', '', '', 'CONS=每周') = 1"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "ROW_NUMBER() OVER (PARTITION BY `aggregate_metric`.`bizdate`" in result.sql
+    assert "DATE_TRUNC(`aggregate_matched`.`bizdate`, 'WEEK')" in result.sql
+    assert "MAX(`aggregate_matched`.`matched`) AS `matched`" in result.sql
     assert result.validation.passed is True
 
 

@@ -43,6 +43,8 @@ from ..physical.ir import (
     PhysicalTableScan,
     PhysicalSetOperation,
     PhysicalTemporal,
+    PhysicalTemporalAggregate,
+    PhysicalTemporalRank,
     PhysicalUnary,
 )
 from ..physical.validate import validate_physical_plan
@@ -217,6 +219,10 @@ def _render_plan(
         return _render_event_filter(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporal):
         return _render_temporal(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalTemporalAggregate):
+        return _render_temporal_aggregate(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalTemporalRank):
+        return _render_temporal_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalSetOperation):
         return _render_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
@@ -378,6 +384,34 @@ def _event_window_aggregate(value, aggregate, partition, order, lookback_session
     )
 
 
+def _render_set_aggregate(function: str, value, date):
+    simple = {
+        "sum": exp.Sum,
+        "avg": exp.Avg,
+        "max": exp.Max,
+        "min": exp.Min,
+    }
+    if function in simple:
+        return simple[function](this=value)
+    if function not in {"growth_rise", "growth_fall"}:
+        raise DorisBackendError(
+            "DORIS_AGGREGATE_UNSUPPORTED",
+            f"unsupported set aggregate function {function}",
+        )
+    first = exp.func("MIN_BY", value.copy(), date.copy())
+    last = exp.func("MAX_BY", value.copy(), date.copy())
+    delta = (
+        exp.Sub(this=last, expression=first.copy())
+        if function == "growth_rise"
+        else exp.Sub(this=first.copy(), expression=last)
+    )
+    return exp.Div(
+        this=exp.Mul(this=exp.Paren(this=delta), expression=exp.convert(100)),
+        expression=exp.Nullif(
+            this=exp.Abs(this=first),
+            expression=exp.convert(0),
+        ),
+    )
 def _retarget_event_result_columns(expression, alias: str, catalog: PhysicalCatalog):
     resource_aliases = {resource.resource_id for resource in catalog.resources}
     resource_aliases.update({"q", "anchor"})
@@ -400,13 +434,10 @@ def _render_grouped_aggregate(
     relation = _find_relation(plan.input)
     stable_alias = _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
-    aggregate = {
-        "sum": exp.Sum,
-        "avg": exp.Avg,
-        "max": exp.Max,
-        "min": exp.Min,
-    }[plan.function](
-        this=_render_expr(plan.measure, catalog, relation)
+    aggregate = _render_set_aggregate(
+        plan.function,
+        _render_expr(plan.measure, catalog, relation),
+        exp.column("bizdate", table=stable_alias, quoted=True),
     ).as_("metric_value", quoted=True)
     source.set(
         "expressions",
@@ -481,13 +512,10 @@ def _render_aggregate_rank(
     relation = _find_relation(plan.input)
     stable_alias = _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
-    aggregate = {
-        "sum": exp.Sum,
-        "avg": exp.Avg,
-        "max": exp.Max,
-        "min": exp.Min,
-    }[plan.function](
-        this=_render_expr(plan.measure, catalog, relation)
+    aggregate = _render_set_aggregate(
+        plan.function,
+        _render_expr(plan.measure, catalog, relation),
+        exp.column("bizdate", table=stable_alias, quoted=True),
     ).as_("metric_value", quoted=True)
     source.set(
         "expressions",
@@ -659,15 +687,11 @@ def _render_aggregate_group(
     relation = _find_relation(group.input)
     stable_alias = _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
-    functions = {
-        "sum": exp.Sum,
-        "avg": exp.Avg,
-        "max": exp.Max,
-        "min": exp.Min,
-    }
     measures = [
-        functions[measure.function](
-            this=_render_expr(measure.expression, catalog, relation)
+        _render_set_aggregate(
+            measure.function,
+            _render_expr(measure.expression, catalog, relation),
+            exp.column("bizdate", table=stable_alias, quoted=True),
         ).as_(measure.alias, quoted=True)
         for measure in group.measures
     ]
@@ -1014,6 +1038,449 @@ def _render_temporal(
         alias="anchor_out",
     )
     qualified_alias = f"{cte_prefix}qualified_result"
+    qualified_table = exp.table_(qualified_name, quoted=True, alias=qualified_alias)
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(name, table="anchor_out", quoted=True),
+                expression=exp.column(name, table=qualified_alias, quoted=True),
+            )
+            for name in keys
+        )
+    )
+    final = exp.select(
+        *(exp.column(name, table="anchor_out", quoted=True) for name in (*keys, "bizdate"))
+    ).from_(anchor).join(qualified_table, on=join_predicate, join_type="INNER")
+    latest = exp.select(
+        exp.Max(this=exp.column("bizdate", table="latest_anchor", quoted=True))
+    ).from_(
+        exp.table_(
+            anchor_resource.table,
+            db=anchor_resource.database,
+            quoted=True,
+            alias="latest_anchor",
+        )
+    )
+    final = final.where(
+        exp.EQ(
+            this=exp.column("bizdate", table="anchor_out", quoted=True),
+            expression=exp.Subquery(this=latest),
+        )
+    )
+    for name, query in ctes:
+        final = final.with_(name, as_=query)
+    return final
+
+
+def _render_temporal_aggregate(
+    plan,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    is_rank = isinstance(plan, PhysicalTemporalRank)
+    function = plan.aggregate_function if is_rank else plan.function
+    value_comparator = plan.rank_comparator if is_rank else plan.value_comparator
+    value_bound = plan.rank_bound if is_rank else plan.value_bound
+    scan = _find_scan(plan.input)
+    stable_alias = "anchor" if scan.anchor_resource_id else "q"
+    keys = ("mktcode", "tgtcode")
+    names = {
+        name: f"{cte_prefix}{name}"
+        for name in (
+            "aggregate_source",
+            "aggregate_eligible",
+            "aggregate_daily",
+            "aggregate_lag",
+            "aggregate_metric",
+            "aggregate_ranked",
+            "aggregate_matched",
+            "aggregate_bucketed",
+            "aggregate_sequenced",
+            "aggregate_hits",
+            "aggregate_runs",
+            "aggregate_temporal_metrics",
+            "aggregate_qualified",
+        )
+    }
+    source = _render_plan(plan.input, catalog, cte_prefix).select(
+        _render_expr(plan.measure, catalog, scan).as_("measure_value", quoted=True),
+        append=True,
+    )
+    needs_session_limit = plan.window.kind in {
+        "recent_sessions",
+        "session_slice",
+        "latest_session",
+    }
+    if needs_session_limit:
+        source = source.select(
+            _row_number(stable_alias, keys, "bizdate", descending=True).as_(
+                "lookback_row", quoted=True
+            ),
+            append=True,
+        )
+    elif plan.window.kind == "exact_date":
+        source = source.where(
+            exp.EQ(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                expression=exp.convert(plan.window.start),
+            )
+        )
+    elif plan.window.kind == "calendar_range":
+        source = source.where(
+            exp.and_(
+                exp.GTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=exp.convert(plan.window.start),
+                ),
+                exp.LTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=exp.convert(plan.window.end),
+                ),
+            )
+        )
+    elif plan.window.kind == "boundary_sessions":
+        source = source.where(
+            _render_expr(
+                PhysicalSessionBoundaryRange(
+                    scan.anchor_resource_id or scan.resource_id,
+                    "bizdate",
+                    plan.window.boundary_direction,
+                    plan.window.boundary_kind,
+                    plan.window.lookback_sessions or 1,
+                    unit=plan.window.calendar_unit,
+                    offset=plan.window.calendar_offset,
+                    boundary_date=plan.window.boundary_date,
+                ),
+                catalog,
+                scan,
+            )
+        )
+    elif plan.window.kind == "recent_calendar":
+        lower, upper, _ = _dynamic_date_bounds(
+            catalog,
+            scan.anchor_resource_id or scan.resource_id,
+            "recent",
+            plan.window.calendar_unit,
+            plan.window.calendar_amount or 1,
+            0,
+            None,
+            None,
+        )
+        source = source.where(
+            exp.and_(
+                exp.GTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=lower,
+                ),
+                exp.LTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=upper,
+                ),
+            )
+        )
+    elif plan.window.kind in {"dynamic_period", "anchor_calendar"}:
+        lower, upper, validity = _dynamic_date_bounds(
+            catalog,
+            scan.anchor_resource_id or scan.resource_id,
+            "period" if plan.window.kind == "dynamic_period" else "anchor_calendar",
+            plan.window.calendar_unit,
+            plan.window.calendar_amount or 1,
+            plan.window.calendar_offset,
+            plan.window.anchor_month,
+            plan.window.anchor_day,
+        )
+        bounds = exp.and_(
+            exp.GTE(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                expression=lower,
+            ),
+            exp.LTE(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                expression=upper,
+            ),
+        )
+        source = source.where(exp.and_(bounds, validity) if validity is not None else bounds)
+
+    ctes = [(names["aggregate_source"], source)]
+    relation_name = names["aggregate_source"]
+    if needs_session_limit:
+        lookback = plan.window.lookback_sessions or 1
+        offset = plan.window.session_offset
+        bounds = exp.LTE(
+            this=exp.column("lookback_row", table=relation_name, quoted=True),
+            expression=exp.convert(offset + lookback),
+        )
+        if offset:
+            bounds = exp.and_(
+                exp.GT(
+                    this=exp.column("lookback_row", table=relation_name, quoted=True),
+                    expression=exp.convert(offset),
+                ),
+                bounds,
+            )
+        eligible = exp.select(exp.Star()).from_(
+            exp.table_(relation_name, quoted=True)
+        ).where(bounds)
+        ctes.append((names["aggregate_eligible"], eligible))
+        relation_name = names["aggregate_eligible"]
+
+    calendar_bucket = plan.unit in {"周", "月", "季度", "年"}
+    aggregate_before_rank = calendar_bucket and (not is_rank or function is not None)
+    value = exp.column("measure_value", table=relation_name, quoted=True)
+    date = exp.column("bizdate", table=relation_name, quoted=True)
+    if aggregate_before_rank:
+        bucket_key = _calendar_bucket_key(relation_name, plan.unit)
+        bucket_ordinal = _calendar_bucket_ordinal(bucket_key, plan.unit)
+        metric = _render_set_aggregate(function, value, date)
+        metric_rows = exp.select(
+            *(exp.column(name, table=relation_name, quoted=True) for name in keys),
+            bucket_key.as_("bucket_key", quoted=True),
+            bucket_ordinal.as_("bucket_ordinal", quoted=True),
+            metric.as_("metric_value", quoted=True),
+        ).from_(exp.table_(relation_name, quoted=True)).group_by(
+            *(exp.column(name, table=relation_name, quoted=True) for name in keys),
+            bucket_key,
+            bucket_ordinal,
+        )
+        ctes.append((names["aggregate_metric"], metric_rows))
+        metric_name = names["aggregate_metric"]
+        order_column = "bucket_key"
+        sequence_column = "bucket_ordinal"
+        projection = (*keys, "bucket_key", "bucket_ordinal", "metric_value")
+    else:
+        daily_function = function if function in {"sum", "avg", "max", "min"} else "max"
+        daily_rows = exp.select(
+            *(exp.column(name, table=relation_name, quoted=True) for name in keys),
+            date.copy(),
+            _render_set_aggregate(daily_function, value, date).as_(
+                "daily_value", quoted=True
+            ),
+        ).from_(exp.table_(relation_name, quoted=True)).group_by(
+            *(exp.column(name, table=relation_name, quoted=True) for name in (*keys, "bizdate"))
+        )
+        ctes.append((names["aggregate_daily"], daily_rows))
+        daily_name = names["aggregate_daily"]
+        current = exp.column("daily_value", table=daily_name, quoted=True)
+        if function in {"growth_rise", "growth_fall"}:
+            previous = exp.Window(
+                this=exp.Lag(this=current.copy()),
+                partition_by=[
+                    exp.column(name, table=daily_name, quoted=True) for name in keys
+                ],
+                order=exp.Order(
+                    expressions=[
+                        exp.Ordered(
+                            this=exp.column("bizdate", table=daily_name, quoted=True),
+                            desc=False,
+                        )
+                    ]
+                ),
+            )
+            lag_rows = exp.select(
+                *(exp.column(name, table=daily_name, quoted=True) for name in (*keys, "bizdate", "daily_value")),
+                previous.as_("previous_value", quoted=True),
+            ).from_(exp.table_(daily_name, quoted=True))
+            ctes.append((names["aggregate_lag"], lag_rows))
+            daily_name = names["aggregate_lag"]
+            current = exp.column("daily_value", table=daily_name, quoted=True)
+            previous_value = exp.column("previous_value", table=daily_name, quoted=True)
+            delta = (
+                exp.Sub(this=current.copy(), expression=previous_value.copy())
+                if function == "growth_rise"
+                else exp.Sub(this=previous_value.copy(), expression=current.copy())
+            )
+            metric = exp.Div(
+                this=exp.Mul(
+                    this=exp.Paren(this=delta),
+                    expression=exp.convert(100),
+                ),
+                expression=exp.Nullif(
+                    this=exp.Abs(this=previous_value),
+                    expression=exp.convert(0),
+                ),
+            )
+        else:
+            metric = current
+        metric_rows = exp.select(
+            *(exp.column(name, table=daily_name, quoted=True) for name in (*keys, "bizdate")),
+            metric.as_("metric_value", quoted=True),
+        ).from_(exp.table_(daily_name, quoted=True))
+        ctes.append((names["aggregate_metric"], metric_rows))
+        metric_name = names["aggregate_metric"]
+        order_column = "bizdate"
+        sequence_column = "all_seq"
+        projection = (*keys, "bizdate", "metric_value")
+
+    if is_rank:
+        rank_partition = (
+            [exp.column("bucket_key", table=metric_name, quoted=True)]
+            if aggregate_before_rank
+            else [exp.column("bizdate", table=metric_name, quoted=True)]
+        )
+        rank_order = exp.Order(
+            expressions=[
+                exp.Ordered(
+                    this=exp.column("metric_value", table=metric_name, quoted=True),
+                    desc=plan.direction == "desc",
+                ),
+                exp.Ordered(
+                    this=exp.column("mktcode", table=metric_name, quoted=True),
+                    desc=False,
+                    nulls_first=True,
+                ),
+                exp.Ordered(
+                    this=exp.column("tgtcode", table=metric_name, quoted=True),
+                    desc=False,
+                    nulls_first=True,
+                ),
+            ]
+        )
+        ranked = exp.select(
+            *(exp.column(name, table=metric_name, quoted=True) for name in projection),
+            exp.Window(
+                this=exp.RowNumber(),
+                partition_by=rank_partition,
+                order=rank_order,
+            ).as_("rank_value", quoted=True),
+        ).from_(exp.table_(metric_name, quoted=True))
+        if plan.rank_percentage:
+            ranked = ranked.select(
+                exp.Window(
+                    this=exp.Count(this=exp.Star()),
+                    partition_by=[item.copy() for item in rank_partition],
+                ).as_("rank_population", quoted=True),
+                append=True,
+            )
+            projection = (*projection, "rank_population")
+        projection = (*projection, "rank_value")
+        ctes.append((names["aggregate_ranked"], ranked))
+        metric_name = names["aggregate_ranked"]
+        rank_bound = (
+            exp.Ceil(
+                this=exp.Div(
+                    this=exp.Mul(
+                        this=exp.column("rank_population", table=metric_name, quoted=True),
+                        expression=exp.convert(value_bound.value),
+                    ),
+                    expression=exp.convert(100.0),
+                )
+            )
+            if plan.rank_percentage
+            else exp.convert(value_bound.value)
+        )
+        predicate_left = exp.column("rank_value", table=metric_name, quoted=True)
+        predicate_right = rank_bound
+    else:
+        predicate_left = exp.column("metric_value", table=metric_name, quoted=True)
+        predicate_right = exp.convert(value_bound.value)
+    value_predicate = _COMPARISON[value_comparator](
+        this=predicate_left,
+        expression=predicate_right,
+    )
+    matched = exp.select(
+        *(exp.column(name, table=metric_name, quoted=True) for name in projection),
+        exp.Case(
+            ifs=[exp.If(this=value_predicate, true=exp.convert(1))],
+            default=exp.convert(0),
+        ).as_("matched", quoted=True),
+    ).from_(exp.table_(metric_name, quoted=True))
+    ctes.append((names["aggregate_matched"], matched))
+    matched_name = names["aggregate_matched"]
+
+    if is_rank and calendar_bucket and not aggregate_before_rank:
+        bucket_key = _calendar_bucket_key(matched_name, plan.unit)
+        bucket_ordinal = _calendar_bucket_ordinal(bucket_key, plan.unit)
+        bucketed = exp.select(
+            *(exp.column(name, table=matched_name, quoted=True) for name in keys),
+            bucket_key.as_("bucket_key", quoted=True),
+            bucket_ordinal.as_("bucket_ordinal", quoted=True),
+            exp.Max(this=exp.column("matched", table=matched_name, quoted=True)).as_(
+                "matched", quoted=True
+            ),
+        ).from_(exp.table_(matched_name, quoted=True)).group_by(
+            *(exp.column(name, table=matched_name, quoted=True) for name in keys),
+            bucket_key,
+            bucket_ordinal,
+        )
+        ctes.append((names["aggregate_bucketed"], bucketed))
+        matched_name = names["aggregate_bucketed"]
+        order_column = "bucket_key"
+        sequence_column = "bucket_ordinal"
+        projection = (*keys, "bucket_key", "bucket_ordinal")
+
+    if plan.every or plan.mode == "EXIST":
+        metrics = _render_exist_metrics(
+            matched_name,
+            keys,
+            gap_aware=calendar_bucket and plan.every,
+        )
+    else:
+        sequenced = exp.select(
+            *(exp.column(name, table=matched_name, quoted=True) for name in projection),
+            exp.column("matched", table=matched_name, quoted=True),
+            _row_number(matched_name, keys, order_column).as_("all_seq", quoted=True),
+        ).from_(exp.table_(matched_name, quoted=True))
+        ctes.append((names["aggregate_sequenced"], sequenced))
+        sequenced_name = names["aggregate_sequenced"]
+        hit_projection = (
+            (*keys, "bucket_key", "bucket_ordinal", "all_seq")
+            if calendar_bucket
+            else (*keys, "bizdate", "all_seq")
+        )
+        hits = exp.select(
+            *(exp.column(name, table=sequenced_name, quoted=True) for name in hit_projection),
+            _row_number(sequenced_name, keys, order_column).as_("matched_seq", quoted=True),
+        ).from_(exp.table_(sequenced_name, quoted=True)).where(
+            exp.EQ(
+                this=exp.column("matched", table=sequenced_name, quoted=True),
+                expression=exp.convert(1),
+            )
+        )
+        ctes.append((names["aggregate_hits"], hits))
+        hits_name = names["aggregate_hits"]
+        base_sequence = exp.column(sequence_column, table=hits_name, quoted=True)
+        island = exp.Sub(
+            this=base_sequence,
+            expression=exp.column("matched_seq", table=hits_name, quoted=True),
+        )
+        runs = exp.select(
+            *(exp.column(name, table=hits_name, quoted=True) for name in keys),
+            island.as_("run_group", quoted=True),
+            exp.Count(this=exp.Star()).as_("run_length", quoted=True),
+        ).from_(exp.table_(hits_name, quoted=True)).group_by(
+            *(exp.column(name, table=hits_name, quoted=True) for name in keys),
+            island,
+        )
+        ctes.append((names["aggregate_runs"], runs))
+        runs_name = names["aggregate_runs"]
+        metrics = exp.select(
+            *(exp.column(name, table=runs_name, quoted=True) for name in keys),
+            exp.Max(this=exp.column("run_length", table=runs_name, quoted=True)).as_(
+                "metric_value", quoted=True
+            ),
+            exp.Count(this=exp.Star()).as_("total_buckets", quoted=True),
+        ).from_(exp.table_(runs_name, quoted=True)).group_by(
+            *(exp.column(name, table=runs_name, quoted=True) for name in keys)
+        )
+
+    metrics_name = names["aggregate_temporal_metrics"]
+    ctes.append((metrics_name, metrics))
+    qualified_name = names["aggregate_qualified"]
+    qualified = exp.select(
+        *(exp.column(name, table=metrics_name, quoted=True) for name in keys)
+    ).from_(exp.table_(metrics_name, quoted=True)).where(
+        _temporal_metric_predicate(plan, metrics_name)
+    )
+    ctes.append((qualified_name, qualified))
+
+    anchor_resource = catalog.resource(plan.anchor_resource_id)
+    anchor = exp.table_(
+        anchor_resource.table,
+        db=anchor_resource.database,
+        quoted=True,
+        alias="anchor_out",
+    )
+    qualified_alias = f"{cte_prefix}aggregate_qualified_result"
     qualified_table = exp.table_(qualified_name, quoted=True, alias=qualified_alias)
     join_predicate = exp.and_(
         *(

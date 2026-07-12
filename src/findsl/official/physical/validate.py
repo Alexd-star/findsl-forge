@@ -4,8 +4,8 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
     PhysicalEventFilter, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
-    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedScalar, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
-    PhysicalTemporal,
+    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
+    PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
 )
@@ -103,11 +103,13 @@ def _validate_plan(plan, catalog, expressions):
                 raise ValueError("physical event result constraint must be boolean")
         return
     if isinstance(plan, PhysicalJoin):
-        _validate_plan(plan.left, catalog, expressions); _validate_plan(plan.right, catalog, expressions)
+        _validate_plan(plan.left, catalog, expressions)
+        _validate_plan(plan.right, catalog, expressions)
         if plan.join_type not in {"inner", "left"}:
             raise ValueError("unsupported physical join type")
         for left, right in plan.keys:
-            _validate_expr(left, catalog, expressions); _validate_expr(right, catalog, expressions)
+            _validate_expr(left, catalog, expressions)
+            _validate_expr(right, catalog, expressions)
             left_resource = catalog.resource(left.resource_id)
             right_resource = catalog.resource(right.resource_id)
             if left_resource.logical_entity != right_resource.logical_entity:
@@ -140,7 +142,7 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("physical percentage rank bound exceeds 100")
         _validate_expr(plan.expression, catalog, expressions)
     elif isinstance(plan, PhysicalAggregateRank):
-        if plan.function not in {"sum", "avg", "max", "min"}:
+        if plan.function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
             raise ValueError("unsupported aggregate rank function")
         if plan.direction not in {"asc", "desc"}:
             raise ValueError("aggregate rank direction is invalid")
@@ -158,7 +160,7 @@ def _validate_plan(plan, catalog, expressions):
             raise PhysicalCatalogError("aggregate rank anchor requires a partition key")
         _validate_expr(plan.measure, catalog, expressions)
     elif isinstance(plan, PhysicalGroupedAggregate):
-        if plan.function not in {"sum", "avg", "max", "min"}:
+        if plan.function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
             raise ValueError("unsupported grouped aggregate function")
         if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
             raise ValueError("unsupported grouped aggregate comparator")
@@ -187,7 +189,7 @@ def _validate_plan(plan, catalog, expressions):
                 if (
                     not measure.alias.isidentifier()
                     or measure.alias in measure_aliases
-                    or measure.function not in {"sum", "avg", "max", "min"}
+                    or measure.function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}
                 ):
                     raise ValueError("composite aggregate measure contract is invalid")
                 measure_aliases.add(measure.alias)
@@ -213,6 +215,60 @@ def _validate_plan(plan, catalog, expressions):
         if not used_refs or not used_refs.issubset(declared_refs):
             raise ValueError("composite aggregate predicate references an undeclared measure")
         _validate_expr(plan.predicate, catalog, expressions)
+    elif isinstance(plan, PhysicalTemporalRank):
+        if plan.aggregate_function is not None and plan.aggregate_function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
+            raise ValueError("unsupported temporal rank aggregate function")
+        if plan.rank_bound.type is not NUMERIC:
+            raise ValueError("temporal rank bound must be numeric")
+        if plan.aggregate_function is not None and plan.measure.type is not NUMERIC:
+            raise ValueError("temporal aggregate rank measure must be numeric")
+        if plan.direction not in {"asc", "desc"}:
+            raise ValueError("invalid temporal rank direction")
+        if plan.rank_comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            raise ValueError("unsupported temporal rank comparator")
+        if plan.rank_percentage and plan.rank_bound.value > 100:
+            raise ValueError("temporal percentage rank bound exceeds 100")
+        if plan.mode not in {"CONS", "EXIST"} or not plan.trading_sequence:
+            raise ValueError("invalid temporal rank mode or sequence semantics")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
+            raise ValueError("invalid temporal rank count comparator")
+        if plan.unit not in {"", "日", "周", "月", "季度", "年"}:
+            raise ValueError("temporal rank bucket unit is not implemented")
+        if plan.every:
+            if plan.threshold is not None or plan.comparator not in {"=", "!="}:
+                raise ValueError("invalid every-bucket temporal rank contract")
+        elif plan.threshold is None or plan.threshold < 0:
+            raise ValueError("invalid temporal rank threshold")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if anchor.partition_key is None:
+            raise PhysicalCatalogError("temporal rank anchor requires a partition key")
+        _validate_expr(plan.measure, catalog, expressions)
+        _validate_expr(plan.rank_bound, catalog, expressions)
+    elif isinstance(plan, PhysicalTemporalAggregate):
+        if plan.function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
+            raise ValueError("unsupported temporal aggregate function")
+        if plan.measure.type is not NUMERIC or plan.value_bound.type is not NUMERIC:
+            raise ValueError("temporal aggregate measure and bound must be numeric")
+        if plan.value_comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            raise ValueError("unsupported temporal aggregate value comparator")
+        if plan.mode not in {"CONS", "EXIST"} or not plan.trading_sequence:
+            raise ValueError("invalid temporal aggregate mode or sequence semantics")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
+            raise ValueError("invalid temporal aggregate count comparator")
+        if plan.unit not in {"", "日", "周", "月", "季度", "年"}:
+            raise ValueError("temporal aggregate bucket unit is not implemented")
+        if plan.window.kind not in {"all_history", "recent_sessions", "session_slice", "boundary_sessions", "recent_calendar", "dynamic_period", "anchor_calendar", "calendar_range", "exact_date", "latest_session"}:
+            raise ValueError("invalid temporal aggregate window")
+        if plan.every:
+            if plan.threshold is not None or plan.comparator not in {"=", "!="}:
+                raise ValueError("invalid every-bucket temporal aggregate contract")
+        elif plan.threshold is None or plan.threshold < 0:
+            raise ValueError("invalid temporal aggregate threshold")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if anchor.partition_key is None:
+            raise PhysicalCatalogError("temporal aggregate anchor requires a partition key")
+        _validate_expr(plan.measure, catalog, expressions)
+        _validate_expr(plan.value_bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporal):
         _validate_expr(plan.predicate, catalog, expressions)
         if plan.predicate.type is not BOOLEAN:
@@ -363,7 +419,8 @@ def _validate_expr(expression, catalog, expressions=None):
         for value in expression.values:
             _validate_expr(value, catalog, expressions)
     elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
-        _validate_expr(expression.left, catalog, expressions); _validate_expr(expression.right, catalog, expressions)
+        _validate_expr(expression.left, catalog, expressions)
+        _validate_expr(expression.right, catalog, expressions)
     elif isinstance(expression, PhysicalUnary):
         if expression.op != "negate" or expression.type is not NUMERIC:
             raise ValueError("unsupported physical unary expression")
@@ -405,6 +462,11 @@ def _walk_aggregate_refs(expression):
         yield from _walk_aggregate_refs(expression.expression)
         yield from _walk_aggregate_refs(expression.null_value)
     elif isinstance(expression, PhysicalCoalesce):
+        for item in expression.expressions:
+            yield from _walk_aggregate_refs(item)
+    elif isinstance(expression, PhysicalAbs):
+        yield from _walk_aggregate_refs(expression.expression)
+    elif isinstance(expression, PhysicalGreatest):
         for item in expression.expressions:
             yield from _walk_aggregate_refs(item)
     elif isinstance(expression, PhysicalIn):

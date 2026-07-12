@@ -34,12 +34,17 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase21_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase21_capability_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
-    migration_funnel_payload = phase20_funnel_payload or phase19_funnel_payload or _read_optional_json(
+    migration_funnel_payload = phase21_funnel_payload or phase20_funnel_payload or phase19_funnel_payload or _read_optional_json(
         snapshot_dir / "phase18_dynamic_date_funnel.json",
         warnings,
         warn_missing=False,
@@ -56,6 +61,16 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
     )
     mapping_event_payload = _read_optional_json(
         snapshot_dir / "phase20_mapping_event_doris.json",
+        warnings,
+        warn_missing=False,
+    )
+    aggregate_rank_payload = _read_optional_json(
+        snapshot_dir / "phase21_aggregate_rank_doris.json",
+        warnings,
+        warn_missing=False,
+    )
+    new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase21_new_success_audit.json",
         warnings,
         warn_missing=False,
     )
@@ -81,6 +96,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             dynamic_date_payload,
             security_scope_payload,
             mapping_event_payload,
+            aggregate_rank_payload,
+            new_success_audit_payload,
         ),
         "doris_cluster": _doris_metadata(doris_payload),
         "warnings": warnings,
@@ -114,6 +131,8 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     dynamic_date = _dict(official_migration.get("dynamic_date_evidence"))
     security_scope = _dict(official_migration.get("security_scope_evidence"))
     mapping_event = _dict(official_migration.get("mapping_event_evidence"))
+    aggregate_rank = _dict(official_migration.get("aggregate_rank_evidence"))
+    new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
     warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
@@ -138,6 +157,8 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Phase 18 dynamic date evidence | {_dynamic_date_display(dynamic_date)} |",
         f"| Phase 19 security scope evidence | {_security_scope_display(security_scope)} |",
         f"| Phase 20 mapping/event evidence | {_mapping_event_display(mapping_event)} |",
+        f"| Phase 21 aggregate/rank evidence | {_mapping_event_display(aggregate_rank)} |",
+        f"| Phase 21 new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
@@ -342,6 +363,8 @@ def _official_migration_metadata(
     dynamic_date: dict[str, Any] | None,
     security_scope: dict[str, Any] | None,
     mapping_event: dict[str, Any] | None,
+    aggregate_rank: dict[str, Any] | None,
+    new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
     gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
     date_gap = None
@@ -374,6 +397,15 @@ def _official_migration_metadata(
         mapping_p95_values = [
             value
             for item in mapping_event["cases"]
+            if isinstance(item, dict)
+            for value in [_number_or_none(item.get("p95_ms"))]
+            if value is not None
+        ]
+    aggregate_rank_p95_values = []
+    if isinstance(aggregate_rank, dict) and isinstance(aggregate_rank.get("cases"), list):
+        aggregate_rank_p95_values = [
+            value
+            for item in aggregate_rank["cases"]
             if isinstance(item, dict)
             for value in [_number_or_none(item.get("p95_ms"))]
             if value is not None
@@ -413,6 +445,22 @@ def _official_migration_metadata(
             "latest_data_date": mapping_event.get("latest_data_date") if isinstance(mapping_event, dict) else None,
             "max_p95_ms": max(mapping_p95_values) if mapping_p95_values else None,
         },
+        "aggregate_rank_evidence": {
+            "available": aggregate_rank is not None,
+            "status": aggregate_rank.get("status") if isinstance(aggregate_rank, dict) else None,
+            "matched": _int_or_none(aggregate_rank.get("matched")) if isinstance(aggregate_rank, dict) else None,
+            "total": _int_or_none(aggregate_rank.get("total")) if isinstance(aggregate_rank, dict) else None,
+            "non_empty": _int_or_none(aggregate_rank.get("non_empty")) if isinstance(aggregate_rank, dict) else None,
+            "latest_data_date": aggregate_rank.get("latest_data_date") if isinstance(aggregate_rank, dict) else None,
+            "max_p95_ms": max(aggregate_rank_p95_values) if aggregate_rank_p95_values else None,
+        },
+        "new_success_audit": {
+            "available": new_success_audit is not None,
+            "status": new_success_audit.get("status") if isinstance(new_success_audit, dict) else None,
+            "passed": _int_or_none(new_success_audit.get("passed")) if isinstance(new_success_audit, dict) else None,
+            "total": _int_or_none(new_success_audit.get("new_successes")) if isinstance(new_success_audit, dict) else None,
+            "failed": _int_or_none(new_success_audit.get("failed")) if isinstance(new_success_audit, dict) else None,
+        },
     }
 
 
@@ -429,6 +477,9 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase19_security_scope_doris_json": str(snapshot_dir / "phase19_security_scope_doris.json"),
         "phase20_capability_funnel_json": str(snapshot_dir / "phase20_capability_funnel.json"),
         "phase20_mapping_event_doris_json": str(snapshot_dir / "phase20_mapping_event_doris.json"),
+        "phase21_capability_funnel_json": str(snapshot_dir / "phase21_capability_funnel.json"),
+        "phase21_aggregate_rank_doris_json": str(snapshot_dir / "phase21_aggregate_rank_doris.json"),
+        "phase21_new_success_audit_json": str(snapshot_dir / "phase21_new_success_audit.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }
@@ -598,6 +649,18 @@ def _mapping_event_display(evidence: dict[str, Any]) -> str:
     non_empty_text = f", non-empty {non_empty}/{total}" if non_empty is not None else ""
     suffix = f", max P95 {max_p95:.4f} ms" if isinstance(max_p95, (int, float)) else ""
     return f"{status}, {matched}/{total}{non_empty_text}{suffix}"
+
+
+def _audit_display(evidence: dict[str, Any]) -> str:
+    if evidence.get("available") is False:
+        return "UNAVAILABLE"
+    status = evidence.get("status") or "<unknown>"
+    passed = evidence.get("passed")
+    total = evidence.get("total")
+    failed = evidence.get("failed")
+    if passed is None or total is None:
+        return str(status)
+    return f"{status}, {passed}/{total}, failed {failed if failed is not None else '<unknown>'}"
 
 
 def _official_performance_display(performance: dict[str, Any]) -> str:

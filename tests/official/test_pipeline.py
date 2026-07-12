@@ -63,6 +63,28 @@ def test_pipeline_classifies_missing_industry_membership_as_data_unavailable():
     assert excinfo.value.code == "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE"
 
 
+def test_pipeline_renders_configured_hybrid_numeric_approximation():
+    result = compile_official(
+        "indicator('', '', '最新价', '今日', '', '', '') ~= 10"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert "ABS((`q`.`lastPx` / 10000.0) - 10)" in sql
+    assert "GREATEST(0.01, 0.01 * GREATEST(ABS(`q`.`lastPx` / 10000.0), ABS(10)))" in sql
+    assert result["backend"]["validation_passed"] is True
+
+
+def test_pipeline_preserves_named_scalar_references_inside_approximation():
+    result = compile_official(
+        "indicator('沪|深|京', '', '成交量', '目前', '', '', '') ~= "
+        "queryData('', '华夏银行', '30日均量线', '目前', '')"
+    ).to_dict()
+
+    assert result["physical"]["selected_strategy"] == "composite_grouped_aggregate"
+    assert "ABS(`q`.`volume` - `scalar_0`.`scalar_value_0`)" in result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
+
+
 @pytest.mark.parametrize(
     "source,sql_fragment",
     [

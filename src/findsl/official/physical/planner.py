@@ -72,6 +72,8 @@ from .ir import (
     PhysicalScan,
     PhysicalTableScan,
     PhysicalTemporal,
+    PhysicalTemporalAggregate,
+    PhysicalTemporalRank,
     PhysicalTemporalWindow,
     PhysicalSetOperation,
     PhysicalUnary,
@@ -81,6 +83,7 @@ from .statistics import PhysicalStatisticsSnapshot
 from .strategies import PhysicalStrategyRegistry
 from .scopes import SecurityScopeCatalog, default_security_scope_catalog
 from .patterns import default_physical_pattern_config
+from .approximation import default_numeric_approximation_policy
 
 
 @dataclass(frozen=True)
@@ -147,6 +150,14 @@ _EXTREME_CALLS = {"record_high", "record_low"}
 _PATTERN_CALLS = {"reset", "close_together"}
 _POSITION_CALLS = {"position"}
 _WINDOW_EVENT_CALLS = _CROSSING_CALLS | _EXTREME_CALLS | _PATTERN_CALLS | _POSITION_CALLS
+_SET_AGGREGATE_FUNCTIONS = {
+    "SUM",
+    "AVG",
+    "MAX",
+    "MIN",
+    "GROWTH_RISE",
+    "GROWTH_FALL",
+}
 
 
 def plan_physical(
@@ -223,6 +234,8 @@ def plan_physical(
     querydata_scalar_calls = _querydata_scalar_calls(lowering.plan)
     aggregate_contract = _aggregate_contract(lowering.plan, aggregate_calls)
     aggregate_rank_contract = _aggregate_rank_contract(lowering.plan)
+    temporal_aggregate_contract = _temporal_aggregate_contract(lowering.plan)
+    temporal_rank_contract = _temporal_rank_contract(lowering.plan)
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
@@ -239,6 +252,24 @@ def plan_physical(
             fields,
             resource_ids,
             expressions,
+        )
+    if temporal_aggregate_contract is not None:
+        return _plan_temporal_aggregate(
+            temporal_aggregate_contract,
+            catalog,
+            fields,
+            resource_ids,
+            expressions,
+            statistics,
+        )
+    if temporal_rank_contract is not None:
+        return _plan_temporal_rank(
+            temporal_rank_contract,
+            catalog,
+            fields,
+            resource_ids,
+            expressions,
+            statistics,
         )
     if aggregate_rank_contract is not None:
         return _plan_aggregate_rank(
@@ -345,6 +376,27 @@ class _AggregateRankContract:
     limit: Optional[Tuple[int, int]] = None
 
 
+@dataclass(frozen=True)
+class _TemporalAggregateContract:
+    call: CallExpr
+    function: str
+    value_comparator: str
+    value_bound: LiteralExpr
+    temporal_plan: object
+    limit: Optional[Tuple[int, int]] = None
+
+
+@dataclass(frozen=True)
+class _TemporalRankContract:
+    call: CallExpr
+    aggregate_function: Optional[str]
+    direction: str
+    rank_comparator: str
+    rank_bound: LiteralExpr
+    temporal_plan: object
+    limit: Optional[Tuple[int, int]] = None
+
+
 def _aggregate_calls(plan) -> Tuple[CallExpr, ...]:
     return tuple(
         call
@@ -382,7 +434,7 @@ def _aggregate_contract(
         str(call.binding.slots.get("agg_func", "")).strip().upper()
         for call in calls
     }
-    unsupported = sorted(functions - {"SUM", "AVG", "MAX", "MIN"})
+    unsupported = sorted(functions - _SET_AGGREGATE_FUNCTIONS)
     if unsupported:
         raise PhysicalPlanningError(
             "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
@@ -426,6 +478,221 @@ def _aggregate_rank_contract(plan) -> Optional[_AggregateRankContract]:
         current.bound,
         current.comparator,
         limit,
+    )
+
+
+def _temporal_aggregate_contract(plan) -> Optional[_TemporalAggregateContract]:
+    limit = None
+    current = plan
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, (LogicalConsecutive, LogicalExist)):
+        return None
+    predicate = current.spec.predicate
+    if not isinstance(predicate, ComparisonExpr):
+        return None
+    if not isinstance(predicate.left, CallExpr) or not isinstance(predicate.right, LiteralExpr):
+        return None
+    call = predicate.left
+    if call.binding is None:
+        return None
+    if call.name == "rank":
+        return None
+    function = str(call.binding.slots.get("agg_func", "")).strip().upper()
+    if not function:
+        return None
+    if function not in _SET_AGGREGATE_FUNCTIONS:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+            f"temporal aggregate function requires a dedicated contract: {function}",
+        )
+    if predicate.op not in {"<", "<=", "=", "!=", ">", ">="}:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
+            "temporal aggregate currently requires a scalar comparison bound",
+        )
+    return _TemporalAggregateContract(
+        call,
+        function.lower(),
+        predicate.op,
+        predicate.right,
+        current,
+        limit,
+    )
+
+
+def _temporal_rank_contract(plan) -> Optional[_TemporalRankContract]:
+    limit = None
+    current = plan
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, (LogicalConsecutive, LogicalExist)):
+        return None
+    predicate = current.spec.predicate
+    if not isinstance(predicate, ComparisonExpr):
+        return None
+    if not isinstance(predicate.left, CallExpr) or predicate.left.name != "rank":
+        return None
+    if not isinstance(predicate.right, LiteralExpr):
+        return None
+    call = predicate.left
+    if call.binding is None:
+        return None
+    function = str(call.binding.slots.get("agg_func", "")).strip().upper() or None
+    if function is not None and function not in _SET_AGGREGATE_FUNCTIONS:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+            f"temporal rank aggregate requires a dedicated contract: {function}",
+        )
+    if predicate.op not in {"<", "<=", "=", "!=", ">", ">="}:
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+            "temporal rank requires one scalar rank bound",
+        )
+    direction = str(call.binding.slots.get("direction", "")).strip().lower()
+    if direction not in {"asc", "desc"}:
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_DIRECTION_UNSUPPORTED",
+            f"unsupported temporal rank direction: {direction}",
+        )
+    return _TemporalRankContract(
+        call,
+        function.lower() if function else None,
+        direction,
+        predicate.op,
+        predicate.right,
+        current,
+        limit,
+    )
+
+
+def _plan_temporal_rank(
+    contract: _TemporalRankContract,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+) -> PhysicalPlanningResult:
+    if len(resource_ids) != 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_MULTI_RESOURCE_UNSUPPORTED",
+            "temporal rank currently requires one physical measure resource",
+        )
+    selected = resource_ids[0]
+    resource = catalog.resource(selected)
+    anchor_id = resource.anchor_resource_id or selected
+    anchor = catalog.resource(anchor_id)
+    if anchor.partition_key is None or not {"mktcode", "tgtcode", "bizdate"}.issubset(anchor.stable_keys):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_ANCHOR_UNAVAILABLE",
+            f"resource {selected} has no dated stable security anchor",
+        )
+    indicator_id = contract.call.binding.slots.get("indicator_name", "")
+    field = _field_for_indicator(fields, indicator_id)
+    input_plan: PhysicalPlan = PhysicalScan(
+        selected,
+        _scan_columns((field,)),
+        None,
+        resource.anchor_resource_id,
+    )
+    for constraint in _call_constraints(contract.call, catalog, selected):
+        input_plan = PhysicalFilter(input_plan, constraint)
+    bound, percentage = _rank_bound(contract.rank_bound, contract.rank_comparator)
+    temporal = contract.temporal_plan
+    plan: PhysicalPlan = PhysicalTemporalRank(
+        input_plan,
+        _physical_field_expression(field),
+        contract.aggregate_function,
+        contract.direction,
+        contract.rank_comparator,
+        bound,
+        percentage,
+        "CONS" if isinstance(temporal, LogicalConsecutive) else "EXIST",
+        temporal.spec.comparator,
+        temporal.spec.threshold,
+        temporal.spec.maximum,
+        temporal.spec.unit,
+        temporal.spec.every,
+        _lower_temporal_window(temporal.spec.window),
+        anchor_id,
+        temporal.spec.trading_sequence,
+    )
+    if contract.limit is not None:
+        plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    decision = replace(
+        _candidate_decision(resource, catalog, statistics),
+        strategy_id="temporal_rank",
+        selected=True,
+    )
+    return PhysicalPlanningResult(plan, selected, (decision,), "temporal_rank")
+
+
+def _plan_temporal_aggregate(
+    contract: _TemporalAggregateContract,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+) -> PhysicalPlanningResult:
+    if len(resource_ids) != 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_MULTI_RESOURCE_UNSUPPORTED",
+            "temporal aggregate currently requires one physical measure resource",
+        )
+    selected = resource_ids[0]
+    resource = catalog.resource(selected)
+    anchor_id = resource.anchor_resource_id or selected
+    anchor = catalog.resource(anchor_id)
+    if anchor.partition_key is None or not {"mktcode", "tgtcode", "bizdate"}.issubset(anchor.stable_keys):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_ANCHOR_UNAVAILABLE",
+            f"resource {selected} has no dated stable security anchor",
+        )
+    indicator_id = contract.call.binding.slots.get("indicator_name", "")
+    field = _field_for_indicator(fields, indicator_id)
+    input_plan: PhysicalPlan = PhysicalScan(
+        selected,
+        _scan_columns((field,)),
+        None,
+        resource.anchor_resource_id,
+    )
+    for constraint in _call_constraints(contract.call, catalog, selected):
+        input_plan = PhysicalFilter(input_plan, constraint)
+    temporal = contract.temporal_plan
+    plan: PhysicalPlan = PhysicalTemporalAggregate(
+        input_plan,
+        _physical_field_expression(field),
+        contract.function,
+        contract.value_comparator,
+        _physical_literal(contract.value_bound),
+        "CONS" if isinstance(temporal, LogicalConsecutive) else "EXIST",
+        temporal.spec.comparator,
+        temporal.spec.threshold,
+        temporal.spec.maximum,
+        temporal.spec.unit,
+        temporal.spec.every,
+        _lower_temporal_window(temporal.spec.window),
+        anchor_id,
+        temporal.spec.trading_sequence,
+    )
+    if contract.limit is not None:
+        plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    decision = replace(
+        _candidate_decision(resource, catalog, statistics),
+        strategy_id="temporal_grouped_aggregate",
+        selected=True,
+    )
+    return PhysicalPlanningResult(
+        plan,
+        selected,
+        (decision,),
+        "temporal_grouped_aggregate",
     )
 
 
@@ -505,7 +772,7 @@ def _plan_aggregate_rank(
     statistics: Optional[PhysicalStatisticsSnapshot],
 ) -> PhysicalPlanningResult:
     function = str(contract.call.binding.slots.get("agg_func", "")).strip().lower()
-    if function not in {"sum", "avg", "max", "min"}:
+    if function not in {item.lower() for item in _SET_AGGREGATE_FUNCTIONS}:
         raise PhysicalPlanningError(
             "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
             f"aggregate rank function requires a dedicated contract: {function.upper()}",
@@ -589,7 +856,7 @@ def _plan_composite_aggregate(
     aggregate_resource_ids = set()
     for index, call in enumerate(unique_aggregates):
         function = str(call.binding.slots.get("agg_func", "")).strip().lower()
-        if function not in {"sum", "avg", "max", "min"}:
+        if function not in {item.lower() for item in _SET_AGGREGATE_FUNCTIONS}:
             raise PhysicalPlanningError(
                 "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
                 f"aggregate function requires a dedicated contract: {function.upper()}",
@@ -908,9 +1175,9 @@ def _lower_composite_expr(
         return PhysicalBinary(expression.op, left, right, expression.type)
     if isinstance(expression, ComparisonExpr):
         if expression.op == "~=":
-            raise PhysicalPlanningError(
-                "PHYSICAL_APPROXIMATION_POLICY_MISSING",
-                "approximate comparison requires catalog-provided tolerances",
+            return _lower_approximate_comparison(
+                _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids),
+                _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids),
             )
         if isinstance(expression.right, RangeExpr) and expression.op == "between":
             value = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids)
@@ -1231,9 +1498,9 @@ def _lower_crossing_predicate(expression, refs):
         )
     if isinstance(expression, ComparisonExpr):
         if expression.op == "~=":
-            raise PhysicalPlanningError(
-                "PHYSICAL_APPROXIMATION_POLICY_MISSING",
-                "approximate event comparison requires a declared tolerance",
+            return _lower_approximate_comparison(
+                _lower_crossing_predicate(expression.left, refs),
+                _lower_crossing_predicate(expression.right, refs),
             )
         if expression.op == "between" and isinstance(expression.right, RangeExpr):
             value = _lower_crossing_predicate(expression.left, refs)
@@ -1860,10 +2127,11 @@ def _lower_expr(
         )
     if isinstance(expression, ComparisonExpr):
         if expression.op == "~=":
-            raise PhysicalPlanningError(
-                "PHYSICAL_APPROXIMATION_POLICY_MISSING",
-                "approximate comparison requires catalog-provided absolute and relative tolerances",
+            result = _lower_approximate_comparison(
+                _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
+                _lower_expr(expression.right, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
             )
+            return _apply_call_constraints(result, expression, catalog, resource_id)
         if isinstance(expression.right, RangeExpr) and expression.op == "between":
             value = _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
             lower = _lower_expr(expression.right.lower, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
@@ -1903,6 +2171,34 @@ def _physical_literal(expression: LiteralExpr) -> PhysicalLiteral:
         numeric = float(value[:-1])
         value = int(numeric) if numeric.is_integer() else numeric
     return PhysicalLiteral(value, expression.type)
+
+
+def _lower_approximate_comparison(left, right):
+    if left.type is not NUMERIC or right.type is not NUMERIC:
+        raise PhysicalPlanningError(
+            "PHYSICAL_APPROXIMATION_TYPE_UNSUPPORTED",
+            "physical approximate equality currently requires numeric operands",
+        )
+    policy = default_numeric_approximation_policy()
+    difference = PhysicalAbs(
+        PhysicalBinary("-", left, right, NUMERIC),
+        NUMERIC,
+    )
+    magnitude = PhysicalGreatest(
+        (PhysicalAbs(left, NUMERIC), PhysicalAbs(right, NUMERIC)),
+        NUMERIC,
+    )
+    relative_bound = PhysicalBinary(
+        "*",
+        PhysicalLiteral(policy.relative_tolerance, NUMERIC),
+        magnitude,
+        NUMERIC,
+    )
+    tolerance = PhysicalGreatest(
+        (PhysicalLiteral(policy.absolute_tolerance, NUMERIC), relative_bound),
+        NUMERIC,
+    )
+    return PhysicalComparison("<=", difference, tolerance)
 
 
 def _rank_bound(expression, comparator: str) -> Tuple[PhysicalLiteral, bool]:

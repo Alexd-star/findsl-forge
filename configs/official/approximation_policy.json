@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "version": "2026-07-13",
+  "numeric": {
+    "relative_tolerance": 0.01,
+    "absolute_tolerance": 0.01,
+    "description": "Numeric approximate equality uses a 1% relative tolerance with a 0.01 absolute floor."
+  }
+}

@@ -47,7 +47,13 @@ $reportFiles = @(
   "phase20_mapping_event_doris.md",
   "phase20_mapping_event_doris.json",
   "phase20_capability_funnel.md",
-  "phase20_capability_funnel.json"
+  "phase20_capability_funnel.json",
+  "phase21_capability_funnel.md",
+  "phase21_capability_funnel.json",
+  "phase21_aggregate_rank_doris.md",
+  "phase21_aggregate_rank_doris.json",
+  "phase21_new_success_audit.md",
+  "phase21_new_success_audit.json"
 )
 
 $status = ""

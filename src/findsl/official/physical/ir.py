@@ -620,6 +620,84 @@ class PhysicalTemporal(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalTemporalAggregate(PhysicalPlan):
+    input: PhysicalPlan
+    measure: PhysicalExpr
+    function: str
+    value_comparator: str
+    value_bound: PhysicalLiteral
+    mode: str
+    comparator: str
+    threshold: Optional[int]
+    maximum: Optional[int]
+    unit: str
+    every: bool
+    window: PhysicalTemporalWindow
+    anchor_resource_id: str
+    trading_sequence: bool = True
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalTemporalAggregate",
+            "input": self.input.to_dict(),
+            "measure": self.measure.to_dict(),
+            "function": self.function,
+            "value_comparator": self.value_comparator,
+            "value_bound": self.value_bound.to_dict(),
+            "mode": self.mode,
+            "comparator": self.comparator,
+            "threshold": self.threshold,
+            "maximum": self.maximum,
+            "unit": self.unit,
+            "every": self.every,
+            "window": self.window.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+            "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence",
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalTemporalRank(PhysicalPlan):
+    input: PhysicalPlan
+    measure: PhysicalExpr
+    aggregate_function: Optional[str]
+    direction: str
+    rank_comparator: str
+    rank_bound: PhysicalLiteral
+    rank_percentage: bool
+    mode: str
+    comparator: str
+    threshold: Optional[int]
+    maximum: Optional[int]
+    unit: str
+    every: bool
+    window: PhysicalTemporalWindow
+    anchor_resource_id: str
+    trading_sequence: bool = True
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalTemporalRank",
+            "input": self.input.to_dict(),
+            "measure": self.measure.to_dict(),
+            "aggregate_function": self.aggregate_function,
+            "direction": self.direction,
+            "rank_comparator": self.rank_comparator,
+            "rank_bound": self.rank_bound.to_dict(),
+            "rank_percentage": self.rank_percentage,
+            "mode": self.mode,
+            "comparator": self.comparator,
+            "threshold": self.threshold,
+            "maximum": self.maximum,
+            "unit": self.unit,
+            "every": self.every,
+            "window": self.window.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+            "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence",
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalSetOperation(PhysicalPlan):
     left: PhysicalPlan
     right: PhysicalPlan

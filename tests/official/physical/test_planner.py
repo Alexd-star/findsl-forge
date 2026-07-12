@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalDynamicDateRange, PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -176,14 +176,15 @@ def test_shadow_prefix_candidate_can_be_selected_for_explicit_validation():
     assert result.plan.predicate.left.window == 5
 
 
-def test_approximate_comparison_without_catalog_tolerance_is_rejected_before_backend():
-    with pytest.raises(PhysicalPlanningError) as excinfo:
-        plan_physical(
-            _lower("indicator('', '', '成交量', '', '', '', '') ~= 100"),
-            default_physical_catalog(),
-        )
+def test_approximate_comparison_uses_typed_hybrid_tolerance_expression():
+    result = plan_physical(
+        _lower("indicator('', '', '成交量', '', '', '', '') ~= 100"),
+        default_physical_catalog(),
+    )
 
-    assert excinfo.value.code == "PHYSICAL_APPROXIMATION_POLICY_MISSING"
+    assert isinstance(result.plan.predicate.left, PhysicalAbs)
+    assert isinstance(result.plan.predicate.right, PhysicalGreatest)
+    assert "0.01" in result.plan.predicate.canonical_json()
 
 
 @pytest.mark.parametrize(
@@ -222,16 +223,18 @@ def test_single_aggregate_lowers_to_grouped_set_plan(aggregate):
     assert result.selected_strategy == "grouped_aggregate"
 
 
-def test_growth_aggregate_is_not_approximated_as_sum_or_scalar_field():
-    with pytest.raises(PhysicalPlanningError) as excinfo:
-        plan_physical(
-            _lower(
-                "indicator('', '', '成交量', '近5日', '', 'GROWTH_RISE', '') > 10"
-            ),
-            default_physical_catalog(),
-        )
+@pytest.mark.parametrize("aggregate", ["GROWTH_RISE", "GROWTH_FALL"])
+def test_growth_aggregate_lowers_to_dedicated_set_measure(aggregate):
+    result = plan_physical(
+        _lower(
+            f"indicator('', '', '成交量', '近5日', '', '{aggregate}', '') > 10"
+        ),
+        default_physical_catalog(),
+    )
 
-    assert excinfo.value.code == "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED"
+    assert isinstance(result.plan, PhysicalGroupedAggregate)
+    assert result.plan.function == aggregate.lower()
+    assert result.selected_strategy == "grouped_aggregate"
 
 
 def test_multiple_aggregate_measures_lower_to_named_relations_and_outer_predicate():
@@ -295,14 +298,75 @@ def test_composite_aggregate_rejects_conflicting_scalar_snapshot_dates():
     assert excinfo.value.code == "PHYSICAL_SCALAR_SCOPE_MISMATCH"
 
 
-def test_growth_rank_keeps_a_dedicated_unsupported_contract():
-    with pytest.raises(PhysicalPlanningError) as excinfo:
-        plan_physical(
-            _lower("rank('', '', '成交量', 'desc', '', '', 'GROWTH_RISE', '') <= 10"),
-            default_physical_catalog(),
-        )
+def test_growth_rank_lowers_to_dedicated_aggregate_rank():
+    result = plan_physical(
+        _lower("rank('', '', '成交量', 'desc', '近10日', '', 'GROWTH_RISE', '') <= 10"),
+        default_physical_catalog(),
+    )
 
-    assert excinfo.value.code == "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED"
+    assert isinstance(result.plan, PhysicalAggregateRank)
+    assert result.plan.function == "growth_rise"
+    assert result.selected_strategy == "aggregate_rank"
+
+
+@pytest.mark.parametrize(
+    "source,function,mode,unit",
+    [
+        (
+            "indicator('', '', '成交量', '近10个交易日内', '', 'GROWTH_RISE', 'EXIST>0') > 50%",
+            "growth_rise",
+            "EXIST",
+            "",
+        ),
+        (
+            "indicator('', '', '成交额', '近3月', '', 'AVG', 'CONS=每月') > 30000",
+            "avg",
+            "CONS",
+            "月",
+        ),
+    ],
+)
+def test_temporal_aggregate_lowers_to_explicit_bucketed_contract(source, function, mode, unit):
+    result = plan_physical(_lower(source), default_physical_catalog())
+
+    assert isinstance(result.plan, PhysicalTemporalAggregate)
+    assert result.plan.function == function
+    assert result.plan.mode == mode
+    assert result.plan.unit == unit
+    assert result.selected_strategy == "temporal_grouped_aggregate"
+
+
+@pytest.mark.parametrize(
+    "source,function,unit,percentage",
+    [
+        (
+            "rank('', '', '成交量', 'desc', '', '', 'GROWTH_RISE', 'CONS=10日') <= 20%",
+            "growth_rise",
+            "日",
+            True,
+        ),
+        (
+            "rank('', '', '集合竞价金额', 'asc', '2023年', '', 'AVG', 'CONS=每年') <= 10",
+            "avg",
+            "年",
+            False,
+        ),
+        (
+            "rank('', '', '涨停时间', 'asc', '最近一周', '', '', 'CONS=每周') = 1",
+            None,
+            "周",
+            False,
+        ),
+    ],
+)
+def test_temporal_rank_lowers_to_bucket_rank_then_quantifier(source, function, unit, percentage):
+    result = plan_physical(_lower(source), default_physical_catalog())
+
+    assert isinstance(result.plan, PhysicalTemporalRank)
+    assert result.plan.aggregate_function == function
+    assert result.plan.unit == unit
+    assert result.plan.rank_percentage is percentage
+    assert result.selected_strategy == "temporal_rank"
 
 
 def test_latest_date_and_market_constraints_are_materialized_in_predicate():
