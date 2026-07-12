@@ -29,6 +29,16 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    migration_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase18_dynamic_date_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
+    dynamic_date_payload = _read_optional_json(
+        snapshot_dir / "phase18_dynamic_date_doris.json",
+        warnings,
+        warn_missing=False,
+    )
 
     return {
         "schema_version": 1,
@@ -46,6 +56,10 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             "slot_coverage": _official_slot_coverage_metadata(official_slot_payload),
             "performance_matrix": _official_performance_matrix_metadata(official_performance_payload),
         },
+        "official_migration": _official_migration_metadata(
+            migration_funnel_payload,
+            dynamic_date_payload,
+        ),
         "doris_cluster": _doris_metadata(doris_payload),
         "warnings": warnings,
         "source_files": _source_files(snapshot_dir, manifest_path),
@@ -74,6 +88,8 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     official_doris = _dict(official_real.get("doris"))
     official_slot = _dict(official_real.get("slot_coverage"))
     official_perf = _dict(official_real.get("performance_matrix"))
+    official_migration = _dict(metadata.get("official_migration"))
+    dynamic_date = _dict(official_migration.get("dynamic_date_evidence"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
     warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
@@ -94,6 +110,8 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Official positive cases | {_ratio_display(_dict(official.get('positive')))} |",
         f"| Official negative diagnostics | {_ratio_display(_dict(official.get('negative')))} |",
         f"| Official slot coverage | {_official_slot_coverage_display(official_slot)} |",
+        f"| ANTLR/IR legacy migration | {_official_migration_display(official_migration)} |",
+        f"| Phase 18 dynamic date evidence | {_dynamic_date_display(dynamic_date)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
@@ -293,6 +311,47 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
     }
 
 
+def _official_migration_metadata(
+    funnel: dict[str, Any] | None,
+    dynamic_date: dict[str, Any] | None,
+) -> dict[str, Any]:
+    gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
+    date_gap = None
+    if isinstance(gaps, list):
+        date_gap = 0
+        for item in gaps:
+            if isinstance(item, dict) and item.get("code") == "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED":
+                date_gap = _int_or_none(item.get("count"))
+                break
+    p95_values = []
+    if isinstance(dynamic_date, dict) and isinstance(dynamic_date.get("cases"), list):
+        p95_values = [
+            value
+            for item in dynamic_date["cases"]
+            if isinstance(item, dict)
+            for value in [_number_or_none(item.get("p95_ms"))]
+            if value is not None
+        ]
+    return {
+        "available": funnel is not None,
+        "git_head": funnel.get("git_head") if isinstance(funnel, dict) else None,
+        "legacy_strict_success": _int_or_none(funnel.get("legacy_strict_success")) if isinstance(funnel, dict) else None,
+        "legacy_to_new_migrated": _int_or_none(funnel.get("legacy_to_new_migrated")) if isinstance(funnel, dict) else None,
+        "migration_coverage": _number_or_none(funnel.get("migration_coverage")) if isinstance(funnel, dict) else None,
+        "new_backend_success": _int_or_none(funnel.get("new_backend_success")) if isinstance(funnel, dict) else None,
+        "physical_date_gap": date_gap,
+        "dynamic_date_evidence": {
+            "available": dynamic_date is not None,
+            "status": dynamic_date.get("status") if isinstance(dynamic_date, dict) else None,
+            "matched": _int_or_none(dynamic_date.get("matched")) if isinstance(dynamic_date, dict) else None,
+            "total": _int_or_none(dynamic_date.get("total")) if isinstance(dynamic_date, dict) else None,
+            "latest_data_date": dynamic_date.get("latest_data_date") if isinstance(dynamic_date, dict) else None,
+            "trading_date_count": _int_or_none(dynamic_date.get("trading_date_count")) if isinstance(dynamic_date, dict) else None,
+            "max_p95_ms": max(p95_values) if p95_values else None,
+        },
+    }
+
+
 def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, str | None]:
     return {
         "submission_readiness": str(snapshot_dir / "submission_readiness.md"),
@@ -300,6 +359,8 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
         "official_slot_coverage_json": str(snapshot_dir / "official_slot_coverage.json"),
         "official_query_performance_matrix_json": str(snapshot_dir / "official_query_performance_matrix.json"),
+        "phase18_dynamic_date_funnel_json": str(snapshot_dir / "phase18_dynamic_date_funnel.json"),
+        "phase18_dynamic_date_doris_json": str(snapshot_dir / "phase18_dynamic_date_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }
@@ -416,6 +477,30 @@ def _official_slot_coverage_display(slot_coverage: dict[str, Any]) -> str:
     if compile_ok is None or row_count is None:
         return "<unknown>"
     return f"{compile_ok}/{row_count} compiled"
+
+
+def _official_migration_display(migration: dict[str, Any]) -> str:
+    if migration.get("available") is False:
+        return "UNAVAILABLE"
+    migrated = migration.get("legacy_to_new_migrated")
+    denominator = migration.get("legacy_strict_success")
+    coverage = migration.get("migration_coverage")
+    if migrated is None or denominator is None or coverage is None:
+        return "<unknown>"
+    return f"{migrated}/{denominator} ({coverage * 100:.2f}%)"
+
+
+def _dynamic_date_display(evidence: dict[str, Any]) -> str:
+    if evidence.get("available") is False:
+        return "UNAVAILABLE"
+    status = evidence.get("status") or "<unknown>"
+    matched = evidence.get("matched")
+    total = evidence.get("total")
+    max_p95 = evidence.get("max_p95_ms")
+    if matched is None or total is None:
+        return str(status)
+    suffix = f", max P95 {max_p95:.4f} ms" if isinstance(max_p95, (int, float)) else ""
+    return f"{status}, {matched}/{total}{suffix}"
 
 
 def _official_performance_display(performance: dict[str, Any]) -> str:

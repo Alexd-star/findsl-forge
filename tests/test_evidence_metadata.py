@@ -133,6 +133,36 @@ def _write_minimal_snapshots(
             ),
             encoding="utf-8",
         )
+        (snapshot_dir / "phase18_dynamic_date_funnel.json").write_text(
+            json.dumps(
+                {
+                    "git_head": "c7a2164",
+                    "legacy_strict_success": 1097,
+                    "legacy_to_new_migrated": 393,
+                    "migration_coverage": 0.35825,
+                    "new_backend_success": 400,
+                    "migration_gaps": [
+                        {"code": "PHYSICAL_CONSTRAINT_UNSUPPORTED", "count": 259}
+                    ],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        (snapshot_dir / "phase18_dynamic_date_doris.json").write_text(
+            json.dumps(
+                {
+                    "status": "PASS",
+                    "matched": 9,
+                    "total": 9,
+                    "latest_data_date": "2026-04-14",
+                    "trading_date_count": 4631,
+                    "cases": [{"p95_ms": 221.9858}, {"p95_ms": 180.0}],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
 
 
 def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(tmp_path: Path) -> None:
@@ -166,6 +196,11 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["official_real_data"]["performance_matrix"]["all_queries_under_10s"] is True
     assert metadata["official_real_data"]["performance_matrix"]["max_p95_ms"] == 61.269
     assert metadata["official_real_data"]["performance_matrix"]["baseline_vs_prefix_speedup_display"] == "1.17x"
+    assert metadata["official_migration"]["legacy_to_new_migrated"] == 393
+    assert metadata["official_migration"]["legacy_strict_success"] == 1097
+    assert metadata["official_migration"]["physical_date_gap"] == 0
+    assert metadata["official_migration"]["dynamic_date_evidence"]["matched"] == 9
+    assert metadata["official_migration"]["dynamic_date_evidence"]["max_p95_ms"] == 221.9858
     assert metadata["git"]["head_at_report_generation"] == "c7a2164"
     assert metadata["git"]["head_at_export"] == "c7a2164"
     assert metadata["warnings"] == []
@@ -228,6 +263,8 @@ def test_render_evidence_summary_markdown_highlights_auditable_metrics(tmp_path:
     assert "| Pytest regression | 311 passed" in markdown
     assert "| Official positive cases | 37/37 |" in markdown
     assert "| Official slot coverage | 1882/5799 compiled |" in markdown
+    assert "| ANTLR/IR legacy migration | 393/1097 (35.83%) |" in markdown
+    assert "| Phase 18 dynamic date evidence | PASS, 9/9, max P95 221.9858 ms |" in markdown
     assert "| Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |" in markdown
     assert "| Official Doris real data | AVAILABLE |" in markdown
     assert "| Official Doris feature tables | PASS |" in markdown
