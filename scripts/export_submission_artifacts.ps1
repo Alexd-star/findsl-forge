@@ -27,7 +27,11 @@ $reportFiles = @(
   "phase15_universe_doris.md",
   "phase15_universe_doris.json",
   "phase15_universe_funnel.md",
-  "phase15_universe_funnel.json"
+  "phase15_universe_funnel.json",
+  "phase16_composite_doris.md",
+  "phase16_composite_doris.json",
+  "phase16_composite_funnel.md",
+  "phase16_composite_funnel.json"
 )
 
 $status = ""

@@ -4,6 +4,16 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端命名组合聚合
+
+- 新增 `PhysicalAggregateGroup`、`PhysicalNamedAggregate`、`PhysicalAggregateRef` 和 `PhysicalCompositeAggregate`，以关系代数方式表达“每只证券的多个分组度量，再执行外层算术或布尔比较”。
+- 每个聚合调用保留自己的市场和日期合同，先独立按 `(mktcode,tgtcode)` 分组，再与最新或明确日期的标量快照连接；不同窗口不会被错误合并到一个源表 WHERE 中。
+- 相同聚合调用按规范节点 ID 去重并复用命名度量。跨资源聚合通过 catalog 声明的证券稳定键连接，不使用每只证券相关标量子查询。
+- 组合除法统一降低为 `NULLIF(denominator,0)`；同时修复 Typed AST 中数值百分比在物理层被渲染为 SQL 字符串的问题。百分比 rank 仍等待分区基数合同，不会被误当成绝对名次。
+- 标量与聚合混用时，标量调用必须共享一个单值快照日期。冲突日期返回 `PHYSICAL_SCALAR_SCOPE_MISMATCH`，范围型标量返回 `PHYSICAL_SCALAR_SCOPE_UNBOUNDED`。
+- 新增 `scripts/collect_phase16_composite_evidence.py`。最新成交量对 100 日最小值、跨 basic/ext 双 AVG 比值、双窗口加最新标量、非空双窗口比较四组场景在 13,650,347 行 Doris 表上完整行集哈希一致 `4/4`，集合式与安全除零检查均为 `4/4`，最高 P95 约 1.23 秒。
+- 官方漏斗新增 3 条精确组合聚合成功，同时撤销 11 条历史假阳性：这些问句此前静默忽略 `GROWTH_RISE/FALL`、时序聚合或 rank 聚合槽。审计后迁移覆盖为 `250/1097（22.79%）`，新后端总成功数为 `252`；该下降是语义正确性修复，不是已实现能力回退。
+
 ### ANTLR/IR 新后端类型化证券全集
 
 - 新增 `UniverseSpec`，把官方 `indicator(market, filter_scope, '', date, ...) = 'all'` 解释为受市场、日期和可用范围约束的证券全集选择，而不是缺失指标或布尔占位。
