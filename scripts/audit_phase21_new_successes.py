@@ -33,6 +33,14 @@ def main() -> int:
         action="store_true",
         help="Require normalized date/open-limit contracts for every new success",
     )
+    parser.add_argument(
+        "--require-event-semantics",
+        action="store_true",
+        help=(
+            "Require every new event success to materialize either a keyed "
+            "candidate-set plan or an event projection before temporal evaluation"
+        ),
+    )
     args = parser.parse_args()
 
     baseline = _rows(args.baseline)
@@ -72,6 +80,7 @@ def main() -> int:
             "period_scalar_materialized": True,
             "event_candidate_materialized": True,
             "date_algebra_materialized": True,
+            "event_semantics_materialized": True,
         }
         if "~=" in source:
             checks["approximation_materialized"] = "ABS(" in sql and "GREATEST(" in sql
@@ -135,6 +144,11 @@ def main() -> int:
                 source,
                 sql,
             )
+        if args.require_event_semantics:
+            checks["event_semantics_materialized"] = _event_semantics_materialized(
+                payload,
+                sql,
+            )
         passed = all(checks.values())
         results.append(
             {
@@ -154,6 +168,7 @@ def main() -> int:
         "require_period_scalars": args.require_period_scalars,
         "require_event_candidates": args.require_event_candidates,
         "require_date_algebra": args.require_date_algebra,
+        "require_event_semantics": args.require_event_semantics,
         "new_successes": len(results),
         "passed": sum(item["passed"] for item in results),
         "failed": sum(not item["passed"] for item in results),
@@ -178,6 +193,36 @@ def _walk_dicts(value):
     elif isinstance(value, list):
         for item in value:
             yield from _walk_dicts(item)
+
+
+def _event_semantics_materialized(payload, sql: str) -> bool:
+    strategy = payload["physical"]["selected_strategy"]
+    physical_nodes = list(_walk_dicts(payload["physical"]["plan"]))
+    kinds = {node.get("kind") for node in physical_nodes}
+    if strategy == "temporal_event_projection":
+        return (
+            {"PhysicalTemporal", "PhysicalEventProjection"}.issubset(kinds)
+            and "LAG(" in sql
+            and "source_rows AS" in sql
+            and "temporal_metrics AS" in sql
+            and (
+                "bucket_rows AS" in sql
+                or {"sequenced_rows AS", "matched_rows AS", "runs AS"}.issubset(
+                    set(re.findall(r"\b([a-z_]+ AS)\b", sql))
+                )
+            )
+        )
+    if strategy.startswith("event_candidate_"):
+        operations = {
+            node.get("operation")
+            for node in physical_nodes
+            if node.get("kind") == "PhysicalCandidateSetOperation"
+        }
+        return bool(operations) and all(
+            operation in {"intersect", "union", "except"}
+            for operation in operations
+        ) and any(f" {operation.upper()} " in sql for operation in operations)
+    return False
 
 
 def _date_algebra_materialized(payload, source: str, sql: str) -> bool:

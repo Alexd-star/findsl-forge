@@ -70,8 +70,12 @@ def test_between_is_lowered_to_auditable_bounded_comparisons():
 
     where = sqlglot.parse_one(result.sql, read="doris").args["where"].this
     assert isinstance(where, exp.And)
-    assert isinstance(where.this, exp.GTE)
-    assert isinstance(where.expression, exp.LTE)
+    assert len(list(where.find_all(exp.GTE))) == 1
+    assert len(list(where.find_all(exp.LTE))) == 1
+    assert any(
+        isinstance(node.expression, exp.Subquery)
+        for node in where.find_all(exp.EQ)
+    )
 
 
 def test_numeric_percent_literal_is_rendered_as_number_not_sql_string():
@@ -751,11 +755,7 @@ def test_filter_then_rank_stage_uses_one_data_scan_and_latest_date_anchor():
 
     parsed = sqlglot.parse_one(result.sql, read="doris")
     tables = [table.name for table in parsed.find_all(exp.Table)]
-    assert tables == [
-        "hsj_stock_hq_basic",
-        "hsj_stock_hq_basic",
-        "hsj_stock_hq_basic",
-    ]
+    assert tables == ["hsj_stock_hq_basic"] * 4
     assert "SELECT MAX(`q_latest`.`bizdate`)" in result.sql
     assert "GROUP BY `stage_1_candidates_raw`.`mktcode`, `stage_1_candidates_raw`.`tgtcode`" in result.sql
     assert "`q`.`volume` > 0" in result.sql
@@ -771,6 +771,7 @@ def test_ext_scan_preserves_official_basic_universe_with_left_join():
     assert [table.name for table in parsed.find_all(exp.Table)] == [
         "hsj_stock_hq_basic",
         "hsj_stock_hq_ext",
+        "hsj_stock_hq_basic",
     ]
     assert "LEFT JOIN" in result.sql
     assert "`q`.`bizdate` = `anchor`.`bizdate`" in result.sql
@@ -791,8 +792,9 @@ def test_multi_resource_join_renders_one_star_join_with_all_stable_keys():
 
     result = render_doris(physical.plan, catalog)
 
-    assert result.sql.count("`hsj_stock_hq_basic`") == 1
+    assert result.sql.count("`hsj_stock_hq_basic`") == 2
     assert result.sql.count("`hsj_stock_hq_ext`") == 1
+    assert "SELECT MAX(`q_latest`.`bizdate`)" in result.sql
     assert "LEFT JOIN" in result.sql
     assert "`official_basic`.`mktcode` = `official_ext`.`mktcode`" in result.sql
     assert "`official_basic`.`tgtcode` = `official_ext`.`tgtcode`" in result.sql

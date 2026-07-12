@@ -513,6 +513,19 @@ class PhysicalPosition(CanonicalIr):
 
 
 @dataclass(frozen=True)
+class PhysicalEventProjection(PhysicalPlan):
+    input: PhysicalPlan
+    events: Tuple[PhysicalCrossing, ...]
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalEventProjection",
+            "input": self.input.to_dict(),
+            "events": [event.to_dict() for event in self.events],
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalEventFilter(PhysicalPlan):
     input: PhysicalPlan
     events: Tuple[CanonicalIr, ...]

@@ -20,6 +20,7 @@ from ..physical.ir import (
     PhysicalFilter,
     PhysicalDynamicDateRange,
     PhysicalEventFilter,
+    PhysicalEventProjection,
     PhysicalEventRef,
     PhysicalExtreme,
     PhysicalGroupedAggregate,
@@ -239,6 +240,8 @@ def _render_plan(
         return _render_composite_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalEventFilter):
         return _render_event_filter(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalEventProjection):
+        return _render_event_projection(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporal):
         return _render_temporal(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporalAggregate):
@@ -397,6 +400,65 @@ def _render_event_filter(
     return outer.where(predicate)
 
 
+def _render_event_projection(
+    plan: PhysicalEventProjection,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(plan.input, catalog, cte_prefix)
+    relation = _find_relation(plan.input)
+    stable_alias = _stable_alias(relation)
+    partition = [
+        exp.column("mktcode", table=stable_alias, quoted=True),
+        exp.column("tgtcode", table=stable_alias, quoted=True),
+    ]
+    order = exp.Order(
+        expressions=[
+            exp.Ordered(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                desc=False,
+                nulls_first=True,
+            )
+        ]
+    )
+    for event in plan.events:
+        left = _render_expr(event.left, catalog, relation)
+        right = _render_expr(event.right, catalog, relation)
+        previous_left = exp.Window(
+            this=exp.Lag(this=left.copy()),
+            partition_by=[item.copy() for item in partition],
+            order=order.copy(),
+        )
+        previous_right = exp.Window(
+            this=exp.Lag(this=right.copy()),
+            partition_by=[item.copy() for item in partition],
+            order=order.copy(),
+        )
+        if event.direction == "above":
+            current = exp.GT(this=left, expression=right)
+            previous = exp.LTE(this=previous_left, expression=previous_right)
+        else:
+            current = exp.LT(this=left, expression=right)
+            previous = exp.GTE(this=previous_left, expression=previous_right)
+        source = source.select(
+            exp.and_(current, previous).as_(event.alias, quoted=True),
+            append=True,
+        )
+    alias = "event_rows"
+    rows = source.subquery(alias=alias)
+    return exp.select(
+        *(
+            exp.column(name, table=alias, quoted=True)
+            for name in (
+                "mktcode",
+                "tgtcode",
+                "bizdate",
+                *(event.alias for event in plan.events),
+            )
+        )
+    ).from_(rows)
+
+
 def _render_event_absence(
     plan: PhysicalEventFilter,
     rows: exp.Subquery,
@@ -500,21 +562,29 @@ def _render_event_absence(
 
 
 def _event_window_aggregate(value, aggregate, partition, order, lookback_sessions):
-    frame_start = (
-        "UNBOUNDED"
-        if lookback_sessions is None
-        else exp.Literal.number(lookback_sessions - 1)
-    )
-    return exp.Window(
-        this=aggregate(this=value.copy()),
-        partition_by=[item.copy() for item in partition],
-        order=order.copy(),
-        spec=exp.WindowSpec(
+    if lookback_sessions == 1:
+        frame = exp.WindowSpec(
+            kind="ROWS",
+            start="CURRENT ROW",
+            end="CURRENT ROW",
+        )
+    else:
+        frame_start = (
+            "UNBOUNDED"
+            if lookback_sessions is None
+            else exp.Literal.number(lookback_sessions - 1)
+        )
+        frame = exp.WindowSpec(
             kind="ROWS",
             start=frame_start,
             start_side="PRECEDING",
             end="CURRENT ROW",
-        ),
+        )
+    return exp.Window(
+        this=aggregate(this=value.copy()),
+        partition_by=[item.copy() for item in partition],
+        order=order.copy(),
+        spec=frame,
     )
 
 
@@ -1260,7 +1330,10 @@ def _render_temporal(
     catalog: PhysicalCatalog,
     cte_prefix: str = "",
 ) -> exp.Select:
-    relation = _find_relation(plan.input)
+    event_projection = isinstance(plan.input, PhysicalEventProjection)
+    relation = _find_relation(
+        plan.input.input if event_projection else plan.input
+    )
     if isinstance(relation, PhysicalScan):
         stable_resource_id = relation.anchor_resource_id or relation.resource_id
     elif isinstance(relation, PhysicalTableScan):
@@ -1268,7 +1341,7 @@ def _render_temporal(
     else:
         root, _ = _flatten_join(relation)
         stable_resource_id = root.resource_id
-    stable_alias = _stable_alias(relation)
+    stable_alias = "event_rows" if event_projection else _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
     source_rows_name = f"{cte_prefix}source_rows"
     eligible_rows_name = f"{cte_prefix}eligible_rows"

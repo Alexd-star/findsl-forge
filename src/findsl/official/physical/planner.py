@@ -45,6 +45,7 @@ from .ir import (
     PhysicalCoalesce,
     PhysicalDynamicDateRange,
     PhysicalEventFilter,
+    PhysicalEventProjection,
     PhysicalEventRef,
     PhysicalCrossing,
     PhysicalExtreme,
@@ -296,6 +297,20 @@ def plan_physical(
             raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
     crossing_calls = _crossing_calls(lowering.plan)
     if crossing_calls:
+        temporal_root = (
+            lowering.plan.input
+            if isinstance(lowering.plan, LogicalLimit)
+            else lowering.plan
+        )
+        if isinstance(temporal_root, (LogicalConsecutive, LogicalExist)):
+            return _plan_temporal_crossing_events(
+                lowering,
+                crossing_calls,
+                catalog,
+                fields,
+                resource_ids,
+                expressions,
+            )
         return _plan_crossing_events(
             lowering,
             crossing_calls,
@@ -401,6 +416,8 @@ def plan_physical(
             f"resource {selected} cannot directly produce stable result keys",
         )
     plan = _lower_plan(lowering.plan, catalog, selected, fields)
+    if _needs_implicit_latest_snapshot(lowering.plan):
+        plan = _with_latest_snapshot(plan, catalog, selected)
     validate_physical_plan(plan, catalog, expressions)
     direct_decision = _candidate_decision(resource, catalog, statistics)
     base_strategy = "controlled_expression" if any(field.expression is not None for field in fields) else "direct_column"
@@ -425,6 +442,12 @@ def plan_physical(
                 (),
                 expression_overrides={indicator_id.casefold(): expression},
             )
+            if _needs_implicit_latest_snapshot(lowering.plan):
+                prefix_plan = _with_latest_snapshot(
+                    prefix_plan,
+                    catalog,
+                    strategy.scan_resource_id,
+                )
             validate_physical_plan(prefix_plan, catalog, expressions)
             decision = _prefix_candidate_decision(strategy, catalog, statistics, allow_shadow_strategies)
             candidates.append((prefix_plan, strategy.scan_resource_id, strategy.strategy_id, decision))
@@ -1647,6 +1670,8 @@ def _plan_multi_resource(
         base_plan=relation,
         allowed_resource_ids=frozenset(joined),
     )
+    if _needs_implicit_latest_snapshot(lowering.plan):
+        plan = _with_latest_snapshot(plan, catalog, root_id)
     validate_physical_plan(plan, catalog, expressions)
     selected_resource = "+".join(joined)
     strategy_id = "stable_temporal_join" if temporal else "stable_key_join"
@@ -1669,6 +1694,79 @@ def _plan_multi_resource(
         selected=True,
     )
     return PhysicalPlanningResult(plan, selected_resource, (decision,), strategy_id)
+
+
+def _needs_implicit_latest_snapshot(plan) -> bool:
+    current = plan.input if isinstance(plan, LogicalLimit) else plan
+    if not isinstance(current, LogicalFilter):
+        return False
+    calls = tuple(_walk_calls(current.predicate))
+    return bool(calls) and all(
+        call.binding is not None
+        and not str(call.binding.slots.get("date", "")).strip()
+        for call in calls
+    )
+
+
+def _with_latest_snapshot(
+    plan: PhysicalPlan,
+    catalog: PhysicalCatalog,
+    resource_id: str,
+) -> PhysicalPlan:
+    resource = catalog.resource(resource_id)
+    stable_id = resource.anchor_resource_id or resource_id
+    stable = catalog.resource(stable_id)
+    predicate = PhysicalComparison(
+        "=",
+        PhysicalColumn(stable_id, stable.partition_key, TIME),
+        PhysicalLatestValue(stable_id, stable.partition_key, TIME),
+    )
+    return _with_partition_predicate(plan, stable_id, predicate)
+
+
+def _with_partition_predicate(
+    plan: PhysicalPlan,
+    resource_id: str,
+    predicate,
+) -> PhysicalPlan:
+    if isinstance(plan, PhysicalScan):
+        combined = (
+            predicate
+            if plan.partition_predicate is None
+            else PhysicalBinary(
+                "and",
+                plan.partition_predicate,
+                predicate,
+                BOOLEAN,
+            )
+        )
+        return replace(plan, partition_predicate=combined)
+    if isinstance(plan, PhysicalTableScan):
+        if plan.resource_id != resource_id:
+            return plan
+        combined = (
+            predicate
+            if plan.partition_predicate is None
+            else PhysicalBinary(
+                "and",
+                plan.partition_predicate,
+                predicate,
+                BOOLEAN,
+            )
+        )
+        return replace(plan, partition_predicate=combined)
+    if isinstance(plan, PhysicalJoin):
+        return replace(
+            plan,
+            left=_with_partition_predicate(plan.left, resource_id, predicate),
+            right=_with_partition_predicate(plan.right, resource_id, predicate),
+        )
+    if isinstance(plan, (PhysicalFilter, PhysicalLimit)):
+        return replace(
+            plan,
+            input=_with_partition_predicate(plan.input, resource_id, predicate),
+        )
+    return plan
 
 
 def _crossing_calls(plan) -> Tuple[CallExpr, ...]:
@@ -1700,7 +1798,32 @@ def _event_composition_contract(plan):
     terms = _flatten_boolean_terms(predicate, logical_op)
     event_terms = tuple(term for term in terms if _contains_window_event_call(term))
     other_terms = tuple(term for term in terms if not _contains_window_event_call(term))
-    if not event_terms or not other_terms:
+    if not event_terms:
+        return None
+    event_groups = {}
+    for term in event_terms:
+        signature = tuple(
+            sorted(
+                {
+                    _call_date_signature(call)
+                    for call in _walk_calls(term)
+                    if call.name in _WINDOW_EVENT_CALLS
+                }
+            )
+        )
+        event_groups.setdefault(signature, []).append(term)
+    if len(event_groups) > 1:
+        first_signature = next(iter(event_groups))
+        selected = tuple(event_groups[first_signature])
+        remaining = tuple(term for term in terms if term not in selected)
+        return (
+            current.input,
+            _combine_boolean_terms(selected, logical_op),
+            _combine_boolean_terms(remaining, logical_op),
+            "intersect" if logical_op == "and" else "union",
+            limit,
+        )
+    if not other_terms:
         return None
     event_calls = tuple(
         call for term in event_terms for call in _walk_calls(term)
@@ -1715,9 +1838,7 @@ def _event_composition_contract(plan):
         for call in other_calls
     )
     date_scopes = {
-        str(call.binding.slots.get("date", "")).strip()
-        for call in (*event_calls, *other_calls)
-        if str(call.binding.slots.get("date", "")).strip()
+        _call_date_signature(call) for call in (*event_calls, *other_calls)
     }
     if projection_compatible and len(date_scopes) <= 1:
         return None
@@ -1728,6 +1849,16 @@ def _event_composition_contract(plan):
         "intersect" if logical_op == "and" else "union",
         limit,
     )
+
+
+def _call_date_signature(call: CallExpr) -> str:
+    date = str(call.binding.slots.get("date", "")).strip()
+    if not date:
+        return "latest_session"
+    constraint = call.date_constraint or parse_date_constraint(date)
+    if constraint.kind == "relative" and constraint.anchor == "today":
+        return "latest_session"
+    return constraint.node_id
 
 
 def _flatten_boolean_terms(expression, logical_op: str):
@@ -1783,6 +1914,8 @@ def _plan_crossing_events(
     fields: Tuple[_ResolvedIndicator, ...],
     resource_ids: Tuple[str, ...],
     expressions: Optional[PhysicalExpressionRegistry],
+    *,
+    default_latest: bool = True,
 ) -> PhysicalPlanningResult:
     current = lowering.plan
     limit = None
@@ -1983,7 +2116,7 @@ def _plan_crossing_events(
                 constraints.append(constraint)
                 seen_constraints.add(constraint.node_id)
 
-    if not date_scopes:
+    if default_latest and not date_scopes:
         stable_resource_id = catalog.resource(root_id).anchor_resource_id or root_id
         partition_key = catalog.resource(stable_resource_id).partition_key
         latest_constraint = PhysicalComparison(
@@ -2052,6 +2185,84 @@ def _plan_crossing_events(
     )
 
 
+def _plan_temporal_crossing_events(
+    lowering: LoweringResult,
+    calls: Tuple[CallExpr, ...],
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+) -> PhysicalPlanningResult:
+    current = lowering.plan
+    limit = None
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, (LogicalConsecutive, LogicalExist)):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_TEMPORAL_PLAN_UNSUPPORTED",
+            "temporal event plan requires one consecutive or existence relation",
+        )
+    event_filter = LogicalFilter(
+        current.input,
+        current.spec.predicate,
+        current.schema,
+    )
+    event_result = _plan_crossing_events(
+        replace(lowering, plan=event_filter),
+        calls,
+        catalog,
+        fields,
+        resource_ids,
+        expressions,
+        default_latest=False,
+    )
+    if not isinstance(event_result.plan, PhysicalEventFilter):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_TEMPORAL_PLAN_UNSUPPORTED",
+            "temporal event lowering requires a row-valued event projection",
+        )
+    event_plan = event_result.plan
+    constrained_input = event_plan.input
+    for constraint in event_plan.result_constraints:
+        constrained_input = PhysicalFilter(constrained_input, constraint)
+    crossings = tuple(
+        event for event in event_plan.events if isinstance(event, PhysicalCrossing)
+    )
+    if len(crossings) != len(event_plan.events):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_TEMPORAL_KIND_UNSUPPORTED",
+            "temporal event projection currently requires crossing events",
+        )
+    plan: PhysicalPlan = PhysicalTemporal(
+        PhysicalEventProjection(constrained_input, crossings),
+        event_plan.predicate,
+        "CONS" if isinstance(current, LogicalConsecutive) else "EXIST",
+        current.spec.comparator,
+        current.spec.threshold,
+        current.spec.maximum,
+        current.spec.unit,
+        current.spec.every,
+        _lower_temporal_window(current.spec.window),
+        current.spec.trading_sequence,
+    )
+    if limit is not None:
+        plan = PhysicalLimit(plan, limit[0], limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    decision = replace(
+        event_result.decisions[0],
+        reason_code="PHYSICAL_EVENT_TEMPORAL_SELECTED",
+        reason="crossing events are projected before typed temporal quantification",
+        strategy_id="temporal_event_projection",
+    )
+    return PhysicalPlanningResult(
+        plan,
+        event_result.selected_resource,
+        (decision,),
+        "temporal_event_projection",
+    )
+
+
 def _lower_resolved_indicator(field: _ResolvedIndicator):
     if field.direct_column is not None:
         return PhysicalColumn(field.resource_id, field.direct_column, _type_from_name(field.value_type))
@@ -2107,6 +2318,13 @@ def _parse_extreme_lookback(value) -> Optional[int]:
     text = str(value or "").strip()
     if not text or text in {"历史", "史高", "史低"}:
         return None
+    shorthand = re.fullmatch(
+        r"(\d+|[零〇一二两三四五六七八九十百]+)内",
+        text,
+    )
+    if shorthand:
+        token = shorthand.group(1)
+        return int(token) if token.isdigit() else _parse_small_chinese_integer(token)
     match = re.fullmatch(
         r"(?:近|最近|过去)?(\d+|[零〇一二两三四五六七八九十百]+)(?:个)?(交易日|日|天|周|星期|月|个月|季度|季|年)(?:内)?",
         text,

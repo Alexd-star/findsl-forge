@@ -219,6 +219,11 @@ def test_pipeline_combines_crossing_events_without_scalar_fallback():
             "ROWS BETWEEN 79 PRECEDING AND CURRENT ROW",
             ">= MAX(`q`.`highPx` / 10000.0) OVER",
         ),
+        (
+            "record_high('', '', '最高价', '1日内', '今日', '', '', '') = True",
+            "ROWS BETWEEN CURRENT ROW AND CURRENT ROW",
+            ">= MAX(`q`.`highPx` / 10000.0) OVER",
+        ),
     ],
 )
 def test_pipeline_lowers_record_extrema_to_typed_window_frames(
@@ -358,6 +363,77 @@ def test_pipeline_position_ratio_preserves_fraction_parentheses():
     ).to_dict()
 
     assert "WHEN (`q`.`quantRatio` / 10000.0 - MIN(" in result["backend"]["sql"]
+
+
+def test_pipeline_splits_events_with_different_date_contracts_by_security():
+    result = compile_official(
+        "record_low('^创业板', '', '最低价', '历史', '今日', '', '', '') = True "
+        "and record_high('^创业板', '', '最高价', '历史', '昨日', '', '', '') = True "
+        "and indicator('^创业板', '', 'ST股票标识', '昨日', '', '', '') = False"
+    ).to_dict()
+
+    assert result["physical"]["selected_strategy"] == "event_candidate_intersect"
+    assert result["backend"]["sql"].count(" INTERSECT ") >= 1
+    assert "MAX(`q_latest`.`bizdate`)" in result["backend"]["sql"]
+    assert "OFFSET 1" in result["backend"]["sql"]
+
+
+def test_pipeline_normalizes_shorthand_extreme_period_and_latest_scalar_scope():
+    result = compile_official(
+        "record_high('', '', '收盘价', '80内', '三日内', '', '', '') = True "
+        "and indicator('', '', '收盘价', '', '', '', '') < 10"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "event_candidate_intersect"
+    assert "ROWS BETWEEN 79 PRECEDING AND CURRENT ROW" in sql
+    assert "LIMIT 3" in sql
+    assert "MAX(`q_latest`.`bizdate`)" in sql
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "indicator('', '', '成交量', '', '', '', '') > 0",
+        (
+            "indicator('', '', '最新价', '', '', '', '') >= "
+            "indicator('', '', '5日均线', '', '', '', '')"
+        ),
+    ],
+)
+def test_pipeline_undated_direct_filters_use_latest_data_snapshot(source):
+    result = compile_official(source).to_dict()
+
+    assert "SELECT MAX(" in result["backend"]["sql"]
+    assert "`bizdate`" in result["backend"]["sql"]
+
+
+@pytest.mark.parametrize(
+    "source,fragments",
+    [
+        (
+            "golden_cross('科创板', '', '3日均线', '30日均线', '17年', '', 'CONS=每月') = True",
+            ("DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH')", "SUM(`bucket_rows`.`matched`)"),
+        ),
+        (
+            "golden_cross('京|深', '', '20日均线', '200日均线', '', '', 'CONS=5日') = True",
+            ("AS `all_seq`", "AS `matched_seq`", "MAX(`runs`.`run_length`)"),
+        ),
+    ],
+)
+def test_pipeline_projects_crossing_events_before_temporal_quantification(
+    source,
+    fragments,
+):
+    result = compile_official(source).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "temporal_event_projection"
+    assert result["physical"]["plan"]["input"]["kind"] == "PhysicalEventProjection"
+    assert "LAG(" in sql
+    assert "CASE WHEN `event_rows`.`event_0` = TRUE THEN 1 ELSE 0 END" in sql
+    for fragment in fragments:
+        assert fragment in sql
 
 
 def test_pipeline_never_ignores_non_empty_window_event_slots():

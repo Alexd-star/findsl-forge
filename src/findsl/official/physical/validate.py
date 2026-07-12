@@ -3,7 +3,7 @@ from __future__ import annotations
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
-    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
+    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
     PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
@@ -58,6 +58,22 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("candidate-set anchor requires a partition key")
         _validate_plan(plan.left, catalog, expressions)
         _validate_plan(plan.right, catalog, expressions)
+        return
+    if isinstance(plan, PhysicalEventProjection):
+        _validate_plan(plan.input, catalog, expressions)
+        if not plan.events:
+            raise ValueError("physical event projection requires crossing events")
+        aliases = set()
+        for event in plan.events:
+            if not event.alias.isidentifier() or event.alias in aliases:
+                raise ValueError("physical event projection alias is invalid or duplicated")
+            if event.direction not in {"above", "below"}:
+                raise ValueError("physical event projection direction is invalid")
+            if event.left.type is not NUMERIC or event.right.type is not NUMERIC:
+                raise ValueError("physical event projection requires numeric operands")
+            aliases.add(event.alias)
+            _validate_expr(event.left, catalog, expressions)
+            _validate_expr(event.right, catalog, expressions)
         return
     if isinstance(plan, PhysicalEventFilter):
         _validate_plan(plan.input, catalog, expressions)
@@ -372,6 +388,11 @@ def _validate_plan(plan, catalog, expressions):
         _validate_expr(plan.value_bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporal):
         _validate_expr(plan.predicate, catalog, expressions)
+        if isinstance(plan.input, PhysicalEventProjection):
+            declared = {event.alias for event in plan.input.events}
+            refs = {item.alias for item in _walk_event_refs(plan.predicate)}
+            if not refs or not refs.issubset(declared):
+                raise ValueError("temporal event predicate references an undeclared event")
         if plan.predicate.type is not BOOLEAN:
             raise ValueError("physical temporal predicate must be boolean")
         if plan.mode not in {"CONS", "EXIST"} or not plan.trading_sequence:
