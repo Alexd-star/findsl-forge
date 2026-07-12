@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalCompositeAggregate, PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -226,6 +226,77 @@ def test_growth_aggregate_is_not_approximated_as_sum_or_scalar_field():
         )
 
     assert excinfo.value.code == "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED"
+
+
+def test_multiple_aggregate_measures_lower_to_named_relations_and_outer_predicate():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '主力净流入', '近5日', '', 'AVG', '') / "
+            "indicator('', '', '成交额', '近5日', '', 'AVG', '') < 20%"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.groups) == 2
+    assert [group.alias for group in result.plan.groups] == ["aggregate_0", "aggregate_1"]
+    assert result.selected_strategy == "composite_grouped_aggregate"
+    assert "PhysicalAggregateRef" in result.plan.predicate.canonical_json()
+    assert "PhysicalNullIf" in result.plan.predicate.canonical_json()
+
+
+def test_identical_aggregate_call_is_materialized_once_and_reused():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '近5日', '', 'SUM', '') > 10 and "
+            "indicator('', '', '成交量', '近5日', '', 'SUM', '') < 1000000000"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.groups) == 1
+    assert result.plan.predicate.canonical_json().count("PhysicalAggregateRef") == 2
+
+
+def test_scalar_snapshot_and_window_aggregate_use_one_typed_composite_plan():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '今日', '', '', '') = "
+            "indicator('', '', '成交量', '近100个交易日', '', 'MIN', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.groups) == 1
+    payload = result.plan.canonical_json()
+    assert "PhysicalLatestValue" in payload
+    assert "PhysicalRecentSessions" in payload
+
+
+def test_composite_aggregate_rejects_conflicting_scalar_snapshot_dates():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower(
+                "indicator('', '', '成交量', '今日', '', '', '') + "
+                "indicator('', '', '成交额', '昨日', '', '', '') > "
+                "indicator('', '', '成交量', '近5日', '', 'AVG', '')"
+            ),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_SCALAR_SCOPE_MISMATCH"
+
+
+def test_rank_over_aggregate_keeps_a_dedicated_unsupported_contract():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower("rank('', '', '成交量', 'desc', '', '', 'AVG', '') <= 10"),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED"
 
 
 def test_latest_date_and_market_constraints_are_materialized_in_predicate():

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
-    PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
+    PhysicalAggregate, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
     PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
@@ -91,6 +91,39 @@ def _validate_plan(plan, catalog, expressions):
             raise PhysicalCatalogError("grouped aggregate anchor requires a partition key")
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.bound, catalog, expressions)
+    elif isinstance(plan, PhysicalCompositeAggregate):
+        if not plan.groups or plan.predicate.type is not BOOLEAN:
+            raise ValueError("composite aggregate requires groups and a boolean predicate")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if anchor.partition_key is None:
+            raise PhysicalCatalogError("composite aggregate anchor requires a partition key")
+        relation_aliases = set()
+        declared_refs = set()
+        for group in plan.groups:
+            if not group.alias.isidentifier() or group.alias in relation_aliases:
+                raise ValueError("composite aggregate relation alias is invalid or duplicated")
+            relation_aliases.add(group.alias)
+            if not group.measures:
+                raise ValueError("composite aggregate group requires at least one measure")
+            _validate_plan(group.input, catalog, expressions)
+            measure_aliases = set()
+            for measure in group.measures:
+                if (
+                    not measure.alias.isidentifier()
+                    or measure.alias in measure_aliases
+                    or measure.function not in {"sum", "avg", "max", "min"}
+                ):
+                    raise ValueError("composite aggregate measure contract is invalid")
+                measure_aliases.add(measure.alias)
+                declared_refs.add((group.alias, measure.alias))
+                _validate_expr(measure.expression, catalog, expressions)
+        used_refs = {
+            (item.relation_alias, item.measure_alias)
+            for item in _walk_aggregate_refs(plan.predicate)
+        }
+        if not used_refs or not used_refs.issubset(declared_refs):
+            raise ValueError("composite aggregate predicate references an undeclared measure")
+        _validate_expr(plan.predicate, catalog, expressions)
     elif isinstance(plan, PhysicalTemporal):
         _validate_expr(plan.predicate, catalog, expressions)
         if plan.predicate.type is not BOOLEAN:
@@ -135,7 +168,10 @@ def _validate_plan(plan, catalog, expressions):
 
 
 def _validate_expr(expression, catalog, expressions=None):
-    if isinstance(expression, PhysicalColumn):
+    if isinstance(expression, PhysicalAggregateRef):
+        if not expression.relation_alias.isidentifier() or not expression.measure_alias.isidentifier():
+            raise ValueError("physical aggregate reference alias is invalid")
+    elif isinstance(expression, PhysicalColumn):
         catalog.resource(expression.resource_id)
         allowed = {field.column for field in catalog.fields if field.resource_id == expression.resource_id}
         if expressions is not None:
@@ -196,3 +232,21 @@ def _validate_expr(expression, catalog, expressions=None):
             raise ValueError("physical COALESCE requires compatible operands")
         for item in expression.expressions:
             _validate_expr(item, catalog, expressions)
+
+
+def _walk_aggregate_refs(expression):
+    if isinstance(expression, PhysicalAggregateRef):
+        yield expression
+    elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
+        yield from _walk_aggregate_refs(expression.left)
+        yield from _walk_aggregate_refs(expression.right)
+    elif isinstance(expression, (PhysicalUnary, PhysicalNot)):
+        yield from _walk_aggregate_refs(expression.operand)
+    elif isinstance(expression, PhysicalNullIf):
+        yield from _walk_aggregate_refs(expression.expression)
+        yield from _walk_aggregate_refs(expression.null_value)
+    elif isinstance(expression, PhysicalCoalesce):
+        for item in expression.expressions:
+            yield from _walk_aggregate_refs(item)
+    elif isinstance(expression, PhysicalIn):
+        yield from _walk_aggregate_refs(expression.expression)

@@ -8,9 +8,12 @@ from sqlglot import exp
 from ..physical.catalog import PhysicalCatalog
 from ..physical.ir import (
     PhysicalBinary,
+    PhysicalAggregateGroup,
+    PhysicalAggregateRef,
     PhysicalCoalesce,
     PhysicalColumn,
     PhysicalComparison,
+    PhysicalCompositeAggregate,
     PhysicalFilter,
     PhysicalGroupedAggregate,
     PhysicalIn,
@@ -182,6 +185,8 @@ def _render_plan(
         return outer.where(comparator)
     if isinstance(plan, PhysicalGroupedAggregate):
         return _render_grouped_aggregate(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalCompositeAggregate):
+        return _render_composite_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporal):
         return _render_temporal(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalSetOperation):
@@ -267,6 +272,65 @@ def _render_grouped_aggregate(
                 expression=latest,
             )
         )
+    )
+
+
+def _render_composite_aggregate(
+    plan: PhysicalCompositeAggregate,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    query = _render_plan(plan.input, catalog, cte_prefix)
+    anchor_relation = _find_relation(plan.input)
+    anchor_alias = _stable_alias(anchor_relation)
+    keys = ("mktcode", "tgtcode")
+    for group in plan.groups:
+        aggregate_rows = _render_aggregate_group(group, catalog, cte_prefix).subquery(
+            alias=group.alias
+        )
+        join_predicate = exp.and_(
+            *(
+                exp.EQ(
+                    this=exp.column(key, table=anchor_alias, quoted=True),
+                    expression=exp.column(key, table=group.alias, quoted=True),
+                )
+                for key in keys
+            )
+        )
+        query = query.join(aggregate_rows, on=join_predicate, join_type="INNER")
+    return query.where(_render_expr(plan.predicate, catalog, anchor_relation))
+
+
+def _render_aggregate_group(
+    group: PhysicalAggregateGroup,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(group.input, catalog, cte_prefix)
+    relation = _find_relation(group.input)
+    stable_alias = _stable_alias(relation)
+    keys = ("mktcode", "tgtcode")
+    functions = {
+        "sum": exp.Sum,
+        "avg": exp.Avg,
+        "max": exp.Max,
+        "min": exp.Min,
+    }
+    measures = [
+        functions[measure.function](
+            this=_render_expr(measure.expression, catalog, relation)
+        ).as_(measure.alias, quoted=True)
+        for measure in group.measures
+    ]
+    source.set(
+        "expressions",
+        [
+            *(exp.column(key, table=stable_alias, quoted=True) for key in keys),
+            *measures,
+        ],
+    )
+    return source.group_by(
+        *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
     )
 
 
@@ -748,6 +812,12 @@ def _stable_alias(relation) -> str:
 
 
 def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPlan] = None):
+    if isinstance(expression, PhysicalAggregateRef):
+        return exp.column(
+            expression.measure_alias,
+            table=expression.relation_alias,
+            quoted=True,
+        )
     if isinstance(expression, PhysicalColumn):
         table_alias = _expression_alias(expression.resource_id, scan)
         return exp.column(expression.column, table=table_alias, quoted=True)

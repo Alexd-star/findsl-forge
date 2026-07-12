@@ -287,6 +287,68 @@ class PhysicalGroupedAggregate(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalAggregateRef(PhysicalExpr):
+    relation_alias: str
+    measure_alias: str
+    type: OfficialType
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalAggregateRef",
+            "relation_alias": self.relation_alias,
+            "measure_alias": self.measure_alias,
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalNamedAggregate(CanonicalIr):
+    alias: str
+    function: str
+    expression: PhysicalExpr
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalNamedAggregate",
+            "alias": self.alias,
+            "function": self.function,
+            "expression": self.expression.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalAggregateGroup(CanonicalIr):
+    alias: str
+    input: PhysicalPlan
+    measures: Tuple[PhysicalNamedAggregate, ...]
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalAggregateGroup",
+            "alias": self.alias,
+            "input": self.input.to_dict(),
+            "measures": [measure.to_dict() for measure in self.measures],
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalCompositeAggregate(PhysicalPlan):
+    input: PhysicalPlan
+    groups: Tuple[PhysicalAggregateGroup, ...]
+    predicate: PhysicalExpr
+    anchor_resource_id: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalCompositeAggregate",
+            "input": self.input.to_dict(),
+            "groups": [group.to_dict() for group in self.groups],
+            "predicate": self.predicate.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalTemporal(PhysicalPlan):
     input: PhysicalPlan
     predicate: PhysicalExpr

@@ -33,8 +33,11 @@ from .catalog import PhysicalCatalog
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
 from .ir import (
     PhysicalBinary,
+    PhysicalAggregateGroup,
+    PhysicalAggregateRef,
     PhysicalColumn,
     PhysicalComparison,
+    PhysicalCompositeAggregate,
     PhysicalCoalesce,
     PhysicalFilter,
     PhysicalGroupedAggregate,
@@ -44,6 +47,7 @@ from .ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalNullIf,
+    PhysicalNamedAggregate,
     PhysicalNot,
     PhysicalNthLatestValue,
     PhysicalPlan,
@@ -166,7 +170,8 @@ def plan_physical(
             f"set_{lowering.plan.operation}",
         )
     _validate_universe_contract(lowering.plan)
-    aggregate_contract = _aggregate_contract(lowering.plan)
+    aggregate_calls = _aggregate_calls(lowering.plan)
+    aggregate_contract = _aggregate_contract(lowering.plan, aggregate_calls)
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
@@ -181,6 +186,15 @@ def plan_physical(
             catalog,
             fields,
             resource_ids,
+            expressions,
+            statistics,
+        )
+    if aggregate_calls:
+        return _plan_composite_aggregate(
+            lowering.plan,
+            aggregate_calls,
+            catalog,
+            fields,
             expressions,
             statistics,
         )
@@ -252,20 +266,25 @@ class _AggregateContract:
     limit: Optional[Tuple[int, int]] = None
 
 
-def _aggregate_contract(plan) -> Optional[_AggregateContract]:
+def _aggregate_calls(plan) -> Tuple[CallExpr, ...]:
+    return tuple(
+        call
+        for expression in _logical_expressions(plan)
+        for call in _walk_calls(expression)
+        if call.binding is not None
+        and str(call.binding.slots.get("agg_func", "")).strip()
+    )
+
+
+def _aggregate_contract(
+    plan,
+    calls: Tuple[CallExpr, ...],
+) -> Optional[_AggregateContract]:
     limit = None
     current = plan
     if isinstance(current, LogicalLimit):
         limit = (current.offset, current.count)
         current = current.input
-    calls = []
-    if isinstance(current, LogicalFilter):
-        calls = [
-            call
-            for call in _walk_calls(current.predicate)
-            if call.binding is not None
-            and str(call.binding.slots.get("agg_func", "")).strip()
-        ]
     if not calls:
         return None
     functions = {
@@ -279,21 +298,12 @@ def _aggregate_contract(plan) -> Optional[_AggregateContract]:
             f"aggregate function requires a dedicated contract: {', '.join(unsupported)}",
         )
     if len(calls) != 1:
-        raise PhysicalPlanningError(
-            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
-            "multiple aggregate calls require named measure propagation",
-        )
+        return None
     if not isinstance(current, LogicalFilter) or not isinstance(current.predicate, ComparisonExpr):
-        raise PhysicalPlanningError(
-            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
-            "aggregate must currently govern one comparison",
-        )
+        return None
     predicate = current.predicate
     if predicate.left is not calls[0] or not isinstance(predicate.right, LiteralExpr):
-        raise PhysicalPlanningError(
-            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
-            "aggregate comparison currently requires aggregate(call) op literal",
-        )
+        return None
     return _AggregateContract(
         calls[0],
         predicate.op,
@@ -346,7 +356,7 @@ def _plan_grouped_aggregate(
     else:
         assert field.expression is not None
         measure = _lower_declared_expression(field.expression, field.resource_id)
-    bound = PhysicalLiteral(contract.bound.value, contract.bound.type)
+    bound = _physical_literal(contract.bound)
     plan: PhysicalPlan = PhysicalGroupedAggregate(
         input_plan,
         measure,
@@ -371,6 +381,278 @@ def _plan_grouped_aggregate(
     )
 
 
+def _plan_composite_aggregate(
+    logical_plan,
+    aggregate_calls: Tuple[CallExpr, ...],
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+) -> PhysicalPlanningResult:
+    all_calls = tuple(
+        call
+        for expression in _logical_expressions(logical_plan)
+        for call in _walk_calls(expression)
+    )
+    if any(call.name == "rank" for call in all_calls):
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+            "rank over or beside aggregate measures requires a named window stage",
+        )
+    predicate, limit = _composite_filter_contract(logical_plan)
+    unique_aggregates = []
+    seen_aggregates = set()
+    for call in aggregate_calls:
+        if call.node_id in seen_aggregates:
+            continue
+        seen_aggregates.add(call.node_id)
+        unique_aggregates.append(call)
+
+    refs = {}
+    groups = []
+    aggregate_resource_ids = set()
+    for index, call in enumerate(unique_aggregates):
+        function = str(call.binding.slots.get("agg_func", "")).strip().lower()
+        if function not in {"sum", "avg", "max", "min"}:
+            raise PhysicalPlanningError(
+                "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+                f"aggregate function requires a dedicated contract: {function.upper()}",
+            )
+        indicator_id = call.binding.slots.get("indicator_name", "")
+        field = _field_for_indicator(fields, indicator_id)
+        aggregate_resource_ids.add(field.resource_id)
+        resource = catalog.resource(field.resource_id)
+        aggregate_input: PhysicalPlan = PhysicalScan(
+            field.resource_id,
+            _scan_columns((field,)),
+            None,
+            resource.anchor_resource_id,
+        )
+        for constraint in _call_constraints(call, catalog, field.resource_id):
+            aggregate_input = PhysicalFilter(aggregate_input, constraint)
+        relation_alias = f"aggregate_{index}"
+        measure_alias = f"metric_{index}"
+        measure = PhysicalNamedAggregate(
+            measure_alias,
+            function,
+            _physical_field_expression(field),
+        )
+        groups.append(PhysicalAggregateGroup(relation_alias, aggregate_input, (measure,)))
+        refs[call.node_id] = PhysicalAggregateRef(
+            relation_alias,
+            measure_alias,
+            _type_from_name(field.value_type),
+        )
+
+    scalar_calls = tuple(
+        call for call in all_calls if call.node_id not in seen_aggregates
+    )
+    scalar_fields = []
+    for call in scalar_calls:
+        if call.name not in _DIRECT_FIELD_CALLS or call.binding is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_EXPRESSION_UNSUPPORTED",
+                f"unsupported scalar call beside aggregate measure: {call.name}",
+            )
+        indicator_id = call.binding.slots.get("indicator_name", "")
+        scalar_fields.append(_field_for_indicator(fields, indicator_id))
+    scalar_fields = tuple(
+        {field.indicator_id.casefold(): field for field in scalar_fields}.values()
+    )
+    anchor_input, anchor_resource_id, allowed_resource_ids = _composite_anchor_relation(
+        scalar_fields,
+        scalar_calls,
+        catalog,
+    )
+    physical_predicate = _lower_composite_expr(
+        predicate,
+        catalog,
+        anchor_resource_id,
+        fields,
+        refs,
+        frozenset(allowed_resource_ids),
+    )
+    plan: PhysicalPlan = PhysicalCompositeAggregate(
+        anchor_input,
+        tuple(groups),
+        physical_predicate,
+        "official_basic",
+    )
+    if limit is not None:
+        plan = PhysicalLimit(plan, limit[0], limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    resources = sorted(aggregate_resource_ids | set(allowed_resource_ids))
+    selected_resource = "+".join(resources)
+    cost = sum(catalog.resource(item).priority for item in resources)
+    decision = PhysicalDecision(
+        resource_id=selected_resource,
+        feasible=True,
+        cost=float(cost),
+        estimated=True,
+        reason_code="PHYSICAL_NAMED_AGGREGATE_SELECTED",
+        reason="independent grouped measure relations joined on catalog stable security keys",
+        strategy_id="composite_grouped_aggregate",
+        selected=True,
+    )
+    return PhysicalPlanningResult(
+        plan,
+        selected_resource,
+        (decision,),
+        "composite_grouped_aggregate",
+    )
+
+
+def _composite_filter_contract(plan):
+    limit = None
+    current = plan
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, LogicalFilter):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_COMPOSITION_UNSUPPORTED",
+            "composite aggregate requires one boolean filter relation",
+        )
+    return current.predicate, limit
+
+
+def _physical_field_expression(field: _ResolvedIndicator):
+    if field.direct_column is not None:
+        return PhysicalColumn(
+            field.resource_id,
+            field.direct_column,
+            _type_from_name(field.value_type),
+        )
+    assert field.expression is not None
+    return _lower_declared_expression(field.expression, field.resource_id)
+
+
+def _composite_anchor_relation(
+    scalar_fields: Tuple[_ResolvedIndicator, ...],
+    scalar_calls: Tuple[CallExpr, ...],
+    catalog: PhysicalCatalog,
+):
+    dated = []
+    for call in scalar_calls:
+        date = str(call.binding.slots.get("date", "")).strip()
+        if not date:
+            continue
+        typed_date = call.date_constraint or parse_date_constraint(date)
+        if typed_date.kind not in {"relative", "exact", "relative_session"}:
+            raise PhysicalPlanningError(
+                "PHYSICAL_SCALAR_SCOPE_UNBOUNDED",
+                f"scalar value beside aggregate requires a singleton date, got {date}",
+            )
+        dated.append(typed_date)
+    signatures = {item.canonical_json() for item in dated}
+    if len(signatures) > 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_SCALAR_SCOPE_MISMATCH",
+            "scalar values beside aggregate measures must share one snapshot date",
+        )
+
+    resource_ids = tuple(sorted({field.resource_id for field in scalar_fields}))
+    if not resource_ids:
+        root_id = "official_basic"
+        relation: PhysicalPlan = PhysicalScan(root_id, (), None, None)
+        allowed = (root_id,)
+    elif len(resource_ids) == 1:
+        root_id = resource_ids[0]
+        resource = catalog.resource(root_id)
+        relation = PhysicalScan(
+            root_id,
+            _scan_columns(scalar_fields),
+            None,
+            resource.anchor_resource_id,
+        )
+        allowed = (root_id,)
+    else:
+        relation, root_id, allowed = _build_join_relation(
+            scalar_fields,
+            resource_ids,
+            catalog,
+        )
+
+    constraints = []
+    for call in scalar_calls:
+        constraints.extend(_call_constraints(call, catalog, root_id))
+    if not dated:
+        stable_id = catalog.resource(root_id).anchor_resource_id or root_id
+        partition_key = catalog.resource(stable_id).partition_key
+        constraints.append(
+            PhysicalComparison(
+                "=",
+                PhysicalColumn(stable_id, partition_key, TIME),
+                PhysicalLatestValue(stable_id, partition_key, TIME),
+            )
+        )
+    if constraints:
+        combined = constraints[0]
+        for constraint in constraints[1:]:
+            combined = PhysicalBinary("and", combined, constraint, BOOLEAN)
+        relation = PhysicalFilter(relation, _deduplicate_and(combined))
+    return relation, root_id, allowed
+
+
+def _lower_composite_expr(
+    expression,
+    catalog,
+    resource_id,
+    fields,
+    refs,
+    allowed_resource_ids,
+):
+    if isinstance(expression, LiteralExpr):
+        return _physical_literal(expression)
+    if isinstance(expression, CallExpr):
+        if expression.node_id in refs:
+            return refs[expression.node_id]
+        if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_EXPRESSION_UNSUPPORTED",
+                f"unsupported physical call {expression.name}",
+            )
+        indicator_id = expression.binding.slots.get("indicator_name", "")
+        field = _field_for_indicator(fields, indicator_id)
+        if field.resource_id not in allowed_resource_ids:
+            raise PhysicalPlanningError(
+                "PHYSICAL_MULTI_RESOURCE_UNSUPPORTED",
+                "scalar aggregate expression references an unavailable anchor resource",
+            )
+        return _physical_field_expression(field)
+    if isinstance(expression, BinaryExpr):
+        left = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids)
+        right = _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids)
+        if expression.op == "/":
+            right = PhysicalNullIf(right, PhysicalLiteral(0, right.type), right.type)
+        return PhysicalBinary(expression.op, left, right, expression.type)
+    if isinstance(expression, ComparisonExpr):
+        if expression.op == "~=":
+            raise PhysicalPlanningError(
+                "PHYSICAL_APPROXIMATION_POLICY_MISSING",
+                "approximate comparison requires catalog-provided tolerances",
+            )
+        if isinstance(expression.right, RangeExpr) and expression.op == "between":
+            value = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids)
+            lower = _lower_composite_expr(expression.right.lower, catalog, resource_id, fields, refs, allowed_resource_ids)
+            upper = _lower_composite_expr(expression.right.upper, catalog, resource_id, fields, refs, allowed_resource_ids)
+            return PhysicalBinary(
+                "and",
+                PhysicalComparison(">=" if expression.right.lower_inclusive else ">", value, lower),
+                PhysicalComparison("<=" if expression.right.upper_inclusive else "<", value, upper),
+                BOOLEAN,
+            )
+        return PhysicalComparison(
+            expression.op,
+            _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids),
+            _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids),
+        )
+    raise PhysicalPlanningError(
+        "PHYSICAL_EXPRESSION_UNSUPPORTED",
+        f"unsupported composite aggregate expression {type(expression).__name__}",
+    )
+
+
 def _plan_multi_resource(
     lowering: LoweringResult,
     catalog: PhysicalCatalog,
@@ -383,6 +665,35 @@ def _plan_multi_resource(
             "PHYSICAL_TEMPORAL_MULTI_RESOURCE_UNSUPPORTED",
             "multi-resource temporal predicates require an explicit temporal join contract",
         )
+    relation, root_id, joined = _build_join_relation(fields, resource_ids, catalog)
+    plan = _lower_plan(
+        lowering.plan,
+        catalog,
+        root_id,
+        fields,
+        base_plan=relation,
+        allowed_resource_ids=frozenset(joined),
+    )
+    validate_physical_plan(plan, catalog, expressions)
+    selected_resource = "+".join(joined)
+    decision = PhysicalDecision(
+        resource_id=selected_resource,
+        feasible=True,
+        cost=float(sum(catalog.resource(item).priority for item in joined)),
+        estimated=True,
+        reason_code="PHYSICAL_STABLE_JOIN_SELECTED",
+        reason="left-deep same-entity join on catalog-declared stable keys",
+        strategy_id="stable_key_join",
+        selected=True,
+    )
+    return PhysicalPlanningResult(plan, selected_resource, (decision,), "stable_key_join")
+
+
+def _build_join_relation(
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    catalog: PhysicalCatalog,
+):
     resources = tuple(catalog.resource(resource_id) for resource_id in resource_ids)
     entities = {resource.logical_entity for resource in resources}
     if len(entities) != 1:
@@ -432,27 +743,7 @@ def _plan_multi_resource(
             for key in key_names
         )
         relation = PhysicalJoin(relation, right, "left", keys)
-    plan = _lower_plan(
-        lowering.plan,
-        catalog,
-        root_id,
-        fields,
-        base_plan=relation,
-        allowed_resource_ids=frozenset({root_id, *joined_ids}),
-    )
-    validate_physical_plan(plan, catalog, expressions)
-    selected_resource = "+".join((root_id, *joined_ids))
-    decision = PhysicalDecision(
-        resource_id=selected_resource,
-        feasible=True,
-        cost=float(sum(catalog.resource(item).priority for item in (root_id, *joined_ids))),
-        estimated=True,
-        reason_code="PHYSICAL_STABLE_JOIN_SELECTED",
-        reason="left-deep same-entity join on catalog-declared stable keys",
-        strategy_id="stable_key_join",
-        selected=True,
-    )
-    return PhysicalPlanningResult(plan, selected_resource, (decision,), "stable_key_join")
+    return relation, root_id, (root_id, *joined_ids)
 
 
 def _contains_temporal_plan(plan) -> bool:
@@ -746,6 +1037,15 @@ def _lower_plan(
         for constraint in _call_constraints(plan.order_by, catalog, resource_id):
             input_plan = PhysicalFilter(input_plan, constraint)
         expression = _lower_expr(plan.order_by, catalog, resource_id, fields, allow_rank=True, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
+        if (
+            isinstance(plan.bound, LiteralExpr)
+            and isinstance(plan.bound.value, str)
+            and plan.bound.value.endswith("%")
+        ):
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+                "percentage rank bounds require partition-cardinality lowering",
+            )
         bound = _lower_expr(plan.bound, catalog, resource_id, fields, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
         if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
@@ -831,7 +1131,7 @@ def _lower_expr(
     allowed_resource_ids=None,
 ):
     if isinstance(expression, LiteralExpr):
-        return PhysicalLiteral(expression.value, expression.type)
+        return _physical_literal(expression)
     if isinstance(expression, CallExpr):
         if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
             raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {expression.name}")
@@ -896,6 +1196,18 @@ def _type_from_name(value_type: str) -> OfficialType:
         return _TYPE_MAP[value_type]
     except KeyError as exc:
         raise PhysicalPlanningError("PHYSICAL_TYPE_UNSUPPORTED", f"unsupported physical type {value_type}") from exc
+
+
+def _physical_literal(expression: LiteralExpr) -> PhysicalLiteral:
+    value = expression.value
+    if (
+        expression.type is NUMERIC
+        and isinstance(value, str)
+        and re.fullmatch(r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)%", value)
+    ):
+        numeric = float(value[:-1])
+        value = int(numeric) if numeric.is_integer() else numeric
+    return PhysicalLiteral(value, expression.type)
 
 
 def _resolve_indicator(

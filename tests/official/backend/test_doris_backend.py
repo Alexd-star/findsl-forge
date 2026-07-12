@@ -74,6 +74,16 @@ def test_between_is_lowered_to_auditable_bounded_comparisons():
     assert isinstance(where.expression, exp.LTE)
 
 
+def test_numeric_percent_literal_is_rendered_as_number_not_sql_string():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '', '', '', '') > 2%"),
+        default_physical_catalog(),
+    )
+
+    assert "`q`.`volume` > 2" in result.sql
+    assert "'2%'" not in result.sql
+
+
 def test_latest_date_and_market_constraints_render_as_sqlglot_ast():
     result = render_doris(
         _physical("indicator('沪|深', '', '成交量', '今日', '', '', '') > 100"),
@@ -187,6 +197,41 @@ def test_grouped_aggregate_preserves_ext_anchor_join_keys():
     assert "LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q" in result.sql
     assert "AVG(`q`.`ZJLXMainNetTur`) AS `metric_value`" in result.sql
     assert "GROUP BY `anchor`.`mktcode`, `anchor`.`tgtcode`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_composite_aggregate_ratio_renders_named_set_relations_and_safe_division():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '主力净流入', '近5日', '', 'AVG', '') / "
+            "indicator('', '', '成交额', '近5日', '', 'AVG', '') < 20%"
+        ),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert result.sql.count("AVG(") == 2
+    assert "AS aggregate_0" in result.sql
+    assert "AS aggregate_1" in result.sql
+    assert "`aggregate_0`.`metric_0` / NULLIF(`aggregate_1`.`metric_1`, 0) < 20" in result.sql
+    assert len(list(parsed.find_all(exp.Join))) == 3
+    assert "WHERE (SELECT AVG(" not in result.sql
+    assert result.validation.passed is True
+
+
+def test_composite_scalar_to_min_renders_latest_anchor_and_grouped_window():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '今日', '', '', '') = "
+            "indicator('', '', '成交量', '近100个交易日', '', 'MIN', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "MIN(`q`.`volume`) AS `metric_0`" in result.sql
+    assert "LIMIT 100" in result.sql
+    assert "`q`.`volume` = `aggregate_0`.`metric_0`" in result.sql
+    assert result.sql.count("SELECT MIN(") == 0
     assert result.validation.passed is True
 
 
