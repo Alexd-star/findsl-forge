@@ -8,7 +8,7 @@ from typing import Optional, Tuple
 from ..registry import IndicatorDefinition, OfficialIndicatorRegistry
 from ..typed_ast import TypedNode
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
-from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRef, MarketScope
+from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRef, MarketScope, UniverseSpec
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 from .temporal import parse_count_token
 from .market import MarketParseError, parse_market_expression
@@ -60,8 +60,17 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
     name = typed.binding.signature.name
     slots = typed.binding.slots
     indicator_slots = [slot for slot in typed.binding.signature.slots if slot.startswith("indicator_name")]
-    indicators = tuple(_bind_indicator(name, slot, slots.get(slot, ""), registry) for slot in indicator_slots)
-    if not indicators:
+    is_universe = (
+        name == "indicator"
+        and indicator_slots == ["indicator_name"]
+        and not str(slots.get("indicator_name", "")).strip()
+    )
+    indicators = (
+        ()
+        if is_universe
+        else tuple(_bind_indicator(name, slot, slots.get(slot, ""), registry) for slot in indicator_slots)
+    )
+    if not indicators and not is_universe:
         raise DomainBindingError("DOMAIN_CAPABILITY_UNSUPPORTED", f"{name} has no bindable indicator slot", function=name, slot="indicator_name", value="")
     market_value = slots.get("market", "")
     try:
@@ -88,10 +97,20 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
         temporal = parse_temporal_quantifier(count_expression) if count_expression else None
     except TemporalParseError as exc:
         raise DomainBindingError(exc.code, str(exc), function=name, slot="count_exp", value=count_expression) from exc
-    domains = frozenset(item.domain for item in indicators)
-    capabilities = frozenset(capability for definition in (_definition(item, registry) for item in indicators) for capability in definition.capabilities)
+    domains = frozenset({"quote"}) if is_universe else frozenset(item.domain for item in indicators)
+    capabilities = (
+        frozenset({"scan"})
+        if is_universe
+        else frozenset(capability for definition in (_definition(item, registry) for item in indicators) for capability in definition.capabilities)
+    )
     requirement = DataRequirement(domains, capabilities)
-    expression = EventSpec(name, indicators[0], indicators[1]) if name in _EVENT_FUNCTIONS else indicators[0]
+    expression = (
+        UniverseSpec()
+        if is_universe
+        else EventSpec(name, indicators[0], indicators[1])
+        if name in _EVENT_FUNCTIONS
+        else indicators[0]
+    )
     return BoundFunction(
         name,
         expression,

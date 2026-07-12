@@ -1,6 +1,6 @@
 import pytest
 
-from findsl.official.domain import EventSpec, IndicatorRef
+from findsl.official.domain import EventSpec, IndicatorRef, UniverseSpec
 from findsl.official.domain.binder import DomainBindingError, bind_function
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
@@ -55,6 +55,44 @@ def test_market_expression_is_carried_as_typed_domain_contract():
     payload = bound.to_dict()
     assert payload["market_expression"]["kind"] == "MarketOr"
     assert "创业板" in str(payload["market_expression"])
+
+
+def test_empty_indicator_binds_only_as_explicit_universe_capability():
+    bound = bind_function(
+        _typed_call("indicator('沪', '', '', '今日', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert isinstance(bound.expression, UniverseSpec)
+    assert bound.indicators == ()
+    assert bound.requirement.domains == frozenset({"quote"})
+    assert "scan" in bound.requirement.capabilities
+    assert bound.to_dict()["expression"] == {
+        "kind": "UniverseSpec",
+        "domain": "quote",
+        "selector": "all",
+        "type": {"kind": "string"},
+    }
+
+
+def test_empty_query_data_indicator_is_not_misclassified_as_universe():
+    with pytest.raises(DomainBindingError) as excinfo:
+        bind_function(
+            _typed_call("queryData('', '', '', '今日', '')"),
+            default_official_registry(),
+        )
+
+    assert excinfo.value.code == "DOMAIN_CAPABILITY_UNSUPPORTED"
+
+
+def test_empty_rank_indicator_remains_unsupported_without_order_measure():
+    with pytest.raises(DomainBindingError) as excinfo:
+        bind_function(
+            _typed_call("rank('', '', '', 'desc', '', '', '', '')"),
+            default_official_registry(),
+        )
+
+    assert excinfo.value.code == "DOMAIN_CAPABILITY_UNSUPPORTED"
 
 
 def test_unknown_indicator_has_precise_diagnostic():

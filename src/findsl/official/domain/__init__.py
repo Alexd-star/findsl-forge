@@ -8,6 +8,7 @@ from .expressions import (
     IndicatorRef,
     MarketScope,
     RankSpec,
+    UniverseSpec,
 )
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 from .binder import parse_date_constraint

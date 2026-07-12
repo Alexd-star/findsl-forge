@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, FrozenSet, Optional, Tuple
 
 from ..ir.base import CanonicalIr
-from ..types import OfficialType
+from ..types import STRING, OfficialType
 
 
 @dataclass(frozen=True)
@@ -21,6 +21,26 @@ class IndicatorRef(CanonicalIr):
 
     def to_dict(self) -> Dict[str, Any]:
         return {"kind": "IndicatorRef", "indicator_id": self.indicator_id, "type": self.value_type.to_dict(), "unit": self.unit, "domain": self.domain, "availability": self.availability}
+
+
+@dataclass(frozen=True)
+class UniverseSpec(CanonicalIr):
+    """Typed selection of the complete security universe in the bound scope."""
+
+    domain: str = "quote"
+    selector: str = "all"
+
+    @property
+    def type(self) -> OfficialType:
+        return STRING
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "kind": "UniverseSpec",
+            "domain": self.domain,
+            "selector": self.selector,
+            "type": self.type.to_dict(),
+        }
 
 
 @dataclass(frozen=True)

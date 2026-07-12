@@ -369,6 +369,41 @@ def test_query_data_uses_the_same_controlled_direct_field_mapping():
     assert result.selected_resource == "official_basic"
 
 
+def test_universe_selector_uses_basic_scan_without_fake_indicator_column():
+    result = plan_physical(
+        _lower("indicator('沪', '', '', '今日', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    assert result.selected_resource == "official_basic"
+    assert result.plan.input.columns == ()
+    payload = result.plan.canonical_json()
+    assert '"value":"all"' in payload
+    assert "mktcode" in payload
+    assert "PhysicalLatestValue" in payload
+
+
+def test_universe_selector_rejects_non_all_comparison():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower("indicator('', '', '', '', '', '', '') = 'subset'"),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_UNIVERSE_COMPARISON_UNSUPPORTED"
+
+
+def test_universe_selector_does_not_claim_unavailable_filter_scope_membership():
+    with pytest.raises(PhysicalPlanningError) as excinfo:
+        plan_physical(
+            _lower("indicator('', '鸿蒙概念', '', '', '', '', '') = 'all'"),
+            default_physical_catalog(),
+        )
+
+    assert excinfo.value.code == "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+
+
 def test_ext_scan_is_anchored_to_official_basic_universe():
     result = plan_physical(
         _lower("indicator('', '', '主力净流入', '', '', '', '') > 0"),

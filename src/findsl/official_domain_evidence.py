@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import subprocess
 import sys
 from collections import Counter
@@ -25,6 +26,20 @@ def _percentile(values: List[int], q: float) -> float:
 def _git_head() -> str:
     result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
     return result.stdout.strip() if result.returncode == 0 else "unavailable"
+
+
+def _isolated_env() -> Dict[str, str]:
+    """Keep source-checkout evidence workers importable without editable install."""
+
+    env = os.environ.copy()
+    source_root = str(Path(__file__).resolve().parents[1])
+    existing = env.get("PYTHONPATH", "")
+    entries = [item for item in existing.split(os.pathsep) if item]
+    if source_root not in entries:
+        entries.insert(0, source_root)
+    env["PYTHONPATH"] = os.pathsep.join(entries)
+    env.setdefault("PYTHONIOENCODING", "utf-8")
+    return env
 
 
 def build_official_domain_evidence(workbook: str, sample_size: int = 20) -> Dict[str, Any]:
@@ -98,6 +113,7 @@ def _build_ir_evidence_isolated(workbook: str, sample_size: int) -> Dict[str, An
     )
     result = subprocess.run(
         [sys.executable, "-c", code, str(workbook), str(sample_size)],
+        env=_isolated_env(),
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -135,6 +151,7 @@ def _build_domain_chunk_isolated(
             str(idempotence_budget),
             str(sample_size),
         ],
+        env=_isolated_env(),
         capture_output=True,
         text=True,
         encoding="utf-8",

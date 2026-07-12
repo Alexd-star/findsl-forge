@@ -165,11 +165,15 @@ def plan_physical(
             decisions,
             f"set_{lowering.plan.operation}",
         )
+    _validate_universe_contract(lowering.plan)
     aggregate_contract = _aggregate_contract(lowering.plan)
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
-        raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
+        if _contains_universe_selector(lowering.plan):
+            resource_ids = ("official_basic",)
+        else:
+            raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
     if aggregate_contract is not None:
         return _plan_grouped_aggregate(
             lowering.plan,
@@ -575,6 +579,8 @@ def _collect_fields(
                 raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {call.name}")
             _reject_unmaterialized_constraints(call)
             indicator_id = call.binding.slots.get("indicator_name", "")
+            if _is_universe_call(call):
+                continue
             try:
                 fields.append(_resolve_indicator(indicator_id, catalog, expressions))
             except KeyError as exc:
@@ -605,6 +611,81 @@ def _walk_calls(expression):
     elif isinstance(expression, RangeExpr):
         yield from _walk_calls(expression.lower)
         yield from _walk_calls(expression.upper)
+
+
+def _logical_expressions(plan):
+    current = plan
+    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage, LogicalConsecutive, LogicalExist)):
+        if isinstance(current, LogicalFilter):
+            yield current.predicate
+        elif isinstance(current, (LogicalConsecutive, LogicalExist)):
+            yield current.spec.predicate
+        elif isinstance(current, LogicalRank):
+            yield current.order_by
+        current = current.operation if isinstance(current, LogicalStage) else current.input
+
+
+def _is_universe_call(expression) -> bool:
+    return (
+        isinstance(expression, CallExpr)
+        and expression.name == "indicator"
+        and expression.binding is not None
+        and not str(expression.binding.slots.get("indicator_name", "")).strip()
+    )
+
+
+def _contains_universe_selector(plan) -> bool:
+    return any(
+        _is_universe_call(call)
+        for expression in _logical_expressions(plan)
+        for call in _walk_calls(expression)
+    )
+
+
+def _validate_universe_contract(plan) -> None:
+    for expression in _logical_expressions(plan):
+        _validate_universe_expression(expression)
+
+
+def _validate_universe_expression(expression) -> None:
+    if isinstance(expression, ComparisonExpr):
+        if _is_universe_call(expression.left):
+            if not (
+                expression.op == "="
+                and isinstance(expression.right, LiteralExpr)
+                and expression.right.type is STRING
+                and expression.right.value == "all"
+            ):
+                raise PhysicalPlanningError(
+                    "PHYSICAL_UNIVERSE_COMPARISON_UNSUPPORTED",
+                    "security universe selection requires indicator(...) = 'all'",
+                )
+            return
+        if _contains_universe_call(expression.left) or _contains_universe_call(expression.right):
+            raise PhysicalPlanningError(
+                "PHYSICAL_UNIVERSE_COMPARISON_UNSUPPORTED",
+                "security universe selector must be the direct left operand of = 'all'",
+            )
+        _validate_universe_expression(expression.left)
+        _validate_universe_expression(expression.right)
+        return
+    if isinstance(expression, BinaryExpr):
+        _validate_universe_expression(expression.left)
+        _validate_universe_expression(expression.right)
+        return
+    if isinstance(expression, RangeExpr):
+        _validate_universe_expression(expression.lower)
+        _validate_universe_expression(expression.upper)
+        return
+    if _is_universe_call(expression):
+        raise PhysicalPlanningError(
+            "PHYSICAL_UNIVERSE_COMPARISON_UNSUPPORTED",
+            "security universe selector requires an explicit = 'all' comparison",
+        )
+
+
+def _contains_universe_call(expression) -> bool:
+    return any(_is_universe_call(call) for call in _walk_calls(expression))
 
 
 def _reject_unmaterialized_constraints(call: CallExpr) -> None:
@@ -759,6 +840,8 @@ def _lower_expr(
                 "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
                 "rank inside a scalar expression requires an explicit window plan",
             )
+        if _is_universe_call(expression):
+            return PhysicalLiteral("all", STRING)
         indicator_id = expression.binding.slots.get("indicator_name", "")
         if expression_overrides and indicator_id.casefold() in expression_overrides:
             return expression_overrides[indicator_id.casefold()]

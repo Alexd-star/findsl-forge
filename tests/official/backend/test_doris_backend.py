@@ -106,6 +106,21 @@ def test_market_set_algebra_renders_typed_code_ranges_and_not():
     assert result.validation.passed is True
 
 
+def test_universe_selector_materializes_market_and_date_without_placeholder_sql():
+    result = render_doris(
+        _physical("indicator('沪主板', '', '', '今日', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    assert "'all' = 'all'" in result.sql
+    assert "`q`.`mktcode` IN (1)" in result.sql
+    assert "`q`.`tgtcode` >= '600000'" in result.sql
+    assert "SELECT MAX(`q_latest`.`bizdate`)" in result.sql
+    assert "1 = 0" not in result.sql
+    assert "1 = 1" not in result.sql
+    assert result.validation.passed is True
+
+
 def test_typed_year_range_renders_bounded_partition_predicate():
     result = render_doris(
         _physical("indicator('', '', '成交量', '一八年', '', '', '') > 100"),
