@@ -165,6 +165,21 @@ def evaluate_temporal_matches(
     }[comparator]
 
 
+def evaluate_calendar_bucket_matches(
+    bucket_matches: Iterable[tuple[int, bool]],
+    quantifier: TemporalQuantifier,
+) -> bool:
+    coalesced: Dict[int, bool] = {}
+    for ordinal, matched in bucket_matches:
+        ordinal = int(ordinal)
+        coalesced[ordinal] = coalesced.get(ordinal, False) or bool(matched)
+    if not coalesced:
+        return evaluate_temporal_matches((), quantifier)
+    first, last = min(coalesced), max(coalesced)
+    dense = tuple(coalesced.get(ordinal, False) for ordinal in range(first, last + 1))
+    return evaluate_temporal_matches(dense, quantifier)
+
+
 def _canonical_unit(unit: str) -> str:
     return "日" if unit == "天" else unit
 

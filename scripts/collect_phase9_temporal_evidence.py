@@ -6,9 +6,14 @@ import json
 import subprocess
 import time
 from collections import defaultdict
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from findsl.official.domain.temporal import evaluate_temporal_matches, parse_temporal_quantifier
+from findsl.official.domain.temporal import (
+    evaluate_calendar_bucket_matches,
+    evaluate_temporal_matches,
+    parse_temporal_quantifier,
+)
 from findsl.official.pipeline import compile_official
 
 
@@ -57,6 +62,13 @@ CASES = (
             ("main_inflow", 0, "EXIST>0", 5),
         ),
     },
+)
+
+BUCKET_CASES = (
+    ("volume_two_year_every_year", "CONS=每年", "年"),
+    ("volume_two_year_exist_2_months", "EXIST>=2月", "月"),
+    ("volume_two_year_cons_3_quarters", "CONS=3季度", "季度"),
+    ("volume_two_year_every_week", "CONS=每周", "周"),
 )
 
 
@@ -152,6 +164,54 @@ def main() -> int:
             }
         )
 
+    bucket_rows = _query_rows(args, _bucket_oracle_source_sql(args.database, latest_date))
+    bucket_grouped = defaultdict(list)
+    for market, code, bizdate, volume in bucket_rows:
+        bucket_grouped[(market, code)].append((bizdate, _numeric(volume)))
+    bucket_sample = set(bucket_grouped)
+    for name, count_exp, unit in BUCKET_CASES:
+        source = f"indicator('', '', '成交量', '两年内', '', '', '{count_exp}') > 100"
+        quantifier = parse_temporal_quantifier(count_exp)
+        expected_stocks = {
+            key
+            for key, records in bucket_grouped.items()
+            if evaluate_calendar_bucket_matches(
+                [(_bucket_ordinal(raw_date, unit), value > 100) for raw_date, value in records],
+                quantifier,
+            )
+        }
+        expected = {(market, code, latest_date) for market, code in expected_stocks}
+        compiled = compile_official(source)
+        timings = []
+        actual = set()
+        for _ in range(args.repeats):
+            started = time.perf_counter_ns()
+            output = _query_rows(args, compiled.backend["sql"])
+            timings.append(round((time.perf_counter_ns() - started) / 1_000_000, 4))
+            actual = {
+                tuple(row[:3])
+                for row in output
+                if (row[0], row[1]) in bucket_sample
+            }
+        results.append(
+            {
+                "name": name,
+                "source": source,
+                "sql": compiled.backend["sql"],
+                "oracle_scope": "deterministic_latest_stock_sample",
+                "oracle_stock_count": len(bucket_sample),
+                "expected_count": len(expected),
+                "actual_count": len(actual),
+                "expected_sha256": _row_hash(expected),
+                "actual_sha256": _row_hash(actual),
+                "matched": expected == actual,
+                "missing_sample": sorted(expected - actual)[:10],
+                "extra_sample": sorted(actual - expected)[:10],
+                "elapsed_ms": timings,
+                "p95_ms": max(timings),
+            }
+        )
+
     report = {
         "schema_version": 1,
         "git_head": _git_head(),
@@ -160,6 +220,8 @@ def main() -> int:
         "official_basic_rows": official_row_count,
         "latest_date": latest_date,
         "oracle_rows": len(rows),
+        "bucket_oracle_rows": len(bucket_rows),
+        "bucket_oracle_stocks": len(bucket_sample),
         "latest_universe": len(latest_universe),
         "repeats": args.repeats,
         "status": "PASS" if all(item["matched"] for item in results) else "FAIL",
@@ -185,6 +247,20 @@ def _oracle_source_sql(database: str) -> str:
     )
 
 
+def _bucket_oracle_source_sql(database: str, latest_date: str) -> str:
+    return (
+        "WITH sample_stocks AS ("
+        "SELECT mktcode,tgtcode "
+        f"FROM `{database}`.`hsj_stock_hq_basic` WHERE bizdate='{latest_date}' "
+        "ORDER BY mktcode,tgtcode LIMIT 200) "
+        "SELECT b.mktcode,b.tgtcode,b.bizdate,b.volume "
+        f"FROM `{database}`.`hsj_stock_hq_basic` AS b "
+        "INNER JOIN sample_stocks AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode "
+        f"WHERE b.bizdate>=DATE_SUB('{latest_date}', INTERVAL 2 YEAR) "
+        "AND b.bizdate<='" + latest_date + "' ORDER BY b.mktcode,b.tgtcode,b.bizdate"
+    )
+
+
 def _group_records(rows):
     grouped = defaultdict(list)
     for market, code, _date, volume, turnover, main_inflow in rows:
@@ -202,6 +278,18 @@ def _numeric(value: str) -> float:
     if value in {"", "NULL", "\\N"}:
         return 0.0
     return float(value)
+
+
+def _bucket_ordinal(raw_date: str, unit: str) -> int:
+    current = datetime.strptime(raw_date, "%Y-%m-%d").date()
+    if unit == "年":
+        return current.year
+    if unit == "月":
+        return current.year * 12 + current.month
+    if unit == "季度":
+        return current.year * 4 + (current.month - 1) // 3 + 1
+    monday = current - timedelta(days=current.weekday())
+    return (monday - date(1970, 1, 1)).days // 7
 
 
 def _query_rows(args, sql: str):
@@ -256,6 +344,7 @@ def _write_report(report, json_output: str, markdown_output: str) -> None:
         f"- MySQL 协议兼容版本：`{report['mysql_protocol_version']}`",
         f"- 官方基础表行数：`{report['official_basic_rows']}`",
         f"- 独立 oracle 行数：`{report['oracle_rows']}`",
+        f"- 日历桶 oracle：`{report['bucket_oracle_rows']}` 行 / `{report['bucket_oracle_stocks']}` 只固定样本股票",
         f"- 最新交易日股票数：`{report['latest_universe']}`",
         f"- 行集哈希一致：`{report['matched']}/{report['total']}`",
         "",
@@ -270,7 +359,7 @@ def _write_report(report, json_output: str, markdown_output: str) -> None:
     lines.extend(
         [
             "",
-            "> oracle 只从 Doris 提取最近 10 条原始交易记录，时序判定由独立 Python 参考解释器完成；它不复用生成 SQL 的窗口/CTE 逻辑。",
+            "> oracle 从 Doris 提取原始交易记录；日粒度覆盖全体最新股票，日历桶覆盖按稳定键排序的 200 只固定样本股票。时序与缺失桶判定由独立 Python 参考解释器完成，不复用生成 SQL 的窗口、桶或 CTE 逻辑。",
         ]
     )
     markdown_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

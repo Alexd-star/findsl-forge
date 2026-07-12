@@ -2,6 +2,7 @@ import pytest
 
 from findsl.official.domain.temporal import (
     TemporalParseError,
+    evaluate_calendar_bucket_matches,
     evaluate_temporal_matches,
     parse_temporal_quantifier,
 )
@@ -90,3 +91,25 @@ def test_reference_oracle_distinguishes_consecutive_run_from_total_matches():
 )
 def test_reference_oracle_covers_bounds_every_and_empty_windows(source, matches, expected):
     assert evaluate_temporal_matches(matches, parse_temporal_quantifier(source)) is expected
+
+
+def test_calendar_bucket_oracle_inserts_missing_periods_as_false():
+    buckets = [(2024, True), (2026, True)]
+
+    assert evaluate_calendar_bucket_matches(
+        buckets, parse_temporal_quantifier("CONS=每年")
+    ) is False
+    assert evaluate_calendar_bucket_matches(
+        buckets, parse_temporal_quantifier("CONS=2年")
+    ) is False
+    assert evaluate_calendar_bucket_matches(
+        buckets, parse_temporal_quantifier("EXIST>=2年")
+    ) is True
+
+
+def test_calendar_bucket_oracle_coalesces_multiple_rows_in_one_bucket():
+    buckets = [(2024, False), (2024, True), (2025, True)]
+
+    assert evaluate_calendar_bucket_matches(
+        buckets, parse_temporal_quantifier("CONS=2年")
+    ) is True
