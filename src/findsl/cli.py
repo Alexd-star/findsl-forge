@@ -143,6 +143,14 @@ def main() -> None:
     official_backend_evidence_cmd.add_argument("--database", default="newzl")
     official_backend_evidence_cmd.add_argument("--client", default="mysql")
     official_backend_evidence_cmd.add_argument("--query-timeout", type=float, default=180.0)
+    official_funnel_cmd = sub.add_parser(
+        "official-coverage-funnel",
+        help="Measure old-to-new official compiler migration coverage",
+    )
+    official_funnel_cmd.add_argument("--workbook", required=True)
+    official_funnel_cmd.add_argument("--json-output", required=True)
+    official_funnel_cmd.add_argument("--report-output", required=True)
+    official_funnel_cmd.add_argument("--json", action="store_true")
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -579,6 +587,22 @@ def main() -> None:
         else:
             print(f"Phase 5 gate: {evidence['gates']['phase5_completion']['status']}")
             print(f"Safe Doris SQL: {evidence['safety_ok']}/{evidence['row_count']}")
+    elif args.command == "official-coverage-funnel":
+        from .official_coverage_funnel import (
+            build_official_workbook_coverage_funnel,
+            write_official_coverage_funnel,
+        )
+
+        report = build_official_workbook_coverage_funnel(args.workbook)
+        write_official_coverage_funnel(report, args.json_output, args.report_output)
+        if args.json:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+        else:
+            print(
+                "Migration coverage: "
+                f"{report['legacy_to_new_migrated']}/{report['legacy_strict_success']} "
+                f"({report['migration_coverage'] * 100:.2f}%)"
+            )
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 

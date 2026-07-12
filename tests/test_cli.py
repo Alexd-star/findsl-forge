@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 
 def test_cli_official_physical_stats_writes_versioned_snapshot(tmp_path, monkeypatch, capsys):
@@ -98,6 +99,52 @@ def test_cli_official_prefix_evidence_wires_doris_config_and_outputs(tmp_path, m
 
     assert seen["host"] == "doris.local"
     assert "Prefix gate: PASS" in capsys.readouterr().out
+    assert json_output.exists() and report_output.exists()
+
+
+def test_cli_official_coverage_funnel_writes_both_artifacts(tmp_path, monkeypatch, capsys):
+    from findsl import cli
+    import findsl.official_coverage_funnel as funnel_module
+
+    json_output = tmp_path / "funnel.json"
+    report_output = tmp_path / "funnel.md"
+    seen = {}
+
+    def build(workbook):
+        seen["workbook"] = workbook
+        return {
+            "row_count": 4,
+            "legacy_strict_success": 2,
+            "new_backend_success": 1,
+            "legacy_to_new_migrated": 1,
+            "migration_coverage": 0.5,
+        }
+
+    def write(report, json_path, markdown_path):
+        Path(json_path).write_text(json.dumps(report), encoding="utf-8")
+        Path(markdown_path).write_text("# funnel", encoding="utf-8")
+
+    monkeypatch.setattr(funnel_module, "build_official_workbook_coverage_funnel", build)
+    monkeypatch.setattr(funnel_module, "write_official_coverage_funnel", write)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "findsl",
+            "official-coverage-funnel",
+            "--workbook",
+            "official.xlsx",
+            "--json-output",
+            str(json_output),
+            "--report-output",
+            str(report_output),
+        ],
+    )
+
+    cli.main()
+
+    assert seen["workbook"] == "official.xlsx"
+    assert "Migration coverage: 1/2 (50.00%)" in capsys.readouterr().out
     assert json_output.exists() and report_output.exists()
 
 
