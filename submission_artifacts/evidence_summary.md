@@ -21,7 +21,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
 | Git HEAD at report generation | 4d03a1a |
-| Git HEAD at export | 4d03a1a |
+| Git HEAD at export | 0f3db86 |
 
 ## Source Files
 
