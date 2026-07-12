@@ -1,7 +1,7 @@
 # Real-Market Quote Sample Evidence
 
 - Passed: True
-- Data directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample`
+- Data directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\data\real_samples\eastmoney_a_share_sample`
 - Source: Eastmoney public historical K-line endpoint
 - Raw payload count: 2
 - Cases passed: 3/3

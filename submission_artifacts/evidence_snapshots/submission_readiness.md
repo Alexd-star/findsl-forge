@@ -2,10 +2,10 @@
 
 ## Decision Summary
 
-- Generated at: 2026-07-06T07:49:59+00:00
-- Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge`
-- Git HEAD at report generation: `7920701` feat: support aggregate count expressions for official data
-- Git branch: `main`
+- Generated at: 2026-07-12T13:03:04+00:00
+- Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening`
+- Git HEAD at report generation: `14e6441` evidence: capture typed universe Doris parity
+- Git branch: `feat/antlr-calcite-architecture`
 - Blocking gates passed: True
 - Warning count: 0
 
@@ -13,19 +13,19 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 33086.1 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 2.194 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 129372.9 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.883 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 1.320 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.789 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
 | Doris SQL validation boundary | required | PASS | validation steps 1, issues 0, escaped literal True |
 | Real-market quote sample | required | PASS | cases 3/3, raw payloads 2, source Eastmoney public historical K-line endpoint |
 | Official-style coverage suite | required | PASS | positive 37/37, negative 37/37 |
-| Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md |
+| Defense package walkthrough | required | PASS | checks 13/13, report D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\defense_package.md |
 | Doris asset integrity | required | PASS | 4/4 generated assets match |
 | Long-window scale benchmark evidence | warning | PASS | report exists with correctness markers |
 | Git rollback cleanliness | warning | PASS | clean working tree |
@@ -35,14 +35,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 2.194 ms
+- Compile P95 latency: 1.883 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.47x
+- Local SQLite prefix benchmark speedup smoke: 1.23x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -59,29 +59,29 @@
 
 ## Evidence Artifacts
 
-- Readiness report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\submission_readiness.md`
-- Evaluation report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\evaluation_report.md`
-- SQL equivalence report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\sql_equivalence_report.md`
-- Official-style coverage suite report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\official_suite_report.md`
-- Defense package report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md`
-- Prefix benchmark report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\prefix_sum_benchmark.md`
-- Long-window scale benchmark report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\prefix_sum_scale_benchmark.md`
-- Doris cluster evidence report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\doris_cluster_evidence.md`
-- Real-market sample report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\real_market_sample_report.md`
-- Doris deployment directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\deploy\doris`
+- Readiness report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\submission_readiness.md`
+- Evaluation report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\evaluation_report.md`
+- SQL equivalence report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\sql_equivalence_report.md`
+- Official-style coverage suite report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\official_suite_report.md`
+- Defense package report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\defense_package.md`
+- Prefix benchmark report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\prefix_sum_benchmark.md`
+- Long-window scale benchmark report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\prefix_sum_scale_benchmark.md`
+- Doris cluster evidence report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\doris_cluster_evidence.md`
+- Real-market sample report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\real_market_sample_report.md`
+- Doris deployment directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\deploy\doris`
 
 ## Official-Style Coverage Suite
 
 - Suite passed: True
 - Positive cases passed: 37/37
 - Negative diagnostic cases passed: 37/37
-- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\official_suite_report.md`
+- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\official_suite_report.md`
 
 ## Defense Package
 
 - Package passed: True
 - Checks passed: 13/13
-- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\defense_package.md`
+- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\defense_package.md`
 
 ## Long-Window Scale Evidence
 
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 1.320 ms
+- Compile latency: 0.789 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -120,7 +120,7 @@
 ## LLM Candidate Safety Smoke Test
 
 - Passed: True
-- Response file: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\samples\llm_candidate_response.json`
+- Response file: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\data\samples\llm_candidate_response.json`
 - Raw candidates: 3
 - Accepted candidates: 1
 - Rejected candidates: 2
@@ -149,23 +149,23 @@
 ## Real-Market Quote Sample
 
 - Passed: True
-- Data directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\data\real_samples\eastmoney_a_share_sample`
+- Data directory: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\data\real_samples\eastmoney_a_share_sample`
 - Source: Eastmoney public historical K-line endpoint
 - Raw payloads: 2
 - Cases passed: 3/3
 - SQL rows total: 21
 - Missing files: <none>
 - Errors: <none>
-- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\reports\real_market_sample_report.md`
+- Report: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\reports\real_market_sample_report.md`
 
 ## Doris Asset Integrity
 
 | File | Exists | Matches generator | Bytes |
 |---|---:|---:|---:|
-| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\deploy\doris\01_schema.sql` | True | True | 2268 |
-| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\deploy\doris\02_sample_data.sql` | True | True | 1799 |
-| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\deploy\doris\03_build_prefix_tables.sql` | True | True | 1173 |
-| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\deploy\doris\04_smoke_queries.sql` | True | True | 964 |
+| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\deploy\doris\01_schema.sql` | True | True | 2268 |
+| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\deploy\doris\02_sample_data.sql` | True | True | 1799 |
+| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\deploy\doris\03_build_prefix_tables.sql` | True | True | 1173 |
+| `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\deploy\doris\04_smoke_queries.sql` | True | True | 964 |
 
 ## Git Rollback State
 
@@ -175,27 +175,22 @@
 
 ## Pytest Evidence
 
-- Command: `C:\Program Files\Python39\python.exe -m pytest`
+- Command: `C:\Program Files\Python39\python.exe -m pytest --basetemp D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\.pytest_cache\readiness_tmp`
 - Exit code: 0
-- Elapsed: 33086.1 ms
+- Elapsed: 129372.9 ms
 
 ```text
-........................................................................ [ 24%]
-........................................................................ [ 48%]
-........................................................................ [ 72%]
-........................................................................ [ 97%]
-........                                                                 [100%]
-296 passed in 31.14s
-```
-
-stderr:
-
-```text
-Error in atexit._run_exitfuncs:
-Traceback (most recent call last):
-  File "C:\Program Files\Python39\lib\pathlib.py", line 206, in resolve
-    s = self._ext_to_normal(_getfinalpathname(s))
-PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\26312\\AppData\\Local\\Temp\\pytest-of-26312\\pytest-267'
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+........................................................................ [ 53%]
+........................................................................ [ 64%]
+........................................................................ [ 75%]
+........................................................................ [ 86%]
+........................................................................ [ 96%]
+.....................                                                    [100%]
+669 passed in 128.65s (0:02:08)
 ```
 
 ## Award-Readiness Differentiators

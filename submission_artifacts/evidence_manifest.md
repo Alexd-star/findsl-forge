@@ -1,14 +1,14 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-12 20:57:49 +08:00
-- Git HEAD at export: 70e91d1
+- Generated at: 2026-07-12 21:03:16 +08:00
+- Git HEAD at export: 14e6441
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
-- `defense_package.md` (9652 bytes)
+- `defense_package.md` (9754 bytes)
 - `doris_cluster_evidence.json` (6537 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `evaluation_report.md` (12366 bytes)
@@ -51,9 +51,9 @@
 - `phase9_temporal_funnel.md` (1753 bytes)
 - `prefix_sum_benchmark.md` (2870 bytes)
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
-- `real_market_sample_report.md` (923 bytes)
+- `real_market_sample_report.md` (957 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (11929 bytes)
+- `submission_readiness.md` (12885 bytes)
 
 ## Excluded By Design
 
