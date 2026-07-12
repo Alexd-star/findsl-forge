@@ -8,13 +8,14 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 |---|---|
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 744 passed in 148.89s |
+| Pytest regression | 777 passed in 152.45s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1873/5799 compiled |
-| ANTLR/IR legacy migration | 406/1097 (37.01%) |
+| ANTLR/IR legacy migration | 534/1097 (48.68%) |
 | Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
 | Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 194.0904 ms |
+| Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
 | Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
@@ -23,8 +24,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris evidence | PASS |
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | d60d401 |
-| Git HEAD at export | d60d401 |
+| Git HEAD at report generation | 7748d90 |
+| Git HEAD at export | 7748d90 |
 
 ## Source Files
 
@@ -39,6 +40,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | phase18_dynamic_date_doris_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_doris.json` |
 | phase19_security_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase19_security_scope_funnel.json` |
 | phase19_security_scope_doris_json | `submission_artifacts\evidence_snapshots\phase19_security_scope_doris.json` |
+| phase20_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase20_capability_funnel.json` |
+| phase20_mapping_event_doris_json | `submission_artifacts\evidence_snapshots\phase20_mapping_event_doris.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
 

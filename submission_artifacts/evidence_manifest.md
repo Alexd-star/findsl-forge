@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-12 23:24:54 +08:00
-- Git HEAD at export: d60d401
+- Generated at: 2026-07-13 00:41:29 +08:00
+- Git HEAD at export: 7748d90
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -59,6 +59,10 @@
 - `phase19_security_scope_doris.md` (1493 bytes)
 - `phase19_security_scope_funnel.json` (3256113 bytes)
 - `phase19_security_scope_funnel.md` (1795 bytes)
+- `phase20_capability_funnel.json` (3259384 bytes)
+- `phase20_capability_funnel.md` (2029 bytes)
+- `phase20_mapping_event_doris.json` (66072 bytes)
+- `phase20_mapping_event_doris.md` (1476 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase9_temporal_doris.json` (27830 bytes)
@@ -69,7 +73,7 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `real_market_sample_report.md` (957 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (12967 bytes)
+- `submission_readiness.md` (12961 bytes)
 
 ## Excluded By Design
 
