@@ -633,6 +633,21 @@ def test_build_evidence_metadata_prefers_phase27_event_semantics_evidence(
         ),
         encoding="utf-8",
     )
+    (snapshot_dir / "phase6c_set_prefix_doris.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "case_count": 14,
+                "matched": 14,
+                "structural_contracts": 14,
+                "prefix_faster": 14,
+                "median_speedup": 1.552475,
+                "min_speedup": 1.229337,
+                "max_speedup": 2.00195,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
 
@@ -650,8 +665,22 @@ def test_build_evidence_metadata_prefers_phase27_event_semantics_evidence(
         "max_p95_ms": 2081.125,
     }
     assert metadata["official_migration"]["new_success_audit"]["passed"] == 4
+    assert metadata["official_migration"]["prefix_join_evidence"] == {
+        "available": True,
+        "status": "PASS",
+        "matched": 14,
+        "total": 14,
+        "structural_contracts": 14,
+        "prefix_faster": 14,
+        "median_speedup": 1.552475,
+        "min_speedup": 1.229337,
+        "max_speedup": 2.00195,
+    }
     assert metadata["source_files"]["phase27_event_semantics_doris_json"].endswith(
         "phase27_event_semantics_doris.json"
+    )
+    assert metadata["source_files"]["phase6c_set_prefix_doris_json"].endswith(
+        "phase6c_set_prefix_doris.json"
     )
 
 

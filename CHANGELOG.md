@@ -4,6 +4,15 @@
 
 ## 2026-07-13
 
+### Phase 6C 集合式前缀 CTE/Join 性能计划
+
+- 新增 `PhysicalPrefixRef` 与 `PhysicalPrefixJoin`，把均线/均量前缀差分从逐行相关标量子查询提升为稳定键命名关系。
+- SQLGlot 后端生成 `prefix_anchor_rows`、`prefix_values` CTE，使用当前前缀 Inner Join 和历史累计 Left Join；筛选 SQL 不再包含相关 `SELECT`。
+- 14 个固定均线/均量筛选在真实 Doris 上完整哈希一致 `14/14`、结构合同 `14/14`、性能提升 `14/14`，中位加速约 `1.55x`，范围约 `1.23x–2.00x`。
+- 14 个筛选策略由 shadow 校准为 active；排名计划因热缓存性能基本持平而继续默认使用技术列，前缀排名保留显式 shadow 回退路径。
+- 证据新增 EXPLAIN 扫描节点、投影列、分区/基数和逻辑宽度成本模型，并明确区分模型成本与实测 I/O。
+- 官方迁移覆盖保持 `690/1097（62.90%）`，策略切换没有引入编译回退或伪覆盖。
+
 ### ANTLR/IR 新后端事件时序投影与跨日期组合
 
 - 新增 `PhysicalEventProjection`，在日期裁剪前使用 `LAG` 投影穿越事件，再由 `PhysicalTemporal` 完成存在次数、自然月桶和连续交易日段计算。

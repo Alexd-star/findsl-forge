@@ -140,6 +140,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    prefix_join_payload = _read_optional_json(
+        snapshot_dir / "phase6c_set_prefix_doris.json",
+        warnings,
+        warn_missing=False,
+    )
     phase27_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase27_new_success_audit.json",
         warnings,
@@ -213,6 +218,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             event_candidate_payload,
             date_limit_payload,
             event_semantics_payload,
+            prefix_join_payload,
             new_success_audit_payload,
         ),
         "doris_cluster": _doris_metadata(doris_payload),
@@ -254,6 +260,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     event_candidate = _dict(official_migration.get("event_candidate_evidence"))
     date_limit = _dict(official_migration.get("date_limit_evidence"))
     event_semantics = _dict(official_migration.get("event_semantics_evidence"))
+    prefix_join = _dict(official_migration.get("prefix_join_evidence"))
     new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
@@ -286,6 +293,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Phase 25 event-candidate evidence | {_mapping_event_display(event_candidate)} |",
         f"| Phase 26 date/limit evidence | {_mapping_event_display(date_limit)} |",
         f"| Phase 27 event-semantics evidence | {_mapping_event_display(event_semantics)} |",
+        f"| Phase 6C set-prefix evidence | {_prefix_join_display(prefix_join)} |",
         f"| Latest phase new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
@@ -498,6 +506,7 @@ def _official_migration_metadata(
     event_candidate: dict[str, Any] | None,
     date_limit: dict[str, Any] | None,
     event_semantics: dict[str, Any] | None,
+    prefix_join: dict[str, Any] | None,
     new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
     gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
@@ -703,6 +712,17 @@ def _official_migration_metadata(
             "structural_contracts": _int_or_none(event_semantics.get("structural_contracts")) if isinstance(event_semantics, dict) else None,
             "max_p95_ms": max(event_semantics_p95_values) if event_semantics_p95_values else None,
         },
+        "prefix_join_evidence": {
+            "available": prefix_join is not None,
+            "status": prefix_join.get("status") if isinstance(prefix_join, dict) else None,
+            "matched": _int_or_none(prefix_join.get("matched")) if isinstance(prefix_join, dict) else None,
+            "total": _int_or_none(prefix_join.get("case_count")) if isinstance(prefix_join, dict) else None,
+            "structural_contracts": _int_or_none(prefix_join.get("structural_contracts")) if isinstance(prefix_join, dict) else None,
+            "prefix_faster": _int_or_none(prefix_join.get("prefix_faster")) if isinstance(prefix_join, dict) else None,
+            "median_speedup": _number_or_none(prefix_join.get("median_speedup")) if isinstance(prefix_join, dict) else None,
+            "min_speedup": _number_or_none(prefix_join.get("min_speedup")) if isinstance(prefix_join, dict) else None,
+            "max_speedup": _number_or_none(prefix_join.get("max_speedup")) if isinstance(prefix_join, dict) else None,
+        },
         "new_success_audit": {
             "available": new_success_audit is not None,
             "status": new_success_audit.get("status") if isinstance(new_success_audit, dict) else None,
@@ -747,6 +767,7 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase27_capability_funnel_json": str(snapshot_dir / "phase27_capability_funnel.json"),
         "phase27_event_semantics_doris_json": str(snapshot_dir / "phase27_event_semantics_doris.json"),
         "phase27_new_success_audit_json": str(snapshot_dir / "phase27_new_success_audit.json"),
+        "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }
@@ -916,6 +937,23 @@ def _mapping_event_display(evidence: dict[str, Any]) -> str:
     non_empty_text = f", non-empty {non_empty}/{total}" if non_empty is not None else ""
     suffix = f", max P95 {max_p95:.4f} ms" if isinstance(max_p95, (int, float)) else ""
     return f"{status}, {matched}/{total}{non_empty_text}{suffix}"
+
+
+def _prefix_join_display(evidence: dict[str, Any]) -> str:
+    if evidence.get("available") is False:
+        return "UNAVAILABLE"
+    status = evidence.get("status") or "<unknown>"
+    matched = evidence.get("matched")
+    total = evidence.get("total")
+    faster = evidence.get("prefix_faster")
+    speedup = evidence.get("median_speedup")
+    if matched is None or total is None:
+        return str(status)
+    faster_text = f", faster {faster}/{total}" if faster is not None else ""
+    speedup_text = (
+        f", median {speedup:.3f}x" if isinstance(speedup, (int, float)) else ""
+    )
+    return f"{status}, hash {matched}/{total}{faster_text}{speedup_text}"
 
 
 def _audit_display(evidence: dict[str, Any]) -> str:
