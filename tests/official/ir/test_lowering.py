@@ -53,6 +53,16 @@ def test_unknown_indicator_cannot_enter_strict_logical_plan():
     assert excinfo.value.code == "UNSUPPORTED_LOGICAL_LOWERING"
 
 
+def test_negative_one_limit_is_typed_as_open_ended_slice():
+    plan = _lower(
+        "indicator('', '', '涨幅', '', '', '', '') > 5 limit 7,-1"
+    ).plan
+
+    assert plan.to_dict()["kind"] == "LogicalLimit"
+    assert plan.offset == 7
+    assert plan.count is None
+
+
 def test_rank_lowering_preserves_comparison_contract():
     upper = _lower("rank('', '', '涨幅', 'desc', '', '', '', '') <= 10").plan
     lower = _lower("rank('', '', '涨幅', 'desc', '', '', '', '') >= 10").plan

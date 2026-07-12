@@ -28,6 +28,11 @@ def main() -> int:
         action="store_true",
         help="Require every newly successful query to use keyed event candidates",
     )
+    parser.add_argument(
+        "--require-date-algebra",
+        action="store_true",
+        help="Require normalized date/open-limit contracts for every new success",
+    )
     args = parser.parse_args()
 
     baseline = _rows(args.baseline)
@@ -66,6 +71,7 @@ def main() -> int:
             "rank_materialized": True,
             "period_scalar_materialized": True,
             "event_candidate_materialized": True,
+            "date_algebra_materialized": True,
         }
         if "~=" in source:
             checks["approximation_materialized"] = "ABS(" in sql and "GREATEST(" in sql
@@ -123,6 +129,12 @@ def main() -> int:
                 checks["event_candidate_materialized"] &= (
                     " EXCEPT " in sql and "`event_rows`.`event_0` = TRUE" in sql
                 )
+        if args.require_date_algebra:
+            checks["date_algebra_materialized"] = _date_algebra_materialized(
+                payload,
+                source,
+                sql,
+            )
         passed = all(checks.values())
         results.append(
             {
@@ -141,6 +153,7 @@ def main() -> int:
         "current": args.current,
         "require_period_scalars": args.require_period_scalars,
         "require_event_candidates": args.require_event_candidates,
+        "require_date_algebra": args.require_date_algebra,
         "new_successes": len(results),
         "passed": sum(item["passed"] for item in results),
         "failed": sum(not item["passed"] for item in results),
@@ -165,6 +178,119 @@ def _walk_dicts(value):
     elif isinstance(value, list):
         for item in value:
             yield from _walk_dicts(item)
+
+
+def _date_algebra_materialized(payload, source: str, sql: str) -> bool:
+    physical_nodes = list(_walk_dicts(payload["physical"]["plan"]))
+    logical_nodes = list(_walk_dicts(payload["logical"]["plan"]))
+    if re.search(r"limit\s+\d+\s*,\s*-1\s*$", source, flags=re.IGNORECASE):
+        open_limits = [
+            node
+            for node in physical_nodes
+            if node.get("kind") == "PhysicalLimit" and node.get("count") is None
+        ]
+        expected_limits = {
+            f"LIMIT {9223372036854775807 - int(node.get('offset', 0))}"
+            for node in open_limits
+        }
+        if not open_limits or not all(limit in sql for limit in expected_limits):
+            return False
+    if "0.5年" in source:
+        normalized_temporal = any(
+            node.get("unit") == "月" and node.get("threshold") == 6
+            for node in physical_nodes
+        )
+        if not normalized_temporal or "'MONTH'" not in sql:
+            return False
+
+    contracts = [
+        node["date_constraint"]
+        for node in logical_nodes
+        if node.get("kind") == "CallExpr"
+        and isinstance(node.get("date_constraint"), dict)
+        and node["date_constraint"].get("constraint_kind")
+        not in {None, "unspecified"}
+    ]
+    for contract in contracts:
+        kind = contract.get("constraint_kind")
+        if kind == "expression":
+            return False
+        if kind in {"exact", "calendar_range"}:
+            for boundary in (contract.get("start"), contract.get("end")):
+                if boundary and boundary not in sql:
+                    return False
+        elif kind in {"before_anchor_sessions", "after_anchor_sessions"}:
+            direction = "before" if kind.startswith("before") else "after"
+            if not any(
+                (
+                    node.get("kind") == "PhysicalSessionBoundaryRange"
+                    and node.get("boundary_kind") == "anchor"
+                    and node.get("direction") == direction
+                    and node.get("amount") == contract.get("amount")
+                    and node.get("month") == contract.get("month")
+                    and node.get("day") == contract.get("day")
+                )
+                or (
+                    node.get("kind") == "boundary_sessions"
+                    and node.get("boundary_kind") == "anchor"
+                    and node.get("boundary_direction") == direction
+                    and node.get("lookback_sessions") == contract.get("amount")
+                    and node.get("anchor_month") == contract.get("month")
+                    and node.get("anchor_day") == contract.get("day")
+                )
+                for node in physical_nodes
+            ):
+                return False
+        elif kind == "session_slice" and contract.get("offset"):
+            if not any(
+                (
+                    node.get("kind") == "PhysicalRecentSessions"
+                    and node.get("amount") == contract.get("amount")
+                    and node.get("offset") == contract.get("offset")
+                )
+                or (
+                    node.get("kind") == "session_slice"
+                    and node.get("lookback_sessions") == contract.get("amount")
+                    and node.get("session_offset") == contract.get("offset")
+                )
+                for node in physical_nodes
+            ):
+                return False
+        elif kind == "recent_calendar":
+            if not any(
+                (
+                    node.get("kind") == "PhysicalDynamicDateRange"
+                    and node.get("range_kind") == "recent"
+                    and node.get("amount") == contract.get("amount")
+                    and node.get("unit") == contract.get("unit")
+                )
+                or (
+                    node.get("kind") == "recent_calendar"
+                    and node.get("calendar_amount") == contract.get("amount")
+                    and node.get("calendar_unit") == contract.get("unit")
+                )
+                for node in physical_nodes
+            ):
+                return False
+    physical_date_contract = any(
+        node.get("kind")
+        in {
+            "PhysicalDynamicDateRange",
+            "PhysicalSessionBoundaryRange",
+            "PhysicalRecentSessions",
+            "boundary_sessions",
+            "calendar_range",
+            "recent_calendar",
+            "session_slice",
+        }
+        for node in physical_nodes
+    )
+    return (
+        bool(contracts)
+        or physical_date_contract
+        or "limit" in source.lower()
+        or "0.5年" in source
+    )
 
 
 def _write(report, json_output: str, report_output: str) -> None:
@@ -193,7 +319,7 @@ def _write(report, json_output: str, report_output: str) -> None:
             "",
             "## 审计合同",
             "",
-            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名；命名周期标量显式携带 `collapse_latest` 合同并生成 `MAX_BY`；事件组合显式声明证券键集合与最新快照输出策略，事件否定使用可判定集合上的 `EXCEPT`。",
+            "逐条重新编译基线失败而当前版本成功的问句，并检查：后端 AST 验证通过；不存在 `1=0/1=1` 占位谓词；近似比较包含配置化容差表达式；聚合函数同时进入 Physical IR 和 SQL；`CONS/EXIST` 进入时序关系；`rank` 生成真实窗口排名；命名周期标量显式携带 `collapse_latest` 合同并生成 `MAX_BY`；事件组合显式声明证券键集合与最新快照输出策略；扩展日期、分数量词和开放分页必须进入 Typed/Physical 合同并在 SQL 中可见。",
         ]
     )
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

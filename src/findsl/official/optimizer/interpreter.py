@@ -17,7 +17,8 @@ def interpret(plan, rows: Iterable[Mapping[str, Any]]) -> Tuple[Mapping[str, Any
         return tuple(row for row in values if bool(_evaluate(plan.predicate, row)))
     if isinstance(plan, LogicalLimit):
         values = interpret(plan.input, source)
-        return values[plan.offset : plan.offset + plan.count]
+        stop = None if plan.count is None else plan.offset + plan.count
+        return values[plan.offset:stop]
     raise ValueError(f"interpreter does not support {type(plan).__name__}")
 
 

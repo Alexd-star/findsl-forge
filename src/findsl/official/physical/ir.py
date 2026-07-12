@@ -223,6 +223,8 @@ class PhysicalSessionBoundaryRange(PhysicalExpr):
     unit: Optional[str] = None
     offset: int = 0
     boundary_date: Optional[str] = None
+    month: Optional[int] = None
+    day: Optional[int] = None
     type: OfficialType = BOOLEAN
 
     def to_dict(self):
@@ -236,6 +238,8 @@ class PhysicalSessionBoundaryRange(PhysicalExpr):
             "unit": self.unit,
             "offset": self.offset,
             "boundary_date": self.boundary_date,
+            "month": self.month,
+            "day": self.day,
             "type": self.type.to_dict(),
         }
 
@@ -852,7 +856,7 @@ class PhysicalCandidateSetOperation(PhysicalPlan):
 class PhysicalLimit(PhysicalPlan):
     input: PhysicalPlan
     offset: int
-    count: int
+    count: Optional[int]
 
     def to_dict(self):
         return {"kind": "PhysicalLimit", "input": self.input.to_dict(), "offset": self.offset, "count": self.count}

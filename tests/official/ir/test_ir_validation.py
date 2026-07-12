@@ -14,6 +14,12 @@ def test_valid_nested_plan_passes_strict_validation():
     assert validate_plan(plan, strict=True) is plan
 
 
+def test_open_ended_limit_is_a_valid_typed_slice():
+    plan = LogicalLimit(SCAN, 7, None, SCHEMA)
+
+    assert validate_plan(plan, strict=True) is plan
+
+
 @pytest.mark.parametrize(
     "plan,code",
     [

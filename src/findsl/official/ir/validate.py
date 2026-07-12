@@ -69,7 +69,7 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
             _fail("IR_FILTER_TYPE", "filter predicate must be boolean", f"{path}.predicate")
         _validate_expr(plan.predicate, f"{path}.predicate", strict, names)
     elif isinstance(plan, LogicalLimit):
-        if plan.offset < 0 or plan.count <= 0:
+        if plan.offset < 0 or (plan.count is not None and plan.count <= 0):
             _fail("IR_LIMIT_BOUNDS", "limit offset must be non-negative and count positive", path)
     elif isinstance(plan, LogicalConsecutive):
         _validate_temporal_spec(plan.spec, path, "CONS")

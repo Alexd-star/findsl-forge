@@ -18,3 +18,9 @@ def test_optimizer_preserves_row_keys_for_supported_rules():
     before = interpret(plan, ROWS)
     after = interpret(optimized.plan, ROWS)
     assert [row["stock_code"] for row in before] == [row["stock_code"] for row in after]
+
+
+def test_interpreter_preserves_open_ended_slice_semantics():
+    plan = LogicalLimit(LogicalScan("market_observation", SCHEMA), 1, None, SCHEMA)
+
+    assert [row["stock_code"] for row in interpret(plan, ROWS)] == ["B", "C"]

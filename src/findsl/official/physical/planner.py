@@ -2744,6 +2744,18 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             boundary_kind="date",
             boundary_date=window.start,
         )
+    if window.kind in {"before_anchor_sessions", "after_anchor_sessions"} and window.amount:
+        return PhysicalTemporalWindow(
+            "boundary_sessions",
+            lookback_sessions=window.amount,
+            calendar_offset=window.offset,
+            anchor_month=window.month,
+            anchor_day=window.day,
+            boundary_direction=(
+                "before" if window.kind == "before_anchor_sessions" else "after"
+            ),
+            boundary_kind="anchor",
+        )
     if window.kind == "recent_calendar" and window.amount and window.unit:
         return PhysicalTemporalWindow(
             "recent_calendar",
@@ -3155,6 +3167,19 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     "date",
                     typed_date.amount,
                     boundary_date=typed_date.start,
+                )
+            )
+        elif typed_date.kind in {"before_anchor_sessions", "after_anchor_sessions"} and typed_date.amount:
+            constraints.append(
+                PhysicalSessionBoundaryRange(
+                    stable_resource_id,
+                    partition_key,
+                    "before" if typed_date.kind == "before_anchor_sessions" else "after",
+                    "anchor",
+                    typed_date.amount,
+                    offset=typed_date.offset,
+                    month=typed_date.month,
+                    day=typed_date.day,
                 )
             )
         elif typed_date.kind == "dynamic_period" and typed_date.unit:

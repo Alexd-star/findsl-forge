@@ -32,3 +32,11 @@ def test_nested_limits_follow_relational_slice_semantics():
     result = Optimizer((LimitNormalizeRule(),)).optimize(outer)
 
     assert (result.plan.offset, result.plan.count) == (15, 20)
+
+
+def test_open_ended_nested_limit_is_not_unsafely_collapsed():
+    plan = LogicalLimit(LogicalLimit(SCAN, 10, None, SCHEMA), 5, 20, SCHEMA)
+    result = Optimizer((LimitNormalizeRule(),)).optimize(plan)
+
+    assert isinstance(result.plan.input, LogicalLimit)
+    assert result.plan.input.count is None

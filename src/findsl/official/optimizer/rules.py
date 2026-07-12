@@ -100,6 +100,8 @@ class LimitNormalizeRule:
         plan = _rewrite_inputs(plan, self.apply)
         if isinstance(plan, LogicalLimit) and isinstance(plan.input, LogicalLimit):
             inner = plan.input
+            if plan.count is None or inner.count is None:
+                return plan
             available = max(0, inner.count - plan.offset)
             if available == 0:
                 return LogicalEmpty(plan.schema, "PROVEN_LIMIT_INTERSECTION_EMPTY")

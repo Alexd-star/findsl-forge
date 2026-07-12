@@ -166,7 +166,17 @@ def _render_plan(
             _render_expr(plan.predicate, catalog, _find_relation(plan.input))
         )
     if isinstance(plan, PhysicalLimit):
-        query = _render_plan(plan.input, catalog, cte_prefix).limit(plan.count)
+        count = (
+            plan.count
+            if plan.count is not None
+            else 9223372036854775807 - plan.offset
+        )
+        query = _render_plan(plan.input, catalog, cte_prefix)
+        if query.args.get("order") is None:
+            query = query.order_by(
+                *(exp.column(key, quoted=True) for key in ("mktcode", "tgtcode", "bizdate"))
+            )
+        query = query.limit(count)
         return query.offset(plan.offset) if plan.offset else query
     if isinstance(plan, PhysicalRank):
         inner = _render_plan(plan.input, catalog, cte_prefix)
@@ -1323,6 +1333,8 @@ def _render_temporal(
                     unit=plan.window.calendar_unit,
                     offset=plan.window.calendar_offset,
                     boundary_date=plan.window.boundary_date,
+                    month=plan.window.anchor_month,
+                    day=plan.window.anchor_day,
                 ),
                 catalog,
                 relation,
@@ -1616,6 +1628,8 @@ def _render_temporal_aggregate(
                     unit=plan.window.calendar_unit,
                     offset=plan.window.calendar_offset,
                     boundary_date=plan.window.boundary_date,
+                    month=plan.window.anchor_month,
+                    day=plan.window.anchor_day,
                 ),
                 catalog,
                 scan,
@@ -2500,8 +2514,21 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
                 expression.offset,
                 expression.unit,
             )
+            validity = None
+        elif expression.boundary_kind == "anchor":
+            boundary, _, validity = _dynamic_date_bounds(
+                catalog,
+                expression.resource_id,
+                "anchor_calendar",
+                "day",
+                1,
+                expression.offset,
+                expression.month,
+                expression.day,
+            )
         else:
             boundary = exp.convert(expression.boundary_date)
+            validity = None
         comparator = exp.LT if expression.direction == "before" else exp.GT
         query = (
             exp.select(calendar_column.copy())
@@ -2513,7 +2540,14 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
                     alias=alias,
                 )
             )
-            .where(comparator(this=calendar_column.copy(), expression=boundary))
+            .where(
+                exp.and_(
+                    comparator(this=calendar_column.copy(), expression=boundary),
+                    validity,
+                )
+                if validity is not None
+                else comparator(this=calendar_column.copy(), expression=boundary)
+            )
             .group_by(calendar_column.copy())
             .order_by(
                 exp.Ordered(

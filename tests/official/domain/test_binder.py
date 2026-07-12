@@ -149,6 +149,7 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("近3个交易日", "recent_sessions", 3, "session"),
         ("两年内", "recent_calendar", 2, "year"),
         ("近两月", "recent_calendar", 2, "month"),
+        ("近半年", "recent_calendar", 6, "month"),
         ("近五周", "recent_calendar", 5, "week"),
         ("本季度", "dynamic_period", None, "quarter"),
         ("上个月", "dynamic_period", None, "month"),
@@ -238,6 +239,48 @@ def test_composite_date_phrases_preserve_relative_session_semantics(
     assert bound.date_constraint.start == start
     assert bound.date_constraint.offset == offset
     assert bound.date_constraint.amount == amount
+
+
+@pytest.mark.parametrize(
+    "date,kind,start,end,offset,amount,month,day",
+    [
+        (
+            "2012年的后4年",
+            "calendar_range",
+            "2013-01-01",
+            "2016-12-31",
+            0,
+            4,
+            None,
+            None,
+        ),
+        ("今天的前1日", "session_slice", None, None, 1, 1, None, None),
+        ("9号的前1日", "before_anchor_sessions", None, None, 0, 1, None, 9),
+        ("3月9号的后3日", "after_anchor_sessions", None, None, 0, 3, 3, 9),
+    ],
+)
+def test_extended_date_algebra_preserves_typed_boundaries(
+    date,
+    kind,
+    start,
+    end,
+    offset,
+    amount,
+    month,
+    day,
+):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == kind
+    assert bound.date_constraint.start == start
+    assert bound.date_constraint.end == end
+    assert bound.date_constraint.offset == offset
+    assert bound.date_constraint.amount == amount
+    assert bound.date_constraint.month == month
+    assert bound.date_constraint.day == day
 
 
 @pytest.mark.parametrize("date", ["2024年13月", "2024年2月30日"])

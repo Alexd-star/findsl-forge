@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 
 from ..registry import IndicatorDefinition, OfficialIndicatorRegistry
 from ..typed_ast import TypedNode
-from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
+from ..types import BOOLEAN, NUMERIC, STRING, TIME
 from .expressions import DataRequirement, DateConstraint, EventSpec, IndicatorRef, MarketScope, UniverseSpec
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
 from .temporal import parse_count_token
@@ -185,6 +185,14 @@ def parse_date_constraint(value: str) -> DateConstraint:
             unit="session",
             trading_day_based=True,
         )
+    if value in {"近半年", "最近半年", "过去半年", "这半年"}:
+        return DateConstraint(
+            "recent_calendar",
+            anchor="latest",
+            amount=6,
+            unit="month",
+            trading_day_based=False,
+        )
     number = r"\d+|[零〇一二两三四五六七八九十百]+"
     year_token = r"\d{2,4}|[零〇一二两三四五六七八九]{2,4}"
     dynamic_periods = {
@@ -227,6 +235,24 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 "calendar_range",
                 f"{year_value:04d}-01-01",
                 f"{year_value:04d}-12-31",
+                unit="year",
+                trading_day_based=False,
+            )
+    following_years = re.fullmatch(
+        rf"(?P<base>.+)的后(?P<count>{number})年",
+        value,
+    )
+    if following_years:
+        base = parse_date_constraint(following_years.group("base"))
+        count = parse_count_token(following_years.group("count"), value)
+        if base.kind == "calendar_range" and base.end:
+            start_year = int(base.end[:4]) + 1
+            end_year = start_year + count - 1
+            return DateConstraint(
+                "calendar_range",
+                f"{start_year:04d}-01-01",
+                f"{end_year:04d}-12-31",
+                amount=count,
                 unit="year",
                 trading_day_based=False,
             )
@@ -278,6 +304,26 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 trading_day_based=True,
                 offset=base.offset,
             )
+        if base.kind == "relative" and base.anchor == "today":
+            return DateConstraint(
+                "session_slice",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+                offset=1,
+            )
+        if base.kind == "anchor_calendar" and base.day is not None:
+            return DateConstraint(
+                "before_anchor_sessions",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                month=base.month,
+                day=base.day,
+            )
     following_sessions = re.fullmatch(
         rf"(?P<base>.+)的后(?P<count>{number})(?:个交易日|日|天)",
         value,
@@ -293,6 +339,17 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 amount=count,
                 unit="session",
                 trading_day_based=True,
+            )
+        if base.kind == "anchor_calendar" and base.day is not None:
+            return DateConstraint(
+                "after_anchor_sessions",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                month=base.month,
+                day=base.day,
             )
     ordinal_session = re.fullmatch(
         rf"(?P<base>.+)的第(?P<count>{number})(?:个交易日|日|天)",

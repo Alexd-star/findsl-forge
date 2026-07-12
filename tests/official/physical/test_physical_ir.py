@@ -27,6 +27,13 @@ def test_validator_rejects_unknown_column_and_invalid_limit():
         validate_physical_plan(PhysicalLimit(PhysicalScan("official_basic", (), None), 0, 0), default_physical_catalog())
 
 
+def test_physical_open_ended_limit_preserves_typed_offset():
+    plan = PhysicalLimit(PhysicalScan("official_basic", (), None), 7, None)
+
+    assert validate_physical_plan(plan, default_physical_catalog()) is plan
+    assert plan.to_dict()["count"] is None
+
+
 def test_temporal_plan_is_explicit_deterministic_and_trading_sequence_based():
     column = PhysicalColumn("official_basic", "volume", NUMERIC)
     scan = PhysicalScan("official_basic", (column,), None)

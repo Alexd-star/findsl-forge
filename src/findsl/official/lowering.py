@@ -124,7 +124,8 @@ def _walk_typed(node: TypedNode):
 def _lower_root(typed: TypedNode, scan: LogicalPlan, bindings: Dict[int, BoundFunction]) -> LogicalPlan:
     if isinstance(typed.node, OfficialLimit):
         inner = _lower_root(typed.children[0], scan, bindings)
-        return LogicalLimit(inner, typed.node.lower, typed.node.upper, inner.schema)
+        count = None if typed.node.upper == -1 else typed.node.upper
+        return LogicalLimit(inner, typed.node.lower, count, inner.schema)
     stages = _flatten_then(typed)
     current = _lower_stage(stages[0], scan, bindings)
     for index, stage in enumerate(stages[1:], start=1):

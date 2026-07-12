@@ -70,6 +70,20 @@ def test_not_every_contract_is_preserved_for_official_negative_semantics():
     assert result.comparator == "!="
 
 
+def test_exact_fractional_year_is_normalized_to_calendar_months():
+    result = parse_temporal_quantifier("CONS=0.5年")
+
+    assert result.threshold == 6
+    assert result.unit == "月"
+
+
+def test_non_integral_fractional_calendar_conversion_is_rejected():
+    with pytest.raises(TemporalParseError) as excinfo:
+        parse_temporal_quantifier("CONS=0.1年")
+
+    assert excinfo.value.code == "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED"
+
+
 def test_reference_oracle_distinguishes_consecutive_run_from_total_matches():
     matches = [True, False, True, False, True]
 

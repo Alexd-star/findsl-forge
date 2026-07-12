@@ -59,13 +59,19 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase26_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase26_capability_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase25_funnel_payload
+        phase26_funnel_payload
+        or phase25_funnel_payload
         or phase24_funnel_payload
         or phase23_funnel_payload
         or phase22_funnel_payload
@@ -118,6 +124,16 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    date_limit_payload = _read_optional_json(
+        snapshot_dir / "phase26_date_limit_doris.json",
+        warnings,
+        warn_missing=False,
+    )
+    phase26_new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase26_new_success_audit.json",
+        warnings,
+        warn_missing=False,
+    )
     phase25_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase25_new_success_audit.json",
         warnings,
@@ -144,7 +160,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     new_success_audit_payload = (
-        phase25_new_success_audit_payload
+        phase26_new_success_audit_payload
+        or phase25_new_success_audit_payload
         or phase24_new_success_audit_payload
         or phase23_new_success_audit_payload
         or phase22_new_success_audit_payload
@@ -177,6 +194,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             relational_payload,
             period_scalar_payload,
             event_candidate_payload,
+            date_limit_payload,
             new_success_audit_payload,
         ),
         "doris_cluster": _doris_metadata(doris_payload),
@@ -216,6 +234,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     relational = _dict(official_migration.get("relational_evidence"))
     period_scalar = _dict(official_migration.get("period_scalar_evidence"))
     event_candidate = _dict(official_migration.get("event_candidate_evidence"))
+    date_limit = _dict(official_migration.get("date_limit_evidence"))
     new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
@@ -246,6 +265,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Phase 23 temporal/relation evidence | {_mapping_event_display(relational)} |",
         f"| Phase 24 period-scalar evidence | {_mapping_event_display(period_scalar)} |",
         f"| Phase 25 event-candidate evidence | {_mapping_event_display(event_candidate)} |",
+        f"| Phase 26 date/limit evidence | {_mapping_event_display(date_limit)} |",
         f"| Latest phase new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
@@ -456,6 +476,7 @@ def _official_migration_metadata(
     relational: dict[str, Any] | None,
     period_scalar: dict[str, Any] | None,
     event_candidate: dict[str, Any] | None,
+    date_limit: dict[str, Any] | None,
     new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
     gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
@@ -542,6 +563,15 @@ def _official_migration_metadata(
             for value in [_number_or_none(item.get("p95_ms"))]
             if value is not None
         ]
+    date_limit_p95_values = []
+    if isinstance(date_limit, dict) and isinstance(date_limit.get("cases"), list):
+        date_limit_p95_values = [
+            value
+            for item in date_limit["cases"]
+            if isinstance(item, dict)
+            for value in [_number_or_none(item.get("p95_ms"))]
+            if value is not None
+        ]
     return {
         "available": funnel is not None,
         "git_head": funnel.get("git_head") if isinstance(funnel, dict) else None,
@@ -622,6 +652,15 @@ def _official_migration_metadata(
             "latest_data_date": event_candidate.get("latest_data_date") if isinstance(event_candidate, dict) else None,
             "max_p95_ms": max(event_candidate_p95_values) if event_candidate_p95_values else None,
         },
+        "date_limit_evidence": {
+            "available": date_limit is not None,
+            "status": date_limit.get("status") if isinstance(date_limit, dict) else None,
+            "matched": _int_or_none(date_limit.get("matched")) if isinstance(date_limit, dict) else None,
+            "total": _int_or_none(date_limit.get("total")) if isinstance(date_limit, dict) else None,
+            "non_empty": _int_or_none(date_limit.get("non_empty")) if isinstance(date_limit, dict) else None,
+            "latest_data_date": date_limit.get("latest_data_date") if isinstance(date_limit, dict) else None,
+            "max_p95_ms": max(date_limit_p95_values) if date_limit_p95_values else None,
+        },
         "new_success_audit": {
             "available": new_success_audit is not None,
             "status": new_success_audit.get("status") if isinstance(new_success_audit, dict) else None,
@@ -660,6 +699,9 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase25_capability_funnel_json": str(snapshot_dir / "phase25_capability_funnel.json"),
         "phase25_event_candidate_doris_json": str(snapshot_dir / "phase25_event_candidate_doris.json"),
         "phase25_new_success_audit_json": str(snapshot_dir / "phase25_new_success_audit.json"),
+        "phase26_capability_funnel_json": str(snapshot_dir / "phase26_capability_funnel.json"),
+        "phase26_date_limit_doris_json": str(snapshot_dir / "phase26_date_limit_doris.json"),
+        "phase26_new_success_audit_json": str(snapshot_dir / "phase26_new_success_audit.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
     }

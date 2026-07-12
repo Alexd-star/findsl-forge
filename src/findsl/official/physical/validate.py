@@ -151,7 +151,7 @@ def _validate_plan(plan, catalog, expressions):
         if plan.predicate.type is not BOOLEAN:
             raise ValueError("physical filter predicate must be boolean")
     elif isinstance(plan, PhysicalLimit):
-        if plan.offset < 0 or plan.count <= 0:
+        if plan.offset < 0 or (plan.count is not None and plan.count <= 0):
             raise ValueError("physical limit bounds are invalid")
     elif isinstance(plan, PhysicalRank):
         if plan.direction not in {"asc", "desc"}:
@@ -390,9 +390,20 @@ def _validate_plan(plan, catalog, expressions):
             plan.window.lookback_sessions is None
             or plan.window.lookback_sessions <= 0
             or plan.window.boundary_direction not in {"before", "after"}
-            or plan.window.boundary_kind not in {"period", "date"}
+            or plan.window.boundary_kind not in {"period", "date", "anchor"}
             or (plan.window.boundary_kind == "period" and plan.window.calendar_unit not in {"week", "month", "quarter", "year"})
             or (plan.window.boundary_kind == "date" and not plan.window.boundary_date)
+            or (
+                plan.window.boundary_kind == "anchor"
+                and (
+                    plan.window.anchor_day is None
+                    or not 1 <= plan.window.anchor_day <= 31
+                    or (
+                        plan.window.anchor_month is not None
+                        and not 1 <= plan.window.anchor_month <= 12
+                    )
+                )
+            )
         ):
             raise ValueError("session boundary window is incomplete")
         if plan.window.kind == "recent_calendar" and (
@@ -523,7 +534,7 @@ def _validate_expr(expression, catalog, expressions=None):
         resource = catalog.resource(expression.resource_id)
         if expression.column != resource.partition_key:
             raise PhysicalCatalogError("session boundary ranges require the partition key")
-        if expression.direction not in {"before", "after"} or expression.boundary_kind not in {"period", "date"}:
+        if expression.direction not in {"before", "after"} or expression.boundary_kind not in {"period", "date", "anchor"}:
             raise ValueError("invalid session boundary range contract")
         if expression.amount <= 0 or expression.offset > 0:
             raise ValueError("session boundary range cannot be empty or future-relative")
@@ -531,6 +542,11 @@ def _validate_expr(expression, catalog, expressions=None):
             raise ValueError("session period boundary has no supported unit")
         if expression.boundary_kind == "date" and not expression.boundary_date:
             raise ValueError("explicit session boundary requires a date")
+        if expression.boundary_kind == "anchor":
+            if expression.day is None or not 1 <= expression.day <= 31:
+                raise ValueError("anchor session boundary requires a valid day")
+            if expression.month is not None and not 1 <= expression.month <= 12:
+                raise ValueError("anchor session boundary month is invalid")
     elif isinstance(expression, PhysicalPrefixAverage):
         resource = catalog.resource(expression.resource_id)
         if "prefix" not in resource.capabilities:

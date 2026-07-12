@@ -22,6 +22,50 @@ def test_official_pipeline_exposes_every_compiler_stage_and_safe_doris_sql():
     assert payload["elapsed_ms"] >= 0
 
 
+def test_open_ended_limit_uses_doris_safe_maximum_with_offset():
+    result = compile_official(
+        "indicator('', '', '涨幅', '今日', '', '', '') > 0 limit 7,-1"
+    ).to_dict()
+
+    assert result["logical"]["plan"]["count"] is None
+    assert result["physical"]["plan"]["count"] is None
+    assert "ORDER BY `mktcode`, `tgtcode`, `bizdate`" in result["backend"]["sql"]
+    assert "LIMIT 9223372036854775800 OFFSET 7" in result["backend"]["sql"]
+
+
+@pytest.mark.parametrize(
+    "source,fragments",
+    [
+        (
+            "indicator('', '', '成交量', '2012年的后4年', '', 'AVG', '') > 0",
+            ("`q`.`bizdate` >= '2013-01-01'", "`q`.`bizdate` <= '2016-12-31'"),
+        ),
+        (
+            "indicator('', '', '成交量', '9号的前1日', '', '', '') > 0",
+            ("`boundary_sessions`.`bizdate` < DATE_ADD", "DESC LIMIT 1"),
+        ),
+        (
+            "indicator('', '', '成交量', '3月9号的后3日', '', '', 'CONS=每日') > 0",
+            ("`boundary_sessions`.`bizdate` > DATE_ADD", "ASC LIMIT 3"),
+        ),
+        (
+            "indicator('', '', '成交量', '近半年', '', 'AVG', '') > 0",
+            ("INTERVAL '6' MONTH", "SELECT MAX(`calendar_anchor`.`bizdate`)"),
+        ),
+        (
+            "indicator('', '', '成交量', '近两年', '', 'SUM', 'CONS=0.5年') > 0",
+            ("DATE_TRUNC(`aggregate_source`.`bizdate`, 'MONTH')", "* 12 + MONTH("),
+        ),
+    ],
+)
+def test_extended_date_algebra_reaches_structured_doris_ast(source, fragments):
+    result = compile_official(source).to_dict()
+
+    for fragment in fragments:
+        assert fragment in result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
+
+
 @pytest.mark.parametrize(
     "source,stage,code",
     [

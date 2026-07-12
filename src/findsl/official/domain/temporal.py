@@ -93,7 +93,20 @@ def parse_temporal_quantifier(source: str) -> TemporalQuantifier:
         return TemporalQuantifier(mode, comparator, None, None, unit, True, text)
 
     if raw_value:
-        threshold = parse_count_token(raw_value, text)
+        if "." in raw_value:
+            if match.group("maximum"):
+                raise TemporalParseError(
+                    "TEMPORAL_FRACTIONAL_RANGE_UNSUPPORTED",
+                    "fractional temporal ranges require one normalized unit",
+                    text,
+                )
+            threshold, unit = _normalize_fractional_calendar_count(
+                raw_value,
+                unit,
+                text,
+            )
+        else:
+            threshold = parse_count_token(raw_value, text)
     else:
         threshold = 1 if mode == "CONS" else 0
 
@@ -182,6 +195,28 @@ def evaluate_calendar_bucket_matches(
 
 def _canonical_unit(unit: str) -> str:
     return "日" if unit == "天" else unit
+
+
+def _normalize_fractional_calendar_count(
+    value: str,
+    unit: str,
+    source: str,
+) -> tuple[int, str]:
+    factor = {"年": 12, "季度": 3}.get(unit)
+    if factor is None:
+        raise TemporalParseError(
+            "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED",
+            "fractional temporal counts support only exact year/quarter to month conversion",
+            source,
+        )
+    months = float(value) * factor
+    if months <= 0 or not months.is_integer():
+        raise TemporalParseError(
+            "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED",
+            "fractional temporal count cannot be represented as whole calendar months",
+            source,
+        )
+    return int(months), "月"
 
 
 def parse_count_token(value: str, source: str = "") -> int:

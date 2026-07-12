@@ -219,7 +219,7 @@ class LogicalStage(LogicalPlan):
 class LogicalLimit(LogicalPlan):
     input: LogicalPlan
     offset: int
-    count: int
+    count: Optional[int]
     schema: Schema
 
     def to_dict(self):
