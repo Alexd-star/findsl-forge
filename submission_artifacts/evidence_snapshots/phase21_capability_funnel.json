@@ -2,7 +2,7 @@
   "schema_version": 1,
   "row_count": 5799,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "git_head": "be49fdc5b3cc188146ae2a37b1e58ea508dd73ea",
+  "git_head": "9478f03706c8527ceac2ca01c4937217c19e2c53",
   "legacy_strict_success": 1097,
   "new_backend_success": 647,
   "legacy_to_new_migrated": 631,
