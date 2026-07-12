@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "git_head": "ed510c240d6d07fb3f273a169a9f674b5c14e109",
+  "doris_versions": [
+    "doris-4.1.0-rc03-5960d4cea0e"
+  ],
+  "mysql_protocol_version": "5.7.99",
+  "latest_five_sessions": [
+    "2026-04-14",
+    "2026-04-13",
+    "2026-04-10",
+    "2026-04-09",
+    "2026-04-08"
+  ],
+  "repeats": 5,
+  "status": "PASS",
+  "matched": 4,
+  "set_based": 4,
+  "total": 4,
+  "cases": [
+    {
+      "name": "sum_volume_5",
+      "source": "indicator('沪', '', '成交量', '近5日', '', 'SUM', '') > 100000000",
+      "generated_sql": "SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN (SELECT `aggregate_rows`.`mktcode`, `aggregate_rows`.`tgtcode` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, SUM(`q`.`volume`) AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`mktcode` IN (1) AND `q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS calendar_sessions GROUP BY `calendar_sessions`.`bizdate` ORDER BY `calendar_sessions`.`bizdate` DESC LIMIT 5) GROUP BY `q`.`mktcode`, `q`.`tgtcode`) AS aggregate_rows WHERE `aggregate_rows`.`metric_value` > 100000000) AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "reference_sql": "WITH qualified AS (SELECT b.mktcode,b.tgtcode FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate IN ('2026-04-14','2026-04-13','2026-04-10','2026-04-09','2026-04-08') GROUP BY b.mktcode,b.tgtcode HAVING SUM(b.volume) > 100000000) SELECT a.mktcode,a.tgtcode,a.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS a INNER JOIN qualified AS q ON q.mktcode=a.mktcode AND q.tgtcode=a.tgtcode WHERE a.bizdate='2026-04-14'",
+      "expected_count": 574,
+      "actual_count": 574,
+      "expected_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
+      "actual_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        493.8443,
+        52.5591,
+        45.3365,
+        44.8695,
+        42.8533
+      ],
+      "p95_ms": 493.8443,
+      "set_based": true
+    },
+    {
+      "name": "avg_volume_5",
+      "source": "indicator('沪', '', '成交量', '近5日', '', 'AVG', '') > 20000000",
+      "generated_sql": "SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN (SELECT `aggregate_rows`.`mktcode`, `aggregate_rows`.`tgtcode` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, AVG(`q`.`volume`) AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`mktcode` IN (1) AND `q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS calendar_sessions GROUP BY `calendar_sessions`.`bizdate` ORDER BY `calendar_sessions`.`bizdate` DESC LIMIT 5) GROUP BY `q`.`mktcode`, `q`.`tgtcode`) AS aggregate_rows WHERE `aggregate_rows`.`metric_value` > 20000000) AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "reference_sql": "WITH qualified AS (SELECT b.mktcode,b.tgtcode FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate IN ('2026-04-14','2026-04-13','2026-04-10','2026-04-09','2026-04-08') GROUP BY b.mktcode,b.tgtcode HAVING AVG(b.volume) > 20000000) SELECT a.mktcode,a.tgtcode,a.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS a INNER JOIN qualified AS q ON q.mktcode=a.mktcode AND q.tgtcode=a.tgtcode WHERE a.bizdate='2026-04-14'",
+      "expected_count": 574,
+      "actual_count": 574,
+      "expected_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
+      "actual_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        280.2891,
+        44.3127,
+        45.1643,
+        45.9058,
+        42.3398
+      ],
+      "p95_ms": 280.2891,
+      "set_based": true
+    },
+    {
+      "name": "max_volume_5",
+      "source": "indicator('沪', '', '成交量', '近5日', '', 'MAX', '') > 50000000",
+      "generated_sql": "SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN (SELECT `aggregate_rows`.`mktcode`, `aggregate_rows`.`tgtcode` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, MAX(`q`.`volume`) AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`mktcode` IN (1) AND `q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS calendar_sessions GROUP BY `calendar_sessions`.`bizdate` ORDER BY `calendar_sessions`.`bizdate` DESC LIMIT 5) GROUP BY `q`.`mktcode`, `q`.`tgtcode`) AS aggregate_rows WHERE `aggregate_rows`.`metric_value` > 50000000) AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "reference_sql": "WITH qualified AS (SELECT b.mktcode,b.tgtcode FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate IN ('2026-04-14','2026-04-13','2026-04-10','2026-04-09','2026-04-08') GROUP BY b.mktcode,b.tgtcode HAVING MAX(b.volume) > 50000000) SELECT a.mktcode,a.tgtcode,a.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS a INNER JOIN qualified AS q ON q.mktcode=a.mktcode AND q.tgtcode=a.tgtcode WHERE a.bizdate='2026-04-14'",
+      "expected_count": 382,
+      "actual_count": 382,
+      "expected_sha256": "53f84dcc1474be1410f85959ace32d6c7f790acaedd3573c87fef231672873c8",
+      "actual_sha256": "53f84dcc1474be1410f85959ace32d6c7f790acaedd3573c87fef231672873c8",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        224.0848,
+        42.7872,
+        43.043,
+        41.2147,
+        40.0465
+      ],
+      "p95_ms": 224.0848,
+      "set_based": true
+    },
+    {
+      "name": "min_volume_5",
+      "source": "indicator('沪', '', '成交量', '近5日', '', 'MIN', '') > 1000000",
+      "generated_sql": "SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN (SELECT `aggregate_rows`.`mktcode`, `aggregate_rows`.`tgtcode` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, MIN(`q`.`volume`) AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`mktcode` IN (1) AND `q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS calendar_sessions GROUP BY `calendar_sessions`.`bizdate` ORDER BY `calendar_sessions`.`bizdate` DESC LIMIT 5) GROUP BY `q`.`mktcode`, `q`.`tgtcode`) AS aggregate_rows WHERE `aggregate_rows`.`metric_value` > 1000000) AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "reference_sql": "WITH qualified AS (SELECT b.mktcode,b.tgtcode FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate IN ('2026-04-14','2026-04-13','2026-04-10','2026-04-09','2026-04-08') GROUP BY b.mktcode,b.tgtcode HAVING MIN(b.volume) > 1000000) SELECT a.mktcode,a.tgtcode,a.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS a INNER JOIN qualified AS q ON q.mktcode=a.mktcode AND q.tgtcode=a.tgtcode WHERE a.bizdate='2026-04-14'",
+      "expected_count": 1478,
+      "actual_count": 1478,
+      "expected_sha256": "8c3a49cfc805613d97276296ea3c4915360676c9f221c7f42d901ab425b75475",
+      "actual_sha256": "8c3a49cfc805613d97276296ea3c4915360676c9f221c7f42d901ab425b75475",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        269.9484,
+        53.3108,
+        48.0426,
+        42.6064,
+        39.499
+      ],
+      "p95_ms": 269.9484,
+      "set_based": true
+    }
+  ]
+}

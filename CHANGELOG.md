@@ -4,6 +4,15 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端集合式分组聚合
+
+- 新增 `PhysicalGroupedAggregate`，支持单指标 `SUM/AVG/MAX/MIN` 与数值比较，并把输出证券集合连接到基础行情最新快照。
+- 聚合输入继续复用 Typed Market 和 Typed Date 约束；最近 N 个交易日先裁剪交易日集合，再按 `mktcode,tgtcode` 分组，不把全历史误聚合。
+- SQLGlot 后端生成源表 `GROUP BY`、派生 `aggregate_rows`、资格集合和 `anchor_out` 最新快照连接，不使用旧后端的每只股票相关标量子查询。
+- `GROWTH/GROWTH_RISE/GROWTH_FALL` 返回 `PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED`；多聚合、聚合算术和 rank 聚合返回独立 composition/rank 缺口，不能近似成普通聚合。
+- 新增 `scripts/collect_phase14_aggregate_evidence.py`。四类聚合与独立 `GROUP BY/HAVING` reference SQL 完整行集哈希一致 `4/4`，集合式计划检查 `4/4`，当前最高 P95 约 0.30 秒。
+- 新后端迁移覆盖从 `218/1097（19.87%）` 提升到 `231/1097（21.06%）`，新后端总成功数为 `233`。原聚合约束被拆分为 13 条已迁移、59 条组合聚合和 22 条增长类函数。
+
 ### ANTLR/IR 新后端市场集合代数
 
 - 新增 SQL 无关的 `MarketAtom/MarketNot/MarketAnd/MarketOr`，正式定义 `^ > & > |` 优先级；非法连续运算符、尾随运算符和未知市场返回稳定诊断。
