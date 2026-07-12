@@ -27,7 +27,7 @@ def test_official_pipeline_exposes_every_compiler_stage_and_safe_doris_sql():
     [
         ("indicator(", "frontend", "OFFICIAL_ANTLR_PARSE_ERROR"),
         ("indicator('', '', '营业收入', '', '', '', '') > 1", "logical", "DOMAIN_DATA_UNAVAILABLE"),
-        ("indicator('', '', '涨幅', '', '', '', '') > 1", "physical", "PHYSICAL_PLAN_UNAVAILABLE"),
+        ("indicator('', '', '3分钟涨速', '', '', '', '') > 1", "physical", "PHYSICAL_PLAN_UNAVAILABLE"),
     ],
 )
 def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(source, stage, code):
@@ -45,8 +45,28 @@ def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(so
 
 def test_physical_failure_keeps_candidate_decision_evidence():
     with pytest.raises(OfficialPipelineError) as excinfo:
-        compile_official("indicator('', '', '涨幅', '', '', '', '') > 1")
+        compile_official("indicator('', '', '3分钟涨速', '', '', '', '') > 1")
 
     diagnostics = excinfo.value.diagnostics
     assert diagnostics[0]["reason_code"] == "PHYSICAL_MAPPING_MISSING"
     assert diagnostics[0]["feasible"] is False
+
+
+@pytest.mark.parametrize(
+    "source,sql_fragment",
+    [
+        ("indicator('', '', '最新价', '', '', '', '') > 1", "`q`.`lastPx` / 10000.0"),
+        ("indicator('', '', '涨幅', '', '', '', '') > 1", "NULLIF(`q`.`preClosePx`, 0)"),
+        ("indicator('', '', '涨停', '', '', '', '') = True", "`q`.`limitFlag` = 1"),
+        ("indicator('', '', '总市值', '', '', '', '') > 1", "`q`.`totalShare`"),
+        ("indicator('', '', '主力净流出', '', '', '', '') > 1", "-`q`.`ZJLXMainNetTur`"),
+    ],
+)
+def test_pipeline_compiles_controlled_derived_indicators_without_legacy_sql(
+    source, sql_fragment
+):
+    result = compile_official(source).to_dict()
+
+    assert result["backend"]["validation_passed"] is True
+    assert sql_fragment in result["backend"]["sql"]
+    assert result["physical"]["selected_strategy"] == "controlled_expression"

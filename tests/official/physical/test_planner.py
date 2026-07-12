@@ -3,6 +3,7 @@ import pytest
 from findsl.official.lowering import lower_official_ast
 from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank
 from findsl.official.physical.catalog import default_physical_catalog
+from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
 from findsl.official.physical.statistics import PhysicalStatisticsSnapshot, default_physical_statistics
 from findsl.official.physical.strategies import default_physical_strategies
@@ -317,3 +318,46 @@ def test_rank_call_inside_scalar_expression_is_not_lowered_as_a_column():
         plan_physical(_lower(source), default_physical_catalog())
 
     assert excinfo.value.code == "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED"
+
+
+@pytest.mark.parametrize(
+    "source,resource,columns,node_kind",
+    [
+        ("indicator('', '', '最新价', '', '', '', '') > 1", "official_basic", {"lastPx"}, "PhysicalBinary"),
+        ("indicator('', '', '涨幅', '', '', '', '') > 1", "official_basic", {"lastPx", "preClosePx"}, "PhysicalNullIf"),
+        ("indicator('', '', '涨停', '', '', '', '') = True", "official_basic", {"limitFlag"}, "PhysicalComparison"),
+        ("indicator('', '', '总市值', '', '', '', '') > 1", "official_basic", {"lastPx", "totalShare"}, "PhysicalBinary"),
+        ("indicator('', '', '主力净流出', '', '', '', '') > 1", "official_ext", {"ZJLXMainNetTur"}, "PhysicalUnary"),
+    ],
+)
+def test_controlled_derived_indicator_lowers_to_typed_physical_expression(
+    source, resource, columns, node_kind
+):
+    catalog = default_physical_catalog()
+    result = plan_physical(
+        _lower(source),
+        catalog,
+        expressions=default_physical_expressions(catalog),
+    )
+
+    assert result.selected_resource == resource
+    assert {column.column for column in result.plan.input.columns} == columns
+    assert node_kind in result.plan.canonical_json()
+    assert result.decisions[0].reason_code in {
+        "PHYSICAL_CANDIDATE_SELECTED",
+        "PHYSICAL_STATISTICS_CANDIDATE_SELECTED",
+    }
+
+
+def test_boolean_derived_indicator_preserves_explicit_true_comparison():
+    catalog = default_physical_catalog()
+    result = plan_physical(
+        _lower("indicator('', '', '首板涨停', '', '', '', '') = True"),
+        catalog,
+        expressions=default_physical_expressions(catalog),
+    )
+
+    payload = result.plan.canonical_json()
+    assert "PhysicalCoalesce" in payload
+    assert "limitFlag" in payload
+    assert "upSerialLb" in payload

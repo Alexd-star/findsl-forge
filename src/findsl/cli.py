@@ -28,6 +28,7 @@ def _exit_official_error(exc: Exception, as_json: bool) -> None:
 def _build_official_physical(dsl: str):
     from .official.lowering import lower_official_ast
     from .official.physical.catalog import default_physical_catalog
+    from .official.physical.expressions import default_physical_expressions
     from .official.physical.planner import plan_physical
     from .official.physical.statistics import default_physical_statistics
     from .official.physical.strategies import default_physical_strategies
@@ -44,6 +45,7 @@ def _build_official_physical(dsl: str):
         catalog,
         statistics=default_physical_statistics(catalog),
         strategies=default_physical_strategies(catalog),
+        expressions=default_physical_expressions(catalog),
     )
 
 
@@ -548,9 +550,11 @@ def main() -> None:
     elif args.command == "official-slot-backend":
         from .official.backend.doris import render_doris
         from .official.physical.catalog import default_physical_catalog
+        from .official.physical.expressions import default_physical_expressions
 
         physical = _build_official_physical(args.dsl)
-        result = render_doris(physical.plan, default_physical_catalog())
+        catalog = default_physical_catalog()
+        result = render_doris(physical.plan, catalog, default_physical_expressions(catalog))
         payload = {
             "sql": result.sql,
             "round_trip_stable": result.round_trip_stable,

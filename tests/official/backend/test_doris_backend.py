@@ -193,6 +193,7 @@ def test_controlled_safe_divide_renders_explicit_nullif_ast():
 
     parsed = sqlglot.parse_one(result.sql, read="doris")
     assert len(list(parsed.find_all(exp.Nullif))) == 1
+    assert "(`q`.`lastPx` - `q`.`preClosePx`) * 100.0" in result.sql
     assert "NULLIF(`q`.`preClosePx`, 0)" in result.sql
     assert result.round_trip_stable is True
 

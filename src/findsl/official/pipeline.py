@@ -9,6 +9,7 @@ from .frontend.antlr_frontend import AntlrOfficialFrontend
 from .lowering import lower_official_ast
 from .optimizer import DEFAULT_RULES, Optimizer
 from .physical.catalog import default_physical_catalog
+from .physical.expressions import default_physical_expressions
 from .physical.planner import plan_physical
 from .physical.statistics import default_physical_statistics
 from .physical.strategies import default_physical_strategies
@@ -125,6 +126,7 @@ def compile_official(
     optimized_lowering = replace(logical, plan=optimized.plan)
 
     catalog = default_physical_catalog()
+    expressions = default_physical_expressions(catalog)
     statistics = default_physical_statistics(catalog) if options.use_statistics else None
     strategies = default_physical_strategies(catalog) if options.use_strategies else None
     try:
@@ -133,6 +135,7 @@ def compile_official(
             catalog,
             statistics=statistics,
             strategies=strategies,
+            expressions=expressions,
             allow_shadow_strategies=options.allow_shadow_strategies,
         )
     except Exception as exc:
@@ -141,7 +144,7 @@ def compile_official(
     partial["physical"] = _physical_payload(physical)
 
     try:
-        rendered = render_doris(physical.plan, catalog)
+        rendered = render_doris(physical.plan, catalog, expressions)
     except Exception as exc:
         _raise_pipeline_error("backend", exc, partial)
     backend = {

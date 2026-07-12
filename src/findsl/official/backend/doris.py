@@ -244,9 +244,15 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalSc
             operator = _BINARY[expression.op.lower()]
         except KeyError as exc:
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported binary operator {expression.op}") from exc
+        left = _render_expr(expression.left, catalog, scan)
+        right = _render_expr(expression.right, catalog, scan)
+        if isinstance(expression.left, PhysicalBinary):
+            left = exp.Paren(this=left)
+        if isinstance(expression.right, PhysicalBinary):
+            right = exp.Paren(this=right)
         return operator(
-            this=_render_expr(expression.left, catalog, scan),
-            expression=_render_expr(expression.right, catalog, scan),
+            this=left,
+            expression=right,
         )
     if isinstance(expression, PhysicalComparison):
         try:

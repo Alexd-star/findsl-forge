@@ -17,6 +17,7 @@ from .official.backend.diff import compare_doris_sql
 from .official.backend.executor import execute_doris_query_digest
 from .official.lowering import lower_official_ast
 from .official.physical.catalog import default_physical_catalog
+from .official.physical.expressions import default_physical_expressions
 from .official.physical.planner import plan_physical
 from .official.physical.statistics import default_physical_statistics
 from .official.physical.strategies import default_physical_strategies
@@ -37,6 +38,7 @@ def audit_official_backend_sources(
     analyzer = OfficialSemanticAnalyzer(_resolve_indicator_meta)
     registry = default_official_registry()
     catalog = default_physical_catalog()
+    expression_registry = default_physical_expressions(catalog)
     statistics = default_physical_statistics(catalog)
     strategies = default_physical_strategies(catalog)
     typed_ok = logical_ok = physical_ok = sqlglot_ok = safety_ok = 0
@@ -61,11 +63,17 @@ def audit_official_backend_sources(
             logical = lower_official_ast(typed, strict=True, domain_registry=registry)
             logical_ok += 1
             stage = "physical"
-            physical = plan_physical(logical, catalog, statistics=statistics, strategies=strategies)
+            physical = plan_physical(
+                logical,
+                catalog,
+                statistics=statistics,
+                strategies=strategies,
+                expressions=expression_registry,
+            )
             physical_ok += 1
             resources[physical.selected_resource] += 1
             stage = "sqlglot"
-            rendered = render_doris(physical.plan, catalog)
+            rendered = render_doris(physical.plan, catalog, expression_registry)
             sqlglot_ok += int(rendered.round_trip_stable)
             safety_ok += int(rendered.validation.passed)
             if legacy_compiler is not None:
