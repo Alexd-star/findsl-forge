@@ -4,12 +4,23 @@ from sqlglot import exp
 from findsl.official.backend.doris import render_doris
 from findsl.official.lowering import lower_official_ast
 from findsl.official.physical.catalog import default_physical_catalog
-from findsl.official.physical import PhysicalColumn, PhysicalComparison, PhysicalFilter, PhysicalLiteral, PhysicalScan
+from findsl.official.physical import (
+    PhysicalBinary,
+    PhysicalCoalesce,
+    PhysicalColumn,
+    PhysicalComparison,
+    PhysicalFilter,
+    PhysicalLiteral,
+    PhysicalNullIf,
+    PhysicalScan,
+    PhysicalUnary,
+)
 from findsl.official.physical.planner import plan_physical
+from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
 from findsl.official_slot import _resolve_indicator_meta, parse_official_slot
-from findsl.official.types import STRING
+from findsl.official.types import BOOLEAN, NUMERIC, STRING
 
 
 def _physical(source):
@@ -155,3 +166,65 @@ def test_prefix_average_candidate_renders_as_controlled_correlated_subquery():
     assert "`p`.`close_count_prefix`" in result.sql
     assert "(`p`.`close_prefix` - COALESCE(`p_prev`.`close_prefix`, 0)) * 1.0" in result.sql
     assert result.validation.passed is True
+
+
+def test_controlled_safe_divide_renders_explicit_nullif_ast():
+    catalog = default_physical_catalog()
+    last = PhysicalColumn("official_basic", "lastPx", NUMERIC)
+    previous = PhysicalColumn("official_basic", "preClosePx", NUMERIC)
+    numerator = PhysicalBinary(
+        "*",
+        PhysicalBinary("-", last, previous, NUMERIC),
+        PhysicalLiteral(100.0, NUMERIC),
+        NUMERIC,
+    )
+    change = PhysicalBinary(
+        "/",
+        numerator,
+        PhysicalNullIf(previous, PhysicalLiteral(0, NUMERIC), NUMERIC),
+        NUMERIC,
+    )
+    plan = PhysicalFilter(
+        PhysicalScan("official_basic", (last, previous), None),
+        PhysicalComparison(">", change, PhysicalLiteral(1, NUMERIC)),
+    )
+
+    result = render_doris(plan, catalog, default_physical_expressions(catalog))
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.Nullif))) == 1
+    assert "NULLIF(`q`.`preClosePx`, 0)" in result.sql
+    assert result.round_trip_stable is True
+
+
+def test_controlled_unary_and_coalesce_render_without_raw_sql():
+    catalog = default_physical_catalog()
+    net = PhysicalColumn("official_ext", "ZJLXMainNetTur", NUMERIC)
+    limit_flag = PhysicalColumn("official_basic", "limitFlag", NUMERIC)
+    serial = PhysicalColumn("official_basic", "upSerialLb", NUMERIC)
+    coalesced = PhysicalCoalesce(
+        (serial, PhysicalLiteral(0, NUMERIC)),
+        NUMERIC,
+    )
+    condition = PhysicalBinary(
+        "and",
+        PhysicalComparison("=", limit_flag, PhysicalLiteral(1, NUMERIC)),
+        PhysicalComparison("=", coalesced, PhysicalLiteral(1, NUMERIC)),
+        BOOLEAN,
+    )
+    basic_plan = PhysicalFilter(
+        PhysicalScan("official_basic", (limit_flag, serial), None),
+        condition,
+    )
+    ext_plan = PhysicalFilter(
+        PhysicalScan("official_ext", (net,), None, "official_basic"),
+        PhysicalComparison(">", PhysicalUnary("negate", net, NUMERIC), PhysicalLiteral(0, NUMERIC)),
+    )
+    expressions = default_physical_expressions(catalog)
+
+    basic_sql = render_doris(basic_plan, catalog, expressions).sql
+    ext_sql = render_doris(ext_plan, catalog, expressions).sql
+
+    assert "COALESCE(`q`.`upSerialLb`, 0) = 1" in basic_sql
+    assert "-`q`.`ZJLXMainNetTur` > 0" in ext_sql
+    assert "Raw" not in repr(sqlglot.parse_one(basic_sql, read="doris"))

@@ -31,6 +31,35 @@ class PhysicalLiteral(PhysicalExpr):
 
 
 @dataclass(frozen=True)
+class PhysicalUnary(PhysicalExpr):
+    op: str
+    operand: PhysicalExpr
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalUnary", "op": self.op, "operand": self.operand.to_dict(), "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
+class PhysicalNullIf(PhysicalExpr):
+    expression: PhysicalExpr
+    null_value: PhysicalExpr
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalNullIf", "expression": self.expression.to_dict(), "null_value": self.null_value.to_dict(), "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
+class PhysicalCoalesce(PhysicalExpr):
+    expressions: Tuple[PhysicalExpr, ...]
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalCoalesce", "expressions": [item.to_dict() for item in self.expressions], "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
 class PhysicalBinary(PhysicalExpr):
     op: str
     left: PhysicalExpr

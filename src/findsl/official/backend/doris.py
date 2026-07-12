@@ -8,6 +8,7 @@ from sqlglot import exp
 from ..physical.catalog import PhysicalCatalog
 from ..physical.ir import (
     PhysicalBinary,
+    PhysicalCoalesce,
     PhysicalColumn,
     PhysicalComparison,
     PhysicalFilter,
@@ -15,10 +16,12 @@ from ..physical.ir import (
     PhysicalLatestValue,
     PhysicalLimit,
     PhysicalLiteral,
+    PhysicalNullIf,
     PhysicalPlan,
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
+    PhysicalUnary,
 )
 from ..physical.validate import validate_physical_plan
 from .validation import DorisAstValidation, validate_doris_ast
@@ -64,8 +67,8 @@ _COMPARISON = {
 }
 
 
-def render_doris(plan: PhysicalPlan, catalog: PhysicalCatalog) -> DorisRenderResult:
-    validate_physical_plan(plan, catalog)
+def render_doris(plan: PhysicalPlan, catalog: PhysicalCatalog, expressions=None) -> DorisRenderResult:
+    validate_physical_plan(plan, catalog, expressions)
     ast = _render_plan(plan, catalog)
     sql = ast.sql(dialect="doris")
     validation = validate_doris_ast(sql, catalog)
@@ -168,6 +171,18 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalSc
         return exp.column(expression.column, table=table_alias, quoted=True)
     if isinstance(expression, PhysicalLiteral):
         return exp.convert(expression.value)
+    if isinstance(expression, PhysicalUnary):
+        if expression.op != "negate":
+            raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported unary operator {expression.op}")
+        return exp.Neg(this=_render_expr(expression.operand, catalog, scan))
+    if isinstance(expression, PhysicalNullIf):
+        return exp.Nullif(
+            this=_render_expr(expression.expression, catalog, scan),
+            expression=_render_expr(expression.null_value, catalog, scan),
+        )
+    if isinstance(expression, PhysicalCoalesce):
+        rendered = [_render_expr(item, catalog, scan) for item in expression.expressions]
+        return exp.Coalesce(this=rendered[0], expressions=rendered[1:])
     if isinstance(expression, PhysicalIn):
         return exp.In(
             this=_render_expr(expression.expression, catalog, scan),
