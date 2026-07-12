@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T13:52:23Z",
+  "generated_at": "2026-07-12T13:55:36Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "4d03a1a",
-    "head_at_export": "0f3db86",
+    "head_at_report_generation": "94bc247",
+    "head_at_export": "94bc247",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-12T13:28:25+00:00",
+    "generated_at": "2026-07-12T13:55:17+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.395,
+    "compile_p95_latency_ms": 1.321,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 677,
-      "elapsed_seconds": 129.71
+      "passed": 688,
+      "elapsed_seconds": 136.57
     }
   },
   "official_suite": {
