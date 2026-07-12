@@ -22,7 +22,11 @@ $reportFiles = @(
   "official_slot_coverage.md",
   "official_slot_coverage.json",
   "official_query_performance_matrix.md",
-  "official_query_performance_matrix.json"
+  "official_query_performance_matrix.json",
+  "phase15_universe_doris.md",
+  "phase15_universe_doris.json",
+  "phase15_universe_funnel.md",
+  "phase15_universe_funnel.json"
 )
 
 $status = ""
@@ -46,8 +50,11 @@ New-Item -ItemType Directory -Force -Path $snapshotDir | Out-Null
 $copied = @()
 foreach ($file in $reportFiles) {
   $source = Join-Path $ReportsDir $file
+  $destination = Join-Path $snapshotDir $file
   if (Test-Path $source) {
-    Copy-Item -Force -Path $source -Destination (Join-Path $snapshotDir $file)
+    Copy-Item -Force -Path $source -Destination $destination
+  }
+  if (Test-Path $destination) {
     $copied += $file
   }
 }

@@ -4,6 +4,16 @@
 
 ## 2026-07-12
 
+### ANTLR/IR 新后端类型化证券全集
+
+- 新增 `UniverseSpec`，把官方 `indicator(market, filter_scope, '', date, ...) = 'all'` 解释为受市场、日期和可用范围约束的证券全集选择，而不是缺失指标或布尔占位。
+- Binder 只允许 `indicator` 的单一空指标槽进入全集合同；空 `rank`、空 `queryData`、空事件操作数继续返回 `DOMAIN_CAPABILITY_UNSUPPORTED`。
+- 物理规划器选择 `official_basic` 作为全集锚点，不构造虚假指标列；只接受左侧全集调用与字符串字面量 `all` 的直接等值比较，其他运算符或字面量返回 `PHYSICAL_UNIVERSE_COMPARISON_UNSUPPORTED`。
+- 市场集合和日期合同继续落到 Typed Physical IR；概念、行业、指数成员等未提供的数据范围继续返回明确约束错误，不以全市场替代。
+- 新增 `scripts/collect_phase15_universe_evidence.py`。全市场、沪主板、创业板补集和最近五个交易日四组生成 SQL 与独立 reference SQL 完整行集哈希一致 `4/4`，且 `4/4` 不含 `1=0/1=1` 占位。
+- 修复领域证据隔离子进程在源码检出、未执行 editable install 时无法导入 `findsl` 的问题；子进程现在显式继承规范化 `src` 路径和 UTF-8 环境。
+- 新后端迁移覆盖从 `231/1097（21.06%）` 提升到 `258/1097（23.52%）`，新后端总成功数从 `233` 提升到 `260`。27 条全集问句精确迁移，带缺失成员关系范围的剩余问句转入可审计的物理约束缺口。
+
 ### ANTLR/IR 新后端集合式分组聚合
 
 - 新增 `PhysicalGroupedAggregate`，支持单指标 `SUM/AVG/MAX/MIN` 与数值比较，并把输出证券集合连接到基础行情最新快照。
