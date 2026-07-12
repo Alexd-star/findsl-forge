@@ -5,6 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 Set-Location -Path (Split-Path -Parent $PSScriptRoot)
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 $reportFiles = @(
   "submission_readiness.md",
@@ -58,12 +59,17 @@ foreach ($file in $reportFiles) {
     $copied += $file
   }
 }
+$copied = @(
+  Get-ChildItem -LiteralPath $snapshotDir -File |
+    Sort-Object Name |
+    ForEach-Object { $_.Name }
+)
 
 $readinessSnapshot = Join-Path $snapshotDir "submission_readiness.md"
 if (Test-Path $readinessSnapshot) {
   $readiness = Get-Content -Raw -Encoding UTF8 -Path $readinessSnapshot
   $readiness = $readiness -replace "- Git HEAD: ", "- Git HEAD at report generation: "
-  Set-Content -Encoding UTF8 -NoNewline -Path $readinessSnapshot -Value $readiness
+  [System.IO.File]::WriteAllText((Resolve-Path $readinessSnapshot), $readiness, $utf8NoBom)
 }
 
 $head = ""
@@ -96,7 +102,11 @@ $manifest += "- Docker volumes and Doris runtime data: environment state, not so
 $manifest += "- Human-narrated raw screen recording: optional final rehearsal artifact if the competition portal requires it. Versioned Web Demo screenshots and the generated one-minute MP4 are under `submission_artifacts/demo_screenshots/` and `submission_artifacts/defense_video/`."
 
 $manifestPath = Join-Path $ArtifactsDir "evidence_manifest.md"
-$manifest -join "`n" | Set-Content -Encoding UTF8 -Path $manifestPath
+[System.IO.File]::WriteAllText(
+  (Join-Path (Get-Location) $manifestPath),
+  (($manifest -join "`n") + "`n"),
+  $utf8NoBom
+)
 
 $metadataPath = Join-Path $ArtifactsDir "evidence_metadata.json"
 $summaryPath = Join-Path $ArtifactsDir "evidence_summary.md"
