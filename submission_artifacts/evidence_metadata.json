@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T14:43:33Z",
+  "generated_at": "2026-07-12T15:21:21Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "067b870",
-    "head_at_export": "067b870",
+    "head_at_export": "e39fbac",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
@@ -81,11 +81,11 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "d34d5e443e861f33538e3a6feb7ad85d7f1ba3fe",
+    "git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 393,
-    "migration_coverage": 0.35825,
-    "new_backend_success": 400,
+    "legacy_to_new_migrated": 406,
+    "migration_coverage": 0.3701,
+    "new_backend_success": 413,
     "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
@@ -95,6 +95,15 @@
       "latest_data_date": "2026-04-14",
       "trading_date_count": 4631,
       "max_p95_ms": 181.0921
+    },
+    "security_scope_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 7,
+      "total": 7,
+      "catalog_rows": 5686,
+      "catalog_source_match": true,
+      "max_p95_ms": 194.0904
     }
   },
   "doris_cluster": {
@@ -121,6 +130,8 @@
     "official_query_performance_matrix_json": "submission_artifacts\\evidence_snapshots\\official_query_performance_matrix.json",
     "phase18_dynamic_date_funnel_json": "submission_artifacts\\evidence_snapshots\\phase18_dynamic_date_funnel.json",
     "phase18_dynamic_date_doris_json": "submission_artifacts\\evidence_snapshots\\phase18_dynamic_date_doris.json",
+    "phase19_security_scope_funnel_json": "submission_artifacts\\evidence_snapshots\\phase19_security_scope_funnel.json",
+    "phase19_security_scope_doris_json": "submission_artifacts\\evidence_snapshots\\phase19_security_scope_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }

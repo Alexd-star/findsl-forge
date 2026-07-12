@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-12 22:43:33 +08:00
-- Git HEAD at export: 067b870
+- Generated at: 2026-07-12 23:21:21 +08:00
+- Git HEAD at export: e39fbac
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -55,6 +55,10 @@
 - `phase18_dynamic_date_doris.md` (1656 bytes)
 - `phase18_dynamic_date_funnel.json` (3255886 bytes)
 - `phase18_dynamic_date_funnel.md` (1795 bytes)
+- `phase19_security_scope_doris.json` (31015 bytes)
+- `phase19_security_scope_doris.md` (1493 bytes)
+- `phase19_security_scope_funnel.json` (3256113 bytes)
+- `phase19_security_scope_funnel.md` (1795 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase9_temporal_doris.json` (27830 bytes)
