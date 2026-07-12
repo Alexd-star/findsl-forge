@@ -120,6 +120,8 @@ Phase 6A replaces the shadow planner's fixed priority cost with a versioned Dori
 
 Phase 6B adds 14 schema-validated prefix-average strategies for fixed moving-price and moving-volume averages. The planner now enumerates direct materialized columns and controlled prefix-difference expressions, records both decisions, and keeps uncalibrated alternatives in `shadow` mode. SQLGlot renders the prefix path from typed AST nodes using current/previous prefix rows; no legacy SQL fragments enter the backend. Real Doris evidence matches both representative result sets exactly (`2/2`, zero errors), but the correlated prefix path is currently slower than the technical feature table (`0.795x` and `0.734x` legacy-over-prefix ratios in the implementation-bound run), so the default remains `direct_column`. Use `official-prefix-evidence` to reproduce the result hashes and timing before changing any strategy to `active`.
 
+Phase 7 exposes the ANTLR-to-SQLGlot path through one `compile_official` orchestration service and a dedicated `/api/official/analyze` Demo endpoint. The endpoint never silently falls back to the legacy compiler: unsupported data domains, constraints, expressions, or physical mappings return the exact terminal stage, stable code, partial IR evidence, and candidate decisions. Versioned official-slot examples are available from `/api/official/examples`. The migration funnel measures the new backend against the 1,097-query legacy strict success set; the current result is `33/1,097` (`3.01%`), with the largest actionable gaps classified as physical constraints, mappings, domain capabilities, and expressions. See `reports/phase7_official_pipeline_funnel.md`; this migration percentage is not presented as SQL correctness.
+
 If running from the repository root without installing the package:
 
 ```powershell
@@ -132,6 +134,7 @@ python -m findsl.cli validate-llm-candidates --response-file data/samples/llm_ca
 python -m findsl.cli llm-suggest-dsl '近3日成交量累计大于300' --model '<provider-model>' --json
 python -m findsl.cli official-suite --json
 python -m findsl.cli official-slot-coverage --workbook "D:\path\to\选股提槽实例.xlsx" --json-output reports/official_slot_coverage.json --report-output reports/official_slot_coverage.md
+python -m findsl.cli official-coverage-funnel --workbook "D:\path\to\选股提槽实例.xlsx" --json-output reports/phase7_official_pipeline_funnel.json --report-output reports/phase7_official_pipeline_funnel.md
 python -m findsl.cli official-performance-matrix --json
 python -m findsl.cli defense-package --json
 powershell -ExecutionPolicy Bypass -File .\scripts\evaluate.ps1
@@ -214,6 +217,10 @@ The same server exposes JSON APIs:
 - `GET /api/examples`
 - `POST /api/suggest`
 - `POST /api/analyze`
+- `GET /api/official/examples`
+- `POST /api/official/analyze`
+
+The first three endpoints preserve the original internal FinDSL demonstration and its local reference verifier. The `/api/official/*` endpoints use the official seven-slot syntax and the new ANTLR/Typed AST/Logical IR/Physical IR/SQLGlot pipeline. They are intentionally separate until the migration funnel shows that replacing the legacy path will not regress supported official behavior.
 
 ## Safe LLM Candidate Adapter
 
