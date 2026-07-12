@@ -30,6 +30,7 @@ from .ir import (
     PhysicalCoalesce,
     PhysicalFilter,
     PhysicalIn,
+    PhysicalJoin,
     PhysicalLatestValue,
     PhysicalLimit,
     PhysicalLiteral,
@@ -38,6 +39,7 @@ from .ir import (
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
+    PhysicalTableScan,
     PhysicalTemporal,
     PhysicalTemporalWindow,
     PhysicalSetOperation,
@@ -155,8 +157,8 @@ def plan_physical(
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
         raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
-    if len(resource_ids) != 1:
-        raise PhysicalPlanningError("PHYSICAL_MULTI_RESOURCE_UNSUPPORTED", "bounded planner currently requires one physical resource")
+    if len(resource_ids) > 1:
+        return _plan_multi_resource(lowering, catalog, fields, resource_ids, expressions)
 
     selected = resource_ids[0]
     resource = catalog.resource(selected)
@@ -212,6 +214,99 @@ def plan_physical(
         for index, item in enumerate(candidates)
     )
     return PhysicalPlanningResult(chosen_plan, chosen_resource, decisions, chosen_strategy)
+
+
+def _plan_multi_resource(
+    lowering: LoweringResult,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+) -> PhysicalPlanningResult:
+    if _contains_temporal_plan(lowering.plan):
+        raise PhysicalPlanningError(
+            "PHYSICAL_TEMPORAL_MULTI_RESOURCE_UNSUPPORTED",
+            "multi-resource temporal predicates require an explicit temporal join contract",
+        )
+    resources = tuple(catalog.resource(resource_id) for resource_id in resource_ids)
+    entities = {resource.logical_entity for resource in resources}
+    if len(entities) != 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_MULTI_RESOURCE_ENTITY_MISMATCH",
+            "multi-resource plan crosses logical entities",
+        )
+    anchor_ids = {
+        resource.anchor_resource_id
+        for resource in resources
+        if resource.anchor_resource_id is not None
+    }
+    if "official_basic" in resource_ids:
+        root_id = "official_basic"
+    elif len(anchor_ids) == 1:
+        root_id = next(iter(anchor_ids))
+    else:
+        raise PhysicalPlanningError(
+            "PHYSICAL_STABLE_ANCHOR_UNAVAILABLE",
+            "multi-resource plan has no unique stable anchor",
+        )
+    root = catalog.resource(root_id)
+    relation: PhysicalPlan = PhysicalTableScan(
+        root_id,
+        _scan_columns(fields, resource_id=root_id),
+    )
+    joined_ids = tuple(sorted(set(resource_ids) - {root_id}))
+    for resource_id in joined_ids:
+        resource = catalog.resource(resource_id)
+        key_names = tuple(
+            key for key in root.stable_keys if key in resource.stable_keys
+        )
+        if not {"mktcode", "tgtcode"}.issubset(key_names):
+            raise PhysicalPlanningError(
+                "PHYSICAL_STABLE_KEY_UNAVAILABLE",
+                f"resources {root_id} and {resource_id} lack stable security join keys",
+            )
+        right = PhysicalTableScan(
+            resource_id,
+            _scan_columns(fields, resource_id=resource_id),
+        )
+        keys = tuple(
+            (
+                PhysicalColumn(root_id, key, TIME if key == "bizdate" else (STRING if key == "tgtcode" else NUMERIC)),
+                PhysicalColumn(resource_id, key, TIME if key == "bizdate" else (STRING if key == "tgtcode" else NUMERIC)),
+            )
+            for key in key_names
+        )
+        relation = PhysicalJoin(relation, right, "left", keys)
+    plan = _lower_plan(
+        lowering.plan,
+        catalog,
+        root_id,
+        fields,
+        base_plan=relation,
+        allowed_resource_ids=frozenset({root_id, *joined_ids}),
+    )
+    validate_physical_plan(plan, catalog, expressions)
+    selected_resource = "+".join((root_id, *joined_ids))
+    decision = PhysicalDecision(
+        resource_id=selected_resource,
+        feasible=True,
+        cost=float(sum(catalog.resource(item).priority for item in (root_id, *joined_ids))),
+        estimated=True,
+        reason_code="PHYSICAL_STABLE_JOIN_SELECTED",
+        reason="left-deep same-entity join on catalog-declared stable keys",
+        strategy_id="stable_key_join",
+        selected=True,
+    )
+    return PhysicalPlanningResult(plan, selected_resource, (decision,), "stable_key_join")
+
+
+def _contains_temporal_plan(plan) -> bool:
+    current = plan
+    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage, LogicalConsecutive, LogicalExist)):
+        if isinstance(current, (LogicalConsecutive, LogicalExist)):
+            return True
+        current = current.operation if isinstance(current, LogicalStage) else current.input
+    return False
 
 
 def _candidate_decision(resource, catalog, statistics):
@@ -381,24 +476,36 @@ def _lower_plan(
     resource_id: str,
     fields: Tuple[_ResolvedIndicator, ...],
     expression_overrides=None,
+    base_plan: Optional[PhysicalPlan] = None,
+    allowed_resource_ids=None,
 ) -> PhysicalPlan:
     if isinstance(plan, LogicalDomainScan):
+        if base_plan is not None:
+            return base_plan
         columns = _scan_columns(fields)
         resource = catalog.resource(resource_id)
         return PhysicalScan(resource_id, columns, None, resource.anchor_resource_id)
     if isinstance(plan, LogicalFilter):
+        predicate = _lower_expr(
+            plan.predicate,
+            catalog,
+            resource_id,
+            fields,
+            expression_overrides=expression_overrides,
+            allowed_resource_ids=allowed_resource_ids,
+        )
         return PhysicalFilter(
-            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
-            _lower_expr(plan.predicate, catalog, resource_id, fields, expression_overrides=expression_overrides),
+            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids),
+            _deduplicate_and(predicate),
         )
     if isinstance(plan, LogicalLimit):
         return PhysicalLimit(
-            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
+            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids),
             plan.offset,
             plan.count,
         )
     if isinstance(plan, LogicalRank):
-        input_plan = _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides)
+        input_plan = _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids)
         if isinstance(input_plan, PhysicalRank):
             raise PhysicalPlanningError(
                 "PHYSICAL_CHAINED_RANK_UNSUPPORTED",
@@ -406,15 +513,15 @@ def _lower_plan(
             )
         for constraint in _call_constraints(plan.order_by, catalog, resource_id):
             input_plan = PhysicalFilter(input_plan, constraint)
-        expression = _lower_expr(plan.order_by, catalog, resource_id, fields, allow_rank=True, expression_overrides=expression_overrides)
-        bound = _lower_expr(plan.bound, catalog, resource_id, fields, expression_overrides=expression_overrides)
+        expression = _lower_expr(plan.order_by, catalog, resource_id, fields, allow_rank=True, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
+        bound = _lower_expr(plan.bound, catalog, resource_id, fields, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
         if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
         return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
     if isinstance(plan, (LogicalConsecutive, LogicalExist)):
         return PhysicalTemporal(
-            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
-            _lower_expr(plan.spec.predicate, catalog, resource_id, fields, expression_overrides=expression_overrides),
+            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids),
+            _lower_expr(plan.spec.predicate, catalog, resource_id, fields, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
             "CONS" if isinstance(plan, LogicalConsecutive) else "EXIST",
             plan.spec.comparator,
             plan.spec.threshold,
@@ -425,8 +532,32 @@ def _lower_plan(
             plan.spec.trading_sequence,
         )
     if isinstance(plan, LogicalStage):
-        return _lower_plan(plan.operation, catalog, resource_id, fields, expression_overrides)
+        return _lower_plan(plan.operation, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids)
     raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical node {type(plan).__name__}")
+
+
+def _deduplicate_and(predicate):
+    conjuncts = []
+
+    def collect(expression):
+        if isinstance(expression, PhysicalBinary) and expression.op.lower() == "and":
+            collect(expression.left)
+            collect(expression.right)
+        else:
+            conjuncts.append(expression)
+
+    collect(predicate)
+    unique = []
+    seen = set()
+    for expression in conjuncts:
+        if expression.node_id in seen:
+            continue
+        seen.add(expression.node_id)
+        unique.append(expression)
+    result = unique[0]
+    for expression in unique[1:]:
+        result = PhysicalBinary("and", result, expression, BOOLEAN)
+    return result
 
 
 def _lower_temporal_window(window) -> PhysicalTemporalWindow:
@@ -465,6 +596,7 @@ def _lower_expr(
     *,
     allow_rank: bool = False,
     expression_overrides=None,
+    allowed_resource_ids=None,
 ):
     if isinstance(expression, LiteralExpr):
         return PhysicalLiteral(expression.value, expression.type)
@@ -483,7 +615,8 @@ def _lower_expr(
             field = _field_for_indicator(fields, indicator_id)
         except KeyError as exc:
             raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", f"no controlled physical mapping for indicator {indicator_id}") from exc
-        if field.resource_id != resource_id:
+        allowed = allowed_resource_ids or frozenset({resource_id})
+        if field.resource_id not in allowed:
             raise PhysicalPlanningError("PHYSICAL_MULTI_RESOURCE_UNSUPPORTED", "expression spans multiple physical resources")
         if field.direct_column is not None:
             return PhysicalColumn(field.resource_id, field.direct_column, _type_from_name(field.value_type))
@@ -492,8 +625,8 @@ def _lower_expr(
     if isinstance(expression, BinaryExpr):
         return PhysicalBinary(
             expression.op,
-            _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides),
-            _lower_expr(expression.right, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides),
+            _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
+            _lower_expr(expression.right, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
             expression.type,
         )
     if isinstance(expression, ComparisonExpr):
@@ -503,9 +636,9 @@ def _lower_expr(
                 "approximate comparison requires catalog-provided absolute and relative tolerances",
             )
         if isinstance(expression.right, RangeExpr) and expression.op == "between":
-            value = _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides)
-            lower = _lower_expr(expression.right.lower, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides)
-            upper = _lower_expr(expression.right.upper, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides)
+            value = _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
+            lower = _lower_expr(expression.right.lower, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
+            upper = _lower_expr(expression.right.upper, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
             lower_op = ">=" if expression.right.lower_inclusive else ">"
             upper_op = "<=" if expression.right.upper_inclusive else "<"
             result = PhysicalBinary(
@@ -517,8 +650,8 @@ def _lower_expr(
         else:
             result = PhysicalComparison(
                 expression.op,
-                _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides),
-                _lower_expr(expression.right, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides),
+                _lower_expr(expression.left, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
+                _lower_expr(expression.right, catalog, resource_id, fields, allow_rank=allow_rank, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids),
             )
         return _apply_call_constraints(result, expression, catalog, resource_id)
     raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported expression {type(expression).__name__}")
@@ -567,9 +700,11 @@ def _field_for_indicator(
     raise KeyError(indicator_id)
 
 
-def _scan_columns(fields: Tuple[_ResolvedIndicator, ...]) -> Tuple[PhysicalColumn, ...]:
+def _scan_columns(fields: Tuple[_ResolvedIndicator, ...], resource_id: Optional[str] = None) -> Tuple[PhysicalColumn, ...]:
     columns = {}
     for field in fields:
+        if resource_id is not None and field.resource_id != resource_id:
+            continue
         for column, value_type in field.required_columns:
             key = (field.resource_id, column)
             physical_type = _type_from_name(value_type)

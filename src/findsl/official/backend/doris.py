@@ -13,6 +13,7 @@ from ..physical.ir import (
     PhysicalComparison,
     PhysicalFilter,
     PhysicalIn,
+    PhysicalJoin,
     PhysicalLatestValue,
     PhysicalLimit,
     PhysicalLiteral,
@@ -21,6 +22,7 @@ from ..physical.ir import (
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
+    PhysicalTableScan,
     PhysicalSetOperation,
     PhysicalTemporal,
     PhysicalUnary,
@@ -84,6 +86,21 @@ def _render_plan(
     catalog: PhysicalCatalog,
     cte_prefix: str = "",
 ) -> exp.Select:
+    if isinstance(plan, PhysicalJoin):
+        return _render_join(plan, catalog)
+    if isinstance(plan, PhysicalTableScan):
+        resource = catalog.resource(plan.resource_id)
+        alias = plan.resource_id
+        projections = tuple(
+            exp.column(name, table=alias, quoted=True)
+            for name in resource.stable_keys
+        )
+        query = exp.select(*projections).from_(
+            exp.table_(resource.table, db=resource.database, quoted=True, alias=alias)
+        )
+        if plan.partition_predicate is not None:
+            query = query.where(_render_expr(plan.partition_predicate, catalog, plan))
+        return query
     if isinstance(plan, PhysicalScan):
         resource = catalog.resource(plan.resource_id)
         anchor = catalog.resource(plan.anchor_resource_id) if plan.anchor_resource_id else None
@@ -122,19 +139,19 @@ def _render_plan(
         return query
     if isinstance(plan, PhysicalFilter):
         return _render_plan(plan.input, catalog, cte_prefix).where(
-            _render_expr(plan.predicate, catalog, _find_scan(plan.input))
+            _render_expr(plan.predicate, catalog, _find_relation(plan.input))
         )
     if isinstance(plan, PhysicalLimit):
         query = _render_plan(plan.input, catalog, cte_prefix).limit(plan.count)
         return query.offset(plan.offset) if plan.offset else query
     if isinstance(plan, PhysicalRank):
         inner = _render_plan(plan.input, catalog, cte_prefix)
-        scan = _find_scan(plan.input)
-        stable_alias = "anchor" if scan.anchor_resource_id else "q"
+        relation = _find_relation(plan.input)
+        stable_alias = _stable_alias(relation)
         order = exp.Order(
             expressions=[
                 exp.Ordered(
-                    this=_render_expr(plan.expression, catalog, scan),
+                    this=_render_expr(plan.expression, catalog, relation),
                     desc=plan.direction == "desc",
                 ),
                 exp.Ordered(
@@ -156,7 +173,7 @@ def _render_plan(
         ).from_(ranked)
         comparator = _COMPARISON[plan.comparator](
             this=exp.column("__rank_value", table="ranked", quoted=True),
-            expression=_render_expr(plan.bound, catalog, scan),
+            expression=_render_expr(plan.bound, catalog, relation),
         )
         return outer.where(comparator)
     if isinstance(plan, PhysicalTemporal):
@@ -164,6 +181,68 @@ def _render_plan(
     if isinstance(plan, PhysicalSetOperation):
         return _render_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
+
+
+def _render_join(plan: PhysicalJoin, catalog: PhysicalCatalog) -> exp.Select:
+    root, joins = _flatten_join(plan)
+    root_resource = catalog.resource(root.resource_id)
+    root_alias = root.resource_id
+    projections = tuple(
+        exp.column(name, table=root_alias, quoted=True)
+        for name in ("mktcode", "tgtcode", "bizdate")
+        if name in root_resource.stable_keys
+    )
+    query = exp.select(*projections).from_(
+        exp.table_(
+            root_resource.table,
+            db=root_resource.database,
+            quoted=True,
+            alias=root_alias,
+        )
+    )
+    if root.partition_predicate is not None:
+        query = query.where(_render_expr(root.partition_predicate, catalog, plan))
+    for right, join_type, keys in joins:
+        resource = catalog.resource(right.resource_id)
+        table = exp.table_(
+            resource.table,
+            db=resource.database,
+            quoted=True,
+            alias=right.resource_id,
+        )
+        predicate = exp.and_(
+            *(
+                exp.EQ(
+                    this=exp.column(left.column, table=left.resource_id, quoted=True),
+                    expression=exp.column(right_key.column, table=right_key.resource_id, quoted=True),
+                )
+                for left, right_key in keys
+            )
+        )
+        query = query.join(table, on=predicate, join_type=join_type.upper())
+        if right.partition_predicate is not None:
+            query = query.where(_render_expr(right.partition_predicate, catalog, plan))
+    return query
+
+
+def _flatten_join(plan: PhysicalJoin):
+    joins = []
+    current = plan
+    while isinstance(current, PhysicalJoin):
+        if not isinstance(current.right, PhysicalTableScan):
+            raise DorisBackendError(
+                "DORIS_JOIN_SHAPE_UNSUPPORTED",
+                "physical join must be a left-deep tree of table scans",
+            )
+        joins.append((current.right, current.join_type, current.keys))
+        current = current.left
+    if not isinstance(current, PhysicalTableScan):
+        raise DorisBackendError(
+            "DORIS_JOIN_SHAPE_UNSUPPORTED",
+            "physical join root must be a table scan",
+        )
+    joins.reverse()
+    return current, tuple(joins)
 
 
 def _render_temporal(
@@ -561,9 +640,29 @@ def _find_scan(plan: PhysicalPlan) -> PhysicalScan:
     return current
 
 
-def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalScan] = None):
+def _find_relation(plan: PhysicalPlan):
+    current = plan
+    while isinstance(current, (PhysicalFilter, PhysicalLimit)):
+        current = current.input
+    if isinstance(current, (PhysicalScan, PhysicalTableScan, PhysicalJoin)):
+        return current
+    raise DorisBackendError("DORIS_RELATION_UNAVAILABLE", "plan has no renderable physical relation")
+
+
+def _stable_alias(relation) -> str:
+    if isinstance(relation, PhysicalScan):
+        return "anchor" if relation.anchor_resource_id else "q"
+    if isinstance(relation, PhysicalTableScan):
+        return relation.resource_id
+    if isinstance(relation, PhysicalJoin):
+        root, _ = _flatten_join(relation)
+        return root.resource_id
+    raise DorisBackendError("DORIS_RELATION_UNAVAILABLE", "plan has no stable output alias")
+
+
+def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPlan] = None):
     if isinstance(expression, PhysicalColumn):
-        table_alias = "anchor" if scan and expression.resource_id == scan.anchor_resource_id else "q"
+        table_alias = _expression_alias(expression.resource_id, scan)
         return exp.column(expression.column, table=table_alias, quoted=True)
     if isinstance(expression, PhysicalLiteral):
         return exp.convert(expression.value)
@@ -660,3 +759,25 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalSc
             expression=_render_expr(expression.right, catalog, scan),
         )
     raise DorisBackendError("DORIS_EXPRESSION_UNSUPPORTED", f"unsupported physical expression {type(expression).__name__}")
+
+
+def _expression_alias(resource_id: str, relation: Optional[PhysicalPlan]) -> str:
+    if isinstance(relation, PhysicalScan):
+        return "anchor" if resource_id == relation.anchor_resource_id else "q"
+    if isinstance(relation, PhysicalTableScan):
+        if resource_id != relation.resource_id:
+            raise DorisBackendError(
+                "DORIS_COLUMN_RESOURCE_UNAVAILABLE",
+                f"resource {resource_id} is not present in table scan {relation.resource_id}",
+            )
+        return relation.resource_id
+    if isinstance(relation, PhysicalJoin):
+        root, joins = _flatten_join(relation)
+        available = {root.resource_id, *(right.resource_id for right, _, _ in joins)}
+        if resource_id not in available:
+            raise DorisBackendError(
+                "DORIS_COLUMN_RESOURCE_UNAVAILABLE",
+                f"resource {resource_id} is not present in physical join",
+            )
+        return resource_id
+    return "q"

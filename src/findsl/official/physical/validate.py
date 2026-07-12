@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
-    PhysicalIn, PhysicalLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalScan, PhysicalWindow,
+    PhysicalIn, PhysicalLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalScan, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
     PhysicalSetOperation,
     PhysicalCoalesce, PhysicalNullIf, PhysicalUnary,
@@ -18,6 +18,15 @@ def validate_physical_plan(plan: PhysicalPlan, catalog: PhysicalCatalog, express
 
 
 def _validate_plan(plan, catalog, expressions):
+    if isinstance(plan, PhysicalTableScan):
+        catalog.resource(plan.resource_id)
+        for column in plan.columns:
+            if column.resource_id != plan.resource_id:
+                raise PhysicalCatalogError("table scan column belongs to another resource")
+            _validate_expr(column, catalog, expressions)
+        if plan.partition_predicate:
+            _validate_expr(plan.partition_predicate, catalog, expressions)
+        return
     if isinstance(plan, PhysicalScan):
         resource = catalog.resource(plan.resource_id)
         if plan.anchor_resource_id != resource.anchor_resource_id:
@@ -47,6 +56,14 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("unsupported physical join type")
         for left, right in plan.keys:
             _validate_expr(left, catalog, expressions); _validate_expr(right, catalog, expressions)
+            left_resource = catalog.resource(left.resource_id)
+            right_resource = catalog.resource(right.resource_id)
+            if left_resource.logical_entity != right_resource.logical_entity:
+                raise PhysicalCatalogError("physical join crosses logical entities")
+            if left.column != right.column:
+                raise PhysicalCatalogError("physical join keys must preserve canonical key names")
+            if left.column not in left_resource.stable_keys or right.column not in right_resource.stable_keys:
+                raise PhysicalCatalogError("physical join key is not catalog-declared stable")
         return
     _validate_plan(plan.input, catalog, expressions)
     if isinstance(plan, PhysicalFilter):

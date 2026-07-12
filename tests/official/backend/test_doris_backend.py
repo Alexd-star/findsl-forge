@@ -133,6 +133,73 @@ def test_ext_scan_preserves_official_basic_universe_with_left_join():
     assert [item.table for item in parsed.expressions] == ["anchor", "anchor", "anchor"]
 
 
+def test_multi_resource_join_renders_one_star_join_with_all_stable_keys():
+    catalog = default_physical_catalog()
+    typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(
+        parse_official_slot(
+            "indicator('', '', '成交量', '', '', '', '') > 100 and "
+            "indicator('', '', '主力净流入', '', '', '', '') > 0",
+            mode="strict",
+        )
+    )
+    logical = lower_official_ast(typed, domain_registry=default_official_registry())
+    physical = plan_physical(logical, catalog)
+
+    result = render_doris(physical.plan, catalog)
+
+    assert result.sql.count("`hsj_stock_hq_basic`") == 1
+    assert result.sql.count("`hsj_stock_hq_ext`") == 1
+    assert "LEFT JOIN" in result.sql
+    assert "`official_basic`.`mktcode` = `official_ext`.`mktcode`" in result.sql
+    assert "`official_basic`.`tgtcode` = `official_ext`.`tgtcode`" in result.sql
+    assert "`official_basic`.`bizdate` = `official_ext`.`bizdate`" in result.sql
+    assert "`official_basic`.`volume` > 100" in result.sql
+    assert "`official_ext`.`ZJLXMainNetTur` > 0" in result.sql
+    assert result.validation.passed is True
+
+
+def test_three_resource_join_uses_static_dimension_keys_without_bizdate():
+    catalog = default_physical_catalog()
+    typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(
+        parse_official_slot(
+            "indicator('', '', '成交量', '', '', '', '') > 100 and "
+            "indicator('', '', '主力净流入', '', '', '', '') > 0 and "
+            "indicator('', '', 'ST股票标识', '', '', '', '') = False",
+            mode="strict",
+        )
+    )
+    logical = lower_official_ast(typed, domain_registry=default_official_registry())
+    physical = plan_physical(logical, catalog)
+
+    result = render_doris(physical.plan, catalog)
+
+    assert result.sql.count("LEFT JOIN") == 2
+    security_on = result.sql.split("LEFT JOIN `newzl`.`hsj_stock_code_info`")[1].split(" WHERE ")[0]
+    assert "`official_security`.`mktcode`" in security_on
+    assert "`official_security`.`tgtcode`" in security_on
+    assert "`official_security`.`bizdate`" not in security_on
+    assert "`official_security`.`stFlag` = FALSE" in result.sql
+    assert result.validation.passed is True
+
+
+def test_multi_resource_join_deduplicates_identical_latest_date_constraints():
+    catalog = default_physical_catalog()
+    typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(
+        parse_official_slot(
+            "indicator('', '', '成交量', '今日', '', '', '') > 100 and "
+            "indicator('', '', '主力净流入', '今日', '', '', '') > 0 and "
+            "indicator('', '', 'ST股票标识', '今日', '', '', '') = False",
+            mode="strict",
+        )
+    )
+    logical = lower_official_ast(typed, domain_registry=default_official_registry())
+    physical = plan_physical(logical, catalog)
+
+    result = render_doris(physical.plan, catalog)
+
+    assert len(list(sqlglot.parse_one(result.sql, read="doris").find_all(exp.Max))) == 1
+
+
 def test_ext_market_constraint_renders_against_anchor_universe():
     result = render_doris(
         _physical("rank('沪|深', '', '连涨天数', 'desc', '', '', '', '') <= 10"),

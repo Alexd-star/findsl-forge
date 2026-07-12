@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank, PhysicalSetOperation, PhysicalTemporal
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -272,6 +272,54 @@ def test_ext_scan_is_anchored_to_official_basic_universe():
 
     assert isinstance(result.plan, PhysicalFilter)
     assert result.plan.input.anchor_resource_id == "official_basic"
+
+
+def test_multi_resource_expression_builds_explicit_stable_key_join_tree():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > 100 and "
+            "indicator('', '', '主力净流入', '', '', '', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    assert isinstance(result.plan.input, PhysicalJoin)
+    assert isinstance(result.plan.input.left, PhysicalTableScan)
+    assert isinstance(result.plan.input.right, PhysicalTableScan)
+    assert result.plan.input.left.resource_id == "official_basic"
+    assert result.plan.input.right.resource_id == "official_ext"
+    assert [(left.column, right.column) for left, right in result.plan.input.keys] == [
+        ("mktcode", "mktcode"),
+        ("tgtcode", "tgtcode"),
+        ("bizdate", "bizdate"),
+    ]
+    assert result.selected_resource == "official_basic+official_ext"
+
+
+def test_three_resource_join_uses_two_keys_for_static_security_dimension():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > 100 and "
+            "indicator('', '', '主力净流入', '', '', '', '') > 0 and "
+            "indicator('', '', 'ST股票标识', '', '', '', '') = False"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    outer_join = result.plan.input
+    assert isinstance(outer_join, PhysicalJoin)
+    assert outer_join.right.resource_id == "official_security"
+    assert [left.column for left, _ in outer_join.keys] == ["mktcode", "tgtcode"]
+    assert isinstance(outer_join.left, PhysicalJoin)
+    assert outer_join.left.right.resource_id == "official_ext"
+    assert [left.column for left, _ in outer_join.left.keys] == [
+        "mktcode",
+        "tgtcode",
+        "bizdate",
+    ]
+    assert result.selected_resource == "official_basic+official_ext+official_security"
 
 
 def test_ext_market_constraint_binds_to_stable_anchor_resource():
