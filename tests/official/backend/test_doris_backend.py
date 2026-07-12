@@ -86,6 +86,30 @@ def test_latest_date_and_market_constraints_render_as_sqlglot_ast():
     assert result.validation.passed is True
 
 
+def test_typed_year_range_renders_bounded_partition_predicate():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '一八年', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert "`q`.`bizdate` >= '2018-01-01'" in result.sql
+    assert "`q`.`bizdate` <= '2018-12-31'" in result.sql
+    assert result.validation.passed is True
+
+
+def test_yesterday_uses_distinct_trading_calendar_offset_not_date_sub():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '昨天', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert "GROUP BY `q_session`.`bizdate`" in result.sql
+    assert "ORDER BY `q_session`.`bizdate` DESC" in result.sql
+    assert "LIMIT 1 OFFSET 1" in result.sql
+    assert "DATE_SUB" not in result.sql
+    assert result.validation.passed is True
+
+
 def test_rank_renders_window_in_subquery_and_filters_outer_query():
     result = render_doris(
         _physical("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10"),

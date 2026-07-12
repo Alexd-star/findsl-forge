@@ -101,6 +101,11 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("两年内", "recent_calendar", 2, "year"),
         ("近两月", "recent_calendar", 2, "month"),
         ("一八年", "calendar_range", None, "year"),
+        ("2024年8月", "calendar_range", None, "month"),
+        ("2011年3月25日", "exact", None, None),
+        ("昨天", "relative_session", 1, "session"),
+        ("前天", "relative_session", 2, "session"),
+        ("当天", "relative", None, None),
     ],
 )
 def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
@@ -117,3 +122,24 @@ def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
             "2018-01-01",
             "2018-12-31",
         )
+    elif date == "2024年8月":
+        assert (bound.date_constraint.start, bound.date_constraint.end) == (
+            "2024-08-01",
+            "2024-08-31",
+        )
+    elif date == "2011年3月25日":
+        assert (bound.date_constraint.start, bound.date_constraint.end) == (
+            "2011-03-25",
+            "2011-03-25",
+        )
+
+
+@pytest.mark.parametrize("date", ["2024年13月", "2024年2月30日"])
+def test_invalid_calendar_date_is_rejected_with_stable_domain_code(date):
+    with pytest.raises(DomainBindingError) as excinfo:
+        bind_function(
+            _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+            default_official_registry(),
+        )
+
+    assert excinfo.value.code == "DOMAIN_DATE_INVALID"

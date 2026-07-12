@@ -10,5 +10,6 @@ from .expressions import (
     RankSpec,
 )
 from .temporal import TemporalParseError, TemporalQuantifier, parse_temporal_quantifier
+from .binder import parse_date_constraint
 
 __all__ = [name for name in globals() if not name.startswith("_")]

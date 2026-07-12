@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -240,6 +240,38 @@ def test_resource_without_date_column_uses_anchor_date_constraint():
     )
 
     assert "official_basic" in result.plan.canonical_json()
+
+
+@pytest.mark.parametrize(
+    "date,start,end",
+    [
+        ("一八年", "2018-01-01", "2018-12-31"),
+        ("2024年8月", "2024-08-01", "2024-08-31"),
+        ("2011年3月25日", "2011-03-25", "2011-03-25"),
+    ],
+)
+def test_typed_calendar_constraints_lower_without_reparsing_date_fragments(date, start, end):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    assert start in payload
+    assert end in payload
+    assert "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED" not in payload
+
+
+@pytest.mark.parametrize("date,offset", [("昨天", 1), ("昨日", 1), ("前天", 2), ("前一个交易日", 1)])
+def test_relative_session_date_lowers_to_trading_calendar_offset(date, offset):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    date_predicate = result.plan.predicate.right
+    assert isinstance(date_predicate.right, PhysicalNthLatestValue)
+    assert date_predicate.right.offset == offset
 
 
 def test_direct_numeric_rank_lowers_with_comparison_contract():

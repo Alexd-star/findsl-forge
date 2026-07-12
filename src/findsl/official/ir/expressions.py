@@ -37,6 +37,7 @@ class CallExpr(LogicalExpr):
     args: Tuple[LogicalExpr, ...]
     type: OfficialType
     binding: Optional[FunctionBinding] = None
+    date_constraint: Optional[Any] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -45,6 +46,7 @@ class CallExpr(LogicalExpr):
             "args": [arg.to_dict() for arg in self.args],
             "type": self.type.to_dict(),
             "binding": self.binding.to_dict() if self.binding else None,
+            "date_constraint": self.date_constraint.to_dict() if self.date_constraint else None,
         }
 
 

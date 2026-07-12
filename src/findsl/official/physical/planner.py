@@ -20,6 +20,7 @@ from ..ir import (
     RangeExpr,
 )
 from ..lowering import LoweringResult
+from ..domain.binder import parse_date_constraint
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .catalog import PhysicalCatalog
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
@@ -35,6 +36,7 @@ from .ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalNullIf,
+    PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
     PhysicalRank,
@@ -810,16 +812,46 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                 f"resource {resource_id} has no catalog-declared date column",
             )
         column = PhysicalColumn(stable_resource_id, partition_key, TIME)
-        if date in {"今日", "今天", "当前", "最新"}:
-            value = PhysicalLatestValue(stable_resource_id, partition_key, TIME)
-        elif re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
-            value = PhysicalLiteral(date, TIME)
+        typed_date = call.date_constraint or parse_date_constraint(date)
+        if typed_date.kind == "relative" and typed_date.anchor == "today":
+            constraints.append(
+                PhysicalComparison(
+                    "=",
+                    column,
+                    PhysicalLatestValue(stable_resource_id, partition_key, TIME),
+                )
+            )
+        elif typed_date.kind == "exact" and typed_date.start:
+            constraints.append(
+                PhysicalComparison("=", column, PhysicalLiteral(typed_date.start, TIME))
+            )
+        elif typed_date.kind == "relative_session" and typed_date.amount:
+            constraints.append(
+                PhysicalComparison(
+                    "=",
+                    column,
+                    PhysicalNthLatestValue(
+                        stable_resource_id,
+                        partition_key,
+                        typed_date.amount,
+                        TIME,
+                    ),
+                )
+            )
+        elif typed_date.kind == "calendar_range" and typed_date.start and typed_date.end:
+            constraints.append(
+                PhysicalBinary(
+                    "and",
+                    PhysicalComparison(">=", column, PhysicalLiteral(typed_date.start, TIME)),
+                    PhysicalComparison("<=", column, PhysicalLiteral(typed_date.end, TIME)),
+                    BOOLEAN,
+                )
+            )
         else:
             raise PhysicalPlanningError(
                 "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-                f"date constraint requires normalization before physical planning: {date}",
+                f"typed date constraint is not materialized for scalar planning: {date}",
             )
-        constraints.append(PhysicalComparison("=", column, value))
     return tuple(constraints)
 
 

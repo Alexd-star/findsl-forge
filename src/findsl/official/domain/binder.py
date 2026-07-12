@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from calendar import monthrange
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
@@ -60,7 +61,7 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
     if not indicators:
         raise DomainBindingError("DOMAIN_CAPABILITY_UNSUPPORTED", f"{name} has no bindable indicator slot", function=name, slot="indicator_name", value="")
     market = _bind_market(name, slots.get("market", ""))
-    date = _bind_date(name, slots.get("date", slots.get("period", "")))
+    date = parse_date_constraint(slots.get("date", slots.get("period", "")))
     aggregate = slots.get("agg_func", "").strip().upper() or None
     if aggregate and aggregate not in {"AVG", "SUM", "MAX", "MIN", "GROWTH", "GROWTH_RISE", "GROWTH_FALL"}:
         raise DomainBindingError("DOMAIN_INVALID_ENUM", f"unsupported aggregate {aggregate}", function=name, slot="agg_func", value=aggregate)
@@ -103,15 +104,76 @@ def _bind_market(function: str, value: str) -> MarketScope:
     return MarketScope(tuple(dict.fromkeys(_MARKETS.get(part, part.upper()) for part in parts)))
 
 
-def _bind_date(function: str, value: str) -> DateConstraint:
+def parse_date_constraint(value: str) -> DateConstraint:
     value = value.strip()
     if not value:
         return DateConstraint("unspecified")
     if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
         return DateConstraint("exact", value, value)
-    if value in {"今日", "今天", "当前", "最新"}:
+    if value in {"今日", "今天", "当天", "当前", "现在", "最新"}:
         return DateConstraint("relative", anchor="today")
+    relative_sessions = {
+        "昨天": 1,
+        "昨日": 1,
+        "前一个交易日": 1,
+        "前一交易日": 1,
+        "前天": 2,
+    }
+    if value in relative_sessions:
+        return DateConstraint(
+            "relative_session",
+            anchor="latest",
+            amount=relative_sessions[value],
+            unit="session",
+            trading_day_based=True,
+        )
     number = r"\d+|[零〇一二两三四五六七八九十百]+"
+    year_token = r"\d{2,4}|[零〇一二两三四五六七八九]{2,4}"
+    full_date = re.fullmatch(
+        rf"(?P<year>{year_token})年(?P<month>{number})月(?P<day>{number})(?:日|号)",
+        value,
+    )
+    if full_date:
+        year_value = _calendar_year(full_date.group("year"), value)
+        month_value = parse_count_token(full_date.group("month"), value)
+        day_value = parse_count_token(full_date.group("day"), value)
+        try:
+            normalized = f"{year_value:04d}-{month_value:02d}-{day_value:02d}"
+            if day_value > monthrange(year_value, month_value)[1]:
+                raise ValueError
+        except (IndexError, ValueError) as exc:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid calendar date {value}",
+                function="",
+                slot="date",
+                value=value,
+            ) from exc
+        return DateConstraint("exact", normalized, normalized)
+    month = re.fullmatch(
+        rf"(?P<year>{year_token})年(?P<month>{number})月",
+        value,
+    )
+    if month:
+        year_value = _calendar_year(month.group("year"), value)
+        month_value = parse_count_token(month.group("month"), value)
+        try:
+            last_day = monthrange(year_value, month_value)[1]
+        except (IndexError, ValueError) as exc:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid calendar month {value}",
+                function="",
+                slot="date",
+                value=value,
+            ) from exc
+        return DateConstraint(
+            "calendar_range",
+            f"{year_value:04d}-{month_value:02d}-01",
+            f"{year_value:04d}-{month_value:02d}-{last_day:02d}",
+            unit="month",
+            trading_day_based=False,
+        )
     recent_sessions = re.fullmatch(
         rf"(?:最近|近|过去|这)(?P<count>{number})(?:个)?(?:交易)?(?:日|天)",
         value,
@@ -133,12 +195,10 @@ def _bind_date(function: str, value: str) -> DateConstraint:
         amount = parse_count_token(recent_calendar.group("count"), value)
         unit = {"年": "year", "月": "month"}[recent_calendar.group("unit")]
         return DateConstraint("recent_calendar", anchor="latest", amount=amount, unit=unit, trading_day_based=False)
-    year = re.fullmatch(r"(?P<year>\d{4}|[零〇一二两三四五六七八九]{2,4})年", value)
+    year = re.fullmatch(rf"(?P<year>{year_token})年", value)
     if year:
         token = year.group("year")
-        number_value = parse_count_token(token, value)
-        if len(token) == 2:
-            number_value = 2000 + number_value if number_value <= 26 else 1900 + number_value
+        number_value = _calendar_year(token, value)
         if 1990 <= number_value <= 2100:
             return DateConstraint(
                 "calendar_range",
@@ -149,3 +209,18 @@ def _bind_date(function: str, value: str) -> DateConstraint:
                 trading_day_based=False,
             )
     return DateConstraint("expression", anchor=value)
+
+
+def _calendar_year(token: str, source: str) -> int:
+    number_value = parse_count_token(token, source)
+    if len(token) == 2:
+        number_value = 2000 + number_value if number_value <= 26 else 1900 + number_value
+    if not 1990 <= number_value <= 2100:
+        raise DomainBindingError(
+            "DOMAIN_DATE_INVALID",
+            f"calendar year is outside the supported range: {source}",
+            function="",
+            slot="date",
+            value=source,
+        )
+    return number_value

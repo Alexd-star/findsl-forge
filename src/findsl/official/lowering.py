@@ -156,7 +156,7 @@ def _lower_stage(
         return LogicalSetOperation(left, right, operation, input_plan.schema)
     temporal_binding = _temporal_binding_for_stage(typed, bindings)
     if temporal_binding is not None:
-        predicate = _lower_expr(typed, strip_count_exp=True)
+        predicate = _lower_expr(typed, strip_count_exp=True, bindings=bindings)
         temporal = temporal_binding.temporal
         if temporal is None:
             raise OfficialLoweringError("TEMPORAL_BINDING_MISSING", "temporal stage has no typed quantifier")
@@ -193,18 +193,23 @@ def _lower_stage(
         if node.op not in {"<", "<=", ">", ">="}:
             raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", f"unsupported rank comparison {node.op}")
         call = typed.children[0]
-        bound = _lower_expr(typed.children[1])
+        bound = _lower_expr(typed.children[1], bindings=bindings)
         direction = call.binding.slots["direction"].lower() if call.binding else ""
-        return LogicalRank(input_plan, _lower_expr(call), direction, bound, input_plan.schema, comparator=node.op)
+        return LogicalRank(input_plan, _lower_expr(call, bindings=bindings), direction, bound, input_plan.schema, comparator=node.op)
     if typed.type is UNKNOWN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "top-level expression has unknown type")
-    predicate = _lower_expr(typed)
+    predicate = _lower_expr(typed, bindings=bindings)
     if predicate.type is not BOOLEAN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "top-level expression must be boolean")
     return LogicalFilter(input_plan, predicate, input_plan.schema)
 
 
-def _lower_expr(typed: TypedNode, *, strip_count_exp: bool = False):
+def _lower_expr(
+    typed: TypedNode,
+    *,
+    strip_count_exp: bool = False,
+    bindings: Optional[Dict[int, BoundFunction]] = None,
+):
     node = typed.node
     if typed.type is UNKNOWN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "unknown expression type")
@@ -222,16 +227,33 @@ def _lower_expr(typed: TypedNode, *, strip_count_exp: bool = False):
             if "date" in slots:
                 slots["date"] = ""
             binding = FunctionBinding.create(binding.signature, slots)
-        return CallExpr(node.name, tuple(_lower_expr(child, strip_count_exp=strip_count_exp) for child in typed.children), typed.type, binding)
+        domain_binding = bindings.get(id(node)) if bindings else None
+        date_constraint = None
+        if domain_binding is not None and not strip_count_exp:
+            date_constraint = domain_binding.date_constraint
+        return CallExpr(
+            node.name,
+            tuple(
+                _lower_expr(
+                    child,
+                    strip_count_exp=strip_count_exp,
+                    bindings=bindings,
+                )
+                for child in typed.children
+            ),
+            typed.type,
+            binding,
+            date_constraint,
+        )
     if isinstance(node, OfficialBinaryOp):
-        return BinaryExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp), typed.type)
+        return BinaryExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp, bindings=bindings), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp, bindings=bindings), typed.type)
     if isinstance(node, OfficialComparison):
-        return ComparisonExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp))
+        return ComparisonExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp, bindings=bindings), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp, bindings=bindings))
     if isinstance(node, OfficialRangeLiteral):
         element = typed.type.element_type if isinstance(typed.type, RangeType) else typed.children[0].type
         return RangeExpr(
-            _lower_expr(typed.children[0], strip_count_exp=strip_count_exp),
-            _lower_expr(typed.children[1], strip_count_exp=strip_count_exp),
+            _lower_expr(typed.children[0], strip_count_exp=strip_count_exp, bindings=bindings),
+            _lower_expr(typed.children[1], strip_count_exp=strip_count_exp, bindings=bindings),
             node.lower_inclusive,
             node.upper_inclusive,
             element,

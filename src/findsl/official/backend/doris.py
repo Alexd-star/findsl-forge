@@ -18,6 +18,7 @@ from ..physical.ir import (
     PhysicalLimit,
     PhysicalLiteral,
     PhysicalNullIf,
+    PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
     PhysicalRank,
@@ -687,6 +688,20 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
         resource = catalog.resource(expression.resource_id)
         table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q_latest")
         query = exp.select(exp.Max(this=exp.column(expression.column, table="q_latest", quoted=True))).from_(table)
+        return exp.Subquery(this=query)
+    if isinstance(expression, PhysicalNthLatestValue):
+        resource = catalog.resource(expression.resource_id)
+        alias = "q_session"
+        column = exp.column(expression.column, table=alias, quoted=True)
+        table = exp.table_(resource.table, db=resource.database, quoted=True, alias=alias)
+        query = (
+            exp.select(column.copy())
+            .from_(table)
+            .group_by(column.copy())
+            .order_by(exp.Ordered(this=column.copy(), desc=True))
+            .limit(1)
+            .offset(expression.offset)
+        )
         return exp.Subquery(this=query)
     if isinstance(expression, PhysicalPrefixAverage):
         if scan is None:
