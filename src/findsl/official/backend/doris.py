@@ -9,6 +9,7 @@ from ..physical.catalog import PhysicalCatalog
 from ..physical.ir import (
     PhysicalBinary,
     PhysicalAggregateGroup,
+    PhysicalAggregateRank,
     PhysicalAggregateRef,
     PhysicalCoalesce,
     PhysicalColumn,
@@ -162,6 +163,11 @@ def _render_plan(
                     desc=plan.direction == "desc",
                 ),
                 exp.Ordered(
+                    this=exp.column("mktcode", table=stable_alias, quoted=True),
+                    desc=False,
+                    nulls_first=True,
+                ),
+                exp.Ordered(
                     this=exp.column("tgtcode", table=stable_alias, quoted=True),
                     desc=False,
                     nulls_first=True,
@@ -174,15 +180,25 @@ def _render_plan(
             order=order,
         ).as_("__rank_value")
         inner = inner.select(window, append=True)
+        if plan.percentage:
+            inner = inner.select(
+                exp.Window(
+                    this=exp.Count(this=exp.Star()),
+                    partition_by=[exp.column("bizdate", table=stable_alias, quoted=True)],
+                ).as_("__partition_count"),
+                append=True,
+            )
         ranked = inner.subquery(alias="ranked")
         outer = exp.select(
             *(exp.column(name, table="ranked", quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
         ).from_(ranked)
         comparator = _COMPARISON[plan.comparator](
             this=exp.column("__rank_value", table="ranked", quoted=True),
-            expression=_render_expr(plan.bound, catalog, relation),
+            expression=_render_rank_bound(plan.bound, plan.percentage, "ranked"),
         )
         return outer.where(comparator)
+    if isinstance(plan, PhysicalAggregateRank):
+        return _render_aggregate_rank(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalGroupedAggregate):
         return _render_grouped_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalCompositeAggregate):
@@ -271,6 +287,150 @@ def _render_grouped_aggregate(
                 this=exp.column(anchor.partition_key, table="anchor_out", quoted=True),
                 expression=latest,
             )
+        )
+    )
+
+
+def _render_aggregate_rank(
+    plan: PhysicalAggregateRank,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(plan.input, catalog, cte_prefix)
+    relation = _find_relation(plan.input)
+    stable_alias = _stable_alias(relation)
+    keys = ("mktcode", "tgtcode")
+    aggregate = {
+        "sum": exp.Sum,
+        "avg": exp.Avg,
+        "max": exp.Max,
+        "min": exp.Min,
+    }[plan.function](
+        this=_render_expr(plan.measure, catalog, relation)
+    ).as_("metric_value", quoted=True)
+    source.set(
+        "expressions",
+        [
+            *(exp.column(key, table=stable_alias, quoted=True) for key in keys),
+            aggregate,
+        ],
+    )
+    source = source.group_by(
+        *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
+    )
+    aggregate_rows = source.subquery(alias="aggregate_rows")
+    order = exp.Order(
+        expressions=[
+            exp.Ordered(
+                this=exp.column("metric_value", table="aggregate_rows", quoted=True),
+                desc=plan.direction == "desc",
+            ),
+            exp.Ordered(
+                this=exp.column("mktcode", table="aggregate_rows", quoted=True),
+                desc=False,
+                nulls_first=True,
+            ),
+            exp.Ordered(
+                this=exp.column("tgtcode", table="aggregate_rows", quoted=True),
+                desc=False,
+                nulls_first=True,
+            ),
+        ]
+    )
+    ranked = exp.select(
+        *(exp.column(key, table="aggregate_rows", quoted=True) for key in keys),
+        exp.column("metric_value", table="aggregate_rows", quoted=True),
+        exp.Window(this=exp.RowNumber(), order=order).as_("__rank_value"),
+    ).from_(aggregate_rows)
+    if plan.percentage:
+        ranked = ranked.select(
+            exp.Window(this=exp.Count(this=exp.Star())).as_("__partition_count"),
+            append=True,
+        )
+    aggregate_ranked = ranked.subquery(alias="aggregate_ranked")
+    qualified = exp.select(
+        *(exp.column(key, table="aggregate_ranked", quoted=True) for key in keys)
+    ).from_(aggregate_ranked).where(
+        _COMPARISON[plan.comparator](
+            this=exp.column("__rank_value", table="aggregate_ranked", quoted=True),
+            expression=_render_rank_bound(
+                plan.bound,
+                plan.percentage,
+                "aggregate_ranked",
+            ),
+        )
+    )
+    qualified_rows = qualified.subquery(alias="qualified_rank")
+    anchor = catalog.resource(plan.anchor_resource_id)
+    anchor_table = exp.table_(
+        anchor.table,
+        db=anchor.database,
+        quoted=True,
+        alias="rank_anchor",
+    )
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table="rank_anchor", quoted=True),
+                expression=exp.column(key, table="qualified_rank", quoted=True),
+            )
+            for key in keys
+        )
+    )
+    latest = exp.Subquery(
+        this=exp.select(
+            exp.Max(
+                this=exp.column(
+                    anchor.partition_key,
+                    table="latest_rank_anchor",
+                    quoted=True,
+                )
+            )
+        ).from_(
+            exp.table_(
+                anchor.table,
+                db=anchor.database,
+                quoted=True,
+                alias="latest_rank_anchor",
+            )
+        )
+    )
+    return (
+        exp.select(
+            *(
+                exp.column(key, table="rank_anchor", quoted=True)
+                for key in (*keys, "bizdate")
+            )
+        )
+        .from_(anchor_table)
+        .join(qualified_rows, on=join_predicate, join_type="INNER")
+        .where(
+            exp.EQ(
+                this=exp.column(
+                    anchor.partition_key,
+                    table="rank_anchor",
+                    quoted=True,
+                ),
+                expression=latest,
+            )
+        )
+    )
+
+
+def _render_rank_bound(bound, percentage: bool, table_alias: str):
+    if not percentage:
+        return exp.convert(bound.value)
+    return exp.Ceil(
+        this=exp.Div(
+            this=exp.Mul(
+                this=exp.column(
+                    "__partition_count",
+                    table=table_alias,
+                    quoted=True,
+                ),
+                expression=exp.convert(bound.value),
+            ),
+            expression=exp.convert(100.0),
         )
     )
 

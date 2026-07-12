@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalCompositeAggregate, PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
+from findsl.official.physical import PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalSetOperation, PhysicalTableScan, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -289,14 +289,14 @@ def test_composite_aggregate_rejects_conflicting_scalar_snapshot_dates():
     assert excinfo.value.code == "PHYSICAL_SCALAR_SCOPE_MISMATCH"
 
 
-def test_rank_over_aggregate_keeps_a_dedicated_unsupported_contract():
+def test_growth_rank_keeps_a_dedicated_unsupported_contract():
     with pytest.raises(PhysicalPlanningError) as excinfo:
         plan_physical(
-            _lower("rank('', '', '成交量', 'desc', '', '', 'AVG', '') <= 10"),
+            _lower("rank('', '', '成交量', 'desc', '', '', 'GROWTH_RISE', '') <= 10"),
             default_physical_catalog(),
         )
 
-    assert excinfo.value.code == "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED"
+    assert excinfo.value.code == "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED"
 
 
 def test_latest_date_and_market_constraints_are_materialized_in_predicate():
@@ -428,6 +428,59 @@ def test_direct_numeric_rank_lowers_with_comparison_contract():
     assert result.plan.direction == "desc"
     assert result.plan.comparator == "<="
     assert result.plan.bound.value == 10
+
+
+def test_percentage_rank_preserves_partition_fraction_contract():
+    result = plan_physical(
+        _lower("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10%"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRank)
+    assert result.plan.percentage is True
+    assert result.plan.bound.value == 10
+
+
+def test_aggregate_rank_groups_measure_before_window_ranking():
+    result = plan_physical(
+        _lower("rank('', '', '成交量', 'desc', '近5日', '', 'AVG', '') <= 10"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalAggregateRank)
+    assert result.plan.function == "avg"
+    assert result.plan.direction == "desc"
+    assert result.plan.bound.value == 10
+    assert result.selected_strategy == "aggregate_rank"
+
+
+def test_rank_and_scalar_predicate_plan_as_stable_set_intersection():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10 and "
+            "indicator('', '', '成交额', '今日', '', '', '') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalSetOperation)
+    assert result.plan.operation == "intersect"
+    assert isinstance(result.plan.left, PhysicalRank)
+    assert isinstance(result.plan.right, PhysicalFilter)
+
+
+def test_limit_wrapped_rank_intersection_preserves_relational_limit():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10 and "
+            "indicator('', '', '成交额', '今日', '', '', '') > 100 limit 0,3"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalLimit)
+    assert isinstance(result.plan.input, PhysicalSetOperation)
+    assert result.plan.count == 3
 
 
 def test_query_data_uses_the_same_controlled_direct_field_mapping():

@@ -34,6 +34,7 @@ from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
 from .ir import (
     PhysicalBinary,
     PhysicalAggregateGroup,
+    PhysicalAggregateRank,
     PhysicalAggregateRef,
     PhysicalColumn,
     PhysicalComparison,
@@ -136,6 +137,33 @@ def plan_physical(
     expressions: Optional[PhysicalExpressionRegistry] = None,
     allow_shadow_strategies: bool = False,
 ) -> PhysicalPlanningResult:
+    if isinstance(lowering.plan, LogicalLimit) and isinstance(
+        lowering.plan.input,
+        (LogicalSetOperation, LogicalStage),
+    ):
+        inner = plan_physical(
+            replace(lowering, plan=lowering.plan.input),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
+        plan = PhysicalLimit(inner.plan, lowering.plan.offset, lowering.plan.count)
+        validate_physical_plan(plan, catalog, expressions)
+        return replace(inner, plan=plan, selected_strategy=f"limit_{inner.selected_strategy}")
+    if isinstance(lowering.plan, LogicalStage) and isinstance(
+        lowering.plan.operation,
+        LogicalSetOperation,
+    ):
+        return plan_physical(
+            replace(lowering, plan=lowering.plan.operation),
+            catalog,
+            statistics=statistics,
+            strategies=strategies,
+            expressions=expressions,
+            allow_shadow_strategies=allow_shadow_strategies,
+        )
     if isinstance(lowering.plan, LogicalSetOperation):
         left = plan_physical(
             replace(lowering, plan=lowering.plan.left),
@@ -172,6 +200,7 @@ def plan_physical(
     _validate_universe_contract(lowering.plan)
     aggregate_calls = _aggregate_calls(lowering.plan)
     aggregate_contract = _aggregate_contract(lowering.plan, aggregate_calls)
+    aggregate_rank_contract = _aggregate_rank_contract(lowering.plan)
     fields = _collect_fields(lowering.plan, catalog, expressions)
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
@@ -179,6 +208,14 @@ def plan_physical(
             resource_ids = ("official_basic",)
         else:
             raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
+    if aggregate_rank_contract is not None:
+        return _plan_aggregate_rank(
+            aggregate_rank_contract,
+            catalog,
+            fields,
+            expressions,
+            statistics,
+        )
     if aggregate_contract is not None:
         return _plan_grouped_aggregate(
             lowering.plan,
@@ -266,6 +303,15 @@ class _AggregateContract:
     limit: Optional[Tuple[int, int]] = None
 
 
+@dataclass(frozen=True)
+class _AggregateRankContract:
+    call: CallExpr
+    direction: str
+    bound: LiteralExpr
+    comparator: str
+    limit: Optional[Tuple[int, int]] = None
+
+
 def _aggregate_calls(plan) -> Tuple[CallExpr, ...]:
     return tuple(
         call
@@ -309,6 +355,31 @@ def _aggregate_contract(
         predicate.op,
         predicate.right,
         next(iter(functions)).lower(),
+        limit,
+    )
+
+
+def _aggregate_rank_contract(plan) -> Optional[_AggregateRankContract]:
+    limit = None
+    current = plan
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, LogicalRank) or not isinstance(current.order_by, CallExpr):
+        return None
+    call = current.order_by
+    if call.binding is None or not str(call.binding.slots.get("agg_func", "")).strip():
+        return None
+    if not isinstance(current.bound, LiteralExpr):
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+            "aggregate rank requires a literal bound",
+        )
+    return _AggregateRankContract(
+        call,
+        current.direction,
+        current.bound,
+        current.comparator,
         limit,
     )
 
@@ -378,6 +449,64 @@ def _plan_grouped_aggregate(
         selected,
         (decision,),
         "grouped_aggregate",
+    )
+
+
+def _plan_aggregate_rank(
+    contract: _AggregateRankContract,
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+) -> PhysicalPlanningResult:
+    function = str(contract.call.binding.slots.get("agg_func", "")).strip().lower()
+    if function not in {"sum", "avg", "max", "min"}:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_FUNCTION_UNSUPPORTED",
+            f"aggregate rank function requires a dedicated contract: {function.upper()}",
+        )
+    indicator_id = contract.call.binding.slots.get("indicator_name", "")
+    field = _field_for_indicator(fields, indicator_id)
+    resource = catalog.resource(field.resource_id)
+    anchor_id = resource.anchor_resource_id or field.resource_id
+    anchor = catalog.resource(anchor_id)
+    if anchor.partition_key is None or not {"mktcode", "tgtcode", "bizdate"}.issubset(anchor.stable_keys):
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_ANCHOR_UNAVAILABLE",
+            f"resource {field.resource_id} has no dated stable security anchor",
+        )
+    aggregate_input: PhysicalPlan = PhysicalScan(
+        field.resource_id,
+        _scan_columns((field,)),
+        None,
+        resource.anchor_resource_id,
+    )
+    for constraint in _call_constraints(contract.call, catalog, field.resource_id):
+        aggregate_input = PhysicalFilter(aggregate_input, constraint)
+    bound, percentage = _rank_bound(contract.bound, contract.comparator)
+    plan: PhysicalPlan = PhysicalAggregateRank(
+        aggregate_input,
+        _physical_field_expression(field),
+        function,
+        contract.direction,
+        bound,
+        contract.comparator,
+        percentage,
+        anchor_id,
+    )
+    if contract.limit is not None:
+        plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    decision = replace(
+        _candidate_decision(resource, catalog, statistics),
+        strategy_id="aggregate_rank",
+        selected=True,
+    )
+    return PhysicalPlanningResult(
+        plan,
+        field.resource_id,
+        (decision,),
+        "aggregate_rank",
     )
 
 
@@ -1037,19 +1166,15 @@ def _lower_plan(
         for constraint in _call_constraints(plan.order_by, catalog, resource_id):
             input_plan = PhysicalFilter(input_plan, constraint)
         expression = _lower_expr(plan.order_by, catalog, resource_id, fields, allow_rank=True, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
-        if (
-            isinstance(plan.bound, LiteralExpr)
-            and isinstance(plan.bound.value, str)
-            and plan.bound.value.endswith("%")
-        ):
-            raise PhysicalPlanningError(
-                "PHYSICAL_RANK_BOUND_UNSUPPORTED",
-                "percentage rank bounds require partition-cardinality lowering",
-            )
-        bound = _lower_expr(plan.bound, catalog, resource_id, fields, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
-        if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
-            raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
-        return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
+        bound, percentage = _rank_bound(plan.bound, plan.comparator)
+        return PhysicalRank(
+            input_plan,
+            expression,
+            plan.direction,
+            bound,
+            plan.comparator,
+            percentage,
+        )
     if isinstance(plan, (LogicalConsecutive, LogicalExist)):
         return PhysicalTemporal(
             _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides, base_plan, allowed_resource_ids),
@@ -1208,6 +1333,28 @@ def _physical_literal(expression: LiteralExpr) -> PhysicalLiteral:
         numeric = float(value[:-1])
         value = int(numeric) if numeric.is_integer() else numeric
     return PhysicalLiteral(value, expression.type)
+
+
+def _rank_bound(expression, comparator: str) -> Tuple[PhysicalLiteral, bool]:
+    if not isinstance(expression, LiteralExpr):
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+            "physical rank requires a numeric or percentage literal bound",
+        )
+    percentage = isinstance(expression.value, str) and expression.value.endswith("%")
+    bound = _physical_literal(expression)
+    if (
+        not isinstance(bound.value, (int, float))
+        or isinstance(bound.value, bool)
+        or bound.value < 0
+        or (bound.value == 0 and comparator not in {">", ">="})
+        or (percentage and bound.value > 100)
+    ):
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+            "rank bound must be positive and percentage bounds cannot exceed 100%",
+        )
+    return bound, percentage
 
 
 def _resolve_indicator(

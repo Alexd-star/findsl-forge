@@ -49,3 +49,29 @@ def test_rank_lowering_preserves_comparison_contract():
     assert upper.comparator == "<="
     assert lower.comparator == ">="
     assert upper.node_id != lower.node_id
+
+
+def test_rank_equality_is_a_relational_filter_contract():
+    plan = _lower("rank('', '', '成交量', 'desc', '今日', '', '', '') = 1").plan
+
+    assert plan.to_dict()["kind"] == "LogicalRank"
+    assert plan.comparator == "="
+
+
+def test_rank_greater_than_zero_is_a_valid_relational_contract():
+    plan = _lower("rank('', '', '成交量', 'desc', '今日', '', '', '') > 0").plan
+
+    assert plan.to_dict()["kind"] == "LogicalRank"
+    assert plan.bound.value == 0
+
+
+def test_rank_and_scalar_boolean_lower_to_independent_set_intersection():
+    plan = _lower(
+        "rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10 and "
+        "indicator('', '', '涨幅', '今日', '', '', '') > 2%"
+    ).plan
+
+    assert plan.to_dict()["kind"] == "LogicalSetOperation"
+    assert plan.operation == "intersect"
+    assert plan.left.to_dict()["kind"] == "LogicalRank"
+    assert plan.right.to_dict()["kind"] == "LogicalFilter"

@@ -54,6 +54,19 @@ def test_doris_sql_validator_rejects_window_functions_inside_where():
     assert any(issue.code == "WINDOW_IN_WHERE" for issue in result.issues)
 
 
+def test_doris_sql_validator_does_not_cross_intersect_when_scanning_where():
+    sql = (
+        "SELECT stock_code FROM (SELECT stock_code, ROW_NUMBER() OVER (ORDER BY score) AS rn "
+        "FROM dwd_stock_daily_quote) AS left_ranked WHERE rn <= 10 INTERSECT "
+        "SELECT stock_code FROM (SELECT stock_code, ROW_NUMBER() OVER (ORDER BY volume) AS rn "
+        "FROM dwd_stock_daily_quote) AS right_ranked WHERE rn <= 10"
+    )
+
+    result = validate_doris_select_sql(sql)
+
+    assert not any(issue.code == "WINDOW_IN_WHERE" for issue in result.issues)
+
+
 def test_doris_sql_validator_ignores_comment_markers_inside_string_literals():
     result = validate_doris_select_sql("SELECT * FROM dwd_stock_daily_quote WHERE market = 'A--safe'")
 

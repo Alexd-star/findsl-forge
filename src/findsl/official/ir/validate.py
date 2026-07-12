@@ -86,8 +86,8 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
             _fail("IR_RANK_DIRECTION", "rank direction must be asc or desc", f"{path}.direction")
         if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
             _fail("IR_RANK_COMPARATOR", "rank comparator is unsupported", f"{path}.comparator")
-        if not _positive_bound(plan.bound):
-            _fail("IR_RANK_BOUND", "rank bound must be a positive numeric or percentage literal", f"{path}.bound")
+        if not _valid_rank_bound(plan.bound, plan.comparator):
+            _fail("IR_RANK_BOUND", "rank bound is invalid for its comparator", f"{path}.bound")
         _validate_expr(plan.order_by, f"{path}.order_by", strict, names)
     elif isinstance(plan, LogicalStage):
         if plan.stage_index < 1:
@@ -122,14 +122,17 @@ def _validate_temporal_spec(spec, path: str, mode: str) -> None:
     _validate_expr(spec.predicate, f"{path}.spec.predicate", True, [])
 
 
-def _positive_bound(expression: LogicalExpr) -> bool:
+def _valid_rank_bound(expression: LogicalExpr, comparator: str) -> bool:
     if not isinstance(expression, LiteralExpr):
         return False
     if isinstance(expression.value, (int, float)) and not isinstance(expression.value, bool):
-        return expression.value > 0
+        return expression.value > 0 or (
+            expression.value == 0 and comparator in {">", ">="}
+        )
     if isinstance(expression.value, str) and expression.value.endswith("%"):
         try:
-            return float(expression.value[:-1]) > 0
+            value = float(expression.value[:-1])
+            return value > 0 or (value == 0 and comparator in {">", ">="})
         except ValueError:
             return False
     return False

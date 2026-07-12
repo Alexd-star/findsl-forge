@@ -190,7 +190,15 @@ def _depth_at(sql: str, offset: int) -> int:
 
 
 def _starts_clause_boundary(upper_sql: str, idx: int) -> bool:
-    boundaries = (" GROUP BY ", " HAVING ", " ORDER BY ", " LIMIT ", " UNION ")
+    boundaries = (
+        " GROUP BY ",
+        " HAVING ",
+        " ORDER BY ",
+        " LIMIT ",
+        " UNION ",
+        " INTERSECT ",
+        " EXCEPT ",
+    )
     return any(upper_sql.startswith(boundary, idx) for boundary in boundaries)
 
 

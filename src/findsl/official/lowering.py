@@ -154,6 +154,15 @@ def _lower_stage(
         right = _lower_stage(typed.children[1], input_plan, bindings)
         operation = "intersect" if node.op == "and" else "union"
         return LogicalSetOperation(left, right, operation, input_plan.schema)
+    if (
+        isinstance(node, OfficialBinaryOp)
+        and node.op in {"and", "or"}
+        and _contains_rank_comparison(typed)
+    ):
+        left = _lower_stage(typed.children[0], input_plan, bindings)
+        right = _lower_stage(typed.children[1], input_plan, bindings)
+        operation = "intersect" if node.op == "and" else "union"
+        return LogicalSetOperation(left, right, operation, input_plan.schema)
     temporal_binding = _temporal_binding_for_stage(typed, bindings)
     if temporal_binding is not None:
         predicate = _lower_expr(typed, strip_count_exp=True, bindings=bindings)
@@ -190,7 +199,7 @@ def _lower_stage(
         and isinstance(node.left, OfficialFunctionCall)
         and node.left.name == "rank"
     ):
-        if node.op not in {"<", "<=", ">", ">="}:
+        if node.op not in {"<", "<=", "=", "!=", ">", ">="}:
             raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", f"unsupported rank comparison {node.op}")
         call = typed.children[0]
         bound = _lower_expr(typed.children[1], bindings=bindings)
@@ -202,6 +211,17 @@ def _lower_stage(
     if predicate.type is not BOOLEAN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "top-level expression must be boolean")
     return LogicalFilter(input_plan, predicate, input_plan.schema)
+
+
+def _contains_rank_comparison(typed: TypedNode) -> bool:
+    node = typed.node
+    if (
+        isinstance(node, OfficialComparison)
+        and isinstance(node.left, OfficialFunctionCall)
+        and node.left.name == "rank"
+    ):
+        return True
+    return any(_contains_rank_comparison(child) for child in typed.children)
 
 
 def _lower_expr(

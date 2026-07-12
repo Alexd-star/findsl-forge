@@ -245,9 +245,51 @@ def test_rank_renders_window_in_subquery_and_filters_outer_query():
     assert len(list(parsed.find_all(exp.RowNumber))) == 1
     assert len(list(parsed.find_all(exp.Window))) == 1
     assert "`ranked`.`__rank_value` <= 10" in result.sql
-    assert "`q`.`volume` DESC, `q`.`tgtcode` ASC" in result.sql
+    assert "`q`.`volume` DESC, `q`.`mktcode` ASC, `q`.`tgtcode` ASC" in result.sql
     outer_order = parsed.args.get("order")
     assert outer_order is None
+    assert result.validation.passed is True
+
+
+def test_percentage_rank_uses_partition_cardinality_and_ceiling():
+    result = render_doris(
+        _physical("rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10%"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.RowNumber))) == 1
+    assert len(list(parsed.find_all(exp.Count))) == 1
+    assert "CEIL(`ranked`.`__partition_count` * 10 / 100.0)" in result.sql
+    assert result.validation.passed is True
+
+
+def test_aggregate_rank_renders_group_then_window_without_correlated_aggregate():
+    result = render_doris(
+        _physical("rank('', '', '成交量', 'desc', '近5日', '', 'AVG', '') <= 10"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert "AVG(`q`.`volume`) AS `metric_value`" in result.sql
+    assert "GROUP BY `q`.`mktcode`, `q`.`tgtcode`" in result.sql
+    assert "ROW_NUMBER() OVER (ORDER BY `aggregate_rows`.`metric_value` DESC" in result.sql
+    assert "`aggregate_ranked`.`__rank_value` <= 10" in result.sql
+    assert result.sql.count("SELECT AVG(") == 0
+    assert len(list(parsed.find_all(exp.RowNumber))) == 1
+    assert result.validation.passed is True
+
+
+def test_rank_and_scalar_filter_render_as_set_intersection():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10 and "
+            "indicator('', '', '成交量', '今日', '', '', '') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert len(list(sqlglot.parse_one(result.sql, read="doris").find_all(exp.Intersect))) == 1
     assert result.validation.passed is True
 
 

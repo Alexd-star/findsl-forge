@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
-    PhysicalAggregate, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
+    PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
     PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
@@ -78,9 +78,33 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("physical rank direction is invalid")
         if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
             raise ValueError("physical rank comparator is invalid")
-        if not isinstance(plan.bound.value, (int, float)) or plan.bound.value <= 0:
+        if (
+            not isinstance(plan.bound.value, (int, float))
+            or plan.bound.value < 0
+            or (plan.bound.value == 0 and plan.comparator not in {">", ">="})
+        ):
             raise ValueError("physical rank bound is invalid")
+        if plan.percentage and plan.bound.value > 100:
+            raise ValueError("physical percentage rank bound exceeds 100")
         _validate_expr(plan.expression, catalog, expressions)
+    elif isinstance(plan, PhysicalAggregateRank):
+        if plan.function not in {"sum", "avg", "max", "min"}:
+            raise ValueError("unsupported aggregate rank function")
+        if plan.direction not in {"asc", "desc"}:
+            raise ValueError("aggregate rank direction is invalid")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+            raise ValueError("aggregate rank comparator is invalid")
+        if (
+            not isinstance(plan.bound.value, (int, float))
+            or plan.bound.value < 0
+            or (plan.bound.value == 0 and plan.comparator not in {">", ">="})
+            or (plan.percentage and plan.bound.value > 100)
+        ):
+            raise ValueError("aggregate rank bound is invalid")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if anchor.partition_key is None:
+            raise PhysicalCatalogError("aggregate rank anchor requires a partition key")
+        _validate_expr(plan.measure, catalog, expressions)
     elif isinstance(plan, PhysicalGroupedAggregate):
         if plan.function not in {"sum", "avg", "max", "min"}:
             raise ValueError("unsupported grouped aggregate function")

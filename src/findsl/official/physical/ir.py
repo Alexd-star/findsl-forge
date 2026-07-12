@@ -260,9 +260,10 @@ class PhysicalRank(PhysicalPlan):
     direction: str
     bound: PhysicalLiteral
     comparator: str = "<="
+    percentage: bool = False
 
     def to_dict(self):
-        return {"kind": "PhysicalRank", "input": self.input.to_dict(), "expression": self.expression.to_dict(), "direction": self.direction, "bound": self.bound.to_dict(), "comparator": self.comparator}
+        return {"kind": "PhysicalRank", "input": self.input.to_dict(), "expression": self.expression.to_dict(), "direction": self.direction, "bound": self.bound.to_dict(), "comparator": self.comparator, "percentage": self.percentage}
 
 
 @dataclass(frozen=True)
@@ -282,6 +283,31 @@ class PhysicalGroupedAggregate(PhysicalPlan):
             "function": self.function,
             "comparator": self.comparator,
             "bound": self.bound.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalAggregateRank(PhysicalPlan):
+    input: PhysicalPlan
+    measure: PhysicalExpr
+    function: str
+    direction: str
+    bound: PhysicalLiteral
+    comparator: str
+    percentage: bool
+    anchor_resource_id: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalAggregateRank",
+            "input": self.input.to_dict(),
+            "measure": self.measure.to_dict(),
+            "function": self.function,
+            "direction": self.direction,
+            "bound": self.bound.to_dict(),
+            "comparator": self.comparator,
+            "percentage": self.percentage,
             "anchor_resource_id": self.anchor_resource_id,
         }
 
