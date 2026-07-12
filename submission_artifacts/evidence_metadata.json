@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T16:41:30Z",
+  "generated_at": "2026-07-12T17:27:42Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "7748d90",
-    "head_at_export": "7748d90",
+    "head_at_export": "be49fdc",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
@@ -81,12 +81,12 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "7748d906a90ec13a5e8c539f06d1390dc577d7ff",
+    "git_head": "be49fdc5b3cc188146ae2a37b1e58ea508dd73ea",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 534,
-    "migration_coverage": 0.486782,
-    "new_backend_success": 548,
-    "physical_date_gap": 2,
+    "legacy_to_new_migrated": 631,
+    "migration_coverage": 0.575205,
+    "new_backend_success": 647,
+    "physical_date_gap": 4,
     "dynamic_date_evidence": {
       "available": true,
       "status": "PASS",
@@ -113,6 +113,22 @@
       "non_empty": 13,
       "latest_data_date": "2026-04-14",
       "max_p95_ms": 3046.7137
+    },
+    "aggregate_rank_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 6,
+      "total": 6,
+      "non_empty": 6,
+      "latest_data_date": "2026-04-14",
+      "max_p95_ms": 520.1959
+    },
+    "new_success_audit": {
+      "available": true,
+      "status": "PASS",
+      "passed": 99,
+      "total": 99,
+      "failed": 0
     }
   },
   "doris_cluster": {
@@ -143,6 +159,9 @@
     "phase19_security_scope_doris_json": "submission_artifacts\\evidence_snapshots\\phase19_security_scope_doris.json",
     "phase20_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase20_capability_funnel.json",
     "phase20_mapping_event_doris_json": "submission_artifacts\\evidence_snapshots\\phase20_mapping_event_doris.json",
+    "phase21_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase21_capability_funnel.json",
+    "phase21_aggregate_rank_doris_json": "submission_artifacts\\evidence_snapshots\\phase21_aggregate_rank_doris.json",
+    "phase21_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase21_new_success_audit.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }
