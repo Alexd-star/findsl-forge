@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "git_head": "68633028de4b13af9f60b6964532ac7b4f822171",
+  "git_head": "aeb4f987cffd0246e1c2a15f889cdbe0970896c3",
   "doris_versions": [
     "doris-4.1.0-rc03-5960d4cea0e"
   ],
@@ -8,11 +8,13 @@
   "official_basic_rows": 13650347,
   "latest_date": "2026-04-14",
   "oracle_rows": 56149,
+  "bucket_oracle_rows": 94323,
+  "bucket_oracle_stocks": 200,
   "latest_universe": 5614,
   "repeats": 5,
   "status": "PASS",
-  "matched": 6,
-  "total": 6,
+  "matched": 10,
+  "total": 10,
   "cases": [
     {
       "name": "volume_recent_10_cons_3",
@@ -26,13 +28,13 @@
       "missing_sample": [],
       "extra_sample": [],
       "elapsed_ms": [
-        995.613,
-        692.2407,
-        690.6999,
-        690.0353,
-        748.9649
+        657.5021,
+        600.3919,
+        519.871,
+        500.0128,
+        502.3001
       ],
-      "p95_ms": 995.613
+      "p95_ms": 657.5021
     },
     {
       "name": "volume_recent_10_exist_5",
@@ -46,13 +48,13 @@
       "missing_sample": [],
       "extra_sample": [],
       "elapsed_ms": [
-        669.1031,
-        672.7702,
-        649.5326,
-        622.3844,
-        568.4435
+        495.1921,
+        428.6698,
+        405.5643,
+        470.8836,
+        438.758
       ],
-      "p95_ms": 672.7702
+      "p95_ms": 495.1921
     },
     {
       "name": "volume_this_5_exist",
@@ -66,13 +68,13 @@
       "missing_sample": [],
       "extra_sample": [],
       "elapsed_ms": [
-        629.0977,
-        545.9376,
-        450.9196,
-        486.5609,
-        490.4649
+        427.8633,
+        477.0894,
+        419.1502,
+        434.5565,
+        527.5753
       ],
-      "p95_ms": 629.0977
+      "p95_ms": 527.5753
     },
     {
       "name": "volume_this_5_every",
@@ -86,13 +88,13 @@
       "missing_sample": [],
       "extra_sample": [],
       "elapsed_ms": [
-        506.2495,
-        461.4914,
-        456.7718,
-        470.6697,
-        517.9561
+        486.3591,
+        521.2775,
+        432.5042,
+        397.7858,
+        520.3043
       ],
-      "p95_ms": 517.9561
+      "p95_ms": 521.2775
     },
     {
       "name": "volume_turnover_temporal_intersection",
@@ -106,13 +108,13 @@
       "missing_sample": [],
       "extra_sample": [],
       "elapsed_ms": [
-        1104.0876,
-        995.3263,
-        1040.9809,
-        972.4848,
-        894.809
+        927.1951,
+        878.8652,
+        933.0383,
+        899.9266,
+        792.4245
       ],
-      "p95_ms": 1104.0876
+      "p95_ms": 933.0383
     },
     {
       "name": "volume_main_inflow_temporal_union",
@@ -126,13 +128,101 @@
       "missing_sample": [],
       "extra_sample": [],
       "elapsed_ms": [
-        1273.4783,
-        1357.0546,
-        1343.0309,
-        1248.8649,
-        1154.0596
+        1256.0241,
+        1228.1426,
+        1295.8596,
+        1131.1422,
+        1217.3042
       ],
-      "p95_ms": 1357.0546
+      "p95_ms": 1295.8596
+    },
+    {
+      "name": "volume_two_year_every_year",
+      "source": "indicator('', '', '成交量', '两年内', '', '', 'CONS=每年') > 100",
+      "sql": "WITH source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 100 THEN 1 ELSE 0 END AS `matched` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`bizdate` >= DATE_SUB((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), INTERVAL '2' YEAR) AND `q`.`bizdate` <= (SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor)), bucket_rows AS (SELECT `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'YEAR') AS `bucket_key`, MAX(`source_rows`.`matched`) AS `matched`, YEAR(DATE_TRUNC(`source_rows`.`bizdate`, 'YEAR')) AS `bucket_ordinal` FROM `source_rows` GROUP BY `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'YEAR'), YEAR(DATE_TRUNC(`source_rows`.`bizdate`, 'YEAR'))), temporal_metrics AS (SELECT `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`, SUM(`bucket_rows`.`matched`) AS `metric_value`, MAX(`bucket_rows`.`bucket_ordinal`) - MIN(`bucket_rows`.`bucket_ordinal`) + 1 AS `total_buckets` FROM `bucket_rows` GROUP BY `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`), qualified AS (SELECT `temporal_metrics`.`mktcode`, `temporal_metrics`.`tgtcode` FROM `temporal_metrics` WHERE `temporal_metrics`.`total_buckets` > 0 AND `temporal_metrics`.`metric_value` = `temporal_metrics`.`total_buckets`) SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `qualified` AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "oracle_scope": "deterministic_latest_stock_sample",
+      "oracle_stock_count": 200,
+      "expected_count": 196,
+      "actual_count": 196,
+      "expected_sha256": "f6e16d1b7a65df1f032e8e50f33ae03ccc1a0d4ebcacfbdae8e25926750fe6eb",
+      "actual_sha256": "f6e16d1b7a65df1f032e8e50f33ae03ccc1a0d4ebcacfbdae8e25926750fe6eb",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        440.7601,
+        422.2398,
+        406.7869,
+        428.0948,
+        445.8838
+      ],
+      "p95_ms": 445.8838
+    },
+    {
+      "name": "volume_two_year_exist_2_months",
+      "source": "indicator('', '', '成交量', '两年内', '', '', 'EXIST>=2月') > 100",
+      "sql": "WITH source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 100 THEN 1 ELSE 0 END AS `matched` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`bizdate` >= DATE_SUB((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), INTERVAL '2' YEAR) AND `q`.`bizdate` <= (SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor)), bucket_rows AS (SELECT `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH') AS `bucket_key`, MAX(`source_rows`.`matched`) AS `matched`, YEAR(DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH')) * 12 + MONTH(DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH')) AS `bucket_ordinal` FROM `source_rows` GROUP BY `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH'), YEAR(DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH')) * 12 + MONTH(DATE_TRUNC(`source_rows`.`bizdate`, 'MONTH'))), temporal_metrics AS (SELECT `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`, SUM(`bucket_rows`.`matched`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `bucket_rows` GROUP BY `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`), qualified AS (SELECT `temporal_metrics`.`mktcode`, `temporal_metrics`.`tgtcode` FROM `temporal_metrics` WHERE `temporal_metrics`.`metric_value` >= 2) SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `qualified` AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "oracle_scope": "deterministic_latest_stock_sample",
+      "oracle_stock_count": 200,
+      "expected_count": 200,
+      "actual_count": 200,
+      "expected_sha256": "e53c01fd9dd0b9499eea03be230e56ec788ac5259bd5d3e4476422bead0d98cd",
+      "actual_sha256": "e53c01fd9dd0b9499eea03be230e56ec788ac5259bd5d3e4476422bead0d98cd",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        454.8785,
+        482.8577,
+        451.4482,
+        439.0927,
+        460.0999
+      ],
+      "p95_ms": 482.8577
+    },
+    {
+      "name": "volume_two_year_cons_3_quarters",
+      "source": "indicator('', '', '成交量', '两年内', '', '', 'CONS=3季度') > 100",
+      "sql": "WITH source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 100 THEN 1 ELSE 0 END AS `matched` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`bizdate` >= DATE_SUB((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), INTERVAL '2' YEAR) AND `q`.`bizdate` <= (SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor)), bucket_rows AS (SELECT `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER') AS `bucket_key`, MAX(`source_rows`.`matched`) AS `matched`, YEAR(DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER')) * 4 + QUARTER(DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER')) AS `bucket_ordinal` FROM `source_rows` GROUP BY `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER'), YEAR(DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER')) * 4 + QUARTER(DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER'))), matched_rows AS (SELECT `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`, `bucket_rows`.`bucket_key`, `bucket_rows`.`bucket_ordinal`, ROW_NUMBER() OVER (PARTITION BY `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode` ORDER BY CASE WHEN `bucket_rows`.`bucket_key` IS NULL THEN 1 ELSE 0 END, `bucket_rows`.`bucket_key` ASC) AS `matched_seq` FROM `bucket_rows` WHERE `bucket_rows`.`matched` = 1), runs AS (SELECT `matched_rows`.`mktcode`, `matched_rows`.`tgtcode`, `matched_rows`.`bucket_ordinal` - `matched_rows`.`matched_seq` AS `run_group`, COUNT(*) AS `run_length` FROM `matched_rows` GROUP BY `matched_rows`.`mktcode`, `matched_rows`.`tgtcode`, `matched_rows`.`bucket_ordinal` - `matched_rows`.`matched_seq`), temporal_metrics AS (SELECT `runs`.`mktcode`, `runs`.`tgtcode`, MAX(`runs`.`run_length`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `runs` GROUP BY `runs`.`mktcode`, `runs`.`tgtcode`), qualified AS (SELECT `temporal_metrics`.`mktcode`, `temporal_metrics`.`tgtcode` FROM `temporal_metrics` WHERE `temporal_metrics`.`metric_value` >= 3) SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `qualified` AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "oracle_scope": "deterministic_latest_stock_sample",
+      "oracle_stock_count": 200,
+      "expected_count": 200,
+      "actual_count": 200,
+      "expected_sha256": "e53c01fd9dd0b9499eea03be230e56ec788ac5259bd5d3e4476422bead0d98cd",
+      "actual_sha256": "e53c01fd9dd0b9499eea03be230e56ec788ac5259bd5d3e4476422bead0d98cd",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        515.2517,
+        459.9667,
+        404.6266,
+        464.7008,
+        421.8861
+      ],
+      "p95_ms": 515.2517
+    },
+    {
+      "name": "volume_two_year_every_week",
+      "source": "indicator('', '', '成交量', '两年内', '', '', 'CONS=每周') > 100",
+      "sql": "WITH source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 100 THEN 1 ELSE 0 END AS `matched` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`bizdate` >= DATE_SUB((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), INTERVAL '2' YEAR) AND `q`.`bizdate` <= (SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor)), bucket_rows AS (SELECT `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'WEEK') AS `bucket_key`, MAX(`source_rows`.`matched`) AS `matched`, FLOOR(UNIX_TIMESTAMP(DATE_TRUNC(`source_rows`.`bizdate`, 'WEEK')) / 604800) AS `bucket_ordinal` FROM `source_rows` GROUP BY `source_rows`.`mktcode`, `source_rows`.`tgtcode`, DATE_TRUNC(`source_rows`.`bizdate`, 'WEEK'), FLOOR(UNIX_TIMESTAMP(DATE_TRUNC(`source_rows`.`bizdate`, 'WEEK')) / 604800)), temporal_metrics AS (SELECT `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`, SUM(`bucket_rows`.`matched`) AS `metric_value`, MAX(`bucket_rows`.`bucket_ordinal`) - MIN(`bucket_rows`.`bucket_ordinal`) + 1 AS `total_buckets` FROM `bucket_rows` GROUP BY `bucket_rows`.`mktcode`, `bucket_rows`.`tgtcode`), qualified AS (SELECT `temporal_metrics`.`mktcode`, `temporal_metrics`.`tgtcode` FROM `temporal_metrics` WHERE `temporal_metrics`.`total_buckets` > 0 AND `temporal_metrics`.`metric_value` = `temporal_metrics`.`total_buckets`) SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `qualified` AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)",
+      "oracle_scope": "deterministic_latest_stock_sample",
+      "oracle_stock_count": 200,
+      "expected_count": 0,
+      "actual_count": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "matched": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        456.8481,
+        43.707,
+        39.9733,
+        36.772,
+        50.6146
+      ],
+      "p95_ms": 456.8481
     }
   ]
 }

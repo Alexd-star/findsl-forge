@@ -11,9 +11,10 @@
 - 新增 `PhysicalTemporal` 与交易窗口合同。日粒度 `EXIST` 使用集合聚合，`CONS` 使用完整交易序号与匹配序号之差的岛屿法，不使用自然日 `DATEDIFF`，也不把连续次数近似为窗口总次数。
 - SQLGlot Doris 后端新增集合式 CTE 计划：`source_rows/eligible_rows/sequenced_rows/matched_rows/runs/temporal_metrics/qualified`，最终按稳定股票键连接最新行情快照。
 - 新增 Logical/Physical Set Operation。顶层时序 `AND` 降低为稳定股票键集合交集，`OR` 降低为去重并集；每个分支保留独立时间窗、指标资源和 CTE 命名空间，支持 `official_basic` 与 `official_ext` 跨资源组合。
-- 新增独立 Python 时序 oracle 和 `scripts/collect_phase9_temporal_evidence.py`。官方 13,650,347 行基础表上，四个原子 `CONS/EXIST/every` 案例及两个集合交并案例均实现 Doris/独立 oracle 行集哈希一致 `6/6`，本轮最高 P95 约 1.36 秒（以提交快照实际值为准）。
+- 年、季度、月、周粒度新增基于 `DATE_TRUNC` 的日历桶物理计划；桶内按 `MAX(matched)` 合并，连续段使用无间隙序号，`每年/每周` 同时校验非空和桶跨度，缺失日历桶不会被错误拼接。
+- 新增独立 Python 时序 oracle 和 `scripts/collect_phase9_temporal_evidence.py`。官方 13,650,347 行基础表上，六个日粒度/集合案例覆盖最新交易日全体股票，四个日历桶案例覆盖稳定排序的 200 只固定样本股票，Doris 与独立 oracle 行集哈希一致 `10/10`，本轮最高 P95 约 1.30 秒（以提交快照实际值为准）。
 - 日期槽新增 Typed DateConstraint，区分最近 N 个交易记录、最近 N 个日历月/年和显式年份范围；覆盖“这五天”“过去6天”“近3个交易日”“两年内”“近两月”和中文数字年份，不再在物理层猜测原始字符串。
-- 新后端迁移覆盖从 `72/1097（6.56%）` 提升至 `101/1097（9.21%）`，新后端总成功数为 `102`。多时序迁移缺口从 31 条下降到 7 条；剩余项主要是同一算术比较内的多个时序合同、非日粒度桶或尚未物理化的聚合约束。
+- 新后端迁移覆盖从 `72/1097（6.56%）` 提升至 `107/1097（9.75%）`，新后端总成功数为 `108`。日历桶不支持错误已清零；多时序迁移缺口剩余 7 条，后续重点转向同一算术比较内多个时序合同、声明式约束、多资源连接和聚合物理化。
 - 官方领域证据生成改为隔离 Phase 3 基线并按 750 条分块执行 Phase 4，全量 5,799 条门禁保持不变，同时限制 Windows 开发机和 CI 的峰值内存。
 - Doris 版本证据改从 `SHOW FRONTENDS` 获取真实 FE build；`SELECT VERSION()` 的 `5.7.99` 仅标注为 MySQL 协议兼容版本。
 
