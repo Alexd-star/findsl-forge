@@ -1,6 +1,10 @@
 import pytest
 
-from findsl.official.domain.temporal import TemporalParseError, parse_temporal_quantifier
+from findsl.official.domain.temporal import (
+    TemporalParseError,
+    evaluate_temporal_matches,
+    parse_temporal_quantifier,
+)
 
 
 @pytest.mark.parametrize(
@@ -38,7 +42,7 @@ def test_official_count_expression_is_parsed_into_typed_contract(source, expecte
         ("CONS=0日", "TEMPORAL_CONSECUTIVE_THRESHOLD_INVALID"),
         ("EXIST=8-3日", "TEMPORAL_RANGE_INVALID"),
         ("CONS=每", "TEMPORAL_EVERY_UNIT_REQUIRED"),
-        ("EXIST!=每日", "TEMPORAL_EVERY_COMPARATOR_INVALID"),
+        ("EXIST>每日", "TEMPORAL_EVERY_COMPARATOR_INVALID"),
         ("CONS=1.5周", "TEMPORAL_FRACTIONAL_UNIT_UNSUPPORTED"),
     ],
 )
@@ -56,3 +60,33 @@ def test_temporal_contract_is_deterministic_and_sql_free():
     assert first.node_id == second.node_id
     assert "SELECT" not in first.canonical_json().upper()
     assert first.to_dict()["semantics"] == "trading_sequence"
+
+
+def test_not_every_contract_is_preserved_for_official_negative_semantics():
+    result = parse_temporal_quantifier("CONS!=每日")
+
+    assert result.every is True
+    assert result.comparator == "!="
+
+
+def test_reference_oracle_distinguishes_consecutive_run_from_total_matches():
+    matches = [True, False, True, False, True]
+
+    assert evaluate_temporal_matches(matches, parse_temporal_quantifier("EXIST>=3")) is True
+    assert evaluate_temporal_matches(matches, parse_temporal_quantifier("CONS=3日")) is False
+
+
+@pytest.mark.parametrize(
+    "source,matches,expected",
+    [
+        ("CONS=3日", [False, True, True, True, False], True),
+        ("CONS>3日", [True, True, True], False),
+        ("EXIST=2-3日", [True, False, True], True),
+        ("EXIST=每日", [True, True], True),
+        ("EXIST=每日", [], False),
+        ("CONS!=每日", [True, False], True),
+        ("CONS!=每日", [], False),
+    ],
+)
+def test_reference_oracle_covers_bounds_every_and_empty_windows(source, matches, expected):
+    assert evaluate_temporal_matches(matches, parse_temporal_quantifier(source)) is expected

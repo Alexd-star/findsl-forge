@@ -127,6 +127,17 @@ class PhysicalPlan(CanonicalIr):
 
 
 @dataclass(frozen=True)
+class PhysicalTemporalWindow(CanonicalIr):
+    kind: str
+    lookback_sessions: Optional[int] = None
+    start: Optional[str] = None
+    end: Optional[str] = None
+
+    def to_dict(self):
+        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end}
+
+
+@dataclass(frozen=True)
 class PhysicalScan(PhysicalPlan):
     resource_id: str
     columns: Tuple[PhysicalColumn, ...]
@@ -188,6 +199,35 @@ class PhysicalRank(PhysicalPlan):
 
     def to_dict(self):
         return {"kind": "PhysicalRank", "input": self.input.to_dict(), "expression": self.expression.to_dict(), "direction": self.direction, "bound": self.bound.to_dict(), "comparator": self.comparator}
+
+
+@dataclass(frozen=True)
+class PhysicalTemporal(PhysicalPlan):
+    input: PhysicalPlan
+    predicate: PhysicalExpr
+    mode: str
+    comparator: str
+    threshold: Optional[int]
+    maximum: Optional[int]
+    unit: str
+    every: bool
+    window: PhysicalTemporalWindow
+    trading_sequence: bool = True
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalTemporal",
+            "input": self.input.to_dict(),
+            "predicate": self.predicate.to_dict(),
+            "mode": self.mode,
+            "comparator": self.comparator,
+            "threshold": self.threshold,
+            "maximum": self.maximum,
+            "unit": self.unit,
+            "every": self.every,
+            "window": self.window.to_dict(),
+            "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence",
+        }
 
 
 @dataclass(frozen=True)

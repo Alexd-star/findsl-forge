@@ -11,6 +11,8 @@ from ..ir import (
     LiteralExpr,
     LogicalDomainScan,
     LogicalFilter,
+    LogicalConsecutive,
+    LogicalExist,
     LogicalLimit,
     LogicalRank,
     LogicalStage,
@@ -35,6 +37,8 @@ from .ir import (
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
+    PhysicalTemporal,
+    PhysicalTemporalWindow,
     PhysicalUnary,
 )
 from .validate import validate_physical_plan
@@ -272,9 +276,11 @@ def _collect_fields(
 ) -> Tuple[_ResolvedIndicator, ...]:
     logical_expressions = []
     current = plan
-    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage)):
+    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage, LogicalConsecutive, LogicalExist)):
         if isinstance(current, LogicalFilter):
             logical_expressions.append(current.predicate)
+        elif isinstance(current, (LogicalConsecutive, LogicalExist)):
+            logical_expressions.append(current.spec.predicate)
         elif isinstance(current, LogicalRank):
             logical_expressions.append(current.order_by)
         current = current.operation if isinstance(current, LogicalStage) else current.input
@@ -370,9 +376,45 @@ def _lower_plan(
         if not isinstance(bound, PhysicalLiteral) or not isinstance(bound.value, (int, float)):
             raise PhysicalPlanningError("PHYSICAL_RANK_BOUND_UNSUPPORTED", "physical rank requires a numeric literal bound")
         return PhysicalRank(input_plan, expression, plan.direction, bound, plan.comparator)
+    if isinstance(plan, (LogicalConsecutive, LogicalExist)):
+        if plan.spec.unit not in {"", "日"}:
+            raise PhysicalPlanningError(
+                "PHYSICAL_TEMPORAL_BUCKET_UNSUPPORTED",
+                f"temporal unit {plan.spec.unit} requires calendar bucket materialization",
+            )
+        return PhysicalTemporal(
+            _lower_plan(plan.input, catalog, resource_id, fields, expression_overrides),
+            _lower_expr(plan.spec.predicate, catalog, resource_id, fields, expression_overrides=expression_overrides),
+            "CONS" if isinstance(plan, LogicalConsecutive) else "EXIST",
+            plan.spec.comparator,
+            plan.spec.threshold,
+            plan.spec.maximum,
+            plan.spec.unit,
+            plan.spec.every,
+            _lower_temporal_window(plan.spec.window),
+            plan.spec.trading_sequence,
+        )
     if isinstance(plan, LogicalStage):
         return _lower_plan(plan.operation, catalog, resource_id, fields, expression_overrides)
     raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical node {type(plan).__name__}")
+
+
+def _lower_temporal_window(window) -> PhysicalTemporalWindow:
+    if window.kind == "unspecified":
+        return PhysicalTemporalWindow("all_history")
+    if window.kind == "relative" and window.anchor == "today":
+        return PhysicalTemporalWindow("latest_session", lookback_sessions=1)
+    if window.kind == "exact" and window.start and window.end:
+        return PhysicalTemporalWindow("exact_date", start=window.start, end=window.end)
+    if window.kind == "expression" and window.anchor:
+        text = str(window.anchor).strip()
+        match = re.fullmatch(r"(?:最近|近)(\d+)(?:日|天)|(?:(\d+)(?:日|天)(?:内|以内))", text)
+        if match:
+            return PhysicalTemporalWindow("recent_sessions", lookback_sessions=int(match.group(1) or match.group(2)))
+    raise PhysicalPlanningError(
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+        f"temporal date window requires typed normalization: {window.anchor or window.start or window.kind}",
+    )
 
 
 def _lower_expr(

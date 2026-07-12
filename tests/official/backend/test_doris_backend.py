@@ -229,3 +229,34 @@ def test_controlled_unary_and_coalesce_render_without_raw_sql():
     assert "COALESCE(`q`.`upSerialLb`, 0) = 1" in basic_sql
     assert "-`q`.`ZJLXMainNetTur` > 0" in ext_sql
     assert "Raw" not in repr(sqlglot.parse_one(basic_sql, read="doris"))
+
+
+def test_exist_temporal_plan_renders_set_based_ctes_and_latest_snapshot_join():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '', '', '', 'EXIST>=5') > 100"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    aliases = {cte.alias_or_name for cte in parsed.find_all(exp.CTE)}
+    assert {"source_rows", "temporal_metrics", "qualified"}.issubset(aliases)
+    assert "SUM" in result.sql
+    assert "`metric_value` >= 5" in result.sql
+    assert "JOIN `qualified`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_consecutive_temporal_plan_uses_trading_row_islands_not_calendar_day_difference():
+    result = render_doris(
+        _physical("indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') > 100"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    aliases = {cte.alias_or_name for cte in parsed.find_all(exp.CTE)}
+    assert {"source_rows", "eligible_rows", "matched_rows", "runs", "temporal_metrics", "qualified"}.issubset(aliases)
+    assert result.sql.count("ROW_NUMBER() OVER") >= 2
+    assert "DATEDIFF" not in result.sql.upper()
+    assert "`run_length`" in result.sql
+    assert "`metric_value` >= 3" in result.sql
+    assert result.validation.passed is True

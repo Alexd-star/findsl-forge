@@ -5,6 +5,7 @@ from .ir import (
     PhysicalAggregate, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalEmpty,
     PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
     PhysicalIn, PhysicalLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalScan, PhysicalWindow,
+    PhysicalTemporal,
     PhysicalCoalesce, PhysicalNullIf, PhysicalUnary,
 )
 from ..types import BOOLEAN, NUMERIC
@@ -56,6 +57,25 @@ def _validate_plan(plan, catalog, expressions):
         if not isinstance(plan.bound.value, (int, float)) or plan.bound.value <= 0:
             raise ValueError("physical rank bound is invalid")
         _validate_expr(plan.expression, catalog, expressions)
+    elif isinstance(plan, PhysicalTemporal):
+        _validate_expr(plan.predicate, catalog, expressions)
+        if plan.predicate.type is not BOOLEAN:
+            raise ValueError("physical temporal predicate must be boolean")
+        if plan.mode not in {"CONS", "EXIST"} or not plan.trading_sequence:
+            raise ValueError("invalid physical temporal mode or sequence semantics")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
+            raise ValueError("invalid physical temporal comparator")
+        if plan.unit not in {"", "日"}:
+            raise ValueError("physical temporal bucket unit is not implemented")
+        if plan.window.kind not in {"all_history", "recent_sessions", "exact_date", "latest_session"}:
+            raise ValueError("invalid physical temporal window")
+        if plan.window.kind == "recent_sessions" and (plan.window.lookback_sessions is None or plan.window.lookback_sessions <= 0):
+            raise ValueError("recent temporal window requires positive trading sessions")
+        if plan.every:
+            if plan.threshold is not None or plan.comparator not in {"=", "!="}:
+                raise ValueError("invalid every-session temporal contract")
+        elif plan.threshold is None or plan.threshold < 0:
+            raise ValueError("invalid physical temporal threshold")
     elif isinstance(plan, PhysicalPrefixLookup):
         resource = catalog.resource(plan.resource_id)
         if "prefix" not in resource.capabilities or plan.window <= 0:

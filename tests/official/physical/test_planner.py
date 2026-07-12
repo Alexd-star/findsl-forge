@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank
+from findsl.official.physical import PhysicalFilter, PhysicalIn, PhysicalLimit, PhysicalPrefixAverage, PhysicalRank, PhysicalTemporal
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -361,3 +361,29 @@ def test_boolean_derived_indicator_preserves_explicit_true_comparison():
     assert "PhysicalCoalesce" in payload
     assert "limitFlag" in payload
     assert "upSerialLb" in payload
+
+
+@pytest.mark.parametrize(
+    "count_exp,mode,threshold",
+    [("EXIST>=5", "EXIST", 5), ("CONS=3日", "CONS", 3)],
+)
+def test_atomic_count_expression_lowers_to_explicit_physical_temporal_plan(count_exp, mode, threshold):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '', '', '', '{count_exp}') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporal)
+    assert result.plan.mode == mode
+    assert result.plan.threshold == threshold
+    assert result.plan.trading_sequence is True
+
+
+def test_recent_days_temporal_window_is_normalized_to_trading_sessions():
+    result = plan_physical(
+        _lower("indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert result.plan.window.kind == "recent_sessions"
+    assert result.plan.window.lookback_sessions == 10

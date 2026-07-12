@@ -2,7 +2,8 @@ import pytest
 
 from findsl.official.physical import (
     PhysicalCatalogError, PhysicalColumn, PhysicalComparison, PhysicalFilter,
-    PhysicalLimit, PhysicalLiteral, PhysicalScan, validate_physical_plan,
+    PhysicalLimit, PhysicalLiteral, PhysicalScan, PhysicalTemporal,
+    PhysicalTemporalWindow, validate_physical_plan,
 )
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.types import BOOLEAN, NUMERIC
@@ -24,3 +25,24 @@ def test_validator_rejects_unknown_column_and_invalid_limit():
         validate_physical_plan(scan, default_physical_catalog())
     with pytest.raises(ValueError):
         validate_physical_plan(PhysicalLimit(PhysicalScan("official_basic", (), None), 0, 0), default_physical_catalog())
+
+
+def test_temporal_plan_is_explicit_deterministic_and_trading_sequence_based():
+    column = PhysicalColumn("official_basic", "volume", NUMERIC)
+    scan = PhysicalScan("official_basic", (column,), None)
+    predicate = PhysicalComparison(">", column, PhysicalLiteral(100, NUMERIC))
+    plan = PhysicalTemporal(
+        scan,
+        predicate,
+        "CONS",
+        ">=",
+        3,
+        None,
+        "日",
+        False,
+        PhysicalTemporalWindow("recent_sessions", lookback_sessions=10),
+    )
+
+    assert validate_physical_plan(plan, default_physical_catalog()) is plan
+    assert plan.node_id == plan.node_id
+    assert plan.to_dict()["window"]["lookback_sessions"] == 10

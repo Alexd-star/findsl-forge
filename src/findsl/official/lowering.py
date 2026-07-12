@@ -159,6 +159,7 @@ def _lower_stage(
                 temporal.unit,
                 temporal.every,
                 temporal.source,
+                temporal_binding.date_constraint,
                 temporal.trading_sequence,
             )
             return LogicalConsecutive(input_plan, spec, input_plan.schema)
@@ -170,6 +171,7 @@ def _lower_stage(
             temporal.unit,
             temporal.every,
             temporal.source,
+            temporal_binding.date_constraint,
             temporal.trading_sequence,
         )
         return LogicalExist(input_plan, spec, input_plan.schema)
@@ -207,6 +209,8 @@ def _lower_expr(typed: TypedNode, *, strip_count_exp: bool = False):
 
             slots = dict(binding.slots)
             slots["count_exp"] = ""
+            if "date" in slots:
+                slots["date"] = ""
             binding = FunctionBinding.create(binding.signature, slots)
         return CallExpr(node.name, tuple(_lower_expr(child, strip_count_exp=strip_count_exp) for child in typed.children), typed.type, binding)
     if isinstance(node, OfficialBinaryOp):

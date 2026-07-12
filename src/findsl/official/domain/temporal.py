@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
 from ..ir.base import CanonicalIr
 
@@ -78,7 +78,7 @@ def parse_temporal_quantifier(source: str) -> TemporalQuantifier:
                 "the every form requires a year/quarter/month/week/day unit",
                 text,
             )
-        if comparator != "=":
+        if comparator not in {"=", "!="}:
             raise TemporalParseError(
                 "TEMPORAL_EVERY_COMPARATOR_INVALID",
                 "the every form only supports equality semantics",
@@ -90,7 +90,7 @@ def parse_temporal_quantifier(source: str) -> TemporalQuantifier:
                 "the every form cannot declare a numeric range",
                 text,
             )
-        return TemporalQuantifier(mode, "=", None, None, unit, True, text)
+        return TemporalQuantifier(mode, comparator, None, None, unit, True, text)
 
     if raw_value:
         threshold = _parse_count(raw_value, text)
@@ -127,6 +127,42 @@ def parse_temporal_quantifier(source: str) -> TemporalQuantifier:
         comparator = "between"
 
     return TemporalQuantifier(mode, comparator, threshold, maximum, unit, False, text)
+
+
+def evaluate_temporal_matches(
+    matches: Iterable[bool],
+    quantifier: TemporalQuantifier,
+) -> bool:
+    values = tuple(bool(value) for value in matches)
+    if quantifier.every:
+        if not values:
+            return False
+        all_match = all(values)
+        return all_match if quantifier.comparator == "=" else not all_match
+
+    if quantifier.mode == "EXIST":
+        metric = sum(values)
+    else:
+        metric = 0
+        current = 0
+        for matched in values:
+            current = current + 1 if matched else 0
+            metric = max(metric, current)
+
+    if quantifier.maximum is not None or quantifier.comparator == "between":
+        return quantifier.threshold <= metric <= quantifier.maximum
+    comparator = quantifier.comparator
+    if quantifier.mode == "CONS" and comparator == "=":
+        comparator = ">="
+    threshold = quantifier.threshold
+    return {
+        "<": metric < threshold,
+        "<=": metric <= threshold,
+        "=": metric == threshold,
+        "!=": metric != threshold,
+        ">": metric > threshold,
+        ">=": metric >= threshold,
+    }[comparator]
 
 
 def _canonical_unit(unit: str) -> str:

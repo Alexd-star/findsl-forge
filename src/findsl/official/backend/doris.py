@@ -21,6 +21,7 @@ from ..physical.ir import (
     PhysicalPrefixAverage,
     PhysicalRank,
     PhysicalScan,
+    PhysicalTemporal,
     PhysicalUnary,
 )
 from ..physical.validate import validate_physical_plan
@@ -153,7 +154,213 @@ def _render_plan(plan: PhysicalPlan, catalog: PhysicalCatalog) -> exp.Select:
             expression=_render_expr(plan.bound, catalog, scan),
         )
         return outer.where(comparator)
+    if isinstance(plan, PhysicalTemporal):
+        return _render_temporal(plan, catalog)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
+
+
+def _render_temporal(plan: PhysicalTemporal, catalog: PhysicalCatalog) -> exp.Select:
+    scan = _find_scan(plan.input)
+    if not isinstance(plan.input, PhysicalScan):
+        raise DorisBackendError(
+            "DORIS_TEMPORAL_INPUT_UNSUPPORTED",
+            "temporal plan currently requires a direct physical scan input",
+        )
+    stable_alias = "anchor" if scan.anchor_resource_id else "q"
+    keys = ("mktcode", "tgtcode")
+    source = _render_plan(scan, catalog)
+    matched = exp.Case(
+        ifs=[
+            exp.If(
+                this=_render_expr(plan.predicate, catalog, scan),
+                true=exp.convert(1),
+            )
+        ],
+        default=exp.convert(0),
+    ).as_("matched", quoted=True)
+    source = source.select(matched, append=True)
+
+    needs_session_limit = plan.window.kind in {"recent_sessions", "latest_session"}
+    if needs_session_limit:
+        source = source.select(
+            _row_number(
+                stable_alias,
+                keys,
+                "bizdate",
+                descending=True,
+            ).as_("lookback_row", quoted=True),
+            append=True,
+        )
+    elif plan.window.kind == "exact_date":
+        source = source.where(
+            exp.EQ(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                expression=exp.convert(plan.window.start),
+            )
+        )
+
+    ctes = [("source_rows", source)]
+    relation_name = "source_rows"
+    if needs_session_limit:
+        lookback = plan.window.lookback_sessions or 1
+        eligible = exp.select(exp.Star()).from_(exp.table_("source_rows", quoted=True)).where(
+            exp.LTE(
+                this=exp.column("lookback_row", table="source_rows", quoted=True),
+                expression=exp.convert(lookback),
+            )
+        )
+        ctes.append(("eligible_rows", eligible))
+        relation_name = "eligible_rows"
+
+    if plan.every or plan.mode == "EXIST":
+        metrics = _render_exist_metrics(relation_name, keys)
+    else:
+        matched_rows = exp.select(
+            *(exp.column(name, table=relation_name, quoted=True) for name in (*keys, "bizdate", "all_seq"))
+        ).from_(exp.table_(relation_name, quoted=True)).where(
+            exp.EQ(
+                this=exp.column("matched", table=relation_name, quoted=True),
+                expression=exp.convert(1),
+            )
+        )
+        matched_rows = matched_rows.select(
+            _row_number(relation_name, keys, "bizdate").as_("matched_seq", quoted=True),
+            append=True,
+        )
+        ctes.append(("matched_rows", matched_rows))
+
+        island = exp.Sub(
+            this=exp.column("all_seq", table="matched_rows", quoted=True),
+            expression=exp.column("matched_seq", table="matched_rows", quoted=True),
+        )
+        runs = exp.select(
+            *(exp.column(name, table="matched_rows", quoted=True) for name in keys),
+            island.as_("run_group", quoted=True),
+            exp.Count(this=exp.Star()).as_("run_length", quoted=True),
+        ).from_(exp.table_("matched_rows", quoted=True)).group_by(
+            *(exp.column(name, table="matched_rows", quoted=True) for name in keys),
+            island,
+        )
+        ctes.append(("runs", runs))
+        metrics = exp.select(
+            *(exp.column(name, table="runs", quoted=True) for name in keys),
+            exp.Max(this=exp.column("run_length", table="runs", quoted=True)).as_("metric_value", quoted=True),
+            exp.Count(this=exp.Star()).as_("total_buckets", quoted=True),
+        ).from_(exp.table_("runs", quoted=True)).group_by(
+            *(exp.column(name, table="runs", quoted=True) for name in keys)
+        )
+
+    if plan.mode == "CONS" and not plan.every:
+        sequence_relation = relation_name
+        sequence = exp.select(
+            *(exp.column(name, table=sequence_relation, quoted=True) for name in (*keys, "bizdate", "matched")),
+            _row_number(sequence_relation, keys, "bizdate").as_("all_seq", quoted=True),
+        ).from_(exp.table_(sequence_relation, quoted=True))
+        insert_at = 2 if needs_session_limit else 1
+        ctes.insert(insert_at, ("sequenced_rows", sequence))
+        for index, (name, query) in enumerate(ctes):
+            if name == "matched_rows":
+                ctes[index] = (name, _replace_table(query, relation_name, "sequenced_rows"))
+        relation_name = "sequenced_rows"
+
+    ctes.append(("temporal_metrics", metrics))
+    qualified_predicate = _temporal_metric_predicate(plan)
+    qualified = exp.select(
+        *(exp.column(name, table="temporal_metrics", quoted=True) for name in keys)
+    ).from_(exp.table_("temporal_metrics", quoted=True)).where(qualified_predicate)
+    ctes.append(("qualified", qualified))
+
+    anchor_resource = catalog.resource(scan.anchor_resource_id or scan.resource_id)
+    anchor = exp.table_(
+        anchor_resource.table,
+        db=anchor_resource.database,
+        quoted=True,
+        alias="anchor_out",
+    )
+    qualified_table = exp.table_("qualified", quoted=True, alias="qualified")
+    join_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(name, table="anchor_out", quoted=True),
+                expression=exp.column(name, table="qualified", quoted=True),
+            )
+            for name in keys
+        )
+    )
+    final = exp.select(
+        *(exp.column(name, table="anchor_out", quoted=True) for name in (*keys, "bizdate"))
+    ).from_(anchor).join(qualified_table, on=join_predicate, join_type="INNER")
+    latest = exp.select(
+        exp.Max(this=exp.column("bizdate", table="latest_anchor", quoted=True))
+    ).from_(
+        exp.table_(
+            anchor_resource.table,
+            db=anchor_resource.database,
+            quoted=True,
+            alias="latest_anchor",
+        )
+    )
+    final = final.where(
+        exp.EQ(
+            this=exp.column("bizdate", table="anchor_out", quoted=True),
+            expression=exp.Subquery(this=latest),
+        )
+    )
+    for name, query in ctes:
+        final = final.with_(name, as_=query)
+    return final
+
+
+def _render_exist_metrics(relation_name: str, keys) -> exp.Select:
+    return exp.select(
+        *(exp.column(name, table=relation_name, quoted=True) for name in keys),
+        exp.Sum(this=exp.column("matched", table=relation_name, quoted=True)).as_("metric_value", quoted=True),
+        exp.Count(this=exp.Star()).as_("total_buckets", quoted=True),
+    ).from_(exp.table_(relation_name, quoted=True)).group_by(
+        *(exp.column(name, table=relation_name, quoted=True) for name in keys)
+    )
+
+
+def _row_number(table: str, keys, order_column: str, descending: bool = False) -> exp.Window:
+    return exp.Window(
+        this=exp.RowNumber(),
+        partition_by=[exp.column(name, table=table, quoted=True) for name in keys],
+        order=exp.Order(
+            expressions=[
+                exp.Ordered(
+                    this=exp.column(order_column, table=table, quoted=True),
+                    desc=descending,
+                )
+            ]
+        ),
+    )
+
+
+def _temporal_metric_predicate(plan: PhysicalTemporal):
+    metric = exp.column("metric_value", table="temporal_metrics", quoted=True)
+    total = exp.column("total_buckets", table="temporal_metrics", quoted=True)
+    non_empty = exp.GT(this=total, expression=exp.convert(0))
+    if plan.every:
+        comparison = (exp.EQ if plan.comparator == "=" else exp.NEQ)(this=metric, expression=total)
+        return exp.and_(non_empty, comparison)
+    if plan.maximum is not None or plan.comparator == "between":
+        return exp.and_(
+            exp.GTE(this=metric, expression=exp.convert(plan.threshold)),
+            exp.LTE(this=metric, expression=exp.convert(plan.maximum)),
+        )
+    comparator = ">=" if plan.mode == "CONS" and plan.comparator == "=" else plan.comparator
+    return _COMPARISON[comparator](this=metric, expression=exp.convert(plan.threshold))
+
+
+def _replace_table(query: exp.Select, old_name: str, new_name: str) -> exp.Select:
+    result = query.copy()
+    for table in result.find_all(exp.Table):
+        if table.name == old_name:
+            table.set("this", exp.to_identifier(new_name, quoted=True))
+    for column in result.find_all(exp.Column):
+        if column.table == old_name:
+            column.set("table", exp.to_identifier(new_name, quoted=True))
+    return result
 
 
 def _find_scan(plan: PhysicalPlan) -> PhysicalScan:
