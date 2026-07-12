@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T20:02:44Z",
+  "generated_at": "2026-07-12T20:29:38Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "fac732b",
-    "head_at_export": "fac732b",
+    "head_at_report_generation": "aedc700",
+    "head_at_export": "aedc700",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-12T20:02:42+00:00",
+    "generated_at": "2026-07-12T20:29:36+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.206,
+    "compile_p95_latency_ms": 1.236,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 847,
-      "elapsed_seconds": 133.33
+      "passed": 866,
+      "elapsed_seconds": 132.81
     }
   },
   "official_suite": {
@@ -81,12 +81,12 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "f95e142df6800189acfcfcfd876e5f2f0bc2d3e3",
+    "git_head": "aedc7006956a29209acc64d59ff0926dc6ebdf54",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 675,
-    "migration_coverage": 0.615314,
-    "new_backend_success": 695,
-    "physical_date_gap": 6,
+    "legacy_to_new_migrated": 686,
+    "migration_coverage": 0.625342,
+    "new_backend_success": 709,
+    "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
       "status": "PASS",
@@ -159,11 +159,20 @@
       "latest_data_date": "2026-04-14",
       "max_p95_ms": 2163.564
     },
+    "date_limit_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 6,
+      "total": 6,
+      "non_empty": 6,
+      "latest_data_date": "2026-04-14",
+      "max_p95_ms": 732.5326
+    },
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 8,
-      "total": 8,
+      "passed": 14,
+      "total": 14,
       "failed": 0
     }
   },
@@ -210,6 +219,9 @@
     "phase25_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase25_capability_funnel.json",
     "phase25_event_candidate_doris_json": "submission_artifacts\\evidence_snapshots\\phase25_event_candidate_doris.json",
     "phase25_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase25_new_success_audit.json",
+    "phase26_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase26_capability_funnel.json",
+    "phase26_date_limit_doris_json": "submission_artifacts\\evidence_snapshots\\phase26_date_limit_doris.json",
+    "phase26_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase26_new_success_audit.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }

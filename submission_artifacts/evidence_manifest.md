@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-13 04:02:44 +08:00
-- Git HEAD at export: fac732b
+- Generated at: 2026-07-13 04:29:37 +08:00
+- Git HEAD at export: aedc700
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -93,6 +93,12 @@
 - `phase25_event_candidate_doris.md` (1192 bytes)
 - `phase25_new_success_audit.json` (7025 bytes)
 - `phase25_new_success_audit.md` (742 bytes)
+- `phase26_capability_funnel.json` (3257642 bytes)
+- `phase26_capability_funnel.md` (1420 bytes)
+- `phase26_date_limit_doris.json` (35053 bytes)
+- `phase26_date_limit_doris.md` (1195 bytes)
+- `phase26_new_success_audit.json` (11706 bytes)
+- `phase26_new_success_audit.md` (987 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase9_temporal_doris.json` (27830 bytes)
@@ -103,7 +109,7 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `real_market_sample_report.md` (957 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13039 bytes)
+- `submission_readiness.md` (13130 bytes)
 
 ## Excluded By Design
 

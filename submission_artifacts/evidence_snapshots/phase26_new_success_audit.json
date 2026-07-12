@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "baseline": "submission_artifacts/evidence_snapshots/phase25_capability_funnel.json",
+  "current": "reports/phase26_capability_funnel.json",
+  "require_period_scalars": false,
+  "require_event_candidates": false,
+  "require_date_algebra": true,
+  "new_successes": 14,
+  "passed": 14,
+  "failed": 0,
+  "status": "PASS",
+  "strategies": {
+    "set_intersect": 5,
+    "temporal_grouped_aggregate": 1,
+    "controlled_expression": 3,
+    "limit_set_intersect": 1,
+    "composite_grouped_aggregate": 1,
+    "event_candidate_intersect": 2,
+    "grouped_aggregate": 1
+  },
+  "results": [
+    {
+      "excel_row": 139,
+      "source": "rank('', '', '主力净流出', 'desc', '2012年', '', '', '') <= 5 and rank('', '', '主力净流出', 'desc', '2012年的后4年', '', '', 'CONS=每年') > 10",
+      "strategy": "set_intersect",
+      "plan_kind": "PhysicalSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 190,
+      "source": "indicator('', '', '委比', '2024年8月', '', '', '') between '[50,90]' and rank('', '', '委比', 'asc', '9号的前1日', '', '', '') <= 10",
+      "strategy": "set_intersect",
+      "plan_kind": "PhysicalSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 1401,
+      "source": "indicator('沪主板', '', '涨跌幅', '', '', 'SUM', 'CONS=0.5年') > 3.5%",
+      "strategy": "temporal_grouped_aggregate",
+      "plan_kind": "PhysicalTemporalAggregate",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 1452,
+      "source": "indicator('沪|深|京', '', '市盈率', '今天', '', '', '') > 50 and (indicator('沪|深|京', '', '涨停', '今天', '', '', '') = True or indicator('沪|深|京', '', '跌停', '今天', '', '', '') = True) limit 7,-1",
+      "strategy": "controlled_expression",
+      "plan_kind": "PhysicalLimit",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 1746,
+      "source": "indicator('', '', '涨幅', '6月9号的前3日', '', '', '') > 0",
+      "strategy": "controlled_expression",
+      "plan_kind": "PhysicalFilter",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 2949,
+      "source": "indicator('', '', '涨停', '30个交易日内', '', '', 'EXIST=2') = True and indicator('', '', '涨停价', '30个交易日内', '', '', 'EXIST=2') >= indicator('', '', '60日均线', '30个交易日', '', '', 'EXIST=2') limit 20,-1",
+      "strategy": "limit_set_intersect",
+      "plan_kind": "PhysicalLimit",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 2986,
+      "source": "indicator('', '', '收盘价', '3月9号的后3日', '', '', 'CONS=每日') < indicator('', '', '20日均线', '3月9号的后3日', '', '', 'CONS=每日') and indicator('', '', '总市值', '3月9号的后3日', '', '', 'CONS=每日') < 8000000000",
+      "strategy": "set_intersect",
+      "plan_kind": "PhysicalSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 3074,
+      "source": "reset('', '', '最新价', '10日均线', '7月15日', '', '') = True and indicator('', '', '10日均线', '7月15日', '', '', '') > indicator('', '', '20日均线', '7月15日', '', '', '') and indicator('', '', '20日均线', '7月15日', '', '', '') > indicator('', '', '30日均线', '7月15日', '', '', '') and indicator('', '', '量比', '7月15日', '', '', '') < indicator('', '', '量比', '7月15日的前1日', '', '', '') * 0.8 and indicator('', '', 'ST股票标识', '7月15日', '', '', '') = False and indicator('', '', '跌幅', '7月15日的后3日', '', '', 'CONS<3日') > 0",
+      "strategy": "set_intersect",
+      "plan_kind": "PhysicalSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 3420,
+      "source": "indicator('沪', '', '散户买入占比', '', '', '', '') <= queryData('深', '比亚迪', '散户买入占比', '近半年', 'AVG')",
+      "strategy": "composite_grouped_aggregate",
+      "plan_kind": "PhysicalCompositeAggregate",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 3813,
+      "source": "reset('', '', '最新价', '10日均线', '7月15日', '', '') = True and indicator('', '', '10日均线', '7月15日', '', '', '') > indicator('', '', '20日均线', '7月15日', '', '', '') and indicator('', '', '量比', '7月15日', '', '', '') < indicator('', '', '量比', '7月15日的前1日', '', '', '') * 0.8 and indicator('', '', 'ST股票标识', '7月15日', '', '', '') = False",
+      "strategy": "event_candidate_intersect",
+      "plan_kind": "PhysicalCandidateSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 3942,
+      "source": "indicator('', '', '跌幅', '', '', '', 'CONS>1日') > 0 limit 20,-1",
+      "strategy": "controlled_expression",
+      "plan_kind": "PhysicalLimit",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 4302,
+      "source": "indicator('', '', '最新价', '', '', '', '') >= indicator('', '', '5日均线', '', '', '', '') and cross_down('', '', '最新价', '10日均量线', '近三天', '', '') = False and indicator('', '', '成交量', '今天', '', '', '') >= indicator('', '', '成交量', '今天的前1日', '', '', '') * 110% and indicator('', '', '成交量', '今天', '', '', '') <= indicator('', '', '成交量', '今天的前1日', '', '', '') * 130%",
+      "strategy": "event_candidate_intersect",
+      "plan_kind": "PhysicalCandidateSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 5173,
+      "source": "indicator('', '', '静态市盈率', '', '', '', '') ~= 10 and indicator('', '', '市净率', '2020年的后5年', '', 'GROWTH_RISE', 'CONS=每年') > 20%",
+      "strategy": "set_intersect",
+      "plan_kind": "PhysicalSetOperation",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    },
+    {
+      "excel_row": 5440,
+      "source": "indicator('', '', '成交量', '今天', '', 'GROWTH_RISE', '') = 700% limit 13,-1",
+      "strategy": "grouped_aggregate",
+      "plan_kind": "PhysicalLimit",
+      "checks": {
+        "backend_validation": true,
+        "no_placeholder_predicate": true,
+        "approximation_materialized": true,
+        "aggregate_materialized": true,
+        "temporal_materialized": true,
+        "rank_materialized": true,
+        "period_scalar_materialized": true,
+        "event_candidate_materialized": true,
+        "date_algebra_materialized": true
+      },
+      "passed": true
+    }
+  ]
+}

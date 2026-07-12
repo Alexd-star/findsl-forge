@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-07-12T20:02:42+00:00
+- Generated at: 2026-07-12T20:29:36+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening`
-- Git HEAD at report generation: `fac732b` docs: record optimized event evidence
+- Git HEAD at report generation: `aedc700` feat: extend typed date algebra and open limits
 - Git branch: `feat/antlr-calcite-architecture`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,12 +13,12 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 134054.6 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.206 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 133439.1 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.236 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.824 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.763 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -35,14 +35,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.206 ms
+- Compile P95 latency: 1.236 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.25x
+- Local SQLite prefix benchmark speedup smoke: 1.47x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.824 ms
+- Compile latency: 0.763 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -177,22 +177,23 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest --basetemp D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\.pytest_cache\readiness_tmp`
 - Exit code: 0
-- Elapsed: 134054.6 ms
+- Elapsed: 133439.1 ms
 
 ```text
 ........................................................................ [  8%]
-........................................................................ [ 17%]
-........................................................................ [ 25%]
-........................................................................ [ 34%]
-........................................................................ [ 42%]
-........................................................................ [ 51%]
-........................................................................ [ 59%]
-........................................................................ [ 68%]
-........................................................................ [ 76%]
-........................................................................ [ 85%]
-........................................................................ [ 93%]
-.......................................................                  [100%]
-847 passed in 133.33s (0:02:13)
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 33%]
+........................................................................ [ 41%]
+........................................................................ [ 49%]
+........................................................................ [ 58%]
+........................................................................ [ 66%]
+........................................................................ [ 74%]
+........................................................................ [ 83%]
+........................................................................ [ 91%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+866 passed in 132.81s (0:02:12)
 ```
 
 ## Award-Readiness Differentiators

@@ -8,11 +8,11 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 |---|---|
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 847 passed in 133.33s |
+| Pytest regression | 866 passed in 132.81s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1873/5799 compiled |
-| ANTLR/IR legacy migration | 675/1097 (61.53%) |
+| ANTLR/IR legacy migration | 686/1097 (62.53%) |
 | Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
 | Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 194.0904 ms |
 | Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
@@ -21,7 +21,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Phase 23 temporal/relation evidence | PASS, 6/6, non-empty 6/6, max P95 1122.9697 ms |
 | Phase 24 period-scalar evidence | PASS, 4/4, non-empty 4/4, max P95 472.0212 ms |
 | Phase 25 event-candidate evidence | PASS, 5/5, non-empty 5/5, max P95 2163.5640 ms |
-| Latest phase new-success audit | PASS, 8/8, failed 0 |
+| Phase 26 date/limit evidence | PASS, 6/6, non-empty 6/6, max P95 732.5326 ms |
+| Latest phase new-success audit | PASS, 14/14, failed 0 |
 | Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
@@ -30,8 +31,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris evidence | PASS |
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | fac732b |
-| Git HEAD at export | fac732b |
+| Git HEAD at report generation | aedc700 |
+| Git HEAD at export | aedc700 |
 
 ## Source Files
 
@@ -63,6 +64,9 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | phase25_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase25_capability_funnel.json` |
 | phase25_event_candidate_doris_json | `submission_artifacts\evidence_snapshots\phase25_event_candidate_doris.json` |
 | phase25_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase25_new_success_audit.json` |
+| phase26_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase26_capability_funnel.json` |
+| phase26_date_limit_doris_json | `submission_artifacts\evidence_snapshots\phase26_date_limit_doris.json` |
+| phase26_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase26_new_success_audit.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
 
