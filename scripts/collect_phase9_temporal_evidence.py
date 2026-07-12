@@ -39,7 +39,18 @@ def main() -> int:
     args = parser.parse_args()
 
     rows = _query_rows(args, _oracle_source_sql(args.database))
-    doris_version = _query_rows(args, "SELECT VERSION()")[0][0]
+    protocol_version = _query_rows(args, "SELECT VERSION()")[0][0]
+    frontend_rows = _query_rows(args, "SHOW FRONTENDS")
+    doris_versions = sorted(
+        {
+            value
+            for row in frontend_rows
+            for value in row
+            if value.lower().startswith("doris-")
+        }
+    )
+    if not doris_versions:
+        raise RuntimeError("SHOW FRONTENDS did not expose a Doris build version")
     official_row_count = int(
         _query_rows(
             args,
@@ -96,7 +107,8 @@ def main() -> int:
     report = {
         "schema_version": 1,
         "git_head": _git_head(),
-        "doris_version": doris_version,
+        "doris_versions": doris_versions,
+        "mysql_protocol_version": protocol_version,
         "official_basic_rows": official_row_count,
         "latest_date": latest_date,
         "oracle_rows": len(rows),
@@ -184,7 +196,8 @@ def _write_report(report, json_output: str, markdown_output: str) -> None:
         "",
         f"- 状态：`{report['status']}`",
         f"- Git HEAD：`{report['git_head']}`",
-        f"- Doris 版本：`{report['doris_version']}`",
+        f"- Doris FE 版本：`{', '.join(report['doris_versions'])}`",
+        f"- MySQL 协议兼容版本：`{report['mysql_protocol_version']}`",
         f"- 官方基础表行数：`{report['official_basic_rows']}`",
         f"- 独立 oracle 行数：`{report['oracle_rows']}`",
         f"- 最新交易日股票数：`{report['latest_universe']}`",
