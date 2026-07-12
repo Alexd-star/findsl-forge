@@ -7,7 +7,7 @@ from findsl.official_coverage_funnel import (
 SOURCES = [
     "indicator('', '', '成交量', '', '', '', '') > 100",
     "indicator('', '', '营业收入', '', '', '', '') > 1",
-    "indicator('', '', '涨幅', '', '', '', '') > 1",
+    "indicator('', '', '3分钟涨速', '', '', '', '') > 1",
     "indicator(",
 ]
 

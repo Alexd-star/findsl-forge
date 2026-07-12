@@ -54,7 +54,7 @@ def test_official_demo_api_returns_success_and_structured_pipeline_failure():
         assert success["backend"]["validation_passed"] is True
 
         with pytest.raises(HTTPError) as excinfo:
-            _post_json(endpoint, {"dsl": "indicator('', '', '涨幅', '', '', '', '') > 1"})
+            _post_json(endpoint, {"dsl": "indicator('', '', '3分钟涨速', '', '', '', '') > 1"})
         error = json.loads(excinfo.value.read().decode("utf-8"))["error"]
         assert error["stage"] == "physical"
         assert error["code"] == "PHYSICAL_PLAN_UNAVAILABLE"

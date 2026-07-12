@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "git_head": "1223d92869ef580701faf113012f0e215e8432ff",
+  "case_count": 6,
+  "cases": [
+    {
+      "excel_row": 1,
+      "name": "latest_price",
+      "source": "indicator('', '', '最新价', '今日', '', '', '') > 10",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE (base.lastPx / 10000.0) > 10 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`lastPx` / 10000.0 > 10 AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false
+    },
+    {
+      "excel_row": 2,
+      "name": "change_percent",
+      "source": "indicator('', '', '涨幅', '今日', '', '', '') > 1",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.lastPx - base.preClosePx) * 100.0 / NULLIF(base.preClosePx, 0)) > 1 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE ((`q`.`lastPx` - `q`.`preClosePx`) * 100.0) / NULLIF(`q`.`preClosePx`, 0) > 1 AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false
+    },
+    {
+      "excel_row": 3,
+      "name": "limit_up",
+      "source": "indicator('', '', '涨停', '今日', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE base.limitFlag = 1 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`limitFlag` = 1 = TRUE AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false
+    },
+    {
+      "excel_row": 4,
+      "name": "market_cap",
+      "source": "indicator('', '', '总市值', '今日', '', '', '') > 1000000",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE ((base.lastPx / 10000.0) * base.totalShare) > 1000000 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (`q`.`lastPx` / 10000.0) * `q`.`totalShare` > 1000000 AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false
+    },
+    {
+      "excel_row": 5,
+      "name": "main_outflow",
+      "source": "indicator('', '', '主力净流出', '今日', '', '', '') > 0",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nLEFT JOIN newzl.hsj_stock_hq_ext AS ext ON ext.mktcode = base.mktcode AND ext.tgtcode = base.tgtcode AND ext.bizdate = base.bizdate\nWHERE (-ext.ZJLXMainNetTur) > 0 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `anchor`.`mktcode`, `anchor`.`tgtcode`, `anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor LEFT JOIN `newzl`.`hsj_stock_hq_ext` AS q ON `q`.`mktcode` = `anchor`.`mktcode` AND `q`.`tgtcode` = `anchor`.`tgtcode` AND `q`.`bizdate` = `anchor`.`bizdate` WHERE -`q`.`ZJLXMainNetTur` > 0 AND `anchor`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false
+    },
+    {
+      "excel_row": 6,
+      "name": "first_limit_up",
+      "source": "indicator('', '', '首板涨停', '今日', '', '', '') = True",
+      "legacy_sql": "SELECT base.mktcode, base.tgtcode, base.bizdate, code.name\nFROM newzl.hsj_stock_hq_basic AS base\nLEFT JOIN newzl.hsj_stock_code_info AS code ON code.mktcode = base.mktcode AND code.tgtcode = base.tgtcode\nWHERE base.limitFlag = 1 AND COALESCE(base.upSerialLb, 0) = 1 AND base.bizdate = '2026-04-14'",
+      "shadow_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`limitFlag` = 1 AND COALESCE(`q`.`upSerialLb`, 0) = 1 = TRUE AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "ordered": false
+    }
+  ],
+  "execution": {
+    "status": "PASS",
+    "passed": true,
+    "eligible": 6,
+    "deterministic_eligible": 6,
+    "compared": 6,
+    "matched": 6,
+    "mismatched": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipped_reasons": {},
+    "legacy_p95_ms": 388.6135,
+    "shadow_p95_ms": 1025.2171,
+    "results": [
+      {
+        "excel_row": 1,
+        "source": "indicator('', '', '最新价', '今日', '', '', '') > 10",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 3841,
+        "shadow_rows": 3841,
+        "legacy_hash": "98836476445d5c84426a3130f0e37c807650034e129cbd18eeeacb11e295860f",
+        "shadow_hash": "98836476445d5c84426a3130f0e37c807650034e129cbd18eeeacb11e295860f",
+        "legacy_elapsed_ms": 328.3484,
+        "shadow_elapsed_ms": 483.2502
+      },
+      {
+        "excel_row": 2,
+        "source": "indicator('', '', '涨幅', '今日', '', '', '') > 1",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 2127,
+        "shadow_rows": 2127,
+        "legacy_hash": "f1dad5fed1c3d7066651c2b294e09b8e326424f815593c8d4fbebcdf4351bef6",
+        "shadow_hash": "f1dad5fed1c3d7066651c2b294e09b8e326424f815593c8d4fbebcdf4351bef6",
+        "legacy_elapsed_ms": 299.2563,
+        "shadow_elapsed_ms": 441.7117
+      },
+      {
+        "excel_row": 3,
+        "source": "indicator('', '', '涨停', '今日', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 74,
+        "shadow_rows": 74,
+        "legacy_hash": "087a51412c14e48074d465915f8bf435cd3bb2816eab3111082dc76d05a49dd9",
+        "shadow_hash": "087a51412c14e48074d465915f8bf435cd3bb2816eab3111082dc76d05a49dd9",
+        "legacy_elapsed_ms": 205.0064,
+        "shadow_elapsed_ms": 227.6138
+      },
+      {
+        "excel_row": 4,
+        "source": "indicator('', '', '总市值', '今日', '', '', '') > 1000000",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 5614,
+        "shadow_rows": 5614,
+        "legacy_hash": "8f2958a57728b9313ba05d205b86e1ad79148b1312c0d070505939bba91e5107",
+        "shadow_hash": "8f2958a57728b9313ba05d205b86e1ad79148b1312c0d070505939bba91e5107",
+        "legacy_elapsed_ms": 223.1172,
+        "shadow_elapsed_ms": 422.7848
+      },
+      {
+        "excel_row": 5,
+        "source": "indicator('', '', '主力净流出', '今日', '', '', '') > 0",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 2963,
+        "shadow_rows": 2963,
+        "legacy_hash": "4c05cd6354d698b3151c4dcc2c4110630392c4b771b5c0a2817b6d321f989f0f",
+        "shadow_hash": "4c05cd6354d698b3151c4dcc2c4110630392c4b771b5c0a2817b6d321f989f0f",
+        "legacy_elapsed_ms": 388.6135,
+        "shadow_elapsed_ms": 1025.2171
+      },
+      {
+        "excel_row": 6,
+        "source": "indicator('', '', '首板涨停', '今日', '', '', '') = True",
+        "status": "PASS",
+        "ordered": false,
+        "legacy_rows": 22,
+        "shadow_rows": 22,
+        "legacy_hash": "48ccd9c16ddd7cb7a5290e0a5cb9aa677e077f00bdbbf6f0c364a57329290ad8",
+        "shadow_hash": "48ccd9c16ddd7cb7a5290e0a5cb9aa677e077f00bdbbf6f0c364a57329290ad8",
+        "legacy_elapsed_ms": 130.0538,
+        "shadow_elapsed_ms": 218.331
+      }
+    ]
+  }
+}

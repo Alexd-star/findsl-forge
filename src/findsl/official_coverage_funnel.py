@@ -124,7 +124,7 @@ def render_official_coverage_funnel_markdown(report: Dict[str, Any]) -> str:
     legacy = report["legacy_strict_success"]
     migrated = report["legacy_to_new_migrated"]
     lines = [
-        "# Phase 7 官方编译器迁移覆盖漏斗",
+        "# 官方编译器迁移覆盖漏斗",
         "",
         f"- Git HEAD：`{report['git_head']}`",
         f"- 官方语料：`{total}`",
