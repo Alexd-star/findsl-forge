@@ -1,10 +1,19 @@
+import json
+import threading
 from pathlib import Path
+from http.server import ThreadingHTTPServer
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+
+import pytest
 
 from findsl.demo import (
     DEFAULT_NL_REQUEST,
     analyze_dsl,
+    analyze_official_dsl,
     demo_examples,
     doris_evidence_summary,
+    make_demo_handler,
     render_demo_html,
     suggest_from_text,
 )
@@ -21,6 +30,49 @@ def test_analyze_dsl_returns_compile_and_verification_payload():
     assert "dwd_stock_daily_quote_prefix" in result["compile"]["sql"]
     assert result["verification"]["passed"]
     assert result["verification"]["sql_row_count"] == result["verification"]["reference_row_count"]
+
+
+def test_analyze_official_dsl_uses_the_new_auditable_pipeline():
+    result = analyze_official_dsl("indicator('', '', '成交量', '', '', '', '') > 100")
+
+    assert result["ok"] is True
+    assert result["pipeline"] == "official-antlr-ir-sqlglot"
+    assert result["frontend"]["frontend"] == "antlr"
+    assert result["physical"]["selected_resource"] == "official_basic"
+    assert result["backend"]["validation_passed"] is True
+
+
+def test_official_demo_api_returns_success_and_structured_pipeline_failure():
+    server = ThreadingHTTPServer(("127.0.0.1", 0), make_demo_handler(DATA_DIR))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    endpoint = f"http://127.0.0.1:{server.server_port}/api/official/analyze"
+    try:
+        success = _post_json(endpoint, {"dsl": "indicator('', '', '成交量', '', '', '', '') > 100"})
+        assert success["pipeline"] == "official-antlr-ir-sqlglot"
+        assert success["backend"]["validation_passed"] is True
+
+        with pytest.raises(HTTPError) as excinfo:
+            _post_json(endpoint, {"dsl": "indicator('', '', '涨幅', '', '', '', '') > 1"})
+        error = json.loads(excinfo.value.read().decode("utf-8"))["error"]
+        assert error["stage"] == "physical"
+        assert error["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
+        assert error["partial"]["optimized"]["diagnostics"] == []
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def _post_json(url, payload):
+    request = Request(
+        url,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urlopen(request, timeout=10) as response:
+        return json.loads(response.read().decode("utf-8"))
 
 
 def test_demo_examples_loads_sample_queries():

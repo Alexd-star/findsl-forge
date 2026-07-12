@@ -12,6 +12,7 @@ from .diagnostics import diagnose_exception
 from .equivalence import verify_sql_equivalence
 from .evaluation import load_cases
 from .nl2dsl import suggest_dsl
+from .official.pipeline import compile_official
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES
 
 
@@ -85,6 +86,12 @@ def analyze_dsl(
             "extra_keys": verification.extra_keys,
             "result_keys": verification.sql_keys[:50],
         }
+    return payload
+
+
+def analyze_official_dsl(dsl: str) -> Dict[str, Any]:
+    payload = compile_official(dsl).to_dict()
+    payload["pipeline"] = "official-antlr-ir-sqlglot"
     return payload
 
 
@@ -214,11 +221,17 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
             self._send_json({"ok": False, "error": {"message": "Not found"}}, HTTPStatus.NOT_FOUND)
 
         def do_POST(self) -> None:  # noqa: N802 - required by BaseHTTPRequestHandler.
-            if self.path not in {"/api/analyze", "/api/suggest"}:
+            if self.path not in {"/api/analyze", "/api/suggest", "/api/official/analyze"}:
                 self._send_json({"ok": False, "error": {"message": "Not found"}}, HTTPStatus.NOT_FOUND)
                 return
             try:
                 request = self._read_json()
+                if self.path == "/api/official/analyze":
+                    dsl = str(request.get("dsl", "")).strip()
+                    if not dsl:
+                        raise ValueError("Official DSL is required")
+                    self._send_json(analyze_official_dsl(dsl))
+                    return
                 if self.path == "/api/suggest":
                     text = str(request.get("text", "")).strip()
                     if not text:
@@ -289,6 +302,11 @@ def run_demo_server(
 
 
 def _error_payload(exc: Exception) -> Dict[str, Any]:
+    if hasattr(exc, "to_dict"):
+        payload = dict(exc.to_dict())
+        payload["type"] = type(exc).__name__
+        payload["trace"] = traceback.format_exc(limit=3).strip().splitlines()
+        return payload
     return {
         "type": type(exc).__name__,
         "message": str(exc),
