@@ -82,6 +82,11 @@ def test_versioned_official_demo_cases_match_declared_pipeline_outcomes():
             result = analyze_official_dsl(item["dsl"])
             assert result["ok"] is True
             assert result["physical"]["selected_resource"] == item["expected_resource"]
+            if "expected_strategy" in item:
+                assert (
+                    result["physical"]["selected_strategy"]
+                    == item["expected_strategy"]
+                )
         else:
             with pytest.raises(Exception) as excinfo:
                 analyze_official_dsl(item["dsl"])
