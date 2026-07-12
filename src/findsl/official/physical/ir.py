@@ -73,6 +73,24 @@ class PhysicalCoalesce(PhysicalExpr):
 
 
 @dataclass(frozen=True)
+class PhysicalAbs(PhysicalExpr):
+    expression: PhysicalExpr
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalAbs", "expression": self.expression.to_dict(), "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
+class PhysicalGreatest(PhysicalExpr):
+    expressions: Tuple[PhysicalExpr, ...]
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalGreatest", "expressions": [item.to_dict() for item in self.expressions], "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
 class PhysicalBinary(PhysicalExpr):
     op: str
     left: PhysicalExpr
@@ -102,6 +120,24 @@ class PhysicalIn(PhysicalExpr):
 
     def to_dict(self):
         return {"kind": "PhysicalIn", "expression": self.expression.to_dict(), "values": [value.to_dict() for value in self.values], "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
+class PhysicalEventRef(PhysicalExpr):
+    alias: str
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {"kind": "PhysicalEventRef", "alias": self.alias, "type": self.type.to_dict()}
+
+
+@dataclass(frozen=True)
+class PhysicalProjectedRef(PhysicalExpr):
+    alias: str
+    type: OfficialType
+
+    def to_dict(self):
+        return {"kind": "PhysicalProjectedRef", "alias": self.alias, "type": self.type.to_dict()}
 
 
 @dataclass(frozen=True)
@@ -372,6 +408,102 @@ class PhysicalAggregateRank(PhysicalPlan):
             "comparator": self.comparator,
             "percentage": self.percentage,
             "anchor_resource_id": self.anchor_resource_id,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalCrossing(CanonicalIr):
+    alias: str
+    left: PhysicalExpr
+    right: PhysicalExpr
+    direction: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalCrossing",
+            "alias": self.alias,
+            "left": self.left.to_dict(),
+            "right": self.right.to_dict(),
+            "direction": self.direction,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalExtreme(CanonicalIr):
+    alias: str
+    expression: PhysicalExpr
+    direction: str
+    lookback_sessions: Optional[int] = None
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalExtreme",
+            "alias": self.alias,
+            "expression": self.expression.to_dict(),
+            "direction": self.direction,
+            "lookback_sessions": self.lookback_sessions,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalProjection(CanonicalIr):
+    alias: str
+    expression: PhysicalExpr
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalProjection",
+            "alias": self.alias,
+            "expression": self.expression.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalPattern(CanonicalIr):
+    alias: str
+    predicate: PhysicalExpr
+    pattern: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalPattern",
+            "alias": self.alias,
+            "predicate": self.predicate.to_dict(),
+            "pattern": self.pattern,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalPosition(CanonicalIr):
+    alias: str
+    expression: PhysicalExpr
+    lookback_sessions: Optional[int] = None
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalPosition",
+            "alias": self.alias,
+            "expression": self.expression.to_dict(),
+            "lookback_sessions": self.lookback_sessions,
+        }
+
+
+@dataclass(frozen=True)
+class PhysicalEventFilter(PhysicalPlan):
+    input: PhysicalPlan
+    events: Tuple[CanonicalIr, ...]
+    projections: Tuple[PhysicalProjection, ...]
+    predicate: PhysicalExpr
+    result_constraints: Tuple[PhysicalExpr, ...] = ()
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalEventFilter",
+            "input": self.input.to_dict(),
+            "events": [event.to_dict() for event in self.events],
+            "projections": [item.to_dict() for item in self.projections],
+            "predicate": self.predicate.to_dict(),
+            "result_constraints": [item.to_dict() for item in self.result_constraints],
         }
 
 

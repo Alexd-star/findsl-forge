@@ -27,7 +27,7 @@ def test_official_pipeline_exposes_every_compiler_stage_and_safe_doris_sql():
     [
         ("indicator(", "frontend", "OFFICIAL_ANTLR_PARSE_ERROR"),
         ("indicator('', '', '营业收入', '', '', '', '') > 1", "logical", "DOMAIN_DATA_UNAVAILABLE"),
-        ("indicator('', '', '3分钟涨速', '', '', '', '') > 1", "physical", "PHYSICAL_PLAN_UNAVAILABLE"),
+        ("indicator('', '', '是否T+0', '', '', '', '') = True", "physical", "PHYSICAL_PLAN_UNAVAILABLE"),
     ],
 )
 def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(source, stage, code):
@@ -45,11 +45,22 @@ def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(so
 
 def test_physical_failure_keeps_candidate_decision_evidence():
     with pytest.raises(OfficialPipelineError) as excinfo:
-        compile_official("indicator('', '', '3分钟涨速', '', '', '', '') > 1")
+        compile_official("indicator('', '', '是否T+0', '', '', '', '') = True")
 
     diagnostics = excinfo.value.diagnostics
     assert diagnostics[0]["reason_code"] == "PHYSICAL_MAPPING_MISSING"
     assert diagnostics[0]["feasible"] is False
+
+
+def test_pipeline_classifies_missing_industry_membership_as_data_unavailable():
+    with pytest.raises(OfficialPipelineError) as excinfo:
+        compile_official(
+            "indicator('', '', '涨幅', '', '', '', '') > "
+            "belong_industry('', '', '涨幅', '', 'AVG')"
+        )
+
+    assert excinfo.value.stage == "physical"
+    assert excinfo.value.code == "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE"
 
 
 @pytest.mark.parametrize(
@@ -60,6 +71,14 @@ def test_physical_failure_keeps_candidate_decision_evidence():
         ("indicator('', '', '涨停', '', '', '', '') = True", "`q`.`limitFlag` = 1"),
         ("indicator('', '', '总市值', '', '', '', '') > 1", "`q`.`totalShare`"),
         ("indicator('', '', '主力净流出', '', '', '', '') > 1", "-`q`.`ZJLXMainNetTur`"),
+        ("indicator('', '', '流通市值', '', '', '', '') > 1", "`q`.`listedShare`"),
+        ("indicator('', '', '委比', '', '', '', '') > 1", "`q`.`commissionBuy`"),
+        ("indicator('', '', '成交均价', '', '', '', '') > 1", "NULLIF(`q`.`volume`, 0)"),
+        ("indicator('', '', '3分钟涨速', '', '', '', '') > 1", "`q`.`riseSpd3m` / 10000.0"),
+        ("indicator('', '', '主力买入占比', '', '', '', '') > 1", "`q`.`ZJLXMainBuyCntPer` / 10000.0"),
+        ("indicator('', '', '放量', '', '', '', '') = True", "`q`.`volume_breakout` = TRUE"),
+        ("indicator('', '', '均线多头排列', '', '', '', '') = True", "`q`.`ma_bullish` = TRUE"),
+        ("indicator('', '', '涨停炸板', '今日', '', '', '') = True", "(COALESCE(`q`.`lmtUpNum`, 0) > 0 OR COALESCE(`q`.`boardBreaks`, 0) > 0) = TRUE"),
     ],
 )
 def test_pipeline_compiles_controlled_derived_indicators_without_legacy_sql(
@@ -70,3 +89,156 @@ def test_pipeline_compiles_controlled_derived_indicators_without_legacy_sql(
     assert result["backend"]["validation_passed"] is True
     assert sql_fragment in result["backend"]["sql"]
     assert result["physical"]["selected_strategy"] == "controlled_expression"
+
+
+@pytest.mark.parametrize(
+    "source,current_fragment,previous_fragment",
+    [
+        (
+            "cross_above('', '', '5日均线', '20日均线', '今日', '', '') = True",
+            "`q`.`ma5` > `q`.`ma20`",
+            "LAG(`q`.`ma5`, 1, NULL) OVER",
+        ),
+        (
+            "cross_down('', '', '最新价', '30日均线', '', '', '') = True",
+            "`official_basic`.`lastPx` / 10000.0 < `official_technical`.`ma30`",
+            "LAG(`official_basic`.`lastPx` / 10000.0, 1, NULL) OVER",
+        ),
+        (
+            "golden_cross('', '', '10日均线', '20日均线', '', '', '') = True",
+            "`q`.`ma10` > `q`.`ma20`",
+            "LAG(`q`.`ma10`, 1, NULL) OVER",
+        ),
+    ],
+)
+def test_pipeline_lowers_crossing_functions_to_set_based_window_relation(
+    source, current_fragment, previous_fragment
+):
+    result = compile_official(source).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert current_fragment in sql
+    assert previous_fragment in sql
+    assert "`event_rows`.`event_0` = TRUE" in sql
+    assert "WHERE LAG(" not in sql
+    assert result["backend"]["validation_passed"] is True
+
+
+def test_pipeline_combines_crossing_events_without_scalar_fallback():
+    result = compile_official(
+        "cross_above('', '', '5日均线', '10日均线', '', '', '') = True "
+        "or cross_down('', '', '5日均线', '10日均线', '', '', '') = True"
+    ).to_dict()
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert "`event_rows`.`event_0` = TRUE OR `event_rows`.`event_1` = TRUE" in result["backend"]["sql"]
+
+
+@pytest.mark.parametrize(
+    "source,window_fragment,comparison_fragment",
+    [
+        (
+            "record_high('', '', '最高价', '60日', '今日', '', '', '') = True",
+            "ROWS BETWEEN 59 PRECEDING AND CURRENT ROW",
+            ">= MAX(`q`.`highPx` / 10000.0) OVER",
+        ),
+        (
+            "record_low('', '', '最低价', '历史', '', '', '', '') = True",
+            "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+            "<= MIN(`q`.`lowPx` / 10000.0) OVER",
+        ),
+        (
+            "record_high('', '', '最高价', '四个月', '今日', '', '', '') = True",
+            "ROWS BETWEEN 79 PRECEDING AND CURRENT ROW",
+            ">= MAX(`q`.`highPx` / 10000.0) OVER",
+        ),
+    ],
+)
+def test_pipeline_lowers_record_extrema_to_typed_window_frames(
+    source, window_fragment, comparison_fragment
+):
+    result = compile_official(source).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert window_fragment in sql
+    assert comparison_fragment in sql
+    assert "`event_rows`.`event_0` = TRUE" in sql
+
+
+@pytest.mark.parametrize(
+    "source,frame",
+    [
+        ("position('', '', '最新价', '10日', '今日', '', '', '') = '最高'", "ROWS BETWEEN 9 PRECEDING AND CURRENT ROW"),
+        ("position('', '', '市净率', '历史', '今日', '', '', '') = '低'", "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
+        ("position('', '', '最新价', '七年内', '今日', '', '', '') = '低'", "ROWS BETWEEN 1749 PRECEDING AND CURRENT ROW"),
+    ],
+)
+def test_pipeline_lowers_position_to_windowed_five_bucket_case(source, frame):
+    result = compile_official(source).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert frame in sql
+    assert "CASE WHEN" in sql
+    assert "THEN '最低'" in sql
+    assert "THEN '最高'" in sql
+    assert "THEN '低'" in sql
+    assert "THEN '高'" in sql
+    assert "ELSE '中' END AS `event_0`" in sql
+    assert "`event_rows`.`event_0`" in sql
+
+
+def test_pipeline_projects_scalar_indicators_next_to_window_events():
+    result = compile_official(
+        "cross_above('', '', '5日均线', '20日均线', '', '', '') = True "
+        "and indicator('', '', '成交量', '', '', '', '') > 0"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert "`official_basic`.`volume` AS `projected_0`" in sql
+    assert "`event_rows`.`event_0` = TRUE AND `event_rows`.`projected_0` > 0" in sql
+
+
+def test_pipeline_rejects_conflicting_dates_inside_window_event_projection():
+    with pytest.raises(OfficialPipelineError) as excinfo:
+        compile_official(
+            "cross_above('', '', '5日均线', '20日均线', '今日', '', '') = True "
+            "and indicator('', '', '成交量', '昨日', '', '', '') > 0"
+        )
+
+    assert excinfo.value.code == "PHYSICAL_EVENT_DATE_SCOPE_MISMATCH"
+
+
+def test_pipeline_never_ignores_non_empty_window_event_slots():
+    with pytest.raises(OfficialPipelineError) as excinfo:
+        compile_official(
+            "record_high('', '', '最高价', '20日', '今日', '', 'MAX', '') = True"
+        )
+
+    assert excinfo.value.code == "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED"
+
+
+@pytest.mark.parametrize(
+    "source,sql_fragments",
+    [
+        (
+            "close_together('', '', '5日均线', '20日均线', '今日', '', '') = True",
+            ("ABS(`q`.`ma5` - `q`.`ma20`)", "GREATEST(ABS(`q`.`ma5`), ABS(`q`.`ma20`))", "<= 0.03"),
+        ),
+        (
+            "reset('', '', '最新价', '20日均线', '今日', '', '') = True",
+            ("ABS((`official_basic`.`lastPx` / 10000.0) - `official_technical`.`ma20`)", "<= 0.02", "* 0.995"),
+        ),
+    ],
+)
+def test_pipeline_lowers_configured_technical_patterns_without_raw_sql(source, sql_fragments):
+    result = compile_official(source).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    for fragment in sql_fragments:
+        assert fragment in sql
+    assert "NULLIF" in sql

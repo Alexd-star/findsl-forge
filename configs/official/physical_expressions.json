@@ -80,6 +80,122 @@
     {
       "indicator_id": "上涨趋势", "resource_id": "official_technical", "value_type": "boolean", "nullable": true,
       "expression": {"op": "equal", "left": {"op": "column", "column": "uptrend", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    },
+    {
+      "indicator_id": "流通市值", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "multiply", "left": {"op": "divide", "left": {"op": "column", "column": "lastPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}, "right": {"op": "column", "column": "listedShare", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "振幅", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "amplitude", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "成交均价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "safe_divide", "left": {"op": "column", "column": "turnover", "type": "numeric"}, "right": {"op": "column", "column": "volume", "type": "numeric"}}, "right": {"op": "literal", "value": 100.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "委差", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "subtract", "left": {"op": "column", "column": "commissionBuy", "type": "numeric"}, "right": {"op": "column", "column": "commissionSale", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "委比", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "safe_divide", "left": {"op": "multiply", "left": {"op": "subtract", "left": {"op": "column", "column": "commissionBuy", "type": "numeric"}, "right": {"op": "column", "column": "commissionSale", "type": "numeric"}}, "right": {"op": "literal", "value": 100.0, "type": "numeric"}}, "right": {"op": "add", "left": {"op": "column", "column": "commissionBuy", "type": "numeric"}, "right": {"op": "column", "column": "commissionSale", "type": "numeric"}}}
+    },
+    {
+      "indicator_id": "每股净资产", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "bVPS", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "静态市盈率", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "staticPE", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "涨停价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "upSealPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "跌停价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "downSealPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "支撑位", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "support", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "上影线", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "upperShadow", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "3分钟涨速", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "riseSpd3m", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "集合竞价涨幅", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "callAucRisePct", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "集合竞价涨跌幅", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "callAucRisePct", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "今日主力增仓占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainIncPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "主力成交量占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainTradeVolPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "主力主动买入占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainActBuyCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "主力买入占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainBuyCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "主力卖出占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainSellCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "散户买入占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXRetailBuyCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "最大回撤", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "maxRetreat", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "历史最大跌幅", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "maxRetreat", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "涨停炸板", "resource_id": "official_ext", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "or", "left": {"op": "greater", "left": {"op": "coalesce", "args": [{"op": "column", "column": "lmtUpNum", "type": "numeric"}, {"op": "literal", "value": 0, "type": "numeric"}]}, "right": {"op": "literal", "value": 0, "type": "numeric"}}, "right": {"op": "greater", "left": {"op": "coalesce", "args": [{"op": "column", "column": "boardBreaks", "type": "numeric"}, {"op": "literal", "value": 0, "type": "numeric"}]}, "right": {"op": "literal", "value": 0, "type": "numeric"}}}
+    },
+    {
+      "indicator_id": "阳线", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "yang_line", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    },
+    {
+      "indicator_id": "阴线", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "yin_line", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    },
+    {
+      "indicator_id": "十字星", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "doji", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    },
+    {
+      "indicator_id": "放量", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "volume_breakout", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    },
+    {
+      "indicator_id": "均线多头排列", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "ma_bullish", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    },
+    {
+      "indicator_id": "均线空头排列", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "ma_bearish", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
     }
   ]
 }

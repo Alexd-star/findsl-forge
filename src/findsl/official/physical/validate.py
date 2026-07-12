@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
-    PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
-    PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup,
+    PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
+    PhysicalEventFilter, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixLookup, PhysicalProjectedRef,
     PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedScalar, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal,
-    PhysicalSetOperation,
+    PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
 )
 from ..types import BOOLEAN, NUMERIC
@@ -49,6 +49,58 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("unsupported physical set operation")
         _validate_plan(plan.left, catalog, expressions)
         _validate_plan(plan.right, catalog, expressions)
+        return
+    if isinstance(plan, PhysicalEventFilter):
+        _validate_plan(plan.input, catalog, expressions)
+        if not plan.events or plan.predicate.type is not BOOLEAN:
+            raise ValueError("physical event filter requires events and a boolean predicate")
+        aliases = set()
+        for event in plan.events:
+            if not event.alias.isidentifier() or event.alias in aliases:
+                raise ValueError("physical event alias is invalid or duplicated")
+            aliases.add(event.alias)
+            if isinstance(event, PhysicalExtreme):
+                if event.direction not in {"high", "low"}:
+                    raise ValueError("physical extreme direction is invalid")
+                if event.expression.type is not NUMERIC:
+                    raise ValueError("physical extreme requires a numeric expression")
+                if event.lookback_sessions is not None and event.lookback_sessions <= 0:
+                    raise ValueError("physical extreme lookback must be positive")
+                _validate_expr(event.expression, catalog, expressions)
+            elif isinstance(event, PhysicalPattern):
+                if event.pattern not in {"close_together", "reset"} or event.predicate.type is not BOOLEAN:
+                    raise ValueError("physical technical pattern contract is invalid")
+                _validate_expr(event.predicate, catalog, expressions)
+            elif isinstance(event, PhysicalPosition):
+                if event.expression.type is not NUMERIC:
+                    raise ValueError("physical position requires a numeric expression")
+                if event.lookback_sessions is not None and event.lookback_sessions <= 0:
+                    raise ValueError("physical position lookback must be positive")
+                _validate_expr(event.expression, catalog, expressions)
+            else:
+                if event.direction not in {"above", "below"}:
+                    raise ValueError("physical crossing direction is invalid")
+                if event.left.type is not event.right.type or event.left.type is not NUMERIC:
+                    raise ValueError("physical crossing operands must be compatible numeric expressions")
+                _validate_expr(event.left, catalog, expressions)
+                _validate_expr(event.right, catalog, expressions)
+        refs = {item.alias for item in _walk_event_refs(plan.predicate)}
+        if not refs or not refs.issubset(aliases):
+            raise ValueError("physical event predicate references an undeclared event")
+        projection_aliases = set()
+        for projection in plan.projections:
+            if not projection.alias.isidentifier() or projection.alias in aliases or projection.alias in projection_aliases:
+                raise ValueError("physical event projection alias is invalid or duplicated")
+            projection_aliases.add(projection.alias)
+            _validate_expr(projection.expression, catalog, expressions)
+        projected_refs = {item.alias for item in _walk_projected_refs(plan.predicate)}
+        if not projected_refs.issubset(projection_aliases):
+            raise ValueError("physical event predicate references an undeclared projection")
+        _validate_expr(plan.predicate, catalog, expressions)
+        for constraint in plan.result_constraints:
+            _validate_expr(constraint, catalog, expressions)
+            if constraint.type is not BOOLEAN:
+                raise ValueError("physical event result constraint must be boolean")
         return
     if isinstance(plan, PhysicalJoin):
         _validate_plan(plan.left, catalog, expressions); _validate_plan(plan.right, catalog, expressions)
@@ -227,7 +279,13 @@ def _validate_plan(plan, catalog, expressions):
 
 
 def _validate_expr(expression, catalog, expressions=None):
-    if isinstance(expression, PhysicalAggregateRef):
+    if isinstance(expression, PhysicalProjectedRef):
+        if not expression.alias.isidentifier():
+            raise ValueError("physical projected reference alias is invalid")
+    elif isinstance(expression, PhysicalEventRef):
+        if not expression.alias.isidentifier():
+            raise ValueError("physical event reference alias is invalid")
+    elif isinstance(expression, PhysicalAggregateRef):
         if not expression.relation_alias.isidentifier() or not expression.measure_alias.isidentifier():
             raise ValueError("physical aggregate reference alias is invalid")
     elif isinstance(expression, PhysicalColumn):
@@ -324,6 +382,15 @@ def _validate_expr(expression, catalog, expressions=None):
             raise ValueError("physical COALESCE requires compatible operands")
         for item in expression.expressions:
             _validate_expr(item, catalog, expressions)
+    elif isinstance(expression, PhysicalAbs):
+        if expression.type is not NUMERIC or expression.expression.type is not NUMERIC:
+            raise ValueError("physical ABS requires a numeric expression")
+        _validate_expr(expression.expression, catalog, expressions)
+    elif isinstance(expression, PhysicalGreatest):
+        if len(expression.expressions) < 2 or expression.type is not NUMERIC or any(item.type is not NUMERIC for item in expression.expressions):
+            raise ValueError("physical GREATEST requires at least two numeric expressions")
+        for item in expression.expressions:
+            _validate_expr(item, catalog, expressions)
 
 
 def _walk_aggregate_refs(expression):
@@ -342,3 +409,49 @@ def _walk_aggregate_refs(expression):
             yield from _walk_aggregate_refs(item)
     elif isinstance(expression, PhysicalIn):
         yield from _walk_aggregate_refs(expression.expression)
+
+
+def _walk_event_refs(expression):
+    if isinstance(expression, PhysicalEventRef):
+        yield expression
+    elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
+        yield from _walk_event_refs(expression.left)
+        yield from _walk_event_refs(expression.right)
+    elif isinstance(expression, (PhysicalUnary, PhysicalNot)):
+        yield from _walk_event_refs(expression.operand)
+    elif isinstance(expression, PhysicalNullIf):
+        yield from _walk_event_refs(expression.expression)
+        yield from _walk_event_refs(expression.null_value)
+    elif isinstance(expression, PhysicalCoalesce):
+        for item in expression.expressions:
+            yield from _walk_event_refs(item)
+    elif isinstance(expression, PhysicalAbs):
+        yield from _walk_event_refs(expression.expression)
+    elif isinstance(expression, PhysicalGreatest):
+        for item in expression.expressions:
+            yield from _walk_event_refs(item)
+    elif isinstance(expression, PhysicalIn):
+        yield from _walk_event_refs(expression.expression)
+
+
+def _walk_projected_refs(expression):
+    if isinstance(expression, PhysicalProjectedRef):
+        yield expression
+    elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
+        yield from _walk_projected_refs(expression.left)
+        yield from _walk_projected_refs(expression.right)
+    elif isinstance(expression, (PhysicalUnary, PhysicalNot)):
+        yield from _walk_projected_refs(expression.operand)
+    elif isinstance(expression, PhysicalNullIf):
+        yield from _walk_projected_refs(expression.expression)
+        yield from _walk_projected_refs(expression.null_value)
+    elif isinstance(expression, PhysicalCoalesce):
+        for item in expression.expressions:
+            yield from _walk_projected_refs(item)
+    elif isinstance(expression, PhysicalAbs):
+        yield from _walk_projected_refs(expression.expression)
+    elif isinstance(expression, PhysicalGreatest):
+        for item in expression.expressions:
+            yield from _walk_projected_refs(item)
+    elif isinstance(expression, PhysicalIn):
+        yield from _walk_projected_refs(expression.expression)

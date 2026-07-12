@@ -33,6 +33,7 @@ from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .catalog import PhysicalCatalog
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
 from .ir import (
+    PhysicalAbs,
     PhysicalBinary,
     PhysicalAggregateGroup,
     PhysicalAggregateRank,
@@ -42,8 +43,13 @@ from .ir import (
     PhysicalCompositeAggregate,
     PhysicalCoalesce,
     PhysicalDynamicDateRange,
+    PhysicalEventFilter,
+    PhysicalEventRef,
+    PhysicalCrossing,
+    PhysicalExtreme,
     PhysicalFilter,
     PhysicalGroupedAggregate,
+    PhysicalGreatest,
     PhysicalIn,
     PhysicalJoin,
     PhysicalLatestValue,
@@ -56,6 +62,10 @@ from .ir import (
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
+    PhysicalPattern,
+    PhysicalPosition,
+    PhysicalProjection,
+    PhysicalProjectedRef,
     PhysicalRank,
     PhysicalRecentSessions,
     PhysicalSessionBoundaryRange,
@@ -70,6 +80,7 @@ from .validate import validate_physical_plan
 from .statistics import PhysicalStatisticsSnapshot
 from .strategies import PhysicalStrategyRegistry
 from .scopes import SecurityScopeCatalog, default_security_scope_catalog
+from .patterns import default_physical_pattern_config
 
 
 @dataclass(frozen=True)
@@ -131,6 +142,11 @@ _TYPE_MAP = {
     "time": TIME,
 }
 _DIRECT_FIELD_CALLS = {"indicator", "queryData", "rank"}
+_CROSSING_CALLS = {"cross_above", "cross_down", "golden_cross"}
+_EXTREME_CALLS = {"record_high", "record_low"}
+_PATTERN_CALLS = {"reset", "close_together"}
+_POSITION_CALLS = {"position"}
+_WINDOW_EVENT_CALLS = _CROSSING_CALLS | _EXTREME_CALLS | _PATTERN_CALLS | _POSITION_CALLS
 
 
 def plan_physical(
@@ -214,6 +230,16 @@ def plan_physical(
             resource_ids = ("official_basic",)
         else:
             raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
+    crossing_calls = _crossing_calls(lowering.plan)
+    if crossing_calls:
+        return _plan_crossing_events(
+            lowering,
+            crossing_calls,
+            catalog,
+            fields,
+            resource_ids,
+            expressions,
+        )
     if aggregate_rank_contract is not None:
         return _plan_aggregate_rank(
             aggregate_rank_contract,
@@ -943,6 +969,347 @@ def _plan_multi_resource(
     return PhysicalPlanningResult(plan, selected_resource, (decision,), "stable_key_join")
 
 
+def _crossing_calls(plan) -> Tuple[CallExpr, ...]:
+    return tuple(
+        call
+        for expression in _logical_expressions(plan)
+        for call in _walk_calls(expression)
+        if call.name in _WINDOW_EVENT_CALLS
+    )
+
+
+def _plan_crossing_events(
+    lowering: LoweringResult,
+    calls: Tuple[CallExpr, ...],
+    catalog: PhysicalCatalog,
+    fields: Tuple[_ResolvedIndicator, ...],
+    resource_ids: Tuple[str, ...],
+    expressions: Optional[PhysicalExpressionRegistry],
+) -> PhysicalPlanningResult:
+    current = lowering.plan
+    limit = None
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+    if not isinstance(current, LogicalFilter):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_PLAN_UNSUPPORTED",
+            "crossing events currently require one filter stage",
+        )
+    all_calls = tuple(_walk_calls(current.predicate))
+    if any(call.name not in _WINDOW_EVENT_CALLS | {"indicator"} for call in all_calls):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
+            "window events support only direct scalar indicator projections",
+        )
+    scalar_calls = tuple(call for call in all_calls if call.name == "indicator")
+    ignored_event_slots = {
+        slot
+        for call in calls
+        for slot in ("select_type", "agg_func", "count_exp")
+        if str(call.binding.slots.get(slot, "")).strip()
+    }
+    if ignored_event_slots:
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
+            "window event plan cannot ignore non-empty slots: "
+            + ", ".join(sorted(ignored_event_slots)),
+        )
+    if any(
+        str(call.binding.slots.get("agg_func", "")).strip()
+        or str(call.binding.slots.get("count_exp", "")).strip()
+        for call in scalar_calls
+    ):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
+            "window events cannot yet mix with aggregate or temporal scalar projections",
+        )
+    date_scopes = {
+        str(call.binding.slots.get("date", "")).strip()
+        for call in all_calls
+        if str(call.binding.slots.get("date", "")).strip()
+    }
+    if len(date_scopes) > 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_DATE_SCOPE_MISMATCH",
+            "window event composition requires one shared non-empty date scope",
+        )
+    if any(call.scope_expression is not None for call in calls):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_SCOPE_UNSUPPORTED",
+            "crossing event scope filters require a projected security relation",
+        )
+
+    if len(resource_ids) > 1:
+        relation, root_id, joined = _build_join_relation(fields, resource_ids, catalog)
+    else:
+        selected = resource_ids[0]
+        resource = catalog.resource(selected)
+        root_id = resource.anchor_resource_id or selected
+        relation = PhysicalScan(
+            selected,
+            _scan_columns(fields),
+            None,
+            resource.anchor_resource_id,
+        )
+        joined = (root_id, selected) if root_id != selected else (selected,)
+
+    event_defs = []
+    event_refs = {}
+    projections = []
+    projected_refs = {}
+    constraints = []
+    seen_constraints = set()
+    pattern_config = default_physical_pattern_config()
+    for index, call in enumerate(calls):
+        alias = f"event_{index}"
+        if call.name in _CROSSING_CALLS | _PATTERN_CALLS:
+            left_id = str(call.binding.slots.get("indicator_name_1", ""))
+            right_id = str(call.binding.slots.get("indicator_name_2", ""))
+            left = _lower_resolved_indicator(_field_for_indicator(fields, left_id))
+            right = _lower_resolved_indicator(_field_for_indicator(fields, right_id))
+            if left.type is not NUMERIC or right.type is not NUMERIC:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_EVENT_TYPE_UNSUPPORTED",
+                    "crossing events require two numeric indicators",
+                )
+            if call.name in _CROSSING_CALLS:
+                direction = "below" if call.name == "cross_down" else "above"
+                event_defs.append(PhysicalCrossing(alias, left, right, direction))
+            else:
+                difference = PhysicalAbs(
+                    PhysicalBinary("-", left, right, NUMERIC),
+                    NUMERIC,
+                )
+                if call.name == "close_together":
+                    denominator = PhysicalNullIf(
+                        PhysicalGreatest(
+                            (
+                                PhysicalAbs(left, NUMERIC),
+                                PhysicalAbs(right, NUMERIC),
+                            ),
+                            NUMERIC,
+                        ),
+                        PhysicalLiteral(0, NUMERIC),
+                        NUMERIC,
+                    )
+                    predicate = PhysicalComparison(
+                        "<=",
+                        PhysicalBinary("/", difference, denominator, NUMERIC),
+                        PhysicalLiteral(
+                            pattern_config.close_together_relative_threshold,
+                            NUMERIC,
+                        ),
+                    )
+                else:
+                    denominator = PhysicalNullIf(
+                        PhysicalAbs(right, NUMERIC),
+                        PhysicalLiteral(0, NUMERIC),
+                        NUMERIC,
+                    )
+                    near = PhysicalComparison(
+                        "<=",
+                        PhysicalBinary("/", difference, denominator, NUMERIC),
+                        PhysicalLiteral(
+                            pattern_config.reset_near_line_threshold,
+                            NUMERIC,
+                        ),
+                    )
+                    floor = PhysicalComparison(
+                        ">=",
+                        left,
+                        PhysicalBinary(
+                            "*",
+                            right,
+                            PhysicalLiteral(
+                                1.0 - pattern_config.reset_below_line_tolerance,
+                                NUMERIC,
+                            ),
+                            NUMERIC,
+                        ),
+                    )
+                    predicate = PhysicalBinary("and", near, floor, BOOLEAN)
+                event_defs.append(PhysicalPattern(alias, predicate, call.name))
+        elif call.name in _EXTREME_CALLS:
+            indicator_id = str(call.binding.slots.get("indicator_name", ""))
+            value = _lower_resolved_indicator(_field_for_indicator(fields, indicator_id))
+            if value.type is not NUMERIC:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_EVENT_TYPE_UNSUPPORTED",
+                    "record extrema require a numeric indicator",
+                )
+            event_defs.append(
+                PhysicalExtreme(
+                    alias,
+                    value,
+                    "high" if call.name == "record_high" else "low",
+                    _parse_extreme_lookback(call.binding.slots.get("period", "")),
+                )
+            )
+        else:
+            indicator_id = str(call.binding.slots.get("indicator_name", ""))
+            value = _lower_resolved_indicator(_field_for_indicator(fields, indicator_id))
+            if value.type is not NUMERIC:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_EVENT_TYPE_UNSUPPORTED",
+                    "position requires a numeric indicator",
+                )
+            event_defs.append(
+                PhysicalPosition(
+                    alias,
+                    value,
+                    _parse_extreme_lookback(call.binding.slots.get("period", "")),
+                )
+            )
+        event_refs[id(call)] = PhysicalEventRef(
+            alias,
+            STRING if call.name in _POSITION_CALLS else BOOLEAN,
+        )
+        for constraint in _call_constraints(call, catalog, root_id):
+            if constraint.node_id not in seen_constraints:
+                constraints.append(constraint)
+                seen_constraints.add(constraint.node_id)
+
+    for index, call in enumerate(scalar_calls):
+        indicator_id = str(call.binding.slots.get("indicator_name", ""))
+        field = _field_for_indicator(fields, indicator_id)
+        expression = _lower_resolved_indicator(field)
+        alias = f"projected_{index}"
+        projections.append(PhysicalProjection(alias, expression))
+        projected_refs[id(call)] = PhysicalProjectedRef(alias, expression.type)
+        for constraint in _call_constraints(call, catalog, root_id):
+            if constraint.node_id not in seen_constraints:
+                constraints.append(constraint)
+                seen_constraints.add(constraint.node_id)
+
+    predicate = _lower_crossing_predicate(
+        current.predicate,
+        {**event_refs, **projected_refs},
+    )
+    plan: PhysicalPlan = PhysicalEventFilter(
+        relation,
+        tuple(event_defs),
+        tuple(projections),
+        predicate,
+        tuple(constraints),
+    )
+    if limit is not None:
+        plan = PhysicalLimit(plan, limit[0], limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    selected_resource = "+".join(dict.fromkeys(joined))
+    decision = PhysicalDecision(
+        resource_id=selected_resource,
+        feasible=True,
+        cost=float(sum(catalog.resource(item).priority for item in dict.fromkeys(joined))),
+        estimated=True,
+        reason_code="PHYSICAL_EVENT_WINDOW_SELECTED",
+        reason="set-based LAG event relation on stable security and trading-date keys",
+        strategy_id="crossing_window",
+        selected=True,
+    )
+    return PhysicalPlanningResult(plan, selected_resource, (decision,), "crossing_window")
+
+
+def _lower_resolved_indicator(field: _ResolvedIndicator):
+    if field.direct_column is not None:
+        return PhysicalColumn(field.resource_id, field.direct_column, _type_from_name(field.value_type))
+    assert field.expression is not None
+    return _lower_declared_expression(field.expression, field.resource_id)
+
+
+def _lower_crossing_predicate(expression, refs):
+    if isinstance(expression, LiteralExpr):
+        return _physical_literal(expression)
+    if isinstance(expression, CallExpr) and id(expression) in refs:
+        return refs[id(expression)]
+    if isinstance(expression, BinaryExpr):
+        return PhysicalBinary(
+            expression.op,
+            _lower_crossing_predicate(expression.left, refs),
+            _lower_crossing_predicate(expression.right, refs),
+            expression.type,
+        )
+    if isinstance(expression, ComparisonExpr):
+        if expression.op == "~=":
+            raise PhysicalPlanningError(
+                "PHYSICAL_APPROXIMATION_POLICY_MISSING",
+                "approximate event comparison requires a declared tolerance",
+            )
+        if expression.op == "between" and isinstance(expression.right, RangeExpr):
+            value = _lower_crossing_predicate(expression.left, refs)
+            lower = _lower_crossing_predicate(expression.right.lower, refs)
+            upper = _lower_crossing_predicate(expression.right.upper, refs)
+            return PhysicalBinary(
+                "and",
+                PhysicalComparison(">=" if expression.right.lower_inclusive else ">", value, lower),
+                PhysicalComparison("<=" if expression.right.upper_inclusive else "<", value, upper),
+                BOOLEAN,
+            )
+        return PhysicalComparison(
+            expression.op,
+            _lower_crossing_predicate(expression.left, refs),
+            _lower_crossing_predicate(expression.right, refs),
+        )
+    if isinstance(expression, RangeExpr):
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_EXPRESSION_UNSUPPORTED",
+            "standalone range values are only valid inside between comparisons",
+        )
+    raise PhysicalPlanningError(
+        "PHYSICAL_EVENT_EXPRESSION_UNSUPPORTED",
+        f"unsupported crossing expression {type(expression).__name__}",
+    )
+
+
+def _parse_extreme_lookback(value) -> Optional[int]:
+    text = str(value or "").strip()
+    if not text or text in {"历史", "史高", "史低"}:
+        return None
+    match = re.fullmatch(
+        r"(?:近|最近|过去)?(\d+|[零〇一二两三四五六七八九十百]+)(?:个)?(交易日|日|天|周|星期|月|个月|季度|季|年)(?:内)?",
+        text,
+    )
+    if not match:
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_PERIOD_UNSUPPORTED",
+            f"record extreme period requires an explicit trading-session count: {text}",
+        )
+    token = match.group(1)
+    amount = int(token) if token.isdigit() else _parse_small_chinese_integer(token)
+    sessions_per_unit = {
+        "交易日": 1,
+        "日": 1,
+        "天": 1,
+        "周": 5,
+        "星期": 5,
+        "月": 20,
+        "个月": 20,
+        "季度": 60,
+        "季": 60,
+        "年": 250,
+    }
+    return amount * sessions_per_unit[match.group(2)]
+
+
+def _parse_small_chinese_integer(text: str) -> int:
+    digits = {"零": 0, "〇": 0, "一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
+    if text == "十":
+        return 10
+    if "百" in text:
+        head, tail = text.split("百", 1)
+        value = digits.get(head, 1) * 100
+        return value + (_parse_small_chinese_integer(tail) if tail else 0)
+    if "十" in text:
+        head, tail = text.split("十", 1)
+        return digits.get(head, 1) * 10 + (digits.get(tail, 0) if tail else 0)
+    if text in digits and digits[text] > 0:
+        return digits[text]
+    raise PhysicalPlanningError(
+        "PHYSICAL_EVENT_PERIOD_UNSUPPORTED",
+        f"record extreme period has an unsupported count: {text}",
+    )
+
+
 def _build_join_relation(
     fields: Tuple[_ResolvedIndicator, ...],
     resource_ids: Tuple[str, ...],
@@ -1122,31 +1489,44 @@ def _collect_fields(
     scope_catalog = default_security_scope_catalog()
     for expression in logical_expressions:
         for call in _walk_calls(expression):
-            if call.name not in _DIRECT_FIELD_CALLS or call.binding is None:
+            if call.name == "belong_industry":
+                raise PhysicalPlanningError(
+                    "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE",
+                    "belong_industry requires industry membership, but the official security master contains no populated industry values",
+                )
+            if call.name not in _DIRECT_FIELD_CALLS | _WINDOW_EVENT_CALLS or call.binding is None:
                 raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {call.name}")
             if call.scope_expression is not None:
                 _resolve_scope_atoms(call.scope_expression, scope_catalog)
                 scope_required = True
             _reject_unmaterialized_constraints(call)
-            indicator_id = call.binding.slots.get("indicator_name", "")
-            if _is_universe_call(call):
-                continue
-            try:
-                fields.append(_resolve_indicator(indicator_id, catalog, expressions))
-            except KeyError as exc:
-                decision = PhysicalDecision(
-                    resource_id=None,
-                    feasible=False,
-                    cost=None,
-                    estimated=False,
-                    reason_code="PHYSICAL_MAPPING_MISSING",
-                    reason=f"no controlled physical mapping for indicator {indicator_id}",
+            indicator_ids = (
+                (
+                    call.binding.slots.get("indicator_name_1", ""),
+                    call.binding.slots.get("indicator_name_2", ""),
                 )
-                raise PhysicalPlanningError(
-                    "PHYSICAL_PLAN_UNAVAILABLE",
-                    f"no controlled physical mapping for indicator {indicator_id}",
-                    decisions=(decision,),
-                ) from exc
+                if call.name in _CROSSING_CALLS | _PATTERN_CALLS
+                else (call.binding.slots.get("indicator_name", ""),)
+            )
+            for indicator_id in indicator_ids:
+                if _is_universe_call(call):
+                    continue
+                try:
+                    fields.append(_resolve_indicator(indicator_id, catalog, expressions))
+                except KeyError as exc:
+                    decision = PhysicalDecision(
+                        resource_id=None,
+                        feasible=False,
+                        cost=None,
+                        estimated=False,
+                        reason_code="PHYSICAL_MAPPING_MISSING",
+                        reason=f"no controlled physical mapping for indicator {indicator_id}",
+                    )
+                    raise PhysicalPlanningError(
+                        "PHYSICAL_PLAN_UNAVAILABLE",
+                        f"no controlled physical mapping for indicator {indicator_id}",
+                        decisions=(decision,),
+                    ) from exc
     if scope_required:
         fields.append(
             _ResolvedIndicator(
@@ -1249,6 +1629,10 @@ def _contains_universe_call(expression) -> bool:
 
 def _reject_unmaterialized_constraints(call: CallExpr) -> None:
     materialized = {"indicator_name", "market", "date", "direction", "agg_func"}
+    if call.name in _CROSSING_CALLS | _PATTERN_CALLS:
+        materialized.update({"indicator_name_1", "indicator_name_2"})
+    if call.name in _EXTREME_CALLS | _POSITION_CALLS:
+        materialized.add("period")
     if call.scope_expression is not None:
         materialized.update({"filter_scope", "keywords"})
     ignored = {

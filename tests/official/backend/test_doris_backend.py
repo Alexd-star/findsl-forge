@@ -324,7 +324,7 @@ def test_composite_aggregate_ratio_renders_named_set_relations_and_safe_division
     assert result.sql.count("AVG(") == 2
     assert "AS aggregate_0" in result.sql
     assert "AS aggregate_1" in result.sql
-    assert "`aggregate_0`.`metric_0` / NULLIF(`aggregate_1`.`metric_1`, 0) < 20" in result.sql
+    assert "(`aggregate_0`.`metric_0` / NULLIF(`aggregate_1`.`metric_1`, 0)) < 20" in result.sql
     assert len(list(parsed.find_all(exp.Join))) == 3
     assert "WHERE (SELECT AVG(" not in result.sql
     assert result.validation.passed is True
@@ -641,7 +641,7 @@ def test_same_scope_temporal_arithmetic_renders_inside_source_row_predicate():
         default_physical_catalog(),
     )
 
-    assert "`q`.`volume` / `q`.`turnover` > 0" in result.sql
+    assert "(`q`.`volume` / `q`.`turnover`) > 0" in result.sql
     assert result.sql.count("`hsj_stock_hq_basic`") == 3
     assert result.validation.passed is True
 

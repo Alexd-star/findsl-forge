@@ -2,6 +2,18 @@
 
 本文档记录 FinDSL Forge 的重要变更。详细提交历史以 Git 为准，提交包证据以 `submission_artifacts/evidence_snapshots/` 为准。
 
+## 2026-07-13
+
+### ANTLR/IR 新后端受控指标映射与窗口事件关系
+
+- 新增 29 个经官方 Doris 字段与单位核验的受控表达式，覆盖流通市值、振幅、成交均价、委比/委差、涨跌停价、盘口涨速、集合竞价涨幅、资金占比、最大回撤、K 线形态、放量和均线排列等指标。
+- 新增 `PhysicalEventFilter`、`PhysicalCrossing`、`PhysicalExtreme`、`PhysicalPosition`、`PhysicalPattern` 及投影引用。上穿/下穿/金叉使用稳定证券键上的 `LAG`；新高/新低和位置使用交易会话行框上的滚动 `MIN/MAX`；窗口函数只出现在派生关系投影中，不进入 Doris `WHERE`。
+- `position` 保留“最低、最高、低、高、中”五档及明确优先级；周/月/季度/年按 5/20/60/250 个交易会话换算。`reset` 和 `close_together` 从版本化阈值配置加载，并以受控 `ABS/GREATEST/NULLIF` AST 实现。
+- 支持窗口事件与同日期普通指标的集合式投影组合；不同非空日期作用域、聚合槽、时序槽和选择类型不会被静默忽略，而是返回专用诊断。
+- 真实 Doris 哈希审计发现并修复复合布尔表达式比较时的括号优先级缺陷。修复前 `涨停炸板=True AND 今日` 错误放出 11,104 行，修复后与独立参考结果 70 行完整哈希一致。
+- 新增 `scripts/collect_phase20_mapping_event_evidence.py`。13 类新增能力全部为非空结果，生成 SQL 与独立参考 SQL 完整结果集哈希一致 `13/13`，并保存五轮 P95 和 EXPLAIN 摘要。
+- 官方迁移覆盖由 `406/1097（37.01%）` 提升至 `534/1097（48.68%）`，新后端总成功数由 413 提升至 548。原 95 条 `PHYSICAL_PLAN_UNAVAILABLE` 降至 3 条，原 81 条 `PHYSICAL_EXPRESSION_UNSUPPORTED` 降至 0；15 条行业相对比较被准确归类为 `PHYSICAL_INDUSTRY_DATA_UNAVAILABLE`。
+
 ## 2026-07-12
 
 ### ANTLR/IR 新后端证券名称范围与 queryData 命名关系

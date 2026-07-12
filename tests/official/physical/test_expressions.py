@@ -31,8 +31,28 @@ def test_default_registry_loads_typed_scaled_ratio_and_boolean_strategies():
         ("limitFlag", "numeric"),
         ("upSerialLb", "numeric"),
     )
-    assert len(registry.definitions) >= 20
+    assert len(registry.definitions) >= 49
     assert len(registry.fingerprint) == 64
+
+
+@pytest.mark.parametrize(
+    "indicator,resource,columns,root_op",
+    [
+        ("流通市值", "official_basic", (("lastPx", "numeric"), ("listedShare", "numeric")), "multiply"),
+        ("委比", "official_basic", (("commissionBuy", "numeric"), ("commissionSale", "numeric")), "safe_divide"),
+        ("成交均价", "official_basic", (("turnover", "numeric"), ("volume", "numeric")), "divide"),
+        ("3分钟涨速", "official_ext", (("riseSpd3m", "numeric"),), "divide"),
+        ("涨停炸板", "official_ext", (("boardBreaks", "numeric"), ("lmtUpNum", "numeric")), "or"),
+        ("放量", "official_technical", (("volume_breakout", "boolean"),), "equal"),
+        ("均线多头排列", "official_technical", (("ma_bullish", "boolean"),), "equal"),
+    ],
+)
+def test_phase20_grounded_expression_registry_contracts(indicator, resource, columns, root_op):
+    definition = default_physical_expressions(default_physical_catalog()).resolve(indicator)
+
+    assert definition.resource_id == resource
+    assert definition.required_columns == columns
+    assert definition.expression.op == root_op
 
 
 def test_registry_rejects_arithmetic_over_boolean_values():

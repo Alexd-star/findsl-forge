@@ -11,7 +11,7 @@ def test_backend_evidence_separates_grounded_sql_from_unavailable_domains():
     report = audit_official_backend_sources(
         [
             "indicator('', '', '成交量', '', '', '', '') > 100",
-            "indicator('', '', '3分钟涨速', '', '', '', '') > 1",
+            "indicator('', '', '是否T+0', '', '', '', '') = True",
             "indicator('', '', '营业收入', '今日', '', '', '') > 1",
         ],
         sample_size=5,

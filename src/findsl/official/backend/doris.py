@@ -7,6 +7,7 @@ from sqlglot import exp
 
 from ..physical.catalog import PhysicalCatalog
 from ..physical.ir import (
+    PhysicalAbs,
     PhysicalBinary,
     PhysicalAggregateGroup,
     PhysicalAggregateRank,
@@ -17,7 +18,11 @@ from ..physical.ir import (
     PhysicalCompositeAggregate,
     PhysicalFilter,
     PhysicalDynamicDateRange,
+    PhysicalEventFilter,
+    PhysicalEventRef,
+    PhysicalExtreme,
     PhysicalGroupedAggregate,
+    PhysicalGreatest,
     PhysicalIn,
     PhysicalJoin,
     PhysicalLatestValue,
@@ -28,6 +33,9 @@ from ..physical.ir import (
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
+    PhysicalPattern,
+    PhysicalPosition,
+    PhysicalProjectedRef,
     PhysicalRank,
     PhysicalRecentSessions,
     PhysicalScan,
@@ -205,11 +213,182 @@ def _render_plan(
         return _render_grouped_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalCompositeAggregate):
         return _render_composite_aggregate(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalEventFilter):
+        return _render_event_filter(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalTemporal):
         return _render_temporal(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalSetOperation):
         return _render_set_operation(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
+
+
+def _render_event_filter(
+    plan: PhysicalEventFilter,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(plan.input, catalog, cte_prefix)
+    relation = _find_relation(plan.input)
+    stable_alias = _stable_alias(relation)
+    partition = [
+        exp.column("mktcode", table=stable_alias, quoted=True),
+        exp.column("tgtcode", table=stable_alias, quoted=True),
+    ]
+    order = exp.Order(
+        expressions=[
+            exp.Ordered(
+                this=exp.column("bizdate", table=stable_alias, quoted=True),
+                desc=False,
+                nulls_first=True,
+            )
+        ]
+    )
+
+    for event in plan.events:
+        if isinstance(event, PhysicalPattern):
+            source = source.select(
+                _render_expr(event.predicate, catalog, relation).as_(
+                    event.alias,
+                    quoted=True,
+                ),
+                append=True,
+            )
+            continue
+        if isinstance(event, PhysicalExtreme):
+            value = _render_expr(event.expression, catalog, relation)
+            aggregate = exp.Max if event.direction == "high" else exp.Min
+            extreme = _event_window_aggregate(
+                value,
+                aggregate,
+                partition,
+                order,
+                event.lookback_sessions,
+            )
+            comparator = exp.GTE if event.direction == "high" else exp.LTE
+            source = source.select(
+                comparator(this=value, expression=extreme).as_(event.alias, quoted=True),
+                append=True,
+            )
+            continue
+        if isinstance(event, PhysicalPosition):
+            value = _render_expr(event.expression, catalog, relation)
+            minimum = _event_window_aggregate(
+                value,
+                exp.Min,
+                partition,
+                order,
+                event.lookback_sessions,
+            )
+            maximum = _event_window_aggregate(
+                value,
+                exp.Max,
+                partition,
+                order,
+                event.lookback_sessions,
+            )
+            missing = exp.or_(
+                exp.Is(this=value.copy(), expression=exp.Null()),
+                exp.or_(
+                    exp.Is(this=minimum.copy(), expression=exp.Null()),
+                    exp.Is(this=maximum.copy(), expression=exp.Null()),
+                ),
+            )
+            ratio = exp.Div(
+                this=exp.Sub(this=value.copy(), expression=minimum.copy()),
+                expression=exp.Nullif(
+                    this=exp.Sub(this=maximum.copy(), expression=minimum.copy()),
+                    expression=exp.convert(0),
+                ),
+            )
+            position = exp.Case(
+                ifs=[
+                    exp.If(this=missing, true=exp.Null()),
+                    exp.If(this=exp.LTE(this=value.copy(), expression=minimum.copy()), true=exp.convert("最低")),
+                    exp.If(this=exp.GTE(this=value.copy(), expression=maximum.copy()), true=exp.convert("最高")),
+                    exp.If(this=exp.LTE(this=ratio.copy(), expression=exp.convert(0.25)), true=exp.convert("低")),
+                    exp.If(this=exp.GTE(this=ratio, expression=exp.convert(0.75)), true=exp.convert("高")),
+                ],
+                default=exp.convert("中"),
+            )
+            source = source.select(position.as_(event.alias, quoted=True), append=True)
+            continue
+        left = _render_expr(event.left, catalog, relation)
+        right = _render_expr(event.right, catalog, relation)
+        previous_left = exp.Window(
+            this=exp.Lag(this=left.copy()),
+            partition_by=[item.copy() for item in partition],
+            order=order.copy(),
+        )
+        previous_right = exp.Window(
+            this=exp.Lag(this=right.copy()),
+            partition_by=[item.copy() for item in partition],
+            order=order.copy(),
+        )
+        if event.direction == "above":
+            current = exp.GT(this=left, expression=right)
+            previous = exp.LTE(this=previous_left, expression=previous_right)
+        else:
+            current = exp.LT(this=left, expression=right)
+            previous = exp.GTE(this=previous_left, expression=previous_right)
+        source = source.select(
+            exp.and_(current, previous).as_(event.alias, quoted=True),
+            append=True,
+        )
+
+    for projection in plan.projections:
+        source = source.select(
+            _render_expr(projection.expression, catalog, relation).as_(
+                projection.alias,
+                quoted=True,
+            ),
+            append=True,
+        )
+
+    alias = "event_rows"
+    rows = source.subquery(alias=alias)
+    outer = exp.select(
+        *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
+    ).from_(rows)
+    predicate = _render_expr(plan.predicate, catalog)
+    for constraint in plan.result_constraints:
+        rendered = _render_expr(constraint, catalog, relation)
+        predicate = exp.and_(
+            predicate,
+            _retarget_event_result_columns(rendered, alias, catalog),
+        )
+    return outer.where(predicate)
+
+
+def _event_window_aggregate(value, aggregate, partition, order, lookback_sessions):
+    frame_start = (
+        "UNBOUNDED"
+        if lookback_sessions is None
+        else exp.Literal.number(lookback_sessions - 1)
+    )
+    return exp.Window(
+        this=aggregate(this=value.copy()),
+        partition_by=[item.copy() for item in partition],
+        order=order.copy(),
+        spec=exp.WindowSpec(
+            kind="ROWS",
+            start=frame_start,
+            start_side="PRECEDING",
+            end="CURRENT ROW",
+        ),
+    )
+
+
+def _retarget_event_result_columns(expression, alias: str, catalog: PhysicalCatalog):
+    resource_aliases = {resource.resource_id for resource in catalog.resources}
+    resource_aliases.update({"q", "anchor"})
+    stable_names = {"mktcode", "tgtcode", "bizdate"}
+
+    def replace(node):
+        if isinstance(node, exp.Column) and node.name in stable_names and node.table in resource_aliases:
+            return exp.column(node.name, table=alias, quoted=True)
+        return node
+
+    return expression.transform(replace)
 
 
 def _render_grouped_aggregate(
@@ -1159,6 +1338,10 @@ def _stable_alias(relation) -> str:
 
 
 def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPlan] = None):
+    if isinstance(expression, PhysicalProjectedRef):
+        return exp.column(expression.alias, table="event_rows", quoted=True)
+    if isinstance(expression, PhysicalEventRef):
+        return exp.column(expression.alias, table="event_rows", quoted=True)
     if isinstance(expression, PhysicalAggregateRef):
         return exp.column(
             expression.measure_alias,
@@ -1184,6 +1367,11 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
     if isinstance(expression, PhysicalCoalesce):
         rendered = [_render_expr(item, catalog, scan) for item in expression.expressions]
         return exp.Coalesce(this=rendered[0], expressions=rendered[1:])
+    if isinstance(expression, PhysicalAbs):
+        return exp.Abs(this=_render_expr(expression.expression, catalog, scan))
+    if isinstance(expression, PhysicalGreatest):
+        rendered = [_render_expr(item, catalog, scan) for item in expression.expressions]
+        return exp.Greatest(this=rendered[0], expressions=rendered[1:])
     if isinstance(expression, PhysicalIn):
         return exp.In(
             this=_render_expr(expression.expression, catalog, scan),
@@ -1371,9 +1559,15 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             operator = _COMPARISON[expression.op]
         except KeyError as exc:
             raise DorisBackendError("DORIS_OPERATOR_UNSUPPORTED", f"unsupported comparison operator {expression.op}") from exc
+        left = _render_expr(expression.left, catalog, scan)
+        right = _render_expr(expression.right, catalog, scan)
+        if isinstance(expression.left, PhysicalBinary):
+            left = exp.Paren(this=left)
+        if isinstance(expression.right, PhysicalBinary):
+            right = exp.Paren(this=right)
         return operator(
-            this=_render_expr(expression.left, catalog, scan),
-            expression=_render_expr(expression.right, catalog, scan),
+            this=left,
+            expression=right,
         )
     raise DorisBackendError("DORIS_EXPRESSION_UNSUPPORTED", f"unsupported physical expression {type(expression).__name__}")
 
