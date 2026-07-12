@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "definitions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "definitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["indicator_id", "resource_id", "value_type", "nullable", "expression"],
+        "properties": {
+          "indicator_id": {"type": "string", "minLength": 1},
+          "resource_id": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+          "value_type": {"enum": ["boolean", "numeric", "string", "time"]},
+          "nullable": {"type": "boolean"},
+          "expression": {"$ref": "#/$defs/expression"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "expression": {
+      "type": "object",
+      "required": ["op"],
+      "properties": {
+        "op": {"enum": ["column", "literal", "add", "subtract", "multiply", "divide", "safe_divide", "negate", "equal", "not_equal", "greater", "greater_equal", "less", "less_equal", "and", "or", "coalesce"]},
+        "column": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+        "type": {"enum": ["boolean", "numeric", "string", "time"]},
+        "value": {},
+        "arg": {"$ref": "#/$defs/expression"},
+        "left": {"$ref": "#/$defs/expression"},
+        "right": {"$ref": "#/$defs/expression"},
+        "args": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/expression"}}
+      }
+    }
+  }
+}

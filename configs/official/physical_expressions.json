@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "definitions": [
+    {
+      "indicator_id": "最新价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "lastPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "开盘价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "openPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "收盘价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "closePx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "最高价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "highPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "最低价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "lowPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "市盈率", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "pETTM", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "动态市盈率", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "dynPE", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "市净率", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "pBR", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "换手率", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "turnRatio", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "量比", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "quantRatio", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "涨幅", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "safe_divide", "left": {"op": "multiply", "left": {"op": "subtract", "left": {"op": "column", "column": "lastPx", "type": "numeric"}, "right": {"op": "column", "column": "preClosePx", "type": "numeric"}}, "right": {"op": "literal", "value": 100.0, "type": "numeric"}}, "right": {"op": "column", "column": "preClosePx", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "涨跌幅", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "safe_divide", "left": {"op": "multiply", "left": {"op": "subtract", "left": {"op": "column", "column": "lastPx", "type": "numeric"}, "right": {"op": "column", "column": "preClosePx", "type": "numeric"}}, "right": {"op": "literal", "value": 100.0, "type": "numeric"}}, "right": {"op": "column", "column": "preClosePx", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "跌幅", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "safe_divide", "left": {"op": "multiply", "left": {"op": "subtract", "left": {"op": "column", "column": "preClosePx", "type": "numeric"}, "right": {"op": "column", "column": "lastPx", "type": "numeric"}}, "right": {"op": "literal", "value": 100.0, "type": "numeric"}}, "right": {"op": "column", "column": "preClosePx", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "总市值", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "multiply", "left": {"op": "divide", "left": {"op": "column", "column": "lastPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}, "right": {"op": "column", "column": "totalShare", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "主力净流出", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "negate", "arg": {"op": "column", "column": "ZJLXMainNetTur", "type": "numeric"}}
+    },
+    {
+      "indicator_id": "每手股数", "resource_id": "official_basic", "value_type": "numeric", "nullable": false,
+      "expression": {"op": "literal", "value": 100, "type": "numeric"}
+    },
+    {
+      "indicator_id": "涨停", "resource_id": "official_basic", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "limitFlag", "type": "numeric"}, "right": {"op": "literal", "value": 1, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "跌停", "resource_id": "official_basic", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "limitFlag", "type": "numeric"}, "right": {"op": "literal", "value": -1, "type": "numeric"}}
+    },
+    {
+      "indicator_id": "首板涨停", "resource_id": "official_basic", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "and", "left": {"op": "equal", "left": {"op": "column", "column": "limitFlag", "type": "numeric"}, "right": {"op": "literal", "value": 1, "type": "numeric"}}, "right": {"op": "equal", "left": {"op": "coalesce", "args": [{"op": "column", "column": "upSerialLb", "type": "numeric"}, {"op": "literal", "value": 0, "type": "numeric"}]}, "right": {"op": "literal", "value": 1, "type": "numeric"}}}
+    },
+    {
+      "indicator_id": "上涨趋势", "resource_id": "official_technical", "value_type": "boolean", "nullable": true,
+      "expression": {"op": "equal", "left": {"op": "column", "column": "uptrend", "type": "boolean"}, "right": {"op": "literal", "value": true, "type": "boolean"}}
+    }
+  ]
+}
