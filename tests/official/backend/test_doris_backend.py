@@ -501,6 +501,36 @@ def test_temporal_rank_percentage_range_renders_shared_population_bounds():
     assert result.validation.passed is True
 
 
+def test_direct_rank_percentage_range_uses_one_population_for_both_bounds():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '今日', '', '', '') "
+            "between '[5%,10%]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("COUNT(*) OVER") == 1
+    assert "`ranked`.`__rank_value` >= CEIL(`ranked`.`__partition_count` * 5 / 100.0)" in result.sql
+    assert "`ranked`.`__rank_value` <= CEIL(`ranked`.`__partition_count` * 10 / 100.0)" in result.sql
+    assert result.validation.passed is True
+
+
+def test_aggregate_rank_range_filters_one_ranked_relation():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '最近30日', '', 'AVG', '') "
+            "between '[5,10]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("ROW_NUMBER() OVER") == 1
+    assert "`aggregate_ranked`.`__rank_value` >= 5" in result.sql
+    assert "`aggregate_ranked`.`__rank_value` <= 10" in result.sql
+    assert result.validation.passed is True
+
+
 def test_named_rank_arithmetic_materializes_each_rank_once_and_joins_by_security():
     result = render_doris(
         _physical(
@@ -579,6 +609,38 @@ def test_aggregate_stage_is_materialized_before_stage_aggregate_rank():
     assert "MIN(`q`.`volume`) AS `metric_value`" in result.sql
     assert "AS stage_1_candidates" in result.sql
     assert "ROW_NUMBER() OVER (ORDER BY `stage_1_joined`.`metric_value` DESC" in result.sql
+    assert result.validation.passed is True
+
+
+def test_stage_rank_range_uses_prior_candidate_population_once():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', '', '') > 0 then "
+            "rank('', '', '成交量', 'desc', '', '', '', '') between '[5,10]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("ROW_NUMBER() OVER") == 1
+    assert "`stage_1_ranked`.`stage_rank` >= 5" in result.sql
+    assert "`stage_1_ranked`.`stage_rank` <= 10" in result.sql
+    assert result.validation.passed is True
+
+
+def test_stage_rank_materializes_prior_set_operation_before_ranking():
+    result = render_doris(
+        _physical(
+            "rank('', '', '成交量', 'desc', '', '', '', '') <= 20 and "
+            "indicator('', '', '成交量', '', '', '', '') > 0 then "
+            "rank('', '', '成交额', 'desc', '', '', '', '') <= 3"
+        ),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.Intersect))) == 1
+    assert "stage_1_candidates_raw" in result.sql
+    assert "`stage_1_ranked`.`stage_rank` <= 3" in result.sql
     assert result.validation.passed is True
 
 
@@ -874,6 +936,53 @@ def test_same_scope_temporal_arithmetic_renders_inside_source_row_predicate():
 
     assert "(`q`.`volume` / `q`.`turnover`) > 0" in result.sql
     assert result.sql.count("`hsj_stock_hq_basic`") == 3
+    assert result.validation.passed is True
+
+
+def test_aligned_multi_temporal_calls_render_one_bucket_predicate():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+            "indicator('', '', '成交额', '最近10日', '', '', 'CONS=3日') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert result.sql.count("source_rows AS (") == 1
+    assert "`q`.`volume`" in result.sql
+    assert "`q`.`turnover`" in result.sql
+    assert "`temporal_metrics`.`metric_value` >= 3" in result.sql
+    assert result.validation.passed is True
+
+
+def test_aligned_multi_resource_temporal_sql_joins_on_full_dated_key():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', '', 'CONS=3日') > "
+            "indicator('', '', '5日均量线', '', '', '', 'CONS=3日')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "`hsj_stock_hq_basic_technical`" in result.sql
+    assert "`official_basic`.`mktcode` = `official_technical`.`mktcode`" in result.sql
+    assert "`official_basic`.`tgtcode` = `official_technical`.`tgtcode`" in result.sql
+    assert "`official_basic`.`bizdate` = `official_technical`.`bizdate`" in result.sql
+    assert "`official_basic`.`volume`" in result.sql
+    assert "`official_technical`.`volume_avg_5`" in result.sql
+    assert result.validation.passed is True
+
+
+def test_not_every_temporal_sql_requires_non_empty_partial_match():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '最近5日', '', '', 'CONS!=每日') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "`temporal_metrics`.`total_buckets` > 0" in result.sql
+    assert "`temporal_metrics`.`metric_value` <> `temporal_metrics`.`total_buckets`" in result.sql
     assert result.validation.passed is True
 
 

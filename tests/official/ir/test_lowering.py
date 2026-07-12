@@ -1,6 +1,7 @@
 import pytest
 
 from findsl.official.lowering import OfficialLoweringError, lower_official_ast
+from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
 from findsl.official_slot import IndicatorMeta, parse_official_slot
 
@@ -13,6 +14,16 @@ def _lower(source):
     ast = parse_official_slot(source, mode="strict", frontend="antlr")
     typed = OfficialSemanticAnalyzer(_resolver).analyze(ast)
     return lower_official_ast(typed, strict=True)
+
+
+def _lower_domain(source):
+    ast = parse_official_slot(source, mode="strict", frontend="antlr")
+    typed = OfficialSemanticAnalyzer(_resolver).analyze(ast)
+    return lower_official_ast(
+        typed,
+        strict=True,
+        domain_registry=default_official_registry(),
+    )
 
 
 @pytest.mark.parametrize(
@@ -65,8 +76,21 @@ def test_rank_greater_than_zero_is_a_valid_relational_contract():
     assert plan.bound.value == 0
 
 
-def test_rank_and_scalar_boolean_lower_to_independent_set_intersection():
+def test_rank_range_preserves_bounds_and_open_closed_contract():
     plan = _lower(
+        "rank('', '', '成交量', 'desc', '今日', '', '', '') between '(5,10]'"
+    ).plan
+
+    assert plan.to_dict()["kind"] == "LogicalRank"
+    assert plan.comparator == "between"
+    assert plan.bound.value == 5
+    assert plan.upper_bound.value == 10
+    assert plan.lower_inclusive is False
+    assert plan.upper_inclusive is True
+
+
+def test_rank_and_scalar_boolean_lower_to_independent_set_intersection():
+    plan = _lower_domain(
         "rank('', '', '成交量', 'desc', '今日', '', '', '') <= 10 and "
         "indicator('', '', '涨幅', '今日', '', '', '') > 2%"
     ).plan
@@ -89,3 +113,36 @@ def test_parenthesized_stage_branches_lower_before_set_union():
     assert plan.operation == "union"
     assert plan.left.to_dict()["kind"] == "LogicalStage"
     assert plan.right.to_dict()["kind"] == "LogicalStage"
+
+
+def test_aligned_temporal_calls_lower_to_one_composite_bucket_predicate():
+    plan = _lower_domain(
+        "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+        "indicator('', '', '涨幅', '最近10日', '', '', 'CONS=3日') > 0"
+    ).plan
+
+    assert plan.to_dict()["kind"] == "LogicalConsecutive"
+    assert plan.spec.threshold == 3
+    payload = plan.spec.predicate.canonical_json()
+    assert payload.count('"kind":"CallExpr"') == 2
+    assert payload.count('"count_exp":""') == 2
+
+
+def test_mixed_temporal_quantifiers_in_one_predicate_remain_rejected():
+    with pytest.raises(OfficialLoweringError) as excinfo:
+        _lower_domain(
+            "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+            "indicator('', '', '涨幅', '最近10日', '', '', 'EXIST=3日') > 0"
+        )
+
+    assert excinfo.value.code == "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED"
+
+
+def test_not_every_temporal_contract_reaches_logical_ir():
+    plan = _lower_domain(
+        "indicator('', '', '涨幅', '这三天', '', '', 'CONS!=每日') > 0"
+    ).plan
+
+    assert plan.to_dict()["kind"] == "LogicalConsecutive"
+    assert plan.spec.every is True
+    assert plan.spec.comparator == "!="

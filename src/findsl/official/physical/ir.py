@@ -360,9 +360,23 @@ class PhysicalRank(PhysicalPlan):
     bound: PhysicalLiteral
     comparator: str = "<="
     percentage: bool = False
+    upper_bound: Optional[PhysicalLiteral] = None
+    lower_inclusive: bool = True
+    upper_inclusive: bool = True
 
     def to_dict(self):
-        return {"kind": "PhysicalRank", "input": self.input.to_dict(), "expression": self.expression.to_dict(), "direction": self.direction, "bound": self.bound.to_dict(), "comparator": self.comparator, "percentage": self.percentage}
+        return {
+            "kind": "PhysicalRank",
+            "input": self.input.to_dict(),
+            "expression": self.expression.to_dict(),
+            "direction": self.direction,
+            "bound": self.bound.to_dict(),
+            "comparator": self.comparator,
+            "percentage": self.percentage,
+            "upper_bound": self.upper_bound.to_dict() if self.upper_bound else None,
+            "lower_inclusive": self.lower_inclusive,
+            "upper_inclusive": self.upper_inclusive,
+        }
 
 
 @dataclass(frozen=True)
@@ -396,6 +410,9 @@ class PhysicalAggregateRank(PhysicalPlan):
     comparator: str
     percentage: bool
     anchor_resource_id: str
+    upper_bound: Optional[PhysicalLiteral] = None
+    lower_inclusive: bool = True
+    upper_inclusive: bool = True
 
     def to_dict(self):
         return {
@@ -408,6 +425,9 @@ class PhysicalAggregateRank(PhysicalPlan):
             "comparator": self.comparator,
             "percentage": self.percentage,
             "anchor_resource_id": self.anchor_resource_id,
+            "upper_bound": self.upper_bound.to_dict() if self.upper_bound else None,
+            "lower_inclusive": self.lower_inclusive,
+            "upper_inclusive": self.upper_inclusive,
         }
 
 
@@ -755,6 +775,9 @@ class PhysicalStageRank(PhysicalPlan):
     percentage: bool
     stage_index: int = 1
     collapse_latest: bool = False
+    upper_bound: Optional[PhysicalLiteral] = None
+    lower_inclusive: bool = True
+    upper_inclusive: bool = True
 
     def to_dict(self):
         return {
@@ -769,6 +792,9 @@ class PhysicalStageRank(PhysicalPlan):
             "percentage": self.percentage,
             "stage_index": self.stage_index,
             "collapse_latest": self.collapse_latest,
+            "upper_bound": self.upper_bound.to_dict() if self.upper_bound else None,
+            "lower_inclusive": self.lower_inclusive,
+            "upper_inclusive": self.upper_inclusive,
         }
 
 

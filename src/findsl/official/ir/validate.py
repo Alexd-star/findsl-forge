@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Set
+from typing import Optional, Set
 
-from ..types import BOOLEAN, NUMERIC, UNKNOWN
+from ..types import BOOLEAN, UNKNOWN
 from .expressions import BinaryExpr, CallExpr, ComparisonExpr, FieldRef, LiteralExpr, LogicalExpr, RangeExpr
 from .relational import (
     LogicalAggregate,
@@ -84,10 +84,25 @@ def _validate_plan(plan: LogicalPlan, path: str, strict: bool, active: Set[int])
     elif isinstance(plan, LogicalRank):
         if plan.direction not in {"asc", "desc"}:
             _fail("IR_RANK_DIRECTION", "rank direction must be asc or desc", f"{path}.direction")
-        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             _fail("IR_RANK_COMPARATOR", "rank comparator is unsupported", f"{path}.comparator")
-        if not _valid_rank_bound(plan.bound, plan.comparator):
-            _fail("IR_RANK_BOUND", "rank bound is invalid for its comparator", f"{path}.bound")
+        if plan.comparator == "between":
+            lower = _rank_bound_value(plan.bound)
+            upper = _rank_bound_value(plan.upper_bound)
+            if (
+                lower is None
+                or upper is None
+                or lower[1] != upper[1]
+                or lower[0] < 0
+                or upper[0] < lower[0]
+                or (lower[1] and upper[0] > 100)
+            ):
+                _fail("IR_RANK_BOUND", "rank range is invalid", f"{path}.bound")
+        else:
+            if plan.upper_bound is not None:
+                _fail("IR_RANK_BOUND", "scalar rank cannot carry an upper bound", f"{path}.upper_bound")
+            if not _valid_rank_bound(plan.bound, plan.comparator):
+                _fail("IR_RANK_BOUND", "rank bound is invalid for its comparator", f"{path}.bound")
         _validate_expr(plan.order_by, f"{path}.order_by", strict, names)
     elif isinstance(plan, LogicalStage):
         if plan.stage_index < 1:
@@ -110,7 +125,12 @@ def _validate_temporal_spec(spec, path: str, mode: str) -> None:
     if not spec.trading_sequence:
         _fail("IR_TEMPORAL_SEQUENCE", "official temporal semantics require trading sequence order", f"{path}.spec")
     if spec.every:
-        if spec.threshold is not None or spec.maximum is not None or not spec.unit or spec.comparator != "=":
+        if (
+            spec.threshold is not None
+            or spec.maximum is not None
+            or not spec.unit
+            or spec.comparator not in {"=", "!="}
+        ):
             _fail("IR_TEMPORAL_EVERY", "invalid every-bucket temporal contract", f"{path}.spec")
     else:
         if spec.threshold is None or spec.threshold < 0:
@@ -123,19 +143,28 @@ def _validate_temporal_spec(spec, path: str, mode: str) -> None:
 
 
 def _valid_rank_bound(expression: LogicalExpr, comparator: str) -> bool:
-    if not isinstance(expression, LiteralExpr):
+    parsed = _rank_bound_value(expression)
+    if parsed is None:
         return False
-    if isinstance(expression.value, (int, float)) and not isinstance(expression.value, bool):
-        return expression.value > 0 or (
-            expression.value == 0 and comparator in {">", ">="}
-        )
+    value, percentage = parsed
+    if percentage and value > 100:
+        return False
+    return value > 0 or (value == 0 and comparator in {">", ">="})
+
+
+def _rank_bound_value(expression: Optional[LogicalExpr]):
+    if not isinstance(expression, LiteralExpr):
+        return None
+    if isinstance(expression.value, (int, float)) and not isinstance(
+        expression.value, bool
+    ):
+        return float(expression.value), False
     if isinstance(expression.value, str) and expression.value.endswith("%"):
         try:
-            value = float(expression.value[:-1])
-            return value > 0 or (value == 0 and comparator in {">", ">="})
+            return float(expression.value[:-1]), True
         except ValueError:
-            return False
-    return False
+            return None
+    return None
 
 
 def _validate_expr(expression: LogicalExpr, path: str, strict: bool, fields) -> None:

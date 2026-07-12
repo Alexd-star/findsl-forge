@@ -206,12 +206,32 @@ def _lower_stage(
         and isinstance(node.left, OfficialFunctionCall)
         and node.left.name == "rank"
     ):
-        if node.op not in {"<", "<=", "=", "!=", ">", ">="}:
+        if node.op not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", f"unsupported rank comparison {node.op}")
         call = typed.children[0]
-        bound = _lower_expr(typed.children[1], bindings=bindings)
         direction = call.binding.slots["direction"].lower() if call.binding else ""
-        return LogicalRank(input_plan, _lower_expr(call, bindings=bindings), direction, bound, input_plan.schema, comparator=node.op)
+        if isinstance(node.right, OfficialRangeLiteral) and node.op == "between":
+            range_node = typed.children[1]
+            return LogicalRank(
+                input_plan,
+                _lower_expr(call, bindings=bindings),
+                direction,
+                _lower_expr(range_node.children[0], bindings=bindings),
+                input_plan.schema,
+                comparator="between",
+                upper_bound=_lower_expr(range_node.children[1], bindings=bindings),
+                lower_inclusive=node.right.lower_inclusive,
+                upper_inclusive=node.right.upper_inclusive,
+            )
+        bound = _lower_expr(typed.children[1], bindings=bindings)
+        return LogicalRank(
+            input_plan,
+            _lower_expr(call, bindings=bindings),
+            direction,
+            bound,
+            input_plan.schema,
+            comparator=node.op,
+        )
     if typed.type is UNKNOWN:
         raise OfficialLoweringError("UNSUPPORTED_LOGICAL_LOWERING", "top-level expression has unknown type")
     predicate = _lower_expr(typed, bindings=bindings)
@@ -305,10 +325,22 @@ def _temporal_binding_for_stage(
     temporal = [bindings[id(node.node)] for node in temporal_nodes]
     if not temporal:
         return None
-    if len(temporal) != 1:
+    temporal_signatures = {
+        (
+            item.temporal.mode,
+            item.temporal.comparator,
+            item.temporal.threshold,
+            item.temporal.maximum,
+            item.temporal.unit,
+            item.temporal.every,
+            item.temporal.trading_sequence,
+        )
+        for item in temporal
+    }
+    if len(temporal_signatures) != 1:
         raise OfficialLoweringError(
             "TEMPORAL_MULTI_PREDICATE_UNSUPPORTED",
-            "multiple count_exp functions require independent temporal relation branches",
+            "one temporal predicate cannot mix different count_exp quantifiers",
         )
     if not isinstance(typed.node, OfficialComparison):
         raise OfficialLoweringError(
@@ -331,6 +363,31 @@ def _temporal_binding_for_stage(
             raise OfficialLoweringError(
                 "TEMPORAL_SCOPE_MISMATCH",
                 "all functions in a temporal arithmetic predicate must share market, date, filter and security scopes",
+            )
+    for item in temporal[1:]:
+        if (
+            (
+                item.market_expression.to_dict()
+                if item.market_expression
+                else None
+            )
+            != (
+                temporal_scope.market_expression.to_dict()
+                if temporal_scope.market_expression
+                else None
+            )
+            or (
+                item.scope_expression.to_dict() if item.scope_expression else None
+            )
+            != (
+                temporal_scope.scope_expression.to_dict()
+                if temporal_scope.scope_expression
+                else None
+            )
+        ):
+            raise OfficialLoweringError(
+                "TEMPORAL_SCOPE_MISMATCH",
+                "aligned temporal calls must share identical market and security set expressions",
             )
     return temporal[0]
 

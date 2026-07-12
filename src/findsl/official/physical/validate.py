@@ -130,31 +130,28 @@ def _validate_plan(plan, catalog, expressions):
     elif isinstance(plan, PhysicalRank):
         if plan.direction not in {"asc", "desc"}:
             raise ValueError("physical rank direction is invalid")
-        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             raise ValueError("physical rank comparator is invalid")
-        if (
-            not isinstance(plan.bound.value, (int, float))
-            or plan.bound.value < 0
-            or (plan.bound.value == 0 and plan.comparator not in {">", ">="})
-        ):
-            raise ValueError("physical rank bound is invalid")
-        if plan.percentage and plan.bound.value > 100:
-            raise ValueError("physical percentage rank bound exceeds 100")
+        _validate_rank_bounds(
+            plan.bound,
+            plan.comparator,
+            plan.percentage,
+            plan.upper_bound,
+        )
         _validate_expr(plan.expression, catalog, expressions)
     elif isinstance(plan, PhysicalAggregateRank):
         if plan.function not in {"sum", "avg", "max", "min", "growth_rise", "growth_fall"}:
             raise ValueError("unsupported aggregate rank function")
         if plan.direction not in {"asc", "desc"}:
             raise ValueError("aggregate rank direction is invalid")
-        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             raise ValueError("aggregate rank comparator is invalid")
-        if (
-            not isinstance(plan.bound.value, (int, float))
-            or plan.bound.value < 0
-            or (plan.bound.value == 0 and plan.comparator not in {">", ">="})
-            or (plan.percentage and plan.bound.value > 100)
-        ):
-            raise ValueError("aggregate rank bound is invalid")
+        _validate_rank_bounds(
+            plan.bound,
+            plan.comparator,
+            plan.percentage,
+            plan.upper_bound,
+        )
         anchor = catalog.resource(plan.anchor_resource_id)
         if anchor.partition_key is None:
             raise PhysicalCatalogError("aggregate rank anchor requires a partition key")
@@ -253,7 +250,7 @@ def _validate_plan(plan, catalog, expressions):
         _validate_plan(plan.measure_input, catalog, expressions)
         if plan.direction not in {"asc", "desc"}:
             raise ValueError("stage rank direction is invalid")
-        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">="}:
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
             raise ValueError("stage rank comparator is invalid")
         if plan.stage_index <= 0:
             raise ValueError("stage rank index must be positive")
@@ -263,10 +260,12 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("stage rank aggregate function is unsupported")
         if plan.aggregate_function is not None and plan.measure.type is not NUMERIC:
             raise ValueError("stage aggregate rank requires a numeric measure")
-        if plan.bound.type is not NUMERIC or plan.bound.value < 0:
-            raise ValueError("stage rank bound is invalid")
-        if plan.percentage and plan.bound.value > 100:
-            raise ValueError("stage percentage rank bound exceeds 100")
+        _validate_rank_bounds(
+            plan.bound,
+            plan.comparator,
+            plan.percentage,
+            plan.upper_bound,
+        )
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporalRank):
@@ -397,6 +396,33 @@ def _validate_plan(plan, catalog, expressions):
     elif isinstance(plan, PhysicalWindow):
         for _, expression in plan.expressions:
             _validate_expr(expression, catalog, expressions)
+
+
+def _validate_rank_bounds(bound, comparator, percentage, upper_bound):
+    if (
+        bound.type is not NUMERIC
+        or not isinstance(bound.value, (int, float))
+        or isinstance(bound.value, bool)
+        or bound.value < 0
+    ):
+        raise ValueError("physical rank lower bound is invalid")
+    if comparator == "between":
+        if (
+            upper_bound is None
+            or upper_bound.type is not NUMERIC
+            or not isinstance(upper_bound.value, (int, float))
+            or isinstance(upper_bound.value, bool)
+            or upper_bound.value < bound.value
+        ):
+            raise ValueError("physical rank range is invalid")
+        if percentage and upper_bound.value > 100:
+            raise ValueError("physical percentage rank upper bound exceeds 100")
+    elif upper_bound is not None:
+        raise ValueError("scalar physical rank cannot carry an upper bound")
+    elif bound.value == 0 and comparator not in {">", ">="}:
+        raise ValueError("physical rank zero bound is invalid")
+    if percentage and bound.value > 100:
+        raise ValueError("physical percentage rank lower bound exceeds 100")
 
 
 def _validate_expr(expression, catalog, expressions=None):

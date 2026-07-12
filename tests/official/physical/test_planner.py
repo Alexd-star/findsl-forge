@@ -385,6 +385,67 @@ def test_temporal_rank_percentage_range_preserves_both_bounds():
     assert result.plan.rank_percentage is True
 
 
+def test_direct_rank_range_reaches_physical_ir_with_shared_percentage_unit():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '今日', '', '', '') "
+            "between '[5%,10%]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRank)
+    assert result.plan.comparator == "between"
+    assert result.plan.bound.value == 5
+    assert result.plan.upper_bound.value == 10
+    assert result.plan.percentage is True
+
+
+def test_aggregate_rank_range_reaches_one_grouped_rank_relation():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '最近30日', '', 'AVG', '') "
+            "between '[5,10]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalAggregateRank)
+    assert result.plan.comparator == "between"
+    assert result.plan.upper_bound.value == 10
+
+
+def test_stage_rank_range_applies_inside_prior_candidate_population():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > 0 then "
+            "rank('', '', '成交量', 'desc', '', '', '', '') between '[5,10]'"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalStageRank)
+    assert result.plan.comparator == "between"
+    assert result.plan.bound.value == 5
+    assert result.plan.upper_bound.value == 10
+
+
+def test_stage_rank_accepts_relational_set_as_prior_candidate_plan():
+    result = plan_physical(
+        _lower(
+            "rank('', '', '成交量', 'desc', '', '', '', '') <= 20 and "
+            "indicator('', '', '成交量', '', '', '', '') > 0 then "
+            "rank('', '', '成交额', 'desc', '', '', '', '') <= 3"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalStageRank)
+    assert isinstance(result.plan.input, PhysicalSetOperation)
+    assert result.plan.input.operation == "intersect"
+    assert result.selected_strategy == "stage_rank"
+
+
 @pytest.mark.parametrize(
     "source,rank_count",
     [
@@ -983,6 +1044,56 @@ def test_same_scope_temporal_arithmetic_lowers_all_required_columns_once():
     assert isinstance(result.plan, PhysicalTemporal)
     assert {column.column for column in result.plan.input.columns} == {"volume", "turnover"}
     assert "PhysicalBinary" in result.plan.predicate.canonical_json()
+
+
+def test_aligned_multi_temporal_calls_share_one_physical_quantifier():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') / "
+            "indicator('', '', '成交额', '最近10日', '', '', 'CONS=3日') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporal)
+    assert result.plan.mode == "CONS"
+    assert result.plan.threshold == 3
+    assert {column.column for column in result.plan.input.columns} == {
+        "volume",
+        "turnover",
+    }
+
+
+def test_aligned_multi_resource_temporal_calls_use_stable_dated_join():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', 'CONS=3日') > "
+            "indicator('', '', '5日均量线', '', '', '', 'CONS=3日')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporal)
+    assert isinstance(result.plan.input, PhysicalJoin)
+    assert [left.column for left, _ in result.plan.input.keys] == [
+        "mktcode",
+        "tgtcode",
+        "bizdate",
+    ]
+    assert result.selected_strategy == "stable_temporal_join"
+
+
+def test_not_every_temporal_contract_is_preserved_in_physical_ir():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '最近5日', '', '', 'CONS!=每日') > 0"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalTemporal)
+    assert result.plan.every is True
+    assert result.plan.comparator == "!="
 
 
 def test_temporal_boolean_branches_lower_to_physical_set_operation():

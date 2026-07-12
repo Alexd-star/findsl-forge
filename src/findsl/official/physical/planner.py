@@ -413,6 +413,9 @@ class _AggregateRankContract:
     direction: str
     bound: LiteralExpr
     comparator: str
+    upper_bound: Optional[LiteralExpr]
+    lower_inclusive: bool
+    upper_inclusive: bool
     limit: Optional[Tuple[int, int]] = None
 
 
@@ -523,11 +526,21 @@ def _aggregate_rank_contract(plan) -> Optional[_AggregateRankContract]:
             "PHYSICAL_RANK_BOUND_UNSUPPORTED",
             "aggregate rank requires a literal bound",
         )
+    if current.upper_bound is not None and not isinstance(
+        current.upper_bound, LiteralExpr
+    ):
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+            "aggregate rank upper bound must be a literal",
+        )
     return _AggregateRankContract(
         call,
         current.direction,
         current.bound,
         current.comparator,
+        current.upper_bound,
+        current.lower_inclusive,
+        current.upper_inclusive,
         limit,
     )
 
@@ -910,7 +923,11 @@ def _plan_aggregate_rank(
     )
     for constraint in _call_constraints(contract.call, catalog, field.resource_id):
         aggregate_input = PhysicalFilter(aggregate_input, constraint)
-    bound, percentage = _rank_bound(contract.bound, contract.comparator)
+    bound, percentage, upper_bound = _physical_rank_bounds(
+        contract.bound,
+        contract.comparator,
+        contract.upper_bound,
+    )
     plan: PhysicalPlan = PhysicalAggregateRank(
         aggregate_input,
         _physical_field_expression(field),
@@ -920,6 +937,9 @@ def _plan_aggregate_rank(
         contract.comparator,
         percentage,
         anchor_id,
+        upper_bound,
+        contract.lower_inclusive,
+        contract.upper_inclusive,
     )
     if contract.limit is not None:
         plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
@@ -1485,11 +1505,7 @@ def _plan_multi_resource(
     resource_ids: Tuple[str, ...],
     expressions: Optional[PhysicalExpressionRegistry],
 ) -> PhysicalPlanningResult:
-    if _contains_temporal_plan(lowering.plan):
-        raise PhysicalPlanningError(
-            "PHYSICAL_TEMPORAL_MULTI_RESOURCE_UNSUPPORTED",
-            "multi-resource temporal predicates require an explicit temporal join contract",
-        )
+    temporal = _contains_temporal_plan(lowering.plan)
     relation, root_id, joined = _build_join_relation(fields, resource_ids, catalog)
     plan = _lower_plan(
         lowering.plan,
@@ -1501,17 +1517,26 @@ def _plan_multi_resource(
     )
     validate_physical_plan(plan, catalog, expressions)
     selected_resource = "+".join(joined)
+    strategy_id = "stable_temporal_join" if temporal else "stable_key_join"
     decision = PhysicalDecision(
         resource_id=selected_resource,
         feasible=True,
         cost=float(sum(catalog.resource(item).priority for item in joined)),
         estimated=True,
-        reason_code="PHYSICAL_STABLE_JOIN_SELECTED",
-        reason="left-deep same-entity join on catalog-declared stable keys",
-        strategy_id="stable_key_join",
+        reason_code=(
+            "PHYSICAL_TEMPORAL_JOIN_SELECTED"
+            if temporal
+            else "PHYSICAL_STABLE_JOIN_SELECTED"
+        ),
+        reason=(
+            "temporal predicate over a same-entity join on security and trading-date keys"
+            if temporal
+            else "left-deep same-entity join on catalog-declared stable keys"
+        ),
+        strategy_id=strategy_id,
         selected=True,
     )
-    return PhysicalPlanningResult(plan, selected_resource, (decision,), "stable_key_join")
+    return PhysicalPlanningResult(plan, selected_resource, (decision,), strategy_id)
 
 
 def _crossing_calls(plan) -> Tuple[CallExpr, ...]:
@@ -2016,18 +2041,17 @@ def _collect_fields(
     catalog: PhysicalCatalog,
     expressions: Optional[PhysicalExpressionRegistry],
 ) -> Tuple[_ResolvedIndicator, ...]:
-    logical_expressions = []
-    current = plan
-    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage, LogicalConsecutive, LogicalExist)):
-        if isinstance(current, LogicalFilter):
-            logical_expressions.append(current.predicate)
-        elif isinstance(current, (LogicalConsecutive, LogicalExist)):
-            logical_expressions.append(current.spec.predicate)
-        elif isinstance(current, LogicalRank):
-            logical_expressions.append(current.order_by)
-        current = current.operation if isinstance(current, LogicalStage) else current.input
-    if not isinstance(current, LogicalDomainScan):
-        raise PhysicalPlanningError("PHYSICAL_LOGICAL_PLAN_UNSUPPORTED", f"unsupported logical root {type(current).__name__}")
+    logical_expressions = tuple(_logical_expressions(plan))
+    unsupported_roots = tuple(
+        root
+        for root in _logical_roots(plan)
+        if not isinstance(root, LogicalDomainScan)
+    )
+    if unsupported_roots:
+        raise PhysicalPlanningError(
+            "PHYSICAL_LOGICAL_PLAN_UNSUPPORTED",
+            f"unsupported logical root {type(unsupported_roots[0]).__name__}",
+        )
 
     fields = []
     scope_required = False
@@ -2098,15 +2122,39 @@ def _walk_calls(expression):
 
 
 def _logical_expressions(plan):
-    current = plan
-    while isinstance(current, (LogicalFilter, LogicalLimit, LogicalRank, LogicalStage, LogicalConsecutive, LogicalExist)):
-        if isinstance(current, LogicalFilter):
-            yield current.predicate
-        elif isinstance(current, (LogicalConsecutive, LogicalExist)):
-            yield current.spec.predicate
-        elif isinstance(current, LogicalRank):
-            yield current.order_by
-        current = current.operation if isinstance(current, LogicalStage) else current.input
+    if isinstance(plan, LogicalSetOperation):
+        yield from _logical_expressions(plan.left)
+        yield from _logical_expressions(plan.right)
+        return
+    if isinstance(plan, LogicalStage):
+        yield from _logical_expressions(plan.operation)
+        return
+    if isinstance(plan, LogicalFilter):
+        yield plan.predicate
+    elif isinstance(plan, (LogicalConsecutive, LogicalExist)):
+        yield plan.spec.predicate
+    elif isinstance(plan, LogicalRank):
+        yield plan.order_by
+    if isinstance(
+        plan,
+        (LogicalFilter, LogicalLimit, LogicalRank, LogicalConsecutive, LogicalExist),
+    ):
+        yield from _logical_expressions(plan.input)
+
+
+def _logical_roots(plan):
+    if isinstance(plan, LogicalSetOperation):
+        yield from _logical_roots(plan.left)
+        yield from _logical_roots(plan.right)
+    elif isinstance(plan, LogicalStage):
+        yield from _logical_roots(plan.operation)
+    elif isinstance(
+        plan,
+        (LogicalFilter, LogicalLimit, LogicalRank, LogicalConsecutive, LogicalExist),
+    ):
+        yield from _logical_roots(plan.input)
+    else:
+        yield plan
 
 
 def _is_universe_call(expression) -> bool:
@@ -2245,7 +2293,11 @@ def _build_stage_rank(
         }
     for constraint in constraints:
         measure_input = PhysicalFilter(measure_input, constraint)
-    bound, percentage = _rank_bound(logical_rank.bound, logical_rank.comparator)
+    bound, percentage, upper_bound = _physical_rank_bounds(
+        logical_rank.bound,
+        logical_rank.comparator,
+        logical_rank.upper_bound,
+    )
     return PhysicalStageRank(
         input_plan,
         measure_input,
@@ -2259,6 +2311,9 @@ def _build_stage_rank(
         if isinstance(input_plan, PhysicalStageRank)
         else 1,
         collapse_latest,
+        upper_bound,
+        logical_rank.lower_inclusive,
+        logical_rank.upper_inclusive,
     )
 
 
@@ -2319,7 +2374,11 @@ def _lower_plan(
         for constraint in rank_constraints:
             input_plan = PhysicalFilter(input_plan, constraint)
         expression = _lower_expr(plan.order_by, catalog, resource_id, fields, allow_rank=True, expression_overrides=expression_overrides, allowed_resource_ids=allowed_resource_ids)
-        bound, percentage = _rank_bound(plan.bound, plan.comparator)
+        bound, percentage, upper_bound = _physical_rank_bounds(
+            plan.bound,
+            plan.comparator,
+            plan.upper_bound,
+        )
         return PhysicalRank(
             input_plan,
             expression,
@@ -2327,6 +2386,9 @@ def _lower_plan(
             bound,
             plan.comparator,
             percentage,
+            upper_bound,
+            plan.lower_inclusive,
+            plan.upper_inclusive,
         )
     if isinstance(plan, (LogicalConsecutive, LogicalExist)):
         return PhysicalTemporal(
@@ -2581,6 +2643,32 @@ def _rank_bound(expression, comparator: str) -> Tuple[PhysicalLiteral, bool]:
             "rank bound must be positive and percentage bounds cannot exceed 100%",
         )
     return bound, percentage
+
+
+def _physical_rank_bounds(expression, comparator: str, upper_expression=None):
+    lower, percentage = _rank_bound(
+        expression,
+        ">=" if comparator == "between" else comparator,
+    )
+    if comparator != "between":
+        if upper_expression is not None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+                "scalar rank comparison cannot carry an upper bound",
+            )
+        return lower, percentage, None
+    if upper_expression is None:
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+            "rank range requires an upper bound",
+        )
+    upper, upper_percentage = _rank_bound(upper_expression, "<=")
+    if upper_percentage != percentage or upper.value < lower.value:
+        raise PhysicalPlanningError(
+            "PHYSICAL_RANK_BOUND_UNSUPPORTED",
+            "rank range bounds must use one unit and increase from lower to upper",
+        )
+    return lower, percentage, upper
 
 
 def _resolve_indicator(

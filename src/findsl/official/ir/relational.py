@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from ..types import OfficialType
 from .base import CanonicalIr
@@ -185,9 +185,23 @@ class LogicalRank(LogicalPlan):
     bound: LogicalExpr
     schema: Schema
     comparator: str = "<="
+    upper_bound: Optional[LogicalExpr] = None
+    lower_inclusive: bool = True
+    upper_inclusive: bool = True
 
     def to_dict(self):
-        return _plan("LogicalRank", self.schema, input=self.input.to_dict(), order_by=self.order_by.to_dict(), direction=self.direction, bound=self.bound.to_dict(), comparator=self.comparator)
+        return _plan(
+            "LogicalRank",
+            self.schema,
+            input=self.input.to_dict(),
+            order_by=self.order_by.to_dict(),
+            direction=self.direction,
+            bound=self.bound.to_dict(),
+            comparator=self.comparator,
+            upper_bound=self.upper_bound.to_dict() if self.upper_bound else None,
+            lower_inclusive=self.lower_inclusive,
+            upper_inclusive=self.upper_inclusive,
+        )
 
 
 @dataclass(frozen=True)

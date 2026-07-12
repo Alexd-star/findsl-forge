@@ -6,7 +6,7 @@ from dataclasses import replace
 from ..ir import BinaryExpr, ComparisonExpr, LiteralExpr, LogicalConstraint, LogicalEmpty, LogicalFilter, LogicalLimit, LogicalRank
 from ..ir.expressions import CallExpr, LogicalExpr, RangeExpr
 from ..ir.relational import LogicalPlan, LogicalSetOperation, LogicalStage
-from ..types import BOOLEAN, NUMERIC
+from ..types import BOOLEAN
 
 
 def _rewrite_inputs(plan: LogicalPlan, callback):
@@ -125,7 +125,8 @@ class BoolFlattenRule:
         operands = []
         def collect(value):
             if isinstance(value, BinaryExpr) and value.op == expression.op:
-                collect(value.left); collect(value.right)
+                collect(value.left)
+                collect(value.right)
             else:
                 operands.append(value)
         collect(expression)
@@ -212,7 +213,19 @@ class RankContractNormalizeRule:
         if isinstance(plan, LogicalRank):
             direction = plan.direction.lower()
             bound = plan.bound
+            upper_bound = plan.upper_bound
             if isinstance(bound, LiteralExpr) and isinstance(bound.value, str) and bound.value.startswith("+"):
                 bound = replace(bound, value=bound.value[1:])
-            return replace(plan, direction=direction, bound=bound)
+            if (
+                isinstance(upper_bound, LiteralExpr)
+                and isinstance(upper_bound.value, str)
+                and upper_bound.value.startswith("+")
+            ):
+                upper_bound = replace(upper_bound, value=upper_bound.value[1:])
+            return replace(
+                plan,
+                direction=direction,
+                bound=bound,
+                upper_bound=upper_bound,
+            )
         return plan

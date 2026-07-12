@@ -207,9 +207,17 @@ def _render_plan(
         outer = exp.select(
             *(exp.column(name, table="ranked", quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
         ).from_(ranked)
-        comparator = _COMPARISON[plan.comparator](
-            this=exp.column("__rank_value", table="ranked", quoted=True),
-            expression=_render_rank_bound(plan.bound, plan.percentage, "ranked"),
+        comparator = _render_bounded_comparison(
+            exp.column("__rank_value", table="ranked", quoted=True),
+            plan.comparator,
+            _render_rank_bound(plan.bound, plan.percentage, "ranked"),
+            (
+                _render_rank_bound(plan.upper_bound, plan.percentage, "ranked")
+                if plan.upper_bound is not None
+                else None
+            ),
+            plan.lower_inclusive,
+            plan.upper_inclusive,
         )
         return outer.where(comparator)
     if isinstance(plan, PhysicalAggregateRank):
@@ -567,13 +575,25 @@ def _render_aggregate_rank(
     qualified = exp.select(
         *(exp.column(key, table="aggregate_ranked", quoted=True) for key in keys)
     ).from_(aggregate_ranked).where(
-        _COMPARISON[plan.comparator](
-            this=exp.column("__rank_value", table="aggregate_ranked", quoted=True),
-            expression=_render_rank_bound(
+        _render_bounded_comparison(
+            exp.column("__rank_value", table="aggregate_ranked", quoted=True),
+            plan.comparator,
+            _render_rank_bound(
                 plan.bound,
                 plan.percentage,
                 "aggregate_ranked",
             ),
+            (
+                _render_rank_bound(
+                    plan.upper_bound,
+                    plan.percentage,
+                    "aggregate_ranked",
+                )
+                if plan.upper_bound is not None
+                else None
+            ),
+            plan.lower_inclusive,
+            plan.upper_inclusive,
         )
     )
     qualified_rows = qualified.subquery(alias="qualified_rank")
@@ -648,6 +668,33 @@ def _render_rank_bound(bound, percentage: bool, table_alias: str):
             ),
             expression=exp.convert(100.0),
         )
+    )
+
+
+def _render_bounded_comparison(
+    column,
+    comparator: str,
+    lower,
+    upper=None,
+    lower_inclusive: bool = True,
+    upper_inclusive: bool = True,
+):
+    if comparator != "between":
+        return _COMPARISON[comparator](this=column, expression=lower)
+    if upper is None:
+        raise DorisBackendError(
+            "DORIS_RANK_BOUND_INVALID",
+            "rank between requires an upper bound",
+        )
+    return exp.and_(
+        (exp.GTE if lower_inclusive else exp.GT)(
+            this=column.copy(),
+            expression=lower,
+        ),
+        (exp.LTE if upper_inclusive else exp.LT)(
+            this=column.copy(),
+            expression=upper,
+        ),
     )
 
 
@@ -882,27 +929,38 @@ def _render_stage_rank(
         )
     ranked_alias = f"{cte_prefix}stage_{plan.stage_index}_ranked"
     ranked_rows = ranked.subquery(alias=ranked_alias)
-    bound = (
-        exp.Ceil(
-            this=exp.Div(
-                this=exp.Mul(
-                    this=exp.column(
-                        "stage_population", table=ranked_alias, quoted=True
+    def render_stage_bound(value):
+        return (
+            exp.Ceil(
+                this=exp.Div(
+                    this=exp.Mul(
+                        this=exp.column(
+                            "stage_population", table=ranked_alias, quoted=True
+                        ),
+                        expression=exp.convert(value.value),
                     ),
-                    expression=exp.convert(plan.bound.value),
-                ),
-                expression=exp.convert(100.0),
+                    expression=exp.convert(100.0),
+                )
             )
+            if plan.percentage
+            else exp.convert(value.value)
         )
-        if plan.percentage
-        else exp.convert(plan.bound.value)
-    )
+
+    bound = render_stage_bound(plan.bound)
     result = exp.select(
         *(exp.column(name, table=ranked_alias, quoted=True) for name in (*keys, "bizdate"))
     ).from_(ranked_rows).where(
-        _COMPARISON[plan.comparator](
-            this=exp.column("stage_rank", table=ranked_alias, quoted=True),
-            expression=bound,
+        _render_bounded_comparison(
+            exp.column("stage_rank", table=ranked_alias, quoted=True),
+            plan.comparator,
+            bound,
+            (
+                render_stage_bound(plan.upper_bound)
+                if plan.upper_bound is not None
+                else None
+            ),
+            plan.lower_inclusive,
+            plan.upper_inclusive,
         )
     )
     for cte in candidate_ctes:
@@ -1018,13 +1076,15 @@ def _render_temporal(
     catalog: PhysicalCatalog,
     cte_prefix: str = "",
 ) -> exp.Select:
-    scan = _find_scan(plan.input)
-    if not isinstance(plan.input, PhysicalScan):
-        raise DorisBackendError(
-            "DORIS_TEMPORAL_INPUT_UNSUPPORTED",
-            "temporal plan currently requires a direct physical scan input",
-        )
-    stable_alias = "anchor" if scan.anchor_resource_id else "q"
+    relation = _find_relation(plan.input)
+    if isinstance(relation, PhysicalScan):
+        stable_resource_id = relation.anchor_resource_id or relation.resource_id
+    elif isinstance(relation, PhysicalTableScan):
+        stable_resource_id = relation.resource_id
+    else:
+        root, _ = _flatten_join(relation)
+        stable_resource_id = root.resource_id
+    stable_alias = _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
     source_rows_name = f"{cte_prefix}source_rows"
     eligible_rows_name = f"{cte_prefix}eligible_rows"
@@ -1034,11 +1094,11 @@ def _render_temporal(
     runs_name = f"{cte_prefix}runs"
     metrics_name = f"{cte_prefix}temporal_metrics"
     qualified_name = f"{cte_prefix}qualified"
-    source = _render_plan(scan, catalog, cte_prefix)
+    source = _render_plan(plan.input, catalog, cte_prefix)
     matched = exp.Case(
         ifs=[
             exp.If(
-                this=_render_expr(plan.predicate, catalog, scan),
+                this=_render_expr(plan.predicate, catalog, relation),
                 true=exp.convert(1),
             )
         ],
@@ -1081,7 +1141,7 @@ def _render_temporal(
         source = source.where(
             _render_expr(
                 PhysicalSessionBoundaryRange(
-                    scan.anchor_resource_id or scan.resource_id,
+                    stable_resource_id,
                     "bizdate",
                     plan.window.boundary_direction,
                     plan.window.boundary_kind,
@@ -1091,7 +1151,7 @@ def _render_temporal(
                     boundary_date=plan.window.boundary_date,
                 ),
                 catalog,
-                scan,
+                relation,
             )
         )
     elif plan.window.kind == "recent_calendar":
@@ -1104,7 +1164,7 @@ def _render_temporal(
             )
         lower, upper, _ = _dynamic_date_bounds(
             catalog,
-            scan.anchor_resource_id or scan.resource_id,
+            stable_resource_id,
             "recent",
             unit,
             amount,
@@ -1134,7 +1194,7 @@ def _render_temporal(
             )
         lower, upper, validity = _dynamic_date_bounds(
             catalog,
-            scan.anchor_resource_id or scan.resource_id,
+            stable_resource_id,
             "period" if plan.window.kind == "dynamic_period" else "anchor_calendar",
             unit,
             amount,
@@ -1262,7 +1322,7 @@ def _render_temporal(
     ).from_(exp.table_(metrics_name, quoted=True)).where(qualified_predicate)
     ctes.append((qualified_name, qualified))
 
-    anchor_resource = catalog.resource(scan.anchor_resource_id or scan.resource_id)
+    anchor_resource = catalog.resource(stable_resource_id)
     anchor = exp.table_(
         anchor_resource.table,
         db=anchor_resource.database,
