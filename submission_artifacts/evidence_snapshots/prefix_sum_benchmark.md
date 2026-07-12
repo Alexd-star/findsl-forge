@@ -23,8 +23,8 @@ filter(SUM(indicator("volume"), 3) > 300)
 
 | Variant | Compile ms | Avg execute ms | P50 execute ms | P95 execute ms | Rows |
 |---|---:|---:|---:|---:|---:|
-| baseline_window | 0.371 | 0.032 | 0.029 | 0.036 | 7 |
-| optimized_prefix_sum | 0.465 | 0.026 | 0.022 | 0.029 | 7 |
+| baseline_window | 0.382 | 0.032 | 0.029 | 0.036 | 7 |
+| optimized_prefix_sum | 0.724 | 0.026 | 0.022 | 0.030 | 7 |
 
 ## Generated SQL
 

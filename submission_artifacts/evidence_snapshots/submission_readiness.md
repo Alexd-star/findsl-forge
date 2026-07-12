@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-07-12T18:25:37+00:00
+- Generated at: 2026-07-12T19:03:10+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening`
-- Git HEAD at report generation: `44c3b32` feat: add named and staged rank planning
+- Git HEAD at report generation: `a7bc571` feat: generalize temporal and rank relations
 - Git branch: `feat/antlr-calcite-architecture`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,12 +13,12 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 133578.2 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.259 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 132185.2 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.183 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.896 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.934 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -35,7 +35,7 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.259 ms
+- Compile P95 latency: 1.183 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.896 ms
+- Compile latency: 0.934 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -177,22 +177,22 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest --basetemp D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\.pytest_cache\readiness_tmp`
 - Exit code: 0
-- Elapsed: 133578.2 ms
+- Elapsed: 132185.2 ms
 
 ```text
 ........................................................................ [  8%]
 ........................................................................ [ 17%]
 ........................................................................ [ 26%]
-........................................................................ [ 35%]
-........................................................................ [ 44%]
-........................................................................ [ 53%]
-........................................................................ [ 62%]
-........................................................................ [ 71%]
-........................................................................ [ 79%]
-........................................................................ [ 88%]
-........................................................................ [ 97%]
-...................                                                      [100%]
-811 passed in 132.92s (0:02:12)
+........................................................................ [ 34%]
+........................................................................ [ 43%]
+........................................................................ [ 52%]
+........................................................................ [ 60%]
+........................................................................ [ 69%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 95%]
+......................................                                   [100%]
+830 passed in 131.54s (0:02:11)
 ```
 
 ## Award-Readiness Differentiators
