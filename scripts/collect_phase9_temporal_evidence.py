@@ -17,11 +17,25 @@ CASES = (
         "name": "volume_recent_10_cons_3",
         "source": "indicator('', '', '成交量', '最近10日', '', '', 'CONS=3日') > 100",
         "count_exp": "CONS=3日",
+        "lookback_sessions": 10,
     },
     {
         "name": "volume_recent_10_exist_5",
         "source": "indicator('', '', '成交量', '最近10日', '', '', 'EXIST>=5') > 100",
         "count_exp": "EXIST>=5",
+        "lookback_sessions": 10,
+    },
+    {
+        "name": "volume_this_5_exist",
+        "source": "indicator('', '', '成交量', '这五天', '', '', 'EXIST>0') > 100",
+        "count_exp": "EXIST>0",
+        "lookback_sessions": 5,
+    },
+    {
+        "name": "volume_this_5_every",
+        "source": "indicator('', '', '成交量', '这五天', '', '', 'CONS=每日') > 100",
+        "count_exp": "CONS=每日",
+        "lookback_sessions": 5,
     },
 )
 
@@ -76,7 +90,8 @@ def main() -> int:
         expected_stocks = {
             key
             for key, matches in grouped.items()
-            if key in latest_universe and evaluate_temporal_matches(matches, quantifier)
+            if key in latest_universe
+            and evaluate_temporal_matches(matches[-case["lookback_sessions"] :], quantifier)
         }
         expected = {(market, code, latest_date) for market, code in expected_stocks}
         compiled = compile_official(case["source"])
