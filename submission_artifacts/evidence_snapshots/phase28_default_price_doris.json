@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "git_head": "a42cd26871f1f8e014c7bbb95b7f760a22151094",
+  "latest_data_date": "2026-04-14",
+  "repeats": 3,
+  "status": "PASS",
+  "matched": 6,
+  "non_empty": 6,
+  "structural_contracts": 6,
+  "total": 6,
+  "cases": [
+    {
+      "name": "price_crosses_above_ma20",
+      "source": "cross_above('', '', '', '20日均线', '', '', '') = True",
+      "selected_strategy": "crossing_window",
+      "generated_sql": "SELECT `event_rows`.`mktcode`, `event_rows`.`tgtcode`, `event_rows`.`bizdate` FROM (SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate`, `official_basic`.`lastPx` / 10000.0 > `official_technical`.`ma20` AND LAG(`official_basic`.`lastPx` / 10000.0, 1, NULL) OVER (PARTITION BY `official_basic`.`mktcode`, `official_basic`.`tgtcode` ORDER BY `official_basic`.`bizdate` ASC) <= LAG(`official_technical`.`ma20`, 1, NULL) OVER (PARTITION BY `official_basic`.`mktcode`, `official_basic`.`tgtcode` ORDER BY `official_basic`.`bizdate` ASC) AS `event_0` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS official_technical ON `official_basic`.`mktcode` = `official_technical`.`mktcode` AND `official_basic`.`tgtcode` = `official_technical`.`tgtcode` AND `official_basic`.`bizdate` = `official_technical`.`bizdate`) AS event_rows WHERE `event_rows`.`event_0` = TRUE AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "WITH event_rows AS (SELECT b.mktcode,b.tgtcode,b.bizdate,b.lastPx / 10000.0>t.ma20 AND LAG(b.lastPx / 10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate)<=LAG(t.ma20) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate) AS matched FROM `newzl`.`hsj_stock_hq_basic` b LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` t ON t.mktcode=b.mktcode AND t.tgtcode=b.tgtcode AND t.bizdate=b.bizdate) SELECT mktcode,tgtcode,bizdate FROM event_rows WHERE bizdate='2026-04-14' AND matched=TRUE",
+      "required_sql": [
+        "lastPx` / 10000.0 >",
+        "LAG(",
+        "event_rows"
+      ],
+      "logical_default_materialized": true,
+      "structural_contract": true,
+      "expected_count": 768,
+      "actual_count": 768,
+      "expected_sha256": "4d9b4da7bb02ceba50cedd0fcb601f4a1b227fb53907e24ac889192f2ff0f89a",
+      "actual_sha256": "4d9b4da7bb02ceba50cedd0fcb601f4a1b227fb53907e24ac889192f2ff0f89a",
+      "matched": true,
+      "non_empty": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        2320.7021,
+        62.8379,
+        54.1869
+      ],
+      "p95_ms": 2320.7021,
+      "explain_sha256": "74acb94bec1ef75f0514f15df8d7ff0627b3f7c7828f869cd682b3614d952adf",
+      "explain_excerpt": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#190]\n    tgtcode[#191]\n    bizdate[#192]\n  PARTITION: HASH_PARTITIONED: mktcode[#123], tgtcode[#124]\n  HAS_COLO_PLAN_NODE: true\n  VRESULT SINK\n     MYSQL_PROTOCOL\n  11:VHASH JOIN(927)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#185] = MAX(`q_latest`.`bizdate`)[#60])\n  |  cardinality=3,412,586\n  |  vec output tuple id: 14\n  |  output tuple id: 14\n  |  vIntermediate tuple ids: 13 \n  |  hash output slot ids: 183 184 185 \n  |  final projections: mktcode[#186], tgtcode[#187], bizdate[#188]\n  |  final project output tuple id: 14\n  |  distribute expr lists: mktcode[#183], tgtcode[#184]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  10:VANALYTIC(890)\n  |  functions: [lag((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)[#179], 1, NULL)], [lag(ma20[#180], 1, NULL)]\n  |  partition by: mktcode[#176], tgtcode[#177]\n  |  order by: bizdate[#178] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING\n  |  predicates: (CAST((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)[#179] AS double) > ma20[#180]), (CAST(lag((cast(lastPx as DECIMALV3(25, 5)) / 10000.0), 1, NULL) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first)[#181] AS double) <= lag(ma20, 1, NULL) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first)[#182])\n  |  final projections: mktcode[#176], tgtcode[#177], bizdate[#178]\n  |  final project output tuple id: 12\n  |  distribute expr lists: mktcode[#176], tgtcode[#177]\n  |  \n  9:VSORT(886)\n  |  order by: mktcode[#176] ASC, tgtcode[#177] ASC, bizdate[#178] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#171], tgtcode[#172]\n  |  \n  8:VHASH JOIN(878)\n  |  join op: RIGHT OUTER JOIN(BUCKET_SHUFFLE)[]\n  |  equal join conjunct: (mktcode[#159] = mktcode[#119])\n  |  equal join conjunct: (tgtcode[#160] = tgtcode[#120])\n  |  equal join conjunct: (bizdate[#161] = bizdate[#121])\n  |  cardinality=13,650,347\n  |  vec output tuple id: 9\n  |  output tuple id: 9\n  |  vIntermediate tuple ids: 8 \n  |  hash output slot ids: 162 119 120 121 122 \n  |  final projections: mktcode[#167], tgtcode[#168], bizdate[#169], (CAST(lastPx[#170] AS decimalv3(25,5)) / 10000.0), ma20[#166]\n  |  final project output tuple id: 9\n  |  distribute expr lists: mktcode[#159], tgtcode[#160]\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  |----6:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#119], tgtcode[#120]\n  |    \n  7:VOlapScanNode(853)\n     TABLE: newzl.hsj_stock_hq_basic_technical(hsj_stock_hq_basic_technical), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#157] = 0)\n     partitions=1/1 (hsj_stock_hq_basic_technical)\n     tablets=16/16, tabletList=1781024062148,1781024062150,1781024062152 ...\n     cardinality=13650347, avgRowSize=516.3533, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#123], tgtcode[#124], bizdate[#125], ma20[#137]\n     final project output tuple id: 7\nPLAN FRAGMENT 1\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n  HAS_COLO_PLAN_NODE: false\n  STREAM DATA SINK\n    EXCHANGE ID: 06\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#119], tgtcode[#120]\n  5:VOlapScanNode(862)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#117] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)"
+    },
+    {
+      "name": "price_does_not_cross_below_ma60",
+      "source": "cross_down('', '', '', '60日均线', '', '', '') = False",
+      "selected_strategy": "crossing_window_absence",
+      "generated_sql": "SELECT `event_absence_anchor`.`mktcode`, `event_absence_anchor`.`tgtcode`, `event_absence_anchor`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS event_absence_anchor INNER JOIN (SELECT `event_rows`.`mktcode`, `event_rows`.`tgtcode` FROM (SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate`, `official_basic`.`lastPx` / 10000.0 < `official_technical`.`ma60` AND LAG(`official_basic`.`lastPx` / 10000.0, 1, NULL) OVER (PARTITION BY `official_basic`.`mktcode`, `official_basic`.`tgtcode` ORDER BY `official_basic`.`bizdate` ASC) >= LAG(`official_technical`.`ma60`, 1, NULL) OVER (PARTITION BY `official_basic`.`mktcode`, `official_basic`.`tgtcode` ORDER BY `official_basic`.`bizdate` ASC) AS `event_0` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS official_technical ON `official_basic`.`mktcode` = `official_technical`.`mktcode` AND `official_basic`.`tgtcode` = `official_technical`.`tgtcode` AND `official_basic`.`bizdate` = `official_technical`.`bizdate`) AS event_rows GROUP BY `event_rows`.`mktcode`, `event_rows`.`tgtcode` HAVING MAX(CASE WHEN (`event_rows`.`event_0` = TRUE OR `event_rows`.`event_0` = FALSE) AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) THEN 1 ELSE 0 END) = 1 AND MAX(CASE WHEN `event_rows`.`event_0` = TRUE AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) THEN 1 ELSE 0 END) = 0) AS event_absence_keys ON `event_absence_anchor`.`mktcode` = `event_absence_keys`.`mktcode` AND `event_absence_anchor`.`tgtcode` = `event_absence_keys`.`tgtcode` WHERE `event_absence_anchor`.`bizdate` = (SELECT MAX(`event_absence_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS event_absence_latest)",
+      "reference_sql": "WITH event_rows AS (SELECT b.mktcode,b.tgtcode,b.bizdate,b.lastPx / 10000.0<t.ma60 AND LAG(b.lastPx / 10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate)>=LAG(t.ma60) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate) AS matched FROM `newzl`.`hsj_stock_hq_basic` b LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` t ON t.mktcode=b.mktcode AND t.tgtcode=b.tgtcode AND t.bizdate=b.bizdate) SELECT mktcode,tgtcode,bizdate FROM event_rows WHERE bizdate='2026-04-14' AND matched=FALSE",
+      "required_sql": [
+        "event_absence_keys",
+        "lastPx` / 10000.0 <",
+        "LAG("
+      ],
+      "logical_default_materialized": true,
+      "structural_contract": true,
+      "expected_count": 5547,
+      "actual_count": 5547,
+      "expected_sha256": "5bcc80567b9d6debf2d0fbad44bcaccf3ac9e27431d5cc398d8f87ccf451f46a",
+      "actual_sha256": "5bcc80567b9d6debf2d0fbad44bcaccf3ac9e27431d5cc398d8f87ccf451f46a",
+      "matched": true,
+      "non_empty": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        3146.0455,
+        3133.41,
+        3177.3871
+      ],
+      "p95_ms": 3177.3871,
+      "explain_sha256": "2f54c93cb2a92450355ea3df215e5ab5da85abd5518597c9a3ef9bff8de229f9",
+      "explain_excerpt": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#408]\n    tgtcode[#409]\n    bizdate[#410]\n  PARTITION: HASH_PARTITIONED: mktcode[#335], tgtcode[#336]\n  HAS_COLO_PLAN_NODE: false\n  VRESULT SINK\n     MYSQL_PROTOCOL\n  27:VHASH JOIN(2799)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#403] = MAX(`event_absence_latest`.`bizdate`)[#60])\n  |  cardinality=13,650,347\n  |  vec output tuple id: 32\n  |  output tuple id: 32\n  |  vIntermediate tuple ids: 31 \n  |  hash output slot ids: 401 402 403 \n  |  final projections: mktcode[#404], tgtcode[#405], bizdate[#406]\n  |  final project output tuple id: 32\n  |  distribute expr lists: mktcode[#401], tgtcode[#402]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  26:VHASH JOIN(2766)\n  |  join op: INNER JOIN(BUCKET_SHUFFLE)[]\n  |  equal join conjunct: (mktcode[#393] = mktcode[#333])\n  |  equal join conjunct: (tgtcode[#394] = tgtcode[#334])\n  |  cardinality=13,650,347\n  |  vec output tuple id: 30\n  |  output tuple id: 30\n  |  vIntermediate tuple ids: 29 \n  |  hash output slot ids: 393 394 395 \n  |  runtime filters: RF006[min_max] <- mktcode[#333](1137528/1048576/1048576), RF007[in_or_bloom] <- mktcode[#333](1137528/1048576/1048576), RF008[min_max] <- tgtcode[#334](1137528/1048576/1048576), RF009[in_or_bloom] <- tgtcode[#334](1137528/1048576/1048576)\n  |  final projections: mktcode[#396], tgtcode[#397], bizdate[#398]\n  |  final project output tuple id: 30\n  |  distribute expr lists: mktcode[#393], tgtcode[#394]\n  |  distribute expr lists: mktcode[#333], tgtcode[#334]\n  |  \n  |----24:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#333], tgtcode[#334]\n  |    \n  25:VOlapScanNode(2634)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#391] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...\n     cardinality=13650347, avgRowSize=150.58104, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF006[min_max] -> mktcode[#335], RF007[in_or_bloom] -> mktcode[#335], RF008[min_max] -> tgtcode[#336], RF009[in_or_bloom] -> tgtcode[#336]\n     final projections: mktcode[#335], tgtcode[#336], bizdate[#337]\n     final project output tuple id: 28\nPLAN FRAGMENT 1\n  PARTITION: HASH_PARTITIONED: mktcode[#245], tgtcode[#246]\n  HAS_COLO_PLAN_NODE: true\n  STREAM DATA SINK\n    EXCHANGE ID: 24\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#333], tgtcode[#334]\n  23:VAGGREGATE (merge finalize)(2750)\n  |  output: max(CASE WHEN AND[OR[(event_0 = TRUE),(event_0 = FALSE)],(bizdate =  (SCALARSUBQUERY) (LogicalProject[78] ( distinct=false, projects=[MAX(`q_latest`.`bizdate`)#211] )))] THEN 1 ELSE 0 END[#327])[#331], max(CASE WHEN AND[(event_0 = TRUE),(bizdate =  (SCALARSUBQUERY) (LogicalProject[95] ( distinct=false, projects=[MAX(`q_latest`.`bizdate`)#270] )))] THEN 1 ELSE 0 END[#328])[#332]\n  |  group by: mktcode[#325], tgtcode[#326]\n  |  having: (max(CASE WHEN AND[OR[(event_0 = TRUE),(event_0 = FALSE)],(bizdate =  (SCALARSUBQUERY) (LogicalProject[78] ( distinct=false, projects=[MAX(`q_latest`.`bizdate`)#211] )))] THEN 1 ELSE 0 END)[#331] = 1), (max(CASE WHEN AND[(event_0 = TRUE),(bizdate =  (SCALARSUBQUERY) (LogicalProject[95] ( distinct=false, projects=[MAX(`q_latest`.`bizdate`)#270] )))] THEN 1 ELSE 0 END)[#332] = 0)\n  |  sortByGroupKey:false\n  |  cardinality=4,550,115\n  |  final projections: mktcode[#329], tgtcode[#330]\n  |  final project output tuple id: 26\n  |  distribute expr lists: mktcode[#325], tgtcode[#326]\n  |  \n  22:VNESTED LOOP JOIN(2742)\n  |  join op: CROSS JOIN()\n  |  is output left side only: false\n  |  cardinality=13,650,347\n  |  vIntermediate tuple ids: 23 \n  |  final projections: mktcode[#319], tgtcode[#320], if((event_0[#322] IN (FALSE, TRUE) AND (bizdate[#321] = MAX(`q_latest`.`bizdate`)[#323])), 1, 0), if(((event_0[#322] = TRUE) AND (bizdate[#321] = MAX(`q_latest`.`bizdate`)[#324])), 1, 0)\n  |  final project output tuple id: 24\n  |  distribute expr lists: mktcode[#314], tgtcode[#315]\n  |  distribute expr lists: "
+    },
+    {
+      "name": "price_at_five_session_low",
+      "source": "record_low('', '', '', '5日', '', '', '', '') = True",
+      "selected_strategy": "crossing_window",
+      "generated_sql": "SELECT `event_rows`.`mktcode`, `event_rows`.`tgtcode`, `event_rows`.`bizdate` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, `q`.`lastPx` / 10000.0 <= MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS `event_0` FROM `newzl`.`hsj_stock_hq_basic` AS q) AS event_rows WHERE `event_rows`.`event_0` = TRUE AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "WITH event_rows AS (SELECT b.mktcode,b.tgtcode,b.bizdate,b.lastPx / 10000.0 AS price,MIN(b.lastPx / 10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS low5 FROM `newzl`.`hsj_stock_hq_basic` b) SELECT mktcode,tgtcode,bizdate FROM event_rows WHERE bizdate='2026-04-14' AND price<=low5",
+      "required_sql": [
+        "MIN(",
+        "ROWS BETWEEN 4 PRECEDING AND CURRENT ROW"
+      ],
+      "logical_default_materialized": true,
+      "structural_contract": true,
+      "expected_count": 919,
+      "actual_count": 919,
+      "expected_sha256": "0878e4c5954abd75d912d38c818d1c18897d6845d1e8d5819f109bfd1111c6f7",
+      "actual_sha256": "0878e4c5954abd75d912d38c818d1c18897d6845d1e8d5819f109bfd1111c6f7",
+      "matched": true,
+      "non_empty": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        976.3866,
+        52.6506,
+        49.476
+      ],
+      "p95_ms": 976.3866,
+      "explain_sha256": "b92f10584b1251f84861661d132b4020e4d0b06b13dca9c68bb484a9e71399c1",
+      "explain_excerpt": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#137]\n    tgtcode[#138]\n    bizdate[#139]\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n  HAS_COLO_PLAN_NODE: true\n  VRESULT SINK\n     MYSQL_PROTOCOL\n  8:VHASH JOIN(626)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#132] = MAX(`q_latest`.`bizdate`)[#60])\n  |  cardinality=6,825,173\n  |  vec output tuple id: 10\n  |  output tuple id: 10\n  |  vIntermediate tuple ids: 9 \n  |  hash output slot ids: 130 131 132 \n  |  final projections: mktcode[#133], tgtcode[#134], bizdate[#135]\n  |  final project output tuple id: 10\n  |  distribute expr lists: mktcode[#130], tgtcode[#131]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  7:VANALYTIC(589)\n  |  functions: [min((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)[#127])]\n  |  partition by: mktcode[#124], tgtcode[#125]\n  |  order by: bizdate[#126] ASC NULLS FIRST\n  |  window: ROWS BETWEEN 4 PRECEDING AND CURRENT ROW\n  |  predicates: (CAST(CAST(lastPx[#128] AS decimalv3(25,5)) AS decimalv3(31,5)) <= (min((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first ROWS BETWEEN 4 PRECEDING AND CURRENT ROW)[#129] * 10000.0))\n  |  final projections: mktcode[#124], tgtcode[#125], bizdate[#126]\n  |  final project output tuple id: 8\n  |  distribute expr lists: mktcode[#124], tgtcode[#125]\n  |  \n  6:VSORT(585)\n  |  order by: mktcode[#124] ASC, tgtcode[#125] ASC, bizdate[#126] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  5:VOlapScanNode(573)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#117] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...\n     cardinality=13650347, avgRowSize=150.58104, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#61], tgtcode[#62], bizdate[#63], (CAST(lastPx[#64] AS decimalv3(25,5)) / 10000.0), lastPx[#64]\n     final project output tuple id: 5\nPLAN FRAGMENT 1\n  PARTITION: UNPARTITIONED\n  HAS_COLO_PLAN_NODE: true\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n  3:VAGGREGATE (merge finalize)(618)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  2:VEXCHANGE\n     offset: 0\n     distribute expr lists: \nPLAN FRAGMENT 2\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\n  HAS_COLO_PLAN_NODE: false\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\n  1:VAGGREGATE (update serialize)(610)\n  |  output: partial_max(bizdate[#58])[#59]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  "
+    },
+    {
+      "name": "price_in_low_historical_quartile",
+      "source": "position('', '', '', '历史', '', '', '', '') = '低'",
+      "selected_strategy": "crossing_window",
+      "generated_sql": "SELECT `event_rows`.`mktcode`, `event_rows`.`tgtcode`, `event_rows`.`bizdate` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`lastPx` / 10000.0 IS NULL OR (MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) IS NULL OR MAX(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) IS NULL) THEN NULL WHEN `q`.`lastPx` / 10000.0 <= MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) THEN '最低' WHEN `q`.`lastPx` / 10000.0 >= MAX(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) THEN '最高' WHEN (`q`.`lastPx` / 10000.0 - MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)) / NULLIF(MAX(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) - MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 0) <= 0.25 THEN '低' WHEN (`q`.`lastPx` / 10000.0 - MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)) / NULLIF(MAX(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) - MIN(`q`.`lastPx` / 10000.0) OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 0) >= 0.75 THEN '高' ELSE '中' END AS `event_0` FROM `newzl`.`hsj_stock_hq_basic` AS q) AS event_rows WHERE `event_rows`.`event_0` = '低' AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "WITH event_rows AS (SELECT b.mktcode,b.tgtcode,b.bizdate,b.lastPx / 10000.0 AS price,MIN(b.lastPx / 10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS low_all,MAX(b.lastPx / 10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS high_all FROM `newzl`.`hsj_stock_hq_basic` b) SELECT mktcode,tgtcode,bizdate FROM event_rows WHERE bizdate='2026-04-14' AND price>low_all AND price<high_all AND (price-low_all)/NULLIF(high_all-low_all,0)<=0.25",
+      "required_sql": [
+        "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+        "ELSE '中' END"
+      ],
+      "logical_default_materialized": true,
+      "structural_contract": true,
+      "expected_count": 797,
+      "actual_count": 797,
+      "expected_sha256": "edf47ad99b677b135e173e6f25101cf030724c84e312e9ca29e963d99d16257d",
+      "actual_sha256": "edf47ad99b677b135e173e6f25101cf030724c84e312e9ca29e963d99d16257d",
+      "matched": true,
+      "non_empty": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        1241.8526,
+        56.6132,
+        46.31
+      ],
+      "p95_ms": 1241.8526,
+      "explain_sha256": "0788aad74591cc744282e68adc8f0736ec5d97f1e85f676334579bf0ce408ffc",
+      "explain_excerpt": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#138]\n    tgtcode[#139]\n    bizdate[#140]\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n  HAS_COLO_PLAN_NODE: true\n  VRESULT SINK\n     MYSQL_PROTOCOL\n  8:VHASH JOIN(609)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#133] = MAX(`q_latest`.`bizdate`)[#60])\n  |  cardinality=1,706,292\n  |  vec output tuple id: 10\n  |  output tuple id: 10\n  |  vIntermediate tuple ids: 9 \n  |  hash output slot ids: 131 132 133 \n  |  final projections: mktcode[#134], tgtcode[#135], bizdate[#136]\n  |  final project output tuple id: 10\n  |  distribute expr lists: mktcode[#131], tgtcode[#132]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  7:VANALYTIC(572)\n  |  functions: [min((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)[#127])], [max((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)[#127])]\n  |  partition by: mktcode[#124], tgtcode[#125]\n  |  order by: bizdate[#126] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (NOT ((CAST(CAST(lastPx[#128] AS decimalv3(25,5)) AS decimalv3(31,5)) <= (min((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)[#129] * 10000.0)) <=> TRUE)), (NOT ((CAST(CAST(lastPx[#128] AS decimalv3(25,5)) AS decimalv3(31,5)) >= (max((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)[#130] * 10000.0)) <=> TRUE)), ((CAST((CAST((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)[#127] AS decimalv3(26,4)) - CAST(min((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)[#129] AS decimalv3(26,4))) AS decimalv3(34,12)) / nullif((CAST(max((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)[#130] AS decimalv3(26,4)) - CAST(min((cast(lastPx as DECIMALV3(25, 5)) / 10000.0)) OVER(PARTITION BY mktcode, tgtcode ORDER BY bizdate asc null first ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)[#129] AS decimalv3(26,4))), 0.0000)) <= 0.25000000)\n  |  final projections: mktcode[#124], tgtcode[#125], bizdate[#126]\n  |  final project output tuple id: 8\n  |  distribute expr lists: mktcode[#124], tgtcode[#125]\n  |  \n  6:VSORT(568)\n  |  order by: mktcode[#124] ASC, tgtcode[#125] ASC, bizdate[#126] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  5:VOlapScanNode(556)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#117] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...\n     cardinality=13650347, avgRowSize=150.58104, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#61], tgtcode[#62], bizdate[#63], (CAST(lastPx[#64] AS decimalv3(25,5)) / 10000.0), lastPx[#64]\n     final project output tuple id: 5\nPLAN FRAGMENT 1\n  PARTITION: UNPARTITIONED\n  HAS_COLO_PLAN_NODE: true\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n  3:VAGGREGATE (merge finalize)(601)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  2:VEXCHANGE\n     offset: 0\n     distribute expr lists: \nPLAN FRAGMENT 2\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\n  HAS_COLO_PLAN_NODE: false\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\n  1:VAGGREGATE (update serialize)(593)\n  |  output: partial_max(bizdate[#58])[#59]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  "
+    },
+    {
+      "name": "price_close_to_ma20",
+      "source": "close_together('', '', '', '20日均线', '', '', '') = True",
+      "selected_strategy": "crossing_window",
+      "generated_sql": "SELECT `event_rows`.`mktcode`, `event_rows`.`tgtcode`, `event_rows`.`bizdate` FROM (SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate`, (ABS((`official_basic`.`lastPx` / 10000.0) - `official_technical`.`ma20`) / NULLIF(GREATEST(ABS(`official_basic`.`lastPx` / 10000.0), ABS(`official_technical`.`ma20`)), 0)) <= 0.03 AS `event_0` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS official_technical ON `official_basic`.`mktcode` = `official_technical`.`mktcode` AND `official_basic`.`tgtcode` = `official_technical`.`tgtcode` AND `official_basic`.`bizdate` = `official_technical`.`bizdate`) AS event_rows WHERE `event_rows`.`event_0` = TRUE AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` b LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` t ON t.mktcode=b.mktcode AND t.tgtcode=b.tgtcode AND t.bizdate=b.bizdate WHERE b.bizdate='2026-04-14' AND ABS(b.lastPx / 10000.0-t.ma20)/NULLIF(GREATEST(ABS(b.lastPx / 10000.0),ABS(t.ma20)),0)<=0.03",
+      "required_sql": [
+        "GREATEST(",
+        "<= 0.03"
+      ],
+      "logical_default_materialized": true,
+      "structural_contract": true,
+      "expected_count": 3018,
+      "actual_count": 3018,
+      "expected_sha256": "d8346f11e357f478c2cd6f253a6fdba1d0361268429809750b76211001f2fb19",
+      "actual_sha256": "d8346f11e357f478c2cd6f253a6fdba1d0361268429809750b76211001f2fb19",
+      "matched": true,
+      "non_empty": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        1114.7119,
+        1184.1075,
+        1085.4504
+      ],
+      "p95_ms": 1184.1075,
+      "explain_sha256": "ade4970aa6de0b28de5f769ae3db5d71472b57bcb35dfca84602e2cece37e63d",
+      "explain_excerpt": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#178]\n    tgtcode[#179]\n    bizdate[#180]\n  PARTITION: HASH_PARTITIONED: mktcode[#123], tgtcode[#124]\n  HAS_COLO_PLAN_NODE: false\n  VRESULT SINK\n     MYSQL_PROTOCOL\n  9:VHASH JOIN(839)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#173] = MAX(`q_latest`.`bizdate`)[#60])\n  |  cardinality=6,825,173\n  |  vec output tuple id: 11\n  |  output tuple id: 11\n  |  vIntermediate tuple ids: 10 \n  |  hash output slot ids: 171 172 173 \n  |  final projections: mktcode[#174], tgtcode[#175], bizdate[#176]\n  |  final project output tuple id: 11\n  |  distribute expr lists: mktcode[#171], tgtcode[#172]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  8:VHASH JOIN(802)\n  |  join op: RIGHT OUTER JOIN(BUCKET_SHUFFLE)[]\n  |  equal join conjunct: (mktcode[#159] = mktcode[#119])\n  |  equal join conjunct: (tgtcode[#160] = tgtcode[#120])\n  |  equal join conjunct: (bizdate[#161] = bizdate[#121])\n  |  other predicates: ((abs((CAST((CAST(lastPx[#170] AS decimalv3(25,5)) / 10000.0) AS double) - ma20[#166])) / nullif(greatest(CAST(abs((CAST(lastPx[#170] AS decimalv3(25,5)) / 10000.0)) AS double), abs(ma20[#166])), 0)) <= 0.03)\n  |  cardinality=13,650,347\n  |  vec output tuple id: 9\n  |  output tuple id: 9\n  |  vIntermediate tuple ids: 8 \n  |  hash output slot ids: 162 119 120 121 122 \n  |  final projections: mktcode[#167], tgtcode[#168], bizdate[#169]\n  |  final project output tuple id: 9\n  |  distribute expr lists: mktcode[#159], tgtcode[#160]\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  |----6:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#119], tgtcode[#120]\n  |    \n  7:VOlapScanNode(777)\n     TABLE: newzl.hsj_stock_hq_basic_technical(hsj_stock_hq_basic_technical), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#157] = 0)\n     partitions=1/1 (hsj_stock_hq_basic_technical)\n     tablets=16/16, tabletList=1781024062148,1781024062150,1781024062152 ...\n     cardinality=13650347, avgRowSize=516.3533, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#123], tgtcode[#124], bizdate[#125], ma20[#137]\n     final project output tuple id: 7\nPLAN FRAGMENT 1\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n  HAS_COLO_PLAN_NODE: false\n  STREAM DATA SINK\n    EXCHANGE ID: 06\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#119], tgtcode[#120]\n  5:VOlapScanNode(786)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#117] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...\n     cardinality=13650347, avgRowSize=150.58104, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#61], tgtcode[#62], bizdate[#63], lastPx[#64]\n     final project output tuple id: 5\nPLAN FRAGMENT 2\n  PARTITION: UNPARTITIONED\n  HAS_COLO_PLAN_NODE: true\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n  3:VAGGREGATE (merge finalize)(831)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false"
+    },
+    {
+      "name": "price_resets_to_ma5",
+      "source": "reset('', '', '', '5日均线', '', '', '') = True",
+      "selected_strategy": "crossing_window",
+      "generated_sql": "SELECT `event_rows`.`mktcode`, `event_rows`.`tgtcode`, `event_rows`.`bizdate` FROM (SELECT `official_basic`.`mktcode`, `official_basic`.`tgtcode`, `official_basic`.`bizdate`, (ABS((`official_basic`.`lastPx` / 10000.0) - `official_technical`.`ma5`) / NULLIF(ABS(`official_technical`.`ma5`), 0)) <= 0.02 AND (`official_basic`.`lastPx` / 10000.0) >= (`official_technical`.`ma5` * 0.995) AS `event_0` FROM `newzl`.`hsj_stock_hq_basic` AS official_basic LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS official_technical ON `official_basic`.`mktcode` = `official_technical`.`mktcode` AND `official_basic`.`tgtcode` = `official_technical`.`tgtcode` AND `official_basic`.`bizdate` = `official_technical`.`bizdate`) AS event_rows WHERE `event_rows`.`event_0` = TRUE AND `event_rows`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+      "reference_sql": "SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` b LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` t ON t.mktcode=b.mktcode AND t.tgtcode=b.tgtcode AND t.bizdate=b.bizdate WHERE b.bizdate='2026-04-14' AND ABS(b.lastPx / 10000.0-t.ma5)/NULLIF(ABS(t.ma5),0)<=0.02 AND b.lastPx / 10000.0>=t.ma5*0.995",
+      "required_sql": [
+        "<= 0.02",
+        "* 0.995"
+      ],
+      "logical_default_materialized": true,
+      "structural_contract": true,
+      "expected_count": 2855,
+      "actual_count": 2855,
+      "expected_sha256": "c7766387c1c3538d64e1d308e292af24495953f8655db2638edc0cad64d04b10",
+      "actual_sha256": "c7766387c1c3538d64e1d308e292af24495953f8655db2638edc0cad64d04b10",
+      "matched": true,
+      "non_empty": true,
+      "missing_sample": [],
+      "extra_sample": [],
+      "elapsed_ms": [
+        1024.1715,
+        55.1761,
+        56.1861
+      ],
+      "p95_ms": 1024.1715,
+      "explain_sha256": "af93829e9660709924e9d522300b6877372043e842f9dd9857f98aa26580e44d",
+      "explain_excerpt": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#178]\n    tgtcode[#179]\n    bizdate[#180]\n  PARTITION: HASH_PARTITIONED: mktcode[#123], tgtcode[#124]\n  HAS_COLO_PLAN_NODE: false\n  VRESULT SINK\n     MYSQL_PROTOCOL\n  9:VHASH JOIN(839)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#173] = MAX(`q_latest`.`bizdate`)[#60])\n  |  cardinality=3,412,586\n  |  vec output tuple id: 11\n  |  output tuple id: 11\n  |  vIntermediate tuple ids: 10 \n  |  hash output slot ids: 171 172 173 \n  |  final projections: mktcode[#174], tgtcode[#175], bizdate[#176]\n  |  final project output tuple id: 11\n  |  distribute expr lists: mktcode[#171], tgtcode[#172]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  8:VHASH JOIN(802)\n  |  join op: RIGHT OUTER JOIN(BUCKET_SHUFFLE)[]\n  |  equal join conjunct: (mktcode[#159] = mktcode[#119])\n  |  equal join conjunct: (tgtcode[#160] = tgtcode[#120])\n  |  equal join conjunct: (bizdate[#161] = bizdate[#121])\n  |  other predicates: ((abs((CAST((CAST(lastPx[#170] AS decimalv3(25,5)) / 10000.0) AS double) - ma5[#166])) / nullif(abs(ma5[#166]), 0)) <= 0.02), (CAST((CAST(lastPx[#170] AS decimalv3(25,5)) / 10000.0) AS double) >= (ma5[#166] * 0.995))\n  |  cardinality=13,650,347\n  |  vec output tuple id: 9\n  |  output tuple id: 9\n  |  vIntermediate tuple ids: 8 \n  |  hash output slot ids: 162 119 120 121 122 \n  |  final projections: mktcode[#167], tgtcode[#168], bizdate[#169]\n  |  final project output tuple id: 9\n  |  distribute expr lists: mktcode[#159], tgtcode[#160]\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  |----6:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#119], tgtcode[#120]\n  |    \n  7:VOlapScanNode(777)\n     TABLE: newzl.hsj_stock_hq_basic_technical(hsj_stock_hq_basic_technical), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#157] = 0)\n     partitions=1/1 (hsj_stock_hq_basic_technical)\n     tablets=16/16, tabletList=1781024062148,1781024062150,1781024062152 ...\n     cardinality=13650347, avgRowSize=516.3533, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#123], tgtcode[#124], bizdate[#125], ma5[#135]\n     final project output tuple id: 7\nPLAN FRAGMENT 1\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n  HAS_COLO_PLAN_NODE: false\n  STREAM DATA SINK\n    EXCHANGE ID: 06\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#119], tgtcode[#120]\n  5:VOlapScanNode(786)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#117] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...\n     cardinality=13650347, avgRowSize=150.58104, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#61], tgtcode[#62], bizdate[#63], lastPx[#64]\n     final project output tuple id: 5\nPLAN FRAGMENT 2\n  PARTITION: UNPARTITIONED\n  HAS_COLO_PLAN_NODE: true\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n  3:VAGGREGATE (merge finalize)(831)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false"
+    }
+  ]
+}

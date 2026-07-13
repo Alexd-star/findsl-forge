@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-13T01:54:59Z",
+  "generated_at": "2026-07-13T02:49:09Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "450f93d",
-    "head_at_export": "450f93d",
+    "head_at_report_generation": "a42cd26",
+    "head_at_export": "a42cd26",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-13T01:54:34+00:00",
+    "generated_at": "2026-07-13T02:46:24+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.365,
+    "compile_p95_latency_ms": 1.398,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 876,
-      "elapsed_seconds": 141.07
+      "passed": 890,
+      "elapsed_seconds": 155.14
     }
   },
   "official_suite": {
@@ -81,12 +81,12 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "0386df26d7abff608551001c6fe545b3ea9386b6",
+    "git_head": "a42cd26871f1f8e014c7bbb95b7f760a22151094",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 690,
-    "migration_coverage": 0.628988,
-    "new_backend_success": 713,
-    "physical_date_gap": 0,
+    "legacy_to_new_migrated": 729,
+    "migration_coverage": 0.66454,
+    "new_backend_success": 752,
+    "physical_date_gap": 1,
     "dynamic_date_evidence": {
       "available": true,
       "status": "PASS",
@@ -178,6 +178,16 @@
       "structural_contracts": 4,
       "max_p95_ms": 2090.4077
     },
+    "default_price_event_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 6,
+      "total": 6,
+      "non_empty": 6,
+      "latest_data_date": "2026-04-14",
+      "structural_contracts": 6,
+      "max_p95_ms": 3177.3871
+    },
     "prefix_join_evidence": {
       "available": true,
       "status": "PASS",
@@ -192,8 +202,8 @@
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 4,
-      "total": 4,
+      "passed": 39,
+      "total": 39,
       "failed": 0
     }
   },
@@ -246,6 +256,9 @@
     "phase27_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase27_capability_funnel.json",
     "phase27_event_semantics_doris_json": "submission_artifacts\\evidence_snapshots\\phase27_event_semantics_doris.json",
     "phase27_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase27_new_success_audit.json",
+    "phase28_default_price_funnel_json": "submission_artifacts\\evidence_snapshots\\phase28_default_price_funnel.json",
+    "phase28_default_price_doris_json": "submission_artifacts\\evidence_snapshots\\phase28_default_price_doris.json",
+    "phase28_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase28_new_success_audit.json",
     "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
