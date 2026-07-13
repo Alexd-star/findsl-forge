@@ -77,7 +77,7 @@ def test_multiple_singleton_dates_become_independent_security_relations():
 def test_cross_scope_temporal_querydata_uses_independent_aggregate_scalar():
     result = compile_official(
         "indicator('', 'AIGC概念', '收盘价', '近两年', '', '', 'EXIST=9季度') <= "
-        "queryData('', '白酒|ai|建筑', '收盘价', '近两年', 'AVG')"
+        "queryData('', '白酒|ai|华为', '收盘价', '近两年', 'AVG')"
     ).to_dict()
     sql = result["backend"]["sql"]
 

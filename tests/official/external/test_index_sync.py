@@ -69,3 +69,19 @@ def test_index_sync_accepts_curated_alphanumeric_index_code():
 
     assert result is not None
     assert result.matched[0]["index_code"] == "CN2697"
+
+
+def test_index_sync_rejects_suffix_stripped_generic_company_scope():
+    class FinancialProvider(_IndexProvider):
+        def list_indices(self):
+            return (
+                IndexDefinition(self.source, "399240", "金融指数", "金融指数"),
+            )
+
+    result = build_index_snapshot(
+        ["金融公司"],
+        provider=FinancialProvider(),
+        as_of_date="2026-07-13",
+    )
+
+    assert result is None

@@ -28,14 +28,25 @@ class ThsConceptProvider:
     source_url = "https://q.10jqka.com.cn/gn/"
     license_note = "THS public concept constituent pages; retain attribution and snapshot date"
 
-    def __init__(self, *, cache_dir: Path = None, session=None, max_attempts: int = 8):
+    def __init__(
+        self,
+        *,
+        cache_dir: Path = None,
+        session=None,
+        max_attempts: int = 8,
+        request_interval_seconds: float = 0.3,
+        trust_environment_proxy: bool = False,
+    ):
         if session is None:
             import requests
 
             session = requests.Session()
+        session.trust_env = trust_environment_proxy
         self.session = session
         self.cache_dir = Path(cache_dir) if cache_dir else None
         self.max_attempts = max_attempts
+        self.request_interval_seconds = max(0.0, float(request_interval_seconds))
+        self._last_request_at = 0.0
 
     def list_constituents(
         self, concept: ThsConceptDefinition
@@ -65,6 +76,7 @@ class ThsConceptProvider:
         last_error = None
         for attempt in range(1, self.max_attempts + 1):
             try:
+                self._throttle()
                 response = self.session.get(
                     url,
                     headers=self._headers(),
@@ -89,6 +101,12 @@ class ThsConceptProvider:
             f"THS page failed after {self.max_attempts} attempts: {code}/{page}: {last_error}"
         ) from last_error
 
+    def _throttle(self) -> None:
+        elapsed = time.monotonic() - self._last_request_at
+        if elapsed < self.request_interval_seconds:
+            time.sleep(self.request_interval_seconds - elapsed)
+        self._last_request_at = time.monotonic()
+
     @staticmethod
     def _headers():
         import py_mini_racer
@@ -101,6 +119,7 @@ class ThsConceptProvider:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122 Safari/537.36",
             "Cookie": f"v={token}",
             "Referer": "https://q.10jqka.com.cn/gn/",
+            "Connection": "close",
         }
 
     @staticmethod

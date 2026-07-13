@@ -131,3 +131,49 @@ def test_snapshot_rejects_empty_and_invalid_dates():
         ScopeMembership(
             "concept", "BK001", "算力", (), 1, "600000", "2026-02-01", "2026-01-01", None
         )
+
+
+def test_runtime_manifest_filters_generic_aliases_that_change_index_semantics(tmp_path):
+    snapshot = CatalogSnapshot(
+        "index-fixture",
+        "fixture-index",
+        "https://example.invalid/index",
+        "2026-07-13T00:00:00Z",
+        "2026-07-13",
+        "1" * 64,
+        "fixture",
+        scope_memberships=(
+            ScopeMembership(
+                "index",
+                "399240",
+                "金融指数",
+                ("金融公司", "金融"),
+                1,
+                "600000",
+                "2026-07-13",
+                None,
+                None,
+            ),
+            ScopeMembership(
+                "index",
+                "000142",
+                "380稳定",
+                ("上证380稳定",),
+                1,
+                "600000",
+                "2026-07-13",
+                None,
+                None,
+            ),
+        ),
+    )
+    catalog = ExternalCatalog(tmp_path / "catalog.sqlite3")
+    catalog.import_snapshot(snapshot)
+
+    runtime = catalog.export_runtime_manifest(tmp_path / "runtime.json")
+    aliases = {item["alias"] for item in runtime["entries"]}
+
+    assert "金融公司" not in aliases
+    assert "金融" not in aliases
+    assert "金融指数" in aliases
+    assert "上证380稳定" in aliases

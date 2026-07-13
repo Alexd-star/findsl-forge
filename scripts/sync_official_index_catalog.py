@@ -9,6 +9,7 @@ from findsl.official.external.index_sync import build_index_snapshot
 from findsl.official.external.matching import canonical_scope_name
 from findsl.official.external.providers.indexes import (
     AkshareCsindexProvider,
+    AkshareIndexProvider,
     CniProvider,
     CsindexProvider,
 )
@@ -29,7 +30,12 @@ def main() -> None:
     }
     catalog = ExternalCatalog(Path(args.catalog))
     results = []
-    for provider in (CsindexProvider(), CniProvider(), AkshareCsindexProvider()):
+    for provider in (
+        CsindexProvider(),
+        CniProvider(),
+        AkshareCsindexProvider(),
+        AkshareIndexProvider(),
+    ):
         result = build_index_snapshot(
             targets,
             provider=provider,
@@ -40,7 +46,14 @@ def main() -> None:
             continue
         catalog.import_snapshot(result.snapshot, replace=True)
         results.append(result.to_dict())
-    payload = {"results": results, "catalog_summary": catalog.summary()}
+    runtime = catalog.export_runtime_manifest(
+        Path("configs/official/external_scope_runtime.json")
+    )
+    payload = {
+        "results": results,
+        "runtime_entries": len(runtime["entries"]),
+        "catalog_summary": catalog.summary(),
+    }
     report = Path(args.report)
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

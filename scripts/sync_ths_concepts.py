@@ -18,7 +18,13 @@ def main() -> None:
     parser.add_argument("--catalog", required=True)
     parser.add_argument("--cache", required=True)
     parser.add_argument("--report", required=True)
+    parser.add_argument(
+        "--runtime", default="configs/official/external_scope_runtime.json"
+    )
     parser.add_argument("--as-of-date", default=None)
+    parser.add_argument("--request-interval-seconds", type=float, default=0.3)
+    parser.add_argument("--trust-environment-proxy", action="store_true")
+    parser.add_argument("--require-complete", action="store_true")
     args = parser.parse_args()
 
     raw = json.loads(Path(args.config).read_text(encoding="utf-8"))
@@ -26,12 +32,23 @@ def main() -> None:
         ThsConceptDefinition(item["code"], item["name"], tuple(item["aliases"]))
         for item in raw["concepts"]
     )
-    provider = ThsConceptProvider(cache_dir=Path(args.cache))
+    provider = ThsConceptProvider(
+        cache_dir=Path(args.cache),
+        request_interval_seconds=args.request_interval_seconds,
+        trust_environment_proxy=args.trust_environment_proxy,
+    )
     snapshot_date = args.as_of_date or date.today().isoformat()
     rows = []
     counts = {}
+    failures = []
     for concept in definitions:
-        members = provider.list_constituents(concept)
+        try:
+            members = provider.list_constituents(concept)
+        except Exception as exc:
+            failures.append(
+                {"code": concept.code, "name": concept.name, "error": str(exc)}
+            )
+            continue
         counts[concept.name] = len(members)
         for member in members:
             rows.append(
@@ -52,6 +69,8 @@ def main() -> None:
     digest = hashlib.sha256(
         json.dumps(content, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
+    if not rows:
+        raise RuntimeError("THS synchronization produced no complete concept")
     snapshot = CatalogSnapshot(
         f"ths-concept-{snapshot_date}-{digest[:12]}",
         provider.source,
@@ -62,15 +81,21 @@ def main() -> None:
         provider.license_note,
         scope_memberships=tuple(rows),
     )
-    catalog = ExternalCatalog(Path(args.catalog))
-    catalog.import_snapshot(snapshot, replace=True)
     report = {
         "schema_version": 1,
         "snapshot_id": snapshot.snapshot_id,
         "content_sha256": digest,
         "concepts": counts,
         "scope_memberships": len(rows),
+        "failed_concepts": failures,
+        "complete": not failures,
     }
+    report["imported"] = not (args.require_complete and failures)
+    catalog = ExternalCatalog(Path(args.catalog))
+    if report["imported"]:
+        catalog.import_snapshot(snapshot, replace=True)
+        runtime = catalog.export_runtime_manifest(Path(args.runtime))
+        report["runtime_entries"] = len(runtime["entries"])
     Path(args.report).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

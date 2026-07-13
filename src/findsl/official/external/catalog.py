@@ -243,6 +243,12 @@ class ExternalCatalog:
         seen = set()
         for row in rows:
             item = dict(row)
+            if not _runtime_scope_alias_allowed(
+                str(item["scope_type"]),
+                str(item["scope_name"]),
+                str(item["alias"]),
+            ):
+                continue
             aliases = _runtime_alias_variants(
                 str(item["scope_type"]),
                 str(item["scope_name"]),
@@ -383,3 +389,15 @@ def _runtime_alias_variants(scope_type: str, scope_name: str, alias: str):
         elif scope_type == "index" and not alias.endswith("指数"):
             variants.append(f"{alias}指数")
     return tuple(dict.fromkeys(variants))
+
+
+def _runtime_scope_alias_allowed(scope_type: str, scope_name: str, alias: str) -> bool:
+    if scope_type != "index":
+        return True
+    source = alias.strip().casefold()
+    canonical_name = scope_name.strip().casefold()
+    if source == canonical_name or "指数" in source:
+        return True
+    if source.endswith(("公司", "企业", "行业", "板块", "类")):
+        return False
+    return not canonical_name.endswith(("指数", "行业"))

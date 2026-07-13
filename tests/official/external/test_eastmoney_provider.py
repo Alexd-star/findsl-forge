@@ -47,6 +47,24 @@ def test_provider_paginates_and_rejects_empty_payloads():
         provider.list_boards("unknown")
 
 
+def test_provider_reuses_exact_raw_response_cache(tmp_path):
+    first_session = _Session(
+        {1: {"rc": 0, "data": {"total": 1, "diff": [{"f12": "BK1", "f14": "算力概念"}]}}}
+    )
+    first = EastmoneyBoardProvider(session=first_session, cache_dir=tmp_path)
+    assert first.list_boards("concept")[0].code == "BK1"
+
+    class _OfflineSession:
+        trust_env = True
+
+        def get(self, *_args, **_kwargs):
+            raise AssertionError("cached request must not reach the network")
+
+    second = EastmoneyBoardProvider(session=_OfflineSession(), cache_dir=tmp_path)
+    assert second.list_boards("concept")[0].name == "算力概念"
+    assert len(list(tmp_path.glob("*.json"))) == 1
+
+
 def test_scope_matching_is_conservative_and_suffix_aware():
     boards = (
         BoardDefinition("concept", "BK1", "算力概念"),

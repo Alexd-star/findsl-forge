@@ -211,6 +211,75 @@ class AkshareCsindexProvider:
         return tuple(rows)
 
 
+class AkshareIndexProvider:
+    """Current SSE/SZSE index definitions and constituents exposed by AKShare."""
+
+    source = "akshare-public-index"
+    source_url = "https://github.com/akfamily/akshare"
+    license_note = (
+        "AKShare index_stock_info and index_stock_cons public interfaces; "
+        "retain upstream attribution and snapshot date"
+    )
+
+    def __init__(self, *, akshare_module=None):
+        self._akshare_module = akshare_module
+
+    def _akshare(self):
+        if self._akshare_module is not None:
+            return self._akshare_module
+        import akshare
+
+        return akshare
+
+    def list_indices(self) -> Tuple[IndexDefinition, ...]:
+        frame = self._akshare().index_stock_info()
+        required = {"index_code", "display_name"}
+        if not required.issubset(frame.columns):
+            raise ExternalProviderError(
+                f"AKShare returned invalid index definitions: {sorted(frame.columns)}"
+            )
+        rows = []
+        for item in frame.to_dict("records"):
+            code = str(item.get("index_code") or "").strip().upper()
+            name = str(item.get("display_name") or "").strip()
+            if len(code) == 6 and code.isalnum() and name:
+                rows.append(IndexDefinition(self.source, code, name, name))
+        if not rows:
+            raise ExternalProviderError("AKShare returned no public index definitions")
+        return tuple(rows)
+
+    def list_constituents(self, index: IndexDefinition) -> Tuple[IndexConstituent, ...]:
+        import pandas as pd
+
+        frame = self._akshare().index_stock_cons(symbol=index.code)
+        required = {"品种代码", "品种名称", "纳入日期"}
+        if not required.issubset(frame.columns):
+            raise ExternalProviderError(
+                f"AKShare returned invalid constituents for {index.code}: "
+                f"{sorted(str(item) for item in frame.columns)}"
+            )
+        rows = []
+        for item in frame.to_dict("records"):
+            code = str(item.get("品种代码") or "").strip().zfill(6)
+            if security_market_code(code) is None:
+                continue
+            parsed_date = pd.to_datetime(item.get("纳入日期"), errors="coerce")
+            effective = None if pd.isna(parsed_date) else parsed_date.date().isoformat()
+            rows.append(
+                IndexConstituent(
+                    code,
+                    str(item.get("品种名称") or "").strip(),
+                    None,
+                    effective,
+                )
+            )
+        if not rows:
+            raise ExternalProviderError(
+                f"AKShare returned no constituents for {index.code} {index.name}"
+            )
+        return tuple(rows)
+
+
 class CniProvider:
     source = "cnindex"
     source_url = "https://www.cnindex.com.cn/"

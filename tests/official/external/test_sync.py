@@ -1,5 +1,8 @@
 from findsl.official.external.providers.eastmoney import BoardConstituent, BoardDefinition
-from findsl.official.external.sync import build_eastmoney_snapshot
+from findsl.official.external.sync import (
+    build_eastmoney_snapshot,
+    build_full_eastmoney_snapshot,
+)
 
 
 class _Provider:
@@ -33,3 +36,19 @@ def test_build_snapshot_matches_targets_and_preserves_unresolved():
     assert [item.target for item in result.matched] == ["算力", "白酒行业"]
     assert result.unresolved == ("不存在范围",)
     assert result.snapshot.content_sha256
+
+
+def test_build_full_snapshot_attempts_every_discovered_board():
+    result = build_full_eastmoney_snapshot(
+        provider=_Provider(),
+        as_of_date="2026-07-13",
+    )
+
+    assert result.discovered_boards == 2
+    assert result.attempted_boards == 2
+    assert result.unresolved == ()
+    assert {(item.board.board_type, item.board.code) for item in result.matched} == {
+        ("concept", "BK1"),
+        ("industry", "BK2"),
+    }
+    assert result.to_dict()["successful_boards"] == 2

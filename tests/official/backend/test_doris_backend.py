@@ -1003,6 +1003,35 @@ def test_prefix_average_projection_feeds_rank_without_correlated_subquery():
     assert result.validation.passed is True
 
 
+def test_dynamic_prefix_event_preserves_non_prefix_input_columns():
+    catalog = default_physical_catalog()
+    typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(
+        parse_official_slot(
+            "cross_down('', '上证周期', '', '24日均线', '今日', '', '') = True",
+            mode="strict",
+        )
+    )
+    logical = lower_official_ast(typed, domain_registry=default_official_registry())
+    physical = plan_physical(
+        logical,
+        catalog,
+        expressions=default_physical_expressions(catalog),
+    )
+    result = render_doris(
+        physical.plan,
+        catalog,
+        default_physical_expressions(catalog),
+    )
+
+    assert "`q`.`lastPx` AS `lastPx`" in result.sql
+    assert "`prefix_anchor`.`lastPx`" in result.sql
+    assert "`prefix_values`.`lastPx` / 10000.0" in result.sql
+    assert "`q`.`lastPx` / 10000.0 <" not in result.sql
+    assert "`external_lookup`.`mktcode` = `event_rows`.`mktcode`" in result.sql
+    assert "`prefix_values`.`mktcode`" not in result.sql.split(" WHERE ", 1)[1]
+    assert result.validation.passed is True
+
+
 def test_controlled_safe_divide_renders_explicit_nullif_ast():
     catalog = default_physical_catalog()
     last = PhysicalColumn("official_basic", "lastPx", NUMERIC)

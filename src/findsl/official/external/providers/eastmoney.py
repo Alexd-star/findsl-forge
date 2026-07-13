@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 
@@ -52,6 +55,8 @@ class EastmoneyBoardProvider:
         trust_environment_proxy: bool = False,
         session=None,
         browser_session=None,
+        cache_dir: Path = None,
+        request_interval_seconds: float = 0.0,
     ):
         if session is None:
             try:
@@ -74,6 +79,9 @@ class EastmoneyBoardProvider:
         self.timeout_seconds = timeout_seconds
         self.max_attempts = max_attempts
         self.backoff_seconds = backoff_seconds
+        self.cache_dir = Path(cache_dir) if cache_dir is not None else None
+        self.request_interval_seconds = max(0.0, float(request_interval_seconds))
+        self._last_request_at = 0.0
 
     def list_boards(self, board_type: str) -> Tuple[BoardDefinition, ...]:
         try:
@@ -193,9 +201,13 @@ class EastmoneyBoardProvider:
         return tuple(rows[:total] if total is not None else rows)
 
     def _request_json(self, url: str, params: Dict[str, str]) -> dict:
+        cached = self._read_cache(url, params)
+        if cached is not None:
+            return cached
         last_error = None
         for attempt in range(1, self.max_attempts + 1):
             try:
+                self._throttle()
                 response = self._get(url, params)
                 response.raise_for_status()
                 payload = response.json()
@@ -203,6 +215,7 @@ class EastmoneyBoardProvider:
                     raise ExternalProviderError(
                         f"Eastmoney returned rc={payload.get('rc')}"
                     )
+                self._write_cache(url, params, payload)
                 return payload
             except Exception as exc:
                 last_error = exc
@@ -211,6 +224,56 @@ class EastmoneyBoardProvider:
         raise ExternalProviderError(
             f"Eastmoney request failed after {self.max_attempts} attempts: {last_error}"
         ) from last_error
+
+    def _throttle(self) -> None:
+        if self.request_interval_seconds <= 0:
+            return
+        elapsed = time.monotonic() - self._last_request_at
+        if elapsed < self.request_interval_seconds:
+            time.sleep(self.request_interval_seconds - elapsed)
+        self._last_request_at = time.monotonic()
+
+    def _cache_path(self, url: str, params: Dict[str, str]) -> Optional[Path]:
+        if self.cache_dir is None:
+            return None
+        canonical = json.dumps(
+            {"url": url, "params": sorted((str(k), str(v)) for k, v in params.items())},
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+        digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+        return self.cache_dir / f"{digest}.json"
+
+    def _read_cache(self, url: str, params: Dict[str, str]) -> Optional[dict]:
+        path = self._cache_path(url, params)
+        if path is None or not path.exists():
+            return None
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+        expected_params = sorted((str(k), str(v)) for k, v in params.items())
+        if record.get("url") != url or record.get("params") != [list(item) for item in expected_params]:
+            return None
+        payload = record.get("payload")
+        return payload if isinstance(payload, dict) else None
+
+    def _write_cache(self, url: str, params: Dict[str, str], payload: dict) -> None:
+        path = self._cache_path(url, params)
+        if path is None:
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
+        record = {
+            "url": url,
+            "params": sorted((str(k), str(v)) for k, v in params.items()),
+            "payload": payload,
+        }
+        temporary = path.with_suffix(".tmp")
+        temporary.write_text(
+            json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        temporary.replace(path)
 
     def _get(self, url: str, params: Dict[str, str]):
         headers = {

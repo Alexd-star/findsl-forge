@@ -20,6 +20,8 @@ class ExternalSyncResult:
     matched: Tuple[ScopeMatch, ...]
     unresolved: Tuple[str, ...]
     failed_boards: Tuple[Dict[str, str], ...]
+    discovered_boards: int = 0
+    attempted_boards: int = 0
 
     def to_dict(self):
         return {
@@ -41,6 +43,14 @@ class ExternalSyncResult:
             ],
             "unresolved": list(self.unresolved),
             "failed_boards": list(self.failed_boards),
+            "discovered_boards": self.discovered_boards,
+            "attempted_boards": self.attempted_boards,
+            "successful_boards": len(
+                {
+                    (item.board.board_type, item.board.code)
+                    for item in self.matched
+                }
+            ),
         }
 
 
@@ -68,6 +78,43 @@ def build_eastmoney_snapshot(
         else:
             matches.append(match)
 
+    return _build_snapshot_from_matches(
+        matches,
+        unresolved,
+        provider=provider,
+        as_of_date=as_of_date,
+        discovered_boards=len(boards),
+    )
+
+
+def build_full_eastmoney_snapshot(
+    *,
+    provider: EastmoneyBoardProvider,
+    as_of_date: str = None,
+) -> ExternalSyncResult:
+    boards = tuple(
+        (*provider.list_boards("concept"), *provider.list_boards("industry"))
+    )
+    matches = tuple(
+        ScopeMatch(board.name, board, "source_full", 1.0) for board in boards
+    )
+    return _build_snapshot_from_matches(
+        matches,
+        (),
+        provider=provider,
+        as_of_date=as_of_date,
+        discovered_boards=len(boards),
+    )
+
+
+def _build_snapshot_from_matches(
+    matches,
+    unresolved,
+    *,
+    provider,
+    as_of_date,
+    discovered_boards,
+):
     scope_rows = []
     industry_rows = []
     failed = []
@@ -160,6 +207,8 @@ def build_eastmoney_snapshot(
         successful_matches,
         tuple(dict.fromkeys((*unresolved, *failed_targets))),
         tuple(failed),
+        discovered_boards=discovered_boards,
+        attempted_boards=len(by_board),
     )
 
 

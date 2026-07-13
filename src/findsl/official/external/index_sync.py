@@ -132,6 +132,16 @@ def _match_index(
             item for item in definitions if item.code.upper() == desired_code
         ]
         return code_matches[0] if len(code_matches) == 1 else None
+    exact_source = [
+        item
+        for item in definitions
+        if str(target).strip().casefold()
+        in {item.name.strip().casefold(), item.full_name.strip().casefold()}
+    ]
+    if len(exact_source) == 1:
+        return exact_source[0]
+    if not alias_used and "指数" not in str(target):
+        return None
     exact = [
         item
         for item in definitions
@@ -143,8 +153,6 @@ def _match_index(
     # A high string-similarity score is not sufficient to turn a generic board
     # name into an index.  Fuzzy matching is reserved for explicitly index-like
     # targets; all other non-exact mappings must be curated in index_aliases.
-    if not alias_used and "指数" not in str(target):
-        return None
     scored = sorted(
         (
             max(

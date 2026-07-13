@@ -437,11 +437,22 @@ def _render_prefix_join(
     values_name = f"{cte_prefix}prefix_values"
     anchor_alias = "prefix_anchor"
     anchor = _render_plan(plan.input, catalog, cte_prefix)
+    relation = _find_relation(plan.input)
+    passthrough = _prefix_passthrough_columns(plan.input)
+    for column in passthrough:
+        anchor = anchor.select(
+            _render_expr(column, catalog, relation).as_(column.column, quoted=True),
+            append=True,
+        )
     values = exp.select(
         *(
             exp.column(key, table=anchor_alias, quoted=True)
             for key in ("mktcode", "tgtcode", "bizdate")
-        )
+        ),
+        *(
+            exp.column(column.column, table=anchor_alias, quoted=True)
+            for column in passthrough
+        ),
     ).from_(exp.table_(anchor_name, alias=anchor_alias, quoted=True))
 
     for index, projection in enumerate(plan.projections):
@@ -509,7 +520,15 @@ def _render_prefix_join(
             *(
                 exp.column(key, table=values_name, quoted=True)
                 for key in ("mktcode", "tgtcode", "bizdate")
-            )
+            ),
+            *(
+                exp.column(column.column, table=values_name, quoted=True)
+                for column in passthrough
+            ),
+            *(
+                exp.column(projection.alias, table=values_name, quoted=True)
+                for projection in plan.projections
+            ),
         )
         .from_(exp.table_(values_name, quoted=True))
         .with_(anchor_name, as_=anchor)
@@ -518,6 +537,23 @@ def _render_prefix_join(
     if plan.predicate is not None:
         result = result.where(_render_expr(plan.predicate, catalog))
     return result
+
+
+def _prefix_passthrough_columns(plan: PhysicalPlan):
+    columns = {}
+
+    def visit(node):
+        if isinstance(node, (PhysicalScan, PhysicalTableScan)):
+            for column in node.columns:
+                if column.column not in {"mktcode", "tgtcode", "bizdate"}:
+                    columns.setdefault(column.column, column)
+            return
+        if isinstance(node, PhysicalJoin):
+            visit(node.left)
+            visit(node.right)
+
+    visit(plan)
+    return tuple(columns[key] for key in sorted(columns))
 
 
 def _prefix_average_expression(
@@ -740,7 +776,7 @@ def _render_set_aggregate(function: str, value, date):
     )
 def _retarget_event_result_columns(expression, alias: str, catalog: PhysicalCatalog):
     resource_aliases = {resource.resource_id for resource in catalog.resources}
-    resource_aliases.update({"q", "anchor"})
+    resource_aliases.update({"q", "anchor", "prefix_values"})
     stable_names = {"mktcode", "tgtcode", "bizdate"}
 
     def replace(node):
@@ -3060,4 +3096,6 @@ def _expression_alias(resource_id: str, relation: Optional[PhysicalPlan]) -> str
                 f"resource {resource_id} is not present in physical join",
             )
         return resource_id
+    if isinstance(relation, PhysicalPrefixJoin):
+        return "prefix_values"
     return "q"
