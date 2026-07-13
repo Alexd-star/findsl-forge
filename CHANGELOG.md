@@ -9,6 +9,7 @@
 - 将 Ruff 0.15.13 固定加入开发依赖，并在 GitHub Actions 中作为 pytest 前置必过门禁。
 - 精确排除 ANTLR 自动生成目录，仅对承担公共 API 重导出的 `__init__.py` 忽略对应 F401/F403/F405，不采用全局规则关闭。
 - 清理文档生成、科研绘图、答辩材料、官方槽位、参考执行器和测试中的真实未使用导入/变量与歧义命名。
+- 修复 Linux CI 对硬编码 Windows 外部工作簿路径执行 `Path.is_file()` 时触发 `ENAMETOOLONG` 的收集失败；支持 `FINDSL_OFFICIAL_WORKBOOK` 覆盖并安全跳过不可用外部资产。
 - 全仓 Ruff 从 214 条降为 0；ANTLR 生成源检查通过；全量 pytest `876 passed`；官方迁移覆盖保持 `690/1097`。
 
 ### Phase 6C 集合式前缀 CTE/Join 性能计划

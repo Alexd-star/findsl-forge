@@ -39,3 +39,5 @@ powershell -ExecutionPolicy Bypass -File scripts/submission_readiness.ps1
 ```
 
 当前结果为全仓 Ruff `0` 条、ANTLR 生成源一致、pytest `876 passed`、Blocking gates `PASS`、Warning count `0`。官方迁移漏斗保持 `690/1097（62.90%）`，说明质量治理没有改变编译覆盖口径。
+
+首次启用远端门禁后，Linux runner 进一步暴露了外部工作簿探测的跨平台问题：硬编码 Windows 路径在 POSIX 上会被当成一个超长文件名，`Path.is_file()` 抛出 `ENAMETOOLONG`，导致 pytest 在收集阶段失败。测试现统一读取可选的 `FINDSL_OFFICIAL_WORKBOOK` 环境变量，并通过受控探测函数将 `OSError/ValueError` 判定为“外部资产不可用”；对应测试被正确 skip，其他异常仍照常暴露。该边界有专门单元测试，不通过全局异常吞噬解决。
