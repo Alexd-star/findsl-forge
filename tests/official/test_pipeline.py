@@ -22,6 +22,72 @@ def test_official_pipeline_exposes_every_compiler_stage_and_safe_doris_sql():
     assert payload["elapsed_ms"] >= 0
 
 
+def test_pipeline_compiles_previous_close_from_official_basic_table():
+    result = compile_official(
+        "indicator('', '', '昨收价', '', '', '', '') > 10"
+    ).to_dict()
+
+    assert "(`q`.`preClosePx` / 10000.0) > 10" in result["backend"]["sql"]
+    assert result["physical"]["selected_resource"] == "official_basic"
+
+
+def test_empty_rank_uses_only_stable_keys_without_positional_ordering():
+    sql = compile_official(
+        "rank('', '', '', 'desc', '', '', '', '') <= 3"
+    ).backend["sql"]
+
+    assert "ORDER BY 0" not in sql
+    assert "ORDER BY `q`.`mktcode` ASC, `q`.`tgtcode` ASC" in sql
+
+
+@pytest.mark.parametrize(
+    "scope,index_code,date",
+    [("沪深300", "000300", "今年以来"), ("深成指数", "399001", "去年")],
+)
+def test_querydata_index_scalar_uses_versioned_quote_and_official_time_anchor(
+    scope, index_code, date
+):
+    sql = compile_official(
+        f"indicator('', '', '涨跌幅', '{date}', '', '', '') > "
+        f"queryData('', '{scope}', '涨跌幅', '{date}', '')"
+    ).backend["sql"]
+
+    assert "`findsl_ext`.`index_quote`" in sql
+    assert f"`external_index_quote`.`index_code` = '{index_code}'" in sql
+    assert "akshare-sina-index-2026-07-13-f291081f7f0a" in sql
+    assert "FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor" in sql
+
+
+def test_multiple_singleton_dates_become_independent_security_relations():
+    sql = compile_official(
+        "indicator('', 'aigc', '成交量', '昨日', '', '', '') = "
+        "indicator('', 'aigc', '成交量', '本季度', '', 'MIN', '') and "
+        "indicator('', 'aigc', '成交量', '前天', '', '', '') = "
+        "indicator('', 'aigc', '成交量', '本季度', '', 'MIN', '')"
+    ).backend["sql"]
+
+    assert "AS scalar_0" in sql and "AS scalar_1" in sql
+    assert "DESC LIMIT 1 OFFSET 1" in sql
+    assert "DESC LIMIT 1 OFFSET 2" in sql
+    assert "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`volume`" in sql
+    assert "`scalar_0`.`scalar_value_0`" in sql
+    assert "`scalar_1`.`scalar_value_1`" in sql
+
+
+def test_cross_scope_temporal_querydata_uses_independent_aggregate_scalar():
+    result = compile_official(
+        "indicator('', 'AIGC概念', '收盘价', '近两年', '', '', 'EXIST=9季度') <= "
+        "queryData('', '白酒|ai|建筑', '收盘价', '近两年', 'AVG')"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "temporal_cross_scope_scalar"
+    assert "CROSS JOIN (SELECT AVG(" in sql
+    assert "AS temporal_scalar_0" in sql
+    assert "DATE_TRUNC(`source_rows`.`bizdate`, 'QUARTER')" in sql
+    assert "`temporal_metrics`.`metric_value` = 9" in sql
+
+
 def test_open_ended_limit_uses_doris_safe_maximum_with_offset():
     result = compile_official(
         "indicator('', '', '涨幅', '今日', '', '', '') > 0 limit 7,-1"
@@ -71,7 +137,6 @@ def test_extended_date_algebra_reaches_structured_doris_ast(source, fragments):
     [
         ("indicator(", "frontend", "OFFICIAL_ANTLR_PARSE_ERROR"),
         ("indicator('', '', '营业收入', '', '', '', '') > 1", "logical", "DOMAIN_DATA_UNAVAILABLE"),
-        ("indicator('', '', '是否T+0', '', '', '', '') = True", "physical", "PHYSICAL_PLAN_UNAVAILABLE"),
     ],
 )
 def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(source, stage, code):
@@ -87,24 +152,30 @@ def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(so
         assert error.partial["frontend"]["ast"] is not None
 
 
-def test_physical_failure_keeps_candidate_decision_evidence():
-    with pytest.raises(OfficialPipelineError) as excinfo:
-        compile_official("indicator('', '', '是否T+0', '', '', '', '') = True")
+def test_t0_indicator_uses_versioned_exchange_rule_membership():
+    result = compile_official(
+        "indicator('', '', '是否T+0', '', '', '', '') = True"
+    ).to_dict()
 
-    diagnostics = excinfo.value.diagnostics
-    assert diagnostics[0]["reason_code"] == "PHYSICAL_MAPPING_MISSING"
-    assert diagnostics[0]["feasible"] is False
+    assert result["physical"]["selected_resource"] == "official_basic"
+    assert "`findsl_ext`.`instrument_rule`" in result["backend"]["sql"]
+    assert "`external_lookup`.`t0_eligible` = TRUE" in result["backend"]["sql"]
+    assert ") = TRUE" not in result["backend"]["sql"]
+    assert "exchange-stock-rules-2026-07-13-bd7ff74aef53" in result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
 
 
-def test_pipeline_classifies_missing_industry_membership_as_data_unavailable():
-    with pytest.raises(OfficialPipelineError) as excinfo:
-        compile_official(
-            "indicator('', '', '涨幅', '', '', '', '') > "
-            "belong_industry('', '', '涨幅', '', 'AVG')"
-        )
+def test_pipeline_materializes_versioned_industry_relative_aggregate():
+    result = compile_official(
+        "indicator('', '', '涨幅', '', '', '', '') > "
+        "belong_industry('', '', '涨幅', '', 'AVG')"
+    ).to_dict()
 
-    assert excinfo.value.stage == "physical"
-    assert excinfo.value.code == "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE"
+    assert result["physical"]["selected_strategy"] == "composite_grouped_aggregate"
+    assert "`findsl_ext`.`industry_membership`" in result["backend"]["sql"]
+    assert "baostock-industry-2026-07-13-4d38e6963e35" in result["backend"]["sql"]
+    assert "GROUP BY" in result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
 
 
 def test_pipeline_renders_configured_hybrid_numeric_approximation():
@@ -606,6 +677,25 @@ def test_pipeline_filters_fixed_since_period_before_event_window():
     assert "WHERE `q`.`bizdate` >= '2025-10-09'" in sql
     assert "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW" in sql
     assert "`event_rows`.`bizdate` = (SELECT MAX(" in sql
+
+
+@pytest.mark.parametrize(
+    "period,end_month_offset",
+    [("今年1月到10月", 10), ("上半年", 6)],
+)
+def test_pipeline_filters_calendar_period_before_event_window(
+    period, end_month_offset
+):
+    result = compile_official(
+        f"record_high('', '房地产服务', '', '{period}', '近3天', '', '', '') = True"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW" in sql
+    assert "LIMIT 3" in sql
+    assert "DATE_TRUNC" in sql
+    assert f"INTERVAL '{end_month_offset}' MONTH" in sql
 
 
 def test_pipeline_ranks_the_materialized_event_candidate_stage():

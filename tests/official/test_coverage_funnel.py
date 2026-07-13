@@ -17,16 +17,16 @@ def test_coverage_funnel_uses_legacy_successes_as_migration_denominator():
 
     assert report["row_count"] == 4
     assert report["legacy_strict_success"] == 2
-    assert report["new_backend_success"] == 1
-    assert report["legacy_to_new_migrated"] == 1
-    assert report["migration_coverage"] == 0.5
+    assert report["new_backend_success"] == 2
+    assert report["legacy_to_new_migrated"] == 2
+    assert report["migration_coverage"] == 1.0
     assert report["stage_success"] == {
         "frontend": 3,
         "typed": 3,
         "logical": 2,
         "optimizer": 2,
-        "physical": 1,
-        "backend": 1,
+        "physical": 2,
+        "backend": 2,
     }
 
 
@@ -35,13 +35,11 @@ def test_coverage_funnel_records_terminal_codes_rows_and_function_families():
 
     assert report["terminal_errors"] == {
         "DOMAIN_DATA_UNAVAILABLE": 1,
-        "PHYSICAL_PLAN_UNAVAILABLE": 1,
         "OFFICIAL_ANTLR_PARSE_ERROR": 1,
     }
     assert report["function_families"]["indicator"]["rows"] == 3
-    assert report["function_families"]["indicator"]["new_backend_success"] == 1
-    assert report["migration_gaps"][0]["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
-    assert report["migration_gaps"][0]["count"] == 1
+    assert report["function_families"]["indicator"]["new_backend_success"] == 2
+    assert report["migration_gaps"] == []
     assert [row["excel_row"] for row in report["rows"]] == [2, 3, 4, 5]
 
 
@@ -51,6 +49,5 @@ def test_coverage_funnel_markdown_explains_denominator_and_next_priority():
     )
 
     assert "旧严格后端成功集" in markdown
-    assert "50.00%" in markdown
-    assert "PHYSICAL_PLAN_UNAVAILABLE" in markdown
+    assert "100.00%" in markdown
     assert "不得把 4 条总语料直接作为 SQL 正确率分母" in markdown

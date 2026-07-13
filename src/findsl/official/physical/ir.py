@@ -123,6 +123,26 @@ class PhysicalIn(PhysicalExpr):
 
 
 @dataclass(frozen=True)
+class PhysicalExternalExists(PhysicalExpr):
+    lookup_resource_id: str
+    anchor_resource_id: str
+    filters: Tuple[Tuple[str, PhysicalLiteral], ...]
+    type: OfficialType = BOOLEAN
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalExternalExists",
+            "lookup_resource_id": self.lookup_resource_id,
+            "anchor_resource_id": self.anchor_resource_id,
+            "filters": [
+                {"column": column, "value": value.to_dict()}
+                for column, value in self.filters
+            ],
+            "type": self.type.to_dict(),
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalEventRef(PhysicalExpr):
     alias: str
     type: OfficialType = BOOLEAN
@@ -209,6 +229,8 @@ class PhysicalDynamicDateRange(PhysicalExpr):
     offset: int = 0
     month: Optional[int] = None
     day: Optional[int] = None
+    end_month: Optional[int] = None
+    anchor_resource_id: Optional[str] = None
     type: OfficialType = BOOLEAN
 
     def to_dict(self):
@@ -222,6 +244,8 @@ class PhysicalDynamicDateRange(PhysicalExpr):
             "offset": self.offset,
             "month": self.month,
             "day": self.day,
+            "end_month": self.end_month,
+            "anchor_resource_id": self.anchor_resource_id,
             "type": self.type.to_dict(),
         }
 
@@ -605,6 +629,10 @@ class PhysicalAggregateGroup(CanonicalIr):
     input: PhysicalPlan
     measures: Tuple[PhysicalNamedAggregate, ...]
     group_by_security: bool = True
+    industry_membership_resource_id: Optional[str] = None
+    industry_snapshot_id: Optional[str] = None
+    industry_classification_system: Optional[str] = None
+    industry_level: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -613,6 +641,10 @@ class PhysicalAggregateGroup(CanonicalIr):
             "input": self.input.to_dict(),
             "measures": [measure.to_dict() for measure in self.measures],
             "group_by_security": self.group_by_security,
+            "industry_membership_resource_id": self.industry_membership_resource_id,
+            "industry_snapshot_id": self.industry_snapshot_id,
+            "industry_classification_system": self.industry_classification_system,
+            "industry_level": self.industry_level,
         }
 
 
@@ -624,6 +656,7 @@ class PhysicalNamedScalar(CanonicalIr):
     value_alias: str
     group_by_security: bool = False
     collapse_latest: bool = False
+    function: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -634,6 +667,7 @@ class PhysicalNamedScalar(CanonicalIr):
             "value_alias": self.value_alias,
             "group_by_security": self.group_by_security,
             "collapse_latest": self.collapse_latest,
+            "function": self.function,
         }
 
 
@@ -668,6 +702,7 @@ class PhysicalTemporal(PhysicalPlan):
     every: bool
     window: PhysicalTemporalWindow
     trading_sequence: bool = True
+    scalars: Tuple[PhysicalNamedScalar, ...] = ()
 
     def to_dict(self):
         return {
@@ -682,6 +717,7 @@ class PhysicalTemporal(PhysicalPlan):
             "every": self.every,
             "window": self.window.to_dict(),
             "semantics": "trading_sequence" if self.trading_sequence else "calendar_sequence",
+            "scalars": [item.to_dict() for item in self.scalars],
         }
 
 

@@ -2,7 +2,6 @@ import json
 import threading
 from pathlib import Path
 from http.server import ThreadingHTTPServer
-from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 import pytest
@@ -44,7 +43,7 @@ def test_analyze_official_dsl_uses_the_new_auditable_pipeline():
     assert result["backend"]["validation_passed"] is True
 
 
-def test_official_demo_api_returns_success_and_structured_pipeline_failure():
+def test_official_demo_api_returns_grounded_t0_analysis_and_preview():
     server = ThreadingHTTPServer(("127.0.0.1", 0), make_demo_handler(DATA_DIR))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -54,20 +53,20 @@ def test_official_demo_api_returns_success_and_structured_pipeline_failure():
         assert success["pipeline"] == "official-antlr-ir-sqlglot"
         assert success["backend"]["validation_passed"] is True
 
-        with pytest.raises(HTTPError) as excinfo:
-            _post_json(endpoint, {"dsl": "indicator('', '', '是否T+0', '', '', '', '') = True"})
-        error = json.loads(excinfo.value.read().decode("utf-8"))["error"]
-        assert error["stage"] == "physical"
-        assert error["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
-        assert error["partial"]["optimized"]["diagnostics"] == []
+        t0 = _post_json(
+            endpoint,
+            {"dsl": "indicator('', '', '是否T+0', '', '', '', '') = True"},
+        )
+        assert t0["ok"] is True
+        assert "findsl_ext" in t0["backend"]["sql"]
+        assert "instrument_rule" in t0["backend"]["sql"]
 
         preview = _post_json(
             f"http://127.0.0.1:{server.server_port}/api/official/preview",
             {"dsl": "indicator('', '', '是否T+0', '', '', '', '') = True"},
         )
-        assert preview["ok"] is False
-        assert preview["error"]["stage"] == "physical"
-        assert preview["error"]["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
+        assert preview["ok"] is True
+        assert "instrument_rule" in preview["backend"]["sql"]
     finally:
         server.shutdown()
         server.server_close()

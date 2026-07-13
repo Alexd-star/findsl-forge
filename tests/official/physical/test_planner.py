@@ -1,7 +1,7 @@
 import pytest
 
 from findsl.official.lowering import lower_official_ast
-from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalPrefixJoin, PhysicalPrefixRef, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalSetOperation, PhysicalStageRank, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
+from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalLiteral, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalPrefixJoin, PhysicalPrefixRef, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalSetOperation, PhysicalStageRank, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
 from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.physical.expressions import default_physical_expressions
 from findsl.official.physical.planner import PhysicalPlanningError, plan_physical
@@ -10,6 +10,7 @@ from findsl.official.physical.strategies import default_physical_strategies
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
 from findsl.official_slot import _resolve_indicator_meta, parse_official_slot
+from findsl.official.types import NUMERIC
 
 
 def _lower(source):
@@ -210,7 +211,7 @@ def test_approximate_comparison_uses_typed_hybrid_tolerance_expression():
     "source,code",
     [
         (
-            "indicator('', '软件开发', '成交量', '', '', '', '') > 100",
+            "indicator('', '完全不存在的范围', '成交量', '', '', '', '') > 100",
             "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
         ),
         (
@@ -353,18 +354,96 @@ def test_period_querydata_scalar_collapses_to_one_cross_join_value():
     assert result.plan.scalars[0].collapse_latest is True
 
 
-def test_composite_aggregate_rejects_conflicting_scalar_snapshot_dates():
-    with pytest.raises(PhysicalPlanningError) as excinfo:
-        plan_physical(
-            _lower(
-                "indicator('', '', '成交量', '今日', '', '', '') + "
-                "indicator('', '', '成交额', '昨日', '', '', '') > "
-                "indicator('', '', '成交量', '近5日', '', 'AVG', '')"
-            ),
-            default_physical_catalog(),
-        )
+def test_external_scope_aggregate_uses_membership_without_security_name_join():
+    result = plan_physical(
+        _lower(
+            "indicator('', '软件开发', '成交量', '近5日', '', 'AVG', '') > 0"
+        ),
+        default_physical_catalog(),
+    )
 
-    assert excinfo.value.code == "PHYSICAL_SCALAR_SCOPE_MISMATCH"
+    assert isinstance(result.plan, PhysicalGroupedAggregate)
+    payload = result.plan.canonical_json()
+    assert "PhysicalExternalExists" in payload
+    assert "__security_scope_name" not in payload
+
+
+def test_external_scope_composite_aggregate_does_not_require_security_name_field():
+    result = plan_physical(
+        _lower(
+            "indicator('', '软件开发', '成交量', '昨日', '', '', '') > "
+            "indicator('', '软件开发', '成交量', '今年', '', 'MAX', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    payload = result.plan.canonical_json()
+    assert "PhysicalExternalExists" in payload
+    assert "__security_scope_name" not in payload
+
+
+def test_external_index_querydata_scalar_uses_versioned_quote_resource():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '今年以来', '', '', '') > "
+            "queryData('', '沪深300', '成交量', '今年以来', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    payload = result.plan.canonical_json()
+    assert "external_index_quote" in payload
+    assert "akshare-sina-index-2026-07-13-f291081f7f0a" in payload
+
+
+def test_industry_relative_aggregate_carries_single_valued_policy_in_physical_ir():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > "
+            "belong_industry('', '', '成交量', '', 'AVG')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    industry = result.plan.groups[0]
+    assert industry.industry_membership_resource_id == "external_industry_membership"
+    assert industry.industry_snapshot_id == (
+        "baostock-industry-2026-07-13-4d38e6963e35"
+    )
+    assert industry.industry_classification_system == "证监会行业分类"
+    assert industry.industry_level == "industry"
+    assert "PhysicalLatestValue" in industry.input.canonical_json()
+
+
+def test_empty_industry_aggregate_function_defaults_to_cross_sectional_average():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '', '', '', '') > "
+            "belong_industry('', '', '成交量', '', '') * 0.6"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert result.plan.groups[0].measures[0].function == "avg"
+
+
+def test_composite_aggregate_splits_conflicting_scalar_snapshot_dates():
+    result = plan_physical(
+        _lower(
+            "indicator('', '', '成交量', '今日', '', '', '') + "
+            "indicator('', '', '成交额', '昨日', '', '', '') > "
+            "indicator('', '', '成交量', '近5日', '', 'AVG', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalCompositeAggregate)
+    assert len(result.plan.scalars) == 2
+    assert all(item.group_by_security for item in result.plan.scalars)
 
 
 def test_growth_rank_lowers_to_dedicated_aggregate_rank():
@@ -780,11 +859,58 @@ def test_universe_selector_rejects_non_all_comparison():
 def test_universe_selector_does_not_claim_unavailable_filter_scope_membership():
     with pytest.raises(PhysicalPlanningError) as excinfo:
         plan_physical(
-            _lower("indicator('', '鸿蒙概念', '', '', '', '', '') = 'all'"),
+            _lower("indicator('', '不存在的机器人概念', '', '', '', '', '') = 'all'"),
             default_physical_catalog(),
         )
 
     assert excinfo.value.code == "PHYSICAL_SCOPE_DATA_UNAVAILABLE"
+
+
+def test_external_scope_membership_is_planned_with_snapshot_provenance():
+    result = plan_physical(
+        _lower("indicator('', '软件开发', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    assert "PhysicalExternalExists" in payload
+    assert "external_scope_membership" in payload
+    assert '"column":"scope_code"' in payload
+    assert '"column":"snapshot_id"' in payload
+
+
+def test_empty_rank_indicator_uses_stable_security_key_tie_break_order():
+    result = plan_physical(
+        _lower("rank('', '', '', 'desc', '', '', '', '') <= 3"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalRank)
+    assert result.plan.expression == PhysicalLiteral(0, NUMERIC)
+    assert result.plan.direction == "desc"
+
+
+def test_unmaterialized_moving_average_uses_parameterized_prefix_relation():
+    result = plan_physical(
+        _lower("indicator('', '', '11日均线', '', '', '', '') > 0"),
+        default_physical_catalog(),
+    )
+
+    assert isinstance(result.plan, PhysicalFilter)
+    assert isinstance(result.plan.input, PhysicalPrefixJoin)
+    assert result.plan.input.projections[0].expression.window == 11
+    assert result.plan.input.projections[0].expression.sum_column == "close_prefix"
+    assert "dynamic_price_average_11" in result.plan.canonical_json()
+
+
+def test_existing_moving_average_keeps_materialized_catalog_priority():
+    result = plan_physical(
+        _lower("indicator('', '', '10日均线', '', '', '', '') > 0"),
+        default_physical_catalog(),
+    )
+
+    assert not isinstance(result.plan.input, PhysicalPrefixJoin)
+    assert result.selected_resource == "official_technical"
 
 
 def test_known_security_name_scope_adds_typed_security_master_join():

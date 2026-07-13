@@ -4,6 +4,7 @@ from findsl.official.domain import EventSpec, IndicatorRef, UniverseSpec
 from findsl.official.domain.binder import DomainBindingError, bind_function
 from findsl.official.registry import default_official_registry
 from findsl.official.semantics import OfficialSemanticAnalyzer
+from findsl.official.types import NUMERIC
 from findsl.official_slot import _resolve_indicator_meta, parse_official_slot
 
 
@@ -85,14 +86,15 @@ def test_empty_query_data_indicator_is_not_misclassified_as_universe():
     assert excinfo.value.code == "DOMAIN_CAPABILITY_UNSUPPORTED"
 
 
-def test_empty_rank_indicator_remains_unsupported_without_order_measure():
-    with pytest.raises(DomainBindingError) as excinfo:
-        bind_function(
-            _typed_call("rank('', '', '', 'desc', '', '', '', '')"),
-            default_official_registry(),
-        )
+def test_empty_rank_indicator_binds_deterministic_stable_order_policy():
+    bound = bind_function(
+        _typed_call("rank('', '', '', 'desc', '', '', '', '')"),
+        default_official_registry(),
+    )
 
-    assert excinfo.value.code == "DOMAIN_CAPABILITY_UNSUPPORTED"
+    assert bound.indicators[0].indicator_id == "稳定证券顺序"
+    assert bound.indicators[0].type is NUMERIC
+    assert bound.requirement.capabilities == frozenset({"scan", "stable_order"})
 
 
 @pytest.mark.parametrize(
@@ -133,6 +135,23 @@ def test_unknown_indicator_has_precise_diagnostic():
         bind_function(typed, default_official_registry())
     assert excinfo.value.code == "DOMAIN_UNKNOWN_INDICATOR"
     assert excinfo.value.slot == "indicator_name"
+
+
+@pytest.mark.parametrize(
+    "indicator,unit",
+    [("11日均线", "currency"), ("34日均量线", "shares"), ("850日均线", "currency")],
+)
+def test_parameterized_moving_average_binds_as_prefix_derived_indicator(
+    indicator, unit
+):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '{indicator}', '', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.indicators[0].indicator_id == indicator
+    assert bound.indicators[0].unit == unit
+    assert "prefix_average" in bound.requirement.capabilities
 
 
 def test_declared_missing_indicator_reports_data_unavailable():
@@ -189,6 +208,7 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("前年", "dynamic_period", None, "year"),
         ("一八年", "calendar_range", None, "year"),
         ("2024年8月", "calendar_range", None, "month"),
+        ("18年-24年", "calendar_range", None, "year"),
         ("2011年3月25日", "exact", None, None),
         ("昨天", "relative_session", 1, "session"),
         ("前天", "relative_session", 2, "session"),
@@ -215,6 +235,11 @@ def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
         assert (bound.date_constraint.start, bound.date_constraint.end) == (
             "2024-08-01",
             "2024-08-31",
+        )
+    elif date == "18年-24年":
+        assert (bound.date_constraint.start, bound.date_constraint.end) == (
+            "2018-01-01",
+            "2024-12-31",
         )
     elif date == "2011年3月25日":
         assert (bound.date_constraint.start, bound.date_constraint.end) == (

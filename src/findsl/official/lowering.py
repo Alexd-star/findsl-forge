@@ -368,7 +368,12 @@ def _temporal_binding_for_stage(
             and slots.get("filter_scope", "") == reference_slots.get("filter_scope", "")
             and slots.get("select_type", "") == reference_slots.get("select_type", "")
         )
-        if not same_scope:
+        independent_querydata_aggregate = (
+            call.node.name == "queryData"
+            and binding.temporal is None
+            and bool(str(slots.get("agg_func", "")).strip())
+        )
+        if not same_scope and not independent_querydata_aggregate:
             raise OfficialLoweringError(
                 "TEMPORAL_SCOPE_MISMATCH",
                 "all functions in a temporal arithmetic predicate must share market, date, filter and security scopes",

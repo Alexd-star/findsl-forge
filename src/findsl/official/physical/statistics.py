@@ -169,15 +169,31 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
     if not doris_version:
         raise PhysicalStatisticsError("SHOW FRONTENDS returned no Doris version")
 
-    data_rows = _metadata_rows(config, "SHOW DATA", runner)
-    sizes = {row["TableName"]: parse_doris_size(row["Size"]) for row in data_rows}
-    missing_tables = sorted(resource.table for resource in catalog.resources if resource.table not in sizes)
+    sizes = {}
+    for database in sorted({resource.database for resource in catalog.resources}):
+        data_rows = _metadata_rows(config, "SHOW DATA", runner, database=database)
+        sizes.update(
+            {
+                (database, row["TableName"]): parse_doris_size(row["Size"])
+                for row in data_rows
+            }
+        )
+    missing_tables = sorted(
+        f"{resource.database}.{resource.table}"
+        for resource in catalog.resources
+        if (resource.database, resource.table) not in sizes
+    )
     if missing_tables:
         raise PhysicalStatisticsError(f"SHOW DATA missing catalog table(s): {', '.join(missing_tables)}")
 
     resources = []
     for resource in sorted(catalog.resources, key=lambda item: item.resource_id):
-        rows = _metadata_rows(config, f"SHOW TABLE STATS `{resource.table}`", runner)
+        rows = _metadata_rows(
+            config,
+            f"SHOW TABLE STATS `{resource.table}`",
+            runner,
+            database=resource.database,
+        )
         if len(rows) != 1 or not str(rows[0].get("row_count", "")).strip():
             raise PhysicalStatisticsError(f"SHOW TABLE STATS missing row_count for {resource.table}")
         try:
@@ -188,7 +204,7 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
             PhysicalResourceStatistics(
                 resource_id=resource.resource_id,
                 row_count=row_count,
-                data_size_bytes=sizes[resource.table],
+                data_size_bytes=sizes[(resource.database, resource.table)],
                 row_count_available=True,
             )
         )
@@ -204,7 +220,7 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
     )
 
 
-def _metadata_rows(config, sql: str, runner):
+def _metadata_rows(config, sql: str, runner, *, database=None):
     command = [
         config.mysql_executable,
         "--batch",
@@ -212,7 +228,7 @@ def _metadata_rows(config, sql: str, runner):
         "--host", config.host,
         "--port", str(config.port),
         "--user", config.user,
-        "--database", config.database,
+        "--database", database or config.database,
         "--execute", sql,
     ]
     environment = os.environ.copy()

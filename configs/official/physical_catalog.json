@@ -109,9 +109,147 @@
       ],
       "anchor_resource_id": "official_basic",
       "priority": 20
+    },
+    {
+      "resource_id": "external_scope_membership",
+      "database": "findsl_ext",
+      "table": "scope_membership",
+      "logical_entity": "security_scope_membership",
+      "partition_key": null,
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "effective_dating",
+        "scope_membership",
+        "weight"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode"
+      ],
+      "anchor_resource_id": null,
+      "priority": 5
+    },
+    {
+      "resource_id": "external_industry_membership",
+      "database": "findsl_ext",
+      "table": "industry_membership",
+      "logical_entity": "security_industry_membership",
+      "partition_key": null,
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "effective_dating",
+        "industry_membership"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode"
+      ],
+      "anchor_resource_id": null,
+      "priority": 5
+    },
+    {
+      "resource_id": "external_instrument_rule",
+      "database": "findsl_ext",
+      "table": "instrument_rule",
+      "logical_entity": "security_instrument_rule",
+      "partition_key": null,
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "effective_dating",
+        "instrument_rule",
+        "t0_eligibility"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode"
+      ],
+      "anchor_resource_id": null,
+      "priority": 5
+    },
+    {
+      "resource_id": "external_index_quote",
+      "database": "findsl_ext",
+      "table": "index_quote",
+      "logical_entity": "index_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "index_code",
+      "capabilities": [
+        "scan",
+        "index_quote"
+      ],
+      "stable_keys": [
+        "index_code",
+        "bizdate"
+      ],
+      "anchor_resource_id": null,
+      "priority": 5
     }
   ],
   "fields": [
+    {
+      "indicator_id": "__index_snapshot_id",
+      "resource_id": "external_index_quote",
+      "column": "snapshot_id",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": false
+    },
+    {
+      "indicator_id": "__index_code",
+      "resource_id": "external_index_quote",
+      "column": "index_code",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": false
+    },
+    {
+      "indicator_id": "__index_pct_change",
+      "resource_id": "external_index_quote",
+      "column": "pct_change",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__index_open",
+      "resource_id": "external_index_quote",
+      "column": "open",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__index_high",
+      "resource_id": "external_index_quote",
+      "column": "high",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__index_low",
+      "resource_id": "external_index_quote",
+      "column": "low",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__index_close",
+      "resource_id": "external_index_quote",
+      "column": "close",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__index_volume",
+      "resource_id": "external_index_quote",
+      "column": "volume",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
     {
       "indicator_id": "10日均线",
       "resource_id": "official_technical",

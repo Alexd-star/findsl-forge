@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "industry": {
+    "resource_id": "external_industry_membership",
+    "snapshot_id": "baostock-industry-2026-07-13-4d38e6963e35",
+    "source": "baostock",
+    "as_of_date": "2026-07-13",
+    "classification_system": "证监会行业分类",
+    "industry_level": "industry"
+  },
+  "instrument_rule": {
+    "resource_id": "external_instrument_rule",
+    "snapshot_id": "exchange-stock-rules-2026-07-13-bd7ff74aef53",
+    "source": "sse-szse-bse",
+    "as_of_date": "2026-07-13"
+  }
+}

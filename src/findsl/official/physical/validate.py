@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalCrossing, PhysicalEmpty,
     PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
-    PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
+    PhysicalDynamicDateRange, PhysicalExternalExists, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -276,6 +276,22 @@ def _validate_plan(plan, catalog, expressions):
             relation_aliases.add(group.alias)
             if not group.measures:
                 raise ValueError("composite aggregate group requires at least one measure")
+            industry_contract = (
+                group.industry_membership_resource_id,
+                group.industry_snapshot_id,
+                group.industry_classification_system,
+                group.industry_level,
+            )
+            if any(industry_contract):
+                if not all(industry_contract) or not group.group_by_security:
+                    raise ValueError("industry aggregate contract is incomplete")
+                membership = catalog.resource(
+                    group.industry_membership_resource_id
+                )
+                if "industry_membership" not in membership.capabilities:
+                    raise PhysicalCatalogError(
+                        "industry aggregate resource lacks industry membership capability"
+                    )
             _validate_plan(group.input, catalog, expressions)
             measure_aliases = set()
             for measure in group.measures:
@@ -441,6 +457,18 @@ def _validate_plan(plan, catalog, expressions):
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.value_bound, catalog, expressions)
     elif isinstance(plan, PhysicalTemporal):
+        _validate_plan(plan.input, catalog, expressions)
+        declared_scalars = {item.alias for item in plan.scalars}
+        if len(declared_scalars) != len(plan.scalars):
+            raise ValueError("temporal scalar aliases must be unique")
+        for scalar in plan.scalars:
+            _validate_plan(scalar.input, catalog, expressions)
+            _validate_expr(scalar.expression, catalog, expressions)
+            if scalar.function not in {"sum", "avg", "max", "min"}:
+                raise ValueError("temporal scalar requires a set aggregate")
+        scalar_refs = {item.relation_alias for item in _walk_aggregate_refs(plan.predicate)}
+        if scalar_refs != declared_scalars:
+            raise ValueError("temporal predicate scalar references are not declared")
         _validate_expr(plan.predicate, catalog, expressions)
         if isinstance(plan.input, PhysicalEventProjection):
             declared = {event.alias for event in plan.input.events}
@@ -593,7 +621,12 @@ def _validate_expr(expression, catalog, expressions=None):
         resource = catalog.resource(expression.resource_id)
         if expression.column != resource.partition_key:
             raise PhysicalCatalogError("dynamic date ranges are restricted to the resource partition key")
-        if expression.range_kind not in {"period", "recent", "anchor_calendar"}:
+        if expression.range_kind not in {
+            "period",
+            "recent",
+            "anchor_calendar",
+            "year_month_range",
+        }:
             raise ValueError("unsupported dynamic date range kind")
         if expression.amount <= 0 or expression.offset > 0:
             raise ValueError("dynamic date range cannot be empty or future-relative")
@@ -601,6 +634,7 @@ def _validate_expr(expression, catalog, expressions=None):
             "period": {"week", "month", "quarter", "year"},
             "recent": {"week", "month", "year"},
             "anchor_calendar": {"day", "month"},
+            "year_month_range": {"month"},
         }
         if expression.unit not in allowed_units[expression.range_kind]:
             raise ValueError("dynamic date range unit does not match its kind")
@@ -608,6 +642,15 @@ def _validate_expr(expression, catalog, expressions=None):
             raise ValueError("dynamic date month is invalid")
         if expression.day is not None and not 1 <= expression.day <= 31:
             raise ValueError("dynamic date day is invalid")
+        if expression.range_kind == "year_month_range":
+            if expression.month is None or expression.end_month is None:
+                raise ValueError("year month range requires both month boundaries")
+            if not 1 <= expression.month <= expression.end_month <= 12:
+                raise ValueError("year month range boundaries are invalid")
+        if expression.anchor_resource_id is not None:
+            anchor = catalog.resource(expression.anchor_resource_id)
+            if anchor.partition_key is None:
+                raise ValueError("dynamic date anchor requires a partition key")
     elif isinstance(expression, PhysicalSessionBoundaryRange):
         resource = catalog.resource(expression.resource_id)
         if expression.column != resource.partition_key:
@@ -639,6 +682,19 @@ def _validate_expr(expression, catalog, expressions=None):
         if not expression.values:
             raise ValueError("physical IN requires at least one value")
         for value in expression.values:
+            _validate_expr(value, catalog, expressions)
+    elif isinstance(expression, PhysicalExternalExists):
+        lookup = catalog.resource(expression.lookup_resource_id)
+        anchor = catalog.resource(expression.anchor_resource_id)
+        if not {"mktcode", "tgtcode"}.issubset(lookup.stable_keys):
+            raise PhysicalCatalogError("external lookup requires security stable keys")
+        if not {"mktcode", "tgtcode"}.issubset(anchor.stable_keys):
+            raise PhysicalCatalogError("external lookup anchor requires security stable keys")
+        if not expression.filters:
+            raise ValueError("external lookup requires at least one controlled filter")
+        for column, value in expression.filters:
+            if not column.isidentifier():
+                raise PhysicalCatalogError("invalid external lookup filter column")
             _validate_expr(value, catalog, expressions)
     elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
         _validate_expr(expression.left, catalog, expressions)

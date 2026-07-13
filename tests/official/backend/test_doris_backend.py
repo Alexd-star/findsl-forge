@@ -111,6 +111,74 @@ def test_numeric_percent_literal_is_rendered_as_number_not_sql_string():
     assert "'2%'" not in result.sql
 
 
+def test_external_scope_membership_renders_correlated_exists_with_snapshot_filter():
+    result = render_doris(
+        _physical("indicator('', '软件开发', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    parsed = sqlglot.parse_one(result.sql, read="doris")
+    assert len(list(parsed.find_all(exp.Exists))) == 1
+    assert "`findsl_ext`.`scope_membership`" in result.sql
+    assert "`external_lookup`.`mktcode` = `q`.`mktcode`" in result.sql
+    assert "`external_lookup`.`tgtcode` = `q`.`tgtcode`" in result.sql
+    assert "`external_lookup`.`scope_code`" in result.sql
+    assert "`external_lookup`.`snapshot_id`" in result.sql
+    assert result.validation.passed is True
+
+
+@pytest.mark.parametrize(
+    "literal,required,forbidden",
+    [("True", "EXISTS(", ") = TRUE"), ("False", "NOT EXISTS(", ") = FALSE")],
+)
+def test_external_rule_boolean_comparison_uses_doris_exists_predicate(
+    literal, required, forbidden
+):
+    result = render_doris(
+        _physical(
+            f"indicator('', '', '是否T+0', '', '', '', '') = {literal}"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert required in result.sql
+    assert forbidden not in result.sql
+    assert result.validation.passed is True
+
+
+def test_industry_relative_aggregate_renders_set_join_not_correlated_scalar_sql():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '成交量', '', '', '', '') > "
+            "belong_industry('', '', '成交量', '', 'AVG')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "`findsl_ext`.`industry_membership`" in result.sql
+    assert "AVG(`aggregate_0_source`.`metric_0`)" in result.sql
+    assert "GROUP BY `aggregate_0_member`.`industry_code`" in result.sql
+    assert result.sql.count("baostock-industry-2026-07-13-4d38e6963e35") == 2
+    assert result.validation.passed is True
+
+
+def test_parameterized_moving_average_renders_one_set_prefix_join_per_window():
+    result = render_doris(
+        _physical(
+            "indicator('', '', '11日均线', '', '', '', '') > "
+            "indicator('', '', '17日均线', '', '', '', '')"
+        ),
+        default_physical_catalog(),
+    )
+
+    assert "dynamic_price_average_11" in result.sql
+    assert "dynamic_price_average_17" in result.sql
+    assert "prefix_current_0" in result.sql
+    assert "prefix_current_1" in result.sql
+    assert "SELECT `p`.`close_prefix`" not in result.sql
+    assert result.validation.passed is True
+
+
 def test_latest_date_and_market_constraints_render_as_sqlglot_ast():
     result = render_doris(
         _physical("indicator('沪|深', '', '成交量', '今日', '', '', '') > 100"),

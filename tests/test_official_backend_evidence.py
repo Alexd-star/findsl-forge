@@ -20,10 +20,10 @@ def test_backend_evidence_separates_grounded_sql_from_unavailable_domains():
     assert report["row_count"] == 3
     assert report["typed_ok"] == 3
     assert report["logical_ok"] == 2
-    assert report["physical_ok"] == 1
-    assert report["sqlglot_ok"] == 1
-    assert report["safety_ok"] == 1
-    assert report["errors"]["PHYSICAL_PLAN_UNAVAILABLE"] == 1
+    assert report["physical_ok"] == 2
+    assert report["sqlglot_ok"] == 2
+    assert report["safety_ok"] == 2
+    assert "PHYSICAL_PLAN_UNAVAILABLE" not in report["errors"]
     assert report["errors"]["DOMAIN_DATA_UNAVAILABLE"] == 1
     assert report["static_gate"]["passed"] is True
     assert report["real_doris_execution"]["status"] == "NOT_RUN"

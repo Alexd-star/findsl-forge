@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "concepts": [
+    {"name": "低空经济", "code": "309115", "aliases": ["低空经济"]},
+    {"name": "DeepSeek概念", "code": "309184", "aliases": ["deepseek相关"]},
+    {"name": "储能", "code": "306380", "aliases": ["储能"]},
+    {"name": "可控核聚变", "code": "309108", "aliases": ["可控核聚变板块"]},
+    {"name": "专精特新", "code": "308740", "aliases": ["专精特新小巨人企业"]},
+    {"name": "国企改革", "code": "309034", "aliases": ["国改"]},
+    {"name": "智慧城市", "code": "300642", "aliases": ["智能城市"]},
+    {"name": "脑机接口", "code": "308535", "aliases": ["脑机接口"]},
+    {"name": "比亚迪概念", "code": "308972", "aliases": ["比亚迪类"]}
+  ]
+}

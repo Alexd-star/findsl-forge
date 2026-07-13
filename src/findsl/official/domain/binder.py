@@ -64,6 +64,8 @@ _DEFAULT_PRICE_SLOTS = {
     "position": "indicator_name",
 }
 _MARKETS = {"沪": "SH", "深": "SZ", "北": "BJ", "港": "HK", "美": "US", "A股": "A", "B股": "B"}
+EMPTY_RANK_POLICY_INDICATOR = "稳定证券顺序"
+_DYNAMIC_MOVING_AVERAGE = re.compile(r"^(\d{1,4})日均(量)?线$")
 
 
 def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> BoundFunction:
@@ -77,9 +79,25 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
         and indicator_slots == ["indicator_name"]
         and not str(slots.get("indicator_name", "")).strip()
     )
+    is_empty_rank = (
+        name == "rank"
+        and indicator_slots == ["indicator_name"]
+        and str(slots.get("indicator_name", "")).strip()
+        in {"", EMPTY_RANK_POLICY_INDICATOR}
+    )
     indicators = (
         ()
         if is_universe
+        else (
+            IndicatorRef(
+                EMPTY_RANK_POLICY_INDICATOR,
+                NUMERIC,
+                "ordinal",
+                "security_reference",
+                "derived",
+            ),
+        )
+        if is_empty_rank
         else tuple(_bind_indicator(name, slot, slots.get(slot, ""), registry) for slot in indicator_slots)
     )
     if not indicators and not is_universe:
@@ -120,11 +138,21 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
         temporal = parse_temporal_quantifier(count_expression) if count_expression else None
     except TemporalParseError as exc:
         raise DomainBindingError(exc.code, str(exc), function=name, slot="count_exp", value=count_expression) from exc
-    domains = frozenset({"quote"}) if is_universe else frozenset(item.domain for item in indicators)
+    domains = (
+        frozenset({"quote"})
+        if is_universe
+        else frozenset(item.domain for item in indicators)
+    )
     capabilities = (
         frozenset({"scan"})
         if is_universe
-        else frozenset(capability for definition in (_definition(item, registry) for item in indicators) for capability in definition.capabilities)
+        else frozenset({"scan", "stable_order"})
+        if is_empty_rank
+        else frozenset(
+            capability
+            for indicator in indicators
+            for capability in _indicator_capabilities(indicator, registry)
+        )
     )
     requirement = DataRequirement(domains, capabilities)
     expression = (
@@ -154,6 +182,8 @@ def normalize_function_slots(name: str, slots: Mapping[str, str]) -> Mapping[str
     default_slot = _DEFAULT_PRICE_SLOTS.get(name)
     if default_slot and not str(normalized.get(default_slot, "")).strip():
         normalized[default_slot] = "最新价"
+    if name == "rank" and not str(normalized.get("indicator_name", "")).strip():
+        normalized["indicator_name"] = EMPTY_RANK_POLICY_INDICATOR
     return normalized
 
 
@@ -161,9 +191,27 @@ def _definition(indicator: IndicatorRef, registry: OfficialIndicatorRegistry) ->
     return registry.resolve(indicator.indicator_id)
 
 
+def _indicator_capabilities(
+    indicator: IndicatorRef,
+    registry: OfficialIndicatorRegistry,
+):
+    if _DYNAMIC_MOVING_AVERAGE.fullmatch(indicator.indicator_id):
+        return ("scan", "prefix_average", "window")
+    return _definition(indicator, registry).capabilities
+
+
 def _bind_indicator(function: str, slot: str, value: str, registry: OfficialIndicatorRegistry) -> IndicatorRef:
     if not value:
         raise DomainBindingError("DOMAIN_CAPABILITY_UNSUPPORTED", "empty indicator slot cannot be bound", function=function, slot=slot, value=value)
+    dynamic = _DYNAMIC_MOVING_AVERAGE.fullmatch(str(value).strip())
+    if dynamic and 1 <= int(dynamic.group(1)) <= 1000:
+        return IndicatorRef(
+            str(value).strip(),
+            NUMERIC,
+            "shares" if dynamic.group(2) else "currency",
+            "quote",
+            "derived",
+        )
     try:
         definition = registry.resolve(value)
     except KeyError as exc:
@@ -477,6 +525,28 @@ def parse_date_constraint(value: str) -> DateConstraint:
             f"{year_value:04d}-{month_value:02d}-01",
             f"{year_value:04d}-{month_value:02d}-{last_day:02d}",
             unit="month",
+            trading_day_based=False,
+        )
+    year_range = re.fullmatch(
+        rf"(?P<start>{year_token})年\s*[-至到]\s*(?P<end>{year_token})年",
+        value,
+    )
+    if year_range:
+        start_year = _calendar_year(year_range.group("start"), value)
+        end_year = _calendar_year(year_range.group("end"), value)
+        if start_year > end_year:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"calendar range starts after it ends: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "calendar_range",
+            f"{start_year:04d}-01-01",
+            f"{end_year:04d}-12-31",
+            unit="year",
             trading_day_based=False,
         )
     recent_sessions = re.fullmatch(

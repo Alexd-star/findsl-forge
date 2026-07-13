@@ -36,6 +36,10 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         "hsj_stock_hq_basic_technical": "1.313 GB",
         "hsj_stock_hq_basic_prefix": "375.350 MB",
         "hsj_stock_hq_ext_prefix": "135.735 MB",
+        "scope_membership": "4.000 MB",
+        "industry_membership": "2.000 MB",
+        "instrument_rule": "512.000 KB",
+        "index_quote": "1.000 MB",
     }
     rows = {
         "hsj_stock_hq_basic": 13650347,
@@ -44,6 +48,10 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         "hsj_stock_hq_basic_technical": 13650347,
         "hsj_stock_hq_basic_prefix": 13650347,
         "hsj_stock_hq_ext_prefix": 13650347,
+        "scope_membership": 35421,
+        "industry_membership": 23226,
+        "instrument_rule": 5686,
+        "index_quote": 14533,
     }
 
     def runner(command, **kwargs):
@@ -56,8 +64,16 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
                 stderr="",
             )
         if sql == "SHOW DATA":
+            database = command[command.index("--database") + 1]
+            expected = {
+                resource.table
+                for resource in catalog.resources
+                if resource.database == database
+            }
             lines = ["TableName\tSize\tReplicaCount\tRemoteSize"]
-            lines.extend(f"{name}\t{size}\t16\t0.000" for name, size in sizes.items())
+            lines.extend(
+                f"{name}\t{sizes[name]}\t16\t0.000" for name in sorted(expected)
+            )
             return SimpleNamespace(returncode=0, stdout="\n".join(lines) + "\n", stderr="")
         table = sql.split("`")[1]
         return SimpleNamespace(
@@ -78,7 +94,7 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
     assert snapshot.doris_version == "doris-4.1.0-rc03-5960d4cea0e"
     assert all("secret" not in part for command, _ in calls for part in command)
     assert all(kwargs["env"]["MYSQL_PWD"] == "secret" for _, kwargs in calls)
-    assert len(calls) == 8
+    assert len(calls) == 13
 
 
 def test_collector_rejects_missing_show_data_resource():

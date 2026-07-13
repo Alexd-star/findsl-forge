@@ -10,6 +10,10 @@
       "expression": {"op": "divide", "left": {"op": "column", "column": "openPx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
     },
     {
+      "indicator_id": "昨收价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "preClosePx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
       "indicator_id": "收盘价", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
       "expression": {"op": "divide", "left": {"op": "column", "column": "closePx", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
     },

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "resource_id": "external_index_quote",
+  "entries": [
+    {
+      "scope_code": "000300",
+      "snapshot_id": "akshare-sina-index-2026-07-13-f291081f7f0a",
+      "source": "akshare-sina-index-daily",
+      "as_of_date": "2026-07-13"
+    },
+    {
+      "scope_code": "399001",
+      "snapshot_id": "akshare-sina-index-2026-07-13-f291081f7f0a",
+      "source": "akshare-sina-index-daily",
+      "as_of_date": "2026-07-13"
+    }
+  ]
+}

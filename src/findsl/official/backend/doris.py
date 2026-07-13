@@ -22,6 +22,7 @@ from ..physical.ir import (
     PhysicalEventFilter,
     PhysicalEventProjection,
     PhysicalEventRef,
+    PhysicalExternalExists,
     PhysicalExtreme,
     PhysicalGroupedAggregate,
     PhysicalGreatest,
@@ -185,12 +186,17 @@ def _render_plan(
         inner = _render_plan(plan.input, catalog, cte_prefix)
         relation = _find_relation(plan.input)
         stable_alias = _stable_alias(relation)
-        order = exp.Order(
-            expressions=[
+        metric_order = []
+        if not isinstance(plan.expression, PhysicalLiteral):
+            metric_order.append(
                 exp.Ordered(
                     this=_render_expr(plan.expression, catalog, relation),
                     desc=plan.direction == "desc",
-                ),
+                )
+            )
+        order = exp.Order(
+            expressions=[
+                *metric_order,
                 exp.Ordered(
                     this=exp.column("mktcode", table=stable_alias, quoted=True),
                     desc=False,
@@ -1319,6 +1325,13 @@ def _render_aggregate_group(
 ) -> exp.Select:
     source = _render_plan(group.input, catalog, cte_prefix)
     relation = _find_relation(group.input)
+    if group.industry_membership_resource_id is not None:
+        return _render_industry_aggregate_group(
+            group,
+            source,
+            relation,
+            catalog,
+        )
     stable_alias = _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
     measures = [
@@ -1338,11 +1351,139 @@ def _render_aggregate_group(
     return source.group_by(*group_keys) if group_keys else source
 
 
+def _render_industry_aggregate_group(
+    group: PhysicalAggregateGroup,
+    source: exp.Select,
+    relation,
+    catalog: PhysicalCatalog,
+) -> exp.Select:
+    membership = catalog.resource(group.industry_membership_resource_id)
+    source_alias = f"{group.alias}_source"
+    member_alias = f"{group.alias}_member"
+    values_alias = f"{group.alias}_industry_values"
+    target_alias = f"{group.alias}_target"
+    for measure in group.measures:
+        source = source.select(
+            _render_expr(measure.expression, catalog, relation).as_(
+                measure.alias,
+                quoted=True,
+            ),
+            append=True,
+        )
+    source_rows = source.subquery(alias=source_alias)
+    member_table = exp.table_(
+        membership.table,
+        db=membership.database,
+        quoted=True,
+        alias=member_alias,
+    )
+    source_member_join = exp.and_(
+        exp.EQ(
+            this=exp.column("mktcode", table=source_alias, quoted=True),
+            expression=exp.column("mktcode", table=member_alias, quoted=True),
+        ),
+        exp.EQ(
+            this=exp.column("tgtcode", table=source_alias, quoted=True),
+            expression=exp.column("tgtcode", table=member_alias, quoted=True),
+        ),
+    )
+    policy = _industry_membership_policy_predicate(group, member_alias)
+    industry_code = exp.column("industry_code", table=member_alias, quoted=True)
+    aggregate_measures = [
+        _render_set_aggregate(
+            measure.function,
+            exp.column(measure.alias, table=source_alias, quoted=True),
+            exp.column("bizdate", table=source_alias, quoted=True),
+        ).as_(measure.alias, quoted=True)
+        for measure in group.measures
+    ]
+    values = (
+        exp.select(
+            industry_code.copy().as_("industry_code", quoted=True),
+            *aggregate_measures,
+        )
+        .from_(source_rows)
+        .join(member_table, on=source_member_join, join_type="INNER")
+        .where(policy)
+        .group_by(industry_code.copy())
+    )
+
+    target_table = exp.table_(
+        membership.table,
+        db=membership.database,
+        quoted=True,
+        alias=target_alias,
+    )
+    target_policy = _industry_membership_policy_predicate(group, target_alias)
+    values_rows = values.subquery(alias=values_alias)
+    return (
+        exp.select(
+            exp.column("mktcode", table=target_alias, quoted=True),
+            exp.column("tgtcode", table=target_alias, quoted=True),
+            *(
+                exp.column(measure.alias, table=values_alias, quoted=True)
+                for measure in group.measures
+            ),
+        )
+        .from_(target_table)
+        .join(
+            values_rows,
+            on=exp.EQ(
+                this=exp.column("industry_code", table=target_alias, quoted=True),
+                expression=exp.column(
+                    "industry_code", table=values_alias, quoted=True
+                ),
+            ),
+            join_type="INNER",
+        )
+        .where(target_policy)
+    )
+
+
+def _industry_membership_policy_predicate(group, alias: str):
+    return exp.and_(
+        exp.EQ(
+            this=exp.column("snapshot_id", table=alias, quoted=True),
+            expression=exp.convert(group.industry_snapshot_id),
+        ),
+        exp.EQ(
+            this=exp.column("classification_system", table=alias, quoted=True),
+            expression=exp.convert(group.industry_classification_system),
+        ),
+        exp.EQ(
+            this=exp.column("industry_level", table=alias, quoted=True),
+            expression=exp.convert(group.industry_level),
+        ),
+    )
+
+
 def _render_named_scalar(scalar, catalog: PhysicalCatalog, cte_prefix: str = "") -> exp.Select:
     source = _render_plan(scalar.input, catalog, cte_prefix)
     relation = _find_relation(scalar.input)
     stable_alias = _stable_alias(relation)
     value = _render_expr(scalar.expression, catalog, relation)
+    if scalar.function is not None:
+        metric = exp.func(scalar.function.upper(), value).as_(
+            scalar.value_alias, quoted=True
+        )
+        expressions = [metric]
+        if scalar.group_by_security:
+            expressions = [
+                *(
+                    exp.column(key, table=stable_alias, quoted=True)
+                    for key in ("mktcode", "tgtcode")
+                ),
+                metric,
+            ]
+        source.set("expressions", expressions)
+        if scalar.group_by_security:
+            source = source.group_by(
+                *(
+                    exp.column(key, table=stable_alias, quoted=True)
+                    for key in ("mktcode", "tgtcode")
+                )
+            )
+        return source
     if scalar.collapse_latest:
         metric = exp.func(
             "MAX_BY",
@@ -1367,15 +1508,16 @@ def _render_named_scalar(scalar, catalog: PhysicalCatalog, cte_prefix: str = "")
                 )
             )
         return source
-    source.set(
-        "expressions",
-        [
-            value.as_(
-                scalar.value_alias,
-                quoted=True,
-            )
-        ],
-    )
+    expressions = [value.as_(scalar.value_alias, quoted=True)]
+    if scalar.group_by_security:
+        expressions = [
+            *(
+                exp.column(key, table=stable_alias, quoted=True)
+                for key in ("mktcode", "tgtcode")
+            ),
+            *expressions,
+        ]
+    source.set("expressions", expressions)
     return source
 
 
@@ -1468,6 +1610,11 @@ def _render_temporal(
     metrics_name = f"{cte_prefix}temporal_metrics"
     qualified_name = f"{cte_prefix}qualified"
     source = _render_plan(plan.input, catalog, cte_prefix)
+    for scalar in plan.scalars:
+        scalar_rows = _render_named_scalar(
+            scalar, catalog, cte_prefix
+        ).subquery(alias=scalar.alias)
+        source = source.join(scalar_rows, join_type="CROSS")
     matched = exp.Case(
         ifs=[
             exp.If(
@@ -2443,8 +2590,10 @@ def _dynamic_date_bounds(
     offset: int,
     month: Optional[int],
     day: Optional[int],
+    end_month: Optional[int] = None,
+    anchor_resource_id: Optional[str] = None,
 ):
-    anchor = _latest_resource_anchor(catalog, resource_id)
+    anchor = _latest_resource_anchor(catalog, anchor_resource_id or resource_id)
     validity = None
     if range_kind == "period":
         current_start = _date_trunc(anchor.copy(), unit)
@@ -2500,6 +2649,18 @@ def _dynamic_date_bounds(
         else:
             lower = base.copy()
             upper = _date_shift(_date_shift(base.copy(), 1, "month"), -1, "day")
+        return lower, upper, validity
+    if range_kind == "year_month_range":
+        if month is None or end_month is None:
+            raise DorisBackendError(
+                "DORIS_DATE_RANGE_UNSUPPORTED",
+                "year month range requires both month boundaries",
+            )
+        year_start = _date_trunc(anchor.copy(), "year")
+        lower = _date_shift(year_start.copy(), month - 1, "month")
+        upper = _date_shift(
+            _date_shift(year_start.copy(), end_month, "month"), -1, "day"
+        )
         return lower, upper, validity
     raise DorisBackendError(
         "DORIS_DATE_RANGE_UNSUPPORTED",
@@ -2625,6 +2786,36 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             this=_render_expr(expression.expression, catalog, scan),
             expressions=[_render_expr(value, catalog, scan) for value in expression.values],
         )
+    if isinstance(expression, PhysicalExternalExists):
+        if scan is None:
+            raise DorisBackendError(
+                "DORIS_EXTERNAL_LOOKUP_CONTEXT_MISSING",
+                "external membership lookup requires a scan context",
+            )
+        lookup = catalog.resource(expression.lookup_resource_id)
+        alias = "external_lookup"
+        table = exp.table_(lookup.table, db=lookup.database, quoted=True, alias=alias)
+        anchor_alias = _expression_alias(expression.anchor_resource_id, scan)
+        predicate = exp.and_(
+            exp.EQ(
+                this=exp.column("mktcode", table=alias, quoted=True),
+                expression=exp.column("mktcode", table=anchor_alias, quoted=True),
+            ),
+            exp.EQ(
+                this=exp.column("tgtcode", table=alias, quoted=True),
+                expression=exp.column("tgtcode", table=anchor_alias, quoted=True),
+            ),
+        )
+        for column, value in expression.filters:
+            predicate = exp.and_(
+                predicate,
+                exp.EQ(
+                    this=exp.column(column, table=alias, quoted=True),
+                    expression=_render_expr(value, catalog, scan),
+                ),
+            )
+        query = exp.select(exp.convert(1)).from_(table).where(predicate)
+        return exp.Exists(this=query)
     if isinstance(expression, PhysicalLatestValue):
         resource = catalog.resource(expression.resource_id)
         table = exp.table_(resource.table, db=resource.database, quoted=True, alias="q_latest")
@@ -2686,6 +2877,8 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             expression.offset,
             expression.month,
             expression.day,
+            expression.end_month,
+            expression.anchor_resource_id,
         )
         predicate = exp.and_(
             exp.GTE(this=column.copy(), expression=lower),
@@ -2804,6 +2997,13 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             expression=right,
         )
     if isinstance(expression, PhysicalComparison):
+        exists_predicate = _render_exists_boolean_comparison(
+            expression,
+            catalog,
+            scan,
+        )
+        if exists_predicate is not None:
+            return exists_predicate
         try:
             operator = _COMPARISON[expression.op]
         except KeyError as exc:
@@ -2819,6 +3019,26 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             expression=right,
         )
     raise DorisBackendError("DORIS_EXPRESSION_UNSUPPORTED", f"unsupported physical expression {type(expression).__name__}")
+
+
+def _render_exists_boolean_comparison(expression, catalog, scan):
+    if expression.op not in {"=", "!="}:
+        return None
+    pairs = (
+        (expression.left, expression.right),
+        (expression.right, expression.left),
+    )
+    for candidate, literal in pairs:
+        if not (
+            isinstance(candidate, PhysicalExternalExists)
+            and isinstance(literal, PhysicalLiteral)
+            and isinstance(literal.value, bool)
+        ):
+            continue
+        rendered = _render_expr(candidate, catalog, scan)
+        expected = literal.value if expression.op == "=" else not literal.value
+        return rendered if expected else exp.Not(this=rendered)
+    return None
 
 
 def _expression_alias(resource_id: str, relation: Optional[PhysicalPlan]) -> str:

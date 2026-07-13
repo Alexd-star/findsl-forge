@@ -81,6 +81,19 @@ def test_temporal_arithmetic_rejects_mismatched_date_scopes():
     assert excinfo.value.code == "TEMPORAL_SCOPE_MISMATCH"
 
 
+def test_temporal_predicate_allows_independent_querydata_aggregate_scope():
+    result = lower_official_ast(
+        _typed(
+            "indicator('', 'AIGC概念', '收盘价', '近两年', '', '', 'EXIST=9季度') <= "
+            "queryData('', '白酒|ai|建筑', '收盘价', '近两年', 'AVG')"
+        ),
+        domain_registry=default_official_registry(),
+    )
+
+    assert isinstance(result.plan, LogicalExist)
+    assert result.plan.spec.predicate.right.name == "queryData"
+
+
 def test_independent_temporal_and_branches_lower_to_relational_intersection():
     result = lower_official_ast(
         _typed(

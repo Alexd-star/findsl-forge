@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "mappings": [
+    {"alias": "ai", "scope_code": "BK0800", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "AI 是人工智能的通用英文缩写"},
+    {"alias": "AI生成", "scope_code": "BK1111", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "AI生成内容对应 AIGC 概念"},
+    {"alias": "保险", "scope_code": "BK0474", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "保险Ⅱ是申万二级保险行业"},
+    {"alias": "光刻机板块", "scope_code": "BK0884", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "来源板块名称为光刻机(胶)"},
+    {"alias": "光刻胶概念", "scope_code": "BK0884", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "来源板块名称为光刻机(胶)"},
+    {"alias": "军工概念", "scope_code": "BK1204", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "国防军工是标准行业名称"},
+    {"alias": "农业板块", "scope_code": "BK1257", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "农业综合Ⅱ是标准行业名称"},
+    {"alias": "农产品行业", "scope_code": "BK1256", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "农产品加工是标准行业名称"},
+    {"alias": "化妆品厂商", "scope_code": "BK1252", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "化妆品是标准行业名称"},
+    {"alias": "印刷物资销售", "scope_code": "BK1534", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "归入印刷行业"},
+    {"alias": "家居日用品", "scope_code": "BK0440", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "家居用品是标准行业名称"},
+    {"alias": "家居陈设", "scope_code": "BK0440", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "归入家居用品行业"},
+    {"alias": "家电类", "scope_code": "BK0456", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "家用电器是标准行业名称"},
+    {"alias": "家电行业板块", "scope_code": "BK0456", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "家用电器是标准行业名称"},
+    {"alias": "工程咨询板块", "scope_code": "BK0726", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "工程咨询服务Ⅱ是标准行业名称"},
+    {"alias": "房地产营销服务房地产代销", "scope_code": "BK1045", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "归入房地产服务行业"},
+    {"alias": "城商行", "scope_code": "BK1609", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "城商行Ⅲ是标准行业名称"},
+    {"alias": "电子化学品", "scope_code": "BK1039", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "电子化学品Ⅱ是标准行业名称"},
+    {"alias": "电子化学品行业", "scope_code": "BK1039", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "电子化学品Ⅱ是标准行业名称"},
+    {"alias": "电机公司", "scope_code": "BK1030", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "电机Ⅱ是标准行业名称"},
+    {"alias": "调味发酵品行业", "scope_code": "BK1278", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "调味发酵品Ⅱ是标准行业名称"},
+    {"alias": "证券商", "scope_code": "BK0473", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea", "reason": "证券Ⅱ是标准行业名称"},
+    {"alias": "重组概念", "scope_code": "BK1181", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "对应并购重组概念"},
+    {"alias": "谷子板块", "scope_code": "BK1183", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "对应谷子经济概念"}
+  ]
+}
