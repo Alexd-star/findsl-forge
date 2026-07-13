@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-13T12:30:00+08:00",
+  "title": "Design System: FinDSL Forge",
+  "extensions": {
+    "colorMeta": {
+      "primary": {"role": "primary", "displayName": "审计青", "canonical": "#0F766E", "tonalRamp": ["#E4F3F1", "#0F766E", "#0B4F4A"]},
+      "secondary": {"role": "secondary", "displayName": "数据蓝", "canonical": "#1D4F73", "tonalRamp": ["#E8F1F6", "#1D4F73", "#14384F"]},
+      "background": {"role": "neutral", "displayName": "工作台背景", "canonical": "#F4F7F8", "tonalRamp": ["#FFFFFF", "#F4F7F8", "#CAD7DA"]},
+      "ink": {"role": "neutral", "displayName": "正文墨色", "canonical": "#162124", "tonalRamp": ["#526469", "#162124", "#101820"]}
+    },
+    "typographyMeta": {
+      "title": {"displayName": "产品标题", "purpose": "产品名称和工作台标题。"},
+      "body": {"displayName": "界面正文", "purpose": "中文操作说明和状态解释。"},
+      "mono": {"displayName": "编译数据", "purpose": "DSL、SQL、IR 和标识符。"}
+    },
+    "shadows": [
+      {"name": "selected-segment", "value": "0 1px 4px rgba(18,36,42,0.14)", "purpose": "仅用于分段控件当前项。"}
+    ],
+    "motion": [
+      {"name": "state-fast", "value": "160ms ease-out", "purpose": "按钮、焦点和状态切换。"}
+    ],
+    "breakpoints": [
+      {"name": "mobile", "value": "640px"},
+      {"name": "single-column", "value": "960px"}
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "执行编译与分析的主操作。",
+      "html": "<button class=\"ds-btn-primary\">执行编译分析</button>",
+      "css": ".ds-btn-primary{height:36px;padding:0 14px;border:0;border-radius:8px;background:#0F766E;color:#fff;font:700 14px/1 'Segoe UI','Microsoft YaHei',sans-serif}.ds-btn-primary:hover{background:#0B4F4A}.ds-btn-primary:focus-visible{outline:3px solid rgba(15,118,110,.28);outline-offset:2px}"
+    },
+    {
+      "name": "Pipeline Switch",
+      "kind": "nav",
+      "description": "内部验证与官方赛题管线的身份切换。",
+      "html": "<div class=\"ds-switch\"><button>内部验证管线</button><button class=\"active\">官方赛题管线</button></div>",
+      "css": ".ds-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid #CAD7DA;border-radius:8px;background:#EEF3F4}.ds-switch button{height:38px;border:0;border-radius:6px;background:transparent;color:#526469;font-weight:700}.ds-switch button.active{background:#fff;color:#0B4F4A;box-shadow:0 1px 4px rgba(18,36,42,.14)}"
+    },
+    {
+      "name": "DSL Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "受控 DSL 编辑区。",
+      "html": "<textarea class=\"ds-input\">indicator('', '', '成交量', '', '', '', '') &gt; 100</textarea>",
+      "css": ".ds-input{width:100%;min-height:120px;padding:10px;border:1px solid #CAD7DA;border-radius:8px;background:#fff;color:#162124;font:12px/1.55 'Cascadia Mono',Consolas,monospace}.ds-input:focus{border-color:#0F766E;outline:3px solid rgba(15,118,110,.18)}"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "description": "同时通过文字和颜色表达状态。",
+      "html": "<span class=\"ds-status\">交付门禁 PASS</span>",
+      "css": ".ds-status{display:inline-flex;align-items:center;min-height:26px;padding:4px 8px;border-radius:999px;background:#EAF6EE;color:#137333;font:700 12px/1.4 'Segoe UI','Microsoft YaHei',sans-serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "审计型投研工作台",
+    "overview": "高密度展示编译、诊断和真实 Doris 证据。界面以线框和表面层级组织信息，不用装饰性卡片或终端皮肤制造技术感。",
+    "keyCharacteristics": ["双管线身份清楚", "证据与结论相邻", "失败是正式结果", "移动端完整可操作"],
+    "rules": [
+      {"name": "稀缺强调规则", "body": "审计青只用于当前选择、主操作和通过状态。", "section": "colors"},
+      {"name": "扁平默认规则", "body": "常驻面板使用边界而不是宽模糊阴影。", "section": "elevation"}
+    ],
+    "dos": ["明确显示当前编译管线", "同时显示状态文字和颜色", "保留失败阶段与部分 IR"],
+    "donts": ["不要制作营销落地页", "不要使用紫色渐变或玻璃拟态", "不要混用两种 DSL", "不要用占位 SQL 假装成功"]
+  }
+}

@@ -18,4 +18,7 @@ reports/
 external_references/
 outputs/**/node_modules/
 outputs/**/presentations/runtime-check/
+outputs/official-clarification-20260713/
+.playwright-cli/
+output/playwright/
 .worktrees/

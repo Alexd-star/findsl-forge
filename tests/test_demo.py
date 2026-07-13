@@ -12,6 +12,7 @@ from findsl.demo import (
     analyze_dsl,
     analyze_official_dsl,
     demo_examples,
+    delivery_evidence_summary,
     doris_evidence_summary,
     make_demo_handler,
     official_demo_examples,
@@ -59,6 +60,14 @@ def test_official_demo_api_returns_success_and_structured_pipeline_failure():
         assert error["stage"] == "physical"
         assert error["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
         assert error["partial"]["optimized"]["diagnostics"] == []
+
+        preview = _post_json(
+            f"http://127.0.0.1:{server.server_port}/api/official/preview",
+            {"dsl": "indicator('', '', '是否T+0', '', '', '', '') = True"},
+        )
+        assert preview["ok"] is False
+        assert preview["error"]["stage"] == "physical"
+        assert preview["error"]["code"] == "PHYSICAL_PLAN_UNAVAILABLE"
     finally:
         server.shutdown()
         server.server_close()
@@ -155,13 +164,15 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     html = render_demo_html()
 
     assert "FinDSL Forge" in html
-    assert "DSL Workbench" in html
-    assert "Natural language" in html
+    assert "内部验证工作台" in html
+    assert "中文选股需求" in html
     assert "/api/analyze" in html
     assert "/api/suggest" in html
     assert "/api/evidence" in html
-    assert "Suggest DSL" in html
-    assert "Copy SQL" in html
+    assert "/api/official/examples" in html
+    assert "/api/official/preview" in html
+    assert "生成 DSL 候选" in html
+    assert "复制 SQL" in html
     assert "data-tab=\"evidence\"" in html
     assert DEFAULT_NL_REQUEST in html
     assert "__DEFAULT_NL_REQUEST__" not in html
@@ -171,11 +182,22 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "formatError(data.error)" in html
     assert "resetMetrics(\"ERROR\")" in html
     assert "selectExample(index)" in html
-    assert "Diagnostic preset" in html
-    assert "Expected diagnostic:" in html
-    assert "Actual diagnostic:" in html
+    assert "诊断样例" in html
+    assert "预期诊断码" in html
+    assert "实际诊断码" in html
     assert "dataset:" in html
     assert "real_market" in html
+    assert "官方赛题管线" in html
+    assert "data-tab=\"logical\"" in html
+    assert "data-tab=\"physical\"" in html
+    assert "normalizeOfficialResult" in html
+    assert "height: clamp(420px, 62vh, 760px)" in html
+    assert 'id="copyButton" type="button" disabled' in html
+    assert 'aria-controls="outputPane"' in html
+    assert 'event.key === "ArrowRight"' in html
+    assert "modeGeneration" in html
+    assert "exampleLoadToken" in html
+    assert "Promise.allSettled" in html
 
 
 def test_doris_evidence_summary_reads_cluster_report(tmp_path):
@@ -200,6 +222,51 @@ def test_doris_evidence_summary_reads_cluster_report(tmp_path):
     assert summary["headline"]["passed"] == "True"
     assert summary["headline"]["speedup"] == "36.24x"
     assert summary["headline"]["row_counts_match"] == "True"
+
+
+def test_delivery_evidence_summary_reads_versioned_metadata(tmp_path):
+    metadata = tmp_path / "evidence_metadata.json"
+    metadata.write_text(
+        json.dumps(
+            {
+                "readiness": {
+                    "blocking_gates_passed": True,
+                    "warning_count": 0,
+                    "pytest": {"passed": 908},
+                },
+                "official_migration": {
+                    "legacy_strict_success": 1097,
+                    "legacy_to_new_migrated": 742,
+                    "migration_coverage": 0.67639,
+                    "new_backend_success": 766,
+                },
+                "git": {"head_at_report_generation": "6ef4412"},
+                "warnings": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    summary = delivery_evidence_summary(metadata)
+
+    assert summary["available"] is True
+    assert summary["blocking_gates_passed"] is True
+    assert summary["warning_count"] == 0
+    assert summary["pytest_passed"] == 908
+    assert summary["legacy_to_new_migrated"] == 742
+    assert summary["legacy_strict_success"] == 1097
+    assert summary["git_head"] == "6ef4412"
+
+
+def test_delivery_evidence_summary_rejects_malformed_metadata(tmp_path):
+    metadata = tmp_path / "evidence_metadata.json"
+    metadata.write_text("{not-json", encoding="utf-8")
+
+    summary = delivery_evidence_summary(metadata)
+
+    assert summary["available"] is False
+    assert "could not be read" in summary["message"]
 
 
 def test_suggest_from_text_returns_validated_candidate_payload():

@@ -12,5 +12,8 @@
 | `06_positive_evidence.png` | Doris evidence 摘要 | 展示 5M 行 Doris 规模证据和性能结论入口 |
 | `07_negative_unknown_indicator.png` | `UNKNOWN_INDICATOR` 负例，预期诊断与实际诊断一致 | 展示错误输入会被稳定诊断并给出修复建议 |
 | `real_market_sample.png` | Eastmoney 真实行情样例、PASS 状态、SQL 行数和真实日期条件 | 说明真实股票代码和交易日期也走同一套编译与 SQL/reference 验证链路 |
+| `08_official_stage_rank_physical_ir.png` | 官方七槽 DSL、`stage_rank` 策略和真实 Physical IR | 证明页面直接操作 ANTLR/IR/SQLGlot 新后端，而不是只展示旧编译器 |
+| `09_official_t0_expected_rejection.png` | T+0 缺失数据负例、失败阶段、预期/实际诊断码与禁用复制按钮 | 说明系统不会用日频数据伪造 T+0 SQL，失败仍可审计 |
+| `10_official_t0_mobile.png` | 390px 移动端完整官方负例页面 | 证明窄屏布局、诊断可读性和无页面横向溢出 |
 
-生成或录制一分钟答辩视频时，建议按 `01 -> 02 -> real_market_sample -> 03 -> 04 -> 05 -> 06 -> 07` 的顺序切换。`scripts/build_defense_video.py` 已按这条路线生成 MP4；如果需要真人讲解，再按同样顺序补录旁白。
+生成或录制一分钟答辩视频时，建议先用 `01 -> 02 -> real_market_sample` 说明内部验证闭环，再切换 `08 -> 09` 展示官方编译架构与诚实拒绝边界，最后用 `06` 收束到 Doris 性能证据。`scripts/build_defense_video.py` 中的旧路线仍可复现历史视频；重新录制时应优先采用当前双管线界面。
