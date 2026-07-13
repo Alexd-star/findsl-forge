@@ -594,6 +594,35 @@ def test_pipeline_accepts_half_year_event_date_as_six_calendar_months():
     assert "INTERVAL '6' MONTH" in result["backend"]["sql"]
 
 
+def test_pipeline_filters_fixed_since_period_before_event_window():
+    result = compile_official(
+        "record_high('', '', '', '2025年10月9日以来', '', '', '', '') = True "
+        "and indicator('', '', '涨幅', '最新', '', '', '') > 6% "
+        "and indicator('', '', '换手率', '最新', '', '', '') > 10%"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    assert "WHERE `q`.`bizdate` >= '2025-10-09'" in sql
+    assert "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW" in sql
+    assert "`event_rows`.`bizdate` = (SELECT MAX(" in sql
+
+
+def test_pipeline_ranks_the_materialized_event_candidate_stage():
+    result = compile_official(
+        "indicator('科创板', '', 'MA角度', '', '', '', '') = 45 and "
+        "position('科创板', '', '', '历史', '目前', '', '', '') = '低' "
+        "then rank('科创板', '', '主力净流入', 'asc', '', '', '', '') <= 5"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "stage_rank"
+    assert "CASE WHEN `official_basic`.`lastPx` / 10000.0" in sql
+    assert "`stage_1_candidates_raw`" in sql
+    assert "ROW_NUMBER() OVER (ORDER BY" in sql
+    assert "`stage_1_ranked`.`stage_rank` <= 5" in sql
+
+
 @pytest.mark.parametrize(
     "source,sql_fragments",
     [

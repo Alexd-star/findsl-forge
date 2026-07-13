@@ -250,7 +250,13 @@ def _git_head() -> str:
     return result.stdout.strip()
 
 
-def _write_report(report, json_output: str, report_output: str) -> None:
+def _write_report(
+    report,
+    json_output: str,
+    report_output: str,
+    *,
+    title: str = "Phase 30 有据事件周期与范围 Doris 证据",
+) -> None:
     json_path = Path(json_output)
     report_path = Path(report_output)
     json_path.parent.mkdir(parents=True, exist_ok=True)
@@ -259,7 +265,7 @@ def _write_report(report, json_output: str, report_output: str) -> None:
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     lines = [
-        "# Phase 30 有据事件周期与范围 Doris 证据",
+        f"# {title}",
         "",
         f"- Git HEAD：`{report['git_head']}`",
         f"- 状态：`{report['status']}`",

@@ -84,13 +84,19 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase31_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase31_final_grounded_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase30_funnel_payload
+        phase31_funnel_payload
+        or phase30_funnel_payload
         or phase29_funnel_payload
         or phase28_funnel_payload
         or phase27_funnel_payload
@@ -173,6 +179,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    final_grounded_payload = _read_optional_json(
+        snapshot_dir / "phase31_final_grounded_doris.json",
+        warnings,
+        warn_missing=False,
+    )
     prefix_join_payload = _read_optional_json(
         snapshot_dir / "phase6c_set_prefix_doris.json",
         warnings,
@@ -195,6 +206,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
     )
     phase30_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase30_new_success_audit.json",
+        warnings,
+        warn_missing=False,
+    )
+    phase31_new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase31_new_success_audit.json",
         warnings,
         warn_missing=False,
     )
@@ -229,7 +245,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     new_success_audit_payload = (
-        phase30_new_success_audit_payload
+        phase31_new_success_audit_payload
+        or phase30_new_success_audit_payload
         or phase29_new_success_audit_payload
         or phase28_new_success_audit_payload
         or phase27_new_success_audit_payload
@@ -272,6 +289,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             default_price_event_payload,
             generalized_event_payload,
             grounded_event_payload,
+            final_grounded_payload,
             prefix_join_payload,
             new_success_audit_payload,
         ),
@@ -323,6 +341,9 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     grounded_event = _dict(
         official_migration.get("grounded_event_evidence")
     )
+    final_grounded = _dict(
+        official_migration.get("final_grounded_evidence")
+    )
     prefix_join = _dict(official_migration.get("prefix_join_evidence"))
     new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
@@ -359,6 +380,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Phase 28 default-price event evidence | {_mapping_event_display(default_price_event)} |",
         f"| Phase 29 generalized event projection evidence | {_mapping_event_display(generalized_event)} |",
         f"| Phase 30 grounded event evidence | {_mapping_event_display(grounded_event)} |",
+        f"| Phase 31 final grounded evidence | {_mapping_event_display(final_grounded)} |",
         f"| Phase 6C set-prefix evidence | {_prefix_join_display(prefix_join)} |",
         f"| Latest phase new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
@@ -575,6 +597,7 @@ def _official_migration_metadata(
     default_price_event: dict[str, Any] | None,
     generalized_event: dict[str, Any] | None,
     grounded_event: dict[str, Any] | None,
+    final_grounded: dict[str, Any] | None,
     prefix_join: dict[str, Any] | None,
     new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
@@ -715,6 +738,17 @@ def _official_migration_metadata(
             for value in [_number_or_none(item.get("p95_ms"))]
             if value is not None
         ]
+    final_grounded_p95_values = []
+    if isinstance(final_grounded, dict) and isinstance(
+        final_grounded.get("cases"), list
+    ):
+        final_grounded_p95_values = [
+            value
+            for item in final_grounded["cases"]
+            if isinstance(item, dict)
+            for value in [_number_or_none(item.get("p95_ms"))]
+            if value is not None
+        ]
     return {
         "available": funnel is not None,
         "git_head": funnel.get("git_head") if isinstance(funnel, dict) else None,
@@ -846,6 +880,17 @@ def _official_migration_metadata(
             "under_performance_target": _int_or_none(grounded_event.get("under_performance_target")) if isinstance(grounded_event, dict) else None,
             "max_p95_ms": max(grounded_event_p95_values) if grounded_event_p95_values else None,
         },
+        "final_grounded_evidence": {
+            "available": final_grounded is not None,
+            "status": final_grounded.get("status") if isinstance(final_grounded, dict) else None,
+            "matched": _int_or_none(final_grounded.get("matched")) if isinstance(final_grounded, dict) else None,
+            "total": _int_or_none(final_grounded.get("total")) if isinstance(final_grounded, dict) else None,
+            "non_empty": _int_or_none(final_grounded.get("non_empty")) if isinstance(final_grounded, dict) else None,
+            "latest_data_date": final_grounded.get("latest_data_date") if isinstance(final_grounded, dict) else None,
+            "structural_contracts": _int_or_none(final_grounded.get("structural_contracts")) if isinstance(final_grounded, dict) else None,
+            "under_performance_target": _int_or_none(final_grounded.get("under_performance_target")) if isinstance(final_grounded, dict) else None,
+            "max_p95_ms": max(final_grounded_p95_values) if final_grounded_p95_values else None,
+        },
         "prefix_join_evidence": {
             "available": prefix_join is not None,
             "status": prefix_join.get("status") if isinstance(prefix_join, dict) else None,
@@ -910,6 +955,9 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase30_grounded_event_funnel_json": str(snapshot_dir / "phase30_grounded_event_funnel.json"),
         "phase30_grounded_event_doris_json": str(snapshot_dir / "phase30_grounded_event_doris.json"),
         "phase30_new_success_audit_json": str(snapshot_dir / "phase30_new_success_audit.json"),
+        "phase31_final_grounded_funnel_json": str(snapshot_dir / "phase31_final_grounded_funnel.json"),
+        "phase31_final_grounded_doris_json": str(snapshot_dir / "phase31_final_grounded_doris.json"),
+        "phase31_new_success_audit_json": str(snapshot_dir / "phase31_new_success_audit.json"),
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,

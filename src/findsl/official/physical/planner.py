@@ -297,30 +297,6 @@ def plan_physical(
             resource_ids = ("official_basic",)
         else:
             raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
-    crossing_calls = _crossing_calls(lowering.plan)
-    if crossing_calls:
-        temporal_root = (
-            lowering.plan.input
-            if isinstance(lowering.plan, LogicalLimit)
-            else lowering.plan
-        )
-        if isinstance(temporal_root, (LogicalConsecutive, LogicalExist)):
-            return _plan_temporal_crossing_events(
-                lowering,
-                crossing_calls,
-                catalog,
-                fields,
-                resource_ids,
-                expressions,
-            )
-        return _plan_crossing_events(
-            lowering,
-            crossing_calls,
-            catalog,
-            fields,
-            resource_ids,
-            expressions,
-        )
     if _is_top_level_stage_rank(lowering.plan):
         current = lowering.plan.input if isinstance(lowering.plan, LogicalLimit) else lowering.plan
         prior = plan_physical(
@@ -345,6 +321,30 @@ def plan_physical(
             prior.selected_resource,
             prior.decisions,
             "stage_rank",
+        )
+    crossing_calls = _crossing_calls(lowering.plan)
+    if crossing_calls:
+        temporal_root = (
+            lowering.plan.input
+            if isinstance(lowering.plan, LogicalLimit)
+            else lowering.plan
+        )
+        if isinstance(temporal_root, (LogicalConsecutive, LogicalExist)):
+            return _plan_temporal_crossing_events(
+                lowering,
+                crossing_calls,
+                catalog,
+                fields,
+                resource_ids,
+                expressions,
+            )
+        return _plan_crossing_events(
+            lowering,
+            crossing_calls,
+            catalog,
+            fields,
+            resource_ids,
+            expressions,
         )
     if temporal_aggregate_contract is not None:
         return _plan_temporal_aggregate(
@@ -2035,6 +2035,30 @@ def _plan_crossing_events(
         )
         joined = (root_id, selected) if root_id != selected else (selected,)
 
+    fixed_period_starts = tuple(
+        _parse_fixed_event_period_start(call.binding.slots.get("period", ""))
+        for call in calls
+    )
+    if any(fixed_period_starts):
+        if not all(fixed_period_starts) or len(set(fixed_period_starts)) != 1:
+            raise PhysicalPlanningError(
+                "PHYSICAL_EVENT_PERIOD_MISMATCH",
+                "fixed-start event composition requires one shared period boundary",
+            )
+        stable_resource_id = catalog.resource(root_id).anchor_resource_id or root_id
+        relation = PhysicalFilter(
+            relation,
+            PhysicalComparison(
+                ">=",
+                PhysicalColumn(
+                    stable_resource_id,
+                    catalog.resource(stable_resource_id).partition_key,
+                    TIME,
+                ),
+                PhysicalLiteral(fixed_period_starts[0], TIME),
+            ),
+        )
+
     event_defs = []
     event_refs = {}
     projections = []
@@ -2361,6 +2385,8 @@ def _parse_extreme_lookback(value) -> Optional[int]:
     text = str(value or "").strip()
     if not text or text in {"历史", "史高", "史低"}:
         return None
+    if _parse_fixed_event_period_start(text) is not None:
+        return None
     natural_period_sessions = {
         "半个月": 10,
         "上个月": 20,
@@ -2399,6 +2425,20 @@ def _parse_extreme_lookback(value) -> Optional[int]:
         "年": 250,
     }
     return amount * sessions_per_unit[match.group(2)]
+
+
+def _parse_fixed_event_period_start(value) -> Optional[str]:
+    text = str(value or "").strip()
+    match = re.fullmatch(r"(.+?)(?:以|之)来", text)
+    if not match:
+        return None
+    boundary = parse_date_constraint(match.group(1))
+    if boundary.kind != "exact" or not boundary.start:
+        raise PhysicalPlanningError(
+            "PHYSICAL_EVENT_PERIOD_UNSUPPORTED",
+            f"event period start must be one exact calendar date: {text}",
+        )
+    return boundary.start
 
 
 def _parse_small_chinese_integer(text: str) -> int:

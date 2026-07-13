@@ -896,6 +896,86 @@ def test_build_evidence_metadata_prefers_phase30_grounded_event_evidence(
     )
 
 
+def test_build_evidence_metadata_prefers_phase31_final_grounded_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase30_grounded_event_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase30-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 740,
+                "migration_coverage": 0.674567,
+                "new_backend_success": 764,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase31_final_grounded_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase31-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 742,
+                "migration_coverage": 0.67639,
+                "new_backend_success": 766,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase31_final_grounded_doris.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "matched": 2,
+                "total": 2,
+                "non_empty": 2,
+                "structural_contracts": 2,
+                "under_performance_target": 2,
+                "latest_data_date": "2026-04-14",
+                "cases": [{"p95_ms": 85.0759}, {"p95_ms": 75.7998}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase31_new_success_audit.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "new_successes": 2,
+                "passed": 2,
+                "failed": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    assert metadata["official_migration"]["git_head"] == "phase31-head"
+    assert metadata["official_migration"]["legacy_to_new_migrated"] == 742
+    assert metadata["official_migration"]["new_backend_success"] == 766
+    assert metadata["official_migration"]["final_grounded_evidence"] == {
+        "available": True,
+        "status": "PASS",
+        "matched": 2,
+        "total": 2,
+        "non_empty": 2,
+        "latest_data_date": "2026-04-14",
+        "structural_contracts": 2,
+        "under_performance_target": 2,
+        "max_p95_ms": 85.0759,
+    }
+    assert metadata["official_migration"]["new_success_audit"]["passed"] == 2
+    assert metadata["source_files"]["phase31_final_grounded_doris_json"].endswith(
+        "phase31_final_grounded_doris.json"
+    )
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)
