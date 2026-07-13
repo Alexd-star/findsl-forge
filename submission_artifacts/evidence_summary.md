@@ -8,11 +8,11 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 |---|---|
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 905 passed in 137.91s |
+| Pytest regression | 908 passed in 156.96s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
-| ANTLR/IR legacy migration | 740/1097 (67.46%) |
+| ANTLR/IR legacy migration | 742/1097 (67.64%) |
 | Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
 | Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 194.0904 ms |
 | Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
@@ -26,8 +26,9 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Phase 28 default-price event evidence | PASS, 6/6, non-empty 6/6, max P95 3177.3871 ms |
 | Phase 29 generalized event projection evidence | PASS, 4/4, non-empty 4/4, max P95 1512.6686 ms |
 | Phase 30 grounded event evidence | PASS, 6/6, non-empty 6/6, max P95 1024.4798 ms |
+| Phase 31 final grounded evidence | PASS, 2/2, non-empty 2/2, max P95 64.6454 ms |
 | Phase 6C set-prefix evidence | PASS, hash 14/14, faster 14/14, median 1.393x |
-| Latest phase new-success audit | PASS, 6/6, failed 0 |
+| Latest phase new-success audit | PASS, 2/2, failed 0 |
 | Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
@@ -36,8 +37,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris evidence | PASS |
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | 55183c4 |
-| Git HEAD at export | 55183c4 |
+| Git HEAD at report generation | 6ef4412 |
+| Git HEAD at export | 6ef4412 |
 
 ## Source Files
 
@@ -84,6 +85,9 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | phase30_grounded_event_funnel_json | `submission_artifacts\evidence_snapshots\phase30_grounded_event_funnel.json` |
 | phase30_grounded_event_doris_json | `submission_artifacts\evidence_snapshots\phase30_grounded_event_doris.json` |
 | phase30_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase30_new_success_audit.json` |
+| phase31_final_grounded_funnel_json | `submission_artifacts\evidence_snapshots\phase31_final_grounded_funnel.json` |
+| phase31_final_grounded_doris_json | `submission_artifacts\evidence_snapshots\phase31_final_grounded_doris.json` |
+| phase31_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase31_new_success_audit.json` |
 | phase6c_set_prefix_doris_json | `submission_artifacts\evidence_snapshots\phase6c_set_prefix_doris.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
