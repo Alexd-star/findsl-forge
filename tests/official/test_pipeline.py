@@ -534,6 +534,67 @@ def test_pipeline_never_ignores_non_empty_window_event_slots():
 
 
 @pytest.mark.parametrize(
+    "source,frame",
+    [
+        ("record_low('', '', '', '半个月', '上月', '', '', '') = True", 9),
+        ("record_high('', '', '', '上个月', '', '', '', '') = True", 19),
+    ],
+)
+def test_pipeline_normalizes_grounded_natural_event_periods(source, frame):
+    result = compile_official(source).to_dict()
+
+    assert f"ROWS BETWEEN {frame} PRECEDING AND CURRENT ROW" in result["backend"]["sql"]
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+
+
+def test_pipeline_projects_exact_security_scope_before_temporal_event():
+    result = compile_official(
+        "cross_above('', '上海电力', '', '60日均线', '', '', 'EXIST>1') = True"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "temporal_event_projection"
+    assert "`hsj_stock_code_info` AS official_security" in sql
+    assert "`official_security`.`name` = '上海电力'" in sql
+    assert "LAG(" in sql
+    assert "`temporal_metrics`.`metric_value` > 1" in sql
+
+
+def test_pipeline_materializes_pressure_events_without_placeholder_sql():
+    result = compile_official(
+        "reset('', '', '', '支撑位', '今天', '', '') = True and "
+        "(cross_above('', '', '', '压力位', '', '', 'EXIST>0') = True or "
+        "cross_down('', '', '', '压力位', '', '', 'EXIST>0') = True)"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert "`q`.`support` / 10000.0" in sql
+    assert "`q`.`pressure` / 10000.0" in sql
+    assert "LAG(`q`.`pressure` / 10000.0" in sql
+    assert "1 = 0" not in sql and "1 = 1" not in sql
+
+
+def test_pipeline_materializes_unsealed_limit_event_from_grounded_quote_fields():
+    result = compile_official(
+        "indicator('', '', '涨停未封板', '2月25号', '', '', '') = True"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert "`q`.`upSealPx` > 0" in sql
+    assert "`q`.`highPx` >= `q`.`upSealPx`" in sql
+    assert "`q`.`limitFlag` <> 1" in sql
+    assert "MONTH(" in sql
+
+
+def test_pipeline_accepts_half_year_event_date_as_six_calendar_months():
+    result = compile_official(
+        "position('', '', '', '历史', '半年内', '', '', '') = '最低'"
+    ).to_dict()
+
+    assert "INTERVAL '6' MONTH" in result["backend"]["sql"]
+
+
+@pytest.mark.parametrize(
     "source,sql_fragments",
     [
         (

@@ -203,7 +203,7 @@ def parse_date_constraint(value: str) -> DateConstraint:
             unit="session",
             trading_day_based=True,
         )
-    if value in {"近半年", "最近半年", "过去半年", "这半年"}:
+    if value in {"近半年", "最近半年", "过去半年", "这半年", "半年内"}:
         return DateConstraint(
             "recent_calendar",
             anchor="latest",

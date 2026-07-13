@@ -182,6 +182,7 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("两年内", "recent_calendar", 2, "year"),
         ("近两月", "recent_calendar", 2, "month"),
         ("近半年", "recent_calendar", 6, "month"),
+        ("半年内", "recent_calendar", 6, "month"),
         ("近五周", "recent_calendar", 5, "week"),
         ("本季度", "dynamic_period", None, "quarter"),
         ("上个月", "dynamic_period", None, "month"),

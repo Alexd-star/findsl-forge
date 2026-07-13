@@ -43,6 +43,13 @@ def test_default_registry_loads_typed_scaled_ratio_and_boolean_strategies():
         ("成交均价", "official_basic", (("turnover", "numeric"), ("volume", "numeric")), "divide"),
         ("3分钟涨速", "official_ext", (("riseSpd3m", "numeric"),), "divide"),
         ("涨停炸板", "official_ext", (("boardBreaks", "numeric"), ("lmtUpNum", "numeric")), "or"),
+        ("压力位", "official_basic", (("pressure", "numeric"),), "divide"),
+        (
+            "涨停未封板",
+            "official_basic",
+            (("highPx", "numeric"), ("limitFlag", "numeric"), ("upSealPx", "numeric")),
+            "and",
+        ),
         ("放量", "official_technical", (("volume_breakout", "boolean"),), "equal"),
         ("均线多头排列", "official_technical", (("ma_bullish", "boolean"),), "equal"),
     ],

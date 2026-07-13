@@ -154,10 +154,20 @@ def main() -> int:
                 sql,
             )
         if args.require_event_semantics:
-            checks["event_semantics_materialized"] = _event_semantics_materialized(
-                payload,
-                sql,
-            )
+            event_functions = {
+                "cross_above",
+                "cross_down",
+                "close_together",
+                "reset",
+                "golden_cross",
+                "record_high",
+                "record_low",
+                "position",
+            }
+            if event_functions.intersection(row.get("functions", [])):
+                checks["event_semantics_materialized"] = (
+                    _event_semantics_materialized(payload, sql)
+                )
         if args.require_default_price_events:
             checks["default_price_event_materialized"] = (
                 _default_price_event_materialized(payload, sql)

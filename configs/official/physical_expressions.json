@@ -122,6 +122,10 @@
       "expression": {"op": "divide", "left": {"op": "column", "column": "support", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
     },
     {
+      "indicator_id": "压力位", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "pressure", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
       "indicator_id": "上影线", "resource_id": "official_basic", "value_type": "numeric", "nullable": true,
       "expression": {"op": "divide", "left": {"op": "column", "column": "upperShadow", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
     },
@@ -172,6 +176,10 @@
     {
       "indicator_id": "涨停炸板", "resource_id": "official_ext", "value_type": "boolean", "nullable": false,
       "expression": {"op": "or", "left": {"op": "greater", "left": {"op": "coalesce", "args": [{"op": "column", "column": "lmtUpNum", "type": "numeric"}, {"op": "literal", "value": 0, "type": "numeric"}]}, "right": {"op": "literal", "value": 0, "type": "numeric"}}, "right": {"op": "greater", "left": {"op": "coalesce", "args": [{"op": "column", "column": "boardBreaks", "type": "numeric"}, {"op": "literal", "value": 0, "type": "numeric"}]}, "right": {"op": "literal", "value": 0, "type": "numeric"}}}
+    },
+    {
+      "indicator_id": "涨停未封板", "resource_id": "official_basic", "value_type": "boolean", "nullable": false,
+      "expression": {"op": "and", "left": {"op": "and", "left": {"op": "greater", "left": {"op": "column", "column": "upSealPx", "type": "numeric"}, "right": {"op": "literal", "value": 0, "type": "numeric"}}, "right": {"op": "greater_equal", "left": {"op": "column", "column": "highPx", "type": "numeric"}, "right": {"op": "column", "column": "upSealPx", "type": "numeric"}}}, "right": {"op": "not_equal", "left": {"op": "column", "column": "limitFlag", "type": "numeric"}, "right": {"op": "literal", "value": 1, "type": "numeric"}}}
     },
     {
       "indicator_id": "阳线", "resource_id": "official_technical", "value_type": "boolean", "nullable": false,

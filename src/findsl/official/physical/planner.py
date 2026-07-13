@@ -2021,12 +2021,6 @@ def _plan_crossing_events(
             "PHYSICAL_EVENT_DATE_SCOPE_MISMATCH",
             "window event composition requires one shared non-empty date scope",
         )
-    if any(call.scope_expression is not None for call in calls):
-        raise PhysicalPlanningError(
-            "PHYSICAL_EVENT_SCOPE_UNSUPPORTED",
-            "crossing event scope filters require a projected security relation",
-        )
-
     if len(resource_ids) > 1:
         relation, root_id, joined = _build_join_relation(fields, resource_ids, catalog)
     else:
@@ -2367,6 +2361,13 @@ def _parse_extreme_lookback(value) -> Optional[int]:
     text = str(value or "").strip()
     if not text or text in {"历史", "史高", "史低"}:
         return None
+    natural_period_sessions = {
+        "半个月": 10,
+        "上个月": 20,
+        "上月": 20,
+    }
+    if text in natural_period_sessions:
+        return natural_period_sessions[text]
     shorthand = re.fullmatch(
         r"(\d+|[零〇一二两三四五六七八九十百]+)内",
         text,
