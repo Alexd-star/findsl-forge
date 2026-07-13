@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "git_head": "2c72d7432ed630a2bedb45853dc09cd5345e2695",
+  "previous_funnel": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\reports\\phase36_external_data_funnel.json",
+  "current_funnel": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\reports\\phase37_sina_external_funnel.json",
+  "previous_git_head": "2c72d7432ed630a2bedb45853dc09cd5345e2695",
+  "current_git_head": "2c72d7432ed630a2bedb45853dc09cd5345e2695",
+  "repeats": 3,
+  "performance_target_ms": 10000.0,
+  "total": 3,
+  "passed": 3,
+  "failed": 0,
+  "status": "PASS",
+  "cases": [
+    {
+      "excel_row": 657,
+      "source": "rank('沪|深|京', '四川', '', 'desc', '', '', '', '') <= 3",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 3,
+      "result_sha256": "664424ffaa1b9598c93ef9f533d15960c2b39c2ba6d19ff93981d25639aca534",
+      "sql_sha256": "f2b99388897ed5e4fcd4c54ae738ad79924b17360c01e6cc39f016abc431241e",
+      "elapsed_ms": [
+        1045.77,
+        72.653,
+        87.29
+      ],
+      "p50_ms": 87.29,
+      "p95_ms": 1045.77,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 789,
+      "source": "indicator('', '山东', '市盈率', '', '', '', '') > belong_industry('', '山东', '市盈率', '', '') * 0.6",
+      "selected_strategy": "composite_grouped_aggregate",
+      "status": "PASS",
+      "row_count": 0,
+      "result_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sql_sha256": "f31c166408d293cb27e3e2910cbef6683bb1c5888501cdf9c23cb8e58855adb8",
+      "elapsed_ms": [
+        1065.36,
+        125.037,
+        94.104
+      ],
+      "p50_ms": 125.037,
+      "p95_ms": 1065.36,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 2413,
+      "source": "indicator('', '科创50', '跌幅', '本周', '', 'SUM', '') > 0",
+      "selected_strategy": "grouped_aggregate",
+      "status": "PASS",
+      "row_count": 13,
+      "result_sha256": "b749dbd7d94d92dadfb2dd22efa8e23ed307b0676008eeed54461905d21a29de",
+      "sql_sha256": "398022ef502a0ad2d6332171545f0c0a77203c9d073572cc9c26818e8da2caf2",
+      "elapsed_ms": [
+        513.533,
+        96.359,
+        69.935
+      ],
+      "p50_ms": 96.359,
+      "p95_ms": 513.533,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    }
+  ]
+}
