@@ -191,6 +191,48 @@ def test_pipeline_lowers_crossing_functions_to_set_based_window_relation(
     assert result["backend"]["validation_passed"] is True
 
 
+@pytest.mark.parametrize(
+    "source,sql_fragments",
+    [
+        (
+            "cross_above('', '', '', '20日均线', '', '', '') = True",
+            ("`official_basic`.`lastPx` / 10000.0 > `official_technical`.`ma20`",),
+        ),
+        (
+            "reset('', '', '', '20日均线', '', '', '') = True",
+            (
+                "ABS((`official_basic`.`lastPx` / 10000.0) - `official_technical`.`ma20`)",
+                "(`official_basic`.`lastPx` / 10000.0) >= (`official_technical`.`ma20` * 0.995)",
+            ),
+        ),
+        (
+            "record_low('', '', '', '20日', '', '', '', '') = True",
+            (
+                "`q`.`lastPx` / 10000.0 <= MIN(`q`.`lastPx` / 10000.0) OVER",
+                "ROWS BETWEEN 19 PRECEDING AND CURRENT ROW",
+            ),
+        ),
+        (
+            "position('', '', '', '历史', '', '', '', '') = '低'",
+            (
+                "MIN(`q`.`lastPx` / 10000.0) OVER",
+                "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+            ),
+        ),
+    ],
+)
+def test_pipeline_materializes_documented_default_price_for_event_functions(
+    source, sql_fragments
+):
+    result = compile_official(source).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "crossing_window"
+    for fragment in sql_fragments:
+        assert fragment in sql
+    assert result["backend"]["validation_passed"] is True
+
+
 def test_pipeline_combines_crossing_events_without_scalar_fallback():
     result = compile_official(
         "cross_above('', '', '5日均线', '10日均线', '', '', '') = True "

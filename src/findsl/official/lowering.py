@@ -35,9 +35,14 @@ from .ir import (
 )
 from .ir.relational import LogicalPlan
 from .ir.validate import OfficialIrError, validate_plan
-from .typed_ast import TypedNode
+from .typed_ast import FunctionBinding, TypedNode
 from .types import BOOLEAN, STRING, UNKNOWN, RangeType
-from .domain.binder import BoundFunction, DomainBindingError, bind_function
+from .domain.binder import (
+    BoundFunction,
+    DomainBindingError,
+    bind_function,
+    normalize_function_slots,
+)
 from .domain.expressions import ConsecutiveSpec, DataRequirement, ExistSpec
 from .registry import OfficialIndicatorRegistry
 
@@ -267,15 +272,18 @@ def _lower_expr(
         return FieldRef(node.name, typed.type)
     if isinstance(node, OfficialFunctionCall):
         binding = typed.binding
+        domain_binding = bindings.get(id(node)) if bindings else None
+        if binding is not None and domain_binding is not None:
+            binding = FunctionBinding.create(
+                binding.signature,
+                normalize_function_slots(node.name, binding.slots),
+            )
         if strip_count_exp and binding is not None and "count_exp" in binding.slots:
-            from .typed_ast import FunctionBinding
-
             slots = dict(binding.slots)
             slots["count_exp"] = ""
             if "date" in slots:
                 slots["date"] = ""
             binding = FunctionBinding.create(binding.signature, slots)
-        domain_binding = bindings.get(id(node)) if bindings else None
         date_constraint = None
         market_expression = domain_binding.market_expression if domain_binding else None
         scope_expression = domain_binding.scope_expression if domain_binding else None

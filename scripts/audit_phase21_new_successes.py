@@ -41,6 +41,14 @@ def main() -> int:
             "candidate-set plan or an event projection before temporal evaluation"
         ),
     )
+    parser.add_argument(
+        "--require-default-price-events",
+        action="store_true",
+        help=(
+            "Require each new success to carry the documented empty event "
+            "indicator default as 最新价 through Logical IR and Doris SQL"
+        ),
+    )
     args = parser.parse_args()
 
     baseline = _rows(args.baseline)
@@ -81,6 +89,7 @@ def main() -> int:
             "event_candidate_materialized": True,
             "date_algebra_materialized": True,
             "event_semantics_materialized": True,
+            "default_price_event_materialized": True,
         }
         if "~=" in source:
             checks["approximation_materialized"] = "ABS(" in sql and "GREATEST(" in sql
@@ -149,6 +158,10 @@ def main() -> int:
                 payload,
                 sql,
             )
+        if args.require_default_price_events:
+            checks["default_price_event_materialized"] = (
+                _default_price_event_materialized(payload, sql)
+            )
         passed = all(checks.values())
         results.append(
             {
@@ -169,6 +182,7 @@ def main() -> int:
         "require_event_candidates": args.require_event_candidates,
         "require_date_algebra": args.require_date_algebra,
         "require_event_semantics": args.require_event_semantics,
+        "require_default_price_events": args.require_default_price_events,
         "new_successes": len(results),
         "passed": sum(item["passed"] for item in results),
         "failed": sum(not item["passed"] for item in results),
@@ -199,6 +213,14 @@ def _event_semantics_materialized(payload, sql: str) -> bool:
     strategy = payload["physical"]["selected_strategy"]
     physical_nodes = list(_walk_dicts(payload["physical"]["plan"]))
     kinds = {node.get("kind") for node in physical_nodes}
+    event_kinds = {
+        "PhysicalCrossing",
+        "PhysicalExtreme",
+        "PhysicalPattern",
+        "PhysicalPosition",
+    }
+    if "PhysicalEventFilter" in kinds and kinds & event_kinds:
+        return " AS `event_" in sql and "`event_rows`.`event_" in sql
     if strategy == "temporal_event_projection":
         return (
             {"PhysicalTemporal", "PhysicalEventProjection"}.issubset(kinds)
@@ -223,6 +245,30 @@ def _event_semantics_materialized(payload, sql: str) -> bool:
             for operation in operations
         ) and any(f" {operation.upper()} " in sql for operation in operations)
     return False
+
+
+def _default_price_event_materialized(payload, sql: str) -> bool:
+    default_slots = {
+        "cross_above": "indicator_name_1",
+        "cross_down": "indicator_name_1",
+        "close_together": "indicator_name_1",
+        "reset": "indicator_name_1",
+        "record_high": "indicator_name",
+        "record_low": "indicator_name",
+        "position": "indicator_name",
+    }
+    calls = [
+        node
+        for node in _walk_dicts(payload["logical"]["plan"])
+        if node.get("kind") == "CallExpr" and node.get("name") in default_slots
+    ]
+    normalized = [
+        node
+        for node in calls
+        if node.get("binding", {}).get("slots", {}).get(default_slots[node["name"]])
+        == "最新价"
+    ]
+    return bool(normalized) and "`lastPx` / 10000.0" in sql
 
 
 def _date_algebra_materialized(payload, source: str, sql: str) -> bool:

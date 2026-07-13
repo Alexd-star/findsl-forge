@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from calendar import monthrange
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Mapping, Optional, Tuple
 
 from ..registry import IndicatorDefinition, OfficialIndicatorRegistry
 from ..typed_ast import TypedNode
@@ -54,6 +54,15 @@ class BoundFunction:
 
 _TYPE_MAP = {"numeric": NUMERIC, "boolean": BOOLEAN, "string": STRING, "time": TIME}
 _EVENT_FUNCTIONS = {"cross_above", "cross_down", "close_together", "reset", "golden_cross"}
+_DEFAULT_PRICE_SLOTS = {
+    "cross_above": "indicator_name_1",
+    "cross_down": "indicator_name_1",
+    "close_together": "indicator_name_1",
+    "reset": "indicator_name_1",
+    "record_high": "indicator_name",
+    "record_low": "indicator_name",
+    "position": "indicator_name",
+}
 _MARKETS = {"沪": "SH", "深": "SZ", "北": "BJ", "港": "HK", "美": "US", "A股": "A", "B股": "B"}
 
 
@@ -61,7 +70,7 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
     if typed.binding is None:
         raise DomainBindingError("DOMAIN_NOT_FUNCTION", "typed node has no function binding", function="", slot="", value="")
     name = typed.binding.signature.name
-    slots = typed.binding.slots
+    slots = normalize_function_slots(name, typed.binding.slots)
     indicator_slots = [slot for slot in typed.binding.signature.slots if slot.startswith("indicator_name")]
     is_universe = (
         name == "indicator"
@@ -137,6 +146,15 @@ def bind_function(typed: TypedNode, registry: OfficialIndicatorRegistry) -> Boun
         aggregate,
         temporal,
     )
+
+
+def normalize_function_slots(name: str, slots: Mapping[str, str]) -> Mapping[str, str]:
+    """Apply only defaults that are explicit in the official slot contract."""
+    normalized = dict(slots)
+    default_slot = _DEFAULT_PRICE_SLOTS.get(name)
+    if default_slot and not str(normalized.get(default_slot, "")).strip():
+        normalized[default_slot] = "最新价"
+    return normalized
 
 
 def _definition(indicator: IndicatorRef, registry: OfficialIndicatorRegistry) -> IndicatorDefinition:

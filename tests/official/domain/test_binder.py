@@ -95,6 +95,38 @@ def test_empty_rank_indicator_remains_unsupported_without_order_measure():
     assert excinfo.value.code == "DOMAIN_CAPABILITY_UNSUPPORTED"
 
 
+@pytest.mark.parametrize(
+    "source, expected_slot",
+    [
+        ("cross_above('', '', '', '20日均线', '', '', '')", "indicator_name_1"),
+        ("cross_down('', '', '', '20日均线', '', '', '')", "indicator_name_1"),
+        ("close_together('', '', '', '20日均线', '', '', '')", "indicator_name_1"),
+        ("reset('', '', '', '20日均线', '', '', '')", "indicator_name_1"),
+        ("record_high('', '', '', '20日', '', '', '', '')", "indicator_name"),
+        ("record_low('', '', '', '20日', '', '', '', '')", "indicator_name"),
+        ("position('', '', '', '历史', '', '', '', '')", "indicator_name"),
+    ],
+)
+def test_price_event_functions_bind_documented_empty_indicator_default(
+    source, expected_slot
+):
+    typed = _typed_call(source)
+    bound = bind_function(typed, default_official_registry())
+
+    assert bound.indicators[0].indicator_id == "最新价"
+    assert typed.binding.slots[expected_slot] == ""
+
+
+def test_empty_event_right_indicator_remains_unsupported():
+    with pytest.raises(DomainBindingError) as excinfo:
+        bind_function(
+            _typed_call("cross_above('', '', '', '', '', '', '')"),
+            default_official_registry(),
+        )
+
+    assert excinfo.value.code == "DOMAIN_CAPABILITY_UNSUPPORTED"
+
+
 def test_unknown_indicator_has_precise_diagnostic():
     typed = _typed_call("indicator('', '', '不存在指标', '今日', '', '', '')")
     with pytest.raises(DomainBindingError) as excinfo:
