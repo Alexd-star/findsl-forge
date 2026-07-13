@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-13 08:08:44 +08:00
-- Git HEAD at export: 8abbac9
+- Generated at: 2026-07-13 09:54:58 +08:00
+- Git HEAD at export: 450f93d
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -119,7 +119,7 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `real_market_sample_report.md` (957 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13127 bytes)
+- `submission_readiness.md` (13131 bytes)
 
 ## Excluded By Design
 
