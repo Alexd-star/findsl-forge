@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-13 10:49:08 +08:00
-- Git HEAD at export: a42cd26
+- Generated at: 2026-07-13 11:17:25 +08:00
+- Git HEAD at export: 84e86ff
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -111,6 +111,12 @@
 - `phase28_default_price_funnel.md` (1517 bytes)
 - `phase28_new_success_audit.json` (31519 bytes)
 - `phase28_new_success_audit.md` (917 bytes)
+- `phase29_event_projection_doris.json` (33964 bytes)
+- `phase29_event_projection_doris.md` (841 bytes)
+- `phase29_event_projection_funnel.json` (3258386 bytes)
+- `phase29_event_projection_funnel.md` (1465 bytes)
+- `phase29_new_success_audit.json` (5321 bytes)
+- `phase29_new_success_audit.md` (815 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase6c_capability_funnel.json` (3257492 bytes)
