@@ -97,7 +97,6 @@ def make_charts(data: dict) -> dict:
 
     # 1. headline gate matrix
     labels = ["Blocking\ngates", "Warning\ncount", "Pytest", "正例", "负例", "Doris\nevidence", "行数一致"]
-    values = [1, 1, readiness["pytest"]["passed"], official["positive"]["passed"], official["negative"]["passed"], 1, 1]
     display = ["PASS", "0", f'{readiness["pytest"]["passed"]}', "37/37", "37/37", "PASS", "PASS"]
     colors = ["#0F4D92", "#0F4D92", "#0F4D92", "#0F4D92", "#0F4D92", "#0F4D92", "#0F4D92"]
     fig, ax = plt.subplots(figsize=(8.2, 3.0))

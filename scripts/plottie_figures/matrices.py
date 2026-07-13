@@ -7,7 +7,6 @@ from .common import (
     BLUE,
     BLUE_LIGHT,
     DOUBLE_IN,
-    GREEN,
     INK,
     MUTED,
     RED,

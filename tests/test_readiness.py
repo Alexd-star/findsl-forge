@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from findsl import readiness
 from findsl.readiness import generate_readiness_report
 

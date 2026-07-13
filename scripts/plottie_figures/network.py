@@ -11,7 +11,6 @@ from .common import (
     GREEN,
     INK,
     MUTED,
-    RED,
     RULE,
     TEXT,
     WHITE,
@@ -22,7 +21,6 @@ from .common import (
     panel_label,
     save_figure,
     thin_arrow,
-    wrap_label,
 )
 
 

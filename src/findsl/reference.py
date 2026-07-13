@@ -93,17 +93,17 @@ class PandasReferenceEvaluator:
             left = self._numeric(node.left, rows)
             right = self._numeric(node.right, rows)
             if node.op == ">":
-                return self._compare(left, right, lambda l, r: l > r)
+                return self._compare(left, right, lambda left_value, right_value: left_value > right_value)
             if node.op == ">=":
-                return self._compare(left, right, lambda l, r: l >= r)
+                return self._compare(left, right, lambda left_value, right_value: left_value >= right_value)
             if node.op == "<":
-                return self._compare(left, right, lambda l, r: l < r)
+                return self._compare(left, right, lambda left_value, right_value: left_value < right_value)
             if node.op == "<=":
-                return self._compare(left, right, lambda l, r: l <= r)
+                return self._compare(left, right, lambda left_value, right_value: left_value <= right_value)
             if node.op in {"=", "=="}:
-                return self._compare(left, right, lambda l, r: l == r)
+                return self._compare(left, right, lambda left_value, right_value: left_value == right_value)
             if node.op == "!=":
-                return self._compare(left, right, lambda l, r: l != r)
+                return self._compare(left, right, lambda left_value, right_value: left_value != right_value)
             raise SemanticError(f"Unsupported comparison operator {node.op}")
         if isinstance(node, BinaryOp) and node.op in {"&", "^", "|"}:
             left = self._bool(node.left, rows)
@@ -217,7 +217,6 @@ class PandasReferenceEvaluator:
         return work.sort_values("__original_index")["__lagged"].set_axis(rows.index)
 
     def _rolling(self, series, rows, window: int, agg: str):
-        pd = self.pd
         work = rows[["ts_code", "trade_date"]].copy()
         work["__value"] = series
         work["__original_index"] = rows.index

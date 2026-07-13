@@ -1,6 +1,6 @@
 import pytest
 
-from findsl.official.domain import DataRequirement, DateConstraint, IndicatorRef, MarketScope, RankSpec
+from findsl.official.domain import DataRequirement, IndicatorRef, RankSpec
 from findsl.official.ir import Field, LiteralExpr, LogicalDomainScan, LogicalEmpty, Schema
 from findsl.official.ir.validate import OfficialIrError, validate_plan
 from findsl.official.types import NUMERIC, STRING

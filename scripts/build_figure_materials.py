@@ -9,11 +9,9 @@ import re
 import shutil
 import struct
 import subprocess
-import textwrap
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Sequence
 
 
 ROOT = Path(__file__).resolve().parents[1]

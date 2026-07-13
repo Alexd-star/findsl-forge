@@ -476,7 +476,7 @@ def _check_unknown_indicator_diagnostic(negative_path: Path) -> DefenseCheck:
             passed=passed,
             evidence=[
                 f"case={case.get('name', '<unnamed>')}",
-                f"expected=UNKNOWN_INDICATOR",
+                "expected=UNKNOWN_INDICATOR",
                 f"actual={actual_code or '<none>'}",
                 f"suggestions={len(suggestions)}",
             ],

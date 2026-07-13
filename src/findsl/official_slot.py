@@ -2363,7 +2363,6 @@ class OfficialSlotCompiler:
                 f" WHERE {' AND '.join(_dedupe(where_parts))})"
             )
         else:
-            threshold = 1 if rule.count is None else rule.count
             comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
             if rule.mode == "CONS":
                 warnings.append(
@@ -2406,7 +2405,6 @@ class OfficialSlotCompiler:
                 f" WHERE {' AND '.join(_dedupe(where_parts))})"
             )
         elif rule.mode == "CONS":
-            threshold = 1 if rule.count is None else rule.count
             warnings.append(
                 f"count_exp {count_exp!r} for {pattern_call.name} is compiled as a threshold count over "
                 "the normalized window; exact longest consecutive-run detection requires a dedicated Doris feature table"
@@ -2424,7 +2422,6 @@ class OfficialSlotCompiler:
                 f" WHERE {' AND '.join(_dedupe(where_parts))})"
             )
         else:
-            threshold = 1 if rule.count is None else rule.count
             comparator = rule.operator or ">"
             count_predicate = _count_rule_predicate_sql("COUNT(*)", rule, comparator)
             subquery = (
@@ -2628,7 +2625,6 @@ class OfficialSlotCompiler:
                 ") AS bucketed\n"
                 " WHERE bucketed.agg_value IS NOT NULL)"
             )
-        threshold = 1 if rule.count is None else rule.count
         comparator = rule.operator or (">" if rule.mode == "EXIST" else ">=")
         count_predicate = _count_rule_predicate_sql("COUNT(*)", rule, comparator)
         return (

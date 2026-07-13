@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from findsl.official.physical.catalog import PhysicalCatalog, PhysicalCatalogError, default_physical_catalog

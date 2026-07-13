@@ -12,7 +12,7 @@ dependencies = ["antlr4-python3-runtime==4.13.2", "sqlglot==28.5.0"]
 
 [project.optional-dependencies]
 eval = ["pandas>=2.0"]
-dev = ["pandas>=2.0", "pytest>=8.0"]
+dev = ["pandas>=2.0", "pytest>=8.0", "ruff==0.15.13"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -21,3 +21,10 @@ where = ["src"]
 pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.ruff]
+extend-exclude = ["src/findsl/official/frontend/generated"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/findsl/**/__init__.py" = ["F401", "F403", "F405"]
+"scripts/build_plottie_style_figures.py" = ["E402"]

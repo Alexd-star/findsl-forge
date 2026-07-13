@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from findsl.official.registry import OfficialIndicatorRegistry, RegistryValidationError, default_official_registry
