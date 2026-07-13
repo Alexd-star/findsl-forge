@@ -749,6 +749,73 @@ def test_build_evidence_metadata_prefers_phase28_default_price_evidence(
     )
 
 
+def test_build_evidence_metadata_prefers_phase29_event_projection_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase29_event_projection_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase29-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 734,
+                "migration_coverage": 0.669098,
+                "new_backend_success": 758,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase29_event_projection_doris.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "matched": 4,
+                "total": 4,
+                "non_empty": 4,
+                "structural_contracts": 4,
+                "under_performance_target": 4,
+                "latest_data_date": "2026-04-14",
+                "cases": [{"p95_ms": 1370.0911}, {"p95_ms": 812.25}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase29_new_success_audit.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "new_successes": 6,
+                "passed": 6,
+                "failed": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    assert metadata["official_migration"]["git_head"] == "phase29-head"
+    assert metadata["official_migration"]["legacy_to_new_migrated"] == 734
+    assert metadata["official_migration"]["new_backend_success"] == 758
+    assert metadata["official_migration"]["generalized_event_projection_evidence"] == {
+        "available": True,
+        "status": "PASS",
+        "matched": 4,
+        "total": 4,
+        "non_empty": 4,
+        "latest_data_date": "2026-04-14",
+        "structural_contracts": 4,
+        "under_performance_target": 4,
+        "max_p95_ms": 1370.0911,
+    }
+    assert metadata["official_migration"]["new_success_audit"]["passed"] == 6
+    assert metadata["source_files"]["phase29_event_projection_doris_json"].endswith(
+        "phase29_event_projection_doris.json"
+    )
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)

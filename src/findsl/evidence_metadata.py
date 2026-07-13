@@ -74,13 +74,19 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase29_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase29_event_projection_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase28_funnel_payload
+        phase29_funnel_payload
+        or phase28_funnel_payload
         or phase27_funnel_payload
         or phase26_funnel_payload
         or phase25_funnel_payload
@@ -151,6 +157,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    generalized_event_payload = _read_optional_json(
+        snapshot_dir / "phase29_event_projection_doris.json",
+        warnings,
+        warn_missing=False,
+    )
     prefix_join_payload = _read_optional_json(
         snapshot_dir / "phase6c_set_prefix_doris.json",
         warnings,
@@ -163,6 +174,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
     )
     phase28_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase28_new_success_audit.json",
+        warnings,
+        warn_missing=False,
+    )
+    phase29_new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase29_new_success_audit.json",
         warnings,
         warn_missing=False,
     )
@@ -197,7 +213,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     new_success_audit_payload = (
-        phase28_new_success_audit_payload
+        phase29_new_success_audit_payload
+        or phase28_new_success_audit_payload
         or phase27_new_success_audit_payload
         or phase26_new_success_audit_payload
         or phase25_new_success_audit_payload
@@ -236,6 +253,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             date_limit_payload,
             event_semantics_payload,
             default_price_event_payload,
+            generalized_event_payload,
             prefix_join_payload,
             new_success_audit_payload,
         ),
@@ -281,6 +299,9 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     default_price_event = _dict(
         official_migration.get("default_price_event_evidence")
     )
+    generalized_event = _dict(
+        official_migration.get("generalized_event_projection_evidence")
+    )
     prefix_join = _dict(official_migration.get("prefix_join_evidence"))
     new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
@@ -315,6 +336,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Phase 26 date/limit evidence | {_mapping_event_display(date_limit)} |",
         f"| Phase 27 event-semantics evidence | {_mapping_event_display(event_semantics)} |",
         f"| Phase 28 default-price event evidence | {_mapping_event_display(default_price_event)} |",
+        f"| Phase 29 generalized event projection evidence | {_mapping_event_display(generalized_event)} |",
         f"| Phase 6C set-prefix evidence | {_prefix_join_display(prefix_join)} |",
         f"| Latest phase new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
@@ -529,6 +551,7 @@ def _official_migration_metadata(
     date_limit: dict[str, Any] | None,
     event_semantics: dict[str, Any] | None,
     default_price_event: dict[str, Any] | None,
+    generalized_event: dict[str, Any] | None,
     prefix_join: dict[str, Any] | None,
     new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
@@ -647,6 +670,17 @@ def _official_migration_metadata(
             for value in [_number_or_none(item.get("p95_ms"))]
             if value is not None
         ]
+    generalized_event_p95_values = []
+    if isinstance(generalized_event, dict) and isinstance(
+        generalized_event.get("cases"), list
+    ):
+        generalized_event_p95_values = [
+            value
+            for item in generalized_event["cases"]
+            if isinstance(item, dict)
+            for value in [_number_or_none(item.get("p95_ms"))]
+            if value is not None
+        ]
     return {
         "available": funnel is not None,
         "git_head": funnel.get("git_head") if isinstance(funnel, dict) else None,
@@ -756,6 +790,17 @@ def _official_migration_metadata(
             "structural_contracts": _int_or_none(default_price_event.get("structural_contracts")) if isinstance(default_price_event, dict) else None,
             "max_p95_ms": max(default_price_event_p95_values) if default_price_event_p95_values else None,
         },
+        "generalized_event_projection_evidence": {
+            "available": generalized_event is not None,
+            "status": generalized_event.get("status") if isinstance(generalized_event, dict) else None,
+            "matched": _int_or_none(generalized_event.get("matched")) if isinstance(generalized_event, dict) else None,
+            "total": _int_or_none(generalized_event.get("total")) if isinstance(generalized_event, dict) else None,
+            "non_empty": _int_or_none(generalized_event.get("non_empty")) if isinstance(generalized_event, dict) else None,
+            "latest_data_date": generalized_event.get("latest_data_date") if isinstance(generalized_event, dict) else None,
+            "structural_contracts": _int_or_none(generalized_event.get("structural_contracts")) if isinstance(generalized_event, dict) else None,
+            "under_performance_target": _int_or_none(generalized_event.get("under_performance_target")) if isinstance(generalized_event, dict) else None,
+            "max_p95_ms": max(generalized_event_p95_values) if generalized_event_p95_values else None,
+        },
         "prefix_join_evidence": {
             "available": prefix_join is not None,
             "status": prefix_join.get("status") if isinstance(prefix_join, dict) else None,
@@ -814,6 +859,9 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase28_default_price_funnel_json": str(snapshot_dir / "phase28_default_price_funnel.json"),
         "phase28_default_price_doris_json": str(snapshot_dir / "phase28_default_price_doris.json"),
         "phase28_new_success_audit_json": str(snapshot_dir / "phase28_new_success_audit.json"),
+        "phase29_event_projection_funnel_json": str(snapshot_dir / "phase29_event_projection_funnel.json"),
+        "phase29_event_projection_doris_json": str(snapshot_dir / "phase29_event_projection_doris.json"),
+        "phase29_new_success_audit_json": str(snapshot_dir / "phase29_new_success_audit.json"),
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
