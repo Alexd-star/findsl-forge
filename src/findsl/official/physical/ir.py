@@ -528,13 +528,15 @@ class PhysicalPosition(CanonicalIr):
 @dataclass(frozen=True)
 class PhysicalEventProjection(PhysicalPlan):
     input: PhysicalPlan
-    events: Tuple[PhysicalCrossing, ...]
+    events: Tuple[CanonicalIr, ...]
+    projections: Tuple[PhysicalProjection, ...] = ()
 
     def to_dict(self):
         return {
             "kind": "PhysicalEventProjection",
             "input": self.input.to_dict(),
             "events": [event.to_dict() for event in self.events],
+            "projections": [item.to_dict() for item in self.projections],
         }
 
 

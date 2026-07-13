@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
-    PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalEmpty,
+    PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalCrossing, PhysicalEmpty,
     PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
     PhysicalDynamicDateRange, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
@@ -82,18 +82,50 @@ def _validate_plan(plan, catalog, expressions):
     if isinstance(plan, PhysicalEventProjection):
         _validate_plan(plan.input, catalog, expressions)
         if not plan.events:
-            raise ValueError("physical event projection requires crossing events")
+            raise ValueError("physical event projection requires events")
         aliases = set()
         for event in plan.events:
             if not event.alias.isidentifier() or event.alias in aliases:
                 raise ValueError("physical event projection alias is invalid or duplicated")
-            if event.direction not in {"above", "below"}:
-                raise ValueError("physical event projection direction is invalid")
-            if event.left.type is not NUMERIC or event.right.type is not NUMERIC:
-                raise ValueError("physical event projection requires numeric operands")
             aliases.add(event.alias)
-            _validate_expr(event.left, catalog, expressions)
-            _validate_expr(event.right, catalog, expressions)
+            if isinstance(event, PhysicalExtreme):
+                if event.direction not in {"high", "low"}:
+                    raise ValueError("physical projected extreme direction is invalid")
+                if event.expression.type is not NUMERIC:
+                    raise ValueError("physical projected extreme requires numeric input")
+                if event.lookback_sessions is not None and event.lookback_sessions <= 0:
+                    raise ValueError("physical projected extreme lookback must be positive")
+                _validate_expr(event.expression, catalog, expressions)
+            elif isinstance(event, PhysicalPattern):
+                if event.pattern not in {"close_together", "reset"}:
+                    raise ValueError("physical projected pattern is invalid")
+                if event.predicate.type is not BOOLEAN:
+                    raise ValueError("physical projected pattern must be boolean")
+                _validate_expr(event.predicate, catalog, expressions)
+            elif isinstance(event, PhysicalPosition):
+                if event.expression.type is not NUMERIC:
+                    raise ValueError("physical projected position requires numeric input")
+                if event.lookback_sessions is not None and event.lookback_sessions <= 0:
+                    raise ValueError("physical projected position lookback must be positive")
+                _validate_expr(event.expression, catalog, expressions)
+            elif isinstance(event, PhysicalCrossing):
+                if event.direction not in {"above", "below"}:
+                    raise ValueError("physical event projection direction is invalid")
+                if event.left.type is not NUMERIC or event.right.type is not NUMERIC:
+                    raise ValueError("physical event projection requires numeric operands")
+                _validate_expr(event.left, catalog, expressions)
+                _validate_expr(event.right, catalog, expressions)
+            else:
+                raise ValueError(
+                    f"unsupported physical projected event {type(event).__name__}"
+                )
+        for projection in plan.projections:
+            if not projection.alias.isidentifier() or projection.alias in aliases:
+                raise ValueError(
+                    "physical event scalar projection alias is invalid or duplicated"
+                )
+            aliases.add(projection.alias)
+            _validate_expr(projection.expression, catalog, expressions)
         return
     if isinstance(plan, PhysicalEventFilter):
         _validate_plan(plan.input, catalog, expressions)
@@ -132,13 +164,15 @@ def _validate_plan(plan, catalog, expressions):
                 if event.lookback_sessions is not None and event.lookback_sessions <= 0:
                     raise ValueError("physical position lookback must be positive")
                 _validate_expr(event.expression, catalog, expressions)
-            else:
+            elif isinstance(event, PhysicalCrossing):
                 if event.direction not in {"above", "below"}:
                     raise ValueError("physical crossing direction is invalid")
                 if event.left.type is not event.right.type or event.left.type is not NUMERIC:
                     raise ValueError("physical crossing operands must be compatible numeric expressions")
                 _validate_expr(event.left, catalog, expressions)
                 _validate_expr(event.right, catalog, expressions)
+            else:
+                raise ValueError(f"unsupported physical event {type(event).__name__}")
         refs = {item.alias for item in _walk_event_refs(plan.predicate)}
         if not refs or not refs.issubset(aliases):
             raise ValueError("physical event predicate references an undeclared event")

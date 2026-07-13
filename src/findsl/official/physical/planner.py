@@ -2279,16 +2279,12 @@ def _plan_temporal_crossing_events(
     constrained_input = event_plan.input
     for constraint in event_plan.result_constraints:
         constrained_input = PhysicalFilter(constrained_input, constraint)
-    crossings = tuple(
-        event for event in event_plan.events if isinstance(event, PhysicalCrossing)
-    )
-    if len(crossings) != len(event_plan.events):
-        raise PhysicalPlanningError(
-            "PHYSICAL_EVENT_TEMPORAL_KIND_UNSUPPORTED",
-            "temporal event projection currently requires crossing events",
-        )
     plan: PhysicalPlan = PhysicalTemporal(
-        PhysicalEventProjection(constrained_input, crossings),
+        PhysicalEventProjection(
+            constrained_input,
+            event_plan.events,
+            event_plan.projections,
+        ),
         event_plan.predicate,
         "CONS" if isinstance(current, LogicalConsecutive) else "EXIST",
         current.spec.comparator,
@@ -2305,7 +2301,7 @@ def _plan_temporal_crossing_events(
     decision = replace(
         event_result.decisions[0],
         reason_code="PHYSICAL_EVENT_TEMPORAL_SELECTED",
-        reason="crossing events are projected before typed temporal quantification",
+        reason="event features are projected before typed temporal quantification",
         strategy_id="temporal_event_projection",
     )
     return PhysicalPlanningResult(

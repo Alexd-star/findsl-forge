@@ -221,6 +221,25 @@ def _event_semantics_materialized(payload, sql: str) -> bool:
     }
     if "PhysicalEventFilter" in kinds and kinds & event_kinds:
         return " AS `event_" in sql and "`event_rows`.`event_" in sql
+    if "PhysicalEventProjection" in kinds:
+        event_nodes = [
+            node
+            for node in physical_nodes
+            if node.get("kind") in event_kinds
+        ]
+        kind_tokens = {
+            "PhysicalCrossing": "LAG(",
+            "PhysicalExtreme": " OVER (",
+            "PhysicalPattern": " AS `event_",
+            "PhysicalPosition": "ELSE '中' END",
+        }
+        return (
+            "PhysicalTemporal" in kinds
+            and bool(event_nodes)
+            and all(kind_tokens[node["kind"]] in sql for node in event_nodes)
+            and "source_rows AS" in sql
+            and "temporal_metrics AS" in sql
+        )
     if strategy == "temporal_event_projection":
         return (
             {"PhysicalTemporal", "PhysicalEventProjection"}.issubset(kinds)

@@ -270,6 +270,38 @@ def _render_event_filter(
 ) -> exp.Select:
     source = _render_plan(plan.input, catalog, cte_prefix)
     relation = _find_relation(plan.input)
+    source = _append_event_columns(
+        source,
+        plan.events,
+        plan.projections,
+        catalog,
+        relation,
+    )
+
+    alias = "event_rows"
+    rows = source.subquery(alias=alias)
+    if plan.quantifier == "none":
+        return _render_event_absence(plan, rows, relation, catalog)
+    outer = exp.select(
+        *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
+    ).from_(rows)
+    predicate = _render_expr(plan.predicate, catalog)
+    for constraint in plan.result_constraints:
+        rendered = _render_expr(constraint, catalog, relation)
+        predicate = exp.and_(
+            predicate,
+            _retarget_event_result_columns(rendered, alias, catalog),
+        )
+    return outer.where(predicate)
+
+
+def _append_event_columns(
+    source: exp.Select,
+    events,
+    projections,
+    catalog: PhysicalCatalog,
+    relation,
+) -> exp.Select:
     stable_alias = _stable_alias(relation)
     partition = [
         exp.column("mktcode", table=stable_alias, quoted=True),
@@ -285,7 +317,7 @@ def _render_event_filter(
         ]
     )
 
-    for event in plan.events:
+    for event in events:
         if isinstance(event, PhysicalPattern):
             source = source.select(
                 _render_expr(event.predicate, catalog, relation).as_(
@@ -378,7 +410,7 @@ def _render_event_filter(
             append=True,
         )
 
-    for projection in plan.projections:
+    for projection in projections:
         source = source.select(
             _render_expr(projection.expression, catalog, relation).as_(
                 projection.alias,
@@ -387,21 +419,7 @@ def _render_event_filter(
             append=True,
         )
 
-    alias = "event_rows"
-    rows = source.subquery(alias=alias)
-    if plan.quantifier == "none":
-        return _render_event_absence(plan, rows, relation, catalog)
-    outer = exp.select(
-        *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
-    ).from_(rows)
-    predicate = _render_expr(plan.predicate, catalog)
-    for constraint in plan.result_constraints:
-        rendered = _render_expr(constraint, catalog, relation)
-        predicate = exp.and_(
-            predicate,
-            _retarget_event_result_columns(rendered, alias, catalog),
-        )
-    return outer.where(predicate)
+    return source
 
 
 def _render_prefix_join(
@@ -534,43 +552,13 @@ def _render_event_projection(
 ) -> exp.Select:
     source = _render_plan(plan.input, catalog, cte_prefix)
     relation = _find_relation(plan.input)
-    stable_alias = _stable_alias(relation)
-    partition = [
-        exp.column("mktcode", table=stable_alias, quoted=True),
-        exp.column("tgtcode", table=stable_alias, quoted=True),
-    ]
-    order = exp.Order(
-        expressions=[
-            exp.Ordered(
-                this=exp.column("bizdate", table=stable_alias, quoted=True),
-                desc=False,
-                nulls_first=True,
-            )
-        ]
+    source = _append_event_columns(
+        source,
+        plan.events,
+        plan.projections,
+        catalog,
+        relation,
     )
-    for event in plan.events:
-        left = _render_expr(event.left, catalog, relation)
-        right = _render_expr(event.right, catalog, relation)
-        previous_left = exp.Window(
-            this=exp.Lag(this=left.copy()),
-            partition_by=[item.copy() for item in partition],
-            order=order.copy(),
-        )
-        previous_right = exp.Window(
-            this=exp.Lag(this=right.copy()),
-            partition_by=[item.copy() for item in partition],
-            order=order.copy(),
-        )
-        if event.direction == "above":
-            current = exp.GT(this=left, expression=right)
-            previous = exp.LTE(this=previous_left, expression=previous_right)
-        else:
-            current = exp.LT(this=left, expression=right)
-            previous = exp.GTE(this=previous_left, expression=previous_right)
-        source = source.select(
-            exp.and_(current, previous).as_(event.alias, quoted=True),
-            append=True,
-        )
     alias = "event_rows"
     rows = source.subquery(alias=alias)
     return exp.select(
@@ -581,6 +569,7 @@ def _render_event_projection(
                 "tgtcode",
                 "bizdate",
                 *(event.alias for event in plan.events),
+                *(projection.alias for projection in plan.projections),
             )
         )
     ).from_(rows)

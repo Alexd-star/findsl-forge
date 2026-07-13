@@ -478,6 +478,52 @@ def test_pipeline_projects_crossing_events_before_temporal_quantification(
         assert fragment in sql
 
 
+@pytest.mark.parametrize(
+    "source,event_kind,sql_fragments",
+    [
+        (
+            "position('', '', '', '历史', '', '', '', 'CONS>1') = '低'",
+            "PhysicalPosition",
+            (
+                "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+                "CASE WHEN `event_rows`.`event_0` = '低' THEN 1 ELSE 0 END",
+                "MAX(`runs`.`run_length`)",
+            ),
+        ),
+        (
+            "record_low('', '', '', '20日', '近5日', '', '', 'EXIST>=2日') = True",
+            "PhysicalExtreme",
+            (
+                "ROWS BETWEEN 19 PRECEDING AND CURRENT ROW",
+                "CASE WHEN `event_rows`.`event_0` = TRUE THEN 1 ELSE 0 END",
+                "`temporal_metrics`.`metric_value` >= 2",
+            ),
+        ),
+        (
+            "close_together('', '', '', '5日均线', '', '', 'CONS=5日') = True",
+            "PhysicalPattern",
+            (
+                "GREATEST(",
+                "CASE WHEN `event_rows`.`event_0` = TRUE THEN 1 ELSE 0 END",
+                "MAX(`runs`.`run_length`)",
+            ),
+        ),
+    ],
+)
+def test_pipeline_projects_all_event_kinds_before_temporal_quantification(
+    source, event_kind, sql_fragments
+):
+    result = compile_official(source).to_dict()
+    projection = result["physical"]["plan"]["input"]
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "temporal_event_projection"
+    assert projection["kind"] == "PhysicalEventProjection"
+    assert projection["events"][0]["kind"] == event_kind
+    for fragment in sql_fragments:
+        assert fragment in sql
+
+
 def test_pipeline_never_ignores_non_empty_window_event_slots():
     with pytest.raises(OfficialPipelineError) as excinfo:
         compile_official(

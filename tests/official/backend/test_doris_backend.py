@@ -10,6 +10,8 @@ from findsl.official.physical import (
     PhysicalCoalesce,
     PhysicalColumn,
     PhysicalComparison,
+    PhysicalEventFilter,
+    PhysicalEventProjection,
     PhysicalFilter,
     PhysicalLiteral,
     PhysicalNullIf,
@@ -44,6 +46,27 @@ def test_direct_filter_and_limit_render_as_stable_doris_select_ast():
     assert result.round_trip_stable is True
     assert result.validation.passed is True
     assert result.validation.table_references == ["hsj_stock_hq_basic"]
+
+
+def test_event_projection_exports_event_and_scalar_feature_columns():
+    event_filter = _physical(
+        "position('', '', '成交量', '历史', '近5日', '', '', '') = '低' and "
+        "indicator('', '', '成交额', '近5日', '', '', '') > 0"
+    )
+    assert isinstance(event_filter, PhysicalEventFilter)
+    projection = PhysicalEventProjection(
+        event_filter.input,
+        event_filter.events,
+        event_filter.projections,
+    )
+
+    result = render_doris(projection, default_physical_catalog())
+
+    assert "AS `event_0`" in result.sql
+    assert "AS `projected_0`" in result.sql
+    assert "`event_rows`.`event_0`" in result.sql
+    assert "`event_rows`.`projected_0`" in result.sql
+    assert result.validation.passed is True
 
 
 def test_backend_uses_sqlglot_literal_escaping():
