@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T21:03:31Z",
+  "generated_at": "2026-07-13T00:08:45Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "0386df2",
-    "head_at_export": "0386df2",
+    "head_at_report_generation": "8abbac9",
+    "head_at_export": "8abbac9",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-12T21:02:47+00:00",
+    "generated_at": "2026-07-12T21:39:57+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.574,
+    "compile_p95_latency_ms": 1.399,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 874,
-      "elapsed_seconds": 130.63
+      "passed": 876,
+      "elapsed_seconds": 132.51
     }
   },
   "official_suite": {
@@ -178,6 +178,17 @@
       "structural_contracts": 4,
       "max_p95_ms": 2090.4077
     },
+    "prefix_join_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 14,
+      "total": 14,
+      "structural_contracts": 14,
+      "prefix_faster": 14,
+      "median_speedup": 1.393279,
+      "min_speedup": 1.205708,
+      "max_speedup": 2.355816
+    },
     "new_success_audit": {
       "available": true,
       "status": "PASS",
@@ -235,6 +246,7 @@
     "phase27_capability_funnel_json": "submission_artifacts\\evidence_snapshots\\phase27_capability_funnel.json",
     "phase27_event_semantics_doris_json": "submission_artifacts\\evidence_snapshots\\phase27_event_semantics_doris.json",
     "phase27_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase27_new_success_audit.json",
+    "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
   }
