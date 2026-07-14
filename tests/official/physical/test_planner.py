@@ -1,5 +1,6 @@
 import pytest
 
+from findsl.official.external.runtime import default_external_index_quote_catalog
 from findsl.official.lowering import lower_official_ast
 from findsl.official.physical import PhysicalAbs, PhysicalAggregateRank, PhysicalCompositeAggregate, PhysicalFilter, PhysicalGreatest, PhysicalGroupedAggregate, PhysicalIn, PhysicalJoin, PhysicalLimit, PhysicalLiteral, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalPrefixJoin, PhysicalPrefixRef, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalSetOperation, PhysicalStageRank, PhysicalTableScan, PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank
 from findsl.official.physical.catalog import default_physical_catalog
@@ -395,7 +396,10 @@ def test_external_index_querydata_scalar_uses_versioned_quote_resource():
     assert isinstance(result.plan, PhysicalCompositeAggregate)
     payload = result.plan.canonical_json()
     assert "external_index_quote" in payload
-    assert "akshare-sina-index-2026-07-13-f291081f7f0a" in payload
+    assert (
+        default_external_index_quote_catalog().resolve("000300").snapshot_id
+        in payload
+    )
 
 
 def test_industry_relative_aggregate_carries_single_valued_policy_in_physical_ir():
@@ -732,7 +736,16 @@ def test_typed_calendar_constraints_lower_without_reparsing_date_fragments(date,
     assert "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED" not in payload
 
 
-@pytest.mark.parametrize("date,offset", [("昨天", 1), ("昨日", 1), ("前天", 2), ("前一个交易日", 1)])
+@pytest.mark.parametrize(
+    "date,offset",
+    [
+        ("昨天", 1),
+        ("昨日", 1),
+        ("上个交易日", 1),
+        ("前天", 2),
+        ("前一个交易日", 1),
+    ],
+)
 def test_relative_session_date_lowers_to_trading_calendar_offset(date, offset):
     result = plan_physical(
         _lower(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),

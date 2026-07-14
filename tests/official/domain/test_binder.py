@@ -211,6 +211,7 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("18年-24年", "calendar_range", None, "year"),
         ("2011年3月25日", "exact", None, None),
         ("昨天", "relative_session", 1, "session"),
+        ("上个交易日", "relative_session", 1, "session"),
         ("前天", "relative_session", 2, "session"),
         ("当天", "relative", None, None),
         ("目前", "relative", None, None),

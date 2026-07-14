@@ -239,6 +239,7 @@ def parse_date_constraint(value: str) -> DateConstraint:
     relative_sessions = {
         "昨天": 1,
         "昨日": 1,
+        "上个交易日": 1,
         "前一个交易日": 1,
         "前一交易日": 1,
         "前天": 2,

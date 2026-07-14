@@ -1,5 +1,6 @@
 import pytest
 
+from findsl.official.external.runtime import default_external_index_quote_catalog
 from findsl.official.pipeline import OfficialPipelineError, compile_official
 
 
@@ -42,7 +43,11 @@ def test_empty_rank_uses_only_stable_keys_without_positional_ordering():
 
 @pytest.mark.parametrize(
     "scope,index_code,date",
-    [("沪深300", "000300", "今年以来"), ("深成指数", "399001", "去年")],
+    [
+        ("上证指数", "000001", "今年"),
+        ("沪深300", "000300", "今年以来"),
+        ("深成指数", "399001", "去年"),
+    ],
 )
 def test_querydata_index_scalar_uses_versioned_quote_and_official_time_anchor(
     scope, index_code, date
@@ -54,7 +59,7 @@ def test_querydata_index_scalar_uses_versioned_quote_and_official_time_anchor(
 
     assert "`findsl_ext`.`index_quote`" in sql
     assert f"`external_index_quote`.`index_code` = '{index_code}'" in sql
-    assert "akshare-sina-index-2026-07-13-f291081f7f0a" in sql
+    assert default_external_index_quote_catalog().resolve(index_code).snapshot_id in sql
     assert "FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor" in sql
 
 

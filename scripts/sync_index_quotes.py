@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 INDEX_SYMBOLS = {
+    "000001": "sh000001",
     "000300": "sh000300",
     "399001": "sz399001",
 }
