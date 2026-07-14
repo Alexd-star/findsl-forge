@@ -38,6 +38,21 @@ def test_build_snapshot_matches_targets_and_preserves_unresolved():
     assert result.snapshot.content_sha256
 
 
+def test_build_snapshot_uses_explicit_alias_and_retains_original_target():
+    result = build_eastmoney_snapshot(
+        ["算力相关"],
+        provider=_Provider(),
+        aliases={"算力相关": "算力概念"},
+        as_of_date="2026-07-13",
+    )
+
+    assert result.matched[0].method == "alias_exact"
+    assert result.matched[0].board.code == "BK1"
+    assert {item.aliases for item in result.snapshot.scope_memberships} == {
+        ("算力相关",)
+    }
+
+
 def test_build_full_snapshot_attempts_every_discovered_board():
     result = build_full_eastmoney_snapshot(
         provider=_Provider(),

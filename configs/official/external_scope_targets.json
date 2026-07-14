@@ -961,7 +961,15 @@
       "occurrences": 1
     }
   ],
-  "aliases": {},
+  "aliases": {
+    "deepseek相关": "DeepSeek概念",
+    "hbm": "高带宽内存",
+    "msci": "MSCI中国",
+    "msic": "MSCI中国",
+    "msic概念": "MSCI中国",
+    "专精特新小巨人企业": "专精特新",
+    "智能城市": "智慧城市"
+  },
   "index_aliases": {
     "上证380稳定": "000142",
     "沪深300医药": "000913",

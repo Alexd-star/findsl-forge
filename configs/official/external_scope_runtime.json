@@ -30249,6 +30249,16 @@
       "alias": "5G概念",
       "normalized_alias": "5g概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0714",
+      "scope_name": "5G概念",
+      "alias": "5G概念",
+      "normalized_alias": "5g概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -30261,6 +30271,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0714",
+      "scope_name": "5G概念",
+      "alias": "5G概念板块",
+      "normalized_alias": "5g概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -56649,6 +56669,16 @@
       "alias": "aigc",
       "normalized_alias": "aigc",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "aigc",
+      "normalized_alias": "aigc",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -56669,6 +56699,16 @@
       "alias": "AIGC概念",
       "normalized_alias": "aigc概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "AIGC概念",
+      "normalized_alias": "aigc概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -56681,6 +56721,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "AIGC概念板块",
+      "normalized_alias": "aigc概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -56721,6 +56771,16 @@
       "source": "cnindex",
       "as_of_date": "2026-07-13",
       "snapshot_id": "cnindex-2026-07-13-73102d15e622"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1629",
+      "scope_name": "AI应用",
+      "alias": "AI应用",
+      "normalized_alias": "ai应用",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -56769,8 +56829,28 @@
       "alias": "AI应用概念",
       "normalized_alias": "ai应用概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1629",
+      "scope_name": "AI应用",
+      "alias": "AI应用概念",
+      "normalized_alias": "ai应用概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1629",
+      "scope_name": "AI应用",
+      "alias": "AI应用概念板块",
+      "normalized_alias": "ai应用概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -56799,8 +56879,28 @@
       "alias": "AI眼镜",
       "normalized_alias": "ai眼镜",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1178",
+      "scope_name": "AI眼镜",
+      "alias": "AI眼镜",
+      "normalized_alias": "ai眼镜",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1178",
+      "scope_name": "AI眼镜",
+      "alias": "AI眼镜概念",
+      "normalized_alias": "ai眼镜概念",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -56819,8 +56919,28 @@
       "alias": "AI眼镜概念板块",
       "normalized_alias": "ai眼镜概念板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1178",
+      "scope_name": "AI眼镜",
+      "alias": "AI眼镜概念板块",
+      "normalized_alias": "ai眼镜概念板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1127",
+      "scope_name": "AI芯片",
+      "alias": "AI芯片",
+      "normalized_alias": "ai芯片",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -56839,6 +56959,16 @@
       "alias": "AI芯片概念",
       "normalized_alias": "ai芯片概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1127",
+      "scope_name": "AI芯片",
+      "alias": "AI芯片概念",
+      "normalized_alias": "ai芯片概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -56849,8 +56979,28 @@
       "alias": "AI芯片概念板块",
       "normalized_alias": "ai芯片概念板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1127",
+      "scope_name": "AI芯片",
+      "alias": "AI芯片概念板块",
+      "normalized_alias": "ai芯片概念板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1127",
+      "scope_name": "AI芯片",
+      "alias": "ai芯片行业",
+      "normalized_alias": "ai芯片行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -57069,8 +57219,28 @@
       "alias": "PLC概念",
       "normalized_alias": "plc概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1119",
+      "scope_name": "PLC概念",
+      "alias": "PLC概念",
+      "normalized_alias": "plc概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1119",
+      "scope_name": "PLC概念",
+      "alias": "PLC概念板块",
+      "normalized_alias": "plc概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -58289,8 +58459,28 @@
       "alias": "UWB概念",
       "normalized_alias": "uwb概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0880",
+      "scope_name": "UWB概念",
+      "alias": "UWB概念",
+      "normalized_alias": "uwb概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0880",
+      "scope_name": "UWB概念",
+      "alias": "UWB概念板块",
+      "normalized_alias": "uwb概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -60329,6 +60519,16 @@
       "alias": "上海自贸",
       "normalized_alias": "上海自贸",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0643",
+      "scope_name": "上海自贸",
+      "alias": "上海自贸",
+      "normalized_alias": "上海自贸",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -60349,6 +60549,16 @@
       "alias": "上海自贸概念",
       "normalized_alias": "上海自贸概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0643",
+      "scope_name": "上海自贸",
+      "alias": "上海自贸概念",
+      "normalized_alias": "上海自贸概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -60361,6 +60571,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0643",
+      "scope_name": "上海自贸",
+      "alias": "上海自贸概念板块",
+      "normalized_alias": "上海自贸概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -60499,6 +60719,16 @@
       "alias": "上证180_",
       "normalized_alias": "上证180_",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0612",
+      "scope_name": "上证180_",
+      "alias": "上证180_",
+      "normalized_alias": "上证180_",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -60509,8 +60739,28 @@
       "alias": "上证180_概念",
       "normalized_alias": "上证180_概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0612",
+      "scope_name": "上证180_",
+      "alias": "上证180_概念",
+      "normalized_alias": "上证180_概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0612",
+      "scope_name": "上证180_",
+      "alias": "上证180_概念板块",
+      "normalized_alias": "上证180_概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -60531,6 +60781,16 @@
       "source": "akshare-public-index",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-public-index-2026-07-13-fd8c3729b96b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0612",
+      "scope_name": "上证180_",
+      "alias": "上证180指数",
+      "normalized_alias": "上证180指数",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -63159,6 +63419,16 @@
       "alias": "中字头",
       "normalized_alias": "中字头",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0505",
+      "scope_name": "中字头",
+      "alias": "中字头",
+      "normalized_alias": "中字头",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -63169,8 +63439,28 @@
       "alias": "中字头概念",
       "normalized_alias": "中字头概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0505",
+      "scope_name": "中字头",
+      "alias": "中字头概念",
+      "normalized_alias": "中字头概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0505",
+      "scope_name": "中字头",
+      "alias": "中字头概念板块",
+      "normalized_alias": "中字头概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -66339,6 +66629,16 @@
       "alias": "云计算",
       "normalized_alias": "云计算",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0579",
+      "scope_name": "云计算",
+      "alias": "云计算",
+      "normalized_alias": "云计算",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -66379,8 +66679,28 @@
       "alias": "云计算概念",
       "normalized_alias": "云计算概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0579",
+      "scope_name": "云计算",
+      "alias": "云计算概念",
+      "normalized_alias": "云计算概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0579",
+      "scope_name": "云计算",
+      "alias": "云计算概念板块",
+      "normalized_alias": "云计算概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -67519,6 +67839,16 @@
       "alias": "人工智能",
       "normalized_alias": "人工智能",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "人工智能",
+      "normalized_alias": "人工智能",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -67569,6 +67899,16 @@
       "alias": "人工智能概念",
       "normalized_alias": "人工智能概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "人工智能概念",
+      "normalized_alias": "人工智能概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -67581,6 +67921,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "人工智能概念板块",
+      "normalized_alias": "人工智能概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -67649,6 +67999,16 @@
       "alias": "人脑工程",
       "normalized_alias": "人脑工程",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0706",
+      "scope_name": "人脑工程",
+      "alias": "人脑工程",
+      "normalized_alias": "人脑工程",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -67659,8 +68019,28 @@
       "alias": "人脑工程概念",
       "normalized_alias": "人脑工程概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0706",
+      "scope_name": "人脑工程",
+      "alias": "人脑工程概念",
+      "normalized_alias": "人脑工程概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0706",
+      "scope_name": "人脑工程",
+      "alias": "人脑工程概念板块",
+      "normalized_alias": "人脑工程概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -68611,6 +68991,36 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1166",
+      "scope_name": "低空经济",
+      "alias": "低空经济",
+      "normalized_alias": "低空经济",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1166",
+      "scope_name": "低空经济",
+      "alias": "低空经济概念",
+      "normalized_alias": "低空经济概念",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1166",
+      "scope_name": "低空经济",
+      "alias": "低空经济概念板块",
+      "normalized_alias": "低空经济概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -70369,6 +70779,16 @@
       "alias": "光刻机(胶)",
       "normalized_alias": "光刻机(胶)",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机(胶)",
+      "normalized_alias": "光刻机(胶)",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -70389,6 +70809,16 @@
       "alias": "光刻机(胶)概念",
       "normalized_alias": "光刻机(胶)概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机(胶)概念",
+      "normalized_alias": "光刻机(胶)概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -70401,6 +70831,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机(胶)概念板块",
+      "normalized_alias": "光刻机(胶)概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -70421,6 +70861,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机胶",
+      "normalized_alias": "光刻机胶",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -72489,6 +72939,16 @@
       "alias": "养老",
       "normalized_alias": "养老",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0653",
+      "scope_name": "养老概念",
+      "alias": "养老",
+      "normalized_alias": "养老",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -72499,8 +72959,28 @@
       "alias": "养老概念",
       "normalized_alias": "养老概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0653",
+      "scope_name": "养老概念",
+      "alias": "养老概念",
+      "normalized_alias": "养老概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0653",
+      "scope_name": "养老概念",
+      "alias": "养老概念板块",
+      "normalized_alias": "养老概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -74439,8 +74919,28 @@
       "alias": "券商",
       "normalized_alias": "券商",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0711",
+      "scope_name": "券商概念",
+      "alias": "券商",
+      "normalized_alias": "券商",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0711",
+      "scope_name": "券商概念",
+      "alias": "券商板块",
+      "normalized_alias": "券商板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -74459,6 +74959,16 @@
       "alias": "券商概念",
       "normalized_alias": "券商概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0711",
+      "scope_name": "券商概念",
+      "alias": "券商概念",
+      "normalized_alias": "券商概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -74469,8 +74979,28 @@
       "alias": "券商概念板块",
       "normalized_alias": "券商概念板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0711",
+      "scope_name": "券商概念",
+      "alias": "券商概念板块",
+      "normalized_alias": "券商概念板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0711",
+      "scope_name": "券商概念",
+      "alias": "券商类",
+      "normalized_alias": "券商类",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -75209,6 +75739,16 @@
       "alias": "化学纤维",
       "normalized_alias": "化学纤维",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0471",
+      "scope_name": "化学纤维",
+      "alias": "化学纤维",
+      "normalized_alias": "化学纤维",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -75289,6 +75829,16 @@
       "alias": "化学纤维板块",
       "normalized_alias": "化学纤维板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0471",
+      "scope_name": "化学纤维",
+      "alias": "化学纤维板块",
+      "normalized_alias": "化学纤维板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -75301,6 +75851,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0471",
+      "scope_name": "化学纤维",
+      "alias": "化学纤维行业",
+      "normalized_alias": "化学纤维行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -76639,8 +77199,28 @@
       "alias": "华为",
       "normalized_alias": "华为",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0854",
+      "scope_name": "华为概念",
+      "alias": "华为",
+      "normalized_alias": "华为",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0854",
+      "scope_name": "华为概念",
+      "alias": "华为概念",
+      "normalized_alias": "华为概念",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -76661,6 +77241,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0854",
+      "scope_name": "华为概念",
+      "alias": "华为概念板块",
+      "normalized_alias": "华为概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -85529,6 +86119,16 @@
       "alias": "大数据",
       "normalized_alias": "大数据",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0634",
+      "scope_name": "大数据",
+      "alias": "大数据",
+      "normalized_alias": "大数据",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -85539,8 +86139,28 @@
       "alias": "大数据概念",
       "normalized_alias": "大数据概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0634",
+      "scope_name": "大数据",
+      "alias": "大数据概念",
+      "normalized_alias": "大数据概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0634",
+      "scope_name": "大数据",
+      "alias": "大数据概念板块",
+      "normalized_alias": "大数据概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -90329,8 +90949,28 @@
       "alias": "小米公司",
       "normalized_alias": "小米公司",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0833",
+      "scope_name": "小米概念",
+      "alias": "小米公司",
+      "normalized_alias": "小米公司",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0833",
+      "scope_name": "小米概念",
+      "alias": "小米概念",
+      "normalized_alias": "小米概念",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -90351,6 +90991,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0833",
+      "scope_name": "小米概念",
+      "alias": "小米概念板块",
+      "normalized_alias": "小米概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -91149,6 +91799,16 @@
       "alias": "工业母机",
       "normalized_alias": "工业母机",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1004",
+      "scope_name": "工业母机",
+      "alias": "工业母机",
+      "normalized_alias": "工业母机",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -91159,8 +91819,28 @@
       "alias": "工业母机概念",
       "normalized_alias": "工业母机概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1004",
+      "scope_name": "工业母机",
+      "alias": "工业母机概念",
+      "normalized_alias": "工业母机概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1004",
+      "scope_name": "工业母机",
+      "alias": "工业母机概念板块",
+      "normalized_alias": "工业母机概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -91899,6 +92579,16 @@
       "alias": "并购重组概念",
       "normalized_alias": "并购重组概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1181",
+      "scope_name": "并购重组概念",
+      "alias": "并购重组概念",
+      "normalized_alias": "并购重组概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -91911,6 +92601,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1181",
+      "scope_name": "并购重组概念",
+      "alias": "并购重组概念板块",
+      "normalized_alias": "并购重组概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -93199,6 +93899,16 @@
       "alias": "建筑材料",
       "normalized_alias": "建筑材料",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1208",
+      "scope_name": "建筑材料",
+      "alias": "建筑材料",
+      "normalized_alias": "建筑材料",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -93249,6 +93959,16 @@
       "alias": "建筑材料板块",
       "normalized_alias": "建筑材料板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1208",
+      "scope_name": "建筑材料",
+      "alias": "建筑材料板块",
+      "normalized_alias": "建筑材料板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -93261,6 +93981,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1208",
+      "scope_name": "建筑材料",
+      "alias": "建筑材料行业",
+      "normalized_alias": "建筑材料行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -93319,6 +94049,16 @@
       "alias": "建筑装饰",
       "normalized_alias": "建筑装饰",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑装饰",
+      "normalized_alias": "建筑装饰",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -93369,6 +94109,16 @@
       "alias": "建筑装饰板块",
       "normalized_alias": "建筑装饰板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑装饰板块",
+      "normalized_alias": "建筑装饰板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -93381,6 +94131,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑装饰行业",
+      "normalized_alias": "建筑装饰行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -95909,6 +96669,16 @@
       "alias": "房地产",
       "normalized_alias": "房地产",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "房地产",
+      "normalized_alias": "房地产",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -96139,6 +96909,16 @@
       "alias": "房地产板块",
       "normalized_alias": "房地产板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "房地产板块",
+      "normalized_alias": "房地产板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -96191,6 +96971,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "房地产行业",
+      "normalized_alias": "房地产行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -97199,6 +97989,16 @@
       "alias": "教育",
       "normalized_alias": "教育",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0740",
+      "scope_name": "教育",
+      "alias": "教育",
+      "normalized_alias": "教育",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -97259,6 +98059,16 @@
       "alias": "教育板块",
       "normalized_alias": "教育板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0740",
+      "scope_name": "教育",
+      "alias": "教育板块",
+      "normalized_alias": "教育板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -97281,6 +98091,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0740",
+      "scope_name": "教育",
+      "alias": "教育行业",
+      "normalized_alias": "教育行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -97409,6 +98229,16 @@
       "alias": "数字水印",
       "normalized_alias": "数字水印",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1129",
+      "scope_name": "数字水印",
+      "alias": "数字水印",
+      "normalized_alias": "数字水印",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -97419,8 +98249,28 @@
       "alias": "数字水印概念",
       "normalized_alias": "数字水印概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1129",
+      "scope_name": "数字水印",
+      "alias": "数字水印概念",
+      "normalized_alias": "数字水印概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1129",
+      "scope_name": "数字水印",
+      "alias": "数字水印概念板块",
+      "normalized_alias": "数字水印概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -98829,6 +99679,16 @@
       "alias": "新能源",
       "normalized_alias": "新能源",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0493",
+      "scope_name": "新能源",
+      "alias": "新能源",
+      "normalized_alias": "新能源",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -98889,6 +99749,16 @@
       "alias": "新能源概念",
       "normalized_alias": "新能源概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0493",
+      "scope_name": "新能源",
+      "alias": "新能源概念",
+      "normalized_alias": "新能源概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -98901,6 +99771,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0493",
+      "scope_name": "新能源",
+      "alias": "新能源概念板块",
+      "normalized_alias": "新能源概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -101349,8 +102229,28 @@
       "alias": "智谱AI概念",
       "normalized_alias": "智谱ai概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1182",
+      "scope_name": "智谱AI概念",
+      "alias": "智谱AI概念",
+      "normalized_alias": "智谱ai概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1182",
+      "scope_name": "智谱AI概念",
+      "alias": "智谱AI概念板块",
+      "normalized_alias": "智谱ai概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -102089,6 +102989,16 @@
       "alias": "机器人",
       "normalized_alias": "机器人",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1408",
+      "scope_name": "机器人",
+      "alias": "机器人",
+      "normalized_alias": "机器人",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -102109,6 +103019,16 @@
       "alias": "机器人执行器",
       "normalized_alias": "机器人执行器",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1145",
+      "scope_name": "机器人执行器",
+      "alias": "机器人执行器",
+      "normalized_alias": "机器人执行器",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -102119,8 +103039,28 @@
       "alias": "机器人执行器概念",
       "normalized_alias": "机器人执行器概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1145",
+      "scope_name": "机器人执行器",
+      "alias": "机器人执行器概念",
+      "normalized_alias": "机器人执行器概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1145",
+      "scope_name": "机器人执行器",
+      "alias": "机器人执行器概念板块",
+      "normalized_alias": "机器人执行器概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -102169,6 +103109,16 @@
       "alias": "机器人板块",
       "normalized_alias": "机器人板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1408",
+      "scope_name": "机器人",
+      "alias": "机器人板块",
+      "normalized_alias": "机器人板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -102219,6 +103169,16 @@
       "alias": "机器人概念",
       "normalized_alias": "机器人概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1090",
+      "scope_name": "机器人概念",
+      "alias": "机器人概念",
+      "normalized_alias": "机器人概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -102239,6 +103199,16 @@
       "alias": "机器人概念板块",
       "normalized_alias": "机器人概念板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1090",
+      "scope_name": "机器人概念",
+      "alias": "机器人概念板块",
+      "normalized_alias": "机器人概念板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -102251,6 +103221,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1408",
+      "scope_name": "机器人",
+      "alias": "机器人行业",
+      "normalized_alias": "机器人行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -110279,6 +111259,16 @@
       "alias": "液冷",
       "normalized_alias": "液冷",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1138",
+      "scope_name": "液冷概念",
+      "alias": "液冷",
+      "normalized_alias": "液冷",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -110289,8 +111279,28 @@
       "alias": "液冷概念",
       "normalized_alias": "液冷概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1138",
+      "scope_name": "液冷概念",
+      "alias": "液冷概念",
+      "normalized_alias": "液冷概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1138",
+      "scope_name": "液冷概念",
+      "alias": "液冷概念板块",
+      "normalized_alias": "液冷概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -114639,6 +115649,16 @@
       "alias": "电力",
       "normalized_alias": "电力",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0428",
+      "scope_name": "电力",
+      "alias": "电力",
+      "normalized_alias": "电力",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -114719,6 +115739,16 @@
       "alias": "电力板块",
       "normalized_alias": "电力板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0428",
+      "scope_name": "电力",
+      "alias": "电力板块",
+      "normalized_alias": "电力板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -114739,6 +115769,16 @@
       "alias": "电力行业",
       "normalized_alias": "电力行业",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0428",
+      "scope_name": "电力",
+      "alias": "电力行业",
+      "normalized_alias": "电力行业",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -114751,6 +115791,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0428",
+      "scope_name": "电力",
+      "alias": "电力行业板块",
+      "normalized_alias": "电力行业板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -115329,6 +116379,16 @@
       "alias": "电池",
       "normalized_alias": "电池",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1033",
+      "scope_name": "电池",
+      "alias": "电池",
+      "normalized_alias": "电池",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -115379,6 +116439,16 @@
       "alias": "电池板块",
       "normalized_alias": "电池板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1033",
+      "scope_name": "电池",
+      "alias": "电池板块",
+      "normalized_alias": "电池板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -115391,6 +116461,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1033",
+      "scope_name": "电池",
+      "alias": "电池行业",
+      "normalized_alias": "电池行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -115859,6 +116939,16 @@
       "alias": "白酒",
       "normalized_alias": "白酒",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0896",
+      "scope_name": "白酒",
+      "alias": "白酒",
+      "normalized_alias": "白酒",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -115929,6 +117019,16 @@
       "alias": "白酒概念",
       "normalized_alias": "白酒概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0896",
+      "scope_name": "白酒",
+      "alias": "白酒概念",
+      "normalized_alias": "白酒概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -115949,6 +117049,16 @@
       "alias": "白酒概念板块",
       "normalized_alias": "白酒概念板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0896",
+      "scope_name": "白酒",
+      "alias": "白酒概念板块",
+      "normalized_alias": "白酒概念板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -115961,6 +117071,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0896",
+      "scope_name": "白酒",
+      "alias": "白酒行业",
+      "normalized_alias": "白酒行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -119703,6 +120823,36 @@
       "snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5"
     },
     {
+      "scope_type": "concept",
+      "scope_code": "BK1134",
+      "scope_name": "算力概念",
+      "alias": "算力",
+      "normalized_alias": "算力",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1134",
+      "scope_name": "算力概念",
+      "alias": "算力概念",
+      "normalized_alias": "算力概念",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1134",
+      "scope_name": "算力概念",
+      "alias": "算力概念板块",
+      "normalized_alias": "算力概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
       "scope_type": "industry",
       "scope_code": "BK1466",
       "scope_name": "管材",
@@ -122779,6 +123929,16 @@
       "alias": "胎压监测",
       "normalized_alias": "胎压监测",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0898",
+      "scope_name": "胎压监测",
+      "alias": "胎压监测",
+      "normalized_alias": "胎压监测",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -122789,8 +123949,28 @@
       "alias": "胎压监测概念",
       "normalized_alias": "胎压监测概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0898",
+      "scope_name": "胎压监测",
+      "alias": "胎压监测概念",
+      "normalized_alias": "胎压监测概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0898",
+      "scope_name": "胎压监测",
+      "alias": "胎压监测概念板块",
+      "normalized_alias": "胎压监测概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -124549,6 +125729,16 @@
       "alias": "英伟达",
       "normalized_alias": "英伟达",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1161",
+      "scope_name": "英伟达概念",
+      "alias": "英伟达",
+      "normalized_alias": "英伟达",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -124559,8 +125749,28 @@
       "alias": "英伟达概念",
       "normalized_alias": "英伟达概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1161",
+      "scope_name": "英伟达概念",
+      "alias": "英伟达概念",
+      "normalized_alias": "英伟达概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1161",
+      "scope_name": "英伟达概念",
+      "alias": "英伟达概念板块",
+      "normalized_alias": "英伟达概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -128559,6 +129769,16 @@
       "alias": "软件开发",
       "normalized_alias": "软件开发",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0737",
+      "scope_name": "软件开发",
+      "alias": "软件开发",
+      "normalized_alias": "软件开发",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -128609,6 +129829,16 @@
       "alias": "软件开发板块",
       "normalized_alias": "软件开发板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0737",
+      "scope_name": "软件开发",
+      "alias": "软件开发板块",
+      "normalized_alias": "软件开发板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -128621,6 +129851,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0737",
+      "scope_name": "软件开发",
+      "alias": "软件开发行业",
+      "normalized_alias": "软件开发行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -129579,6 +130819,16 @@
       "alias": "通信",
       "normalized_alias": "通信",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1215",
+      "scope_name": "通信",
+      "alias": "通信",
+      "normalized_alias": "通信",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -129689,6 +130939,16 @@
       "alias": "通信板块",
       "normalized_alias": "通信板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1215",
+      "scope_name": "通信",
+      "alias": "通信板块",
+      "normalized_alias": "通信板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -129791,6 +131051,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1215",
+      "scope_name": "通信",
+      "alias": "通信行业",
+      "normalized_alias": "通信行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -130039,6 +131309,16 @@
       "alias": "通用设备",
       "normalized_alias": "通用设备",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0545",
+      "scope_name": "通用设备",
+      "alias": "通用设备",
+      "normalized_alias": "通用设备",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -130119,6 +131399,16 @@
       "alias": "通用设备板块",
       "normalized_alias": "通用设备板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0545",
+      "scope_name": "通用设备",
+      "alias": "通用设备板块",
+      "normalized_alias": "通用设备板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -130131,6 +131421,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0545",
+      "scope_name": "通用设备",
+      "alias": "通用设备行业",
+      "normalized_alias": "通用设备行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -133379,6 +134679,16 @@
       "alias": "银行",
       "normalized_alias": "银行",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1283",
+      "scope_name": "银行",
+      "alias": "银行",
+      "normalized_alias": "银行",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -133429,6 +134739,16 @@
       "alias": "银行板块",
       "normalized_alias": "银行板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1283",
+      "scope_name": "银行",
+      "alias": "银行板块",
+      "normalized_alias": "银行板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -133471,6 +134791,16 @@
       "source": "csindex",
       "as_of_date": "2026-07-13",
       "snapshot_id": "csindex-2026-07-13-86968c7b643e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1283",
+      "scope_name": "银行",
+      "alias": "银行行业",
+      "normalized_alias": "银行行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -136539,6 +137869,16 @@
       "alias": "风电设备",
       "normalized_alias": "风电设备",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1032",
+      "scope_name": "风电设备",
+      "alias": "风电设备",
+      "normalized_alias": "风电设备",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -136559,6 +137899,16 @@
       "alias": "风电设备板块",
       "normalized_alias": "风电设备板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1032",
+      "scope_name": "风电设备",
+      "alias": "风电设备板块",
+      "normalized_alias": "风电设备板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -136571,6 +137921,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1032",
+      "scope_name": "风电设备",
+      "alias": "风电设备行业",
+      "normalized_alias": "风电设备行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -136999,6 +138359,16 @@
       "alias": "食品饮料",
       "normalized_alias": "食品饮料",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0438",
+      "scope_name": "食品饮料",
+      "alias": "食品饮料",
+      "normalized_alias": "食品饮料",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -137059,6 +138429,16 @@
       "alias": "食品饮料板块",
       "normalized_alias": "食品饮料板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0438",
+      "scope_name": "食品饮料",
+      "alias": "食品饮料板块",
+      "normalized_alias": "食品饮料板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -137071,6 +138451,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0438",
+      "scope_name": "食品饮料",
+      "alias": "食品饮料行业",
+      "normalized_alias": "食品饮料行业",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "industry",
@@ -137989,6 +139379,16 @@
       "alias": "鸡肉概念",
       "normalized_alias": "鸡肉概念",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0887",
+      "scope_name": "鸡肉概念",
+      "alias": "鸡肉概念",
+      "normalized_alias": "鸡肉概念",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -138001,6 +139401,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0887",
+      "scope_name": "鸡肉概念",
+      "alias": "鸡肉概念板块",
+      "normalized_alias": "鸡肉概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -138139,6 +139549,16 @@
       "alias": "鸿蒙",
       "normalized_alias": "鸿蒙",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0953",
+      "scope_name": "鸿蒙概念",
+      "alias": "鸿蒙",
+      "normalized_alias": "鸿蒙",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
     },
@@ -138149,8 +139569,28 @@
       "alias": "鸿蒙板块",
       "normalized_alias": "鸿蒙板块",
       "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0953",
+      "scope_name": "鸿蒙概念",
+      "alias": "鸿蒙板块",
+      "normalized_alias": "鸿蒙板块",
+      "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0953",
+      "scope_name": "鸿蒙概念",
+      "alias": "鸿蒙概念",
+      "normalized_alias": "鸿蒙概念",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",
@@ -138171,6 +139611,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0953",
+      "scope_name": "鸿蒙概念",
+      "alias": "鸿蒙概念板块",
+      "normalized_alias": "鸿蒙概念板块",
+      "source": "eastmoney",
+      "as_of_date": "2026-07-15",
+      "snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
     },
     {
       "scope_type": "concept",

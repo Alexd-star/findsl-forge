@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
+import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -45,6 +47,12 @@ class EastmoneyBoardProvider:
         "concept": ("https://79.push2.eastmoney.com/api/qt/clist/get", "m:90 t:3 f:!50", "f12"),
         "industry": ("https://17.push2.eastmoney.com/api/qt/clist/get", "m:90 t:2 f:!50", "f3"),
     }
+    _CONSTITUENT_ENDPOINTS = (
+        "https://29.push2.eastmoney.com/api/qt/clist/get",
+        "https://7.push2.eastmoney.com/api/qt/clist/get",
+        "https://82.push2.eastmoney.com/api/qt/clist/get",
+        "https://push2.eastmoney.com/api/qt/clist/get",
+    )
 
     def __init__(
         self,
@@ -55,6 +63,7 @@ class EastmoneyBoardProvider:
         trust_environment_proxy: bool = False,
         session=None,
         browser_session=None,
+        curl_json_loader=None,
         cache_dir: Path = None,
         request_interval_seconds: float = 0.0,
     ):
@@ -64,6 +73,7 @@ class EastmoneyBoardProvider:
             raise ValueError("max_attempts must be at least one")
         if backoff_seconds < 0:
             raise ValueError("backoff_seconds must not be negative")
+        session_injected = session is not None
         if session is None:
             try:
                 import requests
@@ -74,6 +84,7 @@ class EastmoneyBoardProvider:
             session = requests.Session()
         session.trust_env = trust_environment_proxy
         self._session = session
+        self._trust_environment_proxy = trust_environment_proxy
         if browser_session is None:
             try:
                 from curl_cffi import requests as browser_requests
@@ -82,6 +93,14 @@ class EastmoneyBoardProvider:
             except ImportError:
                 browser_session = None
         self._browser_session = browser_session
+        if curl_json_loader is False:
+            curl_json_loader = None
+        elif curl_json_loader is None and not session_injected:
+            executable = shutil.which("curl") or shutil.which("curl.exe")
+            curl_json_loader = (
+                self._load_json_with_curl(executable) if executable else None
+            )
+        self._curl_json_loader = curl_json_loader
         self.timeout_seconds = timeout_seconds
         self.max_attempts = max_attempts
         self.backoff_seconds = backoff_seconds
@@ -119,7 +138,7 @@ class EastmoneyBoardProvider:
 
     def list_constituents(self, board: BoardDefinition) -> Tuple[BoardConstituent, ...]:
         rows = self._fetch_pages(
-            "https://29.push2.eastmoney.com/api/qt/clist/get",
+            self._CONSTITUENT_ENDPOINTS,
             {
                 "po": "1",
                 "np": "1",
@@ -183,13 +202,13 @@ class EastmoneyBoardProvider:
             raise ExternalProviderError("Eastmoney returned no security profiles")
         return tuple(profiles)
 
-    def _fetch_pages(self, url: str, base_params: Dict[str, str]) -> Tuple[dict, ...]:
+    def _fetch_pages(self, url, base_params: Dict[str, str]) -> Tuple[dict, ...]:
         page = 1
         page_size = 100
         total: Optional[int] = None
         rows = []
         while total is None or len(rows) < total:
-            payload = self._request_json(
+            payload = self._request_json_any(
                 url, {**base_params, "pn": str(page), "pz": str(page_size)}
             )
             data = payload.get("data")
@@ -207,29 +226,52 @@ class EastmoneyBoardProvider:
         return tuple(rows[:total] if total is not None else rows)
 
     def _request_json(self, url: str, params: Dict[str, str]) -> dict:
-        cached = self._read_cache(url, params)
-        if cached is not None:
-            return cached
-        last_error = None
+        return self._request_json_any((url,), params)
+
+    def _request_json_any(self, urls, params: Dict[str, str]) -> dict:
+        endpoints = (urls,) if isinstance(urls, str) else tuple(urls)
+        if not endpoints:
+            raise ValueError("at least one Eastmoney endpoint is required")
+        for endpoint in endpoints:
+            cached = self._read_cache(endpoint, params)
+            if cached is not None:
+                return cached
+        errors = {}
         for attempt in range(1, self.max_attempts + 1):
-            try:
-                self._throttle()
-                response = self._get(url, params)
-                response.raise_for_status()
-                payload = response.json()
-                if payload.get("rc") not in {0, None}:
-                    raise ExternalProviderError(
-                        f"Eastmoney returned rc={payload.get('rc')}"
-                    )
-                self._write_cache(url, params, payload)
-                return payload
-            except Exception as exc:
-                last_error = exc
-                if attempt < self.max_attempts:
-                    time.sleep(self.backoff_seconds * attempt)
+            for endpoint in endpoints:
+                try:
+                    self._throttle()
+                    response = self._get(endpoint, params)
+                    response.raise_for_status()
+                    payload = response.json()
+                    if payload.get("rc") not in {0, None}:
+                        raise ExternalProviderError(
+                            f"Eastmoney returned rc={payload.get('rc')}"
+                        )
+                    self._write_cache(endpoint, params, payload)
+                    return payload
+                except Exception as exc:
+                    errors[endpoint] = exc
+                    if self._curl_json_loader is not None:
+                        try:
+                            payload = self._curl_json_loader(endpoint, params)
+                            if payload.get("rc") not in {0, None}:
+                                raise ExternalProviderError(
+                                    f"Eastmoney returned rc={payload.get('rc')}"
+                                )
+                            self._write_cache(endpoint, params, payload)
+                            return payload
+                        except Exception as curl_exc:
+                            errors[endpoint] = curl_exc
+            if attempt < self.max_attempts:
+                time.sleep(self.backoff_seconds * attempt)
+        details = "; ".join(
+            f"{endpoint}: {errors.get(endpoint)}" for endpoint in endpoints
+        )
         raise ExternalProviderError(
-            f"Eastmoney request failed after {self.max_attempts} attempts: {last_error}"
-        ) from last_error
+            f"Eastmoney request failed after {self.max_attempts} attempts across "
+            f"{len(endpoints)} endpoints: {details}"
+        ) from (list(errors.values())[-1] if errors else None)
 
     def _throttle(self) -> None:
         if self.request_interval_seconds <= 0:
@@ -303,6 +345,40 @@ class EastmoneyBoardProvider:
                 headers=headers,
                 impersonate="chrome",
             )
+
+    def _load_json_with_curl(self, executable: str):
+        def load(url: str, params: Dict[str, str]) -> dict:
+            command = [
+                executable,
+                "--fail-with-body",
+                "--silent",
+                "--show-error",
+                "--connect-timeout",
+                str(max(1, int(self.timeout_seconds))),
+                "--max-time",
+                str(max(1, int(self.timeout_seconds))),
+                "--get",
+            ]
+            if not self._trust_environment_proxy:
+                command.extend(("--noproxy", "*"))
+            command.append(url)
+            for key, value in params.items():
+                command.extend(("--data-urlencode", f"{key}={value}"))
+            completed = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="strict",
+                timeout=self.timeout_seconds + 2,
+                check=True,
+            )
+            payload = json.loads(completed.stdout)
+            if not isinstance(payload, dict):
+                raise ExternalProviderError("Eastmoney curl response is not an object")
+            return payload
+
+        return load
 
 
 def security_market_code(code: str) -> Optional[int]:

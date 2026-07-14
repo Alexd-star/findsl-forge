@@ -30,6 +30,80 @@ class _Session:
         return _Response(self.pages[int(params["pn"])])
 
 
+class _UnavailableBrowserSession:
+    def get(self, *_args, **_kwargs):
+        raise RuntimeError("browser fallback unavailable")
+
+
+def test_constituent_fetch_fails_over_between_public_shards():
+    class _ShardSession:
+        trust_env = True
+
+        def __init__(self):
+            self.hosts = []
+
+        def get(self, url, **_kwargs):
+            self.hosts.append(url.split("/")[2])
+            if url.startswith("https://29."):
+                raise ConnectionError("primary shard closed")
+            return _Response(
+                {
+                    "rc": 0,
+                    "data": {
+                        "total": 1,
+                        "diff": [{"f12": "600000", "f14": "浦发银行"}],
+                    },
+                }
+            )
+
+    session = _ShardSession()
+    provider = EastmoneyBoardProvider(
+        session=session,
+        browser_session=_UnavailableBrowserSession(),
+        curl_json_loader=False,
+        max_attempts=1,
+    )
+
+    rows = provider.list_constituents(BoardDefinition("concept", "BK1", "测试"))
+
+    assert [(item.code, item.name) for item in rows] == [("600000", "浦发银行")]
+    assert session.hosts == ["29.push2.eastmoney.com", "7.push2.eastmoney.com"]
+
+
+def test_provider_uses_injected_curl_loader_after_http_clients_fail():
+    class _OfflineSession:
+        trust_env = True
+
+        def get(self, *_args, **_kwargs):
+            raise ConnectionError("requests unavailable")
+
+    curl_hosts = []
+
+    def curl_loader(url, _params):
+        curl_hosts.append(url.split("/")[2])
+        if url.startswith("https://29."):
+            raise ConnectionError("first curl shard unavailable")
+        return {
+            "rc": 0,
+            "data": {
+                "total": 1,
+                "diff": [{"f12": "600000", "f14": "浦发银行"}],
+            },
+        }
+
+    provider = EastmoneyBoardProvider(
+        session=_OfflineSession(),
+        browser_session=_UnavailableBrowserSession(),
+        curl_json_loader=curl_loader,
+        max_attempts=1,
+    )
+
+    rows = provider.list_constituents(BoardDefinition("concept", "BK1", "测试"))
+
+    assert rows[0].code == "600000"
+    assert curl_hosts == ["29.push2.eastmoney.com", "7.push2.eastmoney.com"]
+
+
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [
