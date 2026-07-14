@@ -31,6 +31,7 @@ def test_ths_provider_ignores_environment_proxy_and_reuses_cache(tmp_path):
         session=session,
         cache_dir=tmp_path,
         request_interval_seconds=0,
+        header_factory=lambda: {"User-Agent": "test"},
     )
     concept = ThsConceptDefinition("123", "测试概念", ("测试",))
 

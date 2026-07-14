@@ -48,6 +48,7 @@ class SinaSectorProvider:
         timeout_seconds: float = 20.0,
         max_attempts: int = 5,
         request_interval_seconds: float = 0.05,
+        payload_decoder=None,
     ):
         if session is None:
             import requests
@@ -60,6 +61,7 @@ class SinaSectorProvider:
         self.max_attempts = max_attempts
         self.request_interval_seconds = max(0.0, float(request_interval_seconds))
         self._last_request_at = 0.0
+        self._payload_decoder = payload_decoder or _decode_sina_payload
 
     def list_sectors(self, sector_type: str) -> Tuple[SinaSectorDefinition, ...]:
         try:
@@ -109,9 +111,7 @@ class SinaSectorProvider:
                 },
             )
             try:
-                from akshare.utils import demjson
-
-                payload = demjson.decode(text)
+                payload = self._payload_decoder(text)
             except Exception as exc:
                 raise ExternalProviderError("Sina constituent response is invalid") from exc
             for item in payload if isinstance(payload, list) else ():
@@ -198,3 +198,13 @@ class SinaSectorProvider:
             encoding="utf-8",
         )
         temporary.replace(path)
+
+
+def _decode_sina_payload(text: str):
+    try:
+        from akshare.utils import demjson
+    except ImportError as exc:
+        raise ExternalProviderError(
+            "Sina provider requires the external-data optional dependencies"
+        ) from exc
+    return demjson.decode(text)

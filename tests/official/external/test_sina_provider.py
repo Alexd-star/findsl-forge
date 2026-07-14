@@ -1,4 +1,6 @@
+import ast
 import json
+import re
 
 from findsl.official.external.providers.sina import (
     SinaSectorConstituent,
@@ -38,7 +40,13 @@ class _Session:
 
 def test_sina_provider_parses_and_caches_sector_members(tmp_path):
     session = _Session()
-    provider = SinaSectorProvider(session=session, cache_dir=tmp_path)
+    provider = SinaSectorProvider(
+        session=session,
+        cache_dir=tmp_path,
+        payload_decoder=lambda text: ast.literal_eval(
+            re.sub(r"([{,])\s*([A-Za-z_][A-Za-z0-9_]*)\s*:", r"\1'\2':", text)
+        ),
+    )
 
     sector = provider.list_sectors("concept")[0]
     members = provider.list_constituents(sector)

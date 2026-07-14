@@ -36,6 +36,7 @@ class ThsConceptProvider:
         max_attempts: int = 8,
         request_interval_seconds: float = 0.3,
         trust_environment_proxy: bool = False,
+        header_factory=None,
     ):
         if session is None:
             import requests
@@ -47,6 +48,7 @@ class ThsConceptProvider:
         self.max_attempts = max_attempts
         self.request_interval_seconds = max(0.0, float(request_interval_seconds))
         self._last_request_at = 0.0
+        self._header_factory = header_factory or self._headers
 
     def list_constituents(
         self, concept: ThsConceptDefinition
@@ -79,7 +81,7 @@ class ThsConceptProvider:
                 self._throttle()
                 response = self.session.get(
                     url,
-                    headers=self._headers(),
+                    headers=self._header_factory(),
                     timeout=30,
                 )
                 if response.status_code in {401, 403}:
