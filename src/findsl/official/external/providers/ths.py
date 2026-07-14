@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass
-from io import StringIO
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Tuple
 
@@ -21,6 +21,50 @@ class ThsConceptDefinition:
 class ThsConceptConstituent:
     code: str
     name: str
+
+
+class _ThsConstituentTableParser(HTMLParser):
+    """Extract cells from the constituent table without optional HTML engines."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.rows = []
+        self._table_depth = 0
+        self._row = None
+        self._cell = None
+
+    def handle_starttag(self, tag, attrs) -> None:
+        attributes = dict(attrs)
+        if tag == "table":
+            if self._table_depth:
+                self._table_depth += 1
+            elif "m-pager-table" in attributes.get("class", "").split():
+                self._table_depth = 1
+            return
+        if not self._table_depth:
+            return
+        if tag == "tr":
+            self._row = []
+        elif tag in {"th", "td"} and self._row is not None:
+            self._cell = []
+
+    def handle_data(self, data) -> None:
+        if self._cell is not None:
+            self._cell.append(data)
+
+    def handle_endtag(self, tag) -> None:
+        if not self._table_depth:
+            return
+        if tag in {"th", "td"} and self._cell is not None:
+            self._row.append(" ".join("".join(self._cell).split()))
+            self._cell = None
+        elif tag == "tr" and self._row is not None:
+            if self._row:
+                self.rows.append(tuple(self._row))
+            self._row = None
+            self._cell = None
+        elif tag == "table":
+            self._table_depth -= 1
 
 
 class ThsConceptProvider:
@@ -126,15 +170,27 @@ class ThsConceptProvider:
 
     @staticmethod
     def _parse_table(text: str):
-        import pandas as pd
-
-        tables = pd.read_html(StringIO(text))
-        if not tables or not {"代码", "名称"}.issubset(tables[0].columns):
+        parser = _ThsConstituentTableParser()
+        parser.feed(text)
+        header_index = next(
+            (
+                index
+                for index, row in enumerate(parser.rows)
+                if "代码" in row and "名称" in row
+            ),
+            None,
+        )
+        if header_index is None:
             raise ExternalProviderError("THS constituent table schema changed")
+        header = parser.rows[header_index]
+        code_index = header.index("代码")
+        name_index = header.index("名称")
         rows = []
-        for item in tables[0].to_dict("records"):
-            code = str(item.get("代码") or "").split(".")[0].zfill(6)
-            name = str(item.get("名称") or "").strip()
+        for item in parser.rows[header_index + 1 :]:
+            if len(item) <= max(code_index, name_index):
+                continue
+            code = item[code_index].split(".")[0].zfill(6)
+            name = item[name_index].strip()
             if security_market_code(code) is not None and name:
                 rows.append(ThsConceptConstituent(code, name))
         return tuple(rows)
