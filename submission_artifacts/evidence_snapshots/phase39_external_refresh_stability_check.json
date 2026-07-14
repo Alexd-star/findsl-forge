@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "git_head": "b38a6a7ba88757b51eba4e900ce2663cef360e50",
+  "previous_funnel": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\reports\\phase38_public_index_funnel.json",
+  "current_funnel": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\reports\\phase39_external_refresh_funnel.json",
+  "previous_git_head": "1021dd93fe1d89e0519d31f91e20cb318bbc740b",
+  "current_git_head": "b38a6a7ba88757b51eba4e900ce2663cef360e50",
+  "repeats": 2,
+  "performance_target_ms": 10000.0,
+  "total": 7,
+  "passed": 7,
+  "failed": 0,
+  "status": "PASS",
+  "cases": [
+    {
+      "excel_row": 71,
+      "source": "rank('沪|深|京', '算力', '总股本', 'asc', '', '', '', '') <= 10",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 10,
+      "result_sha256": "a772440c46dd538338258da644658a02813e6129e001f4be07ceee5d57785f33",
+      "sql_sha256": "9424bfbe49e4ab76a2abf05a07ab8e8fb7982c35233a9b5afd7a56241b50ca7d",
+      "execution_sql_sha256": "2baa2e0e67c4ab98451905f5142df9ed846ad52a4f785553fda69ac8f46c2c73",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        63.018,
+        43.079
+      ],
+      "p50_ms": 43.079,
+      "p95_ms": 63.018,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 514,
+      "source": "indicator('', '算力&液冷', '涨停', '', '', '', 'CONS>3') = True",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 5,
+      "result_sha256": "a632be9993669cae2089678ac760c98cd6acd58019c9b938306c1fcc524eac7a",
+      "sql_sha256": "f9e7b7a4653d2e705df1ac8ce8ad28f0b79e39da0e6f93e2a0c3584f090f4efb",
+      "execution_sql_sha256": "4c1860e1481537889a02039d7d4fd201e3b30330a1153e54898fbb470e3878de",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        42.805,
+        43.484
+      ],
+      "p50_ms": 42.805,
+      "p95_ms": 43.484,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 515,
+      "source": "indicator('', '算力&液冷', '', '', '', '', '') = 'all'",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 27,
+      "result_sha256": "99918223c5aa3fd2925038e89888629eae426023f148badb7dbe3684276d4a5c",
+      "sql_sha256": "8858ec63714ca7d1ff920798b272339da5475486353647bef996de9ae64ed25b",
+      "execution_sql_sha256": "0cc9d5d83d4ad40f5713d385e2c497ff52ba38136e40bbc973000a0495652587",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        39.635,
+        40.478
+      ],
+      "p50_ms": 39.635,
+      "p95_ms": 40.478,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 633,
+      "source": "indicator('京', '算力', '', '', '', '', '') = 'all'",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 5,
+      "result_sha256": "1c91e0db6ca89e15954cddea6cf73e9da34c2917cfdb3437d140fa87d665ea4a",
+      "sql_sha256": "5ecbd730ce885690d4baec6b5399293f3e69750ada398b94740433d9a605f441",
+      "execution_sql_sha256": "4903914bf91cdb65d8ee10abc04aa8c4af2404ea3ec827996a77b4350f856b7c",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        42.956,
+        44.39
+      ],
+      "p50_ms": 42.956,
+      "p95_ms": 44.39,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 679,
+      "source": "indicator('', '算力', '', '', '', '', '') = 'all'",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 205,
+      "result_sha256": "53769cce0dc79893d617c9fd5c5bb280182fbbf031b4d902457476bac0cdea69",
+      "sql_sha256": "895f9f401c95fe639f56d3c4b40a3abb774f464c3126bf2f422be891fcd2ffb4",
+      "execution_sql_sha256": "2268339aa64aed6b8c7b8434694886d919015f989536362513f04c58e77632d4",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        55.837,
+        51.321
+      ],
+      "p50_ms": 51.321,
+      "p95_ms": 55.837,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 716,
+      "source": "indicator('', '低空经济|算力', '', '', '', '', '') = 'all' and indicator('', '低空经济|算力', '涨幅', '', '', '', '') = 10% and indicator('', '低空经济|算力', '涨停', '', '', '', '') = True",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 1,
+      "result_sha256": "43a13bafe748802d783126d301d3c45e21285cb727dd2c749c525f0618b5799f",
+      "sql_sha256": "c289bf2a611d25f706d6208536d9f50af3356ccea02e66893b0144c8f509933b",
+      "execution_sql_sha256": "4b833a2a5b1da13950b2b3e34dcc5a727edb5e65e990c75c6ea59a15b7956ff4",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        45.967,
+        50.438
+      ],
+      "p50_ms": 45.967,
+      "p95_ms": 50.438,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 721,
+      "source": "indicator('科创板', '^人脑工程&^算力概念', '', '', '', '', '') = 'all'",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 576,
+      "result_sha256": "cdd94d9710ece568ed7c81bd5e3b6b7818303e8a3a03d2f2b74955ae94458c73",
+      "sql_sha256": "47c60ccb8d44abf4cee34c9377d378dd886527f61de7100129d0cf0d056d0e5f",
+      "execution_sql_sha256": "503fa0799787a1d971cb19aec89adea9d34939a1c53cbe0bbe22fd0ecc672020",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        45.451,
+        48.212
+      ],
+      "p50_ms": 45.451,
+      "p95_ms": 48.212,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    }
+  ]
+}
