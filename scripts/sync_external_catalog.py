@@ -20,6 +20,9 @@ def main() -> None:
     mode.add_argument("--all-boards", action="store_true")
     parser.add_argument("--catalog", required=True)
     parser.add_argument("--report", required=True)
+    parser.add_argument(
+        "--runtime", default="configs/official/external_scope_runtime.json"
+    )
     parser.add_argument("--as-of-date", default=None)
     parser.add_argument("--trust-environment-proxy", action="store_true")
     parser.add_argument("--cache-dir", default=None)
@@ -53,10 +56,20 @@ def main() -> None:
     catalog = ExternalCatalog(Path(args.catalog))
     report = result.to_dict()
     report["catalog"] = str(Path(args.catalog).resolve())
-    report["complete"] = not result.failed_boards and not result.unresolved
+    report["source_complete"] = not result.failed_boards
+    report["target_coverage_complete"] = (
+        not result.failed_boards and not result.unresolved
+    )
+    report["complete"] = report["target_coverage_complete"]
     report["imported"] = not (args.require_complete and not report["complete"])
     if report["imported"]:
         catalog.import_snapshot(result.snapshot, replace=args.replace)
+        runtime = catalog.export_runtime_manifest(Path(args.runtime))
+        report["runtime"] = {
+            "path": str(Path(args.runtime).resolve()),
+            "entries": len(runtime["entries"]),
+            "membership_resource_id": runtime["membership_resource_id"],
+        }
         report["catalog_summary"] = catalog.summary()
     report_path = Path(args.report)
     report_path.parent.mkdir(parents=True, exist_ok=True)
