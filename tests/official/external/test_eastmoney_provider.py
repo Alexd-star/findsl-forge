@@ -30,6 +30,19 @@ class _Session:
         return _Response(self.pages[int(params["pn"])])
 
 
+@pytest.mark.parametrize(
+    ("kwargs", "message"),
+    [
+        ({"timeout_seconds": 0}, "timeout_seconds"),
+        ({"max_attempts": 0}, "max_attempts"),
+        ({"backoff_seconds": -1}, "backoff_seconds"),
+    ],
+)
+def test_provider_rejects_invalid_retry_policy(kwargs, message):
+    with pytest.raises(ValueError, match=message):
+        EastmoneyBoardProvider(session=_Session({}), **kwargs)
+
+
 def test_provider_paginates_and_rejects_empty_payloads():
     session = _Session(
         {

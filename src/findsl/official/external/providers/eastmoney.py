@@ -58,6 +58,12 @@ class EastmoneyBoardProvider:
         cache_dir: Path = None,
         request_interval_seconds: float = 0.0,
     ):
+        if timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be greater than zero")
+        if max_attempts < 1:
+            raise ValueError("max_attempts must be at least one")
+        if backoff_seconds < 0:
+            raise ValueError("backoff_seconds must not be negative")
         if session is None:
             try:
                 import requests

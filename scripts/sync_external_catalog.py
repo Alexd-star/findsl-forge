@@ -26,11 +26,17 @@ def main() -> None:
     parser.add_argument("--as-of-date", default=None)
     parser.add_argument("--trust-environment-proxy", action="store_true")
     parser.add_argument("--cache-dir", default=None)
+    parser.add_argument("--timeout-seconds", type=float, default=20.0)
+    parser.add_argument("--max-attempts", type=int, default=5)
+    parser.add_argument("--backoff-seconds", type=float, default=0.5)
     parser.add_argument("--request-interval-seconds", type=float, default=0.1)
     parser.add_argument("--require-complete", action="store_true")
     parser.add_argument("--replace", action="store_true")
     args = parser.parse_args()
     provider = EastmoneyBoardProvider(
+        timeout_seconds=args.timeout_seconds,
+        max_attempts=args.max_attempts,
+        backoff_seconds=args.backoff_seconds,
         trust_environment_proxy=args.trust_environment_proxy,
         cache_dir=Path(args.cache_dir) if args.cache_dir else None,
         request_interval_seconds=args.request_interval_seconds,
