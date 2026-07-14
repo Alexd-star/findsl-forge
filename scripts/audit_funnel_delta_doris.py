@@ -7,6 +7,9 @@ import math
 import subprocess
 from pathlib import Path
 
+import sqlglot
+from sqlglot import exp
+
 from findsl.official.backend.executor import (
     DorisExecutionConfig,
     execute_doris_query_digest,
@@ -57,6 +60,8 @@ def main() -> int:
             "row_count": None,
             "result_sha256": None,
             "sql_sha256": None,
+            "execution_sql_sha256": None,
+            "result_order_contract": None,
             "elapsed_ms": [],
             "p50_ms": None,
             "p95_ms": None,
@@ -67,8 +72,14 @@ def main() -> int:
         try:
             sql = compile_official(row["source"]).backend["sql"]
             case["sql_sha256"] = hashlib.sha256(sql.encode("utf-8")).hexdigest()
+            execution_sql, order_contract = canonicalize_result_order(sql)
+            case["execution_sql_sha256"] = hashlib.sha256(
+                execution_sql.encode("utf-8")
+            ).hexdigest()
+            case["result_order_contract"] = order_contract
             executions = [
-                execute_doris_query_digest(config, sql) for _ in range(args.repeats)
+                execute_doris_query_digest(config, execution_sql)
+                for _ in range(args.repeats)
             ]
             counts = {item.row_count for item in executions}
             hashes = {item.sha256 for item in executions}
@@ -121,6 +132,25 @@ def select_delta_rows(previous, current):
         for item in current["rows"]
         if item["new_backend_success"] and item["excel_row"] not in previous_success
     )
+
+
+def canonicalize_result_order(sql: str):
+    statement = sqlglot.parse_one(sql, read="doris")
+    if not isinstance(statement, exp.Select):
+        raise ValueError("Doris delta audit requires one SELECT statement")
+    if statement.args.get("order") is not None:
+        return sql, "generated_order"
+    if statement.args.get("limit") is not None:
+        raise ValueError("unordered LIMIT query has no deterministic result contract")
+    projection_count = len(statement.expressions)
+    if projection_count <= 0:
+        raise ValueError("Doris delta audit cannot determine projected columns")
+    ordered = (
+        exp.select("*")
+        .from_(statement.subquery("audit_rows"))
+        .order_by(*(exp.Literal.number(index) for index in range(1, projection_count + 1)))
+    )
+    return ordered.sql(dialect="doris"), "canonical_full_row_order"
 
 
 def _read_json(path: Path):
