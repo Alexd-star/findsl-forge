@@ -17,6 +17,9 @@ def main() -> None:
     parser.add_argument("--aliases", required=True)
     parser.add_argument("--catalog", required=True)
     parser.add_argument("--report", required=True)
+    parser.add_argument(
+        "--runtime", default="configs/official/external_scope_runtime.json"
+    )
     parser.add_argument("--as-of-date", default=None)
     args = parser.parse_args()
 
@@ -78,21 +81,23 @@ def main() -> None:
     snapshot = CatalogSnapshot(
         f"curated-scope-alias-{snapshot_date}-{digest[:12]}",
         "curated-scope-alias",
-        "https://quote.eastmoney.com/center/boardlist.html",
+        "urn:findsl:curated-scope-alias-manifest",
         datetime.now(timezone.utc).isoformat(),
         snapshot_date,
         digest,
-        "Curated aliases over versioned Eastmoney memberships; source snapshot retained in audit report",
+        "Curated aliases over versioned source memberships; original snapshot retained per mapping",
         scope_memberships=tuple(rows),
     )
     catalog = ExternalCatalog(Path(args.catalog))
-    catalog.import_snapshot(snapshot, replace=True)
+    catalog.import_snapshot(snapshot, replace_source_date=True)
+    runtime = catalog.export_runtime_manifest(Path(args.runtime))
     payload = {
         "schema_version": 1,
         "snapshot_id": snapshot.snapshot_id,
         "content_sha256": digest,
         "mapping_count": len(audit),
         "scope_memberships": len(rows),
+        "runtime_entries": len(runtime["entries"]),
         "mappings": audit,
     }
     Path(args.report).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -104,15 +104,28 @@ class ExternalCatalog:
                     f"unsupported external catalog schema version: {current[0]}"
                 )
 
-    def import_snapshot(self, snapshot: CatalogSnapshot, *, replace: bool = False) -> None:
+    def import_snapshot(
+        self,
+        snapshot: CatalogSnapshot,
+        *,
+        replace: bool = False,
+        replace_source_date: bool = False,
+    ) -> None:
         self.initialize()
         with self._transaction() as connection:
             exists = connection.execute(
                 "SELECT 1 FROM snapshots WHERE snapshot_id=?", (snapshot.snapshot_id,)
             ).fetchone()
-            if exists and not replace:
+            if exists and not (replace or replace_source_date):
                 raise ExternalCatalogError(f"snapshot already exists: {snapshot.snapshot_id}")
-            if exists:
+            if replace_source_date:
+                prior_ids = connection.execute(
+                    "SELECT snapshot_id FROM snapshots WHERE source=? AND as_of_date=?",
+                    (snapshot.source, snapshot.as_of_date),
+                ).fetchall()
+                for row in prior_ids:
+                    self._delete_snapshot(connection, row[0])
+            elif exists:
                 self._delete_snapshot(connection, snapshot.snapshot_id)
             connection.execute(
                 """INSERT INTO snapshots(
@@ -158,6 +171,34 @@ class ExternalCatalog:
         """
         with self._connect(readonly=True) as connection:
             rows = connection.execute(query, parameters).fetchall()
+        return tuple(dict(row) for row in rows)
+
+    def latest_security_identities(self, source: str) -> Tuple[Dict[str, object], ...]:
+        self.initialize()
+        with self._connect(readonly=True) as connection:
+            snapshot = connection.execute(
+                """
+                SELECT snapshot_id
+                  FROM snapshots
+                 WHERE source=?
+              ORDER BY as_of_date DESC, imported_at DESC, snapshot_id DESC
+                 LIMIT 1
+                """,
+                (str(source),),
+            ).fetchone()
+            if snapshot is None:
+                raise ExternalCatalogError(
+                    f"security identity source is unavailable: {source}"
+                )
+            rows = connection.execute(
+                """
+                SELECT DISTINCT mktcode,tgtcode,scope_name,snapshot_id
+                  FROM scope_membership
+                 WHERE snapshot_id=? AND scope_type='security'
+              ORDER BY mktcode,tgtcode
+                """,
+                (snapshot["snapshot_id"],),
+            ).fetchall()
         return tuple(dict(row) for row in rows)
 
     def summary(self) -> Dict[str, object]:

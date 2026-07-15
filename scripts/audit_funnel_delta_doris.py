@@ -113,6 +113,7 @@ def main() -> int:
         "repeats": args.repeats,
         "performance_target_ms": args.performance_target_ms,
         "total": len(cases),
+        "new_successes": len(cases),
         "passed": sum(item["status"] == "PASS" for item in cases),
         "failed": sum(item["status"] != "PASS" for item in cases),
         "status": "PASS" if passed else "FAIL",

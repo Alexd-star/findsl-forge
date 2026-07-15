@@ -89,13 +89,19 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase41_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase41_external_scope_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase31_funnel_payload
+        phase41_funnel_payload
+        or phase31_funnel_payload
         or phase30_funnel_payload
         or phase29_funnel_payload
         or phase28_funnel_payload
@@ -214,6 +220,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase41_new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase41_external_scope_delta_doris_audit.json",
+        warnings,
+        warn_missing=False,
+    )
     phase26_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase26_new_success_audit.json",
         warnings,
@@ -245,7 +256,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     new_success_audit_payload = (
-        phase31_new_success_audit_payload
+        phase41_new_success_audit_payload
+        or phase31_new_success_audit_payload
         or phase30_new_success_audit_payload
         or phase29_new_success_audit_payload
         or phase28_new_success_audit_payload
@@ -906,7 +918,9 @@ def _official_migration_metadata(
             "available": new_success_audit is not None,
             "status": new_success_audit.get("status") if isinstance(new_success_audit, dict) else None,
             "passed": _int_or_none(new_success_audit.get("passed")) if isinstance(new_success_audit, dict) else None,
-            "total": _int_or_none(new_success_audit.get("new_successes")) if isinstance(new_success_audit, dict) else None,
+            "total": _int_or_none(
+                new_success_audit.get("new_successes", new_success_audit.get("total"))
+            ) if isinstance(new_success_audit, dict) else None,
             "failed": _int_or_none(new_success_audit.get("failed")) if isinstance(new_success_audit, dict) else None,
         },
     }
@@ -958,6 +972,10 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase31_final_grounded_funnel_json": str(snapshot_dir / "phase31_final_grounded_funnel.json"),
         "phase31_final_grounded_doris_json": str(snapshot_dir / "phase31_final_grounded_doris.json"),
         "phase31_new_success_audit_json": str(snapshot_dir / "phase31_new_success_audit.json"),
+        "phase41_external_scope_funnel_json": str(snapshot_dir / "phase41_external_scope_funnel.json"),
+        "phase41_external_scope_delta_doris_audit_json": str(
+            snapshot_dir / "phase41_external_scope_delta_doris_audit.json"
+        ),
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,

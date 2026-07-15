@@ -1,6 +1,11 @@
 from findsl.official.external.profile_sync import (
+    build_baidu_classification_snapshot,
     build_security_identity_snapshot,
     build_security_profile_snapshot,
+)
+from findsl.official.external.providers.baidu import (
+    BaiduScopeDefinition,
+    BaiduSecurityClassification,
 )
 from findsl.official.external.providers.eastmoney import SecurityProfile
 
@@ -48,3 +53,32 @@ def test_security_identity_snapshot_is_exact_and_singleton():
         "浦发银行",
     }
     assert all(item.scope_type == "security" for item in snapshot.scope_memberships)
+
+
+def test_baidu_classification_snapshot_preserves_all_scope_levels():
+    snapshot = build_baidu_classification_snapshot(
+        (
+            BaiduSecurityClassification(
+                "000001",
+                "平安银行",
+                (
+                    BaiduScopeDefinition("industry", "480000", "银行", "申万一级"),
+                    BaiduScopeDefinition("industry", "480300", "股份制银行Ⅱ", "申万二级"),
+                    BaiduScopeDefinition("concept", "031027", "MSCI概念"),
+                ),
+            ),
+        ),
+        as_of_date="2026-07-15",
+    )
+
+    assert snapshot.source == "baidu-related-block"
+    assert len(snapshot.scope_memberships) == 3
+    assert {item.scope_code for item in snapshot.scope_memberships} == {
+        "BAIDU:480000",
+        "BAIDU:480300",
+        "BAIDU:031027",
+    }
+    assert {item.industry_level for item in snapshot.industry_memberships} == {
+        "申万一级",
+        "申万二级",
+    }

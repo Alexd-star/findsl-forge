@@ -220,9 +220,19 @@ class EastmoneyBoardProvider:
             if not isinstance(chunk, list):
                 raise ExternalProviderError("Eastmoney response diff is not a list")
             rows.extend(item for item in chunk if isinstance(item, dict))
-            if not chunk or len(rows) >= total:
+            if len(rows) >= total:
                 break
+            if not chunk:
+                raise ExternalProviderError(
+                    "Eastmoney pagination ended before the declared total: "
+                    f"received {len(rows)} of {total} rows"
+                )
             page += 1
+        if total is not None and len(rows) < total:
+            raise ExternalProviderError(
+                "Eastmoney pagination is incomplete: "
+                f"received {len(rows)} of {total} rows"
+            )
         return tuple(rows[:total] if total is not None else rows)
 
     def _request_json(self, url: str, params: Dict[str, str]) -> dict:

@@ -4,6 +4,7 @@ from findsl.official.external.matching import canonical_scope_name, match_scope_
 from findsl.official.external.providers.eastmoney import (
     BoardDefinition,
     EastmoneyBoardProvider,
+    ExternalProviderError,
     security_market_code,
 )
 
@@ -132,6 +133,25 @@ def test_provider_paginates_and_rejects_empty_payloads():
     assert session.trust_env is False
     with pytest.raises(ValueError, match="unsupported"):
         provider.list_boards("unknown")
+
+
+def test_provider_rejects_pagination_that_ends_before_declared_total():
+    session = _Session(
+        {
+            1: {
+                "rc": 0,
+                "data": {
+                    "total": 3,
+                    "diff": [{"f12": "BK1", "f14": "算力概念"}],
+                },
+            },
+            2: {"rc": 0, "data": {"total": 3, "diff": []}},
+        }
+    )
+    provider = EastmoneyBoardProvider(session=session)
+
+    with pytest.raises(ExternalProviderError, match="received 1 of 3 rows"):
+        provider.list_boards("concept")
 
 
 def test_provider_reuses_exact_raw_response_cache(tmp_path):

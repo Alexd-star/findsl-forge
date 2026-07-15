@@ -976,6 +976,66 @@ def test_build_evidence_metadata_prefers_phase31_final_grounded_evidence(
     )
 
 
+def test_build_evidence_metadata_prefers_phase41_external_scope_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase31_final_grounded_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase31-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 742,
+                "migration_coverage": 0.67639,
+                "new_backend_success": 766,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase41_external_scope_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase41-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 971,
+                "migration_coverage": 0.885141,
+                "new_backend_success": 1000,
+                "migration_gaps": [
+                    {"code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE", "count": 126}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase41_external_scope_delta_doris_audit.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "total": 15,
+                "passed": 15,
+                "failed": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    migration = metadata["official_migration"]
+    assert migration["git_head"] == "phase41-head"
+    assert migration["legacy_to_new_migrated"] == 971
+    assert migration["new_backend_success"] == 1000
+    assert migration["new_success_audit"] == {
+        "available": True,
+        "status": "PASS",
+        "passed": 15,
+        "total": 15,
+        "failed": 0,
+    }
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)

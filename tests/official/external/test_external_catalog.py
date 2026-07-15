@@ -86,6 +86,68 @@ def test_catalog_duplicate_snapshot_requires_explicit_replace(tmp_path):
     assert catalog.summary()["counts"]["scope_membership"] == 2
 
 
+def test_catalog_can_atomically_supersede_same_source_date_snapshot(tmp_path):
+    catalog = ExternalCatalog(tmp_path / "catalog.sqlite3")
+    catalog.import_snapshot(_snapshot())
+    replacement = CatalogSnapshot(
+        "fixture-2026-07-13-v2",
+        "fixture",
+        "https://example.invalid/catalog",
+        "2026-07-13T13:00:00+08:00",
+        "2026-07-13",
+        "3" * 64,
+        "replacement fixture",
+        scope_memberships=(
+            ScopeMembership(
+                "concept", "BK002", "机器人", (), 0, "000002",
+                "2026-01-01", None, None
+            ),
+        ),
+    )
+
+    catalog.import_snapshot(replacement, replace_source_date=True)
+
+    summary = catalog.summary()
+    assert [item["snapshot_id"] for item in summary["snapshots"]] == [
+        "fixture-2026-07-13-v2"
+    ]
+    assert catalog.resolve_scope("算力") == ()
+    assert catalog.resolve_scope("机器人")[0]["tgtcode"] == "000002"
+
+
+def test_catalog_reads_latest_versioned_security_identities(tmp_path):
+    catalog = ExternalCatalog(tmp_path / "catalog.sqlite3")
+    identity = CatalogSnapshot(
+        "identity-2026-07-13",
+        "identity-source",
+        "https://example.invalid/identities",
+        "2026-07-13T00:00:00Z",
+        "2026-07-13",
+        "2" * 64,
+        "fixture",
+        scope_memberships=(
+            ScopeMembership(
+                "security", "SEC:0:000001", "平安银行", ("000001",), 0,
+                "000001", "2026-07-13", None, None
+            ),
+        ),
+    )
+    catalog.import_snapshot(identity)
+
+    rows = catalog.latest_security_identities("identity-source")
+
+    assert rows == (
+        {
+            "mktcode": 0,
+            "tgtcode": "000001",
+            "scope_name": "平安银行",
+            "snapshot_id": "identity-2026-07-13",
+        },
+    )
+    with pytest.raises(ExternalCatalogError, match="unavailable"):
+        catalog.latest_security_identities("missing-source")
+
+
 def test_catalog_export_writes_doris_csvs_and_manifest(tmp_path):
     catalog = ExternalCatalog(tmp_path / "catalog.sqlite3")
     catalog.import_snapshot(_snapshot())
