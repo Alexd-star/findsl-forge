@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-13T04:03:09Z",
+  "generated_at": "2026-07-28T18:06:36Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "6ef4412",
@@ -81,11 +81,11 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "6ef44126366a9d9fe814dab05a2ed2d934ff958a",
+    "git_head": "ab69ff6b0a68695ea55497c5e443a372a3c2f4e4",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 742,
-    "migration_coverage": 0.67639,
-    "new_backend_success": 766,
+    "legacy_to_new_migrated": 971,
+    "migration_coverage": 0.885141,
+    "new_backend_success": 1000,
     "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
@@ -235,8 +235,8 @@
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 2,
-      "total": 2,
+      "passed": 15,
+      "total": 15,
       "failed": 0
     }
   },
@@ -301,6 +301,8 @@
     "phase31_final_grounded_funnel_json": "submission_artifacts\\evidence_snapshots\\phase31_final_grounded_funnel.json",
     "phase31_final_grounded_doris_json": "submission_artifacts\\evidence_snapshots\\phase31_final_grounded_doris.json",
     "phase31_new_success_audit_json": "submission_artifacts\\evidence_snapshots\\phase31_new_success_audit.json",
+    "phase41_external_scope_funnel_json": "submission_artifacts\\evidence_snapshots\\phase41_external_scope_funnel.json",
+    "phase41_external_scope_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase41_external_scope_delta_doris_audit.json",
     "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
