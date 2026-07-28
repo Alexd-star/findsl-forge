@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-13 12:03:08 +08:00
-- Git HEAD at export: 6ef4412
+- Generated at: 2026-07-29 02:12:02 +08:00
+- Git HEAD at export: 70d506f
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -12,8 +12,12 @@
 - `doris_cluster_evidence.json` (6537 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `evaluation_report.md` (12366 bytes)
+- `external_catalog_doris_load.json` (1477 bytes)
+- `index_quote_doris_load.json` (197 bytes)
+- `index_quote_sync.json` (505 bytes)
 - `official_doris_evidence.json` (21914 bytes)
 - `official_doris_evidence.md` (19990 bytes)
+- `official_index_catalog_sync_phase37.json` (40152 bytes)
 - `official_query_performance_matrix.json` (3656 bytes)
 - `official_query_performance_matrix.md` (1792 bytes)
 - `official_slot_coverage.json` (439394 bytes)
@@ -129,6 +133,31 @@
 - `phase31_final_grounded_funnel.md` (1285 bytes)
 - `phase31_new_success_audit.json` (2240 bytes)
 - `phase31_new_success_audit.md` (802 bytes)
+- `phase37_sina_delta_doris_audit.json` (2672 bytes)
+- `phase37_sina_delta_doris_audit.md` (533 bytes)
+- `phase37_sina_external_funnel.json` (3258763 bytes)
+- `phase37_sina_external_funnel.md` (1088 bytes)
+- `phase38_external_data_summary.md` (3202 bytes)
+- `phase38_public_index_delta_doris_audit.json` (6625 bytes)
+- `phase38_public_index_delta_doris_audit.md` (912 bytes)
+- `phase38_public_index_funnel.json` (3258877 bytes)
+- `phase38_public_index_funnel.md` (1142 bytes)
+- `phase39_external_catalog_doris_load.json` (1477 bytes)
+- `phase39_external_catalog_sync.json` (96878 bytes)
+- `phase39_external_refresh_delta_doris_audit.json` (6385 bytes)
+- `phase39_external_refresh_delta_doris_audit.md` (780 bytes)
+- `phase39_external_refresh_funnel.json` (3258856 bytes)
+- `phase39_external_refresh_funnel.md` (1142 bytes)
+- `phase39_external_refresh_stability_check.json` (6251 bytes)
+- `phase39_external_refresh_summary.md` (1665 bytes)
+- `phase41_baidu_related_blocks.json` (7789 bytes)
+- `phase41_curated_scope_alias.json` (10962 bytes)
+- `phase41_external_catalog_doris_load.json` (1479 bytes)
+- `phase41_external_scope_delta_doris_audit.json` (13145 bytes)
+- `phase41_external_scope_delta_doris_audit.md` (1318 bytes)
+- `phase41_external_scope_funnel.json` (3258836 bytes)
+- `phase41_external_scope_funnel.md` (1091 bytes)
+- `phase41_remaining_scope_targets.json` (10360 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase6c_capability_funnel.json` (3257492 bytes)
@@ -142,8 +171,9 @@
 - `prefix_sum_benchmark.md` (2870 bytes)
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `real_market_sample_report.md` (957 bytes)
+- `sina_sector_sync.json` (5386 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13124 bytes)
+- `submission_readiness.md` (13201 bytes)
 
 ## Excluded By Design
 
