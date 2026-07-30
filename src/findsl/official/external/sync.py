@@ -4,7 +4,7 @@ import hashlib
 import json
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
-from typing import Dict, Iterable, Mapping, Tuple
+from typing import Dict, Iterable, Mapping, Optional, Tuple
 
 from .matching import ScopeMatch, canonical_scope_name, match_scope_target
 from .models import CatalogSnapshot, IndustryMembership, ScopeMembership
@@ -16,7 +16,7 @@ from .providers.eastmoney import (
 
 @dataclass(frozen=True)
 class ExternalSyncResult:
-    snapshot: CatalogSnapshot
+    snapshot: Optional[CatalogSnapshot]
     matched: Tuple[ScopeMatch, ...]
     unresolved: Tuple[str, ...]
     failed_boards: Tuple[Dict[str, str], ...]
@@ -24,12 +24,13 @@ class ExternalSyncResult:
     attempted_boards: int = 0
 
     def to_dict(self):
+        snapshot = self.snapshot
         return {
-            "snapshot_id": self.snapshot.snapshot_id,
-            "source": self.snapshot.source,
-            "as_of_date": self.snapshot.as_of_date,
-            "scope_memberships": len(self.snapshot.scope_memberships),
-            "industry_memberships": len(self.snapshot.industry_memberships),
+            "snapshot_id": snapshot.snapshot_id if snapshot else None,
+            "source": snapshot.source if snapshot else None,
+            "as_of_date": snapshot.as_of_date if snapshot else None,
+            "scope_memberships": len(snapshot.scope_memberships) if snapshot else 0,
+            "industry_memberships": len(snapshot.industry_memberships) if snapshot else 0,
             "matched": [
                 {
                     "target": item.target,
@@ -169,7 +170,15 @@ def _build_snapshot_from_matches(
                     )
                 )
     if not scope_rows:
-        raise ValueError("external synchronization produced no scope memberships")
+        failed_targets = tuple(item.target for item in matches)
+        return ExternalSyncResult(
+            None,
+            (),
+            tuple(dict.fromkeys((*unresolved, *failed_targets))),
+            tuple(failed),
+            discovered_boards=discovered_boards,
+            attempted_boards=len(by_board),
+        )
     snapshot_date = as_of_date or date.today().isoformat()
     content = {
         "scope_memberships": [_canonical_row(item) for item in scope_rows],

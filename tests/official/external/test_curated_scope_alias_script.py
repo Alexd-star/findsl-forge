@@ -76,3 +76,78 @@ def test_curated_direct_mapping_rejects_abnormally_small_source():
 
     with pytest.raises(ValueError, match="below its minimum member count"):
         build_curated_rows(config, connection, "2026-07-30")
+
+
+def test_curated_composite_rejects_abnormally_small_component():
+    connection = sqlite3.connect(":memory:")
+    connection.row_factory = sqlite3.Row
+    connection.execute(
+        """CREATE TABLE scope_membership (
+             snapshot_id TEXT, scope_type TEXT, scope_code TEXT, scope_name TEXT,
+             mktcode INTEGER, tgtcode TEXT, effective_from TEXT,
+             effective_to TEXT, weight REAL
+        )"""
+    )
+    connection.executemany(
+        "INSERT INTO scope_membership VALUES (?,?,?,?,?,?,?,?,?)",
+        [
+            ("left-v1", "concept", "L1", "左侧", 0, "000001", None, None, None),
+            ("right-v1", "concept", "R1", "右侧", 0, "000001", None, None, None),
+        ],
+    )
+    config = {
+        "mappings": [
+            {
+                "alias": "受控交集",
+                "operation": "intersection",
+                "components": [
+                    {
+                        "source_snapshot_id": "left-v1",
+                        "scope_code": "L1",
+                        "minimum_member_count": 2,
+                    },
+                    {"source_snapshot_id": "right-v1", "scope_code": "R1"},
+                ],
+            }
+        ]
+    }
+
+    with pytest.raises(ValueError, match="component is below its minimum member count"):
+        build_curated_rows(config, connection, "2026-07-30")
+
+
+def test_curated_composite_rejects_abnormally_small_result():
+    connection = sqlite3.connect(":memory:")
+    connection.row_factory = sqlite3.Row
+    connection.execute(
+        """CREATE TABLE scope_membership (
+             snapshot_id TEXT, scope_type TEXT, scope_code TEXT, scope_name TEXT,
+             mktcode INTEGER, tgtcode TEXT, effective_from TEXT,
+             effective_to TEXT, weight REAL
+        )"""
+    )
+    connection.executemany(
+        "INSERT INTO scope_membership VALUES (?,?,?,?,?,?,?,?,?)",
+        [
+            ("left-v1", "concept", "L1", "左侧", 0, "000001", None, None, None),
+            ("left-v1", "concept", "L1", "左侧", 0, "000002", None, None, None),
+            ("right-v1", "concept", "R1", "右侧", 0, "000001", None, None, None),
+            ("right-v1", "concept", "R1", "右侧", 0, "000003", None, None, None),
+        ],
+    )
+    config = {
+        "mappings": [
+            {
+                "alias": "受控交集",
+                "operation": "intersection",
+                "minimum_member_count": 2,
+                "components": [
+                    {"source_snapshot_id": "left-v1", "scope_code": "L1"},
+                    {"source_snapshot_id": "right-v1", "scope_code": "R1"},
+                ],
+            }
+        ]
+    }
+
+    with pytest.raises(ValueError, match="result is below its minimum member count"):
+        build_curated_rows(config, connection, "2026-07-30")

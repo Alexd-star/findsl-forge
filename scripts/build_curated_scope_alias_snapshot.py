@@ -125,6 +125,14 @@ def build_curated_rows(config, connection, snapshot_date: str):
             )
             for component in components
         ]
+        for component, values in zip(components, component_rows):
+            minimum = int(component.get("minimum_member_count", 1))
+            if len(values) < minimum:
+                raise ValueError(
+                    "curated composite component is below its minimum member count: "
+                    f"{component['source_snapshot_id']}/{component['scope_code']}: "
+                    f"{len(values)} < {minimum}"
+                )
         component_keys = [
             {(row["mktcode"], row["tgtcode"]) for row in values}
             for values in component_rows
@@ -132,8 +140,12 @@ def build_curated_rows(config, connection, snapshot_date: str):
         selected = set(component_keys[0])
         for keys in component_keys[1:]:
             selected = selected & keys if operation == "intersection" else selected | keys
-        if not selected:
-            raise ValueError(f"curated composite source is empty: {item['alias']}")
+        minimum_member_count = int(item.get("minimum_member_count", 1))
+        if len(selected) < minimum_member_count:
+            raise ValueError(
+                "curated composite result is below its minimum member count: "
+                f"{item['alias']}: {len(selected)} < {minimum_member_count}"
+            )
         fingerprint = hashlib.sha256(
             json.dumps(
                 {

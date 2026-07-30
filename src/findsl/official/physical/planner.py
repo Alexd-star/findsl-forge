@@ -2762,6 +2762,9 @@ def _parse_extreme_lookback(value) -> Optional[int]:
         "半个月": 10,
         "上个月": 20,
         "上月": 20,
+        "季度": 60,
+        "一季度": 60,
+        "一个季度": 60,
     }
     if text in natural_period_sessions:
         return natural_period_sessions[text]

@@ -342,6 +342,11 @@ def test_pipeline_combines_crossing_events_without_scalar_fallback():
             "ROWS BETWEEN CURRENT ROW AND CURRENT ROW",
             ">= MAX(`q`.`highPx` / 10000.0) OVER",
         ),
+        (
+            "record_low('京', '辽宁指数', '', '季度', '', '', '', '') = True",
+            "ROWS BETWEEN 59 PRECEDING AND CURRENT ROW",
+            "<= MIN(`q`.`lastPx` / 10000.0) OVER",
+        ),
     ],
 )
 def test_pipeline_lowers_record_extrema_to_typed_window_frames(

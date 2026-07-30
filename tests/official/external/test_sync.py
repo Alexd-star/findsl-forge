@@ -38,6 +38,33 @@ def test_build_snapshot_matches_targets_and_preserves_unresolved():
     assert result.snapshot.content_sha256
 
 
+def test_build_snapshot_preserves_auditable_result_when_all_targets_are_unresolved():
+    result = build_eastmoney_snapshot(
+        ["不存在范围", "另一个不存在范围"],
+        provider=_Provider(),
+        as_of_date="2026-07-13",
+    )
+
+    assert result.snapshot is None
+    assert result.matched == ()
+    assert result.unresolved == ("不存在范围", "另一个不存在范围")
+    assert result.discovered_boards == 2
+    assert result.attempted_boards == 0
+    assert result.to_dict() == {
+        "snapshot_id": None,
+        "source": None,
+        "as_of_date": None,
+        "scope_memberships": 0,
+        "industry_memberships": 0,
+        "matched": [],
+        "unresolved": ["不存在范围", "另一个不存在范围"],
+        "failed_boards": [],
+        "discovered_boards": 2,
+        "attempted_boards": 0,
+        "successful_boards": 0,
+    }
+
+
 def test_build_snapshot_uses_explicit_alias_and_retains_original_target():
     result = build_eastmoney_snapshot(
         ["算力相关"],

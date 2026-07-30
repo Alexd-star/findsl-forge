@@ -76,8 +76,11 @@ def main() -> None:
         not result.failed_boards and not result.unresolved
     )
     report["complete"] = report["target_coverage_complete"]
-    report["imported"] = not (args.require_complete and not report["complete"])
+    report["imported"] = result.snapshot is not None and not (
+        args.require_complete and not report["complete"]
+    )
     if report["imported"]:
+        assert result.snapshot is not None
         catalog.import_snapshot(result.snapshot, replace=args.replace)
         runtime = catalog.export_runtime_manifest(Path(args.runtime))
         report["runtime"] = {
