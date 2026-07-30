@@ -88,6 +88,7 @@ def _write_minimal_snapshots(
                         "hsj_stock_hq_basic_prefix": 13650347,
                         "hsj_stock_hq_ext_prefix": 13650347,
                         "hsj_stock_hq_basic_technical": 13650347,
+                        "hsj_stock_hq_basic_rollup": 13650347,
                     },
                     "baseline_prefix_row_count_match": True,
                     "baseline_vs_prefix_speedup": 1.173,
@@ -128,6 +129,23 @@ def _write_minimal_snapshots(
                         {"name": "simple_close_price_filter", "execution_target": "PASS"},
                         {"name": "prefix_optimized_volume_sum_20", "execution_target": "PASS"},
                     ],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        (snapshot_dir / "phase42_long_horizon_doris.json").write_text(
+            json.dumps(
+                {
+                    "status": "PASS",
+                    "speedup": 41.913043,
+                    "target_speedup": 10.0,
+                    "target_met": True,
+                    "result_row_count": 5487,
+                    "complete_result_hash_match": True,
+                    "baseline": {"median_ms": 964.0},
+                    "optimized": {"median_ms": 23.0},
+                    "table_evidence": {"rollup_partition_count": 244},
                 },
                 ensure_ascii=False,
             ),
@@ -256,6 +274,19 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["official_real_data"]["performance_matrix"]["all_queries_under_10s"] is True
     assert metadata["official_real_data"]["performance_matrix"]["max_p95_ms"] == 61.269
     assert metadata["official_real_data"]["performance_matrix"]["baseline_vs_prefix_speedup_display"] == "1.17x"
+    assert metadata["official_real_data"]["long_horizon"] == {
+        "available": True,
+        "status": "PASS",
+        "speedup": 41.913043,
+        "speedup_display": "41.91x",
+        "target_speedup": 10.0,
+        "target_met": True,
+        "result_row_count": 5487,
+        "complete_result_hash_match": True,
+        "baseline_median_ms": 964.0,
+        "optimized_median_ms": 23.0,
+        "rollup_partition_count": 244,
+    }
     assert metadata["official_migration"]["legacy_to_new_migrated"] == 534
     assert metadata["official_migration"]["legacy_strict_success"] == 1097
     assert metadata["official_migration"]["physical_date_gap"] == 2
@@ -1100,6 +1131,7 @@ def test_render_evidence_summary_markdown_highlights_auditable_metrics(tmp_path:
     assert "| Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |" in markdown
     assert "| Official Doris real data | AVAILABLE |" in markdown
     assert "| Official Doris feature tables | PASS |" in markdown
+    assert "| Official 20-year long-horizon speedup | PASS, 41.91x, median 964 -> 23 ms |" in markdown
     assert "| Doris cluster speedup | 36.24x |" in markdown
     assert "| Git HEAD at report generation | c7a2164 |" in markdown
     assert "submission_readiness.md" in markdown

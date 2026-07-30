@@ -24,6 +24,8 @@ $reportFiles = @(
   "official_slot_coverage.json",
   "official_query_performance_matrix.md",
   "official_query_performance_matrix.json",
+  "phase42_long_horizon_doris.md",
+  "phase42_long_horizon_doris.json",
   "phase15_universe_doris.md",
   "phase15_universe_doris.json",
   "phase15_universe_funnel.md",

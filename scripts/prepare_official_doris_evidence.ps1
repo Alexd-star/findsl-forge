@@ -52,6 +52,7 @@ function Invoke-DorisSql {
     "-P", [string]$QueryPort,
     "-u", $User,
     "--connect-timeout", "10",
+    "--init-command", "SET enable_sql_cache=false",
     "--batch",
     "--raw",
     "--default-character-set=utf8mb4",
@@ -64,6 +65,7 @@ function Invoke-DorisSql {
       "-u", $User,
       "-p$Password",
       "--connect-timeout", "10",
+      "--init-command", "SET enable_sql_cache=false",
       "--batch",
       "--raw",
       "--default-character-set=utf8mb4",
@@ -193,7 +195,7 @@ function Measure-OfficialQuery {
     execute_ms = $durations
     avg_ms = [Math]::Round($avg, 3)
     p95_ms = [Math]::Round($sorted[$p95Index], 3)
-    plan_contains_prefix = ([string]$explain -match "_prefix" -or $Sql -match "_prefix")
+    plan_contains_prefix = ([string]$explain -match "_(prefix|rollup)" -or $Sql -match "_(prefix|rollup)")
     plan_contains_window = (([string]$explain).ToUpperInvariant() -match "WINDOW" -or $Sql.ToUpperInvariant() -match "ROWS BETWEEN")
   }
 }
@@ -233,7 +235,7 @@ function Write-EvidenceReport {
     $speedup = [Math]::Round($baseline.avg_ms / $optimized.avg_ms, 3)
   }
   $featureTablesAvailable = $true
-  foreach ($featureTable in @("hsj_stock_hq_basic_prefix", "hsj_stock_hq_ext_prefix", "hsj_stock_hq_basic_technical")) {
+  foreach ($featureTable in @("hsj_stock_hq_basic_prefix", "hsj_stock_hq_ext_prefix", "hsj_stock_hq_basic_technical", "hsj_stock_hq_basic_rollup")) {
     if (-not $FeatureRows.ContainsKey($featureTable) -or $FeatureRows[$featureTable] -ne $ExpectedRows["hsj_stock_hq_basic"]) {
       $featureTablesAvailable = $false
     }
@@ -273,7 +275,7 @@ function Write-EvidenceReport {
     "| Table | Expected | Actual |",
     "|---|---:|---:|"
   )
-  foreach ($key in @("hsj_stock_hq_basic_prefix", "hsj_stock_hq_ext_prefix", "hsj_stock_hq_basic_technical")) {
+  foreach ($key in @("hsj_stock_hq_basic_prefix", "hsj_stock_hq_ext_prefix", "hsj_stock_hq_basic_technical", "hsj_stock_hq_basic_rollup")) {
     $lines += "| $key | $($ExpectedRows["hsj_stock_hq_basic"]) | $($FeatureRows[$key]) |"
   }
   $lines += @(
@@ -359,13 +361,13 @@ Wait-DorisReady
 Write-Step "Recreating official newzl tables"
 Invoke-DorisSql -Sql "CREATE DATABASE IF NOT EXISTS newzl;"
 if (-not $SkipStreamLoad) {
-  Invoke-DorisSql -Sql "DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_technical; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic; DROP TABLE IF EXISTS newzl.hsj_stock_code_info;"
+  Invoke-DorisSql -Sql "DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_rollup; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_technical; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic; DROP TABLE IF EXISTS newzl.hsj_stock_code_info;"
   $schemaSql = Get-Content -Raw -LiteralPath "deploy/doris/official/01_schema.sql"
   Invoke-DorisSql -Sql $schemaSql | Out-Null
 } else {
   Write-Host "Preserving official base tables because -SkipStreamLoad was set"
   if (-not $SkipFeatureTables) {
-    Invoke-DorisSql -Sql "DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_technical; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext_prefix;"
+    Invoke-DorisSql -Sql "DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_rollup; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_technical; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext_prefix;"
   } else {
     Write-Host "Preserving existing feature tables because -SkipFeatureTables was set"
   }
@@ -399,6 +401,8 @@ if (-not $SkipFeatureTables) {
       Invoke-DorisSql -Sql $technicalSql | Out-Null
     }
   }
+  $rollupSql = Get-Content -Raw -LiteralPath "deploy/doris/official/06_partitioned_rollup_serving.sql"
+  Invoke-DorisSql -Sql $rollupSql | Out-Null
 }
 
 Write-Step "Validating official feature table row counts"
@@ -406,6 +410,7 @@ $featureRows = @{}
 $featureRows["hsj_stock_hq_basic_prefix"] = Assert-RowCount -Table "hsj_stock_hq_basic_prefix" -Expected 13650347
 $featureRows["hsj_stock_hq_ext_prefix"] = Assert-RowCount -Table "hsj_stock_hq_ext_prefix" -Expected 13650347
 $featureRows["hsj_stock_hq_basic_technical"] = Assert-RowCount -Table "hsj_stock_hq_basic_technical" -Expected 13650347
+$featureRows["hsj_stock_hq_basic_rollup"] = Assert-RowCount -Table "hsj_stock_hq_basic_rollup" -Expected 13650347
 
 Write-Step "Collecting official SQL evidence"
 $queryCases = @(
@@ -431,7 +436,7 @@ $queryCases = @(
   },
   [pscustomobject]@{
     name = "prefix_optimized_volume_sum_20"
-    sql = "SELECT p.mktcode, p.tgtcode, p.bizdate FROM newzl.hsj_stock_hq_basic_prefix AS p WHERE p.bizdate = DATE '2026-04-14' AND p.volume_sum_20 > 10000000"
+    sql = "SELECT p.mktcode, p.tgtcode, p.bizdate FROM newzl.hsj_stock_hq_basic_rollup AS p WHERE p.bizdate = DATE '2026-04-14' AND p.volume_sum_20 > 10000000"
   }
 )
 

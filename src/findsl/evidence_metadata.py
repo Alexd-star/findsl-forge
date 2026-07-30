@@ -29,6 +29,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    long_horizon_payload = _read_optional_json(
+        snapshot_dir / "phase42_long_horizon_doris.json",
+        warnings,
+        warn_missing=False,
+    )
     phase20_funnel_payload = _read_optional_json(
         snapshot_dir / "phase20_capability_funnel.json",
         warnings,
@@ -285,6 +290,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             "doris": _official_doris_metadata(official_doris_payload),
             "slot_coverage": _official_slot_coverage_metadata(official_slot_payload),
             "performance_matrix": _official_performance_matrix_metadata(official_performance_payload),
+            "long_horizon": _long_horizon_metadata(long_horizon_payload),
         },
         "official_migration": _official_migration_metadata(
             migration_funnel_payload,
@@ -333,6 +339,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     official_doris = _dict(official_real.get("doris"))
     official_slot = _dict(official_real.get("slot_coverage"))
     official_perf = _dict(official_real.get("performance_matrix"))
+    long_horizon = _dict(official_real.get("long_horizon"))
     official_migration = _dict(metadata.get("official_migration"))
     dynamic_date = _dict(official_migration.get("dynamic_date_evidence"))
     security_scope = _dict(official_migration.get("security_scope_evidence"))
@@ -399,6 +406,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
         f"| Official Doris prefix speedup | {_display(official_doris.get('baseline_vs_prefix_speedup_display'))} |",
+        f"| Official 20-year long-horizon speedup | {_long_horizon_display(long_horizon)} |",
         f"| Defense package checks | {_ratio_display(_dict(readiness.get('defense_package_checks')))} |",
         f"| Doris evidence | {_doris_evidence_display(doris)} |",
         f"| Doris cluster speedup | {_display(doris.get('speedup_display'))} |",
@@ -537,6 +545,42 @@ def _official_doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
         "baseline_vs_prefix_speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
         "row_counts": row_counts,
         "feature_table_row_counts": feature_rows,
+    }
+
+
+def _long_horizon_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "status": None,
+            "speedup": None,
+            "speedup_display": None,
+            "target_speedup": None,
+            "target_met": None,
+            "result_row_count": None,
+            "complete_result_hash_match": None,
+            "baseline_median_ms": None,
+            "optimized_median_ms": None,
+            "rollup_partition_count": None,
+        }
+    speedup = _number_or_none(payload.get("speedup"))
+    baseline = payload.get("baseline") if isinstance(payload.get("baseline"), dict) else {}
+    optimized = payload.get("optimized") if isinstance(payload.get("optimized"), dict) else {}
+    tables = payload.get("table_evidence") if isinstance(payload.get("table_evidence"), dict) else {}
+    return {
+        "available": True,
+        "status": payload.get("status"),
+        "speedup": speedup,
+        "speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
+        "target_speedup": _number_or_none(payload.get("target_speedup")),
+        "target_met": _bool_or_none(payload.get("target_met")),
+        "result_row_count": _int_or_none(payload.get("result_row_count")),
+        "complete_result_hash_match": _bool_or_none(
+            payload.get("complete_result_hash_match")
+        ),
+        "baseline_median_ms": _number_or_none(baseline.get("median_ms")),
+        "optimized_median_ms": _number_or_none(optimized.get("median_ms")),
+        "rollup_partition_count": _int_or_none(tables.get("rollup_partition_count")),
     }
 
 
@@ -933,6 +977,9 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
         "official_slot_coverage_json": str(snapshot_dir / "official_slot_coverage.json"),
         "official_query_performance_matrix_json": str(snapshot_dir / "official_query_performance_matrix.json"),
+        "phase42_long_horizon_doris_json": str(
+            snapshot_dir / "phase42_long_horizon_doris.json"
+        ),
         "phase18_dynamic_date_funnel_json": str(snapshot_dir / "phase18_dynamic_date_funnel.json"),
         "phase18_dynamic_date_doris_json": str(snapshot_dir / "phase18_dynamic_date_doris.json"),
         "phase19_security_scope_funnel_json": str(snapshot_dir / "phase19_security_scope_funnel.json"),
@@ -1083,6 +1130,18 @@ def _official_doris_display(doris: dict[str, Any]) -> str:
     if doris.get("available") is False:
         return "UNAVAILABLE"
     return "AVAILABLE"
+
+
+def _long_horizon_display(evidence: dict[str, Any]) -> str:
+    if evidence.get("available") is False:
+        return "UNAVAILABLE"
+    status = evidence.get("status") or _pass_fail(evidence.get("target_met"))
+    speedup = evidence.get("speedup_display") or "<unknown>"
+    baseline = evidence.get("baseline_median_ms")
+    optimized = evidence.get("optimized_median_ms")
+    if baseline is None or optimized is None:
+        return f"{status}, {speedup}"
+    return f"{status}, {speedup}, median {baseline:g} -> {optimized:g} ms"
 
 
 def _official_slot_coverage_display(slot_coverage: dict[str, Any]) -> str:
