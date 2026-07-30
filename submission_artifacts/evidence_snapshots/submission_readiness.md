@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-07-30T14:24:59+00:00
+- Generated at: 2026-07-30T16:10:53+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening`
-- Git HEAD at report generation: `f1c0081` feat: add controlled derived scope planning
+- Git HEAD at report generation: `cdb6729` feat: add versioned broad-market benchmark policy
 - Git branch: `feat/antlr-calcite-architecture`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,12 +13,12 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 170105.7 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.328 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 166624.0 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, P95 1.352 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.807 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 1.004 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -35,14 +35,14 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 1.328 ms
+- Compile P95 latency: 1.352 ms
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
 - Equivalence SQL rows: 2
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.34x
+- Local SQLite prefix benchmark speedup smoke: 0.75x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -103,7 +103,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.807 ms
+- Compile latency: 1.004 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -177,7 +177,7 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest --basetemp D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\.pytest_cache\readiness_tmp`
 - Exit code: 0
-- Elapsed: 170105.7 ms
+- Elapsed: 166624.0 ms
 
 ```text
 ........................................................................ [  7%]
@@ -194,8 +194,8 @@
 ........................................................................ [ 84%]
 ........................................................................ [ 91%]
 ........................................................................ [ 98%]
-..............                                                           [100%]
-1022 passed in 169.10s (0:02:49)
+...................                                                      [100%]
+1027 passed in 165.54s (0:02:45)
 ```
 
 ## Award-Readiness Differentiators

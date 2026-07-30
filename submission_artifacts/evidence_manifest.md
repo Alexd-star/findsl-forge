@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-30 22:26:36 +08:00
-- Git HEAD at export: f1c0081
+- Generated at: 2026-07-31 00:11:06 +08:00
+- Git HEAD at export: cdb6729
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -192,6 +192,12 @@
 - `phase46_derived_scope_funnel.json` (3259060 bytes)
 - `phase46_derived_scope_funnel.md` (1145 bytes)
 - `phase46_true_remaining_scope_targets.json` (5078 bytes)
+- `phase47_benchmark_policy_delta_doris_audit.json` (3631 bytes)
+- `phase47_benchmark_policy_delta_doris_audit.md` (544 bytes)
+- `phase47_benchmark_policy_doris.json` (20538 bytes)
+- `phase47_benchmark_policy_doris.md` (1279 bytes)
+- `phase47_benchmark_policy_funnel.json` (3259040 bytes)
+- `phase47_benchmark_policy_funnel.md` (1091 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase6c_capability_funnel.json` (3257492 bytes)
@@ -207,7 +213,7 @@
 - `real_market_sample_report.md` (957 bytes)
 - `sina_sector_sync.json` (5386 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13289 bytes)
+- `submission_readiness.md` (13295 bytes)
 
 ## Excluded By Design
 
