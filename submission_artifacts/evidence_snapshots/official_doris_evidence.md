@@ -3,7 +3,7 @@
 ## Summary
 
 - Evidence source: official Topic 19 CSV package
-- Generated at: 2026-06-09T17:45:34Z
+- Generated at: 2026-07-30T12:40:16Z
 - Doris host: `127.0.0.1`
 - Query port: 9030
 - FE HTTP port: 8030
@@ -14,7 +14,7 @@
 - Official feature tables rebuilt in this run: False
 - Official feature tables available: True
 - Baseline/prefix row-count match: True
-- Baseline vs prefix speedup: 1.173x
+- Baseline vs prefix speedup: 13.986x
 
 ## Row Counts
 
@@ -31,6 +31,7 @@
 | hsj_stock_hq_basic_prefix | 13650347 | 13650347 |
 | hsj_stock_hq_ext_prefix | 13650347 | 13650347 |
 | hsj_stock_hq_basic_technical | 13650347 | 13650347 |
+| hsj_stock_hq_basic_rollup | 13650347 | 13650347 |
 
 ## Date Ranges
 
@@ -45,12 +46,12 @@ first_ext_date	last_ext_date
 
 | Query | Rows | Avg ms | P95 ms | Prefix plan | Window plan |
 |---|---:|---:|---:|---:|---:|
-| simple_close_price_filter | 3836 | 41.518 | 47.384 | False | False |
-| rank_volume_top10 | 10 | 49.361 | 57.073 | False | True |
-| technical_long_window_feature_filter | 5614 | 53.816 | 61.269 | False | False |
-| ext_main_net_inflow_filter | 2247 | 46.139 | 57.988 | False | False |
-| baseline_window_volume_sum_20 | 5487 | 44.321 | 55.058 | False | True |
-| prefix_optimized_volume_sum_20 | 5487 | 37.8 | 38.786 | True | False |
+| simple_close_price_filter | 3836 | 131.749 | 156.158 | False | False |
+| rank_volume_top10 | 10 | 106.809 | 121.446 | False | True |
+| technical_long_window_feature_filter | 5614 | 158.501 | 226.376 | False | False |
+| ext_main_net_inflow_filter | 2247 | 133.772 | 151.11 | False | False |
+| baseline_window_volume_sum_20 | 5487 | 899.765 | 955.935 | False | True |
+| prefix_optimized_volume_sum_20 | 5487 | 64.333 | 66.347 | True | False |
 
 ## Stream Load Results
 
@@ -99,8 +100,8 @@ PLAN FRAGMENT 0
      TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON
      PREDICATES: (((closePx[#30] > 100000) AND (bizdate[#24] = '2026-04-14')) AND (__DORIS_DELETE_SIGN__[#78] = 0))
      partitions=1/1 (hsj_stock_hq_basic)
-     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...
-     cardinality=13650347, avgRowSize=150.58104, numNodes=1
+     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...
+     cardinality=13650347, avgRowSize=150.01868, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#22], tgtcode[#23], bizdate[#24]
      final project output tuple id: 3
@@ -119,7 +120,7 @@ PLAN FRAGMENT 1
      TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON
      PREDICATES: (__DORIS_DELETE_SIGN__[#17] = 0)
      partitions=1/1 (hsj_stock_code_info)
-     tablets=16/16, tabletList=1781024061015,1781024061017,1781024061019 ...
+     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...
      cardinality=5686, avgRowSize=267.0515, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#0], tgtcode[#1], name[#2]
@@ -214,8 +215,8 @@ PLAN FRAGMENT 1
      TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON
      PREDICATES: ((bizdate[#24] = '2026-04-14') AND (__DORIS_DELETE_SIGN__[#78] = 0))
      partitions=1/1 (hsj_stock_hq_basic)
-     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...
-     cardinality=13650347, avgRowSize=150.58104, numNodes=1
+     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...
+     cardinality=13650347, avgRowSize=150.01868, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#22], tgtcode[#23], bizdate[#24], volume[#31]
      final project output tuple id: 3
@@ -234,7 +235,7 @@ PLAN FRAGMENT 2
      TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON
      PREDICATES: (__DORIS_DELETE_SIGN__[#17] = 0)
      partitions=1/1 (hsj_stock_code_info)
-     tablets=16/16, tabletList=1781024061015,1781024061017,1781024061019 ...
+     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...
      cardinality=5686, avgRowSize=267.0515, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#0], tgtcode[#1], name[#2]
@@ -308,8 +309,8 @@ PLAN FRAGMENT 0
      TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON
      PREDICATES: ((bizdate[#62] = '2026-04-14') AND (__DORIS_DELETE_SIGN__[#116] = 0))
      partitions=1/1 (hsj_stock_hq_basic)
-     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...
-     cardinality=13650347, avgRowSize=150.58104, numNodes=1
+     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...
+     cardinality=13650347, avgRowSize=150.01868, numNodes=1
      pushAggOp=NONE
      runtime filters: RF000[min_max] -> mktcode[#60], RF001[in_or_bloom] -> mktcode[#60], RF002[min_max] -> tgtcode[#61], RF003[in_or_bloom] -> tgtcode[#61]
      final projections: mktcode[#60], tgtcode[#61], bizdate[#62]
@@ -329,7 +330,7 @@ PLAN FRAGMENT 1
      TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON
      PREDICATES: (__DORIS_DELETE_SIGN__[#55] = 0)
      partitions=1/1 (hsj_stock_code_info)
-     tablets=16/16, tabletList=1781024061015,1781024061017,1781024061019 ...
+     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...
      cardinality=5686, avgRowSize=267.0515, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#38], tgtcode[#39], name[#40]
@@ -349,8 +350,8 @@ PLAN FRAGMENT 2
      TABLE: newzl.hsj_stock_hq_basic_technical(hsj_stock_hq_basic_technical), PREAGGREGATION: ON
      PREDICATES: (((bizdate[#2] = '2026-04-14') AND (ma250[#19] > 0)) AND ((volume_avg_60[#24] > 0) AND (__DORIS_DELETE_SIGN__[#34] = 0)))
      partitions=1/1 (hsj_stock_hq_basic_technical)
-     tablets=16/16, tabletList=1781024062148,1781024062150,1781024062152 ...
-     cardinality=13650347, avgRowSize=516.3533, numNodes=1
+     tablets=16/16, tabletList=1785410008975,1785410008977,1785410008979 ...
+     cardinality=13650347, avgRowSize=515.9676, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#0], tgtcode[#1]
      final project output tuple id: 1
@@ -423,8 +424,8 @@ PLAN FRAGMENT 0
      TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON
      PREDICATES: ((bizdate[#92] = '2026-04-14') AND (__DORIS_DELETE_SIGN__[#146] = 0))
      partitions=1/1 (hsj_stock_hq_basic)
-     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...
-     cardinality=13650347, avgRowSize=150.58104, numNodes=1
+     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...
+     cardinality=13650347, avgRowSize=150.01868, numNodes=1
      pushAggOp=NONE
      runtime filters: RF000[min_max] -> mktcode[#90], RF001[in_or_bloom] -> mktcode[#90], RF002[min_max] -> tgtcode[#91], RF003[in_or_bloom] -> tgtcode[#91]
      final projections: mktcode[#90], tgtcode[#91], bizdate[#92]
@@ -444,7 +445,7 @@ PLAN FRAGMENT 1
      TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON
      PREDICATES: (__DORIS_DELETE_SIGN__[#85] = 0)
      partitions=1/1 (hsj_stock_code_info)
-     tablets=16/16, tabletList=1781024061015,1781024061017,1781024061019 ...
+     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...
      cardinality=5686, avgRowSize=267.0515, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#68], tgtcode[#69], name[#70]
@@ -464,8 +465,8 @@ PLAN FRAGMENT 2
      TABLE: newzl.hsj_stock_hq_ext(hsj_stock_hq_ext), PREAGGREGATION: ON
      PREDICATES: (((bizdate[#2] = '2026-04-14') AND (ZJLXMainNetTur[#14] > 0)) AND (__DORIS_DELETE_SIGN__[#64] = 0))
      partitions=1/1 (hsj_stock_hq_ext)
-     tablets=16/16, tabletList=1781024061085,1781024061087,1781024061089 ...
-     cardinality=6170822, avgRowSize=248.6715, numNodes=1
+     tablets=16/16, tabletList=1785410008759,1785410008761,1785410008763 ...
+     cardinality=6170822, avgRowSize=247.86974, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#0], tgtcode[#1]
      final project output tuple id: 1
@@ -516,8 +517,8 @@ PLAN FRAGMENT 0
      TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON
      PREDICATES: (__DORIS_DELETE_SIGN__[#56] = 0)
      partitions=1/1 (hsj_stock_hq_basic)
-     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...
-     cardinality=13650347, avgRowSize=150.58104, numNodes=1
+     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...
+     cardinality=13650347, avgRowSize=150.01868, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#0], tgtcode[#1], bizdate[#2], volume[#9]
      final project output tuple id: 1
@@ -531,31 +532,31 @@ planned with unknown column statistics
 ### prefix_optimized_volume_sum_20
 
 ```sql
-SELECT p.mktcode, p.tgtcode, p.bizdate FROM newzl.hsj_stock_hq_basic_prefix AS p WHERE p.bizdate = DATE '2026-04-14' AND p.volume_sum_20 > 10000000
+SELECT p.mktcode, p.tgtcode, p.bizdate FROM newzl.hsj_stock_hq_basic_rollup AS p WHERE p.bizdate = DATE '2026-04-14' AND p.volume_sum_20 > 10000000
 ```
 
 ```text
 Explain String(Nereids Planner)
 PLAN FRAGMENT 0
   OUTPUT EXPRS:
-    mktcode[#15]
-    tgtcode[#16]
-    bizdate[#17]
-  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]
+    mktcode[#8]
+    tgtcode[#9]
+    bizdate[#10]
+  PARTITION: HASH_PARTITIONED: mktcode[#1], tgtcode[#2]
 
   HAS_COLO_PLAN_NODE: false
 
   VRESULT SINK
      MYSQL_PROTOCOL
 
-  0:VOlapScanNode(112)
-     TABLE: newzl.hsj_stock_hq_basic_prefix(hsj_stock_hq_basic_prefix), PREAGGREGATION: ON
-     PREDICATES: (((bizdate[#2] = '2026-04-14') AND (volume_sum_20[#11] > 10000000)) AND (__DORIS_DELETE_SIGN__[#13] = 0))
-     partitions=1/1 (hsj_stock_hq_basic_prefix)
-     tablets=16/16, tabletList=1781024062004,1781024062006,1781024062008 ...
-     cardinality=13650347, avgRowSize=144.16588, numNodes=1
+  0:VOlapScanNode(114)
+     TABLE: newzl.hsj_stock_hq_basic_rollup(hsj_stock_hq_basic_rollup), PREAGGREGATION: ON
+     PREDICATES: (((bizdate[#0] = '2026-04-14') AND (volume_sum_20[#4] > 10000000)) AND (__DORIS_DELETE_SIGN__[#6] = 0))
+     partitions=1/244 (p20260401000000)
+     tablets=16/16, tabletList=1785410022547,1785410022549,1785410022551 ...
+     cardinality=1, avgRowSize=0.0, numNodes=1
      pushAggOp=NONE
-     final projections: mktcode[#0], tgtcode[#1], bizdate[#2]
+     final projections: mktcode[#1], tgtcode[#2], bizdate[#0]
      final project output tuple id: 1
 
 

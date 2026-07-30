@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-29 02:12:02 +08:00
-- Git HEAD at export: 70d506f
+- Generated at: 2026-07-30 20:50:03 +08:00
+- Git HEAD at export: 8d57c49
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -12,11 +12,11 @@
 - `doris_cluster_evidence.json` (6537 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `evaluation_report.md` (12366 bytes)
-- `external_catalog_doris_load.json` (1477 bytes)
+- `external_catalog_doris_load.json` (811 bytes)
 - `index_quote_doris_load.json` (197 bytes)
 - `index_quote_sync.json` (505 bytes)
-- `official_doris_evidence.json` (21914 bytes)
-- `official_doris_evidence.md` (19990 bytes)
+- `official_doris_evidence.json` (21959 bytes)
+- `official_doris_evidence.md` (19915 bytes)
 - `official_index_catalog_sync_phase37.json` (40152 bytes)
 - `official_query_performance_matrix.json` (3656 bytes)
 - `official_query_performance_matrix.md` (1792 bytes)
@@ -158,6 +158,23 @@
 - `phase41_external_scope_funnel.json` (3258836 bytes)
 - `phase41_external_scope_funnel.md` (1091 bytes)
 - `phase41_remaining_scope_targets.json` (10360 bytes)
+- `phase42_long_horizon_doris.json` (10789 bytes)
+- `phase42_long_horizon_doris.md` (1659 bytes)
+- `phase43_curated_scope_alias.json` (13791 bytes)
+- `phase43_eastmoney_exact_batch.json` (12445 bytes)
+- `phase43_eastmoney_targets.json` (8961 bytes)
+- `phase43_external_scope_delta_doris_audit.json` (18590 bytes)
+- `phase43_external_scope_delta_doris_audit.md` (1737 bytes)
+- `phase43_external_scope_funnel.json` (3259016 bytes)
+- `phase43_external_scope_funnel.md` (1145 bytes)
+- `phase43_true_remaining_scope_targets.json` (7191 bytes)
+- `phase44_composite_scope_alias.json` (16410 bytes)
+- `phase44_composite_scope_delta_doris_audit.json` (7412 bytes)
+- `phase44_composite_scope_delta_doris_audit.md` (854 bytes)
+- `phase44_composite_scope_funnel.json` (3258987 bytes)
+- `phase44_composite_scope_funnel.md` (1144 bytes)
+- `phase44_csindex_000300.json` (8938 bytes)
+- `phase44_true_remaining_scope_targets.json` (6732 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase6c_capability_funnel.json` (3257492 bytes)
@@ -173,7 +190,7 @@
 - `real_market_sample_report.md` (957 bytes)
 - `sina_sector_sync.json` (5386 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13201 bytes)
+- `submission_readiness.md` (13283 bytes)
 
 ## Excluded By Design
 

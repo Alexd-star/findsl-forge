@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-30T12:32:58.308876+00:00",
+  "git_head": "1146cf0a4cce9b89409285ea194f50024de7d8cb",
+  "status": "PASS",
+  "target_speedup": 10.0,
+  "speedup": 40.521739,
+  "target_met": true,
+  "warmups": 1,
+  "repeats": 7,
+  "table_evidence": {
+    "base_rows": 13650347,
+    "base_first_date": "2006-01-04",
+    "base_last_date": "2026-04-14",
+    "rollup_rows": 13650347,
+    "rollup_first_date": "2006-01-04",
+    "rollup_last_date": "2026-04-14",
+    "rollup_partition_count": 244,
+    "doris_version": "doris version doris-4.1.0-rc03-5960d4cea0e"
+  },
+  "row_count_match": true,
+  "complete_result_hash_match": true,
+  "result_row_count": 5487,
+  "result_sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+  "partition_ratios": {
+    "baseline": [
+      [
+        1,
+        1
+      ]
+    ],
+    "optimized": [
+      [
+        1,
+        244
+      ]
+    ]
+  },
+  "baseline": {
+    "sql": "SELECT w.mktcode,w.tgtcode,w.bizdate\nFROM (\n  SELECT\n    base.mktcode,\n    base.tgtcode,\n    base.bizdate,\n    SUM(base.volume) OVER (\n      PARTITION BY base.mktcode,base.tgtcode\n      ORDER BY base.bizdate\n      ROWS BETWEEN 19 PRECEDING AND CURRENT ROW\n    ) AS volume_sum_20\n  FROM newzl.hsj_stock_hq_basic AS base\n) AS w\nWHERE w.bizdate = DATE '2026-04-14'\n  AND w.volume_sum_20 > 10000000\nORDER BY w.mktcode,w.tgtcode,w.bizdate",
+    "explain": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#70]\n    tgtcode[#71]\n    bizdate[#72]\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  VRESULT SINK\n     MYSQL_PROTOCOL\n\n  4:VMERGING-EXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#70], tgtcode[#71]\n\nPLAN FRAGMENT 1\n\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\nIS_MERGE: true\n\n  3:VSORT(355)\n  |  order by: mktcode[#70] ASC, tgtcode[#71] ASC\n  |  algorithm: full sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  distribute expr lists: \n  |  \n  2:VANALYTIC(343)\n  |  functions: [sum(volume[#65])]\n  |  partition by: mktcode[#62], tgtcode[#63]\n  |  order by: bizdate[#64] ASC NULLS FIRST\n  |  window: ROWS BETWEEN 19 PRECEDING AND CURRENT ROW\n  |  predicates: (bizdate[#64] = '2026-04-14'), (volume_sum_20[#66] > 10000000)\n  |  final projections: mktcode[#62], tgtcode[#63], bizdate[#64]\n  |  final project output tuple id: 4\n  |  distribute expr lists: mktcode[#62], tgtcode[#63]\n  |  \n  1:VSORT(339)\n  |  order by: mktcode[#62] ASC, tgtcode[#63] ASC, bizdate[#64] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#58], tgtcode[#59]\n  |  \n  0:VOlapScanNode(327)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#56] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1781024061050,1781024061052,1781024061054 ...\n     cardinality=13650347, avgRowSize=150.58104, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#0], tgtcode[#1], bizdate[#2], volume[#9]\n     final project output tuple id: 1\n\n\n\n========== STATISTICS ==========\nplanned with unknown column statistics",
+    "median_ms": 932.0,
+    "p95_ms": 1038.0,
+    "min_ms": 786.0,
+    "max_ms": 1038.0,
+    "runs": [
+      {
+        "query_id": "a8ffa699091f46bd-99d1603bee74372a",
+        "total_ms": 932.0,
+        "total_text": "932ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_1.txt"
+      },
+      {
+        "query_id": "83a5c4c1230c4a56-925e4953f6245e91",
+        "total_ms": 1038.0,
+        "total_text": "1sec38ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_2.txt"
+      },
+      {
+        "query_id": "1d6c6714fe9e4da4-a04ac8e10d5e6ba5",
+        "total_ms": 786.0,
+        "total_text": "786ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_3.txt"
+      },
+      {
+        "query_id": "6e25f06bcaf04a1d-91a4f67e300ac5bc",
+        "total_ms": 819.0,
+        "total_text": "819ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_4.txt"
+      },
+      {
+        "query_id": "bb3ca0914a4d4c06-946c0ace78e50961",
+        "total_ms": 805.0,
+        "total_text": "805ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_5.txt"
+      },
+      {
+        "query_id": "e77f9b8f8f61416a-9805ffcc236fbbbd",
+        "total_ms": 986.0,
+        "total_text": "986ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_6.txt"
+      },
+      {
+        "query_id": "e4fd0eca38a49df-ad7897260de1be1c",
+        "total_ms": 1007.0,
+        "total_text": "1sec7ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\baseline_7.txt"
+      }
+    ]
+  },
+  "optimized": {
+    "sql": "SELECT p.mktcode,p.tgtcode,p.bizdate\nFROM newzl.hsj_stock_hq_basic_rollup AS p\nWHERE p.bizdate = DATE '2026-04-14'\n  AND p.volume_sum_20 > 10000000\nORDER BY p.mktcode,p.tgtcode,p.bizdate",
+    "explain": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#11]\n    tgtcode[#12]\n    bizdate[#13]\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  VRESULT SINK\n     MYSQL_PROTOCOL\n\n  2:VMERGING-EXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#11], tgtcode[#12]\n\nPLAN FRAGMENT 1\n\n  PARTITION: HASH_PARTITIONED: mktcode[#1], tgtcode[#2]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\nIS_MERGE: true\n\n  1:VSORT(179)\n  |  order by: mktcode[#11] ASC, tgtcode[#12] ASC\n  |  algorithm: full sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  distribute expr lists: \n  |  \n  0:VOlapScanNode(167)\n     TABLE: newzl.hsj_stock_hq_basic_rollup(hsj_stock_hq_basic_rollup), PREAGGREGATION: ON\n     PREDICATES: (((bizdate[#0] = '2026-04-14') AND (volume_sum_20[#4] > 10000000)) AND (__DORIS_DELETE_SIGN__[#6] = 0))\n     partitions=1/244 (p20260401000000)\n     tablets=16/16, tabletList=1785410005583,1785410005585,1785410005587 ...\n     cardinality=50446, avgRowSize=98.847084, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#1], tgtcode[#2], bizdate[#0]\n     final project output tuple id: 1\n\n\n\n========== STATISTICS ==========\nplanned with unknown column statistics",
+    "median_ms": 23.0,
+    "p95_ms": 30.0,
+    "min_ms": 19.0,
+    "max_ms": 30.0,
+    "runs": [
+      {
+        "query_id": "105bfa25859447a5-80d0a1a5f965f2ad",
+        "total_ms": 25.0,
+        "total_text": "25ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_1.txt"
+      },
+      {
+        "query_id": "68cf8191b564aae-bd6aa34a8443148a",
+        "total_ms": 24.0,
+        "total_text": "24ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_2.txt"
+      },
+      {
+        "query_id": "5879dcb866f44f74-b484a1a6c26c7975",
+        "total_ms": 20.0,
+        "total_text": "20ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_3.txt"
+      },
+      {
+        "query_id": "14c9cd3da0574077-a956a5ca6a73f5cd",
+        "total_ms": 20.0,
+        "total_text": "20ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_4.txt"
+      },
+      {
+        "query_id": "18ce7c9ee0ff4931-aea8fb1815984682",
+        "total_ms": 23.0,
+        "total_text": "23ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_5.txt"
+      },
+      {
+        "query_id": "d5ed3e93aad8436c-a212759e4adad476",
+        "total_ms": 19.0,
+        "total_text": "19ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_6.txt"
+      },
+      {
+        "query_id": "b80d738dadc14a65-bae2c63fbcfcaf0f",
+        "total_ms": 30.0,
+        "total_text": "30ms",
+        "row_count": 5487,
+        "sha256": "427ef0387f97b245a439152246003e4beaa13a8acc669ffd06559d5f8eba5ac6",
+        "is_cached": false,
+        "task_state": "OK",
+        "profile_path": "reports\\phase42_query_profiles\\optimized_7.txt"
+      }
+    ]
+  },
+  "measurement_policy": {
+    "clock": "Doris Query Profile Summary.Total",
+    "query_cache": "disabled and verified as uncached in every profile",
+    "ordering": "alternating baseline/optimized order",
+    "correctness": "complete ordered result SHA-256",
+    "plan_check": "EXPLAIN partition ratios"
+  }
+}

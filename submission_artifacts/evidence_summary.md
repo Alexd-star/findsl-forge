@@ -8,11 +8,11 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 |---|---|
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 993 passed in 164.93s |
+| Pytest regression | 1011 passed in 182.15s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
-| ANTLR/IR legacy migration | 971/1097 (88.51%) |
+| ANTLR/IR legacy migration | 998/1097 (90.98%) |
 | Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
 | Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 194.0904 ms |
 | Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
@@ -28,17 +28,18 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Phase 30 grounded event evidence | PASS, 6/6, non-empty 6/6, max P95 1024.4798 ms |
 | Phase 31 final grounded evidence | PASS, 2/2, non-empty 2/2, max P95 64.6454 ms |
 | Phase 6C set-prefix evidence | PASS, hash 14/14, faster 14/14, median 1.393x |
-| Latest phase new-success audit | PASS, 15/15, failed 0 |
+| Latest phase new-success audit | PASS, 8/8, failed 0 |
 | Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
-| Official Doris prefix speedup | 1.17x |
+| Official Doris prefix speedup | 13.99x |
+| Official 20-year long-horizon speedup | PASS, 40.52x, median 932 -> 23 ms |
 | Defense package checks | 13/13 |
 | Doris evidence | PASS |
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | 70d506f |
-| Git HEAD at export | 70d506f |
+| Git HEAD at report generation | 8d57c49 |
+| Git HEAD at export | 8d57c49 |
 
 ## Source Files
 
@@ -49,6 +50,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | official_doris_evidence_json | `submission_artifacts\evidence_snapshots\official_doris_evidence.json` |
 | official_slot_coverage_json | `submission_artifacts\evidence_snapshots\official_slot_coverage.json` |
 | official_query_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_query_performance_matrix.json` |
+| phase42_long_horizon_doris_json | `submission_artifacts\evidence_snapshots\phase42_long_horizon_doris.json` |
 | phase18_dynamic_date_funnel_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_funnel.json` |
 | phase18_dynamic_date_doris_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_doris.json` |
 | phase19_security_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase19_security_scope_funnel.json` |
@@ -90,6 +92,12 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | phase31_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase31_new_success_audit.json` |
 | phase41_external_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase41_external_scope_funnel.json` |
 | phase41_external_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase41_external_scope_delta_doris_audit.json` |
+| phase43_external_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase43_external_scope_funnel.json` |
+| phase43_external_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase43_external_scope_delta_doris_audit.json` |
+| phase43_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase43_true_remaining_scope_targets.json` |
+| phase44_composite_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase44_composite_scope_funnel.json` |
+| phase44_composite_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase44_composite_scope_delta_doris_audit.json` |
+| phase44_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase44_true_remaining_scope_targets.json` |
 | phase6c_set_prefix_doris_json | `submission_artifacts\evidence_snapshots\phase6c_set_prefix_doris.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
