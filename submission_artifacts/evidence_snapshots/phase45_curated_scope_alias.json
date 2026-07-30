@@ -1,0 +1,715 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c",
+  "content_sha256": "4e39b11a132c9d54bcbb89f40518493e2236e0fd96a8d3efa69a85800347e42b",
+  "mapping_count": 74,
+  "scope_memberships": 10832,
+  "runtime_entries": 17426,
+  "mappings": [
+    {
+      "alias": "aigc相关",
+      "scope_code": "BK1111",
+      "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72",
+      "reason": "AIGC 相关明确指向 AIGC 概念，成员沿用版本化公开板块快照",
+      "scope_name": "AIGC概念",
+      "member_count": 119
+    },
+    {
+      "alias": "ai",
+      "scope_code": "BK0800",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "AI 是人工智能的通用英文缩写",
+      "scope_name": "人工智能",
+      "member_count": 708
+    },
+    {
+      "alias": "AI生成",
+      "scope_code": "BK1111",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "AI生成内容对应 AIGC 概念",
+      "scope_name": "AIGC概念",
+      "member_count": 119
+    },
+    {
+      "alias": "保险",
+      "scope_code": "BK0474",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "保险Ⅱ是申万二级保险行业",
+      "scope_name": "保险Ⅱ",
+      "member_count": 5
+    },
+    {
+      "alias": "光刻机板块",
+      "scope_code": "BK0884",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "来源板块名称为光刻机(胶)",
+      "scope_name": "光刻机(胶)",
+      "member_count": 97
+    },
+    {
+      "alias": "光刻胶概念",
+      "scope_code": "BK0884",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "来源板块名称为光刻机(胶)",
+      "scope_name": "光刻机(胶)",
+      "member_count": 97
+    },
+    {
+      "alias": "军工概念",
+      "scope_code": "BK1204",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "国防军工是标准行业名称",
+      "scope_name": "国防军工",
+      "member_count": 140
+    },
+    {
+      "alias": "农业板块",
+      "scope_code": "BK1257",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "农业综合Ⅱ是标准行业名称",
+      "scope_name": "农业综合Ⅱ",
+      "member_count": 3
+    },
+    {
+      "alias": "农产品行业",
+      "scope_code": "BK1256",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "农产品加工是标准行业名称",
+      "scope_name": "农产品加工",
+      "member_count": 28
+    },
+    {
+      "alias": "化妆品厂商",
+      "scope_code": "BK1252",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "化妆品是标准行业名称",
+      "scope_name": "化妆品",
+      "member_count": 14
+    },
+    {
+      "alias": "印刷物资销售",
+      "scope_code": "BK1534",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "归入印刷行业",
+      "scope_name": "印刷",
+      "member_count": 4
+    },
+    {
+      "alias": "家居日用品",
+      "scope_code": "BK0440",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "家居用品是标准行业名称",
+      "scope_name": "家居用品",
+      "member_count": 77
+    },
+    {
+      "alias": "家居陈设",
+      "scope_code": "BK0440",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "归入家居用品行业",
+      "scope_name": "家居用品",
+      "member_count": 77
+    },
+    {
+      "alias": "家电类",
+      "scope_code": "BK0456",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "家用电器是标准行业名称",
+      "scope_name": "家用电器",
+      "member_count": 108
+    },
+    {
+      "alias": "家电行业板块",
+      "scope_code": "BK0456",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "家用电器是标准行业名称",
+      "scope_name": "家用电器",
+      "member_count": 108
+    },
+    {
+      "alias": "工程咨询板块",
+      "scope_code": "BK0726",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "工程咨询服务Ⅱ是标准行业名称",
+      "scope_name": "工程咨询服务Ⅱ",
+      "member_count": 46
+    },
+    {
+      "alias": "国改",
+      "scope_code": "SINA:gn_sgqgg",
+      "source_snapshot_id": "sina-sector-2026-07-13-cf1899833511",
+      "reason": "国改是国企改革的通行简称",
+      "scope_name": "国企改革",
+      "member_count": 53
+    },
+    {
+      "alias": "海产品捕捞",
+      "scope_code": "BK1513",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "海产品捕捞按标准行业名称归入海洋捕捞",
+      "scope_name": "海洋捕捞",
+      "member_count": 3
+    },
+    {
+      "alias": "房地产营销服务房地产代销",
+      "scope_code": "BK1045",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "归入房地产服务行业",
+      "scope_name": "房地产服务",
+      "member_count": 15
+    },
+    {
+      "alias": "城商行",
+      "scope_code": "BK1609",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "城商行Ⅲ是标准行业名称",
+      "scope_name": "城商行Ⅲ",
+      "member_count": 17
+    },
+    {
+      "alias": "电子化学品",
+      "scope_code": "BK1039",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "电子化学品Ⅱ是标准行业名称",
+      "scope_name": "电子化学品Ⅱ",
+      "member_count": 37
+    },
+    {
+      "alias": "电子化学品行业",
+      "scope_code": "BK1039",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "电子化学品Ⅱ是标准行业名称",
+      "scope_name": "电子化学品Ⅱ",
+      "member_count": 37
+    },
+    {
+      "alias": "电机公司",
+      "scope_code": "BK1030",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "电机Ⅱ是标准行业名称",
+      "scope_name": "电机Ⅱ",
+      "member_count": 27
+    },
+    {
+      "alias": "调味发酵品行业",
+      "scope_code": "BK1278",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "调味发酵品Ⅱ是标准行业名称",
+      "scope_name": "调味发酵品Ⅱ",
+      "member_count": 15
+    },
+    {
+      "alias": "专精特新小巨人企业",
+      "scope_code": "SINA:gn_zjtx",
+      "source_snapshot_id": "sina-sector-2026-07-13-cf1899833511",
+      "reason": "专精特新小巨人企业属于专精特新公开概念范围",
+      "scope_name": "专精特新",
+      "member_count": 398
+    },
+    {
+      "alias": "金属管件制品行业",
+      "scope_code": "BK1396",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "金属管件制品按标准行业名称归入金属制品",
+      "scope_name": "金属制品",
+      "member_count": 79
+    },
+    {
+      "alias": "证券商",
+      "scope_code": "BK0473",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "reason": "证券Ⅱ是标准行业名称",
+      "scope_name": "证券Ⅱ",
+      "member_count": 49
+    },
+    {
+      "alias": "重组概念",
+      "scope_code": "BK1181",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "对应并购重组概念",
+      "scope_name": "并购重组概念",
+      "member_count": 95
+    },
+    {
+      "alias": "谷子板块",
+      "scope_code": "BK1183",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "对应谷子经济概念",
+      "scope_name": "谷子经济",
+      "member_count": 77
+    },
+    {
+      "alias": "谷子概念",
+      "scope_code": "BK1183",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "谷子概念对应谷子经济公开概念",
+      "scope_name": "谷子经济",
+      "member_count": 77
+    },
+    {
+      "alias": "msci",
+      "scope_code": "BAIDU:031027",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "MSCI 是 MSCI 概念的通行英文简称",
+      "scope_name": "MSCI概念",
+      "member_count": 534
+    },
+    {
+      "alias": "msic概念",
+      "scope_code": "BAIDU:031027",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 500,
+      "reason": "msic 是 MSCI 的相邻字母误序；仅按版本化 MSCI 概念成员修正拼写，不扩展到其他指数",
+      "scope_name": "MSCI概念",
+      "member_count": 534
+    },
+    {
+      "alias": "储能",
+      "scope_code": "BAIDU:011424",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "储能明确对应储能概念",
+      "scope_name": "储能概念",
+      "member_count": 859
+    },
+    {
+      "alias": "抖音公司",
+      "scope_code": "BAIDU:GN2020",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "在 A 股范围槽中抖音公司表示抖音产业链概念而非不可交易主体",
+      "scope_name": "抖音概念",
+      "member_count": 224
+    },
+    {
+      "alias": "芯片",
+      "scope_code": "BAIDU:003891",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "芯片是芯片概念的标准简称",
+      "scope_name": "芯片概念",
+      "member_count": 876
+    },
+    {
+      "alias": "比亚迪类",
+      "scope_code": "BAIDU:GN2144",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "比亚迪类在 A 股范围槽中表示比亚迪产业链概念",
+      "scope_name": "比亚迪概念",
+      "member_count": 662
+    },
+    {
+      "alias": "豆包",
+      "scope_code": "BAIDU:GN2350",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "豆包明确对应豆包概念",
+      "scope_name": "豆包概念",
+      "member_count": 23
+    },
+    {
+      "alias": "豆包应用",
+      "scope_code": "BAIDU:GN2350",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "豆包应用在A股范围槽中对应豆包应用产业链概念",
+      "scope_name": "豆包概念",
+      "member_count": 23
+    },
+    {
+      "alias": "豆包概率",
+      "scope_code": "BAIDU:GN2350",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 20,
+      "reason": "概率是概念的单字录入错误；按已版本化豆包概念成员修正",
+      "scope_name": "豆包概念",
+      "member_count": 23
+    },
+    {
+      "alias": "可控核聚变板块",
+      "scope_code": "BAIDU:GN2286",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "可控核聚变板块对应同名公开概念",
+      "scope_name": "可控核聚变",
+      "member_count": 111
+    },
+    {
+      "alias": "hbm",
+      "scope_code": "BAIDU:GN2272",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "HBM 是高带宽存储器的标准英文缩写",
+      "scope_name": "高带宽存储器HBM",
+      "member_count": 54
+    },
+    {
+      "alias": "deepseek",
+      "scope_code": "BAIDU:GN2355",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "DeepSeek 明确对应 DeepSeek 概念股范围",
+      "scope_name": "DeepSeek概念股",
+      "member_count": 609
+    },
+    {
+      "alias": "deepseek相关",
+      "scope_code": "BAIDU:GN2355",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "DeepSeek相关与公开 DeepSeek 概念股范围同义",
+      "scope_name": "DeepSeek概念股",
+      "member_count": 609
+    },
+    {
+      "alias": "智能城市",
+      "scope_code": "BAIDU:003628",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "智能城市与公开分类智慧城市是通行同义表达",
+      "scope_name": "智慧城市",
+      "member_count": 419
+    },
+    {
+      "alias": "脑机接口",
+      "scope_code": "BAIDU:251393",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "公开分类脑科学(脑机接口)明确包含脑机接口名称",
+      "scope_name": "脑科学(脑机接口)",
+      "member_count": 90
+    },
+    {
+      "alias": "京东方",
+      "scope_code": "SEC:0:000725",
+      "source_snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5",
+      "reason": "京东方是A股证券京东方A的通行公司简称",
+      "scope_name": "京东方Ａ",
+      "member_count": 1
+    },
+    {
+      "alias": "京东方概念",
+      "scope_code": "SEC:0:000725",
+      "source_snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5",
+      "minimum_member_count": 1,
+      "reason": "京东方概念在单证券范围槽中唯一指向京东方A(000725)",
+      "scope_name": "京东方Ａ",
+      "member_count": 1
+    },
+    {
+      "alias": "京东方A概念",
+      "scope_code": "SEC:0:000725",
+      "source_snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5",
+      "minimum_member_count": 1,
+      "reason": "京东方A概念在单证券范围槽中唯一指向京东方A(000725)",
+      "scope_name": "京东方Ａ",
+      "member_count": 1
+    },
+    {
+      "alias": "地产",
+      "scope_code": "BK1202",
+      "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72",
+      "reason": "地产是A股行业语境中房地产行业的通行简称",
+      "scope_name": "房地产",
+      "member_count": 105
+    },
+    {
+      "alias": "SHEIN",
+      "scope_code": "BAIDU:GN2279",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "SHEIN在A股范围槽中指向中文品牌希音的公开合作商概念，来源成员仍固定到版本化快照",
+      "scope_name": "希音合作商",
+      "member_count": 5
+    },
+    {
+      "alias": "大盘",
+      "scope_code": "BAIDU:GN2388",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "大盘在A股范围槽中按公开大盘股分类解释，不扩展为任意宽基指数",
+      "scope_name": "大盘股",
+      "member_count": 199
+    },
+    {
+      "alias": "公共服务",
+      "scope_code": "BAIDU:410000",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "公共服务在A股行业范围中按公用事业行业解释，并保留显式语义政策",
+      "scope_name": "公用事业",
+      "member_count": 130
+    },
+    {
+      "alias": "沪深300港元净收益指数",
+      "scope_code": "000300",
+      "source_snapshot_id": "csindex-2026-07-30-b68b771e8882",
+      "minimum_member_count": 300,
+      "reason": "该净收益币种变体与沪深300价格指数共享样本证券；本映射只提供成员范围，不伪造指数行情",
+      "scope_name": "沪深300",
+      "member_count": 300
+    },
+    {
+      "alias": "综合金融服务概念",
+      "scope_code": "BAIDU:490300",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "综合金融服务在A股行业范围中按公开多元金融分类解释",
+      "scope_name": "多元金融",
+      "member_count": 23
+    },
+    {
+      "alias": "家用轻工",
+      "scope_code": "BAIDU:360000",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "reason": "家用轻工按公开轻工制造行业分类解释",
+      "scope_name": "轻工制造",
+      "member_count": 141
+    },
+    {
+      "alias": "互联网行业",
+      "scope_code": "BK0447",
+      "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687",
+      "reason": "互联网行业按公开互联网服务范围解释",
+      "scope_name": "互联网服务",
+      "member_count": 146
+    },
+    {
+      "alias": "标普概念",
+      "scope_code": "BAIDU:GN2102",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 1000,
+      "reason": "标普概念在 A 股范围槽中对应公开标普道琼斯中国分类",
+      "scope_name": "标普道琼斯中国",
+      "member_count": 1050
+    },
+    {
+      "alias": "低价",
+      "scope_code": "BAIDU:GN2012",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 200,
+      "reason": "低价在范围槽中按公开低价股分类解释，价格阈值仍由来源快照定义",
+      "scope_name": "低价股",
+      "member_count": 257
+    },
+    {
+      "alias": "辽宁指数",
+      "scope_code": "BAIDU:DY1161",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 80,
+      "reason": "现有数据没有辽宁价格指数，范围槽按公开辽宁地域成员解释，不伪造指数行情",
+      "scope_name": "辽宁板块",
+      "member_count": 84
+    },
+    {
+      "alias": "小米汽车核心技术",
+      "scope_code": "BAIDU:GN2271",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 100,
+      "reason": "该词位于 A 股范围槽，按公开小米汽车产业链概念解释，不把核心技术当作独立证券",
+      "scope_name": "小米汽车",
+      "member_count": 124
+    },
+    {
+      "alias": "上海电气概念",
+      "scope_code": "SEC:1:601727",
+      "source_snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5",
+      "minimum_member_count": 1,
+      "reason": "上海电气概念在单证券范围槽中唯一指向上海电气(601727)",
+      "scope_name": "上海电气",
+      "member_count": 1
+    },
+    {
+      "alias": "消费",
+      "scope_code": "BAIDU:GN2103",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 90,
+      "reason": "消费作为 A 股范围槽中的宽泛行业词，按公开大消费分类解释",
+      "scope_name": "大消费",
+      "member_count": 95
+    },
+    {
+      "alias": "医疗",
+      "scope_code": "BAIDU:370000",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 450,
+      "reason": "医疗作为范围槽中的宽泛行业简称，按公开医药生物一级行业成员解释",
+      "scope_name": "医药生物",
+      "member_count": 454
+    },
+    {
+      "alias": "建筑",
+      "scope_code": "BK1209",
+      "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72",
+      "minimum_member_count": 150,
+      "reason": "建筑作为范围槽中的行业简称，按公开建筑装饰行业成员解释",
+      "scope_name": "建筑装饰",
+      "member_count": 158
+    },
+    {
+      "alias": "饮料",
+      "scope_code": "BK1282",
+      "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+      "minimum_member_count": 25,
+      "reason": "饮料作为范围槽中的行业简称，按公开饮料乳品行业成员解释",
+      "scope_name": "饮料乳品",
+      "member_count": 27
+    },
+    {
+      "alias": "基本金属概念",
+      "scope_code": "BAIDU:240300",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 50,
+      "reason": "基本金属按资本市场常用工业金属分类解释",
+      "scope_name": "工业金属",
+      "member_count": 55
+    },
+    {
+      "alias": "金属板块",
+      "scope_code": "BAIDU:240000",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 120,
+      "reason": "未限定贵金属或能源金属时，金属板块按公开有色金属一级行业解释",
+      "scope_name": "有色金属",
+      "member_count": 129
+    },
+    {
+      "alias": "氢能源电池",
+      "scope_code": "BAIDU:003682",
+      "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+      "minimum_member_count": 200,
+      "reason": "氢能源电池在 A 股主题语境中按公开燃料电池概念解释",
+      "scope_name": "燃料电池概念",
+      "member_count": 218
+    },
+    {
+      "alias": "宁夏算力概念",
+      "scope_name": "宁夏算力概念",
+      "operation": "intersection",
+      "components": [
+        {
+          "scope_code": "BAIDU:DY1162",
+          "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+        },
+        {
+          "scope_code": "BK1134",
+          "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"
+        }
+      ],
+      "reason": "由完整宁夏地域成员与完整算力概念成员按证券稳定键求交集",
+      "scope_code": "CURATED:111e42dd73d0faca",
+      "member_count": 1,
+      "component_member_counts": [
+        16,
+        205
+      ]
+    },
+    {
+      "alias": "银行保险",
+      "scope_name": "银行保险",
+      "operation": "union",
+      "components": [
+        {
+          "scope_code": "BK1283",
+          "source_snapshot_id": "eastmoney-2026-07-30-c33dad9203c8"
+        },
+        {
+          "scope_code": "BK0474",
+          "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+        }
+      ],
+      "reason": "银行保险按两个公开行业成员集合的并集解释",
+      "scope_code": "CURATED:e036e80453b7995f",
+      "member_count": 47,
+      "component_member_counts": [
+        42,
+        5
+      ]
+    },
+    {
+      "alias": "金融",
+      "scope_name": "金融",
+      "operation": "union",
+      "minimum_member_count": 120,
+      "components": [
+        {
+          "scope_code": "BK1283",
+          "source_snapshot_id": "eastmoney-2026-07-30-c33dad9203c8",
+          "minimum_member_count": 40
+        },
+        {
+          "scope_code": "BK1203",
+          "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+          "minimum_member_count": 75
+        }
+      ],
+      "reason": "宽泛金融范围由完整银行与非银金融一级行业成员求并集",
+      "scope_code": "CURATED:2c8521d5fcbe2223",
+      "member_count": 122,
+      "component_member_counts": [
+        42,
+        80
+      ]
+    },
+    {
+      "alias": "金融公司",
+      "scope_name": "金融公司",
+      "operation": "union",
+      "minimum_member_count": 120,
+      "components": [
+        {
+          "scope_code": "BK1283",
+          "source_snapshot_id": "eastmoney-2026-07-30-c33dad9203c8",
+          "minimum_member_count": 40
+        },
+        {
+          "scope_code": "BK1203",
+          "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea",
+          "minimum_member_count": 75
+        }
+      ],
+      "reason": "金融公司范围由完整银行与非银金融一级行业成员求并集",
+      "scope_code": "CURATED:477485ed498cc26a",
+      "member_count": 122,
+      "component_member_counts": [
+        42,
+        80
+      ]
+    },
+    {
+      "alias": "华为ai眼镜",
+      "scope_name": "华为AI眼镜",
+      "operation": "intersection",
+      "minimum_member_count": 20,
+      "components": [
+        {
+          "scope_code": "BAIDU:021291",
+          "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+          "minimum_member_count": 1000
+        },
+        {
+          "scope_code": "BAIDU:GN2313",
+          "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+          "minimum_member_count": 40
+        }
+      ],
+      "reason": "由完整华为概念成员与完整AI眼镜成员按证券稳定键求交集",
+      "scope_code": "CURATED:e062bdc441662867",
+      "member_count": 29,
+      "component_member_counts": [
+        1029,
+        45
+      ]
+    },
+    {
+      "alias": "字节跳动算力搭建合作公司",
+      "scope_name": "字节跳动算力合作公司",
+      "operation": "intersection",
+      "minimum_member_count": 10,
+      "components": [
+        {
+          "scope_code": "BK0923",
+          "source_snapshot_id": "eastmoney-2026-07-30-40c8deb732b7",
+          "minimum_member_count": 90
+        },
+        {
+          "scope_code": "BK1134",
+          "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72",
+          "minimum_member_count": 200
+        }
+      ],
+      "reason": "由完整字节概念成员与完整算力概念成员按证券稳定键求交集",
+      "scope_code": "CURATED:1593b6dbc063f8be",
+      "member_count": 15,
+      "component_member_counts": [
+        95,
+        205
+      ]
+    }
+  ]
+}

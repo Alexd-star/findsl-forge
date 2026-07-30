@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T12:31:55.2638123Z",
+  "generated_at": "2026-07-30T13:02:23.7834599Z",
   "catalog": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\data\\external_catalog\\catalog.sqlite3",
   "doris": "127.0.0.1:9030",
   "status": "PASS",
   "tables": {
     "scope_membership": {
-      "expected_rows": 204139,
-      "actual_rows": 204139,
+      "expected_rows": 207079,
+      "actual_rows": 207079,
       "stream_load_status": "Success",
       "filtered_rows": 0
     },

@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T12:50:05Z",
+  "generated_at": "2026-07-30T13:21:03Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "8d57c49",
-    "head_at_export": "8d57c49",
+    "head_at_report_generation": "0a9307b",
+    "head_at_export": "0a9307b",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-30T12:49:49+00:00",
+    "generated_at": "2026-07-30T13:19:13+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.524,
+    "compile_p95_latency_ms": 1.502,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 1011,
-      "elapsed_seconds": 182.15
+      "passed": 1016,
+      "elapsed_seconds": 153.7
     }
   },
   "official_suite": {
@@ -95,11 +95,11 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "1146cf0a4cce9b89409285ea194f50024de7d8cb",
+    "git_head": "0a9307b44bfdbb6bd77d338b4178a7fb51338d17",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 998,
-    "migration_coverage": 0.909754,
-    "new_backend_success": 1029,
+    "legacy_to_new_migrated": 1016,
+    "migration_coverage": 0.926162,
+    "new_backend_success": 1047,
     "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
@@ -249,8 +249,8 @@
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 8,
-      "total": 8,
+      "passed": 18,
+      "total": 18,
       "failed": 0
     }
   },
@@ -324,6 +324,9 @@
     "phase44_composite_scope_funnel_json": "submission_artifacts\\evidence_snapshots\\phase44_composite_scope_funnel.json",
     "phase44_composite_scope_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase44_composite_scope_delta_doris_audit.json",
     "phase44_true_remaining_scope_targets_json": "submission_artifacts\\evidence_snapshots\\phase44_true_remaining_scope_targets.json",
+    "phase45_scope_governance_funnel_json": "submission_artifacts\\evidence_snapshots\\phase45_scope_governance_funnel.json",
+    "phase45_scope_governance_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase45_scope_governance_delta_doris_audit.json",
+    "phase45_true_remaining_scope_targets_json": "submission_artifacts\\evidence_snapshots\\phase45_true_remaining_scope_targets.json",
     "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
