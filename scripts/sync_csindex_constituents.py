@@ -76,7 +76,10 @@ def main() -> None:
         )
 
     catalog = ExternalCatalog(Path(args.catalog))
-    catalog.import_snapshot(result.snapshot, replace_source_date=True)
+    # A targeted snapshot contains one index only. Replacing every snapshot from
+    # the same source and date would delete other indices synchronized that day.
+    # Replace only an identical snapshot id so independent targeted imports coexist.
+    catalog.import_snapshot(result.snapshot, replace=True)
     runtime = catalog.export_runtime_manifest(Path(args.runtime))
     payload = {
         **result.to_dict(),

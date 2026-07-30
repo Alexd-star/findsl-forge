@@ -25529,6 +25529,16 @@
       "alias": "300沪市",
       "normalized_alias": "300沪市",
       "source": "csindex",
+      "as_of_date": "2026-07-30",
+      "snapshot_id": "csindex-2026-07-30-ba167bb7985c"
+    },
+    {
+      "scope_type": "index",
+      "scope_code": "000972",
+      "scope_name": "300沪市",
+      "alias": "300沪市",
+      "normalized_alias": "300沪市",
+      "source": "csindex",
       "as_of_date": "2026-07-13",
       "snapshot_id": "csindex-2026-07-13-36b507e3b6e9"
     },
@@ -25561,6 +25571,16 @@
       "source": "akshare-public-index",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-public-index-2026-07-13-fd8c3729b96b"
+    },
+    {
+      "scope_type": "index",
+      "scope_code": "000972",
+      "scope_name": "300沪市",
+      "alias": "300沪市指数",
+      "normalized_alias": "300沪市指数",
+      "source": "csindex",
+      "as_of_date": "2026-07-30",
+      "snapshot_id": "csindex-2026-07-30-ba167bb7985c"
     },
     {
       "scope_type": "index",
@@ -56980,7 +57000,7 @@
       "normalized_alias": "ai",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -57090,7 +57110,7 @@
       "normalized_alias": "aigc概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -57160,7 +57180,7 @@
       "normalized_alias": "aigc概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -57220,7 +57240,7 @@
       "normalized_alias": "aigc相关",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -57530,7 +57550,7 @@
       "normalized_alias": "ai生成",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -58160,7 +58180,7 @@
       "normalized_alias": "deepseek",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -58190,7 +58210,7 @@
       "normalized_alias": "deepseek概念股",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -58220,7 +58240,7 @@
       "normalized_alias": "deepseek概念股概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -58250,7 +58270,7 @@
       "normalized_alias": "deepseek概念股概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -58270,7 +58290,7 @@
       "normalized_alias": "deepseek相关",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -58560,7 +58580,7 @@
       "normalized_alias": "hbm",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -59120,7 +59140,7 @@
       "normalized_alias": "msci",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -59180,7 +59200,7 @@
       "normalized_alias": "msci概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -59210,7 +59230,7 @@
       "normalized_alias": "msci概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -59240,7 +59260,7 @@
       "normalized_alias": "msic概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -59800,7 +59820,7 @@
       "normalized_alias": "shein",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -63510,7 +63530,7 @@
       "normalized_alias": "上海电气",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -63520,7 +63540,7 @@
       "normalized_alias": "上海电气概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -64360,7 +64380,7 @@
       "normalized_alias": "专精特新",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -64390,7 +64410,7 @@
       "normalized_alias": "专精特新小巨人企业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -64420,7 +64440,7 @@
       "normalized_alias": "专精特新概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -64460,7 +64480,7 @@
       "normalized_alias": "专精特新概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -71180,7 +71200,7 @@
       "normalized_alias": "互联网服务",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -71200,7 +71220,7 @@
       "normalized_alias": "互联网服务概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -71220,7 +71240,7 @@
       "normalized_alias": "互联网服务概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -71310,7 +71330,7 @@
       "normalized_alias": "互联网行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -72060,7 +72080,7 @@
       "normalized_alias": "京东方",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -72080,7 +72100,7 @@
       "normalized_alias": "京东方a",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -72090,7 +72110,7 @@
       "normalized_alias": "京东方a概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -72100,7 +72120,7 @@
       "normalized_alias": "京东方概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -72420,7 +72440,7 @@
       "normalized_alias": "人工智能",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -72540,7 +72560,7 @@
       "normalized_alias": "人工智能概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -72600,7 +72620,7 @@
       "normalized_alias": "人工智能概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -74150,7 +74170,7 @@
       "normalized_alias": "低价",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -74170,7 +74190,7 @@
       "normalized_alias": "低价股",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -74190,7 +74210,7 @@
       "normalized_alias": "低价股概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -74210,7 +74230,7 @@
       "normalized_alias": "低价股概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -75240,7 +75260,7 @@
       "normalized_alias": "保险",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -75280,7 +75300,7 @@
       "normalized_alias": "保险ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -75360,7 +75380,7 @@
       "normalized_alias": "保险ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -75410,7 +75430,7 @@
       "normalized_alias": "保险ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -76110,7 +76130,7 @@
       "normalized_alias": "储能",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -76140,7 +76160,7 @@
       "normalized_alias": "储能概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -76170,7 +76190,7 @@
       "normalized_alias": "储能概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -76970,7 +76990,7 @@
       "normalized_alias": "光刻机(胶)",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -77020,7 +77040,7 @@
       "normalized_alias": "光刻机(胶)概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -77070,7 +77090,7 @@
       "normalized_alias": "光刻机(胶)概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -77120,7 +77140,7 @@
       "normalized_alias": "光刻机板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -77210,7 +77230,7 @@
       "normalized_alias": "光刻胶概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -77970,7 +77990,7 @@
       "normalized_alias": "公共服务",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -78060,7 +78080,7 @@
       "normalized_alias": "公用事业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -78090,7 +78110,7 @@
       "normalized_alias": "公用事业板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -78120,7 +78140,7 @@
       "normalized_alias": "公用事业行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80200,7 +80220,7 @@
       "normalized_alias": "军工概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80570,7 +80590,7 @@
       "normalized_alias": "农业板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80690,7 +80710,7 @@
       "normalized_alias": "农业综合ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80770,7 +80790,7 @@
       "normalized_alias": "农业综合ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80820,7 +80840,7 @@
       "normalized_alias": "农业综合ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80910,7 +80930,7 @@
       "normalized_alias": "农产品加工",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -80960,7 +80980,7 @@
       "normalized_alias": "农产品加工板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -81010,7 +81030,7 @@
       "normalized_alias": "农产品加工行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -81050,7 +81070,7 @@
       "normalized_alias": "农产品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -83830,7 +83850,7 @@
       "normalized_alias": "化妆品",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -83900,7 +83920,7 @@
       "normalized_alias": "化妆品厂商",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -83940,7 +83960,7 @@
       "normalized_alias": "化妆品板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -84010,7 +84030,7 @@
       "normalized_alias": "化妆品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -85240,7 +85260,7 @@
       "normalized_alias": "医疗",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "index",
@@ -86010,7 +86030,7 @@
       "normalized_alias": "医药生物",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -86040,7 +86060,7 @@
       "normalized_alias": "医药生物板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -86070,7 +86090,7 @@
       "normalized_alias": "医药生物行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -86620,7 +86640,7 @@
       "normalized_alias": "华为ai眼镜",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -90270,7 +90290,7 @@
       "normalized_alias": "印刷",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -90400,7 +90420,7 @@
       "normalized_alias": "印刷板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -90440,7 +90460,7 @@
       "normalized_alias": "印刷物资销售",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -90470,7 +90490,7 @@
       "normalized_alias": "印刷行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -91540,7 +91560,7 @@
       "normalized_alias": "可控核聚变",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -91560,7 +91580,7 @@
       "normalized_alias": "可控核聚变板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -91590,7 +91610,7 @@
       "normalized_alias": "可控核聚变概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -91620,7 +91640,7 @@
       "normalized_alias": "可控核聚变概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -94550,7 +94570,7 @@
       "normalized_alias": "国企改革",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -94590,7 +94610,7 @@
       "normalized_alias": "国企改革概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -94630,7 +94650,7 @@
       "normalized_alias": "国企改革概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -94900,7 +94920,7 @@
       "normalized_alias": "国改",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -95600,7 +95620,7 @@
       "normalized_alias": "国防军工",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -95660,7 +95680,7 @@
       "normalized_alias": "国防军工板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -95730,7 +95750,7 @@
       "normalized_alias": "国防军工行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -96260,7 +96280,7 @@
       "normalized_alias": "地产",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "index",
@@ -96800,7 +96820,7 @@
       "normalized_alias": "城商行",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -96840,7 +96860,7 @@
       "normalized_alias": "城商行iii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -96880,7 +96900,7 @@
       "normalized_alias": "城商行iii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -96920,7 +96940,7 @@
       "normalized_alias": "城商行iii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -97230,7 +97250,7 @@
       "normalized_alias": "基本金属概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -97850,7 +97870,7 @@
       "normalized_alias": "多元金融",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -97880,7 +97900,7 @@
       "normalized_alias": "多元金融板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -97910,7 +97930,7 @@
       "normalized_alias": "多元金融行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -98630,7 +98650,7 @@
       "normalized_alias": "大消费",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "index",
@@ -98660,7 +98680,7 @@
       "normalized_alias": "大消费概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -98680,7 +98700,7 @@
       "normalized_alias": "大消费概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -98720,7 +98740,7 @@
       "normalized_alias": "大盘",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -98740,7 +98760,7 @@
       "normalized_alias": "大盘股",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -98760,7 +98780,7 @@
       "normalized_alias": "大盘股概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -98780,7 +98800,7 @@
       "normalized_alias": "大盘股概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -101410,7 +101430,7 @@
       "normalized_alias": "字节跳动算力合作公司",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "composite",
@@ -101420,7 +101440,7 @@
       "normalized_alias": "字节跳动算力搭建合作公司",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -101570,7 +101590,7 @@
       "normalized_alias": "宁夏算力概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -103280,7 +103300,7 @@
       "normalized_alias": "家居日用品",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103340,7 +103360,7 @@
       "normalized_alias": "家居用品",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103390,7 +103410,7 @@
       "normalized_alias": "家居用品板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103440,7 +103460,7 @@
       "normalized_alias": "家居用品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103480,7 +103500,7 @@
       "normalized_alias": "家居陈设",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103580,7 +103600,7 @@
       "normalized_alias": "家用电器",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103630,7 +103650,7 @@
       "normalized_alias": "家用电器板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103700,7 +103720,7 @@
       "normalized_alias": "家用电器行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103740,7 +103760,7 @@
       "normalized_alias": "家用轻工",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103750,7 +103770,7 @@
       "normalized_alias": "家电类",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -103780,7 +103800,7 @@
       "normalized_alias": "家电行业板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -104590,7 +104610,7 @@
       "normalized_alias": "小米汽车",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -104600,7 +104620,7 @@
       "normalized_alias": "小米汽车核心技术",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -104620,7 +104640,7 @@
       "normalized_alias": "小米汽车概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -104640,7 +104660,7 @@
       "normalized_alias": "小米汽车概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -105900,7 +105920,7 @@
       "normalized_alias": "工业金属",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -105970,7 +105990,7 @@
       "normalized_alias": "工业金属板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -106010,7 +106030,7 @@
       "normalized_alias": "工业金属行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -106110,7 +106130,7 @@
       "normalized_alias": "工程咨询服务ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -106190,7 +106210,7 @@
       "normalized_alias": "工程咨询服务ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -106240,7 +106260,7 @@
       "normalized_alias": "工程咨询服务ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -106280,7 +106300,7 @@
       "normalized_alias": "工程咨询板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -106600,7 +106620,7 @@
       "normalized_alias": "希音合作商",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -106620,7 +106640,7 @@
       "normalized_alias": "希音合作商概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -106640,7 +106660,7 @@
       "normalized_alias": "希音合作商概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -106920,7 +106940,7 @@
       "normalized_alias": "并购重组概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -106980,7 +107000,7 @@
       "normalized_alias": "并购重组概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -108360,7 +108380,7 @@
       "normalized_alias": "建筑",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -108740,7 +108760,7 @@
       "normalized_alias": "建筑装饰",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -108850,7 +108870,7 @@
       "normalized_alias": "建筑装饰板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -108900,7 +108920,7 @@
       "normalized_alias": "建筑装饰行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -111870,7 +111890,7 @@
       "normalized_alias": "房地产",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112150,7 +112170,7 @@
       "normalized_alias": "房地产服务",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112210,7 +112230,7 @@
       "normalized_alias": "房地产服务板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112270,7 +112290,7 @@
       "normalized_alias": "房地产服务行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112330,7 +112350,7 @@
       "normalized_alias": "房地产板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112400,7 +112420,7 @@
       "normalized_alias": "房地产营销服务房地产代销",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112440,7 +112460,7 @@
       "normalized_alias": "房地产行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -112950,7 +112970,7 @@
       "normalized_alias": "抖音公司",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -112980,7 +113000,7 @@
       "normalized_alias": "抖音概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -113040,7 +113060,7 @@
       "normalized_alias": "抖音概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -120090,7 +120110,7 @@
       "normalized_alias": "智慧城市",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -120110,7 +120130,7 @@
       "normalized_alias": "智慧城市概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -120130,7 +120150,7 @@
       "normalized_alias": "智慧城市概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -120340,7 +120360,7 @@
       "normalized_alias": "智能城市",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -121190,7 +121210,7 @@
       "normalized_alias": "有色金属",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -121280,7 +121300,7 @@
       "normalized_alias": "有色金属板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -121360,7 +121380,7 @@
       "normalized_alias": "有色金属行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -123250,7 +123270,7 @@
       "normalized_alias": "标普概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -123270,7 +123290,7 @@
       "normalized_alias": "标普道琼斯中国",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -123290,7 +123310,7 @@
       "normalized_alias": "标普道琼斯中国概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -123310,7 +123330,7 @@
       "normalized_alias": "标普道琼斯中国概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -124980,7 +125000,7 @@
       "normalized_alias": "比亚迪概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -125010,7 +125030,7 @@
       "normalized_alias": "比亚迪概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -125030,7 +125050,7 @@
       "normalized_alias": "比亚迪类",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -125560,7 +125580,7 @@
       "normalized_alias": "氢能源电池",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -128570,7 +128590,7 @@
       "normalized_alias": "沪深300",
       "source": "csindex",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "csindex-2026-07-30-b68b771e8882"
+      "snapshot_id": "csindex-2026-07-30-20142f9b9f25"
     },
     {
       "scope_type": "index",
@@ -128600,7 +128620,7 @@
       "normalized_alias": "沪深300",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "index",
@@ -128670,7 +128690,7 @@
       "normalized_alias": "沪深300指数",
       "source": "csindex",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "csindex-2026-07-30-b68b771e8882"
+      "snapshot_id": "csindex-2026-07-30-20142f9b9f25"
     },
     {
       "scope_type": "index",
@@ -128700,7 +128720,7 @@
       "normalized_alias": "沪深300指数",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "index",
@@ -128721,6 +128741,16 @@
       "source": "akshare-public-index",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-public-index-2026-07-13-fd8c3729b96b"
+    },
+    {
+      "scope_type": "index",
+      "scope_code": "000972",
+      "scope_name": "300沪市",
+      "alias": "沪深300沪市指数",
+      "normalized_alias": "沪深300沪市指数",
+      "source": "csindex",
+      "as_of_date": "2026-07-30",
+      "snapshot_id": "csindex-2026-07-30-ba167bb7985c"
     },
     {
       "scope_type": "index",
@@ -128750,7 +128780,7 @@
       "normalized_alias": "沪深300港元净收益指数",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "index",
@@ -130820,7 +130850,7 @@
       "normalized_alias": "海产品捕捞",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -131670,7 +131700,7 @@
       "normalized_alias": "海洋捕捞",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -131700,7 +131730,7 @@
       "normalized_alias": "海洋捕捞板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -131730,7 +131760,7 @@
       "normalized_alias": "海洋捕捞行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -132230,7 +132260,7 @@
       "normalized_alias": "消费",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -135680,7 +135710,7 @@
       "normalized_alias": "燃料电池概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -135700,7 +135730,7 @@
       "normalized_alias": "燃料电池概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -139600,7 +139630,7 @@
       "normalized_alias": "电子化学品",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -139640,7 +139670,7 @@
       "normalized_alias": "电子化学品ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -139720,7 +139750,7 @@
       "normalized_alias": "电子化学品ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -139770,7 +139800,7 @@
       "normalized_alias": "电子化学品ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -139810,7 +139840,7 @@
       "normalized_alias": "电子化学品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -140380,7 +140410,7 @@
       "normalized_alias": "电机ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -140460,7 +140490,7 @@
       "normalized_alias": "电机ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -140510,7 +140540,7 @@
       "normalized_alias": "电机ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -140550,7 +140580,7 @@
       "normalized_alias": "电机公司",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -149290,7 +149320,7 @@
       "normalized_alias": "综合金融服务概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -151590,7 +151620,7 @@
       "normalized_alias": "脑机接口",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -151610,7 +151640,7 @@
       "normalized_alias": "脑科学(脑机接口)",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -151630,7 +151660,7 @@
       "normalized_alias": "脑科学(脑机接口)概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -151650,7 +151680,7 @@
       "normalized_alias": "脑科学(脑机接口)概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -153350,7 +153380,7 @@
       "normalized_alias": "芯片",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -153380,7 +153410,7 @@
       "normalized_alias": "芯片概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -153410,7 +153440,7 @@
       "normalized_alias": "芯片概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -156730,7 +156760,7 @@
       "normalized_alias": "证券ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -156810,7 +156840,7 @@
       "normalized_alias": "证券ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -156860,7 +156890,7 @@
       "normalized_alias": "证券ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -156930,7 +156960,7 @@
       "normalized_alias": "证券商",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -157260,7 +157290,7 @@
       "normalized_alias": "调味发酵品ii",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -157340,7 +157370,7 @@
       "normalized_alias": "调味发酵品ii板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -157390,7 +157420,7 @@
       "normalized_alias": "调味发酵品ii行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -157430,7 +157460,7 @@
       "normalized_alias": "调味发酵品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -157470,7 +157500,7 @@
       "normalized_alias": "谷子板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157500,7 +157530,7 @@
       "normalized_alias": "谷子概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157520,7 +157550,7 @@
       "normalized_alias": "谷子经济",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157560,7 +157590,7 @@
       "normalized_alias": "谷子经济概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157600,7 +157630,7 @@
       "normalized_alias": "谷子经济概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157660,7 +157690,7 @@
       "normalized_alias": "豆包",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157680,7 +157710,7 @@
       "normalized_alias": "豆包应用",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157700,7 +157730,7 @@
       "normalized_alias": "豆包概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157730,7 +157760,7 @@
       "normalized_alias": "豆包概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -157750,7 +157780,7 @@
       "normalized_alias": "豆包概率",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "security",
@@ -160150,7 +160180,7 @@
       "normalized_alias": "轻工制造",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -160180,7 +160210,7 @@
       "normalized_alias": "轻工制造板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -160210,7 +160240,7 @@
       "normalized_alias": "轻工制造行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -160450,7 +160480,7 @@
       "normalized_alias": "辽宁指数",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "region",
@@ -160470,7 +160500,7 @@
       "normalized_alias": "辽宁板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "region",
@@ -163050,7 +163080,7 @@
       "normalized_alias": "重组概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -163500,7 +163530,7 @@
       "normalized_alias": "金属制品",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -163680,7 +163710,7 @@
       "normalized_alias": "金属制品板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -163710,7 +163740,7 @@
       "normalized_alias": "金属制品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -163890,7 +163920,7 @@
       "normalized_alias": "金属板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -163900,7 +163930,7 @@
       "normalized_alias": "金属管件制品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -164380,7 +164410,7 @@
       "normalized_alias": "金融",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -164480,7 +164510,7 @@
       "normalized_alias": "金融公司",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -166580,7 +166610,7 @@
       "normalized_alias": "银行保险",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -171480,7 +171510,7 @@
       "normalized_alias": "饮料",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -171500,7 +171530,7 @@
       "normalized_alias": "饮料乳品",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -171530,7 +171560,7 @@
       "normalized_alias": "饮料乳品板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -171560,7 +171590,7 @@
       "normalized_alias": "饮料乳品行业",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "industry",
@@ -172370,7 +172400,7 @@
       "normalized_alias": "高带宽存储器hbm",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -172400,7 +172430,7 @@
       "normalized_alias": "高带宽存储器hbm概念",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",
@@ -172430,7 +172460,7 @@
       "normalized_alias": "高带宽存储器hbm概念板块",
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
-      "snapshot_id": "curated-scope-alias-2026-07-30-4e39b11a132c"
+      "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
     {
       "scope_type": "concept",

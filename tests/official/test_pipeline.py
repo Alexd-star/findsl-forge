@@ -320,6 +320,37 @@ def test_pipeline_combines_crossing_events_without_scalar_fallback():
 
 
 @pytest.mark.parametrize(
+    "scope,fragments",
+    [
+        ("科创板注册制", ("688000", "688999")),
+        ("沪深主板注册制", ("600000", "000000", "605999", "003999")),
+    ],
+)
+def test_pipeline_lowers_registration_scope_as_controlled_board_ranges(scope, fragments):
+    result = compile_official(
+        f"indicator('', '{scope}', '', '', '', '', '') = 'all'"
+    ).to_dict()
+
+    sql = result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
+    for fragment in fragments:
+        assert fragment in sql
+    assert "registration" not in sql.casefold()
+
+
+def test_pipeline_lowers_t0_scope_from_the_instrument_rule_resource():
+    result = compile_official(
+        "indicator('', '当天买当天卖', '是否T+0', '', '', '', '') = True"
+    ).to_dict()
+
+    assert result["backend"]["validation_passed"] is True
+    sql = result["backend"]["sql"]
+    assert "findsl_ext" in sql
+    assert "t0_eligible" in sql
+    assert sql.count("`findsl_ext`.`instrument_rule`") == 1
+
+
+@pytest.mark.parametrize(
     "source,window_fragment,comparison_fragment",
     [
         (

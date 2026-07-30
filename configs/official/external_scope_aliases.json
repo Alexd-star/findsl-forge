@@ -49,7 +49,7 @@
     {"alias": "SHEIN", "scope_code": "BAIDU:GN2279", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "SHEIN在A股范围槽中指向中文品牌希音的公开合作商概念，来源成员仍固定到版本化快照"},
     {"alias": "大盘", "scope_code": "BAIDU:GN2388", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "大盘在A股范围槽中按公开大盘股分类解释，不扩展为任意宽基指数"},
     {"alias": "公共服务", "scope_code": "BAIDU:410000", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "公共服务在A股行业范围中按公用事业行业解释，并保留显式语义政策"},
-    {"alias": "沪深300港元净收益指数", "scope_code": "000300", "source_snapshot_id": "csindex-2026-07-30-b68b771e8882", "minimum_member_count": 300, "reason": "该净收益币种变体与沪深300价格指数共享样本证券；本映射只提供成员范围，不伪造指数行情"},
+    {"alias": "沪深300港元净收益指数", "scope_code": "000300", "source_snapshot_id": "csindex-2026-07-30-20142f9b9f25", "minimum_member_count": 300, "reason": "该净收益币种变体与沪深300价格指数共享样本证券；本映射只提供成员范围，不伪造指数行情"},
     {"alias": "综合金融服务概念", "scope_code": "BAIDU:490300", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "综合金融服务在A股行业范围中按公开多元金融分类解释"},
     {"alias": "家用轻工", "scope_code": "BAIDU:360000", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "家用轻工按公开轻工制造行业分类解释"},
     {"alias": "互联网行业", "scope_code": "BK0447", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "互联网行业按公开互联网服务范围解释"},

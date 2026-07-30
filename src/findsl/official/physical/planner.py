@@ -3442,6 +3442,7 @@ def _deduplicate_and(predicate):
     unique = []
     seen = set()
     for expression in conjuncts:
+        expression = _normalize_external_exists_boolean(expression)
         if expression.node_id in seen:
             continue
         seen.add(expression.node_id)
@@ -3450,6 +3451,25 @@ def _deduplicate_and(predicate):
     for expression in unique[1:]:
         result = PhysicalBinary("and", result, expression, BOOLEAN)
     return result
+
+
+def _normalize_external_exists_boolean(expression):
+    if not isinstance(expression, PhysicalComparison) or expression.op not in {"=", "!="}:
+        return expression
+    for candidate, literal in (
+        (expression.left, expression.right),
+        (expression.right, expression.left),
+    ):
+        if not (
+            isinstance(candidate, PhysicalExternalExists)
+            and isinstance(literal, PhysicalLiteral)
+            and isinstance(literal.value, bool)
+        ):
+            continue
+        expected = literal.value if expression.op == "=" else not literal.value
+        if expected:
+            return candidate
+    return expression
 
 
 def _lower_temporal_window(window) -> PhysicalTemporalWindow:
@@ -4042,6 +4062,15 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
 def _resolve_scope_atoms(expression, catalog: SecurityScopeCatalog, external_catalog):
     resolved = []
     for atom in expression.atoms:
+        # These names are controlled compiler rules, not membership datasets.
+        # Resolve them before catalog lookup so field collection does not reject
+        # a scope that will be lowered to board ranges or instrument_rule.
+        if atom in _DERIVED_SCOPE_MARKETS:
+            resolved.append(("derived_market", atom))
+            continue
+        if atom == "当天买当天卖":
+            resolved.append(("instrument_rule", atom))
+            continue
         try:
             resolved.append(("security", catalog.resolve(atom)))
             continue
@@ -4077,6 +4106,21 @@ def _lower_scope_expression(
     anchor_resource_id: str,
 ):
     if isinstance(expression, ScopeAtom):
+        derived_market = _DERIVED_SCOPE_MARKETS.get(expression.name)
+        if derived_market is not None:
+            return _lower_market_expression(
+                parse_market_expression(derived_market), anchor_resource_id
+            )
+        if expression.name == "当天买当天卖":
+            policy = default_external_data_policy().instrument_rule
+            return PhysicalExternalExists(
+                policy.resource_id,
+                anchor_resource_id,
+                (
+                    ("snapshot_id", PhysicalLiteral(policy.snapshot_id, STRING)),
+                    ("t0_eligible", PhysicalLiteral(True, BOOLEAN)),
+                ),
+            )
         try:
             resolved = catalog.resolve(expression.name)
         except KeyError:
@@ -4165,6 +4209,11 @@ _BOARD_PREFIXES = {
     "创业板": (0, ("300", "301")),
     "沪主板": (1, ("600", "601", "603", "605")),
     "深主板": (0, ("000", "001", "002", "003")),
+}
+
+_DERIVED_SCOPE_MARKETS = {
+    "科创板注册制": "科创板",
+    "沪深主板注册制": "沪主板|深主板",
 }
 
 

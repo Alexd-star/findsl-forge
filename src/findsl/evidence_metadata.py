@@ -114,13 +114,19 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase46_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase46_derived_scope_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase45_funnel_payload
+        phase46_funnel_payload
+        or phase45_funnel_payload
         or phase44_funnel_payload
         or phase43_funnel_payload
         or phase41_funnel_payload
@@ -213,6 +219,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    derived_scope_payload = _read_optional_json(
+        snapshot_dir / "phase46_derived_scope_doris.json",
+        warnings,
+        warn_missing=False,
+    )
     prefix_join_payload = _read_optional_json(
         snapshot_dir / "phase6c_set_prefix_doris.json",
         warnings,
@@ -263,6 +274,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase46_new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase46_derived_scope_delta_doris_audit.json",
+        warnings,
+        warn_missing=False,
+    )
     phase26_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase26_new_success_audit.json",
         warnings,
@@ -294,7 +310,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     new_success_audit_payload = (
-        phase45_new_success_audit_payload
+        phase46_new_success_audit_payload
+        or phase45_new_success_audit_payload
         or phase44_new_success_audit_payload
         or phase43_new_success_audit_payload
         or phase41_new_success_audit_payload
@@ -345,6 +362,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             grounded_event_payload,
             final_grounded_payload,
             prefix_join_payload,
+            derived_scope_payload,
             new_success_audit_payload,
         ),
         "doris_cluster": _doris_metadata(doris_payload),
@@ -691,6 +709,7 @@ def _official_migration_metadata(
     grounded_event: dict[str, Any] | None,
     final_grounded: dict[str, Any] | None,
     prefix_join: dict[str, Any] | None,
+    derived_scope: dict[str, Any] | None,
     new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
     gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
@@ -994,6 +1013,14 @@ def _official_migration_metadata(
             "min_speedup": _number_or_none(prefix_join.get("min_speedup")) if isinstance(prefix_join, dict) else None,
             "max_speedup": _number_or_none(prefix_join.get("max_speedup")) if isinstance(prefix_join, dict) else None,
         },
+        "derived_scope_evidence": {
+            "available": derived_scope is not None,
+            "status": derived_scope.get("status") if isinstance(derived_scope, dict) else None,
+            "matched": _int_or_none(derived_scope.get("matched")) if isinstance(derived_scope, dict) else None,
+            "total": _int_or_none(derived_scope.get("total")) if isinstance(derived_scope, dict) else None,
+            "scope_member_count": _int_or_none(derived_scope.get("scope_member_count")) if isinstance(derived_scope, dict) else None,
+            "scope_source_contract": _bool_or_none(derived_scope.get("scope_source_contract")) if isinstance(derived_scope, dict) else None,
+        },
         "new_success_audit": {
             "available": new_success_audit is not None,
             "status": new_success_audit.get("status") if isinstance(new_success_audit, dict) else None,
@@ -1085,6 +1112,18 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         ),
         "phase45_true_remaining_scope_targets_json": str(
             snapshot_dir / "phase45_true_remaining_scope_targets.json"
+        ),
+        "phase46_derived_scope_funnel_json": str(
+            snapshot_dir / "phase46_derived_scope_funnel.json"
+        ),
+        "phase46_derived_scope_delta_doris_audit_json": str(
+            snapshot_dir / "phase46_derived_scope_delta_doris_audit.json"
+        ),
+        "phase46_derived_scope_doris_json": str(
+            snapshot_dir / "phase46_derived_scope_doris.json"
+        ),
+        "phase46_true_remaining_scope_targets_json": str(
+            snapshot_dir / "phase46_true_remaining_scope_targets.json"
         ),
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
