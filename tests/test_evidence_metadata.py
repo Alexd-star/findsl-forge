@@ -1321,6 +1321,70 @@ def test_build_evidence_metadata_prefers_phase46_derived_scope_evidence(
     )
 
 
+def test_build_evidence_metadata_prefers_phase47_benchmark_policy_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase46_derived_scope_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase46-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 1019,
+                "migration_coverage": 0.928897,
+                "new_backend_success": 1050,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase47_benchmark_policy_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase47-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 1022,
+                "migration_coverage": 0.931632,
+                "new_backend_success": 1053,
+                "migration_gaps": [
+                    {"code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE", "count": 75}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase47_benchmark_policy_delta_doris_audit.json").write_text(
+        json.dumps(
+            {"status": "PASS", "new_successes": 3, "passed": 3, "failed": 0}
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase47_benchmark_policy_doris.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "matched": 3,
+                "total": 3,
+                "benchmark_policy_id": "a-share-broad-market-v1",
+                "benchmark_index_code": "000300",
+                "latest_data_date": "2026-04-14",
+                "source_contract": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    migration = metadata["official_migration"]
+    assert migration["git_head"] == "phase47-head"
+    assert migration["legacy_to_new_migrated"] == 1022
+    assert migration["new_backend_success"] == 1053
+    assert migration["new_success_audit"]["passed"] == 3
+    assert migration["benchmark_policy_evidence"]["index_code"] == "000300"
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)

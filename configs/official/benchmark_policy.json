@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "resource_id": "external_index_quote",
+  "entries": [
+    {
+      "alias": "大盘",
+      "normalized_alias": "大盘",
+      "market": "",
+      "index_code": "000300",
+      "index_name": "沪深300",
+      "policy_id": "a-share-broad-market-v1",
+      "source": "project-business-policy",
+      "effective_from": "2005-04-08",
+      "rationale_url": "https://www.szse.cn/aboutus/trends/news/t20110119_517265.html"
+    }
+  ]
+}

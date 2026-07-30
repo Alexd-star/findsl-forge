@@ -69,6 +69,74 @@ class ExternalIndexQuoteOption:
     as_of_date: str
 
 
+@dataclass(frozen=True)
+class BenchmarkPolicyOption:
+    alias: str
+    market: str
+    index_code: str
+    index_name: str
+    policy_id: str
+    source: str
+    effective_from: str
+    rationale_url: str
+
+
+class BenchmarkPolicyCatalog:
+    def __init__(self, entries, *, resource_id: str):
+        by_alias: Dict[str, list[BenchmarkPolicyOption]] = {}
+        required = {
+            "alias",
+            "normalized_alias",
+            "market",
+            "index_code",
+            "index_name",
+            "policy_id",
+            "source",
+            "effective_from",
+            "rationale_url",
+        }
+        for entry in entries:
+            if set(entry) != required:
+                raise ExternalScopeRuntimeError("invalid benchmark policy entry")
+            option = BenchmarkPolicyOption(
+                alias=str(entry["alias"]),
+                market=str(entry["market"]),
+                index_code=str(entry["index_code"]),
+                index_name=str(entry["index_name"]),
+                policy_id=str(entry["policy_id"]),
+                source=str(entry["source"]),
+                effective_from=str(entry["effective_from"]),
+                rationale_url=str(entry["rationale_url"]),
+            )
+            by_alias.setdefault(str(entry["normalized_alias"]), []).append(option)
+        self.resource_id = resource_id
+        self._by_alias = MappingProxyType(
+            {key: tuple(value) for key, value in by_alias.items()}
+        )
+
+    def resolve(self, alias: str, market: str = "") -> BenchmarkPolicyOption:
+        source = str(alias).strip()
+        options = self._by_alias.get(normalize_catalog_name(source), ())
+        exact = tuple(item for item in options if item.market == str(market).strip())
+        fallback = tuple(item for item in options if not item.market)
+        selected = exact or fallback
+        if len(selected) != 1:
+            raise KeyError(source)
+        return selected[0]
+
+    @classmethod
+    def from_dict(cls, raw) -> "BenchmarkPolicyCatalog":
+        if set(raw) != {"schema_version", "resource_id", "entries"}:
+            raise ExternalScopeRuntimeError("invalid benchmark policy root")
+        if raw["schema_version"] != 1:
+            raise ExternalScopeRuntimeError("unsupported benchmark policy version")
+        return cls(raw["entries"], resource_id=str(raw["resource_id"]))
+
+    @classmethod
+    def load(cls, path: Path) -> "BenchmarkPolicyCatalog":
+        return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
+
+
 class ExternalIndexQuoteCatalog:
     def __init__(self, entries, *, resource_id: str):
         self.resource_id = resource_id
@@ -235,4 +303,12 @@ def default_external_index_quote_catalog() -> ExternalIndexQuoteCatalog:
     root = Path(__file__).resolve().parents[4]
     return ExternalIndexQuoteCatalog.load(
         root / "configs" / "official" / "external_index_quotes.json"
+    )
+
+
+@lru_cache(maxsize=1)
+def default_benchmark_policy_catalog() -> BenchmarkPolicyCatalog:
+    root = Path(__file__).resolve().parents[4]
+    return BenchmarkPolicyCatalog.load(
+        root / "configs" / "official" / "benchmark_policy.json"
     )

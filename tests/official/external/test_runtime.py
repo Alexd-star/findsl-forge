@@ -1,6 +1,7 @@
 import pytest
 
 from findsl.official.external.runtime import (
+    BenchmarkPolicyCatalog,
     ExternalDataPolicy,
     ExternalScopeRuntimeCatalog,
     ExternalScopeRuntimeError,
@@ -60,3 +61,41 @@ def test_external_data_policy_requires_versioned_industry_and_rule_sources():
 
     with pytest.raises(ExternalScopeRuntimeError):
         ExternalDataPolicy.from_dict({"schema_version": 1})
+
+
+def test_benchmark_policy_requires_one_explicit_context_match():
+    catalog = BenchmarkPolicyCatalog.from_dict(
+        {
+            "schema_version": 1,
+            "resource_id": "external_index_quote",
+            "entries": [
+                {
+                    "alias": "大盘",
+                    "normalized_alias": "大盘",
+                    "market": "",
+                    "index_code": "000300",
+                    "index_name": "沪深300",
+                    "policy_id": "a-share-v1",
+                    "source": "business-policy",
+                    "effective_from": "2005-04-08",
+                    "rationale_url": "https://example.test/benchmark",
+                },
+                {
+                    "alias": "大盘",
+                    "normalized_alias": "大盘",
+                    "market": "沪",
+                    "index_code": "000001",
+                    "index_name": "上证指数",
+                    "policy_id": "sse-v1",
+                    "source": "business-policy",
+                    "effective_from": "1991-07-15",
+                    "rationale_url": "https://example.test/benchmark",
+                },
+            ],
+        }
+    )
+
+    assert catalog.resolve("大盘").index_code == "000300"
+    assert catalog.resolve("大盘", "沪").index_code == "000001"
+    with pytest.raises(KeyError):
+        catalog.resolve("未知基准")

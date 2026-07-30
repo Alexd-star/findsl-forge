@@ -617,6 +617,12 @@ def _validate_expr(expression, catalog, expressions=None):
             raise ValueError("recent sessions require a positive amount")
         if expression.offset < 0:
             raise ValueError("recent sessions offset cannot be negative")
+        if expression.anchor_resource_id is not None:
+            anchor = catalog.resource(expression.anchor_resource_id)
+            if expression.column != anchor.partition_key:
+                raise PhysicalCatalogError(
+                    "recent-session anchor must expose the same partition key"
+                )
     elif isinstance(expression, PhysicalDynamicDateRange):
         resource = catalog.resource(expression.resource_id)
         if expression.column != resource.partition_key:
@@ -668,6 +674,12 @@ def _validate_expr(expression, catalog, expressions=None):
                 raise ValueError("anchor session boundary requires a valid day")
             if expression.month is not None and not 1 <= expression.month <= 12:
                 raise ValueError("anchor session boundary month is invalid")
+        if expression.anchor_resource_id is not None:
+            anchor = catalog.resource(expression.anchor_resource_id)
+            if expression.column != anchor.partition_key:
+                raise PhysicalCatalogError(
+                    "session-boundary anchor must expose the same partition key"
+                )
     elif isinstance(expression, PhysicalPrefixAverage):
         resource = catalog.resource(expression.resource_id)
         if "prefix" not in resource.capabilities:

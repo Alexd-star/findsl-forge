@@ -1,6 +1,9 @@
 import pytest
 
-from findsl.official.external.runtime import default_external_index_quote_catalog
+from findsl.official.external.runtime import (
+    default_benchmark_policy_catalog,
+    default_external_index_quote_catalog,
+)
 from findsl.official.pipeline import OfficialPipelineError, compile_official
 
 
@@ -61,6 +64,36 @@ def test_querydata_index_scalar_uses_versioned_quote_and_official_time_anchor(
     assert f"`external_index_quote`.`index_code` = '{index_code}'" in sql
     assert default_external_index_quote_catalog().resolve(index_code).snapshot_id in sql
     assert "FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor" in sql
+
+
+@pytest.mark.parametrize("indicator,date", [("涨幅", "今天"), ("涨跌幅", "近一月")])
+def test_querydata_broad_market_uses_versioned_business_policy(indicator, date):
+    policy = default_benchmark_policy_catalog().resolve("大盘")
+    sql = compile_official(
+        f"indicator('', '', '{indicator}', '{date}', '', '', '') > "
+        f"queryData('', '大盘', '{indicator}', '{date}', '')"
+    ).backend["sql"]
+
+    assert policy.policy_id == "a-share-broad-market-v1"
+    assert "`findsl_ext`.`index_quote`" in sql
+    assert f"`external_index_quote`.`index_code` = '{policy.index_code}'" in sql
+    assert (
+        default_external_index_quote_catalog().resolve(policy.index_code).snapshot_id
+        in sql
+    )
+    assert "FROM `newzl`.`hsj_stock_hq_basic` AS q_latest" in sql
+
+
+def test_undated_external_index_scalar_uses_official_quote_calendar_anchor():
+    sql = compile_official(
+        "indicator('', '', '涨跌幅', '', '', '', '') > "
+        "queryData('', '沪深300', '涨跌幅', '', '')"
+    ).backend["sql"]
+
+    assert (
+        "`external_index_quote`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) "
+        "FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)"
+    ) in sql
 
 
 def test_multiple_singleton_dates_become_independent_security_relations():

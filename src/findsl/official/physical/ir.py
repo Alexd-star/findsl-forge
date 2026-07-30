@@ -207,6 +207,7 @@ class PhysicalRecentSessions(PhysicalExpr):
     amount: int
     offset: int = 0
     type: OfficialType = BOOLEAN
+    anchor_resource_id: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -215,6 +216,7 @@ class PhysicalRecentSessions(PhysicalExpr):
             "column": self.column,
             "amount": self.amount,
             "offset": self.offset,
+            "anchor_resource_id": self.anchor_resource_id,
             "type": self.type.to_dict(),
         }
 
@@ -263,6 +265,7 @@ class PhysicalSessionBoundaryRange(PhysicalExpr):
     month: Optional[int] = None
     day: Optional[int] = None
     type: OfficialType = BOOLEAN
+    anchor_resource_id: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -277,6 +280,7 @@ class PhysicalSessionBoundaryRange(PhysicalExpr):
             "boundary_date": self.boundary_date,
             "month": self.month,
             "day": self.day,
+            "anchor_resource_id": self.anchor_resource_id,
             "type": self.type.to_dict(),
         }
 

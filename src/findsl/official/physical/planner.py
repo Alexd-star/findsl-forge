@@ -30,6 +30,7 @@ from ..domain.market import (
 )
 from ..domain.scope import ScopeAnd, ScopeAtom, ScopeNot, ScopeOr
 from ..external.runtime import (
+    default_benchmark_policy_catalog,
     default_external_data_policy,
     default_external_index_quote_catalog,
     default_external_scope_catalog,
@@ -155,6 +156,12 @@ class _ResolvedIndicator:
             return ()
         assert self.expression is not None
         return self.expression.required_columns
+
+
+@dataclass(frozen=True)
+class _IndexQuoteBinding:
+    index_code: str
+    snapshot_id: str
 
 
 _TYPE_MAP = {
@@ -1251,6 +1258,47 @@ def _requires_period_scalar(call: CallExpr) -> bool:
     return typed_date.kind not in {"relative", "exact", "relative_session"}
 
 
+def _anchor_external_date_constraint(expression, anchor_resource_id: str):
+    if isinstance(expression, PhysicalLatestValue):
+        return replace(expression, resource_id=anchor_resource_id)
+    if isinstance(expression, PhysicalNthLatestValue):
+        return replace(expression, resource_id=anchor_resource_id)
+    if isinstance(expression, PhysicalRecentSessions):
+        return replace(expression, anchor_resource_id=anchor_resource_id)
+    if isinstance(expression, PhysicalDynamicDateRange):
+        return replace(expression, anchor_resource_id=anchor_resource_id)
+    if isinstance(expression, PhysicalSessionBoundaryRange):
+        return replace(expression, anchor_resource_id=anchor_resource_id)
+    if isinstance(expression, PhysicalComparison):
+        return replace(
+            expression,
+            left=_anchor_external_date_constraint(
+                expression.left, anchor_resource_id
+            ),
+            right=_anchor_external_date_constraint(
+                expression.right, anchor_resource_id
+            ),
+        )
+    if isinstance(expression, PhysicalBinary):
+        return replace(
+            expression,
+            left=_anchor_external_date_constraint(
+                expression.left, anchor_resource_id
+            ),
+            right=_anchor_external_date_constraint(
+                expression.right, anchor_resource_id
+            ),
+        )
+    if isinstance(expression, PhysicalNot):
+        return replace(
+            expression,
+            operand=_anchor_external_date_constraint(
+                expression.operand, anchor_resource_id
+            ),
+        )
+    return expression
+
+
 def _external_index_quote_field(indicator_id: str) -> _ResolvedIndicator:
     columns = {
         "涨幅": "pct_change",
@@ -1304,42 +1352,72 @@ def _build_named_scalar_relations(
                     "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
                     "queryData scalar requires one exact security identity",
                 )
+            resolved_scope = None
+            market = str(call.binding.slots.get("market", "")).strip()
             try:
-                resolved_scope = default_security_scope_catalog().resolve(
-                    call.scope_expression.name
+                benchmark = default_benchmark_policy_catalog().resolve(
+                    call.scope_expression.name, market
                 )
-            except KeyError as exc:
+            except KeyError:
+                benchmark = None
+            if benchmark is not None:
                 try:
-                    external = default_external_scope_catalog().resolve(
-                        call.scope_expression.name
+                    quote = default_external_index_quote_catalog().resolve(
+                        benchmark.index_code
                     )
-                except KeyError:
-                    detail = "scope is absent from security and external catalogs"
-                else:
-                    if external.option.scope_type == "index":
-                        try:
-                            quote = default_external_index_quote_catalog().resolve(
-                                external.option.scope_code
-                            )
-                        except KeyError:
-                            detail = (
-                                f"index {external.option.scope_code} has membership "
-                                "but no versioned quote snapshot"
-                            )
-                        else:
-                            index_quote = (external, quote)
-                            detail = ""
-                    else:
-                        detail = (
-                            f"{external.option.scope_type} membership does not provide "
-                            "a scalar quote for the scope itself"
-                        )
-                if index_quote is None:
+                except KeyError as exc:
                     raise PhysicalPlanningError(
                         "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE",
-                        f"queryData scalar is unavailable for {call.scope_expression.name}: {detail}",
+                        f"benchmark policy {benchmark.policy_id} selects index "
+                        f"{benchmark.index_code} without a versioned quote snapshot",
                     ) from exc
-            if index_quote is None and len(resolved_scope.identities) != 1:
+                index_quote = _IndexQuoteBinding(
+                    benchmark.index_code, quote.snapshot_id
+                )
+            else:
+                try:
+                    resolved_scope = default_security_scope_catalog().resolve(
+                        call.scope_expression.name
+                    )
+                except KeyError as exc:
+                    try:
+                        external = default_external_scope_catalog().resolve(
+                            call.scope_expression.name
+                        )
+                    except KeyError:
+                        detail = "scope is absent from security and external catalogs"
+                    else:
+                        if external.option.scope_type == "index":
+                            try:
+                                quote = default_external_index_quote_catalog().resolve(
+                                    external.option.scope_code
+                                )
+                            except KeyError:
+                                detail = (
+                                    f"index {external.option.scope_code} has membership "
+                                    "but no versioned quote snapshot"
+                                )
+                            else:
+                                index_quote = _IndexQuoteBinding(
+                                    external.option.scope_code, quote.snapshot_id
+                                )
+                                detail = ""
+                        else:
+                            detail = (
+                                f"{external.option.scope_type} membership does not provide "
+                                "a scalar quote for the scope itself"
+                            )
+                    if index_quote is None:
+                        raise PhysicalPlanningError(
+                            "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE",
+                            f"queryData scalar is unavailable for "
+                            f"{call.scope_expression.name}: {detail}",
+                        ) from exc
+            if (
+                index_quote is None
+                and resolved_scope is not None
+                and len(resolved_scope.identities) != 1
+            ):
                 raise PhysicalPlanningError(
                     "PHYSICAL_QUERYDATA_SCALAR_AMBIGUOUS",
                     "queryData scalar scope resolves to multiple securities",
@@ -1387,16 +1465,13 @@ def _build_named_scalar_relations(
         date = str(call.binding.slots.get("date", "")).strip()
         collapse_latest = _requires_period_scalar(call)
         if index_quote is not None:
-            external, quote = index_quote
             constraints = list(
                 _call_constraints(
                     replace(call, scope_expression=None), catalog, scalar_root_id
                 )
             )
             constraints = [
-                replace(constraint, anchor_resource_id="official_basic")
-                if isinstance(constraint, PhysicalDynamicDateRange)
-                else constraint
+                _anchor_external_date_constraint(constraint, "official_basic")
                 for constraint in constraints
             ]
             constraints.extend(
@@ -1404,12 +1479,12 @@ def _build_named_scalar_relations(
                     PhysicalComparison(
                         "=",
                         PhysicalColumn(scalar_root_id, "index_code", STRING),
-                        PhysicalLiteral(external.option.scope_code, STRING),
+                        PhysicalLiteral(index_quote.index_code, STRING),
                     ),
                     PhysicalComparison(
                         "=",
                         PhysicalColumn(scalar_root_id, "snapshot_id", STRING),
-                        PhysicalLiteral(quote.snapshot_id, STRING),
+                        PhysicalLiteral(index_quote.snapshot_id, STRING),
                     ),
                 )
             )
@@ -1421,11 +1496,18 @@ def _build_named_scalar_relations(
                 or scalar_root_id
             )
             partition_key = catalog.resource(stable_id).partition_key
+            latest_resource_id = (
+                "official_basic" if index_quote is not None else stable_id
+            )
             constraints.append(
                 PhysicalComparison(
                     "=",
                     PhysicalColumn(stable_id, partition_key, TIME),
-                    PhysicalLatestValue(stable_id, partition_key, TIME),
+                    PhysicalLatestValue(
+                        latest_resource_id,
+                        catalog.resource(latest_resource_id).partition_key,
+                        TIME,
+                    ),
                 )
             )
         for constraint in constraints:

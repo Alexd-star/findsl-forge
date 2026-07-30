@@ -2872,7 +2872,10 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
         )
         return exp.Subquery(this=query)
     if isinstance(expression, PhysicalRecentSessions):
-        resource = catalog.resource(expression.resource_id)
+        calendar_resource_id = (
+            expression.anchor_resource_id or expression.resource_id
+        )
+        resource = catalog.resource(calendar_resource_id)
         alias = "calendar_sessions"
         column = exp.column(expression.column, table=alias, quoted=True)
         table = exp.table_(resource.table, db=resource.database, quoted=True, alias=alias)
@@ -2927,13 +2930,16 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
                 "DORIS_DATE_CONTEXT_MISSING",
                 "session boundary range requires a scan context",
             )
-        resource = catalog.resource(expression.resource_id)
+        calendar_resource_id = (
+            expression.anchor_resource_id or expression.resource_id
+        )
+        resource = catalog.resource(calendar_resource_id)
         alias = "boundary_sessions"
         calendar_column = exp.column(expression.column, table=alias, quoted=True)
         if expression.boundary_kind == "period":
             boundary = _date_shift(
                 _date_trunc(
-                    _latest_resource_anchor(catalog, expression.resource_id),
+                    _latest_resource_anchor(catalog, calendar_resource_id),
                     expression.unit,
                 ),
                 expression.offset,
@@ -2943,7 +2949,7 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
         elif expression.boundary_kind == "anchor":
             boundary, _, validity = _dynamic_date_bounds(
                 catalog,
-                expression.resource_id,
+                calendar_resource_id,
                 "anchor_calendar",
                 "day",
                 1,
