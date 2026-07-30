@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-30 21:21:01 +08:00
-- Git HEAD at export: 0a9307b
+- Generated at: 2026-07-30 22:26:36 +08:00
+- Git HEAD at export: f1c0081
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -182,6 +182,16 @@
 - `phase45_scope_governance_funnel.json` (3259050 bytes)
 - `phase45_scope_governance_funnel.md` (1145 bytes)
 - `phase45_true_remaining_scope_targets.json` (5309 bytes)
+- `phase46_csindex_000300_restore.json` (9292 bytes)
+- `phase46_csindex_000972_sync.json` (8938 bytes)
+- `phase46_curated_scope_alias.json` (25330 bytes)
+- `phase46_derived_scope_delta_doris_audit.json` (3436 bytes)
+- `phase46_derived_scope_delta_doris_audit.md` (543 bytes)
+- `phase46_derived_scope_doris.json` (23086 bytes)
+- `phase46_derived_scope_doris.md` (1121 bytes)
+- `phase46_derived_scope_funnel.json` (3259060 bytes)
+- `phase46_derived_scope_funnel.md` (1145 bytes)
+- `phase46_true_remaining_scope_targets.json` (5078 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase6c_capability_funnel.json` (3257492 bytes)
@@ -197,7 +207,7 @@
 - `real_market_sample_report.md` (957 bytes)
 - `sina_sector_sync.json` (5386 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13284 bytes)
+- `submission_readiness.md` (13289 bytes)
 
 ## Excluded By Design
 

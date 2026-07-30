@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T13:21:03Z",
+  "generated_at": "2026-07-30T14:26:38Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "0a9307b",
-    "head_at_export": "0a9307b",
+    "head_at_report_generation": "f1c0081",
+    "head_at_export": "f1c0081",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-30T13:19:13+00:00",
+    "generated_at": "2026-07-30T14:24:59+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.502,
+    "compile_p95_latency_ms": 1.328,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 1016,
-      "elapsed_seconds": 153.7
+      "passed": 1022,
+      "elapsed_seconds": 169.1
     }
   },
   "official_suite": {
@@ -95,11 +95,11 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "0a9307b44bfdbb6bd77d338b4178a7fb51338d17",
+    "git_head": "f1c0081450ab6790f82c4618784ba93287feb147",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 1016,
-    "migration_coverage": 0.926162,
-    "new_backend_success": 1047,
+    "legacy_to_new_migrated": 1019,
+    "migration_coverage": 0.928897,
+    "new_backend_success": 1050,
     "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
@@ -246,11 +246,19 @@
       "min_speedup": 1.205708,
       "max_speedup": 2.355816
     },
+    "derived_scope_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 3,
+      "total": 3,
+      "scope_member_count": 189,
+      "scope_source_contract": true
+    },
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 18,
-      "total": 18,
+      "passed": 3,
+      "total": 3,
       "failed": 0
     }
   },
@@ -327,6 +335,10 @@
     "phase45_scope_governance_funnel_json": "submission_artifacts\\evidence_snapshots\\phase45_scope_governance_funnel.json",
     "phase45_scope_governance_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase45_scope_governance_delta_doris_audit.json",
     "phase45_true_remaining_scope_targets_json": "submission_artifacts\\evidence_snapshots\\phase45_true_remaining_scope_targets.json",
+    "phase46_derived_scope_funnel_json": "submission_artifacts\\evidence_snapshots\\phase46_derived_scope_funnel.json",
+    "phase46_derived_scope_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase46_derived_scope_delta_doris_audit.json",
+    "phase46_derived_scope_doris_json": "submission_artifacts\\evidence_snapshots\\phase46_derived_scope_doris.json",
+    "phase46_true_remaining_scope_targets_json": "submission_artifacts\\evidence_snapshots\\phase46_true_remaining_scope_targets.json",
     "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
