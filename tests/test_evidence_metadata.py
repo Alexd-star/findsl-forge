@@ -1067,6 +1067,132 @@ def test_build_evidence_metadata_prefers_phase41_external_scope_evidence(
     }
 
 
+def test_build_evidence_metadata_prefers_phase43_scope_evidence(tmp_path: Path) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase41_external_scope_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase41-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 971,
+                "migration_coverage": 0.885141,
+                "new_backend_success": 1000,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase43_external_scope_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase43-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 990,
+                "migration_coverage": 0.902461,
+                "new_backend_success": 1021,
+                "migration_gaps": [
+                    {"code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE", "count": 104},
+                    {
+                        "code": "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE",
+                        "count": 3,
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase43_external_scope_delta_doris_audit.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "new_successes": 21,
+                "passed": 21,
+                "failed": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    migration = metadata["official_migration"]
+    assert migration["git_head"] == "phase43-head"
+    assert migration["legacy_to_new_migrated"] == 990
+    assert migration["new_backend_success"] == 1021
+    assert migration["new_success_audit"] == {
+        "available": True,
+        "status": "PASS",
+        "passed": 21,
+        "total": 21,
+        "failed": 0,
+    }
+    assert metadata["source_files"]["phase43_external_scope_funnel_json"].endswith(
+        "phase43_external_scope_funnel.json"
+    )
+
+
+def test_build_evidence_metadata_prefers_phase44_composite_scope_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase43_external_scope_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase43-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 990,
+                "migration_coverage": 0.902461,
+                "new_backend_success": 1021,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase44_composite_scope_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase44-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 998,
+                "migration_coverage": 0.909754,
+                "new_backend_success": 1029,
+                "migration_gaps": [
+                    {"code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE", "count": 96},
+                    {
+                        "code": "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE",
+                        "count": 3,
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase44_composite_scope_delta_doris_audit.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "new_successes": 8,
+                "passed": 8,
+                "failed": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    migration = metadata["official_migration"]
+    assert migration["git_head"] == "phase44-head"
+    assert migration["legacy_to_new_migrated"] == 998
+    assert migration["new_backend_success"] == 1029
+    assert migration["new_success_audit"]["passed"] == 8
+    assert metadata["source_files"]["phase44_composite_scope_funnel_json"].endswith(
+        "phase44_composite_scope_funnel.json"
+    )
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)

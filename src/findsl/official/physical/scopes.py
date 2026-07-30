@@ -73,6 +73,16 @@ class SecurityScopeCatalog:
 
     def resolve(self, atom: str) -> ResolvedSecurityScope:
         source = str(atom).strip()
+        if re.fullmatch(r"\d{6}", source):
+            identities = self._by_code.get(source, ())
+            if len(identities) != 1:
+                raise KeyError(source)
+            return ResolvedSecurityScope(
+                source,
+                identities[0].name,
+                identities,
+                True,
+            )
         explicit = re.fullmatch(r"(?P<name>.+?)\((?P<code>\d{6})\)", source)
         if explicit:
             name = explicit.group("name").strip()

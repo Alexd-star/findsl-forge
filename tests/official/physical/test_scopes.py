@@ -17,6 +17,10 @@ def test_default_security_scope_catalog_is_grounded_in_official_master_data():
     explicit = catalog.resolve("珀莱雅(603605)")
     assert explicit.explicit_code is True
     assert explicit.identities[0].tgtcode == "603605"
+    numeric = catalog.resolve("300084")
+    assert numeric.name == "海默科技"
+    assert numeric.explicit_code is True
+    assert numeric.identities[0].tgtcode == "300084"
 
 
 def test_security_scope_catalog_rejects_unknown_concept_membership():

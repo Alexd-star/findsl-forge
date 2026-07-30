@@ -42,6 +42,7 @@ def test_ths_provider_ignores_environment_proxy_and_reuses_cache(tmp_path):
     assert [(item.code, item.name) for item in first] == [("600000", "浦发银行")]
     assert second == first
     assert session.calls == 1
+    assert not tuple(tmp_path.rglob("*.tmp"))
 
 
 def test_ths_provider_can_explicitly_use_environment_proxy():

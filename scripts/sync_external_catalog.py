@@ -18,6 +18,7 @@ def main() -> None:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--targets")
     mode.add_argument("--all-boards", action="store_true")
+    parser.add_argument("--only-target", action="append", default=[])
     parser.add_argument("--catalog", required=True)
     parser.add_argument("--report", required=True)
     parser.add_argument(
@@ -49,6 +50,14 @@ def main() -> None:
     else:
         target_payload = json.loads(Path(args.targets).read_text(encoding="utf-8"))
         targets = [item["name"] for item in target_payload["targets"]]
+        if args.only_target:
+            requested = tuple(dict.fromkeys(str(item).strip() for item in args.only_target))
+            unknown = sorted(set(requested) - set(targets))
+            if unknown:
+                raise ValueError(
+                    f"requested targets are absent from the target manifest: {', '.join(unknown)}"
+                )
+            targets = list(requested)
         aliases = {
             canonical_scope_name(key): value
             for key, value in target_payload.get("aliases", {}).items()

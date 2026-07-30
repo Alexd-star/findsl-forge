@@ -395,7 +395,7 @@ def security_market_code(code: str) -> Optional[int]:
     value = str(code).zfill(6)
     if value.startswith(("600", "601", "603", "605", "688", "689", "900")):
         return 1
-    if value.startswith(("000", "001", "002", "003", "200", "300", "301")):
+    if value.startswith(("000", "001", "002", "003", "200", "300", "301", "302")):
         return 0
     if value.startswith(("4", "8", "92")):
         return 103

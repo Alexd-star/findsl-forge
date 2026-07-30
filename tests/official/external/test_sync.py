@@ -53,6 +53,27 @@ def test_build_snapshot_uses_explicit_alias_and_retains_original_target():
     }
 
 
+def test_exact_source_name_wins_when_canonical_alias_key_collides():
+    class Provider(_Provider):
+        def list_boards(self, board_type):
+            return {
+                "concept": (BoardDefinition("concept", "BK1", "白酒"),),
+                "industry": (BoardDefinition("industry", "BK2", "白酒Ⅱ"),),
+            }[board_type]
+
+    result = build_eastmoney_snapshot(
+        ["白酒", "白酒行业"],
+        provider=Provider(),
+        aliases={"白酒": "白酒Ⅱ"},
+        as_of_date="2026-07-13",
+    )
+
+    assert [(item.target, item.board.code, item.method) for item in result.matched] == [
+        ("白酒", "BK1", "source_exact"),
+        ("白酒行业", "BK2", "alias_exact"),
+    ]
+
+
 def test_build_full_snapshot_attempts_every_discovered_board():
     result = build_full_eastmoney_snapshot(
         provider=_Provider(),

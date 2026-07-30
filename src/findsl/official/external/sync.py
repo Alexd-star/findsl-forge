@@ -214,14 +214,14 @@ def _build_snapshot_from_matches(
 
 def _match_with_type_hint(target, board_sets, boards, aliases) -> ScopeMatch:
     normalized = canonical_scope_name(target)
-    aliased = aliases.get(normalized)
-    if aliased:
-        return match_scope_target(target, boards, aliases=aliases)
     exact_source = [
         board for board in boards if board.name.casefold() == str(target).strip().casefold()
     ]
     if len(exact_source) == 1:
         return ScopeMatch(target, exact_source[0], "source_exact", 1.0)
+    aliased = aliases.get(normalized)
+    if aliased:
+        return match_scope_target(target, boards, aliases=aliases)
     if "行业" in target or target.endswith("类"):
         hinted = match_scope_target(target, board_sets["industry"], aliases=aliases)
         if hinted:

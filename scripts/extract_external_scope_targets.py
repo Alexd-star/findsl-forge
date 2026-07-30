@@ -6,7 +6,9 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from findsl.official.external.runtime import default_external_scope_catalog
 from findsl.official.frontend.antlr_frontend import AntlrOfficialFrontend
+from findsl.official.physical.scopes import default_security_scope_catalog
 
 
 SCOPE_SLOT_FUNCTIONS = {
@@ -29,9 +31,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--funnel", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--include-resolved",
+        action="store_true",
+        help="include atoms already available in the current runtime catalogs",
+    )
     args = parser.parse_args()
     report = json.loads(Path(args.funnel).read_text(encoding="utf-8"))
-    counts = Counter()
+    all_counts = Counter()
     for row in report["rows"]:
         if not (
             row["legacy_strict_success"]
@@ -40,10 +47,23 @@ def main() -> None:
         ):
             continue
         parsed = AntlrOfficialFrontend().parse(row["source"])
-        _collect_scope_atoms(parsed.ast, counts)
+        _collect_scope_atoms(parsed.ast, all_counts)
+    counts = (
+        all_counts
+        if args.include_resolved
+        else _unresolved_counts(
+            all_counts,
+            default_security_scope_catalog(),
+            default_external_scope_catalog(),
+        )
+    )
     payload = {
         "schema_version": 1,
         "source_sha256": report["source_sha256"],
+        "all_target_count": len(all_counts),
+        "all_occurrences": sum(all_counts.values()),
+        "resolved_target_count": len(all_counts) - len(counts),
+        "resolved_occurrences": sum(all_counts.values()) - sum(counts.values()),
         "target_count": len(counts),
         "occurrences": sum(counts.values()),
         "targets": [
@@ -68,6 +88,20 @@ def _collect_scope_atoms(node, counts: Counter) -> None:
         child = getattr(node, attribute, None)
         if child is not None:
             _collect_scope_atoms(child, counts)
+
+
+def _unresolved_counts(counts: Counter, security_catalog, external_catalog) -> Counter:
+    unresolved = Counter()
+    for atom, occurrences in counts.items():
+        for catalog in (security_catalog, external_catalog):
+            try:
+                catalog.resolve(atom)
+                break
+            except KeyError:
+                continue
+        else:
+            unresolved[atom] = occurrences
+    return unresolved
 
 
 if __name__ == "__main__":

@@ -24,7 +24,17 @@ def main() -> None:
     parser.add_argument("--as-of-date", default=None)
     parser.add_argument("--request-interval-seconds", type=float, default=0.3)
     parser.add_argument("--trust-environment-proxy", action="store_true")
-    parser.add_argument("--require-complete", action="store_true")
+    completeness = parser.add_mutually_exclusive_group()
+    completeness.add_argument(
+        "--require-complete",
+        action="store_true",
+        help="deprecated compatibility flag; completeness is required by default",
+    )
+    completeness.add_argument(
+        "--allow-partial",
+        action="store_true",
+        help="explicitly allow importing a partial source snapshot",
+    )
     args = parser.parse_args()
 
     raw = json.loads(Path(args.config).read_text(encoding="utf-8"))
@@ -90,14 +100,17 @@ def main() -> None:
         "failed_concepts": failures,
         "complete": not failures,
     }
-    report["imported"] = not (args.require_complete and failures)
+    report["partial_import_allowed"] = args.allow_partial
+    report["imported"] = not failures or args.allow_partial
     catalog = ExternalCatalog(Path(args.catalog))
     if report["imported"]:
-        catalog.import_snapshot(snapshot, replace=True)
+        catalog.import_snapshot(snapshot, replace_source_date=True)
         runtime = catalog.export_runtime_manifest(Path(args.runtime))
         report["runtime_entries"] = len(runtime["entries"])
     Path(args.report).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
+    if not report["imported"]:
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

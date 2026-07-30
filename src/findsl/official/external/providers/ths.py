@@ -137,7 +137,9 @@ class ThsConceptProvider:
                     raise ExternalProviderError("THS page has no constituent table")
                 if cached is not None:
                     cached.parent.mkdir(parents=True, exist_ok=True)
-                    cached.write_text(response.text, encoding="utf-8")
+                    temporary = cached.with_suffix(cached.suffix + ".tmp")
+                    temporary.write_text(response.text, encoding="utf-8")
+                    temporary.replace(cached)
                 return response.text
             except Exception as exc:
                 last_error = exc

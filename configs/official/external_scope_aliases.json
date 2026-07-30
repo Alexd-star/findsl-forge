@@ -39,6 +39,21 @@
     {"alias": "豆包", "scope_code": "BAIDU:GN2350", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "豆包明确对应豆包概念"},
     {"alias": "可控核聚变板块", "scope_code": "BAIDU:GN2286", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "可控核聚变板块对应同名公开概念"},
     {"alias": "hbm", "scope_code": "BAIDU:GN2272", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "HBM 是高带宽存储器的标准英文缩写"},
-    {"alias": "deepseek", "scope_code": "BAIDU:GN2355", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "DeepSeek 明确对应 DeepSeek 概念股范围"}
+    {"alias": "deepseek", "scope_code": "BAIDU:GN2355", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "DeepSeek 明确对应 DeepSeek 概念股范围"},
+    {"alias": "deepseek相关", "scope_code": "BAIDU:GN2355", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "DeepSeek相关与公开 DeepSeek 概念股范围同义"},
+    {"alias": "智能城市", "scope_code": "BAIDU:003628", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "智能城市与公开分类智慧城市是通行同义表达"},
+    {"alias": "脑机接口", "scope_code": "BAIDU:251393", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "公开分类脑科学(脑机接口)明确包含脑机接口名称"},
+    {"alias": "豆包应用", "scope_code": "BAIDU:GN2350", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "豆包应用在A股范围槽中对应豆包应用产业链概念"},
+    {"alias": "京东方", "scope_code": "SEC:0:000725", "source_snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5", "reason": "京东方是A股证券京东方A的通行公司简称"},
+    {"alias": "地产", "scope_code": "BK1202", "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72", "reason": "地产是A股行业语境中房地产行业的通行简称"},
+    {"alias": "SHEIN", "scope_code": "BAIDU:GN2279", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "SHEIN在A股范围槽中指向中文品牌希音的公开合作商概念，来源成员仍固定到版本化快照"},
+    {"alias": "大盘", "scope_code": "BAIDU:GN2388", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "大盘在A股范围槽中按公开大盘股分类解释，不扩展为任意宽基指数"},
+    {"alias": "公共服务", "scope_code": "BAIDU:410000", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "公共服务在A股行业范围中按公用事业行业解释，并保留显式语义政策"},
+    {"alias": "沪深300港元净收益指数", "scope_code": "000300", "source_snapshot_id": "csindex-2026-07-30-b68b771e8882", "minimum_member_count": 300, "reason": "该净收益币种变体与沪深300价格指数共享样本证券；本映射只提供成员范围，不伪造指数行情"},
+    {"alias": "综合金融服务概念", "scope_code": "BAIDU:490300", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "综合金融服务在A股行业范围中按公开多元金融分类解释"},
+    {"alias": "家用轻工", "scope_code": "BAIDU:360000", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b", "reason": "家用轻工按公开轻工制造行业分类解释"},
+    {"alias": "互联网行业", "scope_code": "BK0447", "source_snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687", "reason": "互联网行业按公开互联网服务范围解释"},
+    {"alias": "宁夏算力概念", "scope_name": "宁夏算力概念", "operation": "intersection", "components": [{"scope_code": "BAIDU:DY1162", "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"}, {"scope_code": "BK1134", "source_snapshot_id": "eastmoney-2026-07-15-2d76ee581e72"}], "reason": "由完整宁夏地域成员与完整算力概念成员按证券稳定键求交集"},
+    {"alias": "银行保险", "scope_name": "银行保险", "operation": "union", "components": [{"scope_code": "BK1283", "source_snapshot_id": "eastmoney-2026-07-30-c33dad9203c8"}, {"scope_code": "BK0474", "source_snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"}], "reason": "银行保险按两个公开行业成员集合的并集解释"}
   ]
 }

@@ -187,7 +187,15 @@ def test_scope_matching_is_conservative_and_suffix_aware():
 
 @pytest.mark.parametrize(
     ("code", "market"),
-    [("600000", 1), ("688001", 1), ("000001", 0), ("300001", 0), ("920001", 103), ("123456", None)],
+    [
+        ("600000", 1),
+        ("688001", 1),
+        ("000001", 0),
+        ("300001", 0),
+        ("302132", 0),
+        ("920001", 103),
+        ("123456", None),
+    ],
 )
 def test_security_market_code(code, market):
     assert security_market_code(code) == market

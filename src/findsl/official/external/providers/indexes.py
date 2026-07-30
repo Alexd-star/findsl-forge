@@ -124,18 +124,35 @@ class CsindexProvider:
                 frame = pd.read_excel(BytesIO(response.content))
                 rows = []
                 for row in frame.to_dict("records"):
-                    code = str(row.get("成分券代码") or "").strip().zfill(6)
+                    code = _security_code(
+                        _first_present(
+                            row,
+                            "成分券代码",
+                            "成份券代码Constituent Code",
+                        )
+                    )
                     if security_market_code(code) is None:
                         continue
-                    raw_date = row.get("日期")
-                    parsed_date = pd.to_datetime(raw_date, errors="coerce")
+                    raw_date = _first_present(row, "日期", "日期Date")
+                    parsed_date = _parse_date(pd, raw_date)
                     effective = None if pd.isna(parsed_date) else parsed_date.date().isoformat()
-                    raw_weight = row.get("权重") if has_weight else None
+                    raw_weight = (
+                        _first_present(row, "权重", "权重(%)weight")
+                        if has_weight
+                        else None
+                    )
                     weight = None if raw_weight is None or pd.isna(raw_weight) else float(raw_weight)
                     rows.append(
                         IndexConstituent(
                             code,
-                            str(row.get("成分券名称") or "").strip(),
+                            str(
+                                _first_present(
+                                    row,
+                                    "成分券名称",
+                                    "成份券名称Constituent Name",
+                                )
+                                or ""
+                            ).strip(),
                             weight,
                             effective,
                         )
@@ -147,6 +164,29 @@ class CsindexProvider:
         raise ExternalProviderError(
             f"CSI returned no constituents for {index.code} {index.name}: {last_error}"
         )
+
+
+def _first_present(row, *columns):
+    for column in columns:
+        value = row.get(column)
+        if value is not None:
+            return value
+    return None
+
+
+def _security_code(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, (int, float)):
+        return str(int(value)).zfill(6)
+    return str(value).strip().split(".", 1)[0].zfill(6)
+
+
+def _parse_date(pd, value):
+    text = str(value).strip().split(".", 1)[0]
+    if text.isdigit() and len(text) == 8:
+        return pd.to_datetime(text, format="%Y%m%d", errors="coerce")
+    return pd.to_datetime(value, errors="coerce")
 
 
 class AkshareCsindexProvider:
