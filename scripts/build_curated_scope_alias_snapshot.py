@@ -10,7 +10,11 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from findsl.official.external import ExternalCatalog
-from findsl.official.external.models import CatalogSnapshot, ScopeMembership
+from findsl.official.external.models import (
+    CatalogSnapshot,
+    ScopeMembership,
+    normalize_catalog_name,
+)
 from findsl.official.external.policy import ScopeSemanticPolicyCatalog
 
 
@@ -324,8 +328,6 @@ def _validate_policy_member_count(policy, member_count: int) -> None:
 
 
 def _assert_no_alias_conflicts(config, catalog: ScopeSemanticPolicyCatalog) -> None:
-    from findsl.official.external.models import normalize_catalog_name
-
     legacy_aliases = {
         normalize_catalog_name(item["alias"]): item["alias"]
         for item in config["mappings"]

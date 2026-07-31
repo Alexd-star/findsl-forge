@@ -75,6 +75,25 @@ def test_policy_catalog_rejects_alias_conflict_and_disallowed_risk():
         _catalog(_entry(risk_level="high"))
 
 
+def test_policy_catalog_rejects_invalid_security_selector_regex_at_load_time():
+    entry = _entry(
+        policy_id="security-rule-v1",
+        aliases=["受控证券"],
+        resolution_kind="security_name_regex",
+        scope_name="受控证券",
+    )
+    entry.pop("target")
+    entry["source_snapshot_id"] = "identity-v1"
+    entry["selector"] = {
+        "field": "scope_name",
+        "operator": "regex",
+        "value": "[",
+    }
+
+    with pytest.raises(ScopeSemanticPolicyError, match="invalid security selector regex"):
+        _catalog(entry)
+
+
 def test_runtime_rejects_policy_target_drift_instead_of_selecting_another_scope():
     policies = _catalog(_entry())
     runtime = ExternalScopeRuntimeCatalog(

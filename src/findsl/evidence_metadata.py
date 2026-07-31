@@ -124,13 +124,19 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase48_funnel_payload = _read_optional_json(
+        snapshot_dir / "phase48_scope_semantic_policy_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
     phase19_funnel_payload = _read_optional_json(
         snapshot_dir / "phase19_security_scope_funnel.json",
         warnings,
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase47_funnel_payload
+        phase48_funnel_payload
+        or phase47_funnel_payload
         or phase46_funnel_payload
         or phase45_funnel_payload
         or phase44_funnel_payload
@@ -235,6 +241,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    scope_semantic_policy_payload = _read_optional_json(
+        snapshot_dir / "phase48_scope_semantic_policy_doris.json",
+        warnings,
+        warn_missing=False,
+    )
     prefix_join_payload = _read_optional_json(
         snapshot_dir / "phase6c_set_prefix_doris.json",
         warnings,
@@ -295,6 +306,11 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warnings,
         warn_missing=False,
     )
+    phase48_new_success_audit_payload = _read_optional_json(
+        snapshot_dir / "phase48_scope_semantic_policy_delta_doris_audit.json",
+        warnings,
+        warn_missing=False,
+    )
     phase26_new_success_audit_payload = _read_optional_json(
         snapshot_dir / "phase26_new_success_audit.json",
         warnings,
@@ -326,7 +342,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     new_success_audit_payload = (
-        phase47_new_success_audit_payload
+        phase48_new_success_audit_payload
+        or phase47_new_success_audit_payload
         or phase46_new_success_audit_payload
         or phase45_new_success_audit_payload
         or phase44_new_success_audit_payload
@@ -381,6 +398,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             prefix_join_payload,
             derived_scope_payload,
             benchmark_policy_payload,
+            scope_semantic_policy_payload,
             new_success_audit_payload,
         ),
         "doris_cluster": _doris_metadata(doris_payload),
@@ -439,6 +457,9 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     benchmark_policy = _dict(
         official_migration.get("benchmark_policy_evidence")
     )
+    scope_semantic_policy = _dict(
+        official_migration.get("scope_semantic_policy_evidence")
+    )
     new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
@@ -477,6 +498,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Phase 31 final grounded evidence | {_mapping_event_display(final_grounded)} |",
         f"| Phase 6C set-prefix evidence | {_prefix_join_display(prefix_join)} |",
         f"| Phase 47 benchmark-policy evidence | {_mapping_event_display(benchmark_policy)} |",
+        f"| Phase 48 scope-policy evidence | {_mapping_event_display(scope_semantic_policy)} |",
         f"| Latest phase new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
@@ -733,6 +755,7 @@ def _official_migration_metadata(
     prefix_join: dict[str, Any] | None,
     derived_scope: dict[str, Any] | None,
     benchmark_policy: dict[str, Any] | None,
+    scope_semantic_policy: dict[str, Any] | None,
     new_success_audit: dict[str, Any] | None,
 ) -> dict[str, Any]:
     gaps = funnel.get("migration_gaps") if isinstance(funnel, dict) else None
@@ -1054,6 +1077,18 @@ def _official_migration_metadata(
             "latest_data_date": benchmark_policy.get("latest_data_date") if isinstance(benchmark_policy, dict) else None,
             "source_contract": _bool_or_none(benchmark_policy.get("source_contract")) if isinstance(benchmark_policy, dict) else None,
         },
+        "scope_semantic_policy_evidence": {
+            "available": scope_semantic_policy is not None,
+            "status": scope_semantic_policy.get("status") if isinstance(scope_semantic_policy, dict) else None,
+            "matched": _int_or_none(scope_semantic_policy.get("query_matched")) if isinstance(scope_semantic_policy, dict) else None,
+            "total": _int_or_none(scope_semantic_policy.get("total")) if isinstance(scope_semantic_policy, dict) else None,
+            "policy_set_id": scope_semantic_policy.get("policy_set_id") if isinstance(scope_semantic_policy, dict) else None,
+            "latest_data_date": scope_semantic_policy.get("latest_data_date") if isinstance(scope_semantic_policy, dict) else None,
+            "materialization_matched": _int_or_none(scope_semantic_policy.get("materialization_matched")) if isinstance(scope_semantic_policy, dict) else None,
+            "compile_passed": _int_or_none(scope_semantic_policy.get("compile_passed")) if isinstance(scope_semantic_policy, dict) else None,
+            "execution_passed": _int_or_none(scope_semantic_policy.get("execution_passed")) if isinstance(scope_semantic_policy, dict) else None,
+            "provenance_passed": _int_or_none(scope_semantic_policy.get("provenance_passed")) if isinstance(scope_semantic_policy, dict) else None,
+        },
         "new_success_audit": {
             "available": new_success_audit is not None,
             "status": new_success_audit.get("status") if isinstance(new_success_audit, dict) else None,
@@ -1166,6 +1201,18 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         ),
         "phase47_benchmark_policy_doris_json": str(
             snapshot_dir / "phase47_benchmark_policy_doris.json"
+        ),
+        "phase48_scope_semantic_policy_funnel_json": str(
+            snapshot_dir / "phase48_scope_semantic_policy_funnel.json"
+        ),
+        "phase48_scope_semantic_policy_delta_doris_audit_json": str(
+            snapshot_dir / "phase48_scope_semantic_policy_delta_doris_audit.json"
+        ),
+        "phase48_scope_semantic_policy_doris_json": str(
+            snapshot_dir / "phase48_scope_semantic_policy_doris.json"
+        ),
+        "phase48_true_remaining_scope_targets_json": str(
+            snapshot_dir / "phase48_true_remaining_scope_targets.json"
         ),
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),

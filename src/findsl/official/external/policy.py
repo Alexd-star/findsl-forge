@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -283,6 +284,10 @@ def _policy_from_dict(raw) -> ScopeSemanticPolicy:
         selector_pattern = str(selector["value"]).strip()
         if not source_snapshot_id or not selector_pattern:
             raise ScopeSemanticPolicyError("security selector source and pattern are required")
+        try:
+            re.compile(selector_pattern)
+        except re.error as exc:
+            raise ScopeSemanticPolicyError("invalid security selector regex") from exc
     else:
         operation = str(raw["operation"])
         if operation not in _SET_OPERATIONS:

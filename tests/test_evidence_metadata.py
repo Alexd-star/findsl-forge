@@ -1385,6 +1385,79 @@ def test_build_evidence_metadata_prefers_phase47_benchmark_policy_evidence(
     assert migration["benchmark_policy_evidence"]["index_code"] == "000300"
 
 
+def test_build_evidence_metadata_prefers_phase48_scope_policy_evidence(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "phase47_benchmark_policy_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase47-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 1022,
+                "migration_coverage": 0.931632,
+                "new_backend_success": 1053,
+                "migration_gaps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase48_scope_semantic_policy_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": "phase48-head",
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 1044,
+                "migration_coverage": 0.951686,
+                "new_backend_success": 1076,
+                "migration_gaps": [
+                    {"code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE", "count": 53}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (
+        snapshot_dir / "phase48_scope_semantic_policy_delta_doris_audit.json"
+    ).write_text(
+        json.dumps(
+            {"status": "PASS", "new_successes": 23, "passed": 23, "failed": 0}
+        ),
+        encoding="utf-8",
+    )
+    (snapshot_dir / "phase48_scope_semantic_policy_doris.json").write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "policy_set_id": "official-competition-scope-policy-v1",
+                "latest_data_date": "2026-04-14",
+                "materialization_matched": 7,
+                "query_matched": 7,
+                "compile_passed": 7,
+                "execution_passed": 7,
+                "provenance_passed": 7,
+                "total": 7,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+
+    migration = metadata["official_migration"]
+    policy = migration["scope_semantic_policy_evidence"]
+    assert migration["git_head"] == "phase48-head"
+    assert migration["legacy_to_new_migrated"] == 1044
+    assert migration["new_backend_success"] == 1076
+    assert migration["new_success_audit"]["passed"] == 23
+    assert policy["policy_set_id"] == "official-competition-scope-policy-v1"
+    assert policy["materialization_matched"] == 7
+    assert metadata["source_files"][
+        "phase48_scope_semantic_policy_doris_json"
+    ].endswith("phase48_scope_semantic_policy_doris.json")
+
+
 def test_build_evidence_metadata_warns_when_optional_doris_json_is_missing(tmp_path: Path) -> None:
     snapshot_dir = tmp_path / "snapshots"
     _write_minimal_snapshots(snapshot_dir, include_doris=False)
