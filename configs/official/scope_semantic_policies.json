@@ -138,6 +138,37 @@
         "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
         "scope_code": "BAIDU:GN2344"
       }
+    },
+    {
+      "policy_id": "shanghai-water-conservancy-intersection-v1",
+      "aliases": ["上海水利工程"],
+      "resolution_kind": "set_operation",
+      "scope_name": "上海水利工程",
+      "minimum_member_count": 5,
+      "maximum_member_count": 30,
+      "semantic_basis": "business_policy",
+      "confidence": "high",
+      "risk_level": "low",
+      "review_status": "approved",
+      "effective_from": "2026-07-15",
+      "rationale": "上海水利工程由完整上海地域成员与完整水利建设主题成员按证券稳定键求交集，不使用名称模糊匹配。",
+      "rationale_urls": [
+        "https://finance.pae.baidu.com/api/getrelatedblock"
+      ],
+      "data_boundary": "交集反映 2026-07-15 的公开截面分类，不反推历史成员，也不替代机构自有工程项目标签。",
+      "operation": "intersection",
+      "components": [
+        {
+          "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+          "scope_code": "BAIDU:DY1145",
+          "minimum_member_count": 400
+        },
+        {
+          "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+          "scope_code": "BAIDU:003597",
+          "minimum_member_count": 200
+        }
+      ]
     }
   ]
 }
