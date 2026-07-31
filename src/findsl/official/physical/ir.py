@@ -128,9 +128,13 @@ class PhysicalExternalExists(PhysicalExpr):
     anchor_resource_id: str
     filters: Tuple[Tuple[str, PhysicalLiteral], ...]
     type: OfficialType = BOOLEAN
+    policy_id: Optional[str] = None
+    policy_semantic_basis: Optional[str] = None
+    policy_risk_level: Optional[str] = None
+    policy_rationale_urls: Tuple[str, ...] = ()
 
     def to_dict(self):
-        return {
+        payload = {
             "kind": "PhysicalExternalExists",
             "lookup_resource_id": self.lookup_resource_id,
             "anchor_resource_id": self.anchor_resource_id,
@@ -140,6 +144,14 @@ class PhysicalExternalExists(PhysicalExpr):
             ],
             "type": self.type.to_dict(),
         }
+        if self.policy_id is not None:
+            payload["semantic_policy"] = {
+                "policy_id": self.policy_id,
+                "semantic_basis": self.policy_semantic_basis,
+                "risk_level": self.policy_risk_level,
+                "rationale_urls": list(self.policy_rationale_urls),
+            }
+        return payload
 
 
 @dataclass(frozen=True)

@@ -56999,6 +56999,16 @@
       "alias": "ai",
       "normalized_alias": "ai",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "ai",
+      "normalized_alias": "ai",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -57109,6 +57119,16 @@
       "alias": "AIGC概念",
       "normalized_alias": "aigc概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "AIGC概念",
+      "normalized_alias": "aigc概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -57179,6 +57199,16 @@
       "alias": "AIGC概念板块",
       "normalized_alias": "aigc概念板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "AIGC概念板块",
+      "normalized_alias": "aigc概念板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -57231,6 +57261,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "aigc相关",
+      "normalized_alias": "aigc相关",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -57541,6 +57581,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1111",
+      "scope_name": "AIGC概念",
+      "alias": "AI生成",
+      "normalized_alias": "ai生成",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -58179,6 +58229,16 @@
       "alias": "deepseek",
       "normalized_alias": "deepseek",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2355",
+      "scope_name": "DeepSeek概念股",
+      "alias": "deepseek",
+      "normalized_alias": "deepseek",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -58209,6 +58269,16 @@
       "alias": "DeepSeek概念股",
       "normalized_alias": "deepseek概念股",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2355",
+      "scope_name": "DeepSeek概念股",
+      "alias": "DeepSeek概念股",
+      "normalized_alias": "deepseek概念股",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -58239,6 +58309,16 @@
       "alias": "DeepSeek概念股概念",
       "normalized_alias": "deepseek概念股概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2355",
+      "scope_name": "DeepSeek概念股",
+      "alias": "DeepSeek概念股概念",
+      "normalized_alias": "deepseek概念股概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -58269,6 +58349,16 @@
       "alias": "DeepSeek概念股概念板块",
       "normalized_alias": "deepseek概念股概念板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2355",
+      "scope_name": "DeepSeek概念股",
+      "alias": "DeepSeek概念股概念板块",
+      "normalized_alias": "deepseek概念股概念板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -58281,6 +58371,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-15",
       "snapshot_id": "curated-scope-alias-2026-07-15-39c2ad482b96"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2355",
+      "scope_name": "DeepSeek概念股",
+      "alias": "deepseek相关",
+      "normalized_alias": "deepseek相关",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -58571,6 +58671,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2272",
+      "scope_name": "高带宽存储器HBM",
+      "alias": "hbm",
+      "normalized_alias": "hbm",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -59139,6 +59249,16 @@
       "alias": "msci",
       "normalized_alias": "msci",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:031027",
+      "scope_name": "MSCI概念",
+      "alias": "msci",
+      "normalized_alias": "msci",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -59199,6 +59319,16 @@
       "alias": "MSCI概念",
       "normalized_alias": "msci概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:031027",
+      "scope_name": "MSCI概念",
+      "alias": "MSCI概念",
+      "normalized_alias": "msci概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -59229,6 +59359,16 @@
       "alias": "MSCI概念板块",
       "normalized_alias": "msci概念板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:031027",
+      "scope_name": "MSCI概念",
+      "alias": "MSCI概念板块",
+      "normalized_alias": "msci概念板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -59251,6 +59391,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-30",
       "snapshot_id": "eastmoney-2026-07-30-c33dad9203c8"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:031027",
+      "scope_name": "MSCI概念",
+      "alias": "msic概念",
+      "normalized_alias": "msic概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -59811,6 +59961,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2279",
+      "scope_name": "希音合作商",
+      "alias": "SHEIN",
+      "normalized_alias": "shein",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -61061,6 +61221,26 @@
       "source": "akshare-security-identity",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5"
+    },
+    {
+      "scope_type": "semantic_policy",
+      "scope_code": "POLICY:bf3b3989f3c09706",
+      "scope_name": "S板",
+      "alias": "S板",
+      "normalized_alias": "s板",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "semantic_policy",
+      "scope_code": "POLICY:bf3b3989f3c09706",
+      "scope_name": "S板",
+      "alias": "s版",
+      "normalized_alias": "s版",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -63529,8 +63709,28 @@
       "alias": "上海电气",
       "normalized_alias": "上海电气",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "security",
+      "scope_code": "SEC:1:601727",
+      "scope_name": "上海电气",
+      "alias": "上海电气",
+      "normalized_alias": "上海电气",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
+    },
+    {
+      "scope_type": "security",
+      "scope_code": "SEC:1:601727",
+      "scope_name": "上海电气",
+      "alias": "上海电气概念",
+      "normalized_alias": "上海电气概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -64379,6 +64579,16 @@
       "alias": "专精特新",
       "normalized_alias": "专精特新",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_zjtx",
+      "scope_name": "专精特新",
+      "alias": "专精特新",
+      "normalized_alias": "专精特新",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -64409,6 +64619,16 @@
       "alias": "专精特新小巨人企业",
       "normalized_alias": "专精特新小巨人企业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_zjtx",
+      "scope_name": "专精特新",
+      "alias": "专精特新小巨人企业",
+      "normalized_alias": "专精特新小巨人企业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -64431,6 +64651,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_zjtx",
+      "scope_name": "专精特新",
+      "alias": "专精特新概念",
+      "normalized_alias": "专精特新概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -64471,6 +64701,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_zjtx",
+      "scope_name": "专精特新",
+      "alias": "专精特新概念板块",
+      "normalized_alias": "专精特新概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -67311,6 +67551,16 @@
       "source": "akshare-security-identity",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:041354",
+      "scope_name": "数据中心",
+      "alias": "中心概念板块",
+      "normalized_alias": "中心概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -71199,6 +71449,16 @@
       "alias": "互联网服务",
       "normalized_alias": "互联网服务",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0447",
+      "scope_name": "互联网服务",
+      "alias": "互联网服务",
+      "normalized_alias": "互联网服务",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -71219,6 +71479,16 @@
       "alias": "互联网服务概念",
       "normalized_alias": "互联网服务概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0447",
+      "scope_name": "互联网服务",
+      "alias": "互联网服务概念",
+      "normalized_alias": "互联网服务概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -71231,6 +71501,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0447",
+      "scope_name": "互联网服务",
+      "alias": "互联网服务概念板块",
+      "normalized_alias": "互联网服务概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -71321,6 +71601,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0447",
+      "scope_name": "互联网服务",
+      "alias": "互联网行业",
+      "normalized_alias": "互联网行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -72079,6 +72369,16 @@
       "alias": "京东方",
       "normalized_alias": "京东方",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "security",
+      "scope_code": "SEC:0:000725",
+      "scope_name": "京东方Ａ",
+      "alias": "京东方",
+      "normalized_alias": "京东方",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -72099,6 +72399,16 @@
       "alias": "京东方Ａ",
       "normalized_alias": "京东方a",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "security",
+      "scope_code": "SEC:0:000725",
+      "scope_name": "京东方Ａ",
+      "alias": "京东方Ａ",
+      "normalized_alias": "京东方a",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -72109,8 +72419,28 @@
       "alias": "京东方A概念",
       "normalized_alias": "京东方a概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "security",
+      "scope_code": "SEC:0:000725",
+      "scope_name": "京东方Ａ",
+      "alias": "京东方A概念",
+      "normalized_alias": "京东方a概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
+    },
+    {
+      "scope_type": "security",
+      "scope_code": "SEC:0:000725",
+      "scope_name": "京东方Ａ",
+      "alias": "京东方概念",
+      "normalized_alias": "京东方概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -72439,6 +72769,16 @@
       "alias": "人工智能",
       "normalized_alias": "人工智能",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "人工智能",
+      "normalized_alias": "人工智能",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -72559,6 +72899,16 @@
       "alias": "人工智能概念",
       "normalized_alias": "人工智能概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "人工智能概念",
+      "normalized_alias": "人工智能概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -72611,6 +72961,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0800",
+      "scope_name": "人工智能",
+      "alias": "人工智能概念板块",
+      "normalized_alias": "人工智能概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -74169,6 +74529,16 @@
       "alias": "低价",
       "normalized_alias": "低价",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2012",
+      "scope_name": "低价股",
+      "alias": "低价",
+      "normalized_alias": "低价",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -74189,6 +74559,16 @@
       "alias": "低价股",
       "normalized_alias": "低价股",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2012",
+      "scope_name": "低价股",
+      "alias": "低价股",
+      "normalized_alias": "低价股",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -74201,6 +74581,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2012",
+      "scope_name": "低价股",
+      "alias": "低价股概念",
+      "normalized_alias": "低价股概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -74221,6 +74611,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2012",
+      "scope_name": "低价股",
+      "alias": "低价股概念板块",
+      "normalized_alias": "低价股概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -75259,6 +75659,16 @@
       "alias": "保险",
       "normalized_alias": "保险",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0474",
+      "scope_name": "保险Ⅱ",
+      "alias": "保险",
+      "normalized_alias": "保险",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -75291,6 +75701,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0474",
+      "scope_name": "保险Ⅱ",
+      "alias": "保险Ⅱ",
+      "normalized_alias": "保险ii",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -75379,6 +75799,16 @@
       "alias": "保险Ⅱ板块",
       "normalized_alias": "保险ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0474",
+      "scope_name": "保险Ⅱ",
+      "alias": "保险Ⅱ板块",
+      "normalized_alias": "保险ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -75421,6 +75851,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0474",
+      "scope_name": "保险Ⅱ",
+      "alias": "保险Ⅱ行业",
+      "normalized_alias": "保险ii行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -76129,6 +76569,16 @@
       "alias": "储能",
       "normalized_alias": "储能",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:011424",
+      "scope_name": "储能概念",
+      "alias": "储能",
+      "normalized_alias": "储能",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -76159,6 +76609,16 @@
       "alias": "储能概念",
       "normalized_alias": "储能概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:011424",
+      "scope_name": "储能概念",
+      "alias": "储能概念",
+      "normalized_alias": "储能概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -76181,6 +76641,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:011424",
+      "scope_name": "储能概念",
+      "alias": "储能概念板块",
+      "normalized_alias": "储能概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -76989,6 +77459,16 @@
       "alias": "光刻机(胶)",
       "normalized_alias": "光刻机(胶)",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机(胶)",
+      "normalized_alias": "光刻机(胶)",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -77039,6 +77519,16 @@
       "alias": "光刻机(胶)概念",
       "normalized_alias": "光刻机(胶)概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机(胶)概念",
+      "normalized_alias": "光刻机(胶)概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -77089,6 +77579,16 @@
       "alias": "光刻机(胶)概念板块",
       "normalized_alias": "光刻机(胶)概念板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机(胶)概念板块",
+      "normalized_alias": "光刻机(胶)概念板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -77131,6 +77631,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻机板块",
+      "normalized_alias": "光刻机板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -77221,6 +77731,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK0884",
+      "scope_name": "光刻机(胶)",
+      "alias": "光刻胶概念",
+      "normalized_alias": "光刻胶概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -77989,6 +78509,16 @@
       "alias": "公共服务",
       "normalized_alias": "公共服务",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:410000",
+      "scope_name": "公用事业",
+      "alias": "公共服务",
+      "normalized_alias": "公共服务",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -78079,6 +78609,16 @@
       "alias": "公用事业",
       "normalized_alias": "公用事业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:410000",
+      "scope_name": "公用事业",
+      "alias": "公用事业",
+      "normalized_alias": "公用事业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -78109,6 +78649,16 @@
       "alias": "公用事业板块",
       "normalized_alias": "公用事业板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:410000",
+      "scope_name": "公用事业",
+      "alias": "公用事业板块",
+      "normalized_alias": "公用事业板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -78131,6 +78681,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:410000",
+      "scope_name": "公用事业",
+      "alias": "公用事业行业",
+      "normalized_alias": "公用事业行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -80219,6 +80779,16 @@
       "alias": "军工概念",
       "normalized_alias": "军工概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1204",
+      "scope_name": "国防军工",
+      "alias": "军工概念",
+      "normalized_alias": "军工概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -80589,6 +81159,16 @@
       "alias": "农业板块",
       "normalized_alias": "农业板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1257",
+      "scope_name": "农业综合Ⅱ",
+      "alias": "农业板块",
+      "normalized_alias": "农业板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -80709,6 +81289,16 @@
       "alias": "农业综合Ⅱ",
       "normalized_alias": "农业综合ii",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1257",
+      "scope_name": "农业综合Ⅱ",
+      "alias": "农业综合Ⅱ",
+      "normalized_alias": "农业综合ii",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -80789,6 +81379,16 @@
       "alias": "农业综合Ⅱ板块",
       "normalized_alias": "农业综合ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1257",
+      "scope_name": "农业综合Ⅱ",
+      "alias": "农业综合Ⅱ板块",
+      "normalized_alias": "农业综合ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -80831,6 +81431,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1257",
+      "scope_name": "农业综合Ⅱ",
+      "alias": "农业综合Ⅱ行业",
+      "normalized_alias": "农业综合ii行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -80929,6 +81539,16 @@
       "alias": "农产品加工",
       "normalized_alias": "农产品加工",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1256",
+      "scope_name": "农产品加工",
+      "alias": "农产品加工",
+      "normalized_alias": "农产品加工",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -80979,6 +81599,16 @@
       "alias": "农产品加工板块",
       "normalized_alias": "农产品加工板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1256",
+      "scope_name": "农产品加工",
+      "alias": "农产品加工板块",
+      "normalized_alias": "农产品加工板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -81029,6 +81659,16 @@
       "alias": "农产品加工行业",
       "normalized_alias": "农产品加工行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1256",
+      "scope_name": "农产品加工",
+      "alias": "农产品加工行业",
+      "normalized_alias": "农产品加工行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -81061,6 +81701,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1256",
+      "scope_name": "农产品加工",
+      "alias": "农产品行业",
+      "normalized_alias": "农产品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -83849,6 +84499,16 @@
       "alias": "化妆品",
       "normalized_alias": "化妆品",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1252",
+      "scope_name": "化妆品",
+      "alias": "化妆品",
+      "normalized_alias": "化妆品",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -83919,6 +84579,16 @@
       "alias": "化妆品厂商",
       "normalized_alias": "化妆品厂商",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1252",
+      "scope_name": "化妆品",
+      "alias": "化妆品厂商",
+      "normalized_alias": "化妆品厂商",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -83951,6 +84621,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1252",
+      "scope_name": "化妆品",
+      "alias": "化妆品板块",
+      "normalized_alias": "化妆品板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -84021,6 +84701,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1252",
+      "scope_name": "化妆品",
+      "alias": "化妆品行业",
+      "normalized_alias": "化妆品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -85259,6 +85949,16 @@
       "alias": "医疗",
       "normalized_alias": "医疗",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:370000",
+      "scope_name": "医药生物",
+      "alias": "医疗",
+      "normalized_alias": "医疗",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -86029,6 +86729,16 @@
       "alias": "医药生物",
       "normalized_alias": "医药生物",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:370000",
+      "scope_name": "医药生物",
+      "alias": "医药生物",
+      "normalized_alias": "医药生物",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -86059,6 +86769,16 @@
       "alias": "医药生物板块",
       "normalized_alias": "医药生物板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:370000",
+      "scope_name": "医药生物",
+      "alias": "医药生物板块",
+      "normalized_alias": "医药生物板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -86081,6 +86801,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:370000",
+      "scope_name": "医药生物",
+      "alias": "医药生物行业",
+      "normalized_alias": "医药生物行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -86631,6 +87361,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:e062bdc441662867",
+      "scope_name": "华为AI眼镜",
+      "alias": "华为AI眼镜",
+      "normalized_alias": "华为ai眼镜",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "composite",
@@ -90289,6 +91029,16 @@
       "alias": "印刷",
       "normalized_alias": "印刷",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1534",
+      "scope_name": "印刷",
+      "alias": "印刷",
+      "normalized_alias": "印刷",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -90419,6 +91169,16 @@
       "alias": "印刷板块",
       "normalized_alias": "印刷板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1534",
+      "scope_name": "印刷",
+      "alias": "印刷板块",
+      "normalized_alias": "印刷板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -90459,6 +91219,16 @@
       "alias": "印刷物资销售",
       "normalized_alias": "印刷物资销售",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1534",
+      "scope_name": "印刷",
+      "alias": "印刷物资销售",
+      "normalized_alias": "印刷物资销售",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -90481,6 +91251,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1534",
+      "scope_name": "印刷",
+      "alias": "印刷行业",
+      "normalized_alias": "印刷行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -91559,6 +92339,16 @@
       "alias": "可控核聚变",
       "normalized_alias": "可控核聚变",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2286",
+      "scope_name": "可控核聚变",
+      "alias": "可控核聚变",
+      "normalized_alias": "可控核聚变",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -91571,6 +92361,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-15",
       "snapshot_id": "curated-scope-alias-2026-07-15-39c2ad482b96"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2286",
+      "scope_name": "可控核聚变",
+      "alias": "可控核聚变板块",
+      "normalized_alias": "可控核聚变板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -91601,6 +92401,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2286",
+      "scope_name": "可控核聚变",
+      "alias": "可控核聚变概念",
+      "normalized_alias": "可控核聚变概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -91631,6 +92441,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2286",
+      "scope_name": "可控核聚变",
+      "alias": "可控核聚变概念板块",
+      "normalized_alias": "可控核聚变概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -94569,6 +95389,16 @@
       "alias": "国企改革",
       "normalized_alias": "国企改革",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_sgqgg",
+      "scope_name": "国企改革",
+      "alias": "国企改革",
+      "normalized_alias": "国企改革",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -94601,6 +95431,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_sgqgg",
+      "scope_name": "国企改革",
+      "alias": "国企改革概念",
+      "normalized_alias": "国企改革概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -94641,6 +95481,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_sgqgg",
+      "scope_name": "国企改革",
+      "alias": "国企改革概念板块",
+      "normalized_alias": "国企改革概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -94911,6 +95761,16 @@
       "source": "akshare-security-identity",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "SINA:gn_sgqgg",
+      "scope_name": "国企改革",
+      "alias": "国改",
+      "normalized_alias": "国改",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -95619,6 +96479,16 @@
       "alias": "国防军工",
       "normalized_alias": "国防军工",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1204",
+      "scope_name": "国防军工",
+      "alias": "国防军工",
+      "normalized_alias": "国防军工",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -95671,6 +96541,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1204",
+      "scope_name": "国防军工",
+      "alias": "国防军工板块",
+      "normalized_alias": "国防军工板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -95741,6 +96621,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1204",
+      "scope_name": "国防军工",
+      "alias": "国防军工行业",
+      "normalized_alias": "国防军工行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -96271,6 +97161,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "地产",
+      "normalized_alias": "地产",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -96819,6 +97719,16 @@
       "alias": "城商行",
       "normalized_alias": "城商行",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1609",
+      "scope_name": "城商行Ⅲ",
+      "alias": "城商行",
+      "normalized_alias": "城商行",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -96859,6 +97769,16 @@
       "alias": "城商行Ⅲ",
       "normalized_alias": "城商行iii",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1609",
+      "scope_name": "城商行Ⅲ",
+      "alias": "城商行Ⅲ",
+      "normalized_alias": "城商行iii",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -96899,6 +97819,16 @@
       "alias": "城商行Ⅲ板块",
       "normalized_alias": "城商行iii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1609",
+      "scope_name": "城商行Ⅲ",
+      "alias": "城商行Ⅲ板块",
+      "normalized_alias": "城商行iii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -96931,6 +97861,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1609",
+      "scope_name": "城商行Ⅲ",
+      "alias": "城商行Ⅲ行业",
+      "normalized_alias": "城商行iii行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -97241,6 +98181,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240300",
+      "scope_name": "工业金属",
+      "alias": "基本金属概念",
+      "normalized_alias": "基本金属概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -97869,6 +98819,16 @@
       "alias": "多元金融",
       "normalized_alias": "多元金融",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:490300",
+      "scope_name": "多元金融",
+      "alias": "多元金融",
+      "normalized_alias": "多元金融",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -97899,6 +98859,16 @@
       "alias": "多元金融板块",
       "normalized_alias": "多元金融板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:490300",
+      "scope_name": "多元金融",
+      "alias": "多元金融板块",
+      "normalized_alias": "多元金融板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -97921,6 +98891,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:490300",
+      "scope_name": "多元金融",
+      "alias": "多元金融行业",
+      "normalized_alias": "多元金融行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -98649,6 +99629,16 @@
       "alias": "大消费",
       "normalized_alias": "大消费",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2103",
+      "scope_name": "大消费",
+      "alias": "大消费",
+      "normalized_alias": "大消费",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -98679,6 +99669,16 @@
       "alias": "大消费概念",
       "normalized_alias": "大消费概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2103",
+      "scope_name": "大消费",
+      "alias": "大消费概念",
+      "normalized_alias": "大消费概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -98691,6 +99691,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2103",
+      "scope_name": "大消费",
+      "alias": "大消费概念板块",
+      "normalized_alias": "大消费概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -98739,6 +99749,16 @@
       "alias": "大盘",
       "normalized_alias": "大盘",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2388",
+      "scope_name": "大盘股",
+      "alias": "大盘",
+      "normalized_alias": "大盘",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -98759,6 +99779,16 @@
       "alias": "大盘股",
       "normalized_alias": "大盘股",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2388",
+      "scope_name": "大盘股",
+      "alias": "大盘股",
+      "normalized_alias": "大盘股",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -98771,6 +99801,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2388",
+      "scope_name": "大盘股",
+      "alias": "大盘股概念",
+      "normalized_alias": "大盘股概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -98791,6 +99831,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2388",
+      "scope_name": "大盘股",
+      "alias": "大盘股概念板块",
+      "normalized_alias": "大盘股概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -101429,8 +102479,28 @@
       "alias": "字节跳动算力合作公司",
       "normalized_alias": "字节跳动算力合作公司",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:1593b6dbc063f8be",
+      "scope_name": "字节跳动算力合作公司",
+      "alias": "字节跳动算力合作公司",
+      "normalized_alias": "字节跳动算力合作公司",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:1593b6dbc063f8be",
+      "scope_name": "字节跳动算力合作公司",
+      "alias": "字节跳动算力搭建合作公司",
+      "normalized_alias": "字节跳动算力搭建合作公司",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "composite",
@@ -101581,6 +102651,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:111e42dd73d0faca",
+      "scope_name": "宁夏算力概念",
+      "alias": "宁夏算力概念",
+      "normalized_alias": "宁夏算力概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "composite",
@@ -103299,6 +104379,16 @@
       "alias": "家居日用品",
       "normalized_alias": "家居日用品",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0440",
+      "scope_name": "家居用品",
+      "alias": "家居日用品",
+      "normalized_alias": "家居日用品",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -103359,6 +104449,16 @@
       "alias": "家居用品",
       "normalized_alias": "家居用品",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0440",
+      "scope_name": "家居用品",
+      "alias": "家居用品",
+      "normalized_alias": "家居用品",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -103409,6 +104509,16 @@
       "alias": "家居用品板块",
       "normalized_alias": "家居用品板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0440",
+      "scope_name": "家居用品",
+      "alias": "家居用品板块",
+      "normalized_alias": "家居用品板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -103459,6 +104569,16 @@
       "alias": "家居用品行业",
       "normalized_alias": "家居用品行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0440",
+      "scope_name": "家居用品",
+      "alias": "家居用品行业",
+      "normalized_alias": "家居用品行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -103491,6 +104611,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0440",
+      "scope_name": "家居用品",
+      "alias": "家居陈设",
+      "normalized_alias": "家居陈设",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -103599,6 +104729,16 @@
       "alias": "家用电器",
       "normalized_alias": "家用电器",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0456",
+      "scope_name": "家用电器",
+      "alias": "家用电器",
+      "normalized_alias": "家用电器",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -103641,6 +104781,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0456",
+      "scope_name": "家用电器",
+      "alias": "家用电器板块",
+      "normalized_alias": "家用电器板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -103719,6 +104869,16 @@
       "alias": "家用电器行业",
       "normalized_alias": "家用电器行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0456",
+      "scope_name": "家用电器",
+      "alias": "家用电器行业",
+      "normalized_alias": "家用电器行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -103759,8 +104919,28 @@
       "alias": "家用轻工",
       "normalized_alias": "家用轻工",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:360000",
+      "scope_name": "轻工制造",
+      "alias": "家用轻工",
+      "normalized_alias": "家用轻工",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0456",
+      "scope_name": "家用电器",
+      "alias": "家电类",
+      "normalized_alias": "家电类",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -103791,6 +104971,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-13",
       "snapshot_id": "curated-scope-alias-2026-07-13-6557cb8ff1dd"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0456",
+      "scope_name": "家用电器",
+      "alias": "家电行业板块",
+      "normalized_alias": "家电行业板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -104609,8 +105799,28 @@
       "alias": "小米汽车",
       "normalized_alias": "小米汽车",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2271",
+      "scope_name": "小米汽车",
+      "alias": "小米汽车",
+      "normalized_alias": "小米汽车",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2271",
+      "scope_name": "小米汽车",
+      "alias": "小米汽车核心技术",
+      "normalized_alias": "小米汽车核心技术",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -104639,6 +105849,16 @@
       "alias": "小米汽车概念",
       "normalized_alias": "小米汽车概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2271",
+      "scope_name": "小米汽车",
+      "alias": "小米汽车概念",
+      "normalized_alias": "小米汽车概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -104651,6 +105871,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2271",
+      "scope_name": "小米汽车",
+      "alias": "小米汽车概念板块",
+      "normalized_alias": "小米汽车概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -105919,6 +107149,16 @@
       "alias": "工业金属",
       "normalized_alias": "工业金属",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240300",
+      "scope_name": "工业金属",
+      "alias": "工业金属",
+      "normalized_alias": "工业金属",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -105989,6 +107229,16 @@
       "alias": "工业金属板块",
       "normalized_alias": "工业金属板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240300",
+      "scope_name": "工业金属",
+      "alias": "工业金属板块",
+      "normalized_alias": "工业金属板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106021,6 +107271,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240300",
+      "scope_name": "工业金属",
+      "alias": "工业金属行业",
+      "normalized_alias": "工业金属行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -106129,6 +107389,16 @@
       "alias": "工程咨询服务Ⅱ",
       "normalized_alias": "工程咨询服务ii",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0726",
+      "scope_name": "工程咨询服务Ⅱ",
+      "alias": "工程咨询服务Ⅱ",
+      "normalized_alias": "工程咨询服务ii",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106209,6 +107479,16 @@
       "alias": "工程咨询服务Ⅱ板块",
       "normalized_alias": "工程咨询服务ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0726",
+      "scope_name": "工程咨询服务Ⅱ",
+      "alias": "工程咨询服务Ⅱ板块",
+      "normalized_alias": "工程咨询服务ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106259,6 +107539,16 @@
       "alias": "工程咨询服务Ⅱ行业",
       "normalized_alias": "工程咨询服务ii行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0726",
+      "scope_name": "工程咨询服务Ⅱ",
+      "alias": "工程咨询服务Ⅱ行业",
+      "normalized_alias": "工程咨询服务ii行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106291,6 +107581,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0726",
+      "scope_name": "工程咨询服务Ⅱ",
+      "alias": "工程咨询板块",
+      "normalized_alias": "工程咨询板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -106619,6 +107919,16 @@
       "alias": "希音合作商",
       "normalized_alias": "希音合作商",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2279",
+      "scope_name": "希音合作商",
+      "alias": "希音合作商",
+      "normalized_alias": "希音合作商",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106639,6 +107949,16 @@
       "alias": "希音合作商概念",
       "normalized_alias": "希音合作商概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2279",
+      "scope_name": "希音合作商",
+      "alias": "希音合作商概念",
+      "normalized_alias": "希音合作商概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106651,6 +107971,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2279",
+      "scope_name": "希音合作商",
+      "alias": "希音合作商概念板块",
+      "normalized_alias": "希音合作商概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -106939,6 +108269,16 @@
       "alias": "并购重组概念",
       "normalized_alias": "并购重组概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1181",
+      "scope_name": "并购重组概念",
+      "alias": "并购重组概念",
+      "normalized_alias": "并购重组概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -106991,6 +108331,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1181",
+      "scope_name": "并购重组概念",
+      "alias": "并购重组概念板块",
+      "normalized_alias": "并购重组概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -108379,6 +109729,16 @@
       "alias": "建筑",
       "normalized_alias": "建筑",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑",
+      "normalized_alias": "建筑",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -108759,6 +110119,16 @@
       "alias": "建筑装饰",
       "normalized_alias": "建筑装饰",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑装饰",
+      "normalized_alias": "建筑装饰",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -108869,6 +110239,16 @@
       "alias": "建筑装饰板块",
       "normalized_alias": "建筑装饰板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑装饰板块",
+      "normalized_alias": "建筑装饰板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -108911,6 +110291,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1209",
+      "scope_name": "建筑装饰",
+      "alias": "建筑装饰行业",
+      "normalized_alias": "建筑装饰行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -111889,6 +113279,16 @@
       "alias": "房地产",
       "normalized_alias": "房地产",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "房地产",
+      "normalized_alias": "房地产",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -112169,6 +113569,16 @@
       "alias": "房地产服务",
       "normalized_alias": "房地产服务",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1045",
+      "scope_name": "房地产服务",
+      "alias": "房地产服务",
+      "normalized_alias": "房地产服务",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -112221,6 +113631,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1045",
+      "scope_name": "房地产服务",
+      "alias": "房地产服务板块",
+      "normalized_alias": "房地产服务板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -112281,6 +113701,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1045",
+      "scope_name": "房地产服务",
+      "alias": "房地产服务行业",
+      "normalized_alias": "房地产服务行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -112341,6 +113771,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "房地产板块",
+      "normalized_alias": "房地产板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -112419,6 +113859,16 @@
       "alias": "房地产营销服务房地产代销",
       "normalized_alias": "房地产营销服务房地产代销",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1045",
+      "scope_name": "房地产服务",
+      "alias": "房地产营销服务房地产代销",
+      "normalized_alias": "房地产营销服务房地产代销",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -112451,6 +113901,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1202",
+      "scope_name": "房地产",
+      "alias": "房地产行业",
+      "normalized_alias": "房地产行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -112969,6 +114429,16 @@
       "alias": "抖音公司",
       "normalized_alias": "抖音公司",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2020",
+      "scope_name": "抖音概念",
+      "alias": "抖音公司",
+      "normalized_alias": "抖音公司",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -112991,6 +114461,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2020",
+      "scope_name": "抖音概念",
+      "alias": "抖音概念",
+      "normalized_alias": "抖音概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -113051,6 +114531,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2020",
+      "scope_name": "抖音概念",
+      "alias": "抖音概念板块",
+      "normalized_alias": "抖音概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -114993,6 +116483,16 @@
       "snapshot_id": "csindex-2026-07-13-86968c7b643e"
     },
     {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:041354",
+      "scope_name": "数据中心",
+      "alias": "数据中心",
+      "normalized_alias": "数据中心",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
       "scope_type": "index",
       "scope_code": "932092",
       "scope_name": "数据中心",
@@ -115036,11 +116536,31 @@
       "scope_type": "concept",
       "scope_code": "BAIDU:041354",
       "scope_name": "数据中心",
+      "alias": "数据中心概念",
+      "normalized_alias": "数据中心概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:041354",
+      "scope_name": "数据中心",
       "alias": "数据中心概念板块",
       "normalized_alias": "数据中心概念板块",
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:041354",
+      "scope_name": "数据中心",
+      "alias": "数据中心概念板块",
+      "normalized_alias": "数据中心概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -115206,6 +116726,16 @@
       "scope_type": "concept",
       "scope_code": "BAIDU:GN2344",
       "scope_name": "文创玩具(谷子经济)",
+      "alias": "文创玩具(谷子经济)",
+      "normalized_alias": "文创玩具(谷子经济)",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2344",
+      "scope_name": "文创玩具(谷子经济)",
       "alias": "文创玩具(谷子经济)概念",
       "normalized_alias": "文创玩具(谷子经济)概念",
       "source": "baidu-related-block",
@@ -115216,11 +116746,31 @@
       "scope_type": "concept",
       "scope_code": "BAIDU:GN2344",
       "scope_name": "文创玩具(谷子经济)",
+      "alias": "文创玩具(谷子经济)概念",
+      "normalized_alias": "文创玩具(谷子经济)概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2344",
+      "scope_name": "文创玩具(谷子经济)",
       "alias": "文创玩具(谷子经济)概念板块",
       "normalized_alias": "文创玩具(谷子经济)概念板块",
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2344",
+      "scope_name": "文创玩具(谷子经济)",
+      "alias": "文创玩具(谷子经济)概念板块",
+      "normalized_alias": "文创玩具(谷子经济)概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -120109,6 +121659,16 @@
       "alias": "智慧城市",
       "normalized_alias": "智慧城市",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003628",
+      "scope_name": "智慧城市",
+      "alias": "智慧城市",
+      "normalized_alias": "智慧城市",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -120129,6 +121689,16 @@
       "alias": "智慧城市概念",
       "normalized_alias": "智慧城市概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003628",
+      "scope_name": "智慧城市",
+      "alias": "智慧城市概念",
+      "normalized_alias": "智慧城市概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -120141,6 +121711,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003628",
+      "scope_name": "智慧城市",
+      "alias": "智慧城市概念板块",
+      "normalized_alias": "智慧城市概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -120351,6 +121931,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003628",
+      "scope_name": "智慧城市",
+      "alias": "智能城市",
+      "normalized_alias": "智能城市",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -121209,6 +122799,16 @@
       "alias": "有色金属",
       "normalized_alias": "有色金属",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240000",
+      "scope_name": "有色金属",
+      "alias": "有色金属",
+      "normalized_alias": "有色金属",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -121299,6 +122899,16 @@
       "alias": "有色金属板块",
       "normalized_alias": "有色金属板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240000",
+      "scope_name": "有色金属",
+      "alias": "有色金属板块",
+      "normalized_alias": "有色金属板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -121371,6 +122981,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240000",
+      "scope_name": "有色金属",
+      "alias": "有色金属行业",
+      "normalized_alias": "有色金属行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -123269,6 +124889,16 @@
       "alias": "标普概念",
       "normalized_alias": "标普概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2102",
+      "scope_name": "标普道琼斯中国",
+      "alias": "标普概念",
+      "normalized_alias": "标普概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -123289,6 +124919,16 @@
       "alias": "标普道琼斯中国",
       "normalized_alias": "标普道琼斯中国",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2102",
+      "scope_name": "标普道琼斯中国",
+      "alias": "标普道琼斯中国",
+      "normalized_alias": "标普道琼斯中国",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -123301,6 +124941,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2102",
+      "scope_name": "标普道琼斯中国",
+      "alias": "标普道琼斯中国概念",
+      "normalized_alias": "标普道琼斯中国概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -123321,6 +124971,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2102",
+      "scope_name": "标普道琼斯中国",
+      "alias": "标普道琼斯中国概念板块",
+      "normalized_alias": "标普道琼斯中国概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -124999,6 +126659,16 @@
       "alias": "比亚迪概念",
       "normalized_alias": "比亚迪概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2144",
+      "scope_name": "比亚迪概念",
+      "alias": "比亚迪概念",
+      "normalized_alias": "比亚迪概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -125029,6 +126699,16 @@
       "alias": "比亚迪概念板块",
       "normalized_alias": "比亚迪概念板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2144",
+      "scope_name": "比亚迪概念",
+      "alias": "比亚迪概念板块",
+      "normalized_alias": "比亚迪概念板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -125041,6 +126721,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-15",
       "snapshot_id": "curated-scope-alias-2026-07-15-39c2ad482b96"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2144",
+      "scope_name": "比亚迪概念",
+      "alias": "比亚迪类",
+      "normalized_alias": "比亚迪类",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -125571,6 +127261,16 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003682",
+      "scope_name": "燃料电池概念",
+      "alias": "氢能源电池",
+      "normalized_alias": "氢能源电池",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -128619,6 +130319,16 @@
       "alias": "沪深300",
       "normalized_alias": "沪深300",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "index",
+      "scope_code": "000300",
+      "scope_name": "沪深300",
+      "alias": "沪深300",
+      "normalized_alias": "沪深300",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -128719,6 +130429,16 @@
       "alias": "沪深300指数",
       "normalized_alias": "沪深300指数",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "index",
+      "scope_code": "000300",
+      "scope_name": "沪深300",
+      "alias": "沪深300指数",
+      "normalized_alias": "沪深300指数",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -128771,6 +130491,16 @@
       "source": "csindex",
       "as_of_date": "2026-07-13",
       "snapshot_id": "csindex-2026-07-13-86968c7b643e"
+    },
+    {
+      "scope_type": "index",
+      "scope_code": "000300",
+      "scope_name": "沪深300",
+      "alias": "沪深300港元净收益指数",
+      "normalized_alias": "沪深300港元净收益指数",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "index",
@@ -130849,6 +132579,16 @@
       "alias": "海产品捕捞",
       "normalized_alias": "海产品捕捞",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1513",
+      "scope_name": "海洋捕捞",
+      "alias": "海产品捕捞",
+      "normalized_alias": "海产品捕捞",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -131171,6 +132911,16 @@
       "source": "akshare-security-identity",
       "as_of_date": "2026-07-13",
       "snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:101414",
+      "scope_name": "激光雷达",
+      "alias": "海商激光测距",
+      "normalized_alias": "海商激光测距",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -131699,6 +133449,16 @@
       "alias": "海洋捕捞",
       "normalized_alias": "海洋捕捞",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1513",
+      "scope_name": "海洋捕捞",
+      "alias": "海洋捕捞",
+      "normalized_alias": "海洋捕捞",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -131729,6 +133489,16 @@
       "alias": "海洋捕捞板块",
       "normalized_alias": "海洋捕捞板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1513",
+      "scope_name": "海洋捕捞",
+      "alias": "海洋捕捞板块",
+      "normalized_alias": "海洋捕捞板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -131751,6 +133521,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1513",
+      "scope_name": "海洋捕捞",
+      "alias": "海洋捕捞行业",
+      "normalized_alias": "海洋捕捞行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -132251,6 +134031,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2103",
+      "scope_name": "大消费",
+      "alias": "消费",
+      "normalized_alias": "消费",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -133261,6 +135051,36 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2363",
+      "scope_name": "深海经济",
+      "alias": "深海经济",
+      "normalized_alias": "深海经济",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2363",
+      "scope_name": "深海经济",
+      "alias": "深海经济概念",
+      "normalized_alias": "深海经济概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2363",
+      "scope_name": "深海经济",
+      "alias": "深海经济概念板块",
+      "normalized_alias": "深海经济概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -134466,6 +136286,16 @@
       "scope_type": "concept",
       "scope_code": "BAIDU:101414",
       "scope_name": "激光雷达",
+      "alias": "激光雷达",
+      "normalized_alias": "激光雷达",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:101414",
+      "scope_name": "激光雷达",
       "alias": "激光雷达概念",
       "normalized_alias": "激光雷达概念",
       "source": "baidu-related-block",
@@ -134476,11 +136306,31 @@
       "scope_type": "concept",
       "scope_code": "BAIDU:101414",
       "scope_name": "激光雷达",
+      "alias": "激光雷达概念",
+      "normalized_alias": "激光雷达概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:101414",
+      "scope_name": "激光雷达",
       "alias": "激光雷达概念板块",
       "normalized_alias": "激光雷达概念板块",
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:101414",
+      "scope_name": "激光雷达",
+      "alias": "激光雷达概念板块",
+      "normalized_alias": "激光雷达概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -135709,6 +137559,16 @@
       "alias": "燃料电池概念",
       "normalized_alias": "燃料电池概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003682",
+      "scope_name": "燃料电池概念",
+      "alias": "燃料电池概念",
+      "normalized_alias": "燃料电池概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -135721,6 +137581,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003682",
+      "scope_name": "燃料电池概念",
+      "alias": "燃料电池概念板块",
+      "normalized_alias": "燃料电池概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -139629,6 +141499,16 @@
       "alias": "电子化学品",
       "normalized_alias": "电子化学品",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1039",
+      "scope_name": "电子化学品Ⅱ",
+      "alias": "电子化学品",
+      "normalized_alias": "电子化学品",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -139661,6 +141541,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1039",
+      "scope_name": "电子化学品Ⅱ",
+      "alias": "电子化学品Ⅱ",
+      "normalized_alias": "电子化学品ii",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -139749,6 +141639,16 @@
       "alias": "电子化学品Ⅱ板块",
       "normalized_alias": "电子化学品ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1039",
+      "scope_name": "电子化学品Ⅱ",
+      "alias": "电子化学品Ⅱ板块",
+      "normalized_alias": "电子化学品ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -139799,6 +141699,16 @@
       "alias": "电子化学品Ⅱ行业",
       "normalized_alias": "电子化学品ii行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1039",
+      "scope_name": "电子化学品Ⅱ",
+      "alias": "电子化学品Ⅱ行业",
+      "normalized_alias": "电子化学品ii行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -139831,6 +141741,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1039",
+      "scope_name": "电子化学品Ⅱ",
+      "alias": "电子化学品行业",
+      "normalized_alias": "电子化学品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -140409,6 +142329,16 @@
       "alias": "电机Ⅱ",
       "normalized_alias": "电机ii",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1030",
+      "scope_name": "电机Ⅱ",
+      "alias": "电机Ⅱ",
+      "normalized_alias": "电机ii",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -140489,6 +142419,16 @@
       "alias": "电机Ⅱ板块",
       "normalized_alias": "电机ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1030",
+      "scope_name": "电机Ⅱ",
+      "alias": "电机Ⅱ板块",
+      "normalized_alias": "电机ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -140539,6 +142479,16 @@
       "alias": "电机Ⅱ行业",
       "normalized_alias": "电机ii行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1030",
+      "scope_name": "电机Ⅱ",
+      "alias": "电机Ⅱ行业",
+      "normalized_alias": "电机ii行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -140571,6 +142521,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1030",
+      "scope_name": "电机Ⅱ",
+      "alias": "电机公司",
+      "normalized_alias": "电机公司",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -145873,6 +147833,16 @@
       "snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5"
     },
     {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2369",
+      "scope_name": "科技",
+      "alias": "科技",
+      "normalized_alias": "科技",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
       "scope_type": "industry",
       "scope_code": "BAIDU:M75000",
       "scope_name": "科技推广和应用服务业",
@@ -145931,6 +147901,46 @@
       "source": "sina-finance",
       "as_of_date": "2026-07-13",
       "snapshot_id": "sina-sector-2026-07-13-cf1899833511"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2369",
+      "scope_name": "科技",
+      "alias": "科技板块",
+      "normalized_alias": "科技板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2369",
+      "scope_name": "科技",
+      "alias": "科技概念",
+      "normalized_alias": "科技概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2369",
+      "scope_name": "科技",
+      "alias": "科技概念板块",
+      "normalized_alias": "科技概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2369",
+      "scope_name": "科技",
+      "alias": "科技类",
+      "normalized_alias": "科技类",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "security",
@@ -149319,6 +151329,16 @@
       "alias": "综合金融服务概念",
       "normalized_alias": "综合金融服务概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:490300",
+      "scope_name": "多元金融",
+      "alias": "综合金融服务概念",
+      "normalized_alias": "综合金融服务概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -151619,6 +153639,16 @@
       "alias": "脑机接口",
       "normalized_alias": "脑机接口",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:251393",
+      "scope_name": "脑科学(脑机接口)",
+      "alias": "脑机接口",
+      "normalized_alias": "脑机接口",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -151639,6 +153669,16 @@
       "alias": "脑科学(脑机接口)",
       "normalized_alias": "脑科学(脑机接口)",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:251393",
+      "scope_name": "脑科学(脑机接口)",
+      "alias": "脑科学(脑机接口)",
+      "normalized_alias": "脑科学(脑机接口)",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -151651,6 +153691,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:251393",
+      "scope_name": "脑科学(脑机接口)",
+      "alias": "脑科学(脑机接口)概念",
+      "normalized_alias": "脑科学(脑机接口)概念",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -151671,6 +153721,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:251393",
+      "scope_name": "脑科学(脑机接口)",
+      "alias": "脑科学(脑机接口)概念板块",
+      "normalized_alias": "脑科学(脑机接口)概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -153379,6 +155439,16 @@
       "alias": "芯片",
       "normalized_alias": "芯片",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003891",
+      "scope_name": "芯片概念",
+      "alias": "芯片",
+      "normalized_alias": "芯片",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -153409,6 +155479,16 @@
       "alias": "芯片概念",
       "normalized_alias": "芯片概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003891",
+      "scope_name": "芯片概念",
+      "alias": "芯片概念",
+      "normalized_alias": "芯片概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -153431,6 +155511,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:003891",
+      "scope_name": "芯片概念",
+      "alias": "芯片概念板块",
+      "normalized_alias": "芯片概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -156759,6 +158849,16 @@
       "alias": "证券Ⅱ",
       "normalized_alias": "证券ii",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0473",
+      "scope_name": "证券Ⅱ",
+      "alias": "证券Ⅱ",
+      "normalized_alias": "证券ii",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -156839,6 +158939,16 @@
       "alias": "证券Ⅱ板块",
       "normalized_alias": "证券ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0473",
+      "scope_name": "证券Ⅱ",
+      "alias": "证券Ⅱ板块",
+      "normalized_alias": "证券ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -156881,6 +158991,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0473",
+      "scope_name": "证券Ⅱ",
+      "alias": "证券Ⅱ行业",
+      "normalized_alias": "证券ii行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -156951,6 +159071,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK0473",
+      "scope_name": "证券Ⅱ",
+      "alias": "证券商",
+      "normalized_alias": "证券商",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -157289,6 +159419,16 @@
       "alias": "调味发酵品Ⅱ",
       "normalized_alias": "调味发酵品ii",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1278",
+      "scope_name": "调味发酵品Ⅱ",
+      "alias": "调味发酵品Ⅱ",
+      "normalized_alias": "调味发酵品ii",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157369,6 +159509,16 @@
       "alias": "调味发酵品Ⅱ板块",
       "normalized_alias": "调味发酵品ii板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1278",
+      "scope_name": "调味发酵品Ⅱ",
+      "alias": "调味发酵品Ⅱ板块",
+      "normalized_alias": "调味发酵品ii板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157419,6 +159569,16 @@
       "alias": "调味发酵品Ⅱ行业",
       "normalized_alias": "调味发酵品ii行业",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1278",
+      "scope_name": "调味发酵品Ⅱ",
+      "alias": "调味发酵品Ⅱ行业",
+      "normalized_alias": "调味发酵品ii行业",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157451,6 +159611,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1278",
+      "scope_name": "调味发酵品Ⅱ",
+      "alias": "调味发酵品行业",
+      "normalized_alias": "调味发酵品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -157494,6 +159664,26 @@
     },
     {
       "scope_type": "concept",
+      "scope_code": "BAIDU:GN2344",
+      "scope_name": "文创玩具(谷子经济)",
+      "alias": "谷子cop",
+      "normalized_alias": "谷子cop",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1183",
+      "scope_name": "谷子经济",
+      "alias": "谷子板块",
+      "normalized_alias": "谷子板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
       "scope_code": "BK1183",
       "scope_name": "谷子经济",
       "alias": "谷子板块",
@@ -157529,6 +159719,16 @@
       "alias": "谷子概念",
       "normalized_alias": "谷子概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1183",
+      "scope_name": "谷子经济",
+      "alias": "谷子概念",
+      "normalized_alias": "谷子概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157541,6 +159741,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-15",
       "snapshot_id": "curated-scope-alias-2026-07-15-39c2ad482b96"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1183",
+      "scope_name": "谷子经济",
+      "alias": "谷子经济",
+      "normalized_alias": "谷子经济",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -157589,6 +159799,16 @@
       "alias": "谷子经济概念",
       "normalized_alias": "谷子经济概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1183",
+      "scope_name": "谷子经济",
+      "alias": "谷子经济概念",
+      "normalized_alias": "谷子经济概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157621,6 +159841,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-f20e5b4e7687"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1183",
+      "scope_name": "谷子经济",
+      "alias": "谷子经济概念板块",
+      "normalized_alias": "谷子经济概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -157689,6 +159919,16 @@
       "alias": "豆包",
       "normalized_alias": "豆包",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2350",
+      "scope_name": "豆包概念",
+      "alias": "豆包",
+      "normalized_alias": "豆包",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157701,6 +159941,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-15",
       "snapshot_id": "curated-scope-alias-2026-07-15-39c2ad482b96"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2350",
+      "scope_name": "豆包概念",
+      "alias": "豆包应用",
+      "normalized_alias": "豆包应用",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -157729,6 +159979,16 @@
       "alias": "豆包概念",
       "normalized_alias": "豆包概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2350",
+      "scope_name": "豆包概念",
+      "alias": "豆包概念",
+      "normalized_alias": "豆包概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157759,6 +160019,16 @@
       "alias": "豆包概念板块",
       "normalized_alias": "豆包概念板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2350",
+      "scope_name": "豆包概念",
+      "alias": "豆包概念板块",
+      "normalized_alias": "豆包概念板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -157771,6 +160041,16 @@
       "source": "curated-scope-alias",
       "as_of_date": "2026-07-15",
       "snapshot_id": "curated-scope-alias-2026-07-15-39c2ad482b96"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2350",
+      "scope_name": "豆包概念",
+      "alias": "豆包概率",
+      "normalized_alias": "豆包概率",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",
@@ -160179,6 +162459,16 @@
       "alias": "轻工制造",
       "normalized_alias": "轻工制造",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:360000",
+      "scope_name": "轻工制造",
+      "alias": "轻工制造",
+      "normalized_alias": "轻工制造",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -160209,6 +162499,16 @@
       "alias": "轻工制造板块",
       "normalized_alias": "轻工制造板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:360000",
+      "scope_name": "轻工制造",
+      "alias": "轻工制造板块",
+      "normalized_alias": "轻工制造板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -160231,6 +162531,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:360000",
+      "scope_name": "轻工制造",
+      "alias": "轻工制造行业",
+      "normalized_alias": "轻工制造行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -160479,6 +162789,16 @@
       "alias": "辽宁指数",
       "normalized_alias": "辽宁指数",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "region",
+      "scope_code": "BAIDU:DY1161",
+      "scope_name": "辽宁板块",
+      "alias": "辽宁指数",
+      "normalized_alias": "辽宁指数",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -160491,6 +162811,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "region",
+      "scope_code": "BAIDU:DY1161",
+      "scope_name": "辽宁板块",
+      "alias": "辽宁板块",
+      "normalized_alias": "辽宁板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "region",
@@ -163079,6 +165409,16 @@
       "alias": "重组概念",
       "normalized_alias": "重组概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BK1181",
+      "scope_name": "并购重组概念",
+      "alias": "重组概念",
+      "normalized_alias": "重组概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -163529,6 +165869,16 @@
       "alias": "金属制品",
       "normalized_alias": "金属制品",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1396",
+      "scope_name": "金属制品",
+      "alias": "金属制品",
+      "normalized_alias": "金属制品",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -163709,6 +166059,16 @@
       "alias": "金属制品板块",
       "normalized_alias": "金属制品板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1396",
+      "scope_name": "金属制品",
+      "alias": "金属制品板块",
+      "normalized_alias": "金属制品板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -163731,6 +166091,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1396",
+      "scope_name": "金属制品",
+      "alias": "金属制品行业",
+      "normalized_alias": "金属制品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -163919,8 +166289,28 @@
       "alias": "金属板块",
       "normalized_alias": "金属板块",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BAIDU:240000",
+      "scope_name": "有色金属",
+      "alias": "金属板块",
+      "normalized_alias": "金属板块",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1396",
+      "scope_name": "金属制品",
+      "alias": "金属管件制品行业",
+      "normalized_alias": "金属管件制品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -164409,6 +166799,16 @@
       "alias": "金融",
       "normalized_alias": "金融",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:2c8521d5fcbe2223",
+      "scope_name": "金融",
+      "alias": "金融",
+      "normalized_alias": "金融",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -164501,6 +166901,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:477485ed498cc26a",
+      "scope_name": "金融公司",
+      "alias": "金融公司",
+      "normalized_alias": "金融公司",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "composite",
@@ -166601,6 +169011,16 @@
       "source": "eastmoney",
       "as_of_date": "2026-07-13",
       "snapshot_id": "eastmoney-2026-07-13-56e24c4923ea"
+    },
+    {
+      "scope_type": "composite",
+      "scope_code": "CURATED:e036e80453b7995f",
+      "scope_name": "银行保险",
+      "alias": "银行保险",
+      "normalized_alias": "银行保险",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "composite",
@@ -171509,6 +173929,16 @@
       "alias": "饮料",
       "normalized_alias": "饮料",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1282",
+      "scope_name": "饮料乳品",
+      "alias": "饮料",
+      "normalized_alias": "饮料",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -171521,6 +173951,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1282",
+      "scope_name": "饮料乳品",
+      "alias": "饮料乳品",
+      "normalized_alias": "饮料乳品",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -171551,6 +173991,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1282",
+      "scope_name": "饮料乳品",
+      "alias": "饮料乳品板块",
+      "normalized_alias": "饮料乳品板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -171581,6 +174031,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "industry",
+      "scope_code": "BK1282",
+      "scope_name": "饮料乳品",
+      "alias": "饮料乳品行业",
+      "normalized_alias": "饮料乳品行业",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "industry",
@@ -172399,6 +174859,16 @@
       "alias": "高带宽存储器HBM",
       "normalized_alias": "高带宽存储器hbm",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2272",
+      "scope_name": "高带宽存储器HBM",
+      "alias": "高带宽存储器HBM",
+      "normalized_alias": "高带宽存储器hbm",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -172429,6 +174899,16 @@
       "alias": "高带宽存储器HBM概念",
       "normalized_alias": "高带宽存储器hbm概念",
       "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2272",
+      "scope_name": "高带宽存储器HBM",
+      "alias": "高带宽存储器HBM概念",
+      "normalized_alias": "高带宽存储器hbm概念",
+      "source": "curated-scope-alias",
       "as_of_date": "2026-07-30",
       "snapshot_id": "curated-scope-alias-2026-07-30-7a4260479631"
     },
@@ -172451,6 +174931,16 @@
       "source": "baidu-related-block",
       "as_of_date": "2026-07-15",
       "snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b"
+    },
+    {
+      "scope_type": "concept",
+      "scope_code": "BAIDU:GN2272",
+      "scope_name": "高带宽存储器HBM",
+      "alias": "高带宽存储器HBM概念板块",
+      "normalized_alias": "高带宽存储器hbm概念板块",
+      "source": "curated-scope-alias",
+      "as_of_date": "2026-08-01",
+      "snapshot_id": "curated-scope-alias-2026-08-01-67feea09f03e"
     },
     {
       "scope_type": "concept",

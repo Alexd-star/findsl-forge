@@ -708,6 +708,14 @@ def _validate_expr(expression, catalog, expressions=None):
             if not column.isidentifier():
                 raise PhysicalCatalogError("invalid external lookup filter column")
             _validate_expr(value, catalog, expressions)
+        if expression.policy_id is not None:
+            if (
+                not expression.policy_id.strip()
+                or not expression.policy_semantic_basis
+                or expression.policy_risk_level not in {"low", "medium", "high"}
+                or not expression.policy_rationale_urls
+            ):
+                raise ValueError("external lookup semantic policy provenance is incomplete")
     elif isinstance(expression, (PhysicalBinary, PhysicalComparison)):
         _validate_expr(expression.left, catalog, expressions)
         _validate_expr(expression.right, catalog, expressions)

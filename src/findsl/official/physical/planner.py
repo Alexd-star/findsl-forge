@@ -4207,12 +4207,21 @@ def _lower_scope_expression(
             resolved = catalog.resolve(expression.name)
         except KeyError:
             external = external_catalog.resolve(expression.name)
+            policy = external.policy
             return PhysicalExternalExists(
                 external_catalog.membership_resource_id,
                 anchor_resource_id,
                 (
                     ("scope_code", PhysicalLiteral(external.option.scope_code, STRING)),
                     ("snapshot_id", PhysicalLiteral(external.option.snapshot_id, STRING)),
+                ),
+                policy_id=policy.policy_id if policy is not None else None,
+                policy_semantic_basis=(
+                    policy.semantic_basis if policy is not None else None
+                ),
+                policy_risk_level=policy.risk_level if policy is not None else None,
+                policy_rationale_urls=(
+                    policy.rationale_urls if policy is not None else ()
                 ),
             )
         else:

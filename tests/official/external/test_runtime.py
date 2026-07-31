@@ -5,6 +5,7 @@ from findsl.official.external.runtime import (
     ExternalDataPolicy,
     ExternalScopeRuntimeCatalog,
     ExternalScopeRuntimeError,
+    default_external_scope_catalog,
 )
 
 
@@ -99,3 +100,15 @@ def test_benchmark_policy_requires_one_explicit_context_match():
     assert catalog.resolve("大盘", "沪").index_code == "000001"
     with pytest.raises(KeyError):
         catalog.resolve("未知基准")
+
+
+def test_default_runtime_resolves_versioned_scope_policy_casefold_and_provenance():
+    catalog = default_external_scope_catalog()
+
+    upper = catalog.resolve("S板")
+    lower = catalog.resolve("s板")
+
+    assert upper.option.scope_code == lower.option.scope_code
+    assert upper.option.snapshot_id.startswith("curated-scope-alias-2026-08-01-")
+    assert upper.policy is not None
+    assert upper.policy.policy_id == "exchange-s-board-name-rule-v1"

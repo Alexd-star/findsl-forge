@@ -892,6 +892,19 @@ def test_external_scope_membership_is_planned_with_snapshot_provenance():
     assert '"column":"snapshot_id"' in payload
 
 
+def test_semantic_scope_policy_is_auditable_in_physical_ir_but_not_sql_filters():
+    result = plan_physical(
+        _lower("indicator('', '科技', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    assert '"policy_id":"broad-technology-to-tmt-v1"' in payload
+    assert '"semantic_basis":"business_policy"' in payload
+    assert '"risk_level":"medium"' in payload
+    assert '"value":"BAIDU:GN2369"' in payload
+
+
 def test_empty_rank_indicator_uses_stable_security_key_tie_break_order():
     result = plan_physical(
         _lower("rank('', '', '', 'desc', '', '', '', '') <= 3"),

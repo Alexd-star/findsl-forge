@@ -5,9 +5,10 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from .models import normalize_catalog_name
+from .policy import ScopeSemanticPolicy, ScopeSemanticPolicyCatalog
 
 
 class ExternalScopeRuntimeError(ValueError):
@@ -28,6 +29,7 @@ class ExternalScopeOption:
 class ResolvedExternalScope:
     source: str
     option: ExternalScopeOption
+    policy: Optional[ScopeSemanticPolicy] = None
 
 
 @dataclass(frozen=True)
@@ -175,7 +177,13 @@ class ExternalIndexQuoteCatalog:
 
 
 class ExternalScopeRuntimeCatalog:
-    def __init__(self, entries, *, membership_resource_id: str):
+    def __init__(
+        self,
+        entries,
+        *,
+        membership_resource_id: str,
+        semantic_policies: Optional[ScopeSemanticPolicyCatalog] = None,
+    ):
         by_alias: Dict[str, list[ExternalScopeOption]] = {}
         for entry in entries:
             expected = {
@@ -206,14 +214,32 @@ class ExternalScopeRuntimeCatalog:
             }
         )
         self.membership_resource_id = membership_resource_id
+        self.semantic_policies = semantic_policies
 
     def resolve(self, atom: str) -> ResolvedExternalScope:
         source = str(atom).strip()
         options = self._by_alias.get(normalize_catalog_name(source), ())
         if not options:
             raise KeyError(source)
+        policy = None
+        if self.semantic_policies is not None:
+            try:
+                policy = self.semantic_policies.resolve(source)
+            except KeyError:
+                pass
+            else:
+                options = tuple(
+                    option
+                    for option in options
+                    if option.scope_code == policy.scope_code
+                )
+                if not options:
+                    raise ExternalScopeRuntimeError(
+                        "semantic policy target is absent from runtime catalog: "
+                        f"{policy.policy_id}/{policy.scope_code}"
+                    )
         selected = min(options, key=lambda item: _option_priority(source, item))
-        return ResolvedExternalScope(source, selected)
+        return ResolvedExternalScope(source, selected, policy)
 
     @classmethod
     def from_dict(cls, raw) -> "ExternalScopeRuntimeCatalog":
@@ -285,8 +311,22 @@ def _membership_policy(raw, *, industry: bool) -> ExternalMembershipPolicy:
 @lru_cache(maxsize=1)
 def default_external_scope_catalog() -> ExternalScopeRuntimeCatalog:
     root = Path(__file__).resolve().parents[4]
-    return ExternalScopeRuntimeCatalog.load(
-        root / "configs" / "official" / "external_scope_runtime.json"
+    runtime = json.loads(
+        (root / "configs" / "official" / "external_scope_runtime.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    policies = ScopeSemanticPolicyCatalog.load(
+        root / "configs" / "official" / "scope_semantic_policies.json"
+    )
+    if set(runtime) != {"schema_version", "membership_resource_id", "entries"}:
+        raise ExternalScopeRuntimeError("invalid external runtime catalog root")
+    if runtime["schema_version"] != 1:
+        raise ExternalScopeRuntimeError("unsupported external runtime catalog version")
+    return ExternalScopeRuntimeCatalog(
+        runtime["entries"],
+        membership_resource_id=str(runtime["membership_resource_id"]),
+        semantic_policies=policies,
     )
 
 

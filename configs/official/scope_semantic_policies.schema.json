@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:findsl:scope-semantic-policies:v1",
+  "title": "FinDSL 范围语义政策",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_set_id",
+    "profile",
+    "allowed_risk_levels",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "policy_set_id": {"type": "string", "minLength": 1},
+    "profile": {"type": "string", "minLength": 1},
+    "allowed_risk_levels": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["low", "medium", "high"]}
+    },
+    "entries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/policy"}
+    }
+  },
+  "$defs": {
+    "common": {
+      "type": "object",
+      "required": [
+        "policy_id",
+        "aliases",
+        "resolution_kind",
+        "scope_name",
+        "minimum_member_count",
+        "maximum_member_count",
+        "semantic_basis",
+        "confidence",
+        "risk_level",
+        "review_status",
+        "effective_from",
+        "rationale",
+        "rationale_urls",
+        "data_boundary"
+      ],
+      "properties": {
+        "policy_id": {"type": "string", "minLength": 1},
+        "aliases": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "scope_name": {"type": "string", "minLength": 1},
+        "minimum_member_count": {"type": "integer", "minimum": 1},
+        "maximum_member_count": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "semantic_basis": {
+          "enum": [
+            "official_rule",
+            "provider_taxonomy",
+            "business_policy",
+            "controlled_typo_correction"
+          ]
+        },
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "risk_level": {"enum": ["low", "medium", "high"]},
+        "review_status": {"enum": ["approved", "draft", "rejected"]},
+        "effective_from": {"type": "string", "format": "date"},
+        "rationale": {"type": "string", "minLength": 1},
+        "rationale_urls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "data_boundary": {"type": "string", "minLength": 1}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_snapshot_id", "scope_code", "minimum_member_count"],
+      "properties": {
+        "source_snapshot_id": {"type": "string", "minLength": 1},
+        "scope_code": {"type": "string", "minLength": 1},
+        "minimum_member_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "policy": {
+      "allOf": [
+        {"$ref": "#/$defs/common"},
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "resolution_kind": {"const": "exact_scope"},
+                "target": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["source_snapshot_id", "scope_code"],
+                  "properties": {
+                    "source_snapshot_id": {"type": "string", "minLength": 1},
+                    "scope_code": {"type": "string", "minLength": 1}
+                  }
+                }
+              },
+              "required": ["target"]
+            },
+            {
+              "properties": {
+                "resolution_kind": {"const": "security_name_regex"},
+                "source_snapshot_id": {"type": "string", "minLength": 1},
+                "selector": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["field", "operator", "value"],
+                  "properties": {
+                    "field": {"const": "scope_name"},
+                    "operator": {"const": "regex"},
+                    "value": {"type": "string", "minLength": 1}
+                  }
+                }
+              },
+              "required": ["source_snapshot_id", "selector"]
+            },
+            {
+              "properties": {
+                "resolution_kind": {"const": "set_operation"},
+                "operation": {"enum": ["intersection", "union"]},
+                "components": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {"$ref": "#/$defs/component"}
+                }
+              },
+              "required": ["operation", "components"]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

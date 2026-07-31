@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "policy_set_id": "official-competition-scope-policy-v1",
+  "profile": "competition",
+  "allowed_risk_levels": ["low", "medium"],
+  "entries": [
+    {
+      "policy_id": "exchange-s-board-name-rule-v1",
+      "aliases": ["S板", "s版"],
+      "resolution_kind": "security_name_regex",
+      "scope_name": "S板",
+      "minimum_member_count": 1,
+      "maximum_member_count": 10,
+      "semantic_basis": "official_rule",
+      "confidence": "high",
+      "risk_level": "low",
+      "review_status": "approved",
+      "effective_from": "2006-10-09",
+      "rationale": "深交所规定，尚未完成股权分置改革的 A 股股票简称前冠 S；规则排除 ST 前缀，并从版本化证券身份快照动态选择当前匹配证券。",
+      "rationale_urls": [
+        "https://www.szse.cn/disclosure/notice/t20060927_499700.html"
+      ],
+      "data_boundary": "只证明当前证券身份快照中的 S 前缀成员，不反推任意历史交易日的 S 状态。",
+      "source_snapshot_id": "akshare-security-identity-2026-07-13-ff0013357ba5",
+      "selector": {
+        "field": "scope_name",
+        "operator": "regex",
+        "value": "^S(?!T)"
+      }
+    },
+    {
+      "policy_id": "deep-sea-economy-to-technology-v1",
+      "aliases": ["深海经济"],
+      "resolution_kind": "exact_scope",
+      "scope_name": "深海经济",
+      "minimum_member_count": 100,
+      "maximum_member_count": 250,
+      "semantic_basis": "business_policy",
+      "confidence": "medium",
+      "risk_level": "medium",
+      "review_status": "approved",
+      "effective_from": "2026-07-15",
+      "rationale": "比赛范围槽中的深海经济按公开深海科技主题成员解释；政府工作报告将深海科技列为新兴产业，但该映射不等同于完整海洋经济产业边界。",
+      "rationale_urls": [
+        "https://www.gov.cn/yaowen/liebiao/202503/content_7013163.htm",
+        "https://finance.pae.baidu.com/api/getrelatedblock"
+      ],
+      "data_boundary": "采用数据提供方 2026-07-15 的 A 股深海科技截面成员，不冒充赛题方唯一口径或历史成分。",
+      "target": {
+        "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+        "scope_code": "BAIDU:GN2363"
+      }
+    },
+    {
+      "policy_id": "broad-technology-to-tmt-v1",
+      "aliases": ["科技", "科技板块", "科技类"],
+      "resolution_kind": "exact_scope",
+      "scope_name": "科技",
+      "minimum_member_count": 1000,
+      "maximum_member_count": 1800,
+      "semantic_basis": "business_policy",
+      "confidence": "medium",
+      "risk_level": "medium",
+      "review_status": "approved",
+      "effective_from": "2026-07-15",
+      "rationale": "未限定细分行业的科技范围在比赛配置中采用宽口径 TMT 成员；这是可替换业务政策，不宣称科技与 TMT 在所有金融语境中天然等价。",
+      "rationale_urls": [
+        "https://finance.pae.baidu.com/api/getrelatedblock"
+      ],
+      "data_boundary": "仅用于 A 股范围槽的宽口径筛选，生产部署可按机构行业分类替换配置，无需修改编译器核心代码。",
+      "target": {
+        "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+        "scope_code": "BAIDU:GN2369"
+      }
+    },
+    {
+      "policy_id": "data-center-truncated-name-correction-v1",
+      "aliases": ["中心概念板块"],
+      "resolution_kind": "exact_scope",
+      "scope_name": "数据中心",
+      "minimum_member_count": 500,
+      "maximum_member_count": 800,
+      "semantic_basis": "controlled_typo_correction",
+      "confidence": "medium",
+      "risk_level": "medium",
+      "review_status": "approved",
+      "effective_from": "2026-07-15",
+      "rationale": "中心概念板块按数据中心概念的截断录入解释，映射到版本化公开成员；不采用编辑距离自动猜测。",
+      "rationale_urls": [
+        "https://finance.pae.baidu.com/api/getrelatedblock"
+      ],
+      "data_boundary": "该修正仅对白名单原子生效，其他含中心字样的范围不会自动映射。",
+      "target": {
+        "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+        "scope_code": "BAIDU:041354"
+      }
+    },
+    {
+      "policy_id": "laser-ranging-to-lidar-correction-v1",
+      "aliases": ["海商激光测距"],
+      "resolution_kind": "exact_scope",
+      "scope_name": "激光雷达",
+      "minimum_member_count": 60,
+      "maximum_member_count": 150,
+      "semantic_basis": "controlled_typo_correction",
+      "confidence": "medium",
+      "risk_level": "medium",
+      "review_status": "approved",
+      "effective_from": "2026-07-15",
+      "rationale": "该原子中的激光测距按资本市场常见激光雷达主题解释，并固定到审核过的公开成员快照。",
+      "rationale_urls": [
+        "https://finance.pae.baidu.com/api/getrelatedblock"
+      ],
+      "data_boundary": "只处理完整白名单词项海商激光测距，不从激光或测距关键词泛化到其他板块。",
+      "target": {
+        "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+        "scope_code": "BAIDU:101414"
+      }
+    },
+    {
+      "policy_id": "guzi-cop-to-guzi-economy-correction-v1",
+      "aliases": ["谷子cop"],
+      "resolution_kind": "exact_scope",
+      "scope_name": "文创玩具(谷子经济)",
+      "minimum_member_count": 80,
+      "maximum_member_count": 200,
+      "semantic_basis": "controlled_typo_correction",
+      "confidence": "medium",
+      "risk_level": "medium",
+      "review_status": "approved",
+      "effective_from": "2026-07-15",
+      "rationale": "谷子cop按谷子经济主题的受控录入修正处理，使用完整公开成员，不创建单成员伪板块。",
+      "rationale_urls": [
+        "https://finance.pae.baidu.com/api/getrelatedblock"
+      ],
+      "data_boundary": "仅对该完整白名单原子生效，不启用通用拼写相似度映射。",
+      "target": {
+        "source_snapshot_id": "baidu-related-block-2026-07-15-a4e417e5272b",
+        "scope_code": "BAIDU:GN2344"
+      }
+    }
+  ]
+}
