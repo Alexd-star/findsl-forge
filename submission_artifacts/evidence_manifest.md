@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-07-31 00:11:06 +08:00
-- Git HEAD at export: cdb6729
+- Generated at: 2026-08-01 02:12:57 +08:00
+- Git HEAD at export: 96e0363
 - Git status when exported, excluding evidence snapshots and this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -12,7 +12,7 @@
 - `doris_cluster_evidence.json` (6537 bytes)
 - `doris_cluster_evidence.md` (6947 bytes)
 - `evaluation_report.md` (12366 bytes)
-- `external_catalog_doris_load.json` (811 bytes)
+- `external_catalog_doris_load.json` (1479 bytes)
 - `index_quote_doris_load.json` (197 bytes)
 - `index_quote_sync.json` (505 bytes)
 - `official_doris_evidence.json` (21959 bytes)
@@ -198,6 +198,14 @@
 - `phase47_benchmark_policy_doris.md` (1279 bytes)
 - `phase47_benchmark_policy_funnel.json` (3259040 bytes)
 - `phase47_benchmark_policy_funnel.md` (1091 bytes)
+- `phase48_scope_semantic_policy.json` (33691 bytes)
+- `phase48_scope_semantic_policy_delta_doris_audit.json` (21081 bytes)
+- `phase48_scope_semantic_policy_delta_doris_audit.md` (1872 bytes)
+- `phase48_scope_semantic_policy_doris.json` (46225 bytes)
+- `phase48_scope_semantic_policy_doris.md` (1671 bytes)
+- `phase48_scope_semantic_policy_funnel.json` (3259098 bytes)
+- `phase48_scope_semantic_policy_funnel.md` (1091 bytes)
+- `phase48_true_remaining_scope_targets.json` (4324 bytes)
 - `phase5_official_backend_evidence.json` (5431 bytes)
 - `phase5_official_backend_evidence.md` (984 bytes)
 - `phase6c_capability_funnel.json` (3257492 bytes)
@@ -213,7 +221,7 @@
 - `real_market_sample_report.md` (957 bytes)
 - `sina_sector_sync.json` (5386 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13295 bytes)
+- `submission_readiness.md` (13290 bytes)
 
 ## Excluded By Design
 

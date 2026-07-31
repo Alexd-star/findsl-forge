@@ -1,27 +1,27 @@
-{
-  "schema_version": 1,
-  "generated_at": "2026-07-30T14:08:30.7244821Z",
-  "catalog": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\data\\external_catalog\\catalog.sqlite3",
-  "doris": "127.0.0.1:9030",
-  "status": "PASS",
-  "tables": {
-    "scope_membership": {
-      "expected_rows": 207268,
-      "actual_rows": 207268,
-      "stream_load_status": "Success",
-      "filtered_rows": 0
-    },
-    "industry_membership": {
-      "expected_rows": 40907,
-      "actual_rows": 40907,
-      "stream_load_status": "Success",
-      "filtered_rows": 0
-    },
-    "instrument_rule": {
-      "expected_rows": 5686,
-      "actual_rows": 5686,
-      "stream_load_status": "Success",
-      "filtered_rows": 0
-    }
-  }
+﻿{
+    "schema_version":  1,
+    "generated_at":  "2026-07-31T17:55:19.8243296Z",
+    "catalog":  "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\data\\external_catalog\\catalog.sqlite3",
+    "doris":  "127.0.0.1:9030",
+    "status":  "PASS",
+    "tables":  {
+                   "scope_membership":  {
+                                            "expected_rows":  220295,
+                                            "actual_rows":  220295,
+                                            "stream_load_status":  "Success",
+                                            "filtered_rows":  0
+                                        },
+                   "industry_membership":  {
+                                               "expected_rows":  40907,
+                                               "actual_rows":  40907,
+                                               "stream_load_status":  "Success",
+                                               "filtered_rows":  0
+                                           },
+                   "instrument_rule":  {
+                                           "expected_rows":  5686,
+                                           "actual_rows":  5686,
+                                           "stream_load_status":  "Success",
+                                           "filtered_rows":  0
+                                       }
+               }
 }

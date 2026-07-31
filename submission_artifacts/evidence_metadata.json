@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-30T16:11:08Z",
+  "generated_at": "2026-07-31T18:12:59Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "cdb6729",
-    "head_at_export": "cdb6729",
+    "head_at_report_generation": "96e0363",
+    "head_at_export": "96e0363",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-30T16:10:53+00:00",
+    "generated_at": "2026-07-31T18:12:46+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.352,
+    "compile_p95_latency_ms": 1.611,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 1027,
-      "elapsed_seconds": 165.54
+      "passed": 1040,
+      "elapsed_seconds": 200.84
     }
   },
   "official_suite": {
@@ -95,11 +95,11 @@
   },
   "official_migration": {
     "available": true,
-    "git_head": "cdb6729d937f511c35c5df4fc39d3a8b2189a064",
+    "git_head": "6163f69c709def8ee28a495e68b03fdd7ca35eb9",
     "legacy_strict_success": 1097,
-    "legacy_to_new_migrated": 1022,
-    "migration_coverage": 0.931632,
-    "new_backend_success": 1053,
+    "legacy_to_new_migrated": 1044,
+    "migration_coverage": 0.951686,
+    "new_backend_success": 1076,
     "physical_date_gap": 0,
     "dynamic_date_evidence": {
       "available": true,
@@ -264,11 +264,23 @@
       "latest_data_date": "2026-04-14",
       "source_contract": true
     },
+    "scope_semantic_policy_evidence": {
+      "available": true,
+      "status": "PASS",
+      "matched": 7,
+      "total": 7,
+      "policy_set_id": "official-competition-scope-policy-v1",
+      "latest_data_date": "2026-04-14",
+      "materialization_matched": 7,
+      "compile_passed": 7,
+      "execution_passed": 7,
+      "provenance_passed": 7
+    },
     "new_success_audit": {
       "available": true,
       "status": "PASS",
-      "passed": 3,
-      "total": 3,
+      "passed": 23,
+      "total": 23,
       "failed": 0
     }
   },
@@ -352,6 +364,10 @@
     "phase47_benchmark_policy_funnel_json": "submission_artifacts\\evidence_snapshots\\phase47_benchmark_policy_funnel.json",
     "phase47_benchmark_policy_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase47_benchmark_policy_delta_doris_audit.json",
     "phase47_benchmark_policy_doris_json": "submission_artifacts\\evidence_snapshots\\phase47_benchmark_policy_doris.json",
+    "phase48_scope_semantic_policy_funnel_json": "submission_artifacts\\evidence_snapshots\\phase48_scope_semantic_policy_funnel.json",
+    "phase48_scope_semantic_policy_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase48_scope_semantic_policy_delta_doris_audit.json",
+    "phase48_scope_semantic_policy_doris_json": "submission_artifacts\\evidence_snapshots\\phase48_scope_semantic_policy_doris.json",
+    "phase48_true_remaining_scope_targets_json": "submission_artifacts\\evidence_snapshots\\phase48_true_remaining_scope_targets.json",
     "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"

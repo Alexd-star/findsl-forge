@@ -8,11 +8,11 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 |---|---|
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 1027 passed in 165.54s |
+| Pytest regression | 1040 passed in 200.84s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
-| ANTLR/IR legacy migration | 1022/1097 (93.16%) |
+| ANTLR/IR legacy migration | 1044/1097 (95.17%) |
 | Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
 | Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 194.0904 ms |
 | Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
@@ -29,7 +29,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Phase 31 final grounded evidence | PASS, 2/2, non-empty 2/2, max P95 64.6454 ms |
 | Phase 6C set-prefix evidence | PASS, hash 14/14, faster 14/14, median 1.393x |
 | Phase 47 benchmark-policy evidence | PASS, 3/3 |
-| Latest phase new-success audit | PASS, 3/3, failed 0 |
+| Phase 48 scope-policy evidence | PASS, 7/7 |
+| Latest phase new-success audit | PASS, 23/23, failed 0 |
 | Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
@@ -39,8 +40,8 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris evidence | PASS |
 | Doris cluster speedup | 36.24x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | cdb6729 |
-| Git HEAD at export | cdb6729 |
+| Git HEAD at report generation | 96e0363 |
+| Git HEAD at export | 96e0363 |
 
 ## Source Files
 
@@ -109,6 +110,10 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | phase47_benchmark_policy_funnel_json | `submission_artifacts\evidence_snapshots\phase47_benchmark_policy_funnel.json` |
 | phase47_benchmark_policy_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase47_benchmark_policy_delta_doris_audit.json` |
 | phase47_benchmark_policy_doris_json | `submission_artifacts\evidence_snapshots\phase47_benchmark_policy_doris.json` |
+| phase48_scope_semantic_policy_funnel_json | `submission_artifacts\evidence_snapshots\phase48_scope_semantic_policy_funnel.json` |
+| phase48_scope_semantic_policy_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase48_scope_semantic_policy_delta_doris_audit.json` |
+| phase48_scope_semantic_policy_doris_json | `submission_artifacts\evidence_snapshots\phase48_scope_semantic_policy_doris.json` |
+| phase48_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase48_true_remaining_scope_targets.json` |
 | phase6c_set_prefix_doris_json | `submission_artifacts\evidence_snapshots\phase6c_set_prefix_doris.json` |
 | doris_cluster_evidence_json | `submission_artifacts\evidence_snapshots\doris_cluster_evidence.json` |
 | evidence_manifest | `submission_artifacts\evidence_manifest.md` |
