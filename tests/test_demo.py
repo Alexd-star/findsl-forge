@@ -163,7 +163,7 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     html = render_demo_html()
 
     assert "FinDSL Forge" in html
-    assert "内部验证工作台" in html
+    assert "官方赛题编译工作台" in html
     assert "中文选股需求" in html
     assert "/api/analyze" in html
     assert "/api/suggest" in html
@@ -197,6 +197,9 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "modeGeneration" in html
     assert "exampleLoadToken" in html
     assert "Promise.allSettled" in html
+    assert 'let currentMode = "official"' in html
+    assert 'setMode("official")' in html
+    assert 'id="officialModeButton" type="button" role="tab" aria-selected="true"' in html
 
 
 def test_doris_evidence_summary_reads_cluster_report(tmp_path):

@@ -28,7 +28,7 @@ def test_official_doris_assets_are_present_and_target_real_tables():
     assert "hsj_stock_code_info.csv" in stream_load
     assert "hsj_stock_hq_basic.csv" in stream_load
     assert "hsj_stock_hq_ext.csv" in stream_load
-    assert "strict_mode:false" in stream_load
+    assert "strict_mode:true" in stream_load
     assert "_stream_load" in stream_load
 
     assert "SELECT COUNT(*) AS hq_basic_rows" in smoke
@@ -65,14 +65,17 @@ def test_official_doris_assets_are_present_and_target_real_tables():
     assert "prepare_official_doris_evidence" in official_evidence_script
     assert "13650347" in official_evidence_script
     assert "6170822" in official_evidence_script
-    assert "strict_mode:false" in official_evidence_script
+    assert "strict_mode:true" in official_evidence_script
+    assert "NumberFilteredRows" in official_evidence_script
+    assert "Get-FileHash" in official_evidence_script
     assert '[int]$StreamLoadPort = 8040' in official_evidence_script
     assert 'http://${StreamLoadHost}:${StreamLoadPort}/api/newzl/${Table}/_stream_load' in official_evidence_script
     assert '"Expect: 100-continue"' in official_evidence_script
     assert "[Path]$EvidenceOutput" not in official_evidence_script
     assert "[System.IO.Path]::ChangeExtension" in official_evidence_script
-    assert "if (-not $SkipStreamLoad)" in official_evidence_script
-    assert "Preserving official base tables because -SkipStreamLoad was set" in official_evidence_script
+    assert "$needBaseLoad = -not $SkipStreamLoad" in official_evidence_script
+    assert "idempotent row-count match" in official_evidence_script
+    assert "Preserving complete official base tables" in official_evidence_script
     assert "Preserving existing feature tables because -SkipFeatureTables was set" in official_evidence_script
     assert "if (-not $SkipFeatureTables) {" in official_evidence_script
     assert "05_technical_features_by_market.sql" in official_evidence_script

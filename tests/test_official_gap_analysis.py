@@ -58,3 +58,23 @@ def test_current_phase48_funnel_has_expected_category_totals():
     }
     assert report["migration_gap_count"] == 53
     assert report["migration_gap_codes"] == ["PHYSICAL_SCOPE_DATA_UNAVAILABLE"]
+
+
+def test_gap_analysis_subclusters_assets_intraday_and_weekday_algebra():
+    payload = {
+        "row_count": 3,
+        "rows": [
+            {"excel_row": 2, "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED", "functions": ["indicator"], "source": "indicator('', '', '', '', 'ETF', '', '') = 'all'"},
+            {"excel_row": 3, "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED", "functions": ["indicator"], "source": "indicator('', '', '涨幅', '开盘30分钟', '', '', '') > 0"},
+            {"excel_row": 4, "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED", "functions": ["rank"], "source": "rank('', '', '最新价', 'asc', '上周二至周四', '', '', '') > 0"},
+        ],
+        "migration_gaps": [],
+    }
+
+    report = analyze_official_funnel(payload)
+    counts = {item["key"]: item["row_count"] for item in report["semantic_subclusters"]}
+    assert counts == {
+        "unsupported_asset_domain": 1,
+        "intraday_data_domain": 1,
+        "deterministic_weekday_range": 1,
+    }

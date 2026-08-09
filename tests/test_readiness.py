@@ -2,6 +2,30 @@ from findsl import readiness
 from findsl.readiness import generate_readiness_report
 
 
+def test_git_state_ignores_generated_evidence_but_not_source_changes(monkeypatch, tmp_path):
+    outputs = {
+        ("branch", "--show-current"): "feat/test\n",
+        ("rev-parse", "--short", "HEAD"): "abc1234\n",
+        ("log", "-1", "--pretty=%s"): "test commit\n",
+        ("status", "--short"): "\n".join(
+            [
+                " M submission_artifacts/evidence_manifest.md",
+                " D submission_artifacts/evidence_metadata.json",
+                "?? submission_artifacts/evidence_summary.md",
+                "?? submission_artifacts/evidence_snapshots/new.json",
+                " M src/findsl/compiler.py",
+            ]
+        ),
+    }
+
+    monkeypatch.setattr(readiness, "_git", lambda _root, args: outputs[tuple(args)])
+
+    state = readiness._git_state(tmp_path)
+
+    assert state.dirty_entries == [" M src/findsl/compiler.py"]
+    assert not state.is_clean
+
+
 def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     reports_dir = tmp_path / "reports"
     output = reports_dir / "submission_readiness.md"

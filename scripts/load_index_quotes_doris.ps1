@@ -6,7 +6,8 @@ param(
   [int]$StreamLoadPort = 8040,
   [string]$User = "root",
   [string]$Password = "",
-  [string]$Client = "mysql"
+  [string]$Client = "mysql",
+  [string]$LoadLabelRunId = "v1"
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,8 +25,16 @@ function Invoke-DorisSql([string]$Sql) {
 
 if (-not (Test-Path -LiteralPath $Data)) { throw "Index quote CSV not found: $Data" }
 Invoke-DorisSql (Get-Content deploy/doris/official/06_external_catalog.sql -Raw) | Out-Null
+$env:NO_PROXY = "127.0.0.1,localhost,172.20.80.0/24"
+$env:no_proxy = $env:NO_PROXY
+$expected = (Import-Csv -LiteralPath $Data).Count
+$actualText = Invoke-DorisSql "SELECT COUNT(*) FROM findsl_ext.index_quote;"
+$actual = [int64](($actualText -split "\r?\n")[-1])
+$fileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Data).Hash.ToLowerInvariant().Substring(0, 16)
+$label = "findsl_index_quote_${fileHash}_${LoadLabelRunId}"
+$load = [pscustomobject]@{ Status = "AlreadyLoaded"; NumberFilteredRows = 0 }
+if ($actual -ne $expected) {
 Invoke-DorisSql "TRUNCATE TABLE findsl_ext.index_quote;" | Out-Null
-$label = "findsl_index_quote_$((Get-Date).ToUniversalTime().ToString('yyyyMMddHHmmssfff'))"
 $url = "http://${StreamLoadHost}:${StreamLoadPort}/api/findsl_ext/index_quote/_stream_load"
 $response = & curl.exe --fail-with-body --show-error --silent --location-trusted `
   -u "${User}:${Password}" -T (Resolve-Path -LiteralPath $Data).Path `
@@ -37,13 +46,14 @@ $load = $response | ConvertFrom-Json
 if ($load.Status -notin @("Success", "Publish Timeout") -or [int64]$load.NumberFilteredRows -ne 0) {
   throw "Index quote Stream Load rejected data: $response"
 }
-$expected = (Import-Csv -LiteralPath $Data).Count
 $actualText = Invoke-DorisSql "SELECT COUNT(*) FROM findsl_ext.index_quote;"
 $actual = [int64](($actualText -split "\r?\n")[-1])
+}
 if ($actual -ne $expected) { throw "Index quote row mismatch: $expected/$actual" }
 $evidence = [ordered]@{
   schema_version = 1
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
+  git_head = (& git rev-parse HEAD).Trim()
   status = "PASS"
   expected_rows = $expected
   actual_rows = $actual

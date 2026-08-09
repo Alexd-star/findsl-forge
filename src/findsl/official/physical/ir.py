@@ -244,6 +244,8 @@ class PhysicalDynamicDateRange(PhysicalExpr):
     month: Optional[int] = None
     day: Optional[int] = None
     end_month: Optional[int] = None
+    weekday_start: Optional[int] = None
+    weekday_end: Optional[int] = None
     anchor_resource_id: Optional[str] = None
     type: OfficialType = BOOLEAN
 
@@ -259,6 +261,8 @@ class PhysicalDynamicDateRange(PhysicalExpr):
             "month": self.month,
             "day": self.day,
             "end_month": self.end_month,
+            "weekday_start": self.weekday_start,
+            "weekday_end": self.weekday_end,
             "anchor_resource_id": self.anchor_resource_id,
             "type": self.type.to_dict(),
         }
@@ -337,9 +341,11 @@ class PhysicalTemporalWindow(CanonicalIr):
     boundary_direction: Optional[str] = None
     boundary_kind: Optional[str] = None
     boundary_date: Optional[str] = None
+    weekday_start: Optional[int] = None
+    weekday_end: Optional[int] = None
 
     def to_dict(self):
-        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit, "calendar_offset": self.calendar_offset, "session_offset": self.session_offset, "anchor_month": self.anchor_month, "anchor_day": self.anchor_day, "boundary_direction": self.boundary_direction, "boundary_kind": self.boundary_kind, "boundary_date": self.boundary_date}
+        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit, "calendar_offset": self.calendar_offset, "session_offset": self.session_offset, "anchor_month": self.anchor_month, "anchor_day": self.anchor_day, "boundary_direction": self.boundary_direction, "boundary_kind": self.boundary_kind, "boundary_date": self.boundary_date, "weekday_start": self.weekday_start, "weekday_end": self.weekday_end}
 
 
 @dataclass(frozen=True)

@@ -661,6 +661,7 @@ def _validate_expr(expression, catalog, expressions=None):
             "recent",
             "anchor_calendar",
             "year_month_range",
+            "weekday_range",
         }:
             raise ValueError("unsupported dynamic date range kind")
         if expression.amount <= 0 or expression.offset > 0:
@@ -670,6 +671,7 @@ def _validate_expr(expression, catalog, expressions=None):
             "recent": {"week", "month", "year"},
             "anchor_calendar": {"day", "month"},
             "year_month_range": {"month"},
+            "weekday_range": {"week"},
         }
         if expression.unit not in allowed_units[expression.range_kind]:
             raise ValueError("dynamic date range unit does not match its kind")
@@ -682,6 +684,11 @@ def _validate_expr(expression, catalog, expressions=None):
                 raise ValueError("year month range requires both month boundaries")
             if not 1 <= expression.month <= expression.end_month <= 12:
                 raise ValueError("year month range boundaries are invalid")
+        if expression.range_kind == "weekday_range":
+            if expression.weekday_start is None or expression.weekday_end is None:
+                raise ValueError("weekday range requires both weekday boundaries")
+            if not 1 <= expression.weekday_start <= expression.weekday_end <= 7:
+                raise ValueError("weekday range boundaries are invalid")
         if expression.anchor_resource_id is not None:
             anchor = catalog.resource(expression.anchor_resource_id)
             if anchor.partition_key is None:

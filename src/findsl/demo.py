@@ -906,15 +906,15 @@ def render_demo_html() -> str:
       <section class="panel">
         <div class="panel-head">
           <div class="panel-title">
-            <h2 id="workbenchTitle">内部验证工作台</h2>
-            <p id="workbenchSubtitle">中文需求、候选 FinDSL 与独立参考验证。</p>
+            <h2 id="workbenchTitle">官方赛题编译工作台</h2>
+            <p id="workbenchSubtitle">七槽 DSL 的 ANTLR、IR 与 SQLGlot 全阶段审计。</p>
           </div>
           <span class="badge" id="pipelineBadge">内部 DSL</span>
         </div>
         <div class="section">
           <div class="pipeline-switch" role="tablist" aria-label="编译管线">
-            <button class="mode-button active" id="internalModeButton" type="button" role="tab" aria-selected="true">内部验证管线</button>
-            <button class="mode-button" id="officialModeButton" type="button" role="tab" aria-selected="false">官方赛题管线</button>
+            <button class="mode-button" id="internalModeButton" type="button" role="tab" aria-selected="false">内部验证管线</button>
+            <button class="mode-button active" id="officialModeButton" type="button" role="tab" aria-selected="true">官方赛题管线</button>
           </div>
           <div class="mode-context" id="modeContext"><strong>当前：</strong><span>自然语言候选经过内部编译器与参考执行器双重验证。</span></div>
           <div id="nlSection">
@@ -1007,7 +1007,7 @@ def render_demo_html() -> str:
     let currentError = null;
     let currentTab = "sql";
     let currentExample = null;
-    let currentMode = "internal";
+    let currentMode = "official";
     let modeGeneration = 0;
     let exampleLoadToken = 0;
     const defaultNlRequest = "__DEFAULT_NL_REQUEST__";
@@ -1727,9 +1727,8 @@ def render_demo_html() -> str:
     internalModeButton.addEventListener("click", () => setMode("internal"));
     officialModeButton.addEventListener("click", () => setMode("official"));
     nlInput.value = defaultNlRequest;
-    Promise.allSettled([loadExamples(), loadEvidence()]).then(() => {
-      if (currentMode === "internal") suggest();
-    });
+    setMode("official");
+    Promise.allSettled([loadEvidence()]);
   </script>
 </body>
 </html>"""

@@ -1,6 +1,6 @@
 # 官方真实 CSV 数据 Stream Load 导入说明
 
-本目录面向赛题 19 官方真实数据包，目标是把三张 CSV 导入 Apache Doris 的 `newzl` 数据库。Doris 官方推荐 Stream Load 通过 HTTP 将本地文件直接导入表，本项目采用该方式保留可复现命令。官方 `hsj_stock_hq_basic.csv` 中 `lastPx` 和 `preClosePx` 存在真实空值，因此本项目 schema 将这两个字段设为可空，并在 Stream Load 中使用 `strict_mode:false`，让空数值按 NULL 落库，而不是过滤官方行。
+本目录面向赛题 19 官方真实数据包，目标是把三张 CSV 导入 Apache Doris 的 `newzl` 数据库。Doris 官方推荐 Stream Load 通过 HTTP 将本地文件直接导入表，本项目采用该方式保留可复现命令。官方 `hsj_stock_hq_basic.csv` 中 `lastPx` 和 `preClosePx` 存在真实空值，因此 schema 将这两个字段设为可空；Stream Load 使用 `strict_mode:true` 与 `max_filter_ratio:0`，合法空值按 NULL 落库，同时任何类型转换失败或过滤行都会阻断装载。
 
 推荐优先使用自动脚本：
 
@@ -46,7 +46,7 @@ curl.exe --location-trusted -u "$User`:$Password" `
   -H "format: csv" `
   -H "column_separator:," `
   -H "skip_lines:1" `
-  -H "strict_mode:false" `
+  -H "strict_mode:true" `
   -H "timeout:7200" `
   -T $CodeInfo `
   "http://$FeHost`:$BeHttpPort/api/$Db/hsj_stock_code_info/_stream_load"
@@ -58,7 +58,7 @@ curl.exe --location-trusted -u "$User`:$Password" `
   -H "format: csv" `
   -H "column_separator:," `
   -H "skip_lines:1" `
-  -H "strict_mode:false" `
+  -H "strict_mode:true" `
   -H "timeout:7200" `
   -T $HqBasic `
   "http://$FeHost`:$BeHttpPort/api/$Db/hsj_stock_hq_basic/_stream_load"
@@ -70,7 +70,7 @@ curl.exe --location-trusted -u "$User`:$Password" `
   -H "format: csv" `
   -H "column_separator:," `
   -H "skip_lines:1" `
-  -H "strict_mode:false" `
+  -H "strict_mode:true" `
   -H "timeout:7200" `
   -T $HqExt `
   "http://$FeHost`:$BeHttpPort/api/$Db/hsj_stock_hq_ext/_stream_load"

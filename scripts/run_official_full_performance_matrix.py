@@ -13,6 +13,11 @@ from findsl.official.performance import (
     write_performance_manifest,
     write_performance_report,
 )
+from findsl.official.watermark import (
+    assert_official_watermarks,
+    collect_official_watermarks,
+    write_official_watermark_report,
+)
 
 
 def main() -> None:
@@ -40,6 +45,7 @@ def main() -> None:
     parser.add_argument("--timeout", type=float, default=10.0)
     parser.add_argument("--warmups", type=int, default=1)
     parser.add_argument("--repeats", type=int, default=7)
+    parser.add_argument("--skip-watermark-check", action="store_true")
     parser.add_argument(
         "--json-output",
         type=Path,
@@ -64,18 +70,31 @@ def main() -> None:
             print(f"manifest={args.manifest} cases={len(selected)}")
             return
     cases = load_performance_manifest(args.manifest)
+    doris = DorisExecutionConfig(
+        args.host,
+        args.port,
+        args.user,
+        os.getenv(args.password_env, ""),
+        args.database,
+        args.mysql,
+        args.timeout,
+    )
+    if not args.skip_watermark_check:
+        watermark = collect_official_watermarks(
+            statistics_path=Path("configs/official/physical_statistics.json"),
+            catalog_path=Path("configs/official/physical_catalog.json"),
+            doris=doris,
+        )
+        write_official_watermark_report(
+            watermark,
+            Path("reports/official_doris_watermark.json"),
+            Path("reports/official_doris_watermark.md"),
+        )
+        assert_official_watermarks(watermark)
     report = run_performance_matrix(
         cases,
         manifest_root=args.correctness_manifest.parent,
-        doris=DorisExecutionConfig(
-            args.host,
-            args.port,
-            args.user,
-            os.getenv(args.password_env, ""),
-            args.database,
-            args.mysql,
-            args.timeout,
-        ),
+        doris=doris,
         warmups=args.warmups,
         repeats=args.repeats,
     )

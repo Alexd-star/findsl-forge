@@ -28,6 +28,14 @@ DEFAULT_EQUIVALENCE_DSL = (
 )
 DEFAULT_BENCHMARK_DSL = 'filter(SUM(indicator("volume"), 3) > 300)'
 DEFAULT_REAL_MARKET_SAMPLE_DIR = Path("data/real_samples/eastmoney_a_share_sample")
+GENERATED_EVIDENCE_PATHS = frozenset(
+    {
+        "submission_artifacts/evidence_manifest.md",
+        "submission_artifacts/evidence_metadata.json",
+        "submission_artifacts/evidence_summary.md",
+    }
+)
+GENERATED_EVIDENCE_PREFIXES = ("submission_artifacts/evidence_snapshots/",)
 
 
 @dataclass(frozen=True)
@@ -1107,7 +1115,11 @@ def _git_state(repo_root: Path) -> GitState:
     branch = _git(repo_root, ["branch", "--show-current"]).strip()
     commit = _git(repo_root, ["rev-parse", "--short", "HEAD"]).strip()
     subject = _git(repo_root, ["log", "-1", "--pretty=%s"]).strip()
-    status = _git(repo_root, ["status", "--short"]).splitlines()
+    status = [
+        entry
+        for entry in _git(repo_root, ["status", "--short"]).splitlines()
+        if not _is_generated_evidence_status(entry)
+    ]
     is_repo = bool(commit)
     return GitState(
         is_repo=is_repo,
@@ -1116,6 +1128,15 @@ def _git_state(repo_root: Path) -> GitState:
         commit_subject=subject,
         dirty_entries=status,
     )
+
+
+def _is_generated_evidence_status(entry: str) -> bool:
+    """Ignore only artifacts that the evidence exporter deterministically rebuilds."""
+
+    path = entry[3:].strip().strip('"').replace("\\", "/")
+    if " -> " in path:
+        path = path.rsplit(" -> ", maxsplit=1)[-1].strip().strip('"')
+    return path in GENERATED_EVIDENCE_PATHS or path.startswith(GENERATED_EVIDENCE_PREFIXES)
 
 
 def _git(repo_root: Path, args: List[str]) -> str:

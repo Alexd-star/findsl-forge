@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "policy_id": "nontrivial-forward-adjustment-validation-v1",
+  "stock_mode": "forward_adjusted",
+  "index_mode": "unadjusted",
+  "formula": "raw_price * multiplier + additive"
+}

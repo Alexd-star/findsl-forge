@@ -10,6 +10,11 @@ from findsl.official.correctness import (
     run_correctness_benchmark,
     write_correctness_report,
 )
+from findsl.official.watermark import (
+    assert_official_watermarks,
+    collect_official_watermarks,
+    write_official_watermark_report,
+)
 
 
 def main() -> int:
@@ -24,20 +29,34 @@ def main() -> int:
     parser.add_argument("--database", default="newzl")
     parser.add_argument("--client", default="mysql")
     parser.add_argument("--timeout", type=float, default=30.0)
+    parser.add_argument("--skip-watermark-check", action="store_true")
+    parser.add_argument("--watermark-json", default="reports/official_doris_watermark.json")
+    parser.add_argument("--watermark-report", default="reports/official_doris_watermark.md")
     args = parser.parse_args()
     manifest = Path(args.manifest).resolve()
+    doris = DorisExecutionConfig(
+        args.host,
+        args.port,
+        args.user,
+        os.environ.get(args.password_env, ""),
+        args.database,
+        args.client,
+        args.timeout,
+    )
+    if not args.skip_watermark_check:
+        watermark = collect_official_watermarks(
+            statistics_path=Path("configs/official/physical_statistics.json"),
+            catalog_path=Path("configs/official/physical_catalog.json"),
+            doris=doris,
+        )
+        write_official_watermark_report(
+            watermark, Path(args.watermark_json), Path(args.watermark_report)
+        )
+        assert_official_watermarks(watermark)
     report = run_correctness_benchmark(
         load_correctness_manifest(manifest),
         manifest_root=manifest.parent,
-        doris=DorisExecutionConfig(
-            args.host,
-            args.port,
-            args.user,
-            os.environ.get(args.password_env, ""),
-            args.database,
-            args.client,
-            args.timeout,
-        ),
+        doris=doris,
     )
     write_correctness_report(report, Path(args.json_output), Path(args.report_output))
     return 0 if report["target_met"] else 1

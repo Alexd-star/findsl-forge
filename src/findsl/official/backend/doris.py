@@ -278,7 +278,9 @@ def _render_event_filter(
     outer = exp.select(
         *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
     ).from_(rows)
-    predicate = _render_expr(plan.predicate, catalog)
+    predicate = _retarget_event_result_columns(
+        _render_expr(plan.predicate, catalog), alias, catalog
+    )
     for constraint in plan.result_constraints:
         rendered = _render_expr(constraint, catalog, relation)
         predicate = exp.and_(
@@ -1842,7 +1844,7 @@ def _render_temporal(
                 ),
             )
         )
-    elif plan.window.kind in {"dynamic_period", "anchor_calendar"}:
+    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range"}:
         amount = plan.window.calendar_amount or 1
         unit = plan.window.calendar_unit
         if unit is None:
@@ -1853,12 +1855,20 @@ def _render_temporal(
         lower, upper, validity = _dynamic_date_bounds(
             catalog,
             stable_resource_id,
-            "period" if plan.window.kind == "dynamic_period" else "anchor_calendar",
+            (
+                "period"
+                if plan.window.kind == "dynamic_period"
+                else "weekday_range"
+                if plan.window.kind == "dynamic_weekday_range"
+                else "anchor_calendar"
+            ),
             unit,
             amount,
             plan.window.calendar_offset,
             plan.window.anchor_month,
             plan.window.anchor_day,
+            weekday_start=plan.window.weekday_start,
+            weekday_end=plan.window.weekday_end,
         )
         bounds = exp.and_(
             exp.GTE(
@@ -2130,16 +2140,24 @@ def _render_temporal_aggregate(
                 ),
             )
         )
-    elif plan.window.kind in {"dynamic_period", "anchor_calendar"}:
+    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range"}:
         lower, upper, validity = _dynamic_date_bounds(
             catalog,
             scan.anchor_resource_id or scan.resource_id,
-            "period" if plan.window.kind == "dynamic_period" else "anchor_calendar",
+            (
+                "period"
+                if plan.window.kind == "dynamic_period"
+                else "weekday_range"
+                if plan.window.kind == "dynamic_weekday_range"
+                else "anchor_calendar"
+            ),
             plan.window.calendar_unit,
             plan.window.calendar_amount or 1,
             plan.window.calendar_offset,
             plan.window.anchor_month,
             plan.window.anchor_day,
+            weekday_start=plan.window.weekday_start,
+            weekday_end=plan.window.weekday_end,
         )
         bounds = exp.and_(
             exp.GTE(
@@ -2715,6 +2733,8 @@ def _dynamic_date_bounds(
     day: Optional[int],
     end_month: Optional[int] = None,
     anchor_resource_id: Optional[str] = None,
+    weekday_start: Optional[int] = None,
+    weekday_end: Optional[int] = None,
 ):
     anchor = _latest_resource_anchor(catalog, anchor_resource_id or resource_id)
     validity = None
@@ -2730,6 +2750,16 @@ def _dynamic_date_bounds(
                 "day",
             )
         )
+        return lower, upper, validity
+    if range_kind == "weekday_range":
+        if weekday_start is None or weekday_end is None or weekday_start > weekday_end:
+            raise DorisBackendError(
+                "DORIS_DATE_RANGE_UNSUPPORTED",
+                "weekday range requires ordered weekday boundaries",
+            )
+        week_start = _date_shift(_date_trunc(anchor.copy(), "week"), offset, "week")
+        lower = _date_shift(week_start.copy(), weekday_start - 1, "day")
+        upper = _date_shift(week_start.copy(), weekday_end - 1, "day")
         return lower, upper, validity
     if range_kind == "recent":
         if unit == "week":
@@ -3047,6 +3077,8 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             expression.day,
             expression.end_month,
             expression.anchor_resource_id,
+            expression.weekday_start,
+            expression.weekday_end,
         )
         predicate = exp.and_(
             exp.GTE(this=column.copy(), expression=lower),

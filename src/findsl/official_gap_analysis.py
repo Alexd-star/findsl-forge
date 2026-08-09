@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
+import re
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
 
@@ -53,11 +54,20 @@ def analyze_official_funnel(payload: Mapping[str, Any]) -> Dict[str, Any]:
     category_counts: Counter[str] = Counter()
     code_rows: Dict[str, list] = defaultdict(list)
     code_functions: Dict[str, set] = defaultdict(set)
+    semantic_rows: Dict[Tuple[str, str], list] = defaultdict(list)
+    semantic_codes: Dict[Tuple[str, str], set] = defaultdict(set)
+    semantic_examples: Dict[Tuple[str, str], list] = defaultdict(list)
     for row in rows:
         code = str(row.get("terminal_code") or "UNKNOWN")
         category_counts[classify_terminal_code(code)] += 1
         code_rows[code].append(int(row.get("excel_row", 0)))
         code_functions[code].update(str(item) for item in row.get("functions") or ())
+        source = str(row.get("source") or "")
+        semantic_key, semantic_category = _semantic_subcluster(code, source)
+        semantic_rows[(semantic_key, semantic_category)].append(int(row.get("excel_row", 0)))
+        semantic_codes[(semantic_key, semantic_category)].add(code)
+        if source and len(semantic_examples[(semantic_key, semantic_category)]) < 2:
+            semantic_examples[(semantic_key, semantic_category)].append(source)
 
     clusters = tuple(
         GapCluster(
@@ -88,6 +98,21 @@ def analyze_official_funnel(payload: Mapping[str, Any]) -> Dict[str, Any]:
         "migration_gap_count": migration_gap_count,
         "migration_gap_codes": list(migration_gap_codes),
         "clusters": [item.to_dict() for item in clusters],
+        "semantic_subclusters": [
+            {
+                "key": key,
+                "category": category,
+                "row_count": len(semantic_rows[(key, category)]),
+                "terminal_codes": sorted(semantic_codes[(key, category)]),
+                "sample_rows": [item for item in semantic_rows[(key, category)][:5] if item > 0],
+                "examples": semantic_examples[(key, category)],
+            }
+            for key, category in sorted(
+                semantic_rows,
+                key=lambda item: (-len(semantic_rows[item]), item[0]),
+            )
+            if key != "passed"
+        ],
         "development_policy": {
             "unit": "capability_cluster",
             "row_level_patches_allowed": False,
@@ -139,6 +164,21 @@ def gap_analysis_markdown(report: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
+            "## 语义根因子类",
+            "",
+            "| 根因 | 分类 | 行数 | 错误码 | 代表行 |",
+            "|---|---|---:|---|---|",
+        ]
+    )
+    for cluster in report.get("semantic_subclusters", []):
+        lines.append(
+            f"| {cluster['key']} | {cluster['category']} | {cluster['row_count']} | "
+            f"{', '.join(cluster['terminal_codes'])} | "
+            f"{', '.join(str(item) for item in cluster['sample_rows']) or '无'} |"
+        )
+    lines.extend(
+        [
+            "",
             "## 开发门禁",
             "",
             "每个能力族必须先确定根因层级，再实现通用规则，并批量回归全部匹配语料。禁止根据完整 DSL 文本或单个 Excel 行添加生产分支。",
@@ -146,6 +186,35 @@ def gap_analysis_markdown(report: Mapping[str, Any]) -> str:
         ]
     )
     return "\n".join(lines)
+
+
+def _semantic_subcluster(code: str, source: str) -> Tuple[str, str]:
+    if code == "PASS":
+        return "passed", "passed"
+    if code == "PHYSICAL_CONSTRAINT_UNSUPPORTED" and re.search(
+        r"场内基金|场外基金|公募基金|ETF|LOF|REITs|可转债|债券|期货|港股|基金",
+        source,
+        flags=re.IGNORECASE,
+    ):
+        return "unsupported_asset_domain", "data_unavailable"
+    if code == "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED":
+        if re.search(r"分钟|盘前|盘中|开盘|收盘后|分时", source):
+            return "intraday_data_domain", "data_unavailable"
+        if re.search(r"年报|季报|财报|季度", source):
+            return "fundamental_reporting_calendar", "data_unavailable"
+        if re.search(
+            r"(?:本周|上周|上上周)[一二三四五六日天](?:到|至)(?:(?:本周|上周|上上周)|周)?[一二三四五六日天]",
+            source,
+        ):
+            return "deterministic_weekday_range", "capability_gap"
+        if re.search(r"最近|近期", source):
+            return "ambiguous_recent_date", "invalid_input"
+        return "other_date_algebra", "capability_gap"
+    if code in DATA_UNAVAILABLE_CODES:
+        return "declared_data_unavailable", "data_unavailable"
+    if code in INVALID_INPUT_CODES:
+        return "invalid_dsl_or_type", "invalid_input"
+    return code.lower(), classify_terminal_code(code)
 
 
 def rows_for_category(

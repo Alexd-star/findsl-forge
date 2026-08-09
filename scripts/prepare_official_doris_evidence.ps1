@@ -14,6 +14,7 @@ param(
   [ValidateRange(1, 1024)]
   [int]$TechnicalBucketCount = 16,
   [string]$ProxyUrl = "",
+  [string]$LoadLabelRunId = "v1",
   [switch]$SkipDockerStart,
   [switch]$SkipStreamLoad,
   [switch]$SkipFeatureTables
@@ -109,7 +110,8 @@ function Invoke-StreamLoad {
     throw "curl.exe is required for Doris Stream Load."
   }
 
-  $label = "findsl_official_${Table}_$((Get-Date).ToUniversalTime().ToString('yyyyMMddHHmmssfff'))"
+  $fileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $CsvPath).Hash.ToLowerInvariant().Substring(0, 16)
+  $label = "findsl_official_${Table}_${fileHash}_${LoadLabelRunId}"
   $url = "http://${StreamLoadHost}:${StreamLoadPort}/api/newzl/${Table}/_stream_load"
   $auth = "${User}:${Password}"
   $args = @(
@@ -124,7 +126,7 @@ function Invoke-StreamLoad {
     "-H", "format: csv",
     "-H", "column_separator:,",
     "-H", "skip_lines:1",
-    "-H", "strict_mode:false",
+    "-H", "strict_mode:true",
     "-H", "max_filter_ratio:0",
     "-H", "timeout:7200",
     $url
@@ -143,6 +145,9 @@ function Invoke-StreamLoad {
 
   if ($payload.Status -notin @("Success", "Publish Timeout")) {
     throw "Stream Load failed for $Table. Status=$($payload.Status), Message=$($payload.Message)"
+  }
+  if ([int64]$payload.NumberFilteredRows -ne 0) {
+    throw "Stream Load filtered rows for ${Table}: $($payload.NumberFilteredRows)"
   }
 
   Write-Host "Loaded ${Table}: Status=$($payload.Status), Total=$($payload.NumberTotalRows), Loaded=$($payload.NumberLoadedRows), Filtered=$($payload.NumberFilteredRows)"
@@ -349,6 +354,8 @@ if ($ProxyUrl) {
   $env:HTTP_PROXY = $ProxyUrl
   $env:HTTPS_PROXY = $ProxyUrl
 }
+$env:NO_PROXY = "127.0.0.1,localhost,172.20.80.0/24"
+$env:no_proxy = $env:NO_PROXY
 
 Write-Step "prepare_official_doris_evidence: checking tools and official files"
 & python --version
@@ -368,12 +375,24 @@ Wait-DorisReady
 
 Write-Step "Recreating official newzl tables"
 Invoke-DorisSql -Sql "CREATE DATABASE IF NOT EXISTS newzl;"
-if (-not $SkipStreamLoad) {
+$needBaseLoad = -not $SkipStreamLoad
+if ($needBaseLoad) {
+  try {
+    $needBaseLoad = -not (
+      [int64](Get-Scalar -Sql "SELECT COUNT(*) FROM newzl.hsj_stock_code_info;") -eq $ExpectedRows.hsj_stock_code_info -and
+      [int64](Get-Scalar -Sql "SELECT COUNT(*) FROM newzl.hsj_stock_hq_basic;") -eq $ExpectedRows.hsj_stock_hq_basic -and
+      [int64](Get-Scalar -Sql "SELECT COUNT(*) FROM newzl.hsj_stock_hq_ext;") -eq $ExpectedRows.hsj_stock_hq_ext
+    )
+  } catch {
+    $needBaseLoad = $true
+  }
+}
+if ($needBaseLoad) {
   Invoke-DorisSql -Sql "DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_rollup; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_technical; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic; DROP TABLE IF EXISTS newzl.hsj_stock_code_info;"
   $schemaSql = Get-Content -Raw -LiteralPath "deploy/doris/official/01_schema.sql"
   Invoke-DorisSql -Sql $schemaSql | Out-Null
 } else {
-  Write-Host "Preserving official base tables because -SkipStreamLoad was set"
+  Write-Host "Preserving complete official base tables (explicit skip or idempotent row-count match)"
   if (-not $SkipFeatureTables) {
     Invoke-DorisSql -Sql "DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_rollup; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_technical; DROP TABLE IF EXISTS newzl.hsj_stock_hq_basic_prefix; DROP TABLE IF EXISTS newzl.hsj_stock_hq_ext_prefix;"
   } else {
@@ -382,7 +401,7 @@ if (-not $SkipStreamLoad) {
 }
 
 $loadResults = @()
-if (-not $SkipStreamLoad) {
+if ($needBaseLoad) {
   Write-Step "Stream Loading official CSV files"
   $loadResults += Invoke-StreamLoad -Table "hsj_stock_code_info" -CsvPath $codeInfo
   $loadResults += Invoke-StreamLoad -Table "hsj_stock_hq_basic" -CsvPath $hqBasic

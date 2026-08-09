@@ -1,0 +1,6 @@
+[
+  {"case_id": "INDEX-UNCHANGED-01", "asset_class": "index", "raw_price": "10.000000", "multiplier": "1.200000", "additive": "-0.500000", "expected": "10.000000"},
+  {"case_id": "INDEX-UNCHANGED-02", "asset_class": "index", "raw_price": "21.250000", "multiplier": "0.750000", "additive": "1.000000", "expected": "21.250000"},
+  {"case_id": "STOCK-FORWARD-01", "asset_class": "stock", "raw_price": "10.000000", "multiplier": "1.200000", "additive": "-0.500000", "expected": "11.500000"},
+  {"case_id": "STOCK-FORWARD-02", "asset_class": "stock", "raw_price": "20.000000", "multiplier": "0.750000", "additive": "1.000000", "expected": "16.000000"}
+]

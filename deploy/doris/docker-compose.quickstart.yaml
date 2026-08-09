@@ -7,10 +7,18 @@ networks:
       config:
         - subnet: 172.20.80.0/24
 
+volumes:
+  fe_meta:
+    name: findsl_doris_fe_meta
+  be_storage:
+    name: findsl_doris_be_storage
+
 services:
   fe:
     image: apache/doris:fe-4.1.0
     hostname: fe
+    restart: unless-stopped
+    init: true
     entrypoint: ["/bin/bash"]
     command:
       - "-lc"
@@ -22,6 +30,15 @@ services:
     environment:
       - FE_SERVERS=fe1:172.20.80.2:9010
       - FE_ID=1
+      - NO_PROXY=127.0.0.1,localhost,172.20.80.0/24
+    volumes:
+      - fe_meta:/opt/apache-doris/fe/doris-meta
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://127.0.0.1:8030/api/bootstrap >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
     networks:
       doris_quickstart:
         ipv4_address: 172.20.80.2
@@ -29,6 +46,8 @@ services:
   be:
     image: apache/doris:be-4.1.0
     hostname: be
+    restart: unless-stopped
+    init: true
     entrypoint: ["/bin/bash"]
     command:
       - "-lc"
@@ -39,8 +58,18 @@ services:
     environment:
       - FE_SERVERS=fe1:172.20.80.2:9010
       - BE_ADDR=172.20.80.3:9050
+      - NO_PROXY=127.0.0.1,localhost,172.20.80.0/24
+    volumes:
+      - be_storage:/opt/apache-doris/be/storage
     depends_on:
-      - fe
+      fe:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://127.0.0.1:8040/api/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
     networks:
       doris_quickstart:
         ipv4_address: 172.20.80.3

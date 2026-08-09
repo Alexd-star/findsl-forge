@@ -289,6 +289,64 @@ def parse_date_constraint(value: str) -> DateConstraint:
             trading_day_based=False,
             offset=offset,
         )
+    weekday_range = re.fullmatch(
+        r"(?P<period>本周|上周|上上周)(?P<start>[一二三四五六日天])(?:到|至)(?:(?P<end_period>本周|上周|上上周)|周)?(?P<end>[一二三四五六日天])",
+        value,
+    )
+    if weekday_range:
+        period = weekday_range.group("period")
+        end_period = weekday_range.group("end_period")
+        if end_period and end_period != period:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"weekday range crosses incompatible weeks: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        weekdays = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "日": 7, "天": 7}
+        start_weekday = weekdays[weekday_range.group("start")]
+        end_weekday = weekdays[weekday_range.group("end")]
+        if start_weekday > end_weekday:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"weekday range starts after it ends: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "dynamic_weekday_range",
+            anchor="latest",
+            unit="week",
+            trading_day_based=False,
+            offset={"本周": 0, "上周": -1, "上上周": -2}[period],
+            weekday_start=start_weekday,
+            weekday_end=end_weekday,
+        )
+    latest_ordinal_session = re.fullmatch(
+        rf"最近的第(?P<count>{number})(?:个交易日|交易日|日|天)",
+        value,
+    )
+    if latest_ordinal_session:
+        count = parse_count_token(latest_ordinal_session.group("count"), value)
+        if count < 1:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"latest ordinal session must start from one: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        if count == 1:
+            return DateConstraint("relative", anchor="today")
+        return DateConstraint(
+            "relative_session",
+            anchor="latest",
+            amount=count - 1,
+            unit="session",
+            trading_day_based=True,
+        )
     ordinal_year = re.fullmatch(
         rf"(?P<base>.+)的第(?P<count>{number})年",
         value,

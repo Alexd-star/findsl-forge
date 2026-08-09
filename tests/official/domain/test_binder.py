@@ -351,3 +351,43 @@ def test_invalid_calendar_date_is_rejected_with_stable_domain_code(date):
         )
 
     assert excinfo.value.code == "DOMAIN_DATE_INVALID"
+
+
+@pytest.mark.parametrize(
+    ("source", "offset", "start", "end"),
+    [
+        ("上周二至周四", -1, 2, 4),
+        ("本周一至周五", 0, 1, 5),
+        ("本周一到本周三", 0, 1, 3),
+        ("上上周一到周四", -2, 1, 4),
+    ],
+)
+def test_weekday_ranges_are_typed_without_row_specific_rules(source, offset, start, end):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{source}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    constraint = bound.date_constraint
+    assert constraint.kind == "dynamic_weekday_range"
+    assert constraint.offset == offset
+    assert constraint.weekday_start == start
+    assert constraint.weekday_end == end
+
+
+@pytest.mark.parametrize(
+    ("source", "kind", "amount"),
+    [
+        ("最近的第一天", "relative", None),
+        ("最近的第二天", "relative_session", 1),
+        ("最近的第5个交易日", "relative_session", 4),
+    ],
+)
+def test_latest_ordinal_sessions_use_trading_session_offsets(source, kind, amount):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{source}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == kind
+    assert bound.date_constraint.amount == amount

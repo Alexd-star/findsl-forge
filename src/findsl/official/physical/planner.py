@@ -2839,7 +2839,9 @@ def _plan_crossing_events(
     projections = []
     projected_refs = {}
     constraints = []
+    scoped_constraints = {}
     seen_constraints = set()
+    preserve_boolean_scope = _contains_boolean_operator(event_predicate, "or")
     pattern_config = current_physical_pattern_config()
     for index, call in enumerate(calls):
         alias = f"event_{index}"
@@ -2945,10 +2947,14 @@ def _plan_crossing_events(
             alias,
             STRING if call.name in _POSITION_CALLS else BOOLEAN,
         )
-        for constraint in _call_constraints(call, catalog, root_id):
-            if constraint.node_id not in seen_constraints:
-                constraints.append(constraint)
-                seen_constraints.add(constraint.node_id)
+        call_constraints = _call_constraints(call, catalog, root_id)
+        if preserve_boolean_scope:
+            scoped_constraints[id(call)] = call_constraints
+        else:
+            for constraint in call_constraints:
+                if constraint.node_id not in seen_constraints:
+                    constraints.append(constraint)
+                    seen_constraints.add(constraint.node_id)
 
     for index, call in enumerate(scalar_calls):
         indicator_id = str(call.binding.slots.get("indicator_name", ""))
@@ -2957,10 +2963,14 @@ def _plan_crossing_events(
         alias = f"projected_{index}"
         projections.append(PhysicalProjection(alias, expression))
         projected_refs[id(call)] = PhysicalProjectedRef(alias, expression.type)
-        for constraint in _call_constraints(call, catalog, root_id):
-            if constraint.node_id not in seen_constraints:
-                constraints.append(constraint)
-                seen_constraints.add(constraint.node_id)
+        call_constraints = _call_constraints(call, catalog, root_id)
+        if preserve_boolean_scope:
+            scoped_constraints[id(call)] = call_constraints
+        else:
+            for constraint in call_constraints:
+                if constraint.node_id not in seen_constraints:
+                    constraints.append(constraint)
+                    seen_constraints.add(constraint.node_id)
 
     if default_latest and not date_scopes:
         stable_resource_id = catalog.resource(root_id).anchor_resource_id or root_id
@@ -2976,6 +2986,7 @@ def _plan_crossing_events(
     predicate = _lower_crossing_predicate(
         event_predicate,
         {**event_refs, **projected_refs},
+        scoped_constraints,
     )
     if event_absence:
         event_ref = next(iter(event_refs.values()))
@@ -3109,38 +3120,49 @@ def _lower_resolved_indicator(field: _ResolvedIndicator):
     return _physical_field_expression(field)
 
 
-def _lower_crossing_predicate(expression, refs):
+def _lower_crossing_predicate(expression, refs, scoped_constraints=None):
     if isinstance(expression, LiteralExpr):
         return _physical_literal(expression)
     if isinstance(expression, CallExpr) and id(expression) in refs:
-        return refs[id(expression)]
+        result = refs[id(expression)]
+        if scoped_constraints and result.type is BOOLEAN:
+            return _append_scoped_constraints(
+                result, (expression,), scoped_constraints
+            )
+        return result
     if isinstance(expression, BinaryExpr):
         return PhysicalBinary(
             expression.op,
-            _lower_crossing_predicate(expression.left, refs),
-            _lower_crossing_predicate(expression.right, refs),
+            _lower_crossing_predicate(expression.left, refs, scoped_constraints),
+            _lower_crossing_predicate(expression.right, refs, scoped_constraints),
             expression.type,
         )
     if isinstance(expression, ComparisonExpr):
         if expression.op == "~=":
-            return _lower_approximate_comparison(
+            result = _lower_approximate_comparison(
                 _lower_crossing_predicate(expression.left, refs),
                 _lower_crossing_predicate(expression.right, refs),
             )
-        if expression.op == "between" and isinstance(expression.right, RangeExpr):
+        elif expression.op == "between" and isinstance(expression.right, RangeExpr):
             value = _lower_crossing_predicate(expression.left, refs)
             lower = _lower_crossing_predicate(expression.right.lower, refs)
             upper = _lower_crossing_predicate(expression.right.upper, refs)
-            return PhysicalBinary(
+            result = PhysicalBinary(
                 "and",
                 PhysicalComparison(">=" if expression.right.lower_inclusive else ">", value, lower),
                 PhysicalComparison("<=" if expression.right.upper_inclusive else "<", value, upper),
                 BOOLEAN,
             )
-        return PhysicalComparison(
-            expression.op,
-            _lower_crossing_predicate(expression.left, refs),
-            _lower_crossing_predicate(expression.right, refs),
+        else:
+            result = PhysicalComparison(
+                expression.op,
+                _lower_crossing_predicate(expression.left, refs),
+                _lower_crossing_predicate(expression.right, refs),
+            )
+        return _append_scoped_constraints(
+            result,
+            tuple(_walk_calls(expression)),
+            scoped_constraints,
         )
     if isinstance(expression, RangeExpr):
         raise PhysicalPlanningError(
@@ -3151,6 +3173,38 @@ def _lower_crossing_predicate(expression, refs):
         "PHYSICAL_EVENT_EXPRESSION_UNSUPPORTED",
         f"unsupported crossing expression {type(expression).__name__}",
     )
+
+
+def _append_scoped_constraints(predicate, calls, scoped_constraints):
+    if not scoped_constraints:
+        return predicate
+    result = predicate
+    seen = set()
+    for call in calls:
+        for constraint in scoped_constraints.get(id(call), ()):
+            if constraint.node_id in seen:
+                continue
+            result = PhysicalBinary("and", result, constraint, BOOLEAN)
+            seen.add(constraint.node_id)
+    return result
+
+
+def _contains_boolean_operator(expression, operator: str) -> bool:
+    if isinstance(expression, BinaryExpr):
+        return (
+            expression.op == operator
+            or _contains_boolean_operator(expression.left, operator)
+            or _contains_boolean_operator(expression.right, operator)
+        )
+    if isinstance(expression, ComparisonExpr):
+        return _contains_boolean_operator(
+            expression.left, operator
+        ) or _contains_boolean_operator(expression.right, operator)
+    if isinstance(expression, RangeExpr):
+        return _contains_boolean_operator(
+            expression.lower, operator
+        ) or _contains_boolean_operator(expression.upper, operator)
+    return False
 
 
 def _parse_extreme_lookback(value) -> Optional[int]:
@@ -4044,6 +4098,19 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             calendar_unit=window.unit,
             calendar_offset=window.offset,
         )
+    if (
+        window.kind == "dynamic_weekday_range"
+        and window.weekday_start is not None
+        and window.weekday_end is not None
+    ):
+        return PhysicalTemporalWindow(
+            "dynamic_weekday_range",
+            calendar_amount=1,
+            calendar_unit="week",
+            calendar_offset=window.offset,
+            weekday_start=window.weekday_start,
+            weekday_end=window.weekday_end,
+        )
     if window.kind == "anchor_calendar" and window.unit:
         return PhysicalTemporalWindow(
             "anchor_calendar",
@@ -4587,6 +4654,22 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     "period",
                     typed_date.unit,
                     offset=typed_date.offset,
+                )
+            )
+        elif (
+            typed_date.kind == "dynamic_weekday_range"
+            and typed_date.weekday_start is not None
+            and typed_date.weekday_end is not None
+        ):
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "weekday_range",
+                    "week",
+                    offset=typed_date.offset,
+                    weekday_start=typed_date.weekday_start,
+                    weekday_end=typed_date.weekday_end,
                 )
             )
         elif typed_date.kind == "recent_calendar" and typed_date.amount and typed_date.unit:

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://findsl-forge.local/schemas/official_dsl_anomaly_ledger.schema.json",
+  "title": "官方 DSL 异常修复账本",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ledger_id", "source_workbook", "source_sha256", "evidence_policy", "anomalies"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "ledger_id": {"type": "string", "minLength": 1},
+    "source_workbook": {"type": "string", "minLength": 1},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evidence_policy": {"type": "string", "minLength": 1},
+    "anomalies": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["excel_row", "original_dsl", "normalized_dsl", "repair_code", "repair_position", "original_sha256", "normalized_sha256", "disposition"],
+        "properties": {
+          "excel_row": {"type": "integer", "minimum": 2},
+          "original_dsl": {"type": "string", "minLength": 1},
+          "normalized_dsl": {"type": "string", "minLength": 1},
+          "repair_code": {"enum": ["ORPHAN_LITERAL_QUOTED", "DANGLING_EDGE_QUOTE", "UNMATCHED_CLOSING_PAREN", "LEADING_BOOLEAN_OPERATOR"]},
+          "repair_position": {"type": "integer", "minimum": 0},
+          "original_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "normalized_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "disposition": {"const": "recovery_only_original_preserved"}
+        }
+      }
+    }
+  }
+}

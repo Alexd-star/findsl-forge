@@ -2,6 +2,8 @@ param(
   [string]$DorisHost = "127.0.0.1",
   [int]$QueryPort = 9030,
   [int]$HttpPort = 8030,
+  [string]$StreamLoadHost = "127.0.0.1",
+  [int]$StreamLoadPort = 8040,
   [string]$User = "root",
   [string]$Password = "",
   [string]$Database = "findsl_demo",
@@ -18,6 +20,7 @@ param(
   [string]$EvidenceOutput = "reports/doris_cluster_evidence.md",
   [string]$ReadinessOutput = "reports/submission_readiness.md",
   [string]$ProxyUrl = "",
+  [string]$LoadLabelRunId = "v1",
   [switch]$SkipDockerStart,
   [switch]$SkipDataGeneration,
   [switch]$SkipStreamLoad,
@@ -58,7 +61,17 @@ function Invoke-DorisSql {
       "-e", $Sql
     )
   }
-  & $Client @mysqlArgs
+  $output = & $Client @mysqlArgs 2>&1
+  if ($LASTEXITCODE -ne 0) {
+    throw "Doris SQL failed: $Sql`n$output"
+  }
+  return ($output | Out-String).Trim()
+}
+
+function Get-Scalar([string]$Sql) {
+  $text = Invoke-DorisSql -Sql $Sql
+  $lines = $text -split "\r?\n" | Where-Object { $_.Trim() }
+  return $lines[-1].Trim()
 }
 
 function Wait-DorisReady {
@@ -91,8 +104,9 @@ function Invoke-StreamLoad {
     throw "curl.exe is required for Doris Stream Load."
   }
 
-  $label = "findsl_${Table}_$((Get-Date).ToUniversalTime().ToString('yyyyMMddHHmmss'))"
-  $url = "http://${DorisHost}:${HttpPort}/api/${Database}/${Table}/_stream_load"
+  $fileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $CsvPath).Hash.ToLowerInvariant().Substring(0, 16)
+  $label = "findsl_${Table}_${fileHash}_${LoadLabelRunId}"
+  $url = "http://${StreamLoadHost}:${StreamLoadPort}/api/${Database}/${Table}/_stream_load"
   $auth = "${User}:${Password}"
   $args = @(
     "--fail-with-body",
@@ -105,7 +119,8 @@ function Invoke-StreamLoad {
     "-H", "format: csv",
     "-H", "column_separator:,",
     "-H", "skip_lines:1",
-    "-H", "strict_mode:false",
+    "-H", "strict_mode:true",
+    "-H", "max_filter_ratio:0",
     $url
   )
 
@@ -123,6 +138,9 @@ function Invoke-StreamLoad {
   if ($payload.Status -notin @("Success", "Publish Timeout")) {
     throw "Stream Load failed for $Table. Status=$($payload.Status), Message=$($payload.Message)"
   }
+  if ([int64]$payload.NumberFilteredRows -ne 0) {
+    throw "Stream Load filtered rows for ${Table}: $($payload.NumberFilteredRows)"
+  }
 
   Write-Host "Loaded ${Table}: Status=$($payload.Status), NumberTotalRows=$($payload.NumberTotalRows), NumberLoadedRows=$($payload.NumberLoadedRows)"
 }
@@ -131,6 +149,8 @@ if ($ProxyUrl) {
   $env:HTTP_PROXY = $ProxyUrl
   $env:HTTPS_PROXY = $ProxyUrl
 }
+$env:NO_PROXY = "127.0.0.1,localhost,172.20.80.0/24"
+$env:no_proxy = $env:NO_PROXY
 
 Write-Step "Checking local tools"
 & python --version
@@ -167,7 +187,20 @@ Write-Step "Applying Doris schema"
 $schemaSql = Get-Content -Raw -Path "deploy/doris/01_schema.sql"
 Invoke-DorisSql -Sql $schemaSql
 
-if (-not $SkipStreamLoad) {
+$needScaleLoad = -not $SkipStreamLoad
+if ($needScaleLoad) {
+  $expectedDailyRows = [int64]$Stocks * [int64]$Days
+  try {
+    $needScaleLoad = -not (
+      [int64](Get-Scalar "SELECT COUNT(*) FROM ${Database}.dwd_stock_daily_quote;") -eq $expectedDailyRows -and
+      [int64](Get-Scalar "SELECT COUNT(*) FROM ${Database}.dwd_stock_money_flow;") -eq $expectedDailyRows -and
+      [int64](Get-Scalar "SELECT COUNT(*) FROM ${Database}.dim_stock_universe;") -eq $Stocks
+    )
+  } catch {
+    $needScaleLoad = $true
+  }
+}
+if ($needScaleLoad) {
   Write-Step "Truncating base and prefix tables before scale load"
   Invoke-DorisSql -Sql "USE $Database; TRUNCATE TABLE dwd_stock_daily_quote; TRUNCATE TABLE dwd_stock_money_flow; TRUNCATE TABLE dim_stock_universe; TRUNCATE TABLE dwd_stock_daily_quote_prefix; TRUNCATE TABLE dwd_stock_money_flow_prefix;"
 
@@ -175,6 +208,8 @@ if (-not $SkipStreamLoad) {
   Invoke-StreamLoad -Table "dwd_stock_daily_quote" -CsvPath (Join-Path $DataDir "daily_quote.csv")
   Invoke-StreamLoad -Table "dwd_stock_money_flow" -CsvPath (Join-Path $DataDir "money_flow.csv")
   Invoke-StreamLoad -Table "dim_stock_universe" -CsvPath (Join-Path $DataDir "stock_universe.csv")
+} else {
+  Write-Host "Preserving complete scale tables (explicit skip or idempotent row-count match)"
 }
 
 Write-Step "Rebuilding prefix tables"

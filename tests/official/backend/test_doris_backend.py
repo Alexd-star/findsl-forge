@@ -313,6 +313,33 @@ def test_recent_sessions_use_distinct_exchange_calendar_membership():
     assert result.validation.passed is True
 
 
+def test_weekday_range_uses_anchor_relative_week_bounds():
+    result = render_doris(
+        _physical("rank('京', '', '成交量', 'asc', '上周二至周四', '', '', '') > 0"),
+        default_physical_catalog(),
+    )
+
+    assert "DATE_TRUNC" in result.sql
+    assert "WEEK" in result.sql
+    assert "INTERVAL '1' WEEK" in result.sql
+    assert result.validation.passed is True
+
+
+def test_or_event_branches_keep_market_and_date_constraints_in_branch_scope():
+    source = (
+        "((close_together('', '', '5日均线', '20日均线', '今日', '', '') = True "
+        "and indicator('深', '', '成交量', '今日', '', '', '') >= 1) or "
+        "(cross_above('', '', '5日均线', '20日均线', '今日', '', '') = True "
+        "and indicator('沪', '', '成交量', '今日', '', '', '') >= 100))"
+    )
+    result = render_doris(_physical(source), default_physical_catalog())
+
+    assert result.sql.count("`event_rows`.`mktcode` IN") == 2
+    assert result.sql.count("`event_rows`.`bizdate` =") == 4
+    assert " OR " in result.sql
+    assert result.validation.passed is True
+
+
 @pytest.mark.parametrize(
     "date,required",
     [

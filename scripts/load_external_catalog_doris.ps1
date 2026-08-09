@@ -8,7 +8,8 @@ param(
   [string]$User = "root",
   [string]$Password = "",
   [string]$Client = "mysql",
-  [string]$Python = "python"
+  [string]$Python = "python",
+  [string]$LoadLabelRunId = "v1"
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,7 +30,8 @@ function Invoke-DorisSql {
 function Invoke-ExternalStreamLoad {
   param([string]$Table, [string]$Path)
   if (-not (Test-Path -LiteralPath $Path)) { throw "CSV not found: $Path" }
-  $label = "findsl_external_${Table}_$((Get-Date).ToUniversalTime().ToString('yyyyMMddHHmmssfff'))"
+  $fileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant().Substring(0, 16)
+  $label = "findsl_external_${Table}_${fileHash}_${LoadLabelRunId}"
   $url = "http://${StreamLoadHost}:${StreamLoadPort}/api/findsl_ext/${Table}/_stream_load"
   $response = & curl.exe --fail-with-body --show-error --silent --location-trusted `
     -u "${User}:${Password}" -T (Resolve-Path -LiteralPath $Path).Path `
@@ -54,14 +56,22 @@ if ($LASTEXITCODE -ne 0) { throw "Project Python environment is unavailable" }
 if ($LASTEXITCODE -ne 0) { throw "External catalog CSV export failed" }
 
 Invoke-DorisSql -Sql (Get-Content deploy/doris/official/06_external_catalog.sql -Raw) | Out-Null
+$env:NO_PROXY = "127.0.0.1,localhost,172.20.80.0/24"
+$env:no_proxy = $env:NO_PROXY
 $manifest = Get-Content (Join-Path $DataDir "manifest.json") -Raw | ConvertFrom-Json
 $results = [ordered]@{}
 foreach ($table in @("scope_membership", "industry_membership", "instrument_rule")) {
-  Invoke-DorisSql -Sql "TRUNCATE TABLE findsl_ext.${table};" | Out-Null
-  $load = Invoke-ExternalStreamLoad -Table $table -Path (Join-Path $DataDir "${table}.csv")
   $actualText = Invoke-DorisSql -Sql "SELECT COUNT(*) AS row_count FROM findsl_ext.${table};"
   $actual = [int64](($actualText -split "\r?\n")[-1])
   $expected = [int64]$manifest.exports.$table.rows
+  if ($actual -eq $expected) {
+    $load = [pscustomobject]@{ Status = "AlreadyLoaded"; NumberFilteredRows = 0 }
+  } else {
+    Invoke-DorisSql -Sql "TRUNCATE TABLE findsl_ext.${table};" | Out-Null
+    $load = Invoke-ExternalStreamLoad -Table $table -Path (Join-Path $DataDir "${table}.csv")
+    $actualText = Invoke-DorisSql -Sql "SELECT COUNT(*) AS row_count FROM findsl_ext.${table};"
+    $actual = [int64](($actualText -split "\r?\n")[-1])
+  }
   if ($actual -ne $expected) { throw "Row count mismatch for ${table}: expected $expected, got $actual" }
   $results[$table] = [ordered]@{
     expected_rows = $expected
@@ -74,6 +84,7 @@ foreach ($table in @("scope_membership", "industry_membership", "instrument_rule
 $evidence = [ordered]@{
   schema_version = 1
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
+  git_head = (& git rev-parse HEAD).Trim()
   catalog = (Resolve-Path -LiteralPath $Catalog).Path
   doris = "${DorisHost}:${QueryPort}"
   status = "PASS"
