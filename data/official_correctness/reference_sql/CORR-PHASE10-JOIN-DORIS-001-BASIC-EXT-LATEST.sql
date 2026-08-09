@@ -1,0 +1,1 @@
+SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_hq_ext` AS e ON e.mktcode=b.mktcode AND e.tgtcode=b.tgtcode AND e.bizdate=b.bizdate WHERE b.bizdate='2026-04-14' AND b.volume > 100 AND e.ZJLXMainNetTur > 0;

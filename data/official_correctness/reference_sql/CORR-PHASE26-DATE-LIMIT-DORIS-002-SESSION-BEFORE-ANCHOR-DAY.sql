@@ -1,0 +1,1 @@
+WITH target AS (SELECT MAX(bizdate) AS bizdate FROM `newzl`.`hsj_stock_hq_basic` WHERE bizdate<DATE_ADD(DATE_TRUNC('2026-04-14', 'MONTH'), INTERVAL '8' DAY)) SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` b JOIN target d ON d.bizdate=b.bizdate WHERE b.volume>0;

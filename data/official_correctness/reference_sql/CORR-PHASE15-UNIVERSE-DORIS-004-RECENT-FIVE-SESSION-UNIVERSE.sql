@@ -1,0 +1,1 @@
+SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate IN ('2026-04-14','2026-04-13','2026-04-10','2026-04-09','2026-04-08');

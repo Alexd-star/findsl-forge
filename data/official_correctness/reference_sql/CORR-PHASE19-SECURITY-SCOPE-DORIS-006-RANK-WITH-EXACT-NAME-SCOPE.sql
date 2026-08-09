@@ -1,0 +1,1 @@
+WITH ranked AS (SELECT b.mktcode,b.tgtcode,b.bizdate,ROW_NUMBER() OVER (ORDER BY b.volume DESC,b.mktcode,b.tgtcode) AS rn FROM `newzl`.`hsj_stock_hq_basic` AS b INNER JOIN `newzl`.`hsj_stock_code_info` AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode WHERE s.name='华泰证券' AND b.mktcode=1 AND b.bizdate='2026-04-14') SELECT mktcode,tgtcode,bizdate FROM ranked WHERE rn<=1;

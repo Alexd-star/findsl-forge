@@ -111,6 +111,26 @@
       "priority": 20
     },
     {
+      "resource_id": "official_basic_rollup",
+      "database": "newzl",
+      "table": "hsj_stock_hq_basic_rollup",
+      "logical_entity": "market_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "materialized_aggregate",
+        "partition_pruning",
+        "scan"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": null,
+      "priority": 2
+    },
+    {
       "resource_id": "external_scope_membership",
       "database": "findsl_ext",
       "table": "scope_membership",
@@ -186,6 +206,78 @@
     }
   ],
   "fields": [
+    {
+      "indicator_id": "__prefix_row_no",
+      "resource_id": "official_basic_prefix",
+      "column": "row_no",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": false
+    },
+    {
+      "indicator_id": "__prefix_close_sum",
+      "resource_id": "official_basic_prefix",
+      "column": "close_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__prefix_close_count",
+      "resource_id": "official_basic_prefix",
+      "column": "close_count_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__prefix_volume_sum",
+      "resource_id": "official_basic_prefix",
+      "column": "volume_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__prefix_volume_count",
+      "resource_id": "official_basic_prefix",
+      "column": "volume_count_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__prefix_turnover_sum",
+      "resource_id": "official_basic_prefix",
+      "column": "turnover_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_volume_sum_5",
+      "resource_id": "official_basic_rollup",
+      "column": "volume_sum_5",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_volume_sum_20",
+      "resource_id": "official_basic_rollup",
+      "column": "volume_sum_20",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_turnover_sum_20",
+      "resource_id": "official_basic_rollup",
+      "column": "turnover_sum_20",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
     {
       "indicator_id": "__index_snapshot_id",
       "resource_id": "external_index_quote",

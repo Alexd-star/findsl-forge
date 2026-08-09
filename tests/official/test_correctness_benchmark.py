@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -84,6 +85,7 @@ def test_runner_compares_complete_unordered_row_sets(tmp_path: Path) -> None:
     assert report["matched"] == 1
     assert report["accuracy"] == 0.5
     assert report["target_met"] is False
+    assert report["dataset_snapshot_id"] == "snapshot-v1"
     assert report["groups"]["function_family"]["indicator"]["matched"] == 1
 
 
@@ -101,6 +103,27 @@ def test_manifest_rejects_duplicate_ids(tmp_path: Path) -> None:
 
     with pytest.raises(CorrectnessContractError, match="duplicate"):
         load_correctness_manifest(manifest)
+
+
+def test_runner_rejects_mixed_dataset_snapshots(tmp_path: Path) -> None:
+    (tmp_path / "ref1.sql").write_text("reference1", encoding="utf-8")
+    (tmp_path / "ref2.sql").write_text("reference2", encoding="utf-8")
+    context = CompileContext.load(REPO_ROOT)
+    cases = (
+        _case("C1", "dsl1", "ref1.sql", context.snapshot.policy_id),
+        replace(
+            _case("C2", "dsl2", "ref2.sql", context.snapshot.policy_id),
+            dataset_snapshot_id="snapshot-v2",
+        ),
+    )
+
+    with pytest.raises(CorrectnessContractError, match="exactly one dataset snapshot"):
+        run_correctness_benchmark(
+            cases,
+            manifest_root=tmp_path,
+            doris=DorisExecutionConfig("127.0.0.1", 9030, "root", "", "newzl"),
+            context=context,
+        )
 
 
 def _case(case_id: str, dsl: str, reference: str, policy_id: str) -> CorrectnessCase:

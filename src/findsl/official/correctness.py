@@ -17,6 +17,24 @@ class CorrectnessContractError(ValueError):
     pass
 
 
+OFFICIAL_FUNCTION_FAMILIES = frozenset(
+    {
+        "indicator",
+        "rank",
+        "belong_industry",
+        "queryData",
+        "cross_above",
+        "cross_down",
+        "close_together",
+        "reset",
+        "golden_cross",
+        "record_high",
+        "record_low",
+        "position",
+    }
+)
+
+
 @dataclass(frozen=True)
 class CorrectnessCase:
     case_id: str
@@ -126,10 +144,19 @@ def run_correctness_benchmark(
 ) -> Dict[str, Any]:
     compile_context = context or default_compile_context()
     case_list = tuple(cases)
+    snapshot_ids = {
+        case.dataset_snapshot_id for case in case_list if case.score_eligible
+    }
+    if len(snapshot_ids) != 1:
+        raise CorrectnessContractError(
+            "formal benchmark must use exactly one dataset snapshot"
+        )
+    dataset_snapshot_id = next(iter(snapshot_ids))
     contract = validate_correctness_manifest(
         case_list,
         root=manifest_root,
         expected_policy_id=compile_context.snapshot.policy_id,
+        expected_snapshot_id=dataset_snapshot_id,
     )
     if not contract["passed"]:
         raise CorrectnessContractError("; ".join(contract["errors"]))
@@ -150,6 +177,27 @@ def run_correctness_benchmark(
     matched = sum(1 for result in results if result.matched)
     total = len(results)
     groups = _group_summary(results)
+    family_groups = groups["function_family"]
+    all_families_covered = OFFICIAL_FUNCTION_FAMILIES.issubset(family_groups)
+    family_target_met = bool(family_groups) and all(
+        item["accuracy"] >= 0.95 for item in family_groups.values()
+    )
+    accuracy = matched / total if total else None
+    official_target_met = bool(
+        total
+        and accuracy is not None
+        and accuracy >= 0.95
+        and all_families_covered
+        and family_target_met
+    )
+    internal_target_met = bool(
+        total >= 240
+        and accuracy is not None
+        and accuracy >= 0.98
+        and all_families_covered
+        and family_target_met
+        and all(item["total"] >= 12 for item in family_groups.values())
+    )
     lower, upper = wilson_interval(matched, total)
     return {
         "schema_version": 1,
@@ -157,14 +205,18 @@ def run_correctness_benchmark(
         "git_head": _git_head(),
         "catalog_snapshot_id": compile_context.context_id,
         "policy_id": compile_context.snapshot.policy_id,
+        "dataset_snapshot_id": dataset_snapshot_id,
         "eligible_total": total,
         "matched": matched,
         "mismatched": total - matched,
-        "accuracy": matched / total if total else None,
+        "accuracy": accuracy,
         "wilson_95": {"lower": lower, "upper": upper},
         "target_accuracy": 0.95,
         "internal_target_accuracy": 0.98,
-        "target_met": bool(total) and matched / total >= 0.95,
+        "all_12_function_families_covered": all_families_covered,
+        "function_family_target_met": family_target_met,
+        "target_met": official_target_met,
+        "internal_target_met": internal_target_met,
         "contract": contract,
         "groups": groups,
         "results": [asdict(item) for item in results],
@@ -181,11 +233,14 @@ def write_correctness_report(report: Mapping[str, Any], json_path: Path, markdow
         f"- Git HEAD：`{report.get('git_head')}`",
         f"- Catalog snapshot：`{report.get('catalog_snapshot_id')}`",
         f"- Policy：`{report.get('policy_id')}`",
+        f"- Dataset snapshot：`{report.get('dataset_snapshot_id')}`",
         f"- Eligible：`{report.get('eligible_total')}`",
         f"- 完整行集一致：`{report.get('matched')}`",
         f"- 正确率：`{_percent(report.get('accuracy'))}`",
         f"- Wilson 95% 下界：`{_percent((report.get('wilson_95') or {}).get('lower'))}`",
         f"- 95% 门禁：`{'PASS' if report.get('target_met') else 'FAIL'}`",
+        f"- 十二类函数覆盖：`{report.get('all_12_function_families_covered')}`",
+        f"- 内部 240 条/98% 门禁：`{'PASS' if report.get('internal_target_met') else 'FAIL'}`",
         "",
         "## 分层结果",
         "",

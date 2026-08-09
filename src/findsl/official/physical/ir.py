@@ -949,6 +949,35 @@ class PhysicalPrefixJoin(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalPrefixAggregate(PhysicalPlan):
+    resource_id: str
+    anchor_resource_id: str
+    sum_column: str
+    count_column: str
+    window: int
+    function: str
+    comparator: str
+    bound: PhysicalLiteral
+    scale_divisor: float
+    constraints: Tuple[PhysicalExpr, ...] = ()
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalPrefixAggregate",
+            "resource_id": self.resource_id,
+            "anchor_resource_id": self.anchor_resource_id,
+            "sum_column": self.sum_column,
+            "count_column": self.count_column,
+            "window": self.window,
+            "function": self.function,
+            "comparator": self.comparator,
+            "bound": self.bound.to_dict(),
+            "scale_divisor": self.scale_divisor,
+            "constraints": [item.to_dict() for item in self.constraints],
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalLimit(PhysicalPlan):
     input: PhysicalPlan
     offset: int

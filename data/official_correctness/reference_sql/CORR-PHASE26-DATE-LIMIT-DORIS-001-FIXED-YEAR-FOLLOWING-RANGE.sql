@@ -1,0 +1,1 @@
+WITH qualified AS (SELECT mktcode,tgtcode FROM `newzl`.`hsj_stock_hq_basic` WHERE bizdate>='2013-01-01' AND bizdate<='2016-12-31' GROUP BY mktcode,tgtcode HAVING AVG(volume)>0) SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` b JOIN qualified q ON q.mktcode=b.mktcode AND q.tgtcode=b.tgtcode WHERE b.bizdate='2026-04-14';

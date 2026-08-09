@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalog_sha256": "98a717073e7ff7ce5c25635679dc8b078e7cbdd8d99599e4a0f50d077525c470",
+  "catalog_sha256": "3a852362faafe738938e4a13aa6ca78c58938d8082442f4f493039efe92a5ffd",
   "collected_at": "2026-07-11T23:23:39+08:00",
   "doris_version": "doris-4.1.0-rc03-5960d4cea0e",
   "resources": [

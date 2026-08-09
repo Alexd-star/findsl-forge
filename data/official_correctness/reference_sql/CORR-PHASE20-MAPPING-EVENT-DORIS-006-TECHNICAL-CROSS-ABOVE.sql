@@ -1,0 +1,1 @@
+WITH w AS (SELECT mktcode,tgtcode,bizdate,ma5,ma20,LAG(ma5) OVER(PARTITION BY mktcode,tgtcode ORDER BY bizdate) AS p5,LAG(ma20) OVER(PARTITION BY mktcode,tgtcode ORDER BY bizdate) AS p20 FROM `newzl`.`hsj_stock_hq_basic_technical`) SELECT mktcode,tgtcode,bizdate FROM w WHERE bizdate='2026-04-14' AND ma5>ma20 AND p5<=p20;

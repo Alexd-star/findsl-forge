@@ -1,0 +1,1 @@
+SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` b JOIN `newzl`.`hsj_stock_hq_basic` p ON p.mktcode=b.mktcode AND p.tgtcode=b.tgtcode WHERE b.bizdate='2026-04-14' AND p.bizdate='2026-04-13' AND b.highPx IS NOT NULL AND p.highPx IS NOT NULL;

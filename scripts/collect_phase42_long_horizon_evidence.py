@@ -15,35 +15,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from findsl.doris_profile import explain_partition_ratios, parse_profile_summary
+from findsl.official.pipeline import OfficialPipelineOptions, compile_official
 
 
-BASELINE_SQL = """
-SELECT w.mktcode,w.tgtcode,w.bizdate
-FROM (
-  SELECT
-    base.mktcode,
-    base.tgtcode,
-    base.bizdate,
-    SUM(base.volume) OVER (
-      PARTITION BY base.mktcode,base.tgtcode
-      ORDER BY base.bizdate
-      ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
-    ) AS volume_sum_20
-  FROM newzl.hsj_stock_hq_basic AS base
-) AS w
-WHERE w.bizdate = DATE '2026-04-14'
-  AND w.volume_sum_20 > 10000000
-ORDER BY w.mktcode,w.tgtcode,w.bizdate
-""".strip()
-
-
-OPTIMIZED_SQL = """
-SELECT p.mktcode,p.tgtcode,p.bizdate
-FROM newzl.hsj_stock_hq_basic_rollup AS p
-WHERE p.bizdate = DATE '2026-04-14'
-  AND p.volume_sum_20 > 10000000
-ORDER BY p.mktcode,p.tgtcode,p.bizdate
-""".strip()
+DEFAULT_DSL = "indicator('', '', '成交量', '近5000日', '', 'SUM', '') > 10000000"
 
 
 def main() -> None:
@@ -57,6 +32,7 @@ def main() -> None:
     parser.add_argument("--repeats", type=int, default=7)
     parser.add_argument("--min-speedup", type=float, default=10.0)
     parser.add_argument("--expected-rows", type=int, default=13650347)
+    parser.add_argument("--dsl", default=DEFAULT_DSL)
     parser.add_argument("--json-output", required=True)
     parser.add_argument("--report-output", required=True)
     args = parser.parse_args()
@@ -67,6 +43,24 @@ def main() -> None:
     if not mysql:
         raise RuntimeError("mysql client is unavailable")
 
+    baseline_compilation = compile_official(
+        args.dsl,
+        OfficialPipelineOptions(strategy_mode="force_baseline"),
+    ).to_dict()
+    optimized_compilation = compile_official(
+        args.dsl,
+        OfficialPipelineOptions(strategy_mode="force_candidate"),
+    ).to_dict()
+    if (
+        baseline_compilation["compile_context"]["context_id"]
+        != optimized_compilation["compile_context"]["context_id"]
+    ):
+        raise RuntimeError("baseline and optimized compiler contexts differ")
+    if baseline_compilation["physical"]["selected_strategy"] == optimized_compilation["physical"]["selected_strategy"]:
+        raise RuntimeError("compiler did not produce distinct baseline and optimized strategies")
+    baseline_sql = _ordered_sql(baseline_compilation["backend"]["sql"])
+    optimized_sql = _ordered_sql(optimized_compilation["backend"]["sql"])
+
     context = {"args": args, "mysql": mysql}
     table_evidence = _table_evidence(context)
     if table_evidence["base_rows"] != args.expected_rows:
@@ -75,23 +69,20 @@ def main() -> None:
         raise RuntimeError("partitioned rollup row count does not match the base table")
 
     explains = {
-        "baseline": _mysql(context, "EXPLAIN " + BASELINE_SQL),
-        "optimized": _mysql(context, "EXPLAIN " + OPTIMIZED_SQL),
+        "baseline": _mysql(context, "EXPLAIN " + baseline_sql),
+        "optimized": _mysql(context, "EXPLAIN " + optimized_sql),
     }
     partition_ratios = {
         name: explain_partition_ratios(value) for name, value in explains.items()
     }
-    if not partition_ratios["optimized"] or not any(
-        selected == 1 and total > 1
-        for selected, total in partition_ratios["optimized"]
-    ):
-        raise RuntimeError("optimized EXPLAIN does not prove single-partition pruning")
+    if "hsj_stock_hq_basic_prefix" not in explains["optimized"]:
+        raise RuntimeError("optimized EXPLAIN does not use the compiler-selected prefix resource")
 
     profile_dir = Path(args.json_output).parent / "phase42_query_profiles"
     profile_dir.mkdir(parents=True, exist_ok=True)
     for index in range(args.warmups):
-        _profiled_query(context, BASELINE_SQL, profile_dir / f"warmup_baseline_{index + 1}.txt")
-        _profiled_query(context, OPTIMIZED_SQL, profile_dir / f"warmup_optimized_{index + 1}.txt")
+        _profiled_query(context, baseline_sql, profile_dir / f"warmup_baseline_{index + 1}.txt")
+        _profiled_query(context, optimized_sql, profile_dir / f"warmup_optimized_{index + 1}.txt")
 
     results = {"baseline": [], "optimized": []}
     canonical_hashes = {"baseline": set(), "optimized": set()}
@@ -99,7 +90,7 @@ def main() -> None:
     for index in range(args.repeats):
         order = ("baseline", "optimized") if index % 2 == 0 else ("optimized", "baseline")
         for name in order:
-            sql = BASELINE_SQL if name == "baseline" else OPTIMIZED_SQL
+            sql = baseline_sql if name == "baseline" else optimized_sql
             evidence = _profiled_query(
                 context,
                 sql,
@@ -131,6 +122,14 @@ def main() -> None:
         "target_speedup": args.min_speedup,
         "speedup": round(speedup, 6),
         "target_met": passed,
+        "dsl": args.dsl,
+        "compiler_context_id": baseline_compilation["compile_context"]["context_id"],
+        "baseline_plan_id": baseline_compilation["physical"]["plan_id"],
+        "optimized_plan_id": optimized_compilation["physical"]["plan_id"],
+        "baseline_strategy": baseline_compilation["physical"]["selected_strategy"],
+        "optimized_strategy": optimized_compilation["physical"]["selected_strategy"],
+        "baseline_decisions": baseline_compilation["physical"]["decisions"],
+        "optimized_decisions": optimized_compilation["physical"]["decisions"],
         "warmups": args.warmups,
         "repeats": args.repeats,
         "table_evidence": table_evidence,
@@ -143,13 +142,13 @@ def main() -> None:
             for key, value in partition_ratios.items()
         },
         "baseline": {
-            "sql": BASELINE_SQL,
+            "sql": baseline_sql,
             "explain": explains["baseline"],
             **summaries["baseline"],
             "runs": results["baseline"],
         },
         "optimized": {
-            "sql": OPTIMIZED_SQL,
+            "sql": optimized_sql,
             "explain": explains["optimized"],
             **summaries["optimized"],
             "runs": results["optimized"],
@@ -159,7 +158,7 @@ def main() -> None:
             "query_cache": "disabled and verified as uncached in every profile",
             "ordering": "alternating baseline/optimized order",
             "correctness": "complete ordered result SHA-256",
-            "plan_check": "EXPLAIN partition ratios",
+            "plan_check": "compiler plan IDs, selected strategies, and Doris EXPLAIN resources",
         },
     }
     json_path = Path(args.json_output)
@@ -200,6 +199,16 @@ SELECT @@version_comment;
         "rollup_partition_count": int(output[2]),
         "doris_version": output[3],
     }
+
+
+def _ordered_sql(sql: str) -> str:
+    return (
+        "SELECT result_rows.mktcode,result_rows.tgtcode,result_rows.bizdate\n"
+        "FROM (\n"
+        f"{sql.rstrip(';')}\n"
+        ") AS result_rows\n"
+        "ORDER BY result_rows.mktcode,result_rows.tgtcode,result_rows.bizdate"
+    )
 
 
 def _profiled_query(context, sql, profile_path: Path):
@@ -326,6 +335,9 @@ def _markdown(payload):
             "",
             f"- 状态：`{payload['status']}`",
             f"- Git HEAD：`{payload['git_head']}`",
+            f"- 输入 DSL：`{payload['dsl']}`",
+            f"- 编译目录快照：`{payload['compiler_context_id']}`",
+            f"- 基线/优化策略：`{payload['baseline_strategy']}` / `{payload['optimized_strategy']}`",
             f"- 官方基础行情：`{tables['base_rows']}` 行，`{tables['base_first_date']}` 至 `{tables['base_last_date']}`",
             f"- 月分区滚动特征表：`{tables['rollup_rows']}` 行，`{tables['rollup_partition_count']}` 个分区",
             f"- 完整结果集：`{payload['result_row_count']}` 行，SHA-256 一致 `{payload['complete_result_hash_match']}`",
@@ -341,7 +353,7 @@ def _markdown(payload):
             "",
             f"- 基线分区比：`{payload['partition_ratios']['baseline']}`",
             f"- 优化分区比：`{payload['partition_ratios']['optimized']}`",
-            "- 优化查询命中交易月单分区；基线必须扫描全量 20 年行情并执行排序与窗口聚合。",
+            "- 基线和优化 SQL 均由同一 DSL、同一编译目录快照生成；优化计划使用前缀端点差分，基线计划对 20 年会话范围执行集合聚合。",
             "",
             "## 基线 SQL",
             "",

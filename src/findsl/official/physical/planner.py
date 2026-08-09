@@ -66,6 +66,7 @@ from .ir import (
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
+    PhysicalPrefixAggregate,
     PhysicalPrefixJoin,
     PhysicalPrefixRef,
     PhysicalPattern,
@@ -88,7 +89,11 @@ from .ir import (
 )
 from .validate import validate_physical_plan
 from .statistics import PhysicalStatisticsSnapshot
-from .strategies import PhysicalStrategyRegistry
+from .strategies import (
+    PhysicalMaterializedAggregateStrategy,
+    PhysicalPrefixAggregateStrategy,
+    PhysicalStrategyRegistry,
+)
 from .runtime import (
     current_benchmark_policy_catalog,
     current_external_data_policy,
@@ -136,6 +141,15 @@ class PhysicalPlanningResult:
     selected_resource: str
     decisions: Tuple[PhysicalDecision, ...]
     selected_strategy: str = "direct_column"
+
+
+@dataclass(frozen=True)
+class _PlanCandidate:
+    plan: PhysicalPlan
+    resource_id: str
+    strategy_id: str
+    decision: PhysicalDecision
+    baseline: bool = False
 
 
 @dataclass(frozen=True)
@@ -422,6 +436,8 @@ def plan_physical(
             resource_ids,
             expressions,
             statistics,
+            strategies,
+            allow_shadow_strategies,
         )
     if aggregate_calls or querydata_scalar_calls:
         return _plan_composite_aggregate(
@@ -1127,6 +1143,8 @@ def _plan_grouped_aggregate(
     resource_ids: Tuple[str, ...],
     expressions: Optional[PhysicalExpressionRegistry],
     statistics: Optional[PhysicalStatisticsSnapshot],
+    strategies: Optional[PhysicalStrategyRegistry],
+    allow_shadow_strategies: bool,
 ) -> PhysicalPlanningResult:
     if len(resource_ids) != 1:
         raise PhysicalPlanningError(
@@ -1167,16 +1185,179 @@ def _plan_grouped_aggregate(
     if contract.limit is not None:
         plan = PhysicalLimit(plan, contract.limit[0], contract.limit[1])
     validate_physical_plan(plan, catalog, expressions)
-    decision = replace(
+    baseline_decision = replace(
         _candidate_decision(resource, catalog, statistics),
         strategy_id="grouped_aggregate",
-        selected=True,
+    )
+    candidates = [
+        _PlanCandidate(
+            plan,
+            selected,
+            "grouped_aggregate",
+            baseline_decision,
+            baseline=True,
+        )
+    ]
+    if strategies is not None:
+        candidates.extend(
+            _grouped_aggregate_candidates(
+                contract,
+                field,
+                catalog,
+                statistics,
+                strategies,
+                expressions,
+                allow_shadow_strategies,
+            )
+        )
+    return _select_plan_candidates(candidates)
+
+
+def _grouped_aggregate_candidates(
+    contract: _AggregateContract,
+    field: _ResolvedIndicator,
+    catalog: PhysicalCatalog,
+    statistics: Optional[PhysicalStatisticsSnapshot],
+    strategies: PhysicalStrategyRegistry,
+    expressions: Optional[PhysicalExpressionRegistry],
+    allow_shadow_strategies: bool,
+) -> Tuple[_PlanCandidate, ...]:
+    typed_date = contract.call.date_constraint
+    if typed_date is None:
+        date = str(contract.call.binding.slots.get("date", "")).strip()
+        typed_date = parse_date_constraint(date) if date else None
+    if typed_date is None or typed_date.kind != "recent_sessions" or not typed_date.amount:
+        return ()
+    function = contract.function.upper()
+    candidates = []
+    for strategy in strategies.aggregate_strategies_for(field.indicator_id):
+        if strategy.scan_resource_id != field.resource_id:
+            continue
+        if isinstance(strategy, PhysicalPrefixAggregateStrategy):
+            if (
+                function not in strategy.functions
+                or not strategy.min_window <= typed_date.amount <= strategy.max_window
+            ):
+                continue
+            constraints = _aggregate_non_window_constraints(
+                contract.call,
+                catalog,
+                strategy.prefix_resource_id,
+            )
+            candidate_plan: PhysicalPlan = PhysicalPrefixAggregate(
+                strategy.prefix_resource_id,
+                catalog.resource(strategy.prefix_resource_id).anchor_resource_id
+                or strategy.scan_resource_id,
+                strategy.sum_column,
+                strategy.count_column,
+                typed_date.amount,
+                function,
+                contract.comparator,
+                _physical_literal(contract.bound),
+                strategy.scale_divisor,
+                constraints,
+            )
+            candidate_resource_id = strategy.prefix_resource_id
+        elif isinstance(strategy, PhysicalMaterializedAggregateStrategy):
+            if function != strategy.function or typed_date.amount != strategy.window:
+                continue
+            candidate_resource_id = strategy.materialized_resource_id
+            feature = PhysicalColumn(
+                candidate_resource_id,
+                strategy.feature_column,
+                NUMERIC,
+            )
+            measure = feature
+            if strategy.scale_divisor != 1.0:
+                measure = PhysicalBinary(
+                    "/",
+                    feature,
+                    PhysicalLiteral(strategy.scale_divisor, NUMERIC),
+                    NUMERIC,
+                )
+            candidate_plan = PhysicalScan(
+                candidate_resource_id,
+                (feature,),
+                None,
+                None,
+            )
+            for constraint in _aggregate_non_window_constraints(
+                contract.call,
+                catalog,
+                candidate_resource_id,
+            ):
+                candidate_plan = PhysicalFilter(candidate_plan, constraint)
+            candidate_plan = PhysicalFilter(
+                candidate_plan,
+                PhysicalComparison(
+                    contract.comparator,
+                    measure,
+                    _physical_literal(contract.bound),
+                ),
+            )
+            candidate_plan = _with_latest_snapshot(
+                candidate_plan,
+                catalog,
+                candidate_resource_id,
+            )
+        else:
+            continue
+        if contract.limit is not None:
+            candidate_plan = PhysicalLimit(
+                candidate_plan,
+                contract.limit[0],
+                contract.limit[1],
+            )
+        validate_physical_plan(candidate_plan, catalog, expressions)
+        decision = _aggregate_strategy_decision(
+            strategy,
+            catalog,
+            statistics,
+            allow_shadow_strategies,
+        )
+        candidates.append(
+            _PlanCandidate(
+                candidate_plan,
+                candidate_resource_id,
+                strategy.strategy_id,
+                decision,
+            )
+        )
+    return tuple(candidates)
+
+
+def _aggregate_non_window_constraints(call, catalog, resource_id):
+    constraints = tuple(_call_constraints(call, catalog, resource_id))
+    recent = tuple(item for item in constraints if isinstance(item, PhysicalRecentSessions))
+    if len(recent) != 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_AGGREGATE_WINDOW_UNAVAILABLE",
+            "accelerated aggregate requires exactly one recent-session window",
+        )
+    return tuple(item for item in constraints if not isinstance(item, PhysicalRecentSessions))
+
+
+def _select_plan_candidates(candidates) -> PhysicalPlanningResult:
+    ordered = sorted(
+        candidates,
+        key=lambda item: (
+            not item.decision.selection_eligible,
+            float("inf")
+            if item.decision.cost is None
+            else item.decision.cost * (2.0 if item.decision.estimated else 1.0),
+            item.strategy_id,
+        ),
+    )
+    chosen = ordered[0]
+    decisions = tuple(
+        replace(item.decision, strategy_id=item.strategy_id, selected=item is chosen)
+        for item in ordered
     )
     return PhysicalPlanningResult(
-        plan,
-        selected,
-        (decision,),
-        "grouped_aggregate",
+        chosen.plan,
+        chosen.resource_id,
+        decisions,
+        chosen.strategy_id,
     )
 
 
@@ -3124,6 +3305,78 @@ def _prefix_candidate_decision(
         estimated=True,
         reason_code="PHYSICAL_PREFIX_STATISTICS_INCOMPLETE",
         reason="catalog priority fallback for prefix candidate",
+        selection_eligible=selection_eligible,
+    )
+
+
+def _aggregate_strategy_decision(
+    strategy,
+    catalog,
+    statistics,
+    allow_shadow_strategies,
+):
+    if isinstance(strategy, PhysicalPrefixAggregateStrategy):
+        resource_id = strategy.prefix_resource_id
+        access_fraction = strategy.access_fraction_hint
+        access_multiplier = 2.0
+        reason_label = "two prefix endpoint lookups"
+    else:
+        resource_id = strategy.materialized_resource_id
+        access_fraction = strategy.partition_fraction_hint
+        access_multiplier = 1.0
+        reason_label = "partition-pruned materialized feature lookup"
+    selection_eligible = (
+        strategy.selection_mode == "active"
+    ) or allow_shadow_strategies
+    resource = catalog.resource(resource_id)
+    measured_bytes = None
+    estimated = True
+    if statistics is not None:
+        try:
+            item = statistics.resource(resource_id)
+        except KeyError:
+            item = None
+        if item is not None and item.row_count_available and item.data_size_bytes > 0:
+            measured_bytes = float(item.data_size_bytes)
+            estimated = False
+    if measured_bytes is None and statistics is not None:
+        try:
+            source = statistics.resource(strategy.scan_resource_id)
+        except KeyError:
+            source = None
+        if source is not None and source.row_count_available and source.data_size_bytes > 0:
+            measured_bytes = float(source.data_size_bytes)
+    if measured_bytes is not None:
+        effective_bytes = measured_bytes * access_fraction * access_multiplier
+        return PhysicalDecision(
+            resource_id=resource_id,
+            feasible=True,
+            cost=effective_bytes,
+            estimated=estimated,
+            reason_code=(
+                "PHYSICAL_AGGREGATE_ACCELERATION_SELECTED"
+                if selection_eligible
+                else "PHYSICAL_AGGREGATE_ACCELERATION_SHADOW"
+            ),
+            reason=(
+                f"cost models {reason_label}; access fraction {access_fraction:.6f}; "
+                f"selection mode is {strategy.selection_mode}"
+            ),
+            cost_unit="effective_bytes",
+            cost_components=(
+                ("catalog_bytes", measured_bytes),
+                ("access_fraction", access_fraction),
+                ("access_multiplier", access_multiplier),
+            ),
+            selection_eligible=selection_eligible,
+        )
+    return PhysicalDecision(
+        resource_id=resource_id,
+        feasible=True,
+        cost=float(resource.priority),
+        estimated=True,
+        reason_code="PHYSICAL_AGGREGATE_ACCELERATION_STATISTICS_INCOMPLETE",
+        reason=f"catalog priority fallback for {reason_label}",
         selection_eligible=selection_eligible,
     )
 

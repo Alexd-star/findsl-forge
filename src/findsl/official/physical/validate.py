@@ -3,7 +3,7 @@ from __future__ import annotations
 from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalCrossing, PhysicalEmpty,
-    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
+    PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixAggregate, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
     PhysicalDynamicDateRange, PhysicalExternalExists, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
@@ -78,6 +78,31 @@ def _validate_plan(plan, catalog, expressions):
             if not refs or not refs.issubset(aliases):
                 raise ValueError("physical prefix predicate references an undeclared projection")
             _validate_expr(plan.predicate, catalog, expressions)
+        return
+    if isinstance(plan, PhysicalPrefixAggregate):
+        resource = catalog.resource(plan.resource_id)
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if "prefix" not in resource.capabilities:
+            raise ValueError("physical prefix aggregate requires a prefix resource")
+        if resource.logical_entity != anchor.logical_entity:
+            raise ValueError("physical prefix aggregate resource entity mismatch")
+        allowed = {
+            field.column
+            for field in catalog.fields
+            if field.resource_id == plan.resource_id
+        }
+        if plan.sum_column not in allowed or plan.count_column not in allowed:
+            raise ValueError("physical prefix aggregate references an undeclared prefix column")
+        if plan.function not in {"SUM", "AVG"} or plan.window <= 0:
+            raise ValueError("physical prefix aggregate contract is invalid")
+        if plan.comparator not in {"=", "!=", ">", ">=", "<", "<="}:
+            raise ValueError("physical prefix aggregate comparator is invalid")
+        if plan.scale_divisor <= 0 or plan.bound.type is not NUMERIC:
+            raise ValueError("physical prefix aggregate numeric contract is invalid")
+        for constraint in plan.constraints:
+            if constraint.type is not BOOLEAN:
+                raise ValueError("physical prefix aggregate constraints must be boolean")
+            _validate_expr(constraint, catalog, expressions)
         return
     if isinstance(plan, PhysicalEventProjection):
         _validate_plan(plan.input, catalog, expressions)

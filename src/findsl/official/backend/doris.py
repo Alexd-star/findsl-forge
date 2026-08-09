@@ -38,6 +38,7 @@ from ..physical.ir import (
     PhysicalNthLatestValue,
     PhysicalPlan,
     PhysicalPrefixAverage,
+    PhysicalPrefixAggregate,
     PhysicalPrefixJoin,
     PhysicalPrefixRef,
     PhysicalPattern,
@@ -166,6 +167,8 @@ def _render_plan(
         if plan.partition_predicate is not None:
             query = query.where(_render_expr(plan.partition_predicate, catalog, plan))
         return query
+    if isinstance(plan, PhysicalPrefixAggregate):
+        return _render_prefix_aggregate(plan, catalog)
     if isinstance(plan, PhysicalFilter):
         return _render_plan(plan.input, catalog, cte_prefix).where(
             _render_expr(plan.predicate, catalog, _find_relation(plan.input))
@@ -846,6 +849,138 @@ def _render_grouped_aggregate(
                 expression=latest,
             )
         )
+    )
+
+
+def _render_prefix_aggregate(
+    plan: PhysicalPrefixAggregate,
+    catalog: PhysicalCatalog,
+) -> exp.Select:
+    resource = catalog.resource(plan.resource_id)
+    anchor = catalog.resource(plan.anchor_resource_id)
+    current_alias = "q"
+    previous_alias = "prefix_previous"
+    anchor_alias = "anchor"
+    current = exp.table_(
+        resource.table,
+        db=resource.database,
+        quoted=True,
+        alias=current_alias,
+    )
+    previous = exp.table_(
+        resource.table,
+        db=resource.database,
+        quoted=True,
+        alias=previous_alias,
+    )
+    anchor_table = exp.table_(
+        anchor.table,
+        db=anchor.database,
+        quoted=True,
+        alias=anchor_alias,
+    )
+    current_join = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table=current_alias, quoted=True),
+                expression=exp.column(key, table=anchor_alias, quoted=True),
+            )
+            for key in ("mktcode", "tgtcode", "bizdate")
+        )
+    )
+    previous_join = exp.and_(
+        exp.EQ(
+            this=exp.column("mktcode", table=previous_alias, quoted=True),
+            expression=exp.column("mktcode", table=current_alias, quoted=True),
+        ),
+        exp.EQ(
+            this=exp.column("tgtcode", table=previous_alias, quoted=True),
+            expression=exp.column("tgtcode", table=current_alias, quoted=True),
+        ),
+        exp.EQ(
+            this=exp.column("row_no", table=previous_alias, quoted=True),
+            expression=exp.Sub(
+                this=exp.column("row_no", table=current_alias, quoted=True),
+                expression=exp.convert(plan.window),
+            ),
+        ),
+    )
+    sum_delta = exp.Sub(
+        this=exp.column(plan.sum_column, table=current_alias, quoted=True),
+        expression=exp.Coalesce(
+            this=exp.column(plan.sum_column, table=previous_alias, quoted=True),
+            expressions=[exp.convert(0)],
+        ),
+    )
+    metric = sum_delta
+    if plan.function == "AVG":
+        count_delta = exp.Sub(
+            this=exp.column(plan.count_column, table=current_alias, quoted=True),
+            expression=exp.Coalesce(
+                this=exp.column(plan.count_column, table=previous_alias, quoted=True),
+                expressions=[exp.convert(0)],
+            ),
+        )
+        metric = exp.Div(
+            this=exp.Mul(this=exp.Paren(this=sum_delta), expression=exp.convert(1.0)),
+            expression=exp.Nullif(this=count_delta, expression=exp.convert(0)),
+        )
+    if plan.scale_divisor != 1.0:
+        metric = exp.Div(
+            this=exp.Paren(this=metric),
+            expression=exp.convert(plan.scale_divisor),
+        )
+    latest = exp.Subquery(
+        this=exp.select(
+            exp.Max(
+                this=exp.column(
+                    anchor.partition_key,
+                    table="latest_anchor",
+                    quoted=True,
+                )
+            )
+        ).from_(
+            exp.table_(
+                anchor.table,
+                db=anchor.database,
+                quoted=True,
+                alias="latest_anchor",
+            )
+        )
+    )
+    predicate = _COMPARISON[plan.comparator](
+        this=metric,
+        expression=exp.convert(plan.bound.value),
+    )
+    predicate = exp.and_(
+        exp.EQ(
+            this=exp.column(anchor.partition_key, table=anchor_alias, quoted=True),
+            expression=latest,
+        ),
+        predicate,
+    )
+    scan_context = PhysicalScan(
+        plan.resource_id,
+        (),
+        None,
+        plan.anchor_resource_id,
+    )
+    for constraint in plan.constraints:
+        predicate = exp.and_(
+            predicate,
+            _render_expr(constraint, catalog, scan_context),
+        )
+    return (
+        exp.select(
+            *(
+                exp.column(key, table=anchor_alias, quoted=True)
+                for key in ("mktcode", "tgtcode", "bizdate")
+            )
+        )
+        .from_(anchor_table)
+        .join(current, on=current_join, join_type="INNER")
+        .join(previous, on=previous_join, join_type="LEFT")
+        .where(predicate)
     )
 
 

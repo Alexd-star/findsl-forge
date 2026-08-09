@@ -19,6 +19,13 @@ class OfficialPipelineOptions:
     use_statistics: bool = True
     use_strategies: bool = True
     allow_shadow_strategies: bool = False
+    strategy_mode: str = "auto"
+
+    def __post_init__(self):
+        if self.strategy_mode not in {"auto", "force_baseline", "force_candidate"}:
+            raise ValueError("strategy_mode must be auto, force_baseline, or force_candidate")
+        if self.strategy_mode == "force_candidate" and not self.use_strategies:
+            raise ValueError("force_candidate requires physical strategies")
 
 
 class OfficialPipelineError(ValueError):
@@ -136,7 +143,11 @@ def compile_official(
     catalog = compile_context.physical_catalog
     expressions = compile_context.physical_expressions
     statistics = compile_context.physical_statistics if options.use_statistics else None
-    strategies = compile_context.physical_strategies if options.use_strategies else None
+    strategies = (
+        compile_context.physical_strategies
+        if options.use_strategies and options.strategy_mode != "force_baseline"
+        else None
+    )
     try:
         with use_physical_runtime(compile_context.physical_runtime):
             physical = plan_physical(
@@ -145,8 +156,23 @@ def compile_official(
                 statistics=statistics,
                 strategies=strategies,
                 expressions=expressions,
-                allow_shadow_strategies=options.allow_shadow_strategies,
+                allow_shadow_strategies=(
+                    options.allow_shadow_strategies
+                    or options.strategy_mode == "force_candidate"
+                ),
             )
+        if (
+            options.strategy_mode == "force_candidate"
+            and not any(
+                item.selected and item.strategy_id not in {
+                    "direct_column",
+                    "controlled_expression",
+                    "grouped_aggregate",
+                }
+                for item in physical.decisions
+            )
+        ):
+            raise ValueError("no eligible non-baseline physical candidate exists")
     except Exception as exc:
         decisions = tuple(asdict(item) for item in getattr(exc, "decisions", ()))
         _raise_pipeline_error("physical", exc, partial, diagnostics=decisions)

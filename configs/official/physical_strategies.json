@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalog_sha256": "98a717073e7ff7ce5c25635679dc8b078e7cbdd8d99599e4a0f50d077525c470",
+  "catalog_sha256": "3a852362faafe738938e4a13aa6ca78c58938d8082442f4f493039efe92a5ffd",
   "strategies": [
     {
       "strategy_id": "ma10_prefix_average",
@@ -182,6 +182,90 @@
       "window": 60,
       "scale_divisor": 1.0,
       "value_type": "numeric",
+      "selection_mode": "active"
+    },
+    {
+      "strategy_id": "close_prefix_aggregate",
+      "indicator_id": "收盘价",
+      "kind": "prefix_aggregate",
+      "scan_resource_id": "official_basic",
+      "prefix_resource_id": "official_basic_prefix",
+      "sum_column": "close_prefix",
+      "count_column": "close_count_prefix",
+      "functions": ["AVG", "SUM"],
+      "min_window": 1,
+      "max_window": 10000,
+      "scale_divisor": 10000.0,
+      "access_fraction_hint": 0.02,
+      "selection_mode": "active"
+    },
+    {
+      "strategy_id": "turnover_prefix_aggregate",
+      "indicator_id": "成交额",
+      "kind": "prefix_aggregate",
+      "scan_resource_id": "official_basic",
+      "prefix_resource_id": "official_basic_prefix",
+      "sum_column": "turnover_prefix",
+      "count_column": "volume_count_prefix",
+      "functions": ["SUM"],
+      "min_window": 1,
+      "max_window": 10000,
+      "scale_divisor": 1.0,
+      "access_fraction_hint": 0.02,
+      "selection_mode": "active"
+    },
+    {
+      "strategy_id": "volume_prefix_aggregate",
+      "indicator_id": "成交量",
+      "kind": "prefix_aggregate",
+      "scan_resource_id": "official_basic",
+      "prefix_resource_id": "official_basic_prefix",
+      "sum_column": "volume_prefix",
+      "count_column": "volume_count_prefix",
+      "functions": ["AVG", "SUM"],
+      "min_window": 1,
+      "max_window": 10000,
+      "scale_divisor": 1.0,
+      "access_fraction_hint": 0.02,
+      "selection_mode": "active"
+    },
+    {
+      "strategy_id": "volume_sum_5_materialized",
+      "indicator_id": "成交量",
+      "kind": "materialized_aggregate",
+      "scan_resource_id": "official_basic",
+      "materialized_resource_id": "official_basic_rollup",
+      "feature_column": "volume_sum_5",
+      "function": "SUM",
+      "window": 5,
+      "scale_divisor": 1.0,
+      "partition_fraction_hint": 0.0041,
+      "selection_mode": "active"
+    },
+    {
+      "strategy_id": "volume_sum_20_materialized",
+      "indicator_id": "成交量",
+      "kind": "materialized_aggregate",
+      "scan_resource_id": "official_basic",
+      "materialized_resource_id": "official_basic_rollup",
+      "feature_column": "volume_sum_20",
+      "function": "SUM",
+      "window": 20,
+      "scale_divisor": 1.0,
+      "partition_fraction_hint": 0.0041,
+      "selection_mode": "active"
+    },
+    {
+      "strategy_id": "turnover_sum_20_materialized",
+      "indicator_id": "成交额",
+      "kind": "materialized_aggregate",
+      "scan_resource_id": "official_basic",
+      "materialized_resource_id": "official_basic_rollup",
+      "feature_column": "turnover_sum_20",
+      "function": "SUM",
+      "window": 20,
+      "scale_divisor": 1.0,
+      "partition_fraction_hint": 0.0041,
       "selection_mode": "active"
     }
   ]

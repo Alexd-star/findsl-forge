@@ -1,0 +1,1 @@
+SELECT q.mktcode,q.tgtcode,q.bizdate FROM `newzl`.`hsj_stock_hq_basic` q WHERE q.bizdate='2026-04-14' AND EXISTS (SELECT 1 FROM `findsl_ext`.`instrument_rule` r WHERE r.mktcode=q.mktcode AND r.tgtcode=q.tgtcode AND r.snapshot_id='exchange-stock-rules-2026-07-13-bd7ff74aef53' AND r.t0_eligible=TRUE);

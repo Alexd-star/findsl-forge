@@ -1,0 +1,1 @@
+WITH features AS (SELECT b.mktcode,b.tgtcode,b.bizdate,b.lastPx/10000.0 AS value,MIN(b.lastPx/10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) AS rolling_low FROM `newzl`.`hsj_stock_hq_basic` b) SELECT mktcode,tgtcode,bizdate FROM features WHERE bizdate='2026-04-14' AND value<=rolling_low;

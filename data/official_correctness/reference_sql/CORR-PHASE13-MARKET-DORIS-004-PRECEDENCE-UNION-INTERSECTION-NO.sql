@@ -1,0 +1,1 @@
+SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate='2026-04-14' AND b.volume>100 AND (b.mktcode=1 OR (b.mktcode=0 AND NOT (b.mktcode=0 AND ((b.tgtcode>='300000' AND b.tgtcode<='300999') OR (b.tgtcode>='301000' AND b.tgtcode<='301999')))));

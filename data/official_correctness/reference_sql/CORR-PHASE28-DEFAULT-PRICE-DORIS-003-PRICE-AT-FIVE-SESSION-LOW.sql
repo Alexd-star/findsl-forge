@@ -1,0 +1,1 @@
+WITH event_rows AS (SELECT b.mktcode,b.tgtcode,b.bizdate,b.lastPx / 10000.0 AS price,MIN(b.lastPx / 10000.0) OVER(PARTITION BY b.mktcode,b.tgtcode ORDER BY b.bizdate ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS low5 FROM `newzl`.`hsj_stock_hq_basic` b) SELECT mktcode,tgtcode,bizdate FROM event_rows WHERE bizdate='2026-04-14' AND price<=low5;

@@ -1,0 +1,1 @@
+SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.mktcode=1 AND b.bizdate IN ('2024-03-11','2024-03-12','2024-03-13','2024-03-14','2024-03-15') AND b.volume>100000000;

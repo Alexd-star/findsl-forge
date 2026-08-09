@@ -1,0 +1,1 @@
+WITH ranked AS (SELECT b.mktcode,b.tgtcode,b.bizdate,ROW_NUMBER() OVER (ORDER BY b.volume DESC,b.mktcode ASC,b.tgtcode ASC) AS rn,COUNT(*) OVER () AS population FROM `newzl`.`hsj_stock_hq_basic` AS b WHERE b.bizdate='2026-04-14') SELECT mktcode,tgtcode,bizdate FROM ranked WHERE rn<=CEIL(population*10/100.0);

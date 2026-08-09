@@ -1,0 +1,1 @@
+SELECT b.mktcode,b.tgtcode,b.bizdate FROM `newzl`.`hsj_stock_hq_basic` AS b LEFT JOIN `newzl`.`hsj_stock_hq_basic_technical` AS t ON t.mktcode=b.mktcode AND t.tgtcode=b.tgtcode AND t.bizdate=b.bizdate WHERE b.bizdate='2026-04-14' AND ABS(b.lastPx/10000.0-t.ma20)/NULLIF(ABS(t.ma20),0)<=0.02 AND b.lastPx/10000.0>=t.ma20*0.995;

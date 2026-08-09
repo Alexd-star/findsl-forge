@@ -1,0 +1,1 @@
+WITH w AS (SELECT mktcode,tgtcode,bizdate,lowPx/10000.0 AS px,MIN(lowPx/10000.0) OVER(PARTITION BY mktcode,tgtcode ORDER BY bizdate ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS extreme FROM `newzl`.`hsj_stock_hq_basic`) SELECT mktcode,tgtcode,bizdate FROM w WHERE bizdate='2026-04-14' AND px<=extreme;
