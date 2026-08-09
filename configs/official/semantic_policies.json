@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "policy_id": "official-semantic-policy-v1",
+  "profile": "competition",
+  "ranking": {
+    "method": "row_number",
+    "tie_breakers": ["mktcode", "tgtcode"],
+    "metric_null_order": "engine_default",
+    "rationale": "赛题没有定义边界并列扩张规则，默认使用稳定证券键打破并列，使前 N 名严格不超过 N 条。"
+  },
+  "price_adjustment": {
+    "stock_mode": "official_raw_price",
+    "index_mode": "unadjusted",
+    "missing_factor_behavior": "reject_adjusted_claim",
+    "rationale": "官方行情三表未提供可审计复权因子，系统不得把原始价伪装为前复权价；接入版本化复权因子后可发布新的政策版本。"
+  },
+  "nulls": {
+    "division_by_zero": "null",
+    "nullable_predicate": "sql_three_valued_logic",
+    "suspended_session": "preserve_missing_observation",
+    "pre_listing_window": "require_available_observations"
+  },
+  "time": {
+    "recent_day_semantics": "trading_observations",
+    "calendar_period_semantics": "calendar_boundary",
+    "financial_period_semantics": "not_substituted_by_calendar_period"
+  },
+  "provisional_items": [
+    "ranking.metric_null_order",
+    "price_adjustment.stock_mode"
+  ]
+}

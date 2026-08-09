@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "functions": [
+    {
+      "name": "abs_value",
+      "aliases": [],
+      "argument_mode": "expressions",
+      "arg_types": ["numeric"],
+      "result_kind": "numeric",
+      "template_kind": "numeric_scalar",
+      "lowering_op": "abs",
+      "reference_op": "abs",
+      "version": "1"
+    },
+    {
+      "name": "safe_ratio",
+      "aliases": [],
+      "argument_mode": "expressions",
+      "arg_types": ["numeric", "numeric"],
+      "result_kind": "numeric",
+      "template_kind": "numeric_binary",
+      "lowering_op": "safe_divide",
+      "reference_op": "safe_divide",
+      "version": "1"
+    },
+    {
+      "name": "above_value",
+      "aliases": [],
+      "argument_mode": "expressions",
+      "arg_types": ["numeric", "numeric"],
+      "result_kind": "boolean",
+      "template_kind": "boolean_event",
+      "lowering_op": "greater_than",
+      "reference_op": "greater_than",
+      "version": "1"
+    }
+  ]
+}

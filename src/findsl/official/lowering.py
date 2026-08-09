@@ -100,6 +100,8 @@ def lower_official_ast(
                 (node, bind_function(node, domain_registry))
                 for node in _walk_typed(typed)
                 if isinstance(node.node, OfficialFunctionCall)
+                and node.binding is not None
+                and node.binding.signature.argument_mode == "slot_literals"
             )
             bindings = tuple(binding for _, binding in bound_nodes)
             binding_by_node = {id(node.node): binding for node, binding in bound_nodes}
@@ -290,7 +292,7 @@ def _lower_expr(
         if domain_binding is not None and not strip_count_exp:
             date_constraint = domain_binding.date_constraint
         return CallExpr(
-            node.name,
+            binding.signature.name if binding is not None else node.name,
             tuple(
                 _lower_expr(
                     child,

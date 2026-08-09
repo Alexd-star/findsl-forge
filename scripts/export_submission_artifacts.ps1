@@ -22,6 +22,10 @@ $reportFiles = @(
   "official_doris_evidence.json",
   "official_slot_coverage.md",
   "official_slot_coverage.json",
+  "official_compiler_funnel.md",
+  "official_compiler_funnel.json",
+  "official_correctness_benchmark.md",
+  "official_correctness_benchmark.json",
   "official_query_performance_matrix.md",
   "official_query_performance_matrix.json",
   "phase42_long_horizon_doris.md",
@@ -254,7 +258,10 @@ $env:PYTHONPATH = "src"
   --snapshots-dir $snapshotDir `
   --manifest $manifestPath `
   --output $metadataPath `
-  --summary-output $summaryPath | Out-Null
+  --summary-output $summaryPath `
+  --contract "configs/official/evidence_contract.json" `
+  --expected-git-head $head `
+  --require-contract-pass | Out-Null
 
 Write-Host "Exported $($copied.Count) evidence files into $snapshotDir"
 Write-Host "Manifest: $manifestPath"

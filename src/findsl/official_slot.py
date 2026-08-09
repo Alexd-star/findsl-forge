@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import re
+import subprocess
 from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -3614,7 +3617,8 @@ def compile_training_workbook(
 ) -> Dict[str, Any]:
     import pandas as pd
 
-    df = pd.read_excel(path, sheet_name="训练语料")
+    workbook_path = Path(path).resolve()
+    df = pd.read_excel(workbook_path, sheet_name="训练语料")
     compile_mode = CompileMode.parse(mode)
     recovery_compiler = OfficialSlotCompiler(mode=CompileMode.RECOVERY.value)
     strict_compiler = OfficialSlotCompiler(mode=CompileMode.STRICT.value)
@@ -3784,7 +3788,11 @@ def compile_training_workbook(
         strict_compiled_samples if compile_mode is CompileMode.STRICT else compiled_samples
     )
     return {
-        "path": path,
+        "schema_version": 1,
+        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "git_head": _current_git_head(),
+        "path": str(workbook_path),
+        "input_sha256": _file_sha256(workbook_path),
         "mode": compile_mode.value,
         "row_count": row_count,
         "strict_parse_ok": strict_parse_ok,
@@ -4255,3 +4263,21 @@ def _dedupe(items: Iterable[str]) -> List[str]:
         seen.add(item)
         result.append(item)
     return result
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _current_git_head() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "unavailable"

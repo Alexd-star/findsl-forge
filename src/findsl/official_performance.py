@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from statistics import mean
@@ -22,7 +23,14 @@ def build_official_performance_matrix(evidence: Mapping[str, Any]) -> Dict[str, 
         "baseline_vs_prefix_speedup": evidence.get("baseline_vs_prefix_speedup"),
         "row_counts": dict(evidence.get("row_counts", {})),
     }
-    return {"summary": summary, "queries": queries}
+    return {
+        "schema_version": 1,
+        "git_head": evidence.get("git_head"),
+        "source_snapshot_fingerprint": evidence.get("snapshot_fingerprint")
+        or _snapshot_fingerprint(evidence),
+        "summary": summary,
+        "queries": queries,
+    }
 
 
 def write_official_performance_matrix(
@@ -72,6 +80,24 @@ def _round_or_none(value: Any) -> Optional[float]:
     if value is None:
         return None
     return round(float(value), 3)
+
+
+def _snapshot_fingerprint(evidence: Mapping[str, Any]) -> str:
+    basis = {
+        "database": evidence.get("database", "newzl"),
+        "row_counts": evidence.get("row_counts") or {},
+        "feature_table_row_counts": evidence.get("feature_table_row_counts") or {},
+        "basic_date_range": evidence.get("basic_date_range"),
+        "ext_date_range": evidence.get("ext_date_range"),
+        "doris_version": evidence.get("doris_version"),
+    }
+    payload = json.dumps(
+        basis,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def _render_markdown(matrix: Mapping[str, Any]) -> str:

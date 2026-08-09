@@ -23,7 +23,14 @@ class FunctionBinding:
         return {
             "name": self.signature.name,
             "arity": self.signature.arity,
-            "slots": {name: self.slots[name] for name in self.signature.slots},
+            "slots": {
+                name: self.slots[name]
+                for name in self.signature.slots
+                if name in self.slots
+            },
+            "argument_mode": self.signature.argument_mode,
+            "template_kind": self.signature.template_kind,
+            "lowering_op": self.signature.lowering_op,
         }
 
 

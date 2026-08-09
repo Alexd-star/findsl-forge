@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://findsl-forge.local/schemas/official-functions-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "functions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "functions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "aliases", "argument_mode", "arg_types", "result_kind", "template_kind", "lowering_op", "reference_op", "version"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+          "aliases": {"type": "array", "items": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"}, "uniqueItems": true},
+          "argument_mode": {"const": "expressions"},
+          "arg_types": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"enum": ["numeric", "boolean", "string"]}},
+          "result_kind": {"enum": ["numeric", "boolean", "string"]},
+          "template_kind": {"enum": ["numeric_scalar", "numeric_binary", "boolean_event"]},
+          "lowering_op": {"enum": ["abs", "add", "subtract", "multiply", "safe_divide", "greatest", "greater_than", "less_than"]},
+          "reference_op": {"enum": ["abs", "add", "subtract", "multiply", "safe_divide", "greatest", "greater_than", "less_than"]},
+          "version": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

@@ -221,6 +221,8 @@ function Write-EvidenceReport {
   }
   $jsonOutputPath = [System.IO.Path]::ChangeExtension($outputPath, ".json")
   $generatedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+  $gitHead = (& git rev-parse HEAD).Trim()
+  $dorisVersion = (Invoke-DorisSql -Sql "SELECT VERSION();" | Select-Object -Last 1).Trim()
   $optimized = $Queries | Where-Object { $_.name -eq "prefix_optimized_volume_sum_20" } | Select-Object -First 1
   $baseline = $Queries | Where-Object { $_.name -eq "baseline_window_volume_sum_20" } | Select-Object -First 1
   $baselinePrefixRowCountMatch = $false
@@ -248,6 +250,8 @@ function Write-EvidenceReport {
     "",
     "- Evidence source: official Topic 19 CSV package",
     "- Generated at: $generatedAt",
+    "- Git HEAD: ``$gitHead``",
+    "- Doris version: ``$dorisVersion``",
     ("- Doris host: ``{0}``" -f $DorisHost),
     "- Query port: $QueryPort",
     "- FE HTTP port: $HttpPort",
@@ -318,7 +322,11 @@ function Write-EvidenceReport {
 
   $lines -join "`n" | Set-Content -LiteralPath $outputPath -Encoding UTF8
   [pscustomobject]@{
+    schema_version = 1
     generated_at = $generatedAt
+    git_head = $gitHead
+    doris_version = $dorisVersion
+    database = "newzl"
     official_root = $OfficialRoot
     doris_host = $DorisHost
     query_port = $QueryPort

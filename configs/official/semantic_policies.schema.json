@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://findsl-forge.local/schemas/semantic-policies-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "profile", "ranking", "price_adjustment", "nulls", "time", "provisional_items"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "policy_id": {"type": "string", "minLength": 1},
+    "profile": {"enum": ["competition", "production"]},
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "tie_breakers", "metric_null_order", "rationale"],
+      "properties": {
+        "method": {"enum": ["row_number", "rank", "dense_rank"]},
+        "tie_breakers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "metric_null_order": {"enum": ["engine_default", "first", "last", "exclude"]},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    },
+    "price_adjustment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stock_mode", "index_mode", "missing_factor_behavior", "rationale"],
+      "properties": {
+        "stock_mode": {"enum": ["official_raw_price", "forward_adjusted", "backward_adjusted"]},
+        "index_mode": {"const": "unadjusted"},
+        "missing_factor_behavior": {"enum": ["reject_adjusted_claim", "use_raw_with_warning"]},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    },
+    "nulls": {"type": "object"},
+    "time": {"type": "object"},
+    "provisional_items": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  }
+}

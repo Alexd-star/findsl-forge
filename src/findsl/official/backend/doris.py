@@ -6,6 +6,7 @@ from typing import Optional
 from sqlglot import exp
 
 from ..physical.catalog import PhysicalCatalog
+from ..physical.runtime import current_semantic_policy
 from ..physical.ir import (
     PhysicalAbs,
     PhysicalBinary,
@@ -186,31 +187,14 @@ def _render_plan(
         inner = _render_plan(plan.input, catalog, cte_prefix)
         relation = _find_relation(plan.input)
         stable_alias = _stable_alias(relation)
-        metric_order = []
-        if not isinstance(plan.expression, PhysicalLiteral):
-            metric_order.append(
-                exp.Ordered(
-                    this=_render_expr(plan.expression, catalog, relation),
-                    desc=plan.direction == "desc",
-                )
-            )
-        order = exp.Order(
-            expressions=[
-                *metric_order,
-                exp.Ordered(
-                    this=exp.column("mktcode", table=stable_alias, quoted=True),
-                    desc=False,
-                    nulls_first=True,
-                ),
-                exp.Ordered(
-                    this=exp.column("tgtcode", table=stable_alias, quoted=True),
-                    desc=False,
-                    nulls_first=True,
-                ),
-            ]
+        metric = (
+            None
+            if isinstance(plan.expression, PhysicalLiteral)
+            else _render_expr(plan.expression, catalog, relation)
         )
+        order = _rank_order(metric, plan.direction == "desc", stable_alias)
         window = exp.Window(
-            this=exp.RowNumber(),
+            this=_rank_function(),
             partition_by=[exp.column("bizdate", table=stable_alias, quoted=True)],
             order=order,
         ).as_("__rank_value")
@@ -890,28 +874,15 @@ def _render_aggregate_rank(
         *(exp.column(key, table=stable_alias, quoted=True) for key in keys)
     )
     aggregate_rows = source.subquery(alias="aggregate_rows")
-    order = exp.Order(
-        expressions=[
-            exp.Ordered(
-                this=exp.column("metric_value", table="aggregate_rows", quoted=True),
-                desc=plan.direction == "desc",
-            ),
-            exp.Ordered(
-                this=exp.column("mktcode", table="aggregate_rows", quoted=True),
-                desc=False,
-                nulls_first=True,
-            ),
-            exp.Ordered(
-                this=exp.column("tgtcode", table="aggregate_rows", quoted=True),
-                desc=False,
-                nulls_first=True,
-            ),
-        ]
+    order = _rank_order(
+        exp.column("metric_value", table="aggregate_rows", quoted=True),
+        plan.direction == "desc",
+        "aggregate_rows",
     )
     ranked = exp.select(
         *(exp.column(key, table="aggregate_rows", quoted=True) for key in keys),
         exp.column("metric_value", table="aggregate_rows", quoted=True),
-        exp.Window(this=exp.RowNumber(), order=order).as_("__rank_value"),
+        exp.Window(this=_rank_function(), order=order).as_("__rank_value"),
     ).from_(aggregate_rows)
     if plan.percentage:
         ranked = ranked.select(
@@ -1186,27 +1157,14 @@ def _render_named_rank(
         source = source.select(value.as_("metric_value", quoted=True), append=True)
     metric_alias = f"{rank.alias}_metric"
     metrics = source.subquery(alias=metric_alias)
-    order = exp.Order(
-        expressions=[
-            exp.Ordered(
-                this=exp.column("metric_value", table=metric_alias, quoted=True),
-                desc=rank.direction == "desc",
-            ),
-            exp.Ordered(
-                this=exp.column("mktcode", table=metric_alias, quoted=True),
-                desc=False,
-                nulls_first=True,
-            ),
-            exp.Ordered(
-                this=exp.column("tgtcode", table=metric_alias, quoted=True),
-                desc=False,
-                nulls_first=True,
-            ),
-        ]
+    order = _rank_order(
+        exp.column("metric_value", table=metric_alias, quoted=True),
+        rank.direction == "desc",
+        metric_alias,
     )
     return exp.select(
         *(exp.column(key, table=metric_alias, quoted=True) for key in keys),
-        exp.Window(this=exp.RowNumber(), order=order).as_(rank.value_alias, quoted=True),
+        exp.Window(this=_rank_function(), order=order).as_(rank.value_alias, quoted=True),
     ).from_(metrics)
 
 
@@ -1284,27 +1242,14 @@ def _render_stage_rank(
     ).from_(candidate_table).join(metric_table, on=join_predicate, join_type="INNER")
     joined_alias = f"{cte_prefix}stage_{plan.stage_index}_joined"
     joined_rows = joined.subquery(alias=joined_alias)
-    order = exp.Order(
-        expressions=[
-            exp.Ordered(
-                this=exp.column("metric_value", table=joined_alias, quoted=True),
-                desc=plan.direction == "desc",
-            ),
-            exp.Ordered(
-                this=exp.column("mktcode", table=joined_alias, quoted=True),
-                desc=False,
-                nulls_first=True,
-            ),
-            exp.Ordered(
-                this=exp.column("tgtcode", table=joined_alias, quoted=True),
-                desc=False,
-                nulls_first=True,
-            ),
-        ]
+    order = _rank_order(
+        exp.column("metric_value", table=joined_alias, quoted=True),
+        plan.direction == "desc",
+        joined_alias,
     )
     ranked = exp.select(
         *(exp.column(name, table=joined_alias, quoted=True) for name in (*keys, "bizdate")),
-        exp.Window(this=exp.RowNumber(), order=order).as_("stage_rank", quoted=True),
+        exp.Window(this=_rank_function(), order=order).as_("stage_rank", quoted=True),
     ).from_(joined_rows)
     if plan.percentage:
         ranked = ranked.select(
@@ -2169,28 +2114,15 @@ def _render_temporal_aggregate(
             if aggregate_before_rank
             else [exp.column("bizdate", table=metric_name, quoted=True)]
         )
-        rank_order = exp.Order(
-            expressions=[
-                exp.Ordered(
-                    this=exp.column("metric_value", table=metric_name, quoted=True),
-                    desc=plan.direction == "desc",
-                ),
-                exp.Ordered(
-                    this=exp.column("mktcode", table=metric_name, quoted=True),
-                    desc=False,
-                    nulls_first=True,
-                ),
-                exp.Ordered(
-                    this=exp.column("tgtcode", table=metric_name, quoted=True),
-                    desc=False,
-                    nulls_first=True,
-                ),
-            ]
+        rank_order = _rank_order(
+            exp.column("metric_value", table=metric_name, quoted=True),
+            plan.direction == "desc",
+            metric_name,
         )
         ranked = exp.select(
             *(exp.column(name, table=metric_name, quoted=True) for name in projection),
             exp.Window(
-                this=exp.RowNumber(),
+                this=_rank_function(),
                 partition_by=rank_partition,
                 order=rank_order,
             ).as_("rank_value", quoted=True),
@@ -2717,6 +2649,48 @@ def _row_number(table: str, keys, order_column: str, descending: bool = False) -
             ]
         ),
     )
+
+
+def _rank_function():
+    policy = current_semantic_policy()
+    method = policy.ranking.method if policy else "row_number"
+    if method == "row_number":
+        return exp.RowNumber()
+    if method == "rank":
+        return exp.Rank()
+    if method == "dense_rank":
+        return exp.DenseRank()
+    raise DorisBackendError("DORIS_RANK_POLICY_UNSUPPORTED", f"unsupported rank method {method}")
+
+
+def _rank_order(metric, descending: bool, table: str) -> exp.Order:
+    policy = current_semantic_policy()
+    method = policy.ranking.method if policy else "row_number"
+    null_order = policy.ranking.metric_null_order if policy else "engine_default"
+    if null_order == "exclude":
+        raise DorisBackendError(
+            "DORIS_RANK_NULL_POLICY_UNSUPPORTED",
+            "rank NULL exclusion requires an explicit pre-rank filter",
+        )
+    expressions = []
+    if metric is not None:
+        kwargs = {"this": metric, "desc": descending}
+        if null_order == "first":
+            kwargs["nulls_first"] = True
+        elif null_order == "last":
+            kwargs["nulls_first"] = False
+        expressions.append(exp.Ordered(**kwargs))
+    if method == "row_number":
+        tie_breakers = policy.ranking.tie_breakers if policy else ("mktcode", "tgtcode")
+        expressions.extend(
+            exp.Ordered(
+                this=exp.column(name, table=table, quoted=True),
+                desc=False,
+                nulls_first=True,
+            )
+            for name in tie_breakers
+        )
+    return exp.Order(expressions=expressions)
 
 
 def _temporal_metric_predicate(plan: PhysicalTemporal, metrics_name: str):

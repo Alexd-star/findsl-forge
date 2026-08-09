@@ -5,15 +5,12 @@ from time import perf_counter_ns
 from typing import Any, Dict, Tuple
 
 from .backend.doris import render_doris
+from .context import CompileContext, default_compile_context
 from .frontend.antlr_frontend import AntlrOfficialFrontend
 from .lowering import lower_official_ast
 from .optimizer import DEFAULT_RULES, Optimizer
-from .physical.catalog import default_physical_catalog
-from .physical.expressions import default_physical_expressions
 from .physical.planner import plan_physical
-from .physical.statistics import default_physical_statistics
-from .physical.strategies import default_physical_strategies
-from .registry import default_official_registry
+from .physical.runtime import use_physical_runtime
 from .semantics import OfficialSemanticAnalyzer
 
 
@@ -60,6 +57,7 @@ class OfficialPipelineResult:
     optimized: Dict[str, Any]
     physical: Dict[str, Any]
     backend: Dict[str, Any]
+    compile_context: Dict[str, Any]
     elapsed_ns: int
 
     @property
@@ -76,6 +74,7 @@ class OfficialPipelineResult:
             "optimized": self.optimized,
             "physical": self.physical,
             "backend": self.backend,
+            "compile_context": self.compile_context,
             "elapsed_ms": self.elapsed_ms,
         }
 
@@ -83,9 +82,16 @@ class OfficialPipelineResult:
 def compile_official(
     source: str,
     options: OfficialPipelineOptions = OfficialPipelineOptions(),
+    context: CompileContext | None = None,
 ) -> OfficialPipelineResult:
     started = perf_counter_ns()
     partial: Dict[str, Any] = {"source": source}
+    try:
+        compile_context = context or default_compile_context()
+        compile_context.assert_current()
+    except Exception as exc:
+        _raise_pipeline_error("context", exc, partial)
+    partial["compile_context"] = compile_context.to_dict()
 
     frontend = AntlrOfficialFrontend().parse(str(source or ""), original_source=source)
     partial["frontend"] = frontend.to_dict()
@@ -99,9 +105,12 @@ def compile_official(
             diagnostics=tuple(item.to_dict() for item in frontend.diagnostics),
         )
 
-    registry = default_official_registry()
+    registry = compile_context.registry
     try:
-        typed = OfficialSemanticAnalyzer(registry.resolve_optional).analyze(frontend.ast)
+        typed = OfficialSemanticAnalyzer(
+            registry.resolve_optional,
+            compile_context.function_catalog,
+        ).analyze(frontend.ast)
     except Exception as exc:
         _raise_pipeline_error("typed", exc, partial)
     partial["typed_ast"] = typed.to_dict()
@@ -124,26 +133,28 @@ def compile_official(
         )
     optimized_lowering = replace(logical, plan=optimized.plan)
 
-    catalog = default_physical_catalog()
-    expressions = default_physical_expressions(catalog)
-    statistics = default_physical_statistics(catalog) if options.use_statistics else None
-    strategies = default_physical_strategies(catalog) if options.use_strategies else None
+    catalog = compile_context.physical_catalog
+    expressions = compile_context.physical_expressions
+    statistics = compile_context.physical_statistics if options.use_statistics else None
+    strategies = compile_context.physical_strategies if options.use_strategies else None
     try:
-        physical = plan_physical(
-            optimized_lowering,
-            catalog,
-            statistics=statistics,
-            strategies=strategies,
-            expressions=expressions,
-            allow_shadow_strategies=options.allow_shadow_strategies,
-        )
+        with use_physical_runtime(compile_context.physical_runtime):
+            physical = plan_physical(
+                optimized_lowering,
+                catalog,
+                statistics=statistics,
+                strategies=strategies,
+                expressions=expressions,
+                allow_shadow_strategies=options.allow_shadow_strategies,
+            )
     except Exception as exc:
         decisions = tuple(asdict(item) for item in getattr(exc, "decisions", ()))
         _raise_pipeline_error("physical", exc, partial, diagnostics=decisions)
-    partial["physical"] = _physical_payload(physical)
+    partial["physical"] = _physical_payload(physical, compile_context, options)
 
     try:
-        rendered = render_doris(physical.plan, catalog, expressions)
+        with use_physical_runtime(compile_context.physical_runtime):
+            rendered = render_doris(physical.plan, catalog, expressions)
     except Exception as exc:
         _raise_pipeline_error("backend", exc, partial)
     backend = {
@@ -155,6 +166,10 @@ def compile_official(
         "safety_issues": [item.to_dict() for item in rendered.validation.issues],
         "table_references": list(rendered.validation.table_references),
     }
+    try:
+        compile_context.assert_current()
+    except Exception as exc:
+        _raise_pipeline_error("context", exc, partial)
     return OfficialPipelineResult(
         source,
         partial["frontend"],
@@ -163,14 +178,22 @@ def compile_official(
         partial["optimized"],
         partial["physical"],
         backend,
+        partial["compile_context"],
         perf_counter_ns() - started,
     )
 
 
-def _physical_payload(result) -> Dict[str, Any]:
+def _physical_payload(
+    result,
+    context: CompileContext,
+    options: OfficialPipelineOptions,
+) -> Dict[str, Any]:
     return {
         "plan": result.plan.to_dict(),
-        "plan_id": result.plan.node_id,
+        "physical_node_id": result.plan.node_id,
+        "plan_id": context.versioned_plan_id(result.plan.node_id, asdict(options)),
+        "catalog_snapshot_id": context.context_id,
+        "policy_id": context.snapshot.policy_id,
         "selected_resource": result.selected_resource,
         "selected_strategy": result.selected_strategy,
         "decisions": [asdict(item) for item in result.decisions],

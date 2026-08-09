@@ -29,12 +29,6 @@ from ..domain.market import (
     parse_market_expression,
 )
 from ..domain.scope import ScopeAnd, ScopeAtom, ScopeNot, ScopeOr
-from ..external.runtime import (
-    default_benchmark_policy_catalog,
-    default_external_data_policy,
-    default_external_index_quote_catalog,
-    default_external_scope_catalog,
-)
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .catalog import PhysicalCatalog
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
@@ -95,9 +89,17 @@ from .ir import (
 from .validate import validate_physical_plan
 from .statistics import PhysicalStatisticsSnapshot
 from .strategies import PhysicalStrategyRegistry
-from .scopes import SecurityScopeCatalog, default_security_scope_catalog
-from .patterns import default_physical_pattern_config
-from .approximation import default_numeric_approximation_policy
+from .runtime import (
+    current_benchmark_policy_catalog,
+    current_external_data_policy,
+    current_external_index_quote_catalog,
+    current_external_scope_catalog,
+    current_function_catalog,
+    current_numeric_approximation_policy,
+    current_physical_pattern_config,
+    current_security_scope_catalog,
+)
+from .scopes import SecurityScopeCatalog
 
 
 @dataclass(frozen=True)
@@ -1355,14 +1357,14 @@ def _build_named_scalar_relations(
             resolved_scope = None
             market = str(call.binding.slots.get("market", "")).strip()
             try:
-                benchmark = default_benchmark_policy_catalog().resolve(
+                benchmark = current_benchmark_policy_catalog().resolve(
                     call.scope_expression.name, market
                 )
             except KeyError:
                 benchmark = None
             if benchmark is not None:
                 try:
-                    quote = default_external_index_quote_catalog().resolve(
+                    quote = current_external_index_quote_catalog().resolve(
                         benchmark.index_code
                     )
                 except KeyError as exc:
@@ -1376,12 +1378,12 @@ def _build_named_scalar_relations(
                 )
             else:
                 try:
-                    resolved_scope = default_security_scope_catalog().resolve(
+                    resolved_scope = current_security_scope_catalog().resolve(
                         call.scope_expression.name
                     )
                 except KeyError as exc:
                     try:
-                        external = default_external_scope_catalog().resolve(
+                        external = current_external_scope_catalog().resolve(
                             call.scope_expression.name
                         )
                     except KeyError:
@@ -1389,7 +1391,7 @@ def _build_named_scalar_relations(
                     else:
                         if external.option.scope_type == "index":
                             try:
-                                quote = default_external_index_quote_catalog().resolve(
+                                quote = current_external_index_quote_catalog().resolve(
                                     external.option.scope_code
                                 )
                             except KeyError:
@@ -1641,7 +1643,7 @@ def _plan_composite_aggregate(
             _physical_field_expression(field),
         )
         industry_policy = (
-            default_external_data_policy().industry
+            current_external_data_policy().industry
             if call.name == "belong_industry"
             else None
         )
@@ -1981,7 +1983,7 @@ def _physical_field_expression(field: _ResolvedIndicator):
     if field.indicator_id == "稳定证券顺序":
         return PhysicalLiteral(0, NUMERIC)
     if field.indicator_id == "是否T+0":
-        policy = default_external_data_policy().instrument_rule
+        policy = current_external_data_policy().instrument_rule
         return PhysicalExternalExists(
             policy.resource_id,
             "official_basic",
@@ -2083,6 +2085,18 @@ def _lower_composite_expr(
     if isinstance(expression, CallExpr):
         if expression.node_id in refs:
             return refs[expression.node_id]
+        if _configured_function_signature(expression) is not None:
+            return _lower_configured_function(
+                expression,
+                lambda item: _lower_composite_expr(
+                    item,
+                    catalog,
+                    resource_id,
+                    fields,
+                    refs,
+                    allowed_resource_ids,
+                ),
+            )
         if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
             raise PhysicalPlanningError(
                 "PHYSICAL_EXPRESSION_UNSUPPORTED",
@@ -2519,7 +2533,7 @@ def _plan_crossing_events(
     projected_refs = {}
     constraints = []
     seen_constraints = set()
-    pattern_config = default_physical_pattern_config()
+    pattern_config = current_physical_pattern_config()
     for index, call in enumerate(calls):
         alias = f"event_{index}"
         if call.name in _CROSSING_CALLS | _PATTERN_CALLS:
@@ -3133,10 +3147,12 @@ def _collect_fields(
 
     fields = []
     security_scope_required = False
-    scope_catalog = default_security_scope_catalog()
-    external_scope_catalog = default_external_scope_catalog()
+    scope_catalog = current_security_scope_catalog()
+    external_scope_catalog = current_external_scope_catalog()
     for expression in logical_expressions:
         for call in _walk_calls(expression):
+            if _configured_function_signature(call) is not None:
+                continue
             if (
                 call.name
                 not in _DIRECT_FIELD_CALLS | _WINDOW_EVENT_CALLS | {"belong_industry"}
@@ -3651,6 +3667,19 @@ def _lower_expr(
     if isinstance(expression, LiteralExpr):
         return _physical_literal(expression)
     if isinstance(expression, CallExpr):
+        if _configured_function_signature(expression) is not None:
+            return _lower_configured_function(
+                expression,
+                lambda item: _lower_expr(
+                    item,
+                    catalog,
+                    resource_id,
+                    fields,
+                    allow_rank=allow_rank,
+                    expression_overrides=expression_overrides,
+                    allowed_resource_ids=allowed_resource_ids,
+                ),
+            )
         if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
             raise PhysicalPlanningError("PHYSICAL_EXPRESSION_UNSUPPORTED", f"unsupported physical call {expression.name}")
         if expression.name == "rank" and not allow_rank:
@@ -3732,7 +3761,7 @@ def _lower_approximate_comparison(left, right):
             "PHYSICAL_APPROXIMATION_TYPE_UNSUPPORTED",
             "physical approximate equality currently requires numeric operands",
         )
-    policy = default_numeric_approximation_policy()
+    policy = current_numeric_approximation_policy()
     difference = PhysicalAbs(
         PhysicalBinary("-", left, right, NUMERIC),
         NUMERIC,
@@ -3972,6 +4001,54 @@ def _lower_declared_expression(
     )
 
 
+def _configured_function_signature(expression: CallExpr):
+    catalog = current_function_catalog()
+    signature = catalog.resolve(expression.name) if catalog is not None else None
+    if signature is None or signature.argument_mode != "expressions":
+        return None
+    return signature
+
+
+def _lower_configured_function(expression: CallExpr, lower_argument):
+    signature = _configured_function_signature(expression)
+    if signature is None:
+        raise PhysicalPlanningError(
+            "PHYSICAL_FUNCTION_TEMPLATE_UNAVAILABLE",
+            f"configured function is unavailable: {expression.name}",
+        )
+    arguments = tuple(lower_argument(item) for item in expression.args)
+    operation = signature.lowering_op
+    if operation == "abs" and len(arguments) == 1:
+        return PhysicalAbs(arguments[0], expression.type)
+    if operation == "greatest" and len(arguments) == 2:
+        return PhysicalGreatest(arguments, expression.type)
+    binary = {
+        "add": "+",
+        "subtract": "-",
+        "multiply": "*",
+    }
+    if operation in binary and len(arguments) == 2:
+        return PhysicalBinary(binary[operation], arguments[0], arguments[1], expression.type)
+    if operation == "safe_divide" and len(arguments) == 2:
+        return PhysicalBinary(
+            "/",
+            arguments[0],
+            PhysicalNullIf(
+                arguments[1],
+                PhysicalLiteral(0, arguments[1].type),
+                arguments[1].type,
+            ),
+            expression.type,
+        )
+    comparison = {"greater_than": ">", "less_than": "<"}
+    if operation in comparison and len(arguments) == 2:
+        return PhysicalComparison(comparison[operation], arguments[0], arguments[1])
+    raise PhysicalPlanningError(
+        "PHYSICAL_FUNCTION_TEMPLATE_UNSUPPORTED",
+        f"unsupported configured function template {signature.template_kind}/{operation}",
+    )
+
+
 def _apply_call_constraints(predicate, logical_expression, catalog: PhysicalCatalog, resource_id: str):
     constraints = []
     seen = set()
@@ -4000,8 +4077,8 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
         constraints.append(
             _lower_scope_expression(
                 call.scope_expression,
-                default_security_scope_catalog(),
-                default_external_scope_catalog(),
+                current_security_scope_catalog(),
+                current_external_scope_catalog(),
                 stable_resource_id,
             )
         )
@@ -4171,7 +4248,7 @@ def _resolve_scope_atoms(expression, catalog: SecurityScopeCatalog, external_cat
 def _scope_requires_security_join(expression) -> bool:
     if expression is None:
         return False
-    catalog = default_security_scope_catalog()
+    catalog = current_security_scope_catalog()
     for atom in expression.atoms:
         try:
             catalog.resolve(atom)
@@ -4194,7 +4271,7 @@ def _lower_scope_expression(
                 parse_market_expression(derived_market), anchor_resource_id
             )
         if expression.name == "当天买当天卖":
-            policy = default_external_data_policy().instrument_rule
+            policy = current_external_data_policy().instrument_rule
             return PhysicalExternalExists(
                 policy.resource_id,
                 anchor_resource_id,

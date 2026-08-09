@@ -91,6 +91,7 @@ class DorisEvidenceResult:
     optimized: DorisVariantEvidence
     generated_at: str
     client_command: str
+    git_head: str = "unavailable"
 
     @property
     def passed(self) -> bool:
@@ -125,6 +126,7 @@ class DorisEvidenceResult:
             "min_speedup": self.min_speedup,
             "generated_at": self.generated_at,
             "client_command": self.client_command,
+            "git_head": self.git_head,
             "passed": self.passed,
             "row_counts_match": self.row_counts_match,
             "speedup": self.speedup,
@@ -143,6 +145,7 @@ class DorisEvidenceResult:
             "",
             "- Evidence source: Apache Doris MySQL-compatible query port",
             f"- Generated at: {self.generated_at}",
+            f"- Git HEAD: `{self.git_head}`",
             f"- Database: `{self.database}`",
             f"- Iterations: {self.iterations}",
             f"- Client command template: `{self.client_command}`",
@@ -228,6 +231,7 @@ def collect_doris_evidence(
         optimized=_collect_variant(config, "optimized_prefix_sum", optimized.sql, iterations, password_mode),
         generated_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         client_command=_redacted_command(config.command("SELECT 1", password_mode=password_mode)),
+        git_head=_git_head(),
     )
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -237,6 +241,16 @@ def collect_doris_evidence(
         encoding="utf-8",
     )
     return result
+
+
+def _git_head() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "unavailable"
 
 
 def _collect_variant(

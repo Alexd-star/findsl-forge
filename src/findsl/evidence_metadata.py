@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from datetime import datetime, timezone
@@ -7,7 +8,12 @@ from pathlib import Path
 from typing import Any
 
 
-def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = None) -> dict[str, Any]:
+def build_evidence_metadata(
+    snapshot_dir: Path,
+    manifest_path: Path | None = None,
+    contract_path: Path | None = None,
+    expected_git_head: str | None = None,
+) -> dict[str, Any]:
     """Build a machine-readable index from exported evidence snapshots."""
     warnings: list[str] = []
     readiness_text = _read_optional_text(snapshot_dir / "submission_readiness.md", warnings)
@@ -31,6 +37,16 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
     )
     long_horizon_payload = _read_optional_json(
         snapshot_dir / "phase42_long_horizon_doris.json",
+        warnings,
+        warn_missing=False,
+    )
+    current_funnel_payload = _read_optional_json(
+        snapshot_dir / "official_compiler_funnel.json",
+        warnings,
+        warn_missing=False,
+    )
+    correctness_payload = _read_optional_json(
+        snapshot_dir / "official_correctness_benchmark.json",
         warnings,
         warn_missing=False,
     )
@@ -135,7 +151,8 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         warn_missing=False,
     )
     migration_funnel_payload = (
-        phase48_funnel_payload
+        current_funnel_payload
+        or phase48_funnel_payload
         or phase47_funnel_payload
         or phase46_funnel_payload
         or phase45_funnel_payload
@@ -362,7 +379,7 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
         or phase21_new_success_audit_payload
     )
 
-    return {
+    metadata = {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "snapshot_dir": str(snapshot_dir),
@@ -401,10 +418,23 @@ def build_evidence_metadata(snapshot_dir: Path, manifest_path: Path | None = Non
             scope_semantic_policy_payload,
             new_success_audit_payload,
         ),
+        "formal_correctness": _formal_correctness_metadata(correctness_payload),
         "doris_cluster": _doris_metadata(doris_payload),
         "warnings": warnings,
         "source_files": _source_files(snapshot_dir, manifest_path),
     }
+    if contract_path is not None:
+        from .evidence_contract import EvidenceContract, audit_evidence_metadata
+
+        contract = EvidenceContract.load(contract_path)
+        metadata["evidence_contract"] = audit_evidence_metadata(
+            metadata,
+            contract,
+            expected_git_head=expected_git_head,
+        )
+        warnings.extend(metadata["evidence_contract"]["errors"])
+        warnings.extend(metadata["evidence_contract"]["warnings"])
+    return metadata
 
 
 def write_evidence_metadata(
@@ -412,8 +442,21 @@ def write_evidence_metadata(
     output_path: Path,
     manifest_path: Path | None = None,
     summary_output_path: Path | None = None,
+    contract_path: Path | None = None,
+    expected_git_head: str | None = None,
+    require_contract_pass: bool = False,
 ) -> dict[str, Any]:
-    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir, manifest_path=manifest_path)
+    metadata = build_evidence_metadata(
+        snapshot_dir=snapshot_dir,
+        manifest_path=manifest_path,
+        contract_path=contract_path,
+        expected_git_head=expected_git_head,
+    )
+    if require_contract_pass and not _dict(metadata.get("evidence_contract")).get("passed"):
+        from .evidence_contract import EvidenceContractError
+
+        errors = _dict(metadata.get("evidence_contract")).get("errors") or []
+        raise EvidenceContractError("; ".join(str(item) for item in errors))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if summary_output_path is not None:
@@ -463,6 +506,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     new_success_audit = _dict(official_migration.get("new_success_audit"))
     doris = _dict(metadata.get("doris_cluster"))
     git = _dict(metadata.get("git"))
+    evidence_contract = _dict(metadata.get("evidence_contract"))
     warnings = metadata.get("warnings") if isinstance(metadata.get("warnings"), list) else []
     sources = _dict(metadata.get("source_files"))
 
@@ -475,6 +519,7 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         "",
         "| Item | Value |",
         "|---|---|",
+        f"| Evidence contract | {_pass_fail(evidence_contract.get('passed'))} |",
         f"| Blocking gates | {_pass_fail(readiness.get('blocking_gates_passed'))} |",
         f"| Warning count | {_display(readiness.get('warning_count'))} |",
         f"| Pytest regression | {_pytest_display(readiness)} |",
@@ -596,6 +641,7 @@ def _doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
             "speedup": None,
             "speedup_display": None,
             "speedup_target_met": None,
+            "git_head": None,
         }
     speedup = _number_or_none(payload.get("speedup"))
     baseline = payload.get("baseline") if isinstance(payload.get("baseline"), dict) else {}
@@ -614,6 +660,7 @@ def _doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
         "optimized_avg_execute_ms": _number_or_none(optimized.get("avg_execute_ms")),
         "baseline_row_count": _int_or_none(baseline.get("row_count")),
         "optimized_row_count": _int_or_none(optimized.get("row_count")),
+        "git_head": payload.get("git_head"),
     }
 
 
@@ -627,6 +674,8 @@ def _official_doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
             "baseline_vs_prefix_speedup_display": None,
             "row_counts": {},
             "feature_table_row_counts": {},
+            "git_head": None,
+            "snapshot_fingerprint": None,
         }
     speedup = _number_or_none(payload.get("baseline_vs_prefix_speedup"))
     row_counts = payload.get("row_counts") if isinstance(payload.get("row_counts"), dict) else {}
@@ -643,6 +692,8 @@ def _official_doris_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
         "baseline_vs_prefix_speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
         "row_counts": row_counts,
         "feature_table_row_counts": feature_rows,
+        "git_head": payload.get("git_head"),
+        "snapshot_fingerprint": _official_doris_snapshot_fingerprint(payload),
     }
 
 
@@ -660,6 +711,7 @@ def _long_horizon_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
             "baseline_median_ms": None,
             "optimized_median_ms": None,
             "rollup_partition_count": None,
+            "git_head": None,
         }
     speedup = _number_or_none(payload.get("speedup"))
     baseline = payload.get("baseline") if isinstance(payload.get("baseline"), dict) else {}
@@ -679,6 +731,7 @@ def _long_horizon_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
         "baseline_median_ms": _number_or_none(baseline.get("median_ms")),
         "optimized_median_ms": _number_or_none(optimized.get("median_ms")),
         "rollup_partition_count": _int_or_none(tables.get("rollup_partition_count")),
+        "git_head": payload.get("git_head"),
     }
 
 
@@ -693,6 +746,8 @@ def _official_slot_coverage_metadata(payload: dict[str, Any] | None) -> dict[str
             "compile_failed": None,
             "compile_rate_on_all_rows": None,
             "compile_rate_on_parse_ok": None,
+            "git_head": None,
+            "input_sha256": None,
         }
     return {
         "available": True,
@@ -703,6 +758,8 @@ def _official_slot_coverage_metadata(payload: dict[str, Any] | None) -> dict[str
         "compile_failed": _int_or_none(payload.get("compile_failed")),
         "compile_rate_on_all_rows": _number_or_none(payload.get("compile_rate_on_all_rows")),
         "compile_rate_on_parse_ok": _number_or_none(payload.get("compile_rate_on_parse_ok")),
+        "git_head": payload.get("git_head"),
+        "input_sha256": payload.get("input_sha256") or payload.get("source_sha256"),
     }
 
 
@@ -719,6 +776,7 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
             "baseline_prefix_row_count_match": None,
             "baseline_vs_prefix_speedup": None,
             "baseline_vs_prefix_speedup_display": None,
+            "git_head": None,
         }
     summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
     speedup = _number_or_none(summary.get("baseline_vs_prefix_speedup"))
@@ -733,6 +791,7 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
         "baseline_prefix_row_count_match": _bool_or_none(summary.get("baseline_prefix_row_count_match")),
         "baseline_vs_prefix_speedup": speedup,
         "baseline_vs_prefix_speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
+        "git_head": payload.get("git_head") or summary.get("git_head"),
     }
 
 
@@ -909,6 +968,13 @@ def _official_migration_metadata(
     return {
         "available": funnel is not None,
         "git_head": funnel.get("git_head") if isinstance(funnel, dict) else None,
+        "row_count": _int_or_none(funnel.get("row_count")) if isinstance(funnel, dict) else None,
+        "source_sha256": funnel.get("source_sha256") if isinstance(funnel, dict) else None,
+        "input_sha256": (
+            funnel.get("input_sha256") or funnel.get("source_sha256")
+            if isinstance(funnel, dict)
+            else None
+        ),
         "legacy_strict_success": _int_or_none(funnel.get("legacy_strict_success")) if isinstance(funnel, dict) else None,
         "legacy_to_new_migrated": _int_or_none(funnel.get("legacy_to_new_migrated")) if isinstance(funnel, dict) else None,
         "migration_coverage": _number_or_none(funnel.get("migration_coverage")) if isinstance(funnel, dict) else None,
@@ -1108,6 +1174,10 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
         "official_slot_coverage_json": str(snapshot_dir / "official_slot_coverage.json"),
         "official_query_performance_matrix_json": str(snapshot_dir / "official_query_performance_matrix.json"),
+        "official_compiler_funnel_json": str(snapshot_dir / "official_compiler_funnel.json"),
+        "official_correctness_benchmark_json": str(
+            snapshot_dir / "official_correctness_benchmark.json"
+        ),
         "phase42_long_horizon_doris_json": str(
             snapshot_dir / "phase42_long_horizon_doris.json"
         ),
@@ -1217,6 +1287,46 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
+    }
+
+
+def _official_doris_snapshot_fingerprint(payload: dict[str, Any]) -> str:
+    basis = {
+        "database": payload.get("database", "newzl"),
+        "row_counts": payload.get("row_counts") or {},
+        "feature_table_row_counts": payload.get("feature_table_row_counts") or {},
+        "basic_date_range": payload.get("basic_date_range"),
+        "ext_date_range": payload.get("ext_date_range"),
+        "doris_version": payload.get("doris_version"),
+    }
+    canonical = json.dumps(
+        basis,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _formal_correctness_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "git_head": None,
+            "eligible_total": None,
+            "matched": None,
+            "accuracy": None,
+            "target_met": None,
+        }
+    return {
+        "available": True,
+        "git_head": payload.get("git_head"),
+        "catalog_snapshot_id": payload.get("catalog_snapshot_id"),
+        "policy_id": payload.get("policy_id"),
+        "eligible_total": _int_or_none(payload.get("eligible_total")),
+        "matched": _int_or_none(payload.get("matched")),
+        "accuracy": _number_or_none(payload.get("accuracy")),
+        "target_met": _bool_or_none(payload.get("target_met")),
     }
 
 

@@ -291,6 +291,9 @@ def main() -> None:
     metadata_cmd.add_argument("--manifest", default="submission_artifacts/evidence_manifest.md", help="Evidence manifest path; use an empty value to skip")
     metadata_cmd.add_argument("--output", default="submission_artifacts/evidence_metadata.json", help="Output JSON metadata path")
     metadata_cmd.add_argument("--summary-output", default=None, help="Optional output Markdown summary path")
+    metadata_cmd.add_argument("--contract", default=None, help="Optional evidence contract JSON path")
+    metadata_cmd.add_argument("--expected-git-head", default=None, help="Expected Git HEAD for every current evidence source")
+    metadata_cmd.add_argument("--require-contract-pass", action="store_true", help="Fail when the evidence contract audit does not pass")
     compliance_cmd = sub.add_parser("topic-compliance", help="Generate Topic 19 compliance and next-step planning report")
     compliance_cmd.add_argument("--output", default="reports/topic_19_compliance_plan.md", help="Output Markdown report")
     compliance_cmd.add_argument("--json", action="store_true", help="Print compliance report JSON")
@@ -957,6 +960,9 @@ def main() -> None:
             manifest_path=manifest_path,
             output_path=Path(args.output),
             summary_output_path=Path(args.summary_output) if args.summary_output else None,
+            contract_path=Path(args.contract) if args.contract else None,
+            expected_git_head=args.expected_git_head,
+            require_contract_pass=args.require_contract_pass,
         )
         print(json.dumps(metadata, ensure_ascii=False, indent=2))
     elif args.command == "topic-compliance":

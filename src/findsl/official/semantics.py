@@ -5,7 +5,11 @@ from typing import Any, Callable, Optional
 
 from .errors import OfficialSlotError
 from .literals import is_numeric_percent_literal
-from .signatures import OFFICIAL_FUNCTION_SIGNATURES, FunctionSignature
+from .signatures import (
+    DEFAULT_OFFICIAL_FUNCTION_CATALOG,
+    FunctionSignature,
+    OfficialFunctionCatalog,
+)
 from .ast import (
     OfficialBinaryOp,
     OfficialComparison,
@@ -28,8 +32,13 @@ _TIME_LITERAL = re.compile(
 
 
 class OfficialSemanticAnalyzer:
-    def __init__(self, indicator_resolver: IndicatorResolver):
+    def __init__(
+        self,
+        indicator_resolver: IndicatorResolver,
+        function_catalog: OfficialFunctionCatalog = DEFAULT_OFFICIAL_FUNCTION_CATALOG,
+    ):
         self._indicator_resolver = indicator_resolver
+        self._function_catalog = function_catalog
 
     def validate(self, node: Any) -> str:
         return self.analyze(node).type.legacy_name
@@ -42,7 +51,8 @@ class OfficialSemanticAnalyzer:
         children = tuple(self._build_typed(child) for child in iter_child_nodes(node))
         binding = None
         if isinstance(node, OfficialFunctionCall):
-            signature = OFFICIAL_FUNCTION_SIGNATURES[node.name]
+            signature = self._function_catalog.resolve(node.name)
+            assert signature is not None
             binding = FunctionBinding.create(
                 signature,
                 {
@@ -110,7 +120,7 @@ class OfficialSemanticAnalyzer:
         )
 
     def _infer_function(self, node: Any) -> str:
-        signature = OFFICIAL_FUNCTION_SIGNATURES.get(node.name)
+        signature = self._function_catalog.resolve(node.name)
         if signature is None:
             raise OfficialSlotError(
                 "UNSUPPORTED_OFFICIAL_FUNCTION",
@@ -121,12 +131,21 @@ class OfficialSemanticAnalyzer:
                 "OFFICIAL_SLOT_ARITY_ERROR",
                 f"{node.name}() expects exactly {signature.arity} args, got {len(node.args)}",
             )
-        for index, (slot, arg) in enumerate(zip(signature.slots, node.args), start=1):
-            if not isinstance(arg, OfficialLiteral) or not isinstance(arg.value, str):
-                raise OfficialSlotError(
-                    "OFFICIAL_SLOT_ARG_ERROR",
-                    f"{node.name}() slot {index} ({slot}) must be a string literal",
-                )
+        if signature.argument_mode == "slot_literals":
+            for index, (slot, arg) in enumerate(zip(signature.slots, node.args), start=1):
+                if not isinstance(arg, OfficialLiteral) or not isinstance(arg.value, str):
+                    raise OfficialSlotError(
+                        "OFFICIAL_SLOT_ARG_ERROR",
+                        f"{node.name}() slot {index} ({slot}) must be a string literal",
+                    )
+        else:
+            for index, (expected, arg) in enumerate(zip(signature.arg_types, node.args), start=1):
+                actual = self._infer(arg)
+                if actual not in {expected, "unknown"}:
+                    raise OfficialSlotError(
+                        "OFFICIAL_FUNCTION_ARG_TYPE",
+                        f"{node.name}() argument {index} expects {expected}, got {actual}",
+                    )
         return self._function_result_kind(node, signature)
 
     def _function_result_kind(self, node: Any, signature: FunctionSignature) -> str:

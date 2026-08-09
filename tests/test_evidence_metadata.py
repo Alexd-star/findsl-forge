@@ -284,9 +284,10 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
         "result_row_count": 5487,
         "complete_result_hash_match": True,
         "baseline_median_ms": 964.0,
-        "optimized_median_ms": 23.0,
-        "rollup_partition_count": 244,
-    }
+            "optimized_median_ms": 23.0,
+            "rollup_partition_count": 244,
+            "git_head": None,
+        }
     assert metadata["official_migration"]["legacy_to_new_migrated"] == 534
     assert metadata["official_migration"]["legacy_strict_success"] == 1097
     assert metadata["official_migration"]["physical_date_gap"] == 2

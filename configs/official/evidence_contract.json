@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "contract_id": "competition-current-evidence-v1",
+  "required_git_paths": [
+    "git.head_at_report_generation",
+    "git.head_at_export",
+    "official_migration.git_head",
+    "official_real_data.slot_coverage.git_head",
+    "official_real_data.doris.git_head",
+    "official_real_data.performance_matrix.git_head",
+    "official_real_data.long_horizon.git_head",
+    "doris_cluster.git_head"
+  ],
+  "datasets": [
+    {
+      "dataset_id": "official_dsl_workbook",
+      "fingerprint_path": "official_migration.input_sha256",
+      "required": true
+    },
+    {
+      "dataset_id": "official_doris_snapshot",
+      "fingerprint_path": "official_real_data.doris.snapshot_fingerprint",
+      "required": true
+    }
+  ],
+  "metrics": [
+    {
+      "metric_id": "official_recovery_parse_coverage",
+      "metric_type": "coverage",
+      "numerator_path": "official_real_data.slot_coverage.parse_ok",
+      "denominator_path": "official_real_data.slot_coverage.row_count",
+      "value_path": null,
+      "denominator_set": "官方工作簿训练语料全部行",
+      "proves": "恢复模式能够解析的官方语料比例",
+      "does_not_prove": "SQL 语义正确、可在官方三表执行或满足正确率指标",
+      "required": true
+    },
+    {
+      "metric_id": "official_slot_compile_coverage",
+      "metric_type": "coverage",
+      "numerator_path": "official_real_data.slot_coverage.compile_ok",
+      "denominator_path": "official_real_data.slot_coverage.row_count",
+      "value_path": null,
+      "denominator_set": "官方工作簿训练语料全部行",
+      "proves": "兼容槽位编译器在当前数据与恢复政策下生成 SQL 的覆盖范围",
+      "does_not_prove": "正式新编译器覆盖率或 SQL 正确率",
+      "required": true
+    },
+    {
+      "metric_id": "legacy_migration_coverage",
+      "metric_type": "migration",
+      "numerator_path": "official_migration.legacy_to_new_migrated",
+      "denominator_path": "official_migration.legacy_strict_success",
+      "value_path": null,
+      "denominator_set": "旧编译器严格模式成功集合",
+      "proves": "旧严格成功集合迁入正式新后端的比例",
+      "does_not_prove": "官方 SQL 正确率、全量 5799 条成功率或业务语义正确性",
+      "required": true
+    },
+    {
+      "metric_id": "new_backend_coverage",
+      "metric_type": "coverage",
+      "numerator_path": "official_migration.new_backend_success",
+      "denominator_path": "official_migration.row_count",
+      "value_path": null,
+      "denominator_set": "官方工作簿训练语料全部行",
+      "proves": "正式新后端在官方全量语料上的可编译覆盖范围",
+      "does_not_prove": "缺失数据域可被安全补全或生成 SQL 的结果完全正确",
+      "required": true
+    },
+    {
+      "metric_id": "sql_correctness",
+      "metric_type": "correctness",
+      "numerator_path": "formal_correctness.matched",
+      "denominator_path": "formal_correctness.eligible_total",
+      "value_path": null,
+      "denominator_set": "独立判定 eligible 且有冻结 reference SQL 的正式正确率用例",
+      "proves": "生成 SQL 与独立真值完整结果行集一致的比例",
+      "does_not_prove": "官方未提供数据域的语句已经可执行，或所有未来语句均正确",
+      "required": false
+    },
+    {
+      "metric_id": "compile_p95_latency",
+      "metric_type": "latency",
+      "numerator_path": null,
+      "denominator_path": null,
+      "value_path": "readiness.compile_p95_latency_ms",
+      "denominator_set": "readiness 冻结编译基准用例",
+      "proves": "当前基准中的编译 P95 延迟",
+      "does_not_prove": "所有官方复杂语句或并发负载下的尾延迟",
+      "required": true
+    },
+    {
+      "metric_id": "long_horizon_speedup_gate",
+      "metric_type": "performance",
+      "numerator_path": null,
+      "denominator_path": null,
+      "value_path": "official_real_data.long_horizon.target_met",
+      "denominator_set": "冻结的官方长周期 baseline/optimized 等价查询",
+      "proves": "指定长周期工作负载达到不低于十倍的门禁",
+      "does_not_prove": "所有查询均能获得相同加速或普通查询性能更快",
+      "required": true
+    },
+    {
+      "metric_id": "query_under_10s_gate",
+      "metric_type": "performance",
+      "numerator_path": null,
+      "denominator_path": null,
+      "value_path": "official_real_data.performance_matrix.all_queries_under_10s",
+      "denominator_set": "正式逐问句性能矩阵中的 eligible 查询",
+      "proves": "矩阵内全部查询的 P95 不超过十秒",
+      "does_not_prove": "未进入矩阵的函数族、计划族和并发场景均已达标",
+      "required": true
+    }
+  ]
+}

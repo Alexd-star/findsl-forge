@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://findsl-forge.local/schemas/evidence-contract-v1.json",
+  "title": "FinDSL Forge evidence contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "required_git_paths", "datasets", "metrics"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "contract_id": {"type": "string", "minLength": 1},
+    "required_git_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dataset_id", "fingerprint_path", "required"],
+        "properties": {
+          "dataset_id": {"type": "string", "minLength": 1},
+          "fingerprint_path": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "metric_id", "metric_type", "numerator_path", "denominator_path",
+          "value_path", "denominator_set", "proves", "does_not_prove", "required"
+        ],
+        "properties": {
+          "metric_id": {"type": "string", "minLength": 1},
+          "metric_type": {
+            "enum": ["coverage", "migration", "correctness", "latency", "performance", "gate"]
+          },
+          "numerator_path": {"type": ["string", "null"]},
+          "denominator_path": {"type": ["string", "null"]},
+          "value_path": {"type": ["string", "null"]},
+          "denominator_set": {"type": "string", "minLength": 1},
+          "proves": {"type": "string", "minLength": 1},
+          "does_not_prove": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}
