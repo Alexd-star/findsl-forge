@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_sha256", "entries"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "category", "competition_decision", "reason", "next_action", "candidate_sources"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "category": {"enum": ["ambiguous_nonstandard", "derived_semantics", "out_of_official_domain", "suspected_invalid", "vendor_snapshot_candidate"]},
+          "competition_decision": {"enum": ["implement_derived_rule", "optional_domain_extension", "pending_external_dataset", "reject_ambiguous", "reject_invalid"]},
+          "reason": {"type": "string", "minLength": 1},
+          "next_action": {"type": "string", "minLength": 1},
+          "candidate_sources": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+        }
+      }
+    }
+  }
+}

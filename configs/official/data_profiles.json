@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "default_profile": "enriched_public",
+  "profiles": [
+    {
+      "profile_id": "official_only",
+      "manifest_path": "configs/official/compiler_manifest.official_only.json",
+      "uses_external_data": false,
+      "offline_reproducible": true,
+      "description": "仅使用赛题方数据包；缺失的行业、概念、指数行情和交易规则返回确定性拒绝。"
+    },
+    {
+      "profile_id": "enriched_public",
+      "manifest_path": "configs/official/compiler_manifest.json",
+      "uses_external_data": true,
+      "offline_reproducible": false,
+      "description": "编译配置已固化且请求期不访问网络；执行外部范围 SQL 前仍须按来源许可同步并装载对应快照。"
+    }
+  ]
+}

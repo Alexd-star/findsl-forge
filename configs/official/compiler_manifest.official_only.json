@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "profile_id": "competition-official-only-v1",
+  "policy_id": "official-semantic-policy-v1",
+  "entries": [
+    {"role": "indicator_registry", "path": "configs/official/indicators.json"},
+    {"role": "function_catalog", "path": "configs/official/functions.json"},
+    {"role": "semantic_policies", "path": "configs/official/semantic_policies.json"},
+    {"role": "physical_catalog", "path": "configs/official/physical_catalog.json"},
+    {"role": "physical_expressions", "path": "configs/official/physical_expressions.json"},
+    {"role": "physical_statistics", "path": "configs/official/physical_statistics.json"},
+    {"role": "physical_strategies", "path": "configs/official/physical_strategies.json"},
+    {"role": "security_scopes", "path": "configs/official/security_scopes.json"},
+    {"role": "external_scope_runtime", "path": "configs/official/external_scope_runtime.official_only.json"},
+    {"role": "scope_semantic_policies", "path": "configs/official/scope_semantic_policies.json"},
+    {"role": "external_data_policy", "path": "configs/official/external_data_policy.official_only.json"},
+    {"role": "external_index_quotes", "path": "configs/official/external_index_quotes.official_only.json"},
+    {"role": "benchmark_policy", "path": "configs/official/benchmark_policy.official_only.json"},
+    {"role": "approximation_policy", "path": "configs/official/approximation_policy.json"},
+    {"role": "technical_patterns", "path": "configs/official_technical_patterns.json"}
+  ]
+}

@@ -10,6 +10,7 @@ from types import MappingProxyType
 from typing import Any, Dict, Mapping, Tuple
 
 from .external.policy import ScopeSemanticPolicyCatalog
+from .external.profiles import DataProfileCatalog, DataProfileError
 from .external.runtime import (
     BenchmarkPolicyCatalog,
     ExternalDataPolicy,
@@ -162,12 +163,27 @@ class CompileContext:
         cls,
         repo_root: Path | None = None,
         manifest_path: Path | None = None,
+        data_profile: str | None = None,
     ) -> "CompileContext":
         root = Path(
             repo_root
             or os.getenv("FINDSL_REPO_ROOT")
             or Path(__file__).resolve().parents[3]
         ).resolve()
+        if manifest_path is not None and data_profile:
+            raise CompileContextError(
+                "manifest_path and data_profile cannot be selected together"
+            )
+        if manifest_path is None:
+            requested_profile = data_profile or os.getenv("FINDSL_DATA_PROFILE")
+            try:
+                profiles = DataProfileCatalog.load(
+                    root / "configs" / "official" / "data_profiles.json"
+                )
+                selected_profile = profiles.resolve(requested_profile)
+            except DataProfileError as exc:
+                raise CompileContextError(str(exc)) from exc
+            manifest_path = root / selected_profile.manifest_path
         snapshot = CatalogSnapshot.capture(root, manifest_path)
         paths = snapshot.paths
         registry = OfficialIndicatorRegistry.load(paths["indicator_registry"])

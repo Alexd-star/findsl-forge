@@ -222,6 +222,25 @@ class ExternalCatalog:
             ]
         return {"schema_version": _SCHEMA_VERSION, "counts": counts, "snapshots": sources}
 
+    def snapshot_inventory(self) -> Tuple[Dict[str, object], ...]:
+        self.initialize()
+        with self._connect(readonly=True) as connection:
+            rows = connection.execute(
+                """
+                SELECT s.snapshot_id,s.source,s.source_url,s.retrieved_at,s.as_of_date,
+                       s.content_sha256,s.license_note,
+                       (SELECT COUNT(*) FROM scope_membership m
+                         WHERE m.snapshot_id=s.snapshot_id) AS scope_memberships,
+                       (SELECT COUNT(*) FROM industry_membership m
+                         WHERE m.snapshot_id=s.snapshot_id) AS industry_memberships,
+                       (SELECT COUNT(*) FROM instrument_rule m
+                         WHERE m.snapshot_id=s.snapshot_id) AS instrument_rules
+                  FROM snapshots s
+              ORDER BY s.source,s.as_of_date,s.snapshot_id
+                """
+            ).fetchall()
+        return tuple(dict(row) for row in rows)
+
     def export_doris(self, output_dir: Path) -> Dict[str, object]:
         self.initialize()
         output_dir = Path(output_dir)

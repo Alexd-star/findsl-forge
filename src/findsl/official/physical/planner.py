@@ -1944,6 +1944,11 @@ def _plan_composite_aggregate(
             if call.name == "belong_industry"
             else None
         )
+        if call.name == "belong_industry" and industry_policy is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE",
+                "belong_industry requires a versioned industry membership dataset",
+            )
         groups.append(
             PhysicalAggregateGroup(
                 relation_alias,
@@ -2281,6 +2286,11 @@ def _physical_field_expression(field: _ResolvedIndicator):
         return PhysicalLiteral(0, NUMERIC)
     if field.indicator_id == "是否T+0":
         policy = current_external_data_policy().instrument_rule
+        if policy is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_INSTRUMENT_RULE_DATA_UNAVAILABLE",
+                "T+0 screening requires a versioned instrument rule dataset",
+            )
         return PhysicalExternalExists(
             policy.resource_id,
             "official_basic",
@@ -4671,6 +4681,11 @@ def _lower_scope_expression(
             )
         if expression.name == "当天买当天卖":
             policy = current_external_data_policy().instrument_rule
+            if policy is None:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_INSTRUMENT_RULE_DATA_UNAVAILABLE",
+                    "T+0 screening requires a versioned instrument rule dataset",
+                )
             return PhysicalExternalExists(
                 policy.resource_id,
                 anchor_resource_id,

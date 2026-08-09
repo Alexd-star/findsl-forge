@@ -73,6 +73,12 @@ def test_catalog_import_resolve_alias_and_effective_date(tmp_path):
         "industry_membership": 1,
         "instrument_rule": 1,
     }
+    inventory = catalog.snapshot_inventory()
+    assert inventory[0]["snapshot_id"] == "fixture-2026-07-13"
+    assert inventory[0]["scope_memberships"] == 2
+    assert inventory[0]["industry_memberships"] == 1
+    assert inventory[0]["instrument_rules"] == 1
+    assert inventory[0]["license_note"] == "test fixture"
 
 
 def test_catalog_duplicate_snapshot_requires_explicit_replace(tmp_path):

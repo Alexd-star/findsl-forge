@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "provider_id": "official-package",
+      "source": "competition-official-package",
+      "source_url": "https://fintechpf.yunzhengdata.com/",
+      "authority_level": "competition_official",
+      "data_domains": ["security_identity", "daily_quote", "extended_daily_quote", "official_dsl_corpus"],
+      "temporal_model": "historical_series",
+      "redistribution": "bundled_by_organizer",
+      "terms_url": "",
+      "enabled_profiles": ["official_only", "enriched_public"],
+      "notes": "赛题方提供的唯一评分基线；外部数据不得覆盖其原始字段。"
+    },
+    {
+      "provider_id": "sse-szse-bse",
+      "source": "sse-szse-bse",
+      "source_url": "https://www.sse.com.cn/",
+      "authority_level": "official_publisher",
+      "data_domains": ["security_identity", "instrument_rule"],
+      "temporal_model": "effective_dated",
+      "redistribution": "review_required",
+      "terms_url": "https://www.sse.com.cn/aboutus/copyright/",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "交易所规则和证券身份优先于聚合平台；入库时保留生效日期。"
+    },
+    {
+      "provider_id": "csindex",
+      "source": "csindex",
+      "source_url": "https://www.csindex.com.cn/",
+      "authority_level": "official_publisher",
+      "data_domains": ["index_identity", "index_membership"],
+      "temporal_model": "effective_dated",
+      "redistribution": "review_required",
+      "terms_url": "https://www.csindex.com.cn/#/about/legalNotice",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "中证指数及成分的首选来源；历史查询必须使用对应生效期快照。"
+    },
+    {
+      "provider_id": "cnindex",
+      "source": "cnindex",
+      "source_url": "https://www.cnindex.com.cn/",
+      "authority_level": "official_publisher",
+      "data_domains": ["index_identity", "index_membership"],
+      "temporal_model": "effective_dated",
+      "redistribution": "review_required",
+      "terms_url": "",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "国证指数及成分的首选来源。"
+    },
+    {
+      "provider_id": "baostock-industry",
+      "source": "baostock",
+      "source_url": "http://baostock.com/baostock/index.php/Python_API文档",
+      "authority_level": "public_data_service",
+      "data_domains": ["industry_membership"],
+      "temporal_model": "dated_snapshot",
+      "redistribution": "review_required",
+      "terms_url": "http://baostock.com/",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "用于证监会行业分类快照；不把当前行业归属倒推为完整历史归属。"
+    },
+    {
+      "provider_id": "eastmoney",
+      "source": "eastmoney",
+      "source_url": "https://quote.eastmoney.com/center/boardlist.html",
+      "authority_level": "public_information_platform",
+      "data_domains": ["concept_membership", "industry_membership"],
+      "temporal_model": "current_snapshot",
+      "redistribution": "derived_snapshot_only",
+      "terms_url": "https://about.eastmoney.com/home/conceal",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "板块口径属于数据源自身分类；只用于带采集日期的当前快照。"
+    },
+    {
+      "provider_id": "baidu-related-block",
+      "source": "baidu-related-block",
+      "source_url": "https://finance.pae.baidu.com/api/getrelatedblock",
+      "authority_level": "public_information_platform",
+      "data_domains": ["concept_membership", "industry_membership", "region_membership"],
+      "temporal_model": "current_snapshot",
+      "redistribution": "derived_snapshot_only",
+      "terms_url": "https://www.baidu.com/duty/",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "相关板块结果只能作为来源快照，不能声明为行业统一标准。"
+    },
+    {
+      "provider_id": "sina-sector",
+      "source": "sina-finance",
+      "source_url": "https://finance.sina.com.cn/stock/sl/",
+      "authority_level": "public_information_platform",
+      "data_domains": ["sector_membership"],
+      "temporal_model": "current_snapshot",
+      "redistribution": "derived_snapshot_only",
+      "terms_url": "https://corp.sina.com.cn/chn/sina_legal.html",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "仅作为有日期的板块快照和交叉核验来源。"
+    },
+    {
+      "provider_id": "ths-concept",
+      "source": "ths-concept",
+      "source_url": "https://q.10jqka.com.cn/gn/",
+      "authority_level": "public_information_platform",
+      "data_domains": ["concept_membership"],
+      "temporal_model": "current_snapshot",
+      "redistribution": "derived_snapshot_only",
+      "terms_url": "https://www.10jqka.com.cn/",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "概念成员为同花顺口径，分页不完整时整次同步失败，禁止导入半截数据。"
+    },
+    {
+      "provider_id": "akshare-index",
+      "source": "akshare-public-index",
+      "source_url": "https://github.com/akfamily/akshare",
+      "authority_level": "open_source_adapter",
+      "data_domains": ["index_identity", "index_membership"],
+      "temporal_model": "current_snapshot",
+      "redistribution": "academic_only",
+      "terms_url": "https://akshare.akfamily.xyz/special.html",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "开源适配器而非数据权威来源；优先回溯到指数公司。"
+    },
+    {
+      "provider_id": "akshare-eastmoney-index",
+      "source": "akshare-eastmoney-index",
+      "source_url": "https://github.com/akfamily/akshare",
+      "authority_level": "open_source_adapter",
+      "data_domains": ["index_membership"],
+      "temporal_model": "current_snapshot",
+      "redistribution": "academic_only",
+      "terms_url": "https://akshare.akfamily.xyz/special.html",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "中证下载不可用时的研究型回退，不覆盖官方指数来源。"
+    },
+    {
+      "provider_id": "akshare-security-identity",
+      "source": "akshare-security-identity",
+      "source_url": "https://github.com/akfamily/akshare",
+      "authority_level": "open_source_adapter",
+      "data_domains": ["security_identity"],
+      "temporal_model": "dated_snapshot",
+      "redistribution": "academic_only",
+      "terms_url": "https://akshare.akfamily.xyz/special.html",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "用于公开证券身份补充；最终代码和名称仍需交易所规则校验。"
+    },
+    {
+      "provider_id": "tushare-optional",
+      "source": "tushare",
+      "source_url": "https://tushare.pro/",
+      "authority_level": "licensed_data_service",
+      "data_domains": ["industry_membership", "index_membership", "adjustment_factor", "intraday_quote", "money_flow"],
+      "temporal_model": "effective_dated",
+      "redistribution": "not_redistributed",
+      "terms_url": "https://tushare.pro/document/1?doc_id=405",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "仅在用户具备合法权限时启用；Token和原始受限数据不进入代码仓库或交付包。"
+    },
+    {
+      "provider_id": "curated-scope-alias",
+      "source": "curated-scope-alias",
+      "source_url": "https://github.com/Alexd-star/findsl-forge",
+      "authority_level": "project_curated",
+      "data_domains": ["scope_alias", "derived_scope"],
+      "temporal_model": "project_policy",
+      "redistribution": "derived_snapshot_only",
+      "terms_url": "",
+      "enabled_profiles": ["enriched_public"],
+      "notes": "只保存有证据依据的确定性组合和别名，不接受编辑距离自动映射。"
+    }
+  ]
+}

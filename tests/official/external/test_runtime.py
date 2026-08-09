@@ -64,6 +64,15 @@ def test_external_data_policy_requires_versioned_industry_and_rule_sources():
         ExternalDataPolicy.from_dict({"schema_version": 1})
 
 
+def test_external_data_policy_can_explicitly_disable_optional_domains():
+    policy = ExternalDataPolicy.from_dict(
+        {"schema_version": 1, "industry": None, "instrument_rule": None}
+    )
+
+    assert policy.industry is None
+    assert policy.instrument_rule is None
+
+
 def test_benchmark_policy_requires_one_explicit_context_match():
     catalog = BenchmarkPolicyCatalog.from_dict(
         {

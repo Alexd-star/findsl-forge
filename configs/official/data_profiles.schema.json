@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "default_profile", "profiles"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "default_profile": {"type": "string", "minLength": 1},
+    "profiles": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["profile_id", "manifest_path", "uses_external_data", "offline_reproducible", "description"],
+        "properties": {
+          "profile_id": {"type": "string", "minLength": 1},
+          "manifest_path": {"type": "string", "minLength": 1},
+          "uses_external_data": {"type": "boolean"},
+          "offline_reproducible": {"type": "boolean"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

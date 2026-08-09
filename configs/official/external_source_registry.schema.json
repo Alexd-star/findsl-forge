@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "sources"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider_id", "source", "source_url", "authority_level", "data_domains", "temporal_model", "redistribution", "terms_url", "enabled_profiles", "notes"],
+        "properties": {
+          "provider_id": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "minLength": 1},
+          "source_url": {"type": "string", "format": "uri"},
+          "authority_level": {"enum": ["competition_official", "official_publisher", "licensed_data_service", "public_data_service", "public_information_platform", "open_source_adapter", "project_curated"]},
+          "data_domains": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "temporal_model": {"enum": ["effective_dated", "dated_snapshot", "current_snapshot", "historical_series", "project_policy"]},
+          "redistribution": {"enum": ["bundled_by_organizer", "review_required", "derived_snapshot_only", "academic_only", "not_redistributed"]},
+          "terms_url": {"type": "string"},
+          "enabled_profiles": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "notes": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

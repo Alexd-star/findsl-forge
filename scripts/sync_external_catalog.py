@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from findsl.official.external import ExternalCatalog
+from findsl.official.external import ExternalCatalog, ExternalSourceRegistry
 from findsl.official.external.matching import canonical_scope_name
 from findsl.official.external.providers import EastmoneyBoardProvider
 from findsl.official.external.sync import (
@@ -33,6 +33,10 @@ def main() -> None:
     parser.add_argument("--request-interval-seconds", type=float, default=0.1)
     parser.add_argument("--require-complete", action="store_true")
     parser.add_argument("--replace", action="store_true")
+    parser.add_argument(
+        "--source-registry",
+        default="configs/official/external_source_registry.json",
+    )
     args = parser.parse_args()
     provider = EastmoneyBoardProvider(
         timeout_seconds=args.timeout_seconds,
@@ -42,6 +46,8 @@ def main() -> None:
         cache_dir=Path(args.cache_dir) if args.cache_dir else None,
         request_interval_seconds=args.request_interval_seconds,
     )
+    source_registry = ExternalSourceRegistry.load(Path(args.source_registry))
+    source_registry.assert_provider("eastmoney", provider)
     if args.all_boards:
         result = build_full_eastmoney_snapshot(
             provider=provider,

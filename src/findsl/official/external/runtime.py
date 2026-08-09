@@ -44,8 +44,8 @@ class ExternalMembershipPolicy:
 
 @dataclass(frozen=True)
 class ExternalDataPolicy:
-    industry: ExternalMembershipPolicy
-    instrument_rule: ExternalMembershipPolicy
+    industry: Optional[ExternalMembershipPolicy]
+    instrument_rule: Optional[ExternalMembershipPolicy]
 
     @classmethod
     def from_dict(cls, raw) -> "ExternalDataPolicy":
@@ -291,7 +291,11 @@ def _option_priority(source: str, option: ExternalScopeOption):
     return type_priority, source_priority, option.scope_code
 
 
-def _membership_policy(raw, *, industry: bool) -> ExternalMembershipPolicy:
+def _membership_policy(
+    raw, *, industry: bool
+) -> Optional[ExternalMembershipPolicy]:
+    if raw is None:
+        return None
     required = {"resource_id", "snapshot_id", "source", "as_of_date"}
     allowed = required | (
         {"classification_system", "industry_level"} if industry else set()

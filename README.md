@@ -80,6 +80,18 @@ python -m pytest
 $env:PYTHONPATH = "src"
 ```
 
+数据运行模式由 `FINDSL_DATA_PROFILE` 显式选择：
+
+```powershell
+# 评委复现与官方数据基线：不引用外部成员、行业、指数行情或交易规则表
+$env:FINDSL_DATA_PROFILE = "official_only"
+
+# 扩展能力验证：使用已经登记的公开数据快照；执行前必须装载相应外部表
+$env:FINDSL_DATA_PROFILE = "enriched_public"
+```
+
+`official_only` 可以随赛题方数据包离线复现；`enriched_public` 的编译请求不会临时联网，但第三方成员数据受许可约束，干净环境必须按来源清单重新同步和装载，不能把本机缓存当成交付依赖。来源清单见 [external_source_registry.json](configs/official/external_source_registry.json)，当前缺口裁决见 [数据缺口逐条审计](submission_artifacts/evidence_snapshots/current_scope_data_gap_audit.md)。
+
 解析、生成 IR 和 Doris SQL：
 
 ```powershell
@@ -132,6 +144,8 @@ python -m findsl.cli readiness-report --output reports/submission_readiness.md
 - [提交说明](docs/17_项目交付说明.md)
 - [机器可读证据](submission_artifacts/evidence_metadata.json)
 - [证据摘要](submission_artifacts/evidence_summary.md)
+- [外部数据来源与快照清单](submission_artifacts/evidence_snapshots/current_external_data_inventory.md)
+- [53条严格迁移缺口逐条审计](submission_artifacts/evidence_snapshots/current_scope_data_gap_audit.md)
 
 `reports/` 是可再生成的本地工作产物；`submission_artifacts/evidence_snapshots/` 是提交用快照。导出前必须确认所有 current 证据使用同一 Git HEAD、配置指纹和数据快照，历史证据只能进入 historical 分组。
 
