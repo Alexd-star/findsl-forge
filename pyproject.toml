@@ -20,6 +20,7 @@ external-data = [
     "tushare==1.4.29",
 ]
 dev = [
+    "import-linter==2.5.2",
     "openpyxl>=3.1",
     "pandas>=2.0",
     "Pillow>=11.0",
@@ -41,3 +42,20 @@ extend-exclude = ["src/findsl/official/frontend/generated"]
 [tool.ruff.lint.per-file-ignores]
 "src/findsl/**/__init__.py" = ["F401", "F403", "F405"]
 "scripts/build_plottie_style_figures.py" = ["E402"]
+
+[tool.importlinter]
+root_packages = ["findsl"]
+
+[[tool.importlinter.contracts]]
+name = "Canonical official compiler must not depend on legacy compiler pipelines"
+type = "forbidden"
+source_modules = [
+    "findsl.official",
+]
+forbidden_modules = [
+    "findsl.official_slot",
+    "findsl.compiler",
+    "findsl.parser",
+    "findsl.semantic",
+    "findsl.sqlgen",
+]

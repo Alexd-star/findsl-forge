@@ -23,5 +23,7 @@ jobs:
         run: python scripts/generate_antlr.py --check
       - name: Lint
         run: python -m ruff check .
+      - name: Verify architecture boundaries
+        run: lint-imports
       - name: Test
         run: python -m pytest -q

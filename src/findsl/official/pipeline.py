@@ -15,7 +15,6 @@ from .physical.statistics import default_physical_statistics
 from .physical.strategies import default_physical_strategies
 from .registry import default_official_registry
 from .semantics import OfficialSemanticAnalyzer
-from ..official_slot import _resolve_indicator_meta
 
 
 @dataclass(frozen=True)
@@ -100,13 +99,13 @@ def compile_official(
             diagnostics=tuple(item.to_dict() for item in frontend.diagnostics),
         )
 
+    registry = default_official_registry()
     try:
-        typed = OfficialSemanticAnalyzer(_resolve_indicator_meta).analyze(frontend.ast)
+        typed = OfficialSemanticAnalyzer(registry.resolve_optional).analyze(frontend.ast)
     except Exception as exc:
         _raise_pipeline_error("typed", exc, partial)
     partial["typed_ast"] = typed.to_dict()
 
-    registry = default_official_registry()
     try:
         logical = lower_official_ast(typed, strict=True, domain_registry=registry)
     except Exception as exc:

@@ -4,9 +4,9 @@ import re
 from time import perf_counter_ns
 from typing import Optional, Tuple
 
+from ...official.diagnostics import SourceRepair
+from ...official.frontend.protocol import FrontendDiagnostic, ParseOutcome, Severity, SourceSpan
 from ...official_slot import OfficialSlotError, OfficialSlotParser
-from ..diagnostics import SourceRepair
-from .protocol import FrontendDiagnostic, ParseOutcome, Severity, SourceSpan
 
 
 class HandwrittenOfficialFrontend:

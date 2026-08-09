@@ -14,7 +14,7 @@ from ..ast import (
     OfficialNode,
     OfficialRangeLiteral,
 )
-from ...official_slot import _parse_range_text
+from ..literals import parse_range_text
 from .generated.OfficialSlotParser import OfficialSlotParser
 from .generated.OfficialSlotVisitor import OfficialSlotVisitor
 from .protocol import SourceMap, SourceSpan
@@ -98,7 +98,7 @@ class OfficialAstAdapter(OfficialSlotVisitor):
     def visitRangeLiteral(self, ctx: OfficialSlotParser.RangeLiteralContext):
         if ctx.STRING():
             value = _decode_string(ctx.STRING().getText())
-            parsed = _parse_range_text(value)
+            parsed = parse_range_text(value)
             return self._record(parsed if parsed is not None else OfficialLiteral(value), ctx)
         values = ctx.additiveExpression()
         node = OfficialRangeLiteral(

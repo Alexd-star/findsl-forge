@@ -1,4 +1,4 @@
-from findsl.official.frontend.handwritten import HandwrittenOfficialFrontend
+from findsl.compat.official_frontend.handwritten import HandwrittenOfficialFrontend
 
 
 def test_handwritten_frontend_returns_common_outcome():

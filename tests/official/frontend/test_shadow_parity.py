@@ -1,4 +1,4 @@
-from findsl.official.frontend.shadow import compare_frontends, first_ast_difference
+from findsl.compat.official_frontend.shadow import compare_frontends, first_ast_difference
 
 
 def test_shadow_match_uses_canonical_ast_and_hash():

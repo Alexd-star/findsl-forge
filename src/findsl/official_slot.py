@@ -19,13 +19,12 @@ from .official.ast import (
     OfficialNode,
     OfficialRangeLiteral,
 )
+from .official.errors import OfficialSlotError
+from .official.literals import (
+    is_numeric_percent_literal as _is_numeric_percent_literal,
+    parse_range_text as _parse_range_text,
+)
 from .official_time import normalize_official_date
-
-
-class OfficialSlotError(Exception):
-    def __init__(self, code: str, message: str):
-        super().__init__(message)
-        self.code = code
 
 
 @dataclass(frozen=True)
@@ -930,7 +929,7 @@ def parse_official_slot_with_diagnostics(
     else:
         normalized_source, repairs = _normalize_official_slot_source(source)
     if frontend == "handwritten":
-        from .official.frontend.handwritten import HandwrittenOfficialFrontend
+        from .compat.official_frontend.handwritten import HandwrittenOfficialFrontend
 
         outcome = HandwrittenOfficialFrontend().parse(
             normalized_source, original_source=source, repairs=repairs
@@ -4228,29 +4227,6 @@ def classify_official_compile_error_domain(exc: OfficialSlotError) -> str:
     return "其他解析或编译问题"
 
 
-def _parse_range_text(value: str) -> Optional[OfficialRangeLiteral]:
-    match = re.fullmatch(r"\s*([\[(])\s*(?P<lower>.+?)\s*,\s*(?P<upper>.+?)\s*([\])])\s*", value)
-    if not match:
-        return None
-    return OfficialRangeLiteral(
-        lower=_range_part_literal(match.group("lower")),
-        upper=_range_part_literal(match.group("upper")),
-        lower_inclusive=match.group(1) == "[",
-        upper_inclusive=match.group(4) == "]",
-    )
-
-
-def _range_part_literal(value: str) -> OfficialLiteral:
-    text = value.strip()
-    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?%", text):
-        return OfficialLiteral(text)
-    if re.fullmatch(r"[+-]?\d+", text):
-        return OfficialLiteral(int(text))
-    if re.fullmatch(r"[+-]?\d+\.\d+", text):
-        return OfficialLiteral(float(text))
-    return OfficialLiteral(text)
-
-
 def _md_escape(value: str) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ")
 
@@ -4268,10 +4244,6 @@ def _normalize_iso_date(value: str) -> str:
 
 def _sql_quote(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
-
-
-def _is_numeric_percent_literal(value: str) -> bool:
-    return bool(re.fullmatch(r"[+-]?(?:\d+(?:\.\d+)?|\.\d+)%", value))
 
 
 def _dedupe(items: Iterable[str]) -> List[str]:

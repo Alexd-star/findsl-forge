@@ -4,9 +4,9 @@ import hashlib
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Optional
 
+from ...official.frontend.antlr_frontend import AntlrOfficialFrontend
+from ...official.policy import CompileMode
 from ...official_slot import _normalize_official_slot_source
-from ..policy import CompileMode
-from .antlr_frontend import AntlrOfficialFrontend
 from .handwritten import HandwrittenOfficialFrontend
 
 

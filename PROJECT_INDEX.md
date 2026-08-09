@@ -1,268 +1,165 @@
 # FinDSL Forge 项目文件索引
 
-本文档是 FinDSL Forge 仓库的中文文件索引和归档说明。它面向项目维护者、比赛答辩成员、代码审查人员和后续接手开发者，用来快速判断每个目录“为什么存在、里面放什么、哪些文件是运行入口、哪些文件是证据产物、哪些文件不建议删除”。本文档根据当前代码、配置、测试、文档和提交证据推断整理，不删除任何文件；无法完全确认用途的内容会标注为“待确认”。
+本文按当前代码事实说明仓库结构、正式入口、兼容边界、文档状态和可清理内容。开发路线见 [docs/00_当前开发主线.md](docs/00_当前开发主线.md)，文档选择见 [docs/README.md](docs/README.md)。无法仅凭代码确认的业务语义继续标为待核验，不以推测替代官方定义。
 
 ## 1. 项目总体说明
 
-FinDSL Forge 是面向中国研究生金融科技创新大赛赛题 19 的金融选股 DSL 编译系统。项目核心目标是把受控的金融选股 DSL 编译为 Apache Doris SQL，并围绕正确性验证、长窗口加速、Doris 部署证据、自然语言到 DSL 辅助、Web Demo 和提交包证据形成完整工程交付。
+FinDSL Forge 将赛题 19 的官方七槽位行情选股 DSL 编译为 Apache Doris SQL。正式链路为 ANTLR4 → Typed AST → 语义绑定 → Domain Model → Logical IR → 规则优化 → Physical IR → SQLGlot Doris SQL → 执行与独立结果核验。
 
-项目主链路为：
+仓库仍保留早期内部 FinDSL 编译器和官方兼容入口，它们用于样例、迁移差分和回归，不是后续新增官方能力的开发位置。正式边界见 [ADR-0001](docs/adr/0001-官方编译器主线与兼容层边界.md)。
 
-```text
-中文需求 / DSL / LLM 候选
-  -> Lexer 词法分析
-  -> Parser 语法分析
-  -> AST 抽象语法树
-  -> Semantic 语义校验
-  -> SQL Generator 生成 Doris SQL
-  -> Doris SQL Validator
-  -> SQLite/Pandas 本地等价验证
-  -> Doris 集群证据与提交包
-```
+## 2. 根目录文件
 
-更详细的项目介绍见 [docs/01_项目简介.md](docs/01_项目简介.md)，运行和部署见 [docs/03_操作手册.md](docs/03_操作手册.md) 与 [docs/12_环境依赖与部署.md](docs/12_环境依赖与部署.md)。
+| 路径 | 作用 | 维护规则 |
+| --- | --- | --- |
+| `README.md` | 项目入口、当前事实、快速运行和开发规则。 | 必须与当前代码一致，禁止堆叠阶段日志。 |
+| `PROJECT_INDEX.md` | 当前文件；解释目录、文件和状态。 | 目录职责变化时更新。 |
+| `CHANGELOG.md` | 版本变更记录。 | 记录用户可见和架构级变化，不代替主路线。 |
+| `pyproject.toml` | Python 版本、依赖、测试、Ruff 和 import-linter 配置。 | 必须保留并接受 CI 校验。 |
+| `.github/workflows/test.yml` | ANTLR、静态检查、依赖边界和测试流水线。 | 正式质量门禁，不应绕过。 |
+| `.gitignore` | 缓存、生成数据和本地产物忽略规则。 | 新增生成目录时同步维护。 |
+| `LICENSE` | 许可文件。 | 待提交前复核依赖许可和原创性声明。 |
 
-## 2. 根目录文件说明
+## 3. 目录职责
 
-| 文件/目录 | 类型 | 作用 | 是否建议保留 |
-|---|---|---|---|
-| `README.md` | 项目入口文档 | 说明项目目标、快速启动、核心能力、Doris 证据和提交流程。 | 必须保留 |
-| `PROJECT_INDEX.md` | 文件索引 | 当前文件，统一说明目录、文件、归档建议和运行入口。 | 必须保留 |
-| `CHANGELOG.md` | 更新日志 | 汇总版本变更、语义修复、证据刷新和维护记录。 | 必须保留 |
-| `pyproject.toml` | Python 项目配置 | 声明包名、Python 版本、可选依赖、pytest 配置。 | 必须保留 |
-| `.gitignore` | Git 忽略规则 | 忽略缓存、虚拟环境、生成数据、报告目录、日志等。 | 必须保留 |
-| `.git/` | Git 元数据 | 本地版本控制目录，不应手工编辑。 | 必须保留 |
-| `.pytest_cache/` | 测试缓存 | pytest 运行缓存，可清理，已被 `.gitignore` 忽略。 | 可清理 |
-| `demo_8765*.log` 等 | 空日志文件 | Web Demo 端口启动时留下的日志占位，当前长度为 0。 | 可清理，删除前确认无运行进程依赖 |
+| 目录 | 为什么存在 | 应放内容 | 不应放内容 |
+| --- | --- | --- | --- |
+| `src/findsl/` | 可安装的 Python 产品代码。 | 编译核心、服务、证据与工具模块。 | 报告、截图、大数据、临时脚本。 |
+| `src/findsl/official/` | 官方 DSL 唯一正式编译器。 | 前端、类型、语义、领域模型、IR、优化、物理规划、Doris 后端。 | 对旧编译管道的反向依赖、按语句硬编码。 |
+| `configs/` | 版本化声明与策略。 | 指标、函数、表、物理策略、语义政策和 Schema。 | 任意可执行 SQL、密钥、临时参数。 |
+| `data/` | 输入样例和可复现实验数据。 | 小型样例、公开样例、官方数据引用说明、生成数据目录。 | 无来源的第三方数据、提交不允许的大文件。 |
+| `deploy/doris/` | Doris 建库、表、导入和 smoke 资产。 | 幂等 SQL、Compose、导入与健康检查材料。 | 本机密码、不可复现手工状态。 |
+| `docs/` | 当前有效说明和比赛材料。 | 唯一主路线、正式规范、手册、验收、答辩。 | 每轮临时复盘和重复计划。 |
+| `docs/history/` | 已替代与阶段材料的可追溯归档。 | 旧计划、阶段报告、历史实施记录。 | 当前唯一规范。 |
+| `docs/adr/` | 长期架构决策。 | 决策背景、选择、理由、影响和退出条件。 | 日常进度、待办清单。 |
+| `scripts/` | 可复现辅助入口。 | 证据采集、数据同步、构建、检查和发布脚本。 | 一次性且无说明的实验片段。 |
+| `tests/` | 自动化验证。 | 单元、属性、集成、Doris、证据和 UI 测试。 | 生产代码或真实密钥。 |
+| `reports/` | 本地可再生成报告。 | 当前运行输出、分析和临时 QA。 | 唯一不可重建的提交证据。 |
+| `submission_artifacts/` | 面向评委的轻量交付证据。 | 当前快照、metadata、摘要、报告和截图。 | 未标版本的历史数字。 |
+| `archive/` | 非文档类旧资产归档。 | 经记录的旧产物和保留文件。 | 当前运行依赖。 |
 
-## 3. 各文件夹作用说明
+## 4. 正式核心代码
 
-### `src/`
+### 4.1 官方编译入口
 
-主程序源码目录。当前主要包为 `src/findsl/`，包含 DSL 编译器、SQL 生成、语义校验、Doris 资产生成、Web Demo、LLM 候选验证、readiness 门禁等模块。此目录只应放可发布、可测试的 Python 源码，不应放运行日志、临时截图或大数据文件。
+| 文件/目录 | 主要功能 | 输入 | 输出 | 关系与注意事项 |
+| --- | --- | --- | --- | --- |
+| `src/findsl/official/pipeline.py` | 正式编译编排。 | 官方 DSL、模式、目录与策略。 | 各阶段结果、SQL 或结构化诊断。 | 只协调阶段，不应承载具体语义。 |
+| `src/findsl/official/frontend/` | ANTLR 前端、协议和适配。 | DSL 文本。 | 统一 AST 与源位置信息。 | `OfficialSlot.g4` 是正式语法源；generated 由脚本生成。 |
+| `src/findsl/official/typed_ast.py` | 不可变强类型语法树。 | 前端 AST 与绑定信息。 | 有类型、可审计节点。 | 进入 IR 前消除未知类型。 |
+| `src/findsl/official/semantics.py` | 函数签名、参数、类型和槽位约束。 | AST、Registry。 | Typed AST 或稳定错误码。 | 不选择物理表，不调用旧语义模块。 |
+| `src/findsl/official/domain/` | 金融业务概念绑定。 | Typed AST、语义政策、范围目录。 | 领域表达和数据需求。 | 未定义/缺数据时 fail closed。 |
+| `src/findsl/official/ir/` | SQL 无关的关系 IR。 | 已绑定领域模型。 | Filter、Project、Join、Aggregate、Window、Rank 等关系节点。 | 不含 Doris 表名或 SQL 字符串。 |
+| `src/findsl/official/optimizer/` | 等价重写规则与解释轨迹。 | Logical IR。 | 等价候选和规则 trace。 | 规则负责等价，不负责成本选择。 |
+| `src/findsl/official/physical/` | 物理目录、候选规划、统计和 Physical IR。 | Logical IR、Catalog Snapshot、Statistics。 | 可验证物理候选与选择依据。 | `planner.py` 仍偏大，是后续拆分重点。 |
+| `src/findsl/official/backend/` | SQLGlot Doris AST、渲染、安全校验和执行。 | Physical IR。 | 单条只读 Doris SQL、执行/差分结果。 | 禁止把任意配置字符串直接拼入 SQL。 |
+| `src/findsl/official/external/` | 外部范围与成员数据 Provider。 | 版本、日期、来源配置。 | 带来源和有效期的目录快照。 | 模糊别名不得自动进入正式目录。 |
+| `src/findsl/official/errors.py` | 官方核心错误基类。 | 阶段失败信息。 | 稳定异常与错误码载体。 | 兼容层可引用，核心不反向引用兼容层。 |
+| `src/findsl/official/literals.py` | 范围、百分比等共享字面量解析。 | 字符串。 | 规范化值。 | 消除 `official_slot.py` 中重复实现。 |
 
-### `configs/`
+### 4.2 证据与评估
 
-配置目录。当前包含 `functions.json`、`indicators.json`、`tables.json`。它们定义 DSL 函数签名、金融指标元数据、逻辑表到 Doris 物理表的映射。新指标优先在这里扩展；简单数值函数可通过 `sql_template` 与 `reference_op` 模板扩展，复杂时序函数再修改编译器。
+| 文件 | 作用 | 关键输出 |
+| --- | --- | --- |
+| `src/findsl/official_gap_analysis.py` | 把 5799 条结果按能力族归类。 | passed/data_unavailable/invalid_input/capability_gap 统计。 |
+| `src/findsl/official_coverage_funnel.py` | 生成各阶段漏斗与终止错误。 | JSON/Markdown 漏斗。 |
+| `src/findsl/official_*_evidence.py` | 采集前端、IR、领域、后端、前缀等专项证据。 | 版本化报告。 |
+| `src/findsl/evidence_metadata.py` | 聚合提交快照的机器可读索引。 | `evidence_metadata.json` 与摘要。 |
+| `src/findsl/readiness.py` | 提交前综合门禁。 | readiness 报告和阻断项。 |
+| `src/findsl/official_suite.py` | 固定官方风格正负例。 | 覆盖和诊断结果。 |
+| `src/findsl/equivalence.py` / `reference.py` | 独立 SQL/reference 等价验证。 | 缺失、额外、顺序和结果差异。 |
 
-### `data/`
+### 4.3 兼容和非正式入口
 
-数据目录，分为 `samples/`、`real_samples/` 和被忽略的 `generated/`。`samples/` 是轻量回归样本和官方风格用例，必须保留；`real_samples/` 是公开东方财富样本，用于展示真实 A 股代码和日期；`generated/` 是可再生成的规模数据，已被 `.gitignore` 忽略，不建议提交。
+`src/findsl/compat/official_frontend/` 保存迁移期手写前端和 ANTLR/手写差分；`src/findsl/official_slot.py`、`compiler.py`、`lexer.py`、`parser.py`、`semantic.py` 和 `sqlgen.py` 属于早期管道。它们仍可能被内部样例、历史 CLI 或迁移测试调用，因此暂不删除；后续只允许缩小为 facade 或只读基线。新增官方函数、语义和物理策略不得写入这些文件。
 
-### `deploy/`
+`src/findsl/demo.py` 是演示服务，必须调用应用服务/正式 pipeline，不得复制编译规则。`nl2dsl.py`、`llm_adapter.py` 和 `llm_provider.py` 只生成或筛选 DSL 候选，模型输出不能绕过确定性编译器和安全校验。
 
-部署资产目录。`deploy/doris/` 保存 Doris schema、样例数据、prefix 表构建 SQL、smoke query 和 Docker Compose 快速启动文件。该目录是 Doris 环境复现和答辩证据的重要入口。
+## 5. 配置文件
 
-### `docs/`
+| 路径 | 作用 | 当前注意事项 |
+| --- | --- | --- |
+| `configs/indicators.json` | 指标名、类型、来源列和物理能力。 | 新指标优先配置扩展，但必须验证列和数据域真实存在。 |
+| `configs/functions.json` | 早期内部函数目录。 | 不等同于正式官方函数零代码扩展能力。 |
+| `configs/tables.json` | 逻辑表到物理表映射。 | 与 Doris schema 和数据快照一致。 |
+| `configs/official/` | 官方指标、资源、物理策略、范围和政策。 | 后续统一 Catalog Snapshot 与 schema 校验。 |
 
-项目文档目录。既包含已有的架构、Doris runbook、中文综合操作指南，也包含本次补齐的编号中文文档体系。今后新增说明文档应优先放在这里，除非属于提交包快照或报告产物。
+任何配置发布都应产生版本、内容哈希和 catalog fingerprint。密钥只通过环境变量或秘密管理注入。
 
-### `scripts/`
+## 6. 数据文件
 
-辅助脚本目录。主要用于运行测试、生成报告、生成 Doris 资产、启动 Web Demo、采集 Doris 证据、导出提交包、生成中文手册和答辩视频。脚本应保持幂等或有清晰输出路径。
+- `data/samples/`：快速单元和参考执行数据，必须小、确定、可提交。
+- `data/real_samples/`：带来源说明的公开样例，只证明所含数据域。
+- `data/generated/`：可再生成规模数据，默认不提交。
+- 官方赛题数据：必须记录原文件 SHA-256、接收日期、表结构和使用限制，不得根据缺失列伪造事实。
+- 外部成员数据：必须带 Provider、原始响应、快照时间、有效期、成员数和人工审核状态。
 
-### `tests/`
+## 7. 文档状态
 
-测试目录。覆盖词法、语法、语义、SQL 生成、等价验证、Doris 资产、LLM 安全链路、Web Demo、readiness 和提交包。新增核心能力必须同步补测试。
+当前有效文档列在 [docs/README.md](docs/README.md)。`docs/history/phase_reports/`、`legacy_plans/` 和 `implementation_records/` 已归档，不再作为当前开发依据。长篇 Word/PDF 手册是发布材料，证据刷新后需重新生成并做版面检查。
 
-其中 `tests/test_template_functions.py` 验证 `ABS` 这类简单数值模板函数可以通过配置进入 SQL 生成和 reference 等价验证；`tests/test_topic_compliance.py` 验证赛题 19 完成度报告可以稳定生成，防止“基本实现/部分实现/待证据”口径只停留在人工文档里。
+## 8. 当前版本与历史
 
-### `reports/`
+当前正式代码在分支 `feat/antlr-calcite-architecture`。Git HEAD 是代码身份，证据还必须同时记录配置指纹、数据快照和 Doris 版本。仓库里存在多个历史 HEAD 的真实证据；它们可以用于趋势比较，但最终结论必须用同一当前 HEAD 重新生成。
 
-运行报告和 QA 产物目录。该目录已在 `.gitignore` 中忽略，包含 readiness 报告、Doris 证据、文档渲染 QA、UI 截图浏览器缓存等。它是本地工作产物，不是最终提交入口；最终轻量证据应通过 `scripts/export_submission_artifacts.ps1` 复制到 `submission_artifacts/evidence_snapshots/`。
+阶段演进不再写入根 README。需要追溯时查看 `CHANGELOG.md`、`docs/history/` 和 Git log。
 
-### `submission_artifacts/`
+## 9. 不建议删除
 
-提交包目录。包含技术报告、得分点映射、答辩脚本、Demo 截图、视频、证据快照、evidence manifest、机器可读 metadata 和可读 evidence summary。该目录中的内容面向比赛提交和离线审阅，应保持轻量、稳定、可读。
+- `src/findsl/official/`、`configs/official/`、正式 grammar 与 generated ANTLR 文件；
+- `tests/` 中当前门禁测试；
+- `deploy/doris/` 和 Doris runbook；
+- `data/samples/` 与已声明来源的真实样例；
+- `submission_artifacts/evidence_snapshots/` 中进入 manifest 的证据；
+- `docs/00_当前开发主线.md`、ADR、赛题规范、操作和交付文档；
+- 旧管道文件，直到兼容调用图和迁移退出门禁完成。
 
-### `archive/`
+## 10. 可归档或可清理
 
-历史归档目录。本次仅建立说明文件，不移动现有文件。后续如要归档旧报告、旧截图、旧视频或备份文件，应先在 [docs/16_历史文件说明.md](docs/16_历史文件说明.md) 记录来源和原因。
+| 内容 | 处理建议 | 原因 |
+| --- | --- | --- |
+| `__pycache__/`、`.pytest_cache/` | 可直接重建，保持忽略。 | Python/pytest 缓存。 |
+| 空的 Demo 日志和浏览器 profile | 服务停止后清理。 | 不含产品事实。 |
+| `reports/` 中旧 HEAD 报告 | 迁入历史证据区或重新生成。 | 不能证明当前版本。 |
+| 重复截图、临时渲染页 | 先核对 manifest，再归档。 | 避免提交包膨胀。 |
+| 阶段计划与阶段复盘 | 已迁入 `docs/history/`。 | 被唯一主线替代。 |
+| 大型 planner/backend 中已废弃私有函数 | 先做调用图和测试，再删除。 | 不能靠文件名判断无用。 |
 
-## 4. 核心代码文件说明
+本轮没有删除受 Git 管理的历史文件。代码清理必须先证明符号无调用、门禁通过且兼容边界不受影响。
 
-| 文件 | 主要功能 | 输入 | 输出/副作用 | 注意事项 |
-|---|---|---|---|---|
-| `src/findsl/lexer.py` | DSL 词法分析。 | DSL 字符串。 | Token 列表。 | 解析失败抛 `LexError`。 |
-| `src/findsl/parser.py` | 递归下降语法分析。 | Token 或 DSL 字符串。 | AST 节点。 | 支持函数调用、命名参数、比较和布尔/算术表达式。 |
-| `src/findsl/ast_nodes.py` | AST 数据结构。 | 解析阶段构造。 | 可序列化 AST。 | 供 compiler、semantic、sqlgen 共享。 |
-| `src/findsl/semantic.py` | 语义校验。 | AST、Registry。 | 类型判断或异常。 | 拦截未知指标、窗口错误、裸字段、非法 rank 参数等。 |
-| `src/findsl/sqlgen.py` | Doris SQL 生成与优化。 | 已校验 AST。 | SQL、trace、explain。 | 负责窗口物化、rank、date pushdown、prefix-sum rewrite。 |
-| `src/findsl/compiler.py` | 编译器总入口。 | DSL 字符串。 | `CompileResult`。 | 串联 parse、semantic、SQL 生成和 Doris SQL validation。 |
-| `src/findsl/doris_sql.py` | 生成 SQL 安全形态验证。 | SQL 字符串。 | Validation result。 | 阻止多语句、DDL/DML、未知表和 window-in-WHERE。 |
-| `src/findsl/reference.py` | Pandas reference oracle。 | DSL 与 CSV 数据。 | 参考结果行。 | 用于独立语义校验，需保持与 SQL 三值逻辑一致。 |
-| `src/findsl/executor.py` | SQLite 本地执行器。 | 生成 SQL、CSV 样本。 | SQL 结果行。 | 注册 Doris 兼容函数，如 `CEIL`，用于本地等价验证。 |
-| `src/findsl/equivalence.py` | SQL/reference 等价比较。 | DSL、数据目录。 | missing/extra keys。 | 对比赛正确性证据非常关键。 |
-| `src/findsl/registry.py` | 配置加载。 | `configs/*.json`。 | Registry 对象。 | 新指标、新表、新函数优先走配置。 |
-| `src/findsl/nl2dsl.py` | 中文自然语言模板到 DSL 候选。 | 中文文本。 | 候选 DSL 列表。 | 不是自由生成 SQL，只生成受控 DSL。 |
-| `src/findsl/llm_adapter.py` | LLM 输出提取与安全验证。 | LLM 文本/JSON。 | accepted/rejected candidates。 | 直接 SQL 和无效 DSL 会被拒绝。 |
-| `src/findsl/llm_provider.py` | OpenAI-compatible provider 调用。 | API 配置、中文文本。 | LLM 候选验证结果。 | Provider 输出仍需走 compiler 和 oracle。 |
-| `src/findsl/demo.py` | Web Demo 和 JSON API。 | HTTP 请求。 | HTML/API 响应。 | 默认运行在 `127.0.0.1:8765`。 |
-| `src/findsl/doris.py` | Doris DDL/SQL 资产生成。 | 配置与样本数据。 | `deploy/doris/*.sql`。 | 与 registry 强绑定，保证表和指标一致。 |
-| `src/findsl/doris_evidence.py` | Doris 集群证据采集。 | MySQL 客户端配置、DSL。 | Markdown/JSON evidence。 | 需真实 Doris 9030 端口和已加载数据。 |
-| `src/findsl/readiness.py` | 提交前综合门禁。 | 项目目录、报告目录。 | readiness report。 | 评估测试、证据、官方套件和 Git clean 状态。 |
-| `src/findsl/evidence_metadata.py` | 提交证据结构化索引。 | evidence snapshots、manifest。 | `evidence_metadata.json`、`evidence_summary.md`。 | 从已生成证据抽取字段，不重新计算或伪造性能结论。 |
-| `src/findsl/official_performance.py` | 官方真实 Doris 逐问句性能矩阵生成。 | `reports/official_doris_evidence.json`。 | `official_query_performance_matrix.md/json`。 | 只汇总真实 evidence 中已执行查询，不替代原始 SQL/EXPLAIN。 |
-| `src/findsl/defense_package.py` | 答辩证据包生成。 | 样本、报告、配置。 | defense package。 | 映射演示步骤到得分点。 |
-| `src/findsl/official_suite.py` | 官方风格用例套件。 | JSONL 正/负例。 | coverage report。 | 正例和负例均为 required gate。 |
-| `src/findsl/benchmark.py` | prefix-sum 本地基准。 | DSL、样本数据。 | benchmark report。 | 本地 SQLite timing 只作回归信号。 |
-| `src/findsl/scale_benchmark.py` | 长窗口规模基准编排。 | 合成数据参数。 | scale benchmark report。 | 不替代 Doris 集群性能证据。 |
-| `src/findsl/synthetic.py` | 合成市场数据生成。 | 股票数、日期数、随机种子。 | CSV 数据。 | 生成数据默认放 `data/generated/`。 |
-| `src/findsl/diagnostics.py` | 诊断和修复建议。 | 异常对象。 | 结构化诊断。 | Web Demo 和 CLI 共享。 |
-| `src/findsl/cli.py` | 命令行入口。 | `python -m findsl.cli ...`。 | 各类命令输出。 | 所有常用流程均从这里暴露。 |
-| `src/findsl/topic_compliance.py` | 赛题 19 完成度与下一步规划报告生成器。 | 官方要求、registry 配置和证据口径。 | Markdown/JSON 合规报告。 | 用于区分 implemented、partial、needs_evidence，避免人工口径漂移。 |
-
-## 5. 配置文件说明
-
-| 文件 | 作用 | 维护建议 |
-|---|---|---|
-| `configs/functions.json` | 定义 DSL 函数参数个数、命名参数、返回类型和简单模板函数。 | 普通签名用于核心函数；`ABS` 这类简单数值函数可用 `sql_template`、`reference_op` 进入通用模板路径。复杂窗口/关系函数仍需同步 semantic/sqlgen/reference/tests。 |
-| `configs/indicators.json` | 定义指标类型、来源表、列名、是否支持 prefix-sum。 | 新增普通数值指标通常只需配置；支持 prefix-sum 时必须补 prefix table 信息。 |
-| `configs/tables.json` | 定义逻辑表、物理表、别名、日期列、证券代码列、分区列。 | 修改物理表名后必须重新生成 Doris 资产和报告。 |
-| `pyproject.toml` | Python 包和测试配置。 | 当前核心运行无强依赖；`dev`/`eval` 依赖用于 pandas/pytest。 |
-| `.gitignore` | 忽略生成数据、报告、日志、缓存。 | 不建议提交 `reports/`、`data/generated/`、`.pytest_cache/`。 |
-
-## 6. 数据文件说明
-
-| 路径 | 内容 | 用途 | 是否提交 |
-|---|---|---|---|
-| `data/samples/daily_quote.csv` | 小型行情样本。 | 单元测试、CLI 示例、Web Demo 默认数据。 | 是 |
-| `data/samples/money_flow.csv` | 小型资金流样本。 | 多表 join、稀疏辅助表、prefix-sum 语义测试。 | 是 |
-| `data/samples/stock_universe.csv` | 市场归属样本。 | `market("A")`、`market("B")` 过滤。 | 是 |
-| `data/samples/queries.jsonl` | 编译评估用例。 | `evaluate` 和 readiness。 | 是 |
-| `data/samples/official_positive_cases.jsonl` | 官方风格正例。 | official-suite。 | 是 |
-| `data/samples/official_negative_cases.jsonl` | 官方风格负例。 | diagnostics 和安全边界。 | 是 |
-| `data/samples/llm_candidate_response.json` | 模拟 LLM 输出。 | 验证 LLM 安全适配器。 | 是 |
-| `data/real_samples/eastmoney_a_share_sample/` | 东方财富公开行情小样本。 | 真实 A 股代码、日期和字段展示。 | 是 |
-| `data/real_samples/.../raw/*.json` | 原始接口响应缓存。 | 样本来源可追溯。 | 是 |
-| `data/generated/` | 合成规模数据。 | Doris/SQLite 规模实验。 | 否，已忽略 |
-
-## 7. 文档文件说明
-
-### 已有主要文档
-
-| 文件 | 作用 | 当前建议 |
-|---|---|---|
-| `docs/architecture.md` | 英文架构说明，覆盖编译器、验证、Doris 证据链。 | 保留，作为架构原始文档。 |
-| `docs/doris_runbook.md` | Doris 部署和证据采集 runbook。 | 保留，编号文档中引用。 |
-| `docs/development_plan.md` | 分阶段开发计划。 | 保留，历史规划与路线依据。 |
-| `docs/defense_walkthrough.md` | 答辩流程。 | 保留。 |
-| `docs/requirement_mapping.md` | 赛题要求映射。 | 保留。 |
-| `docs/submission_package.md` | 提交包生成说明。 | 保留。 |
-| `docs/ui_redesign_plan.md` | Web Demo UI 改造规划。 | 保留，属于历史设计决策。 |
-| `docs/18_企业级审计与补强报告.md` | 功能、代码、算法、安全边界和交付成熟度审计报告。 | 保留，作为后续质量复核入口。 |
-| `docs/FinDSL_Forge_中文综合操作指南.md/.docx` | 长篇中文综合文档。 | 保留，作为正式说明书。 |
-| `docs/FinDSL_Forge_中文操作手册.md/.docx/.pdf` | 中文操作手册。 | 保留，作为用户/操作手册。 |
-
-### 本次补齐文档
-
-此前新增 `docs/01_项目简介.md` 到 `docs/17_项目交付说明.md`，作为统一中文文档体系。当前进一步补充 `docs/18_企业级审计与补强报告.md`，记录功能、代码、算法、安全边界和交付成熟度审计结论。编号文档不会覆盖旧文档，而是提供清晰入口、补充中文解释，并引用已有详细资料。
-
-最新官方真实数据复盘见 `docs/22_官方真实数据落库复盘与满分冲刺计划.md`。该文档记录官方 CSV 全量落库、Doris Stream Load 修正、技术特征表分桶构建、官方三表和三张派生特征表行数、官方 workbook 覆盖率以及下一步满分冲刺任务。当前还新增 `docs/34_官方槽位DSL_BNF与ANTLR形式化说明.md`、`docs/35_官方三表缺失数据域不可伪造SQL审计报告.md` 和 `docs/grammar/OfficialSlot.g4`，用于说明形式化语法、不可伪造 SQL 边界和后续 ANTLR 迁移依据。
-
-## 8. 历史文件说明
-
-历史或可归档内容包括：
-
-| 路径 | 原因 | 建议 |
-|---|---|---|
-| `reports/doris_cluster_evidence_*_threshold_probe.md` | 阈值探测报告，不是最终默认证据。 | 可归档到 `archive/reports/`，暂不删除。 |
-| `reports/manual_*` | Word/PDF 渲染 QA 产物。 | 可归档或保留在本地，不建议提交。 |
-| `reports/_docx_qa_deps/` | 文档 QA 依赖缓存，体积较大。 | 可清理或转移到本地工具缓存。 |
-| `reports/ui_redesign_qa/*profile*` | 浏览器自动化缓存。 | 可清理。 |
-| 根目录 `demo_8765*.log` 等 | 空日志文件，已被 `.gitignore` 忽略。 | 可清理，确认没有运行中的 Demo 后删除。 |
-| `data/generated/` | 可再生成的合成规模数据。 | 不提交；需要复现实验时重新生成。 |
-
-详细记录见 [docs/16_历史文件说明.md](docs/16_历史文件说明.md)。
-
-## 9. 最新版本文件说明
-
-当前最新源码以 `src/findsl/`、`configs/`、`tests/`、`scripts/`、`deploy/doris/`、`submission_artifacts/evidence_snapshots/` 为准。官方真实数据 Doris 证据以 `reports/official_doris_evidence.md/json` 的最新运行结果为本地原始产物，提交前应复制到 `submission_artifacts/evidence_snapshots/`。最终提交证据以 `submission_artifacts/evidence_manifest.md`、`submission_artifacts/evidence_metadata.json`、`submission_artifacts/evidence_summary.md` 和 `submission_artifacts/evidence_snapshots/submission_readiness.md` 为准，不以被忽略的 `reports/` 为最终交付依据。
-
-## 10. 不建议删除的文件
-
-不建议删除：
-
-- `src/findsl/*.py`
-- `configs/*.json`
-- `data/samples/*`
-- `data/real_samples/eastmoney_a_share_sample/*`
-- `deploy/doris/*`
-- `scripts/*.ps1` 与核心 Python 脚本
-- `tests/*.py`
-- `README.md`
-- `PROJECT_INDEX.md`
-- `CHANGELOG.md`
-- `docs/*.md`
-- `submission_artifacts/*`
-
-这些文件构成项目运行、测试、部署、答辩和回溯链路。
-
-## 11. 可归档/可清理/疑似无用文件
-
-| 类型 | 路径 | 判断 | 建议 |
-|---|---|---|---|
-| pytest 缓存 | `.pytest_cache/` | 自动生成，可再生。 | 可清理。 |
-| 空日志 | `demo_876*.log` | 当前为 0 字节。 | 可清理，删除前确认服务未运行。 |
-| 报告缓存 | `reports/_docx_qa_deps/` | 文档 QA 依赖缓存，非源码。 | 可清理或归档。 |
-| 浏览器缓存 | `reports/ui_redesign_qa/*profile*` | Playwright/Chrome profile 缓存。 | 可清理。 |
-| 合成数据 | `data/generated/` | 可由脚本重新生成。 | 不提交，可按需保留本地。 |
-| 阈值探测报告 | `reports/doris_cluster_evidence_*threshold_probe.md` | 辅助实验，不是最终证据。 | 可归档到 `archive/`。 |
-
-## 12. 项目运行入口
-
-### CLI 入口
+## 11. 运行入口
 
 ```powershell
-$env:PYTHONPATH="src"
-python -m findsl.cli compile 'filter(indicator("close") > 10)'
-python -m findsl.cli verify-sql 'filter(SUM(indicator("volume"), 3) > 300)' --data-dir data/samples
-python -m findsl.cli official-suite --json
-python -m findsl.cli official-performance-matrix --json
-python -m findsl.cli readiness-report --output reports/submission_readiness.md
-python -m findsl.cli evidence-metadata --snapshots-dir submission_artifacts/evidence_snapshots --output submission_artifacts/evidence_metadata.json --summary-output submission_artifacts/evidence_summary.md
+python -m pip install -e ".[dev]"
+$env:PYTHONPATH = "src"
+python -m findsl.cli official-slot-backend "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
+python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 ```
 
-### Web Demo 入口
+数据和 Doris 运行按 [docs/doris_runbook.md](docs/doris_runbook.md) 操作。所有 CLI 参数以 `python -m findsl.cli --help` 和子命令 `--help` 为准。
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\serve_demo.ps1
-```
-
-默认访问 `http://127.0.0.1:8765`。
-
-### Doris 资产入口
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\generate_doris_assets.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\collect_doris_evidence.ps1
-```
-
-### 提交证据入口
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
-```
-
-`export_submission_artifacts.ps1` 会同步生成 `submission_artifacts/evidence_metadata.json` 和 `submission_artifacts/evidence_summary.md`，把 readiness、official suite、Doris cluster evidence、官方真实数据覆盖率和官方逐问句性能矩阵中的关键数值整理为机器可读 JSON 和可读摘要，供答辩 PPT、Web Demo、技术报告或后续自动检查复用。
-
-## 13. 项目构建、运行、测试流程
+## 12. 构建、测试与提交
 
 推荐顺序：
 
-1. 设置 Python 路径：`$env:PYTHONPATH="src"`。
-2. 运行全量测试：`python -m pytest -q`。
-3. 运行官方风格套件：`python -m findsl.cli official-suite --json`。
-4. 运行 readiness：`powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1`。
-5. 如果需要 Doris 证据，先按 [docs/12_环境依赖与部署.md](docs/12_环境依赖与部署.md) 启动 Doris，再采集证据。
-6. 最终提交前执行 `scripts/export_submission_artifacts.ps1`。
+```powershell
+python scripts/generate_antlr.py --check
+python -m ruff check .
+lint-imports
+python -m pytest
+python -m findsl.cli official-suite --json
+python -m findsl.cli readiness-report --output reports/submission_readiness.md
+```
 
-## 14. 后续维护建议
+真实 Doris 可用后再执行健康、数据行数、统计、正确性、性能矩阵与证据导出。提交前检查 Git 状态、当前 HEAD、metadata、Markdown、截图和手册口径一致，然后生成 SHA-256 manifest。
 
-1. 新增 DSL 函数时，先判断是否属于简单数值模板函数。若是，优先通过 `configs/functions.json` 的 `sql_template` 和 `reference_op` 扩展，并补 `tests/test_template_functions.py`；若涉及窗口、关系阶段、布尔状态或 Doris 特殊优化，再同步更新 `semantic.py`、`sqlgen.py`、`reference.py`、测试和文档。
-2. 新增指标时优先走 `configs/indicators.json`；如支持 prefix-sum，需要同步 Doris schema 和 prefix 构建逻辑。
-3. 修改 SQL 生成后必须跑 `tests/test_equivalence.py`，防止 SQL 与 reference oracle 分歧。
-4. 修改 Doris 表结构后必须重新生成 `deploy/doris/*.sql`，并重新采集或标注 Doris 证据。
-5. `reports/` 只作为本地输出目录；最终可提交证据通过 `submission_artifacts/` 管理。
-6. 历史文件不要直接删除，先记录在 [docs/16_历史文件说明.md](docs/16_历史文件说明.md)，必要时移动到 `archive/`。
+## 13. 后续维护
+
+1. 以能力族而非单条语料安排任务。
+2. 保持新官方核心到旧管道的依赖禁令。
+3. 用 `CompileContext/CatalogSnapshot` 固定一次编译所见的配置和数据版本。
+4. 继续拆分超大 planner、backend 和 validator，但每次拆分保持行为与证据不变。
+5. 将正式 SQL 正确率、迁移率、解析率和编译成功率分别统计。
+6. 只有完整、版本化、可审计的数据 Provider 能补齐范围；不做未经证实的模糊映射。
+7. 每个阶段完成后把稳定结论合并到正式文档，阶段记录转入历史区。
+8. 每次发布都从干净环境重建、执行门禁、刷新当前证据并做人工答辩演练。

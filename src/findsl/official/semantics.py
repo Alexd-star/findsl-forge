@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from typing import Any, Callable, Optional
 
+from .errors import OfficialSlotError
+from .literals import is_numeric_percent_literal
 from .signatures import OFFICIAL_FUNCTION_SIGNATURES, FunctionSignature
 from .ast import (
     OfficialBinaryOp,
@@ -71,8 +73,6 @@ class OfficialSemanticAnalyzer:
         return UNKNOWN
 
     def _infer(self, node: Any) -> str:
-        from ..official_slot import OfficialSlotError
-
         if isinstance(node, OfficialLiteral):
             return self._literal_kind(node.value)
         if isinstance(node, OfficialIdentifier):
@@ -110,8 +110,6 @@ class OfficialSemanticAnalyzer:
         )
 
     def _infer_function(self, node: Any) -> str:
-        from ..official_slot import OfficialSlotError
-
         signature = OFFICIAL_FUNCTION_SIGNATURES.get(node.name)
         if signature is None:
             raise OfficialSlotError(
@@ -141,14 +139,12 @@ class OfficialSemanticAnalyzer:
         meta = self._indicator_resolver(indicator_name)
         if meta is None:
             return "unknown"
-        return str(getattr(meta, "kind", "unknown"))
+        return str(getattr(meta, "value_type", getattr(meta, "kind", "unknown")))
 
     def _infer_comparison(self, node: Any) -> str:
         left_kind = self._infer(node.left)
         if node.op == "between":
             if not isinstance(node.right, OfficialRangeLiteral):
-                from ..official_slot import OfficialSlotError
-
                 raise OfficialSlotError(
                     "OFFICIAL_TYPE_ERROR",
                     "between requires an explicit range literal such as [lower, upper]",
@@ -169,14 +165,12 @@ class OfficialSemanticAnalyzer:
         return "boolean"
 
     def _literal_kind(self, value: Any) -> str:
-        from ..official_slot import _is_numeric_percent_literal
-
         if isinstance(value, bool):
             return "boolean"
         if isinstance(value, (int, float)):
             return "numeric"
         if isinstance(value, str):
-            if _is_numeric_percent_literal(value):
+            if is_numeric_percent_literal(value):
                 return "numeric"
             if _TIME_LITERAL.fullmatch(value):
                 return "time"
@@ -184,8 +178,6 @@ class OfficialSemanticAnalyzer:
         return "unknown"
 
     def _require_numeric(self, op: str, left_kind: str, right_kind: str) -> None:
-        from ..official_slot import OfficialSlotError
-
         invalid = [kind for kind in (left_kind, right_kind) if kind not in {"numeric", "unknown"}]
         if invalid:
             raise OfficialSlotError(
@@ -194,8 +186,6 @@ class OfficialSemanticAnalyzer:
             )
 
     def _require_boolean(self, op: str, left_kind: str, right_kind: str) -> None:
-        from ..official_slot import OfficialSlotError
-
         invalid = [kind for kind in (left_kind, right_kind) if kind not in {"boolean", "unknown"}]
         if invalid:
             raise OfficialSlotError(
@@ -204,8 +194,6 @@ class OfficialSemanticAnalyzer:
             )
 
     def _require_ordered_compatible(self, op: str, left_kind: str, right_kind: str) -> None:
-        from ..official_slot import OfficialSlotError
-
         if "unknown" in {left_kind, right_kind}:
             return
         if left_kind == right_kind and left_kind in {"numeric", "time"}:
@@ -216,8 +204,6 @@ class OfficialSemanticAnalyzer:
         )
 
     def _require_equality_compatible(self, op: str, left_kind: str, right_kind: str) -> None:
-        from ..official_slot import OfficialSlotError
-
         if "unknown" in {left_kind, right_kind} or left_kind == right_kind:
             return
         raise OfficialSlotError(
@@ -226,8 +212,6 @@ class OfficialSemanticAnalyzer:
         )
 
     def _require_approximate_compatible(self, left_kind: str, right_kind: str) -> None:
-        from ..official_slot import OfficialSlotError
-
         if "unknown" in {left_kind, right_kind}:
             return
         if left_kind == right_kind and left_kind in {"numeric", "string"}:

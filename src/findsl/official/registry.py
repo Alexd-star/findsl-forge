@@ -75,6 +75,9 @@ class OfficialIndicatorRegistry:
         except KeyError as exc:
             raise KeyError(f"unknown official indicator: {name}") from exc
 
+    def resolve_optional(self, name: str) -> Optional[IndicatorDefinition]:
+        return self._index.get(str(name).casefold())
+
     @classmethod
     def load(cls, path: Path) -> "OfficialIndicatorRegistry":
         raw = json.loads(Path(path).read_text(encoding="utf-8"))

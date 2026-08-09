@@ -9,7 +9,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .official.frontend.shadow import compare_frontends
+from .compat.official_frontend.shadow import compare_frontends
 
 
 def _file_sha256(path: Path) -> str:
