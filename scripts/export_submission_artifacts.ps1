@@ -191,6 +191,14 @@ if (-not $status) {
 }
 
 $snapshotDir = Join-Path $ArtifactsDir "evidence_snapshots"
+$artifactsRoot = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $ArtifactsDir))
+$snapshotRoot = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $snapshotDir))
+if ([System.IO.Path]::GetDirectoryName($snapshotRoot) -ne $artifactsRoot) {
+  throw "Refusing to rebuild evidence snapshots outside the artifact root: $snapshotRoot"
+}
+if (Test-Path -LiteralPath $snapshotRoot) {
+  Remove-Item -LiteralPath $snapshotRoot -Recurse -Force
+}
 New-Item -ItemType Directory -Force -Path $snapshotDir | Out-Null
 
 $copied = @()
@@ -255,6 +263,8 @@ $manifestPath = Join-Path $ArtifactsDir "evidence_manifest.md"
 
 $metadataPath = Join-Path $ArtifactsDir "evidence_metadata.json"
 $summaryPath = Join-Path $ArtifactsDir "evidence_summary.md"
+Remove-Item -LiteralPath $metadataPath -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $summaryPath -Force -ErrorAction SilentlyContinue
 $env:PYTHONPATH = "src"
 & python -m findsl.cli evidence-metadata `
   --snapshots-dir $snapshotDir `
@@ -264,6 +274,9 @@ $env:PYTHONPATH = "src"
   --contract "configs/official/evidence_contract.json" `
   --expected-git-head $head `
   --require-contract-pass | Out-Null
+if ($LASTEXITCODE -ne 0) {
+  throw "Evidence metadata contract failed with exit code $LASTEXITCODE"
+}
 
 Write-Host "Exported $($copied.Count) evidence files into $snapshotDir"
 Write-Host "Manifest: $manifestPath"
