@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -39,7 +40,11 @@ def test_registry_validates_provider_provenance_contract() -> None:
     registry = ExternalSourceRegistry.load(
         REPO_ROOT / "configs/official/external_source_registry.json"
     )
-    provider = EastmoneyBoardProvider()
+    provider = SimpleNamespace(
+        source=EastmoneyBoardProvider.source,
+        source_url=EastmoneyBoardProvider.source_url,
+        license_note=EastmoneyBoardProvider.license_note,
+    )
 
     entry = registry.assert_provider("eastmoney", provider)
 
