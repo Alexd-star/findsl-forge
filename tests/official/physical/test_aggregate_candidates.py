@@ -38,6 +38,13 @@ def test_long_window_uses_generic_prefix_endpoint_candidate():
     assert "prefix_previous" not in result["backend"]["sql"]
     assert "`q`.`volume_prefix` > 10000000" in result["backend"]["sql"]
     assert "GROUP BY" not in result["backend"]["sql"]
+    selected = next(
+        decision
+        for decision in result["physical"]["decisions"]
+        if decision["selected"]
+    )
+    assert selected["cost_components"][-1] == ("access_multiplier", 1.0)
+    assert "one partition-pruned full-history" in selected["reason"]
 
 
 def test_force_candidate_exposes_short_window_candidate_for_validation_only():

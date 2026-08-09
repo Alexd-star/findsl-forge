@@ -3436,8 +3436,12 @@ def _aggregate_strategy_decision(
     if isinstance(strategy, PhysicalPrefixAggregateStrategy):
         resource_id = strategy.prefix_resource_id
         access_fraction = strategy.access_fraction_hint
-        access_multiplier = 2.0
-        reason_label = "two prefix endpoint lookups"
+        access_multiplier = 1.0 if semantic_eligible else 2.0
+        reason_label = (
+            "one partition-pruned full-history prefix endpoint lookup"
+            if semantic_eligible
+            else "two bounded-window prefix endpoint lookups"
+        )
     else:
         resource_id = strategy.materialized_resource_id
         access_fraction = strategy.partition_fraction_hint
