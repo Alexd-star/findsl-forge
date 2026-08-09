@@ -120,6 +120,7 @@
       "capabilities": [
         "materialized_aggregate",
         "partition_pruning",
+        "prefix",
         "scan"
       ],
       "stable_keys": [
@@ -249,6 +250,54 @@
     {
       "indicator_id": "__prefix_turnover_sum",
       "resource_id": "official_basic_prefix",
+      "column": "turnover_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_row_no",
+      "resource_id": "official_basic_rollup",
+      "column": "row_no",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": false
+    },
+    {
+      "indicator_id": "__rollup_close_sum",
+      "resource_id": "official_basic_rollup",
+      "column": "close_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_close_count",
+      "resource_id": "official_basic_rollup",
+      "column": "close_count_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_volume_sum",
+      "resource_id": "official_basic_rollup",
+      "column": "volume_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_volume_count",
+      "resource_id": "official_basic_rollup",
+      "column": "volume_count_prefix",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__rollup_turnover_sum",
+      "resource_id": "official_basic_rollup",
       "column": "turnover_prefix",
       "value_type": "numeric",
       "scale": 1.0,

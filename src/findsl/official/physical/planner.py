@@ -1347,6 +1347,15 @@ def _grouped_aggregate_candidates(
                 catalog,
                 strategy.prefix_resource_id,
             )
+            semantic_eligible = _prefix_aggregate_semantically_eligible(
+                strategy,
+                typed_date.amount,
+                statistics,
+            )
+            as_of_date = _prefix_aggregate_as_of_date(
+                strategy,
+                statistics,
+            ) if semantic_eligible else None
             candidate_plan: PhysicalPlan = PhysicalPrefixAggregate(
                 strategy.prefix_resource_id,
                 catalog.resource(strategy.prefix_resource_id).anchor_resource_id
@@ -1359,13 +1368,10 @@ def _grouped_aggregate_candidates(
                 _physical_literal(contract.bound),
                 strategy.scale_divisor,
                 constraints,
+                semantic_eligible,
+                as_of_date,
             )
             candidate_resource_id = strategy.prefix_resource_id
-            semantic_eligible = _prefix_aggregate_semantically_eligible(
-                strategy,
-                typed_date.amount,
-                statistics,
-            )
         elif isinstance(strategy, PhysicalMaterializedAggregateStrategy):
             if function != strategy.function or typed_date.amount != strategy.window:
                 continue
@@ -3505,6 +3511,16 @@ def _prefix_aggregate_semantically_eligible(strategy, window, statistics) -> boo
         source.partition_value_count is not None
         and window >= source.partition_value_count
     )
+
+
+def _prefix_aggregate_as_of_date(strategy, statistics) -> Optional[str]:
+    if statistics is None:
+        return None
+    try:
+        source = statistics.resource(strategy.scan_resource_id)
+    except KeyError:
+        return None
+    return source.partition_max
 
 
 def _collect_fields(

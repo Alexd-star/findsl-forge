@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalog_sha256": "3a852362faafe738938e4a13aa6ca78c58938d8082442f4f493039efe92a5ffd",
+  "catalog_sha256": "ee58f58a0d54ee1e2eaf1deb4bcef89ab1826e0296df2619278a019e0bf585a1",
   "strategies": [
     {
       "strategy_id": "ma10_prefix_average",
@@ -189,14 +189,14 @@
       "indicator_id": "收盘价",
       "kind": "prefix_aggregate",
       "scan_resource_id": "official_basic",
-      "prefix_resource_id": "official_basic_prefix",
+      "prefix_resource_id": "official_basic_rollup",
       "sum_column": "close_prefix",
       "count_column": "close_count_prefix",
       "functions": ["AVG", "SUM"],
       "min_window": 1,
       "max_window": 10000,
       "scale_divisor": 10000.0,
-      "access_fraction_hint": 0.02,
+      "access_fraction_hint": 0.0041,
       "selection_mode": "active"
     },
     {
@@ -204,14 +204,14 @@
       "indicator_id": "成交额",
       "kind": "prefix_aggregate",
       "scan_resource_id": "official_basic",
-      "prefix_resource_id": "official_basic_prefix",
+      "prefix_resource_id": "official_basic_rollup",
       "sum_column": "turnover_prefix",
       "count_column": "volume_count_prefix",
       "functions": ["SUM"],
       "min_window": 1,
       "max_window": 10000,
       "scale_divisor": 1.0,
-      "access_fraction_hint": 0.02,
+      "access_fraction_hint": 0.0041,
       "selection_mode": "active"
     },
     {
@@ -219,14 +219,14 @@
       "indicator_id": "成交量",
       "kind": "prefix_aggregate",
       "scan_resource_id": "official_basic",
-      "prefix_resource_id": "official_basic_prefix",
+      "prefix_resource_id": "official_basic_rollup",
       "sum_column": "volume_prefix",
       "count_column": "volume_count_prefix",
       "functions": ["AVG", "SUM"],
       "min_window": 1,
       "max_window": 10000,
       "scale_divisor": 1.0,
-      "access_fraction_hint": 0.02,
+      "access_fraction_hint": 0.0041,
       "selection_mode": "active"
     },
     {

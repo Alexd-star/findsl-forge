@@ -960,6 +960,8 @@ class PhysicalPrefixAggregate(PhysicalPlan):
     bound: PhysicalLiteral
     scale_divisor: float
     constraints: Tuple[PhysicalExpr, ...] = ()
+    full_history: bool = False
+    as_of_date: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -974,6 +976,8 @@ class PhysicalPrefixAggregate(PhysicalPlan):
             "bound": self.bound.to_dict(),
             "scale_divisor": self.scale_divisor,
             "constraints": [item.to_dict() for item in self.constraints],
+            "full_history": self.full_history,
+            "as_of_date": self.as_of_date,
         }
 
 

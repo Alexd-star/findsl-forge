@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from findsl.doris_profile import explain_partition_ratios, parse_profile_summary
+from findsl.official.physical.catalog import default_physical_catalog
 from findsl.official.pipeline import OfficialPipelineOptions, compile_official
 
 
@@ -75,8 +76,13 @@ def main() -> None:
     partition_ratios = {
         name: explain_partition_ratios(value) for name, value in explains.items()
     }
-    if "hsj_stock_hq_basic_prefix" not in explains["optimized"]:
-        raise RuntimeError("optimized EXPLAIN does not use the compiler-selected prefix resource")
+    optimized_resource_id = optimized_compilation["physical"]["selected_resource"]
+    optimized_table = default_physical_catalog().resource(optimized_resource_id).table
+    if optimized_table not in explains["optimized"]:
+        raise RuntimeError(
+            "optimized EXPLAIN does not use the compiler-selected resource "
+            f"{optimized_resource_id}/{optimized_table}"
+        )
 
     profile_dir = Path(args.json_output).parent / "phase42_query_profiles"
     profile_dir.mkdir(parents=True, exist_ok=True)
@@ -128,6 +134,8 @@ def main() -> None:
         "optimized_plan_id": optimized_compilation["physical"]["plan_id"],
         "baseline_strategy": baseline_compilation["physical"]["selected_strategy"],
         "optimized_strategy": optimized_compilation["physical"]["selected_strategy"],
+        "optimized_resource_id": optimized_resource_id,
+        "optimized_table": optimized_table,
         "baseline_decisions": baseline_compilation["physical"]["decisions"],
         "optimized_decisions": optimized_compilation["physical"]["decisions"],
         "warmups": args.warmups,

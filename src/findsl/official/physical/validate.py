@@ -99,6 +99,10 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("physical prefix aggregate comparator is invalid")
         if plan.scale_divisor <= 0 or plan.bound.type is not NUMERIC:
             raise ValueError("physical prefix aggregate numeric contract is invalid")
+        if plan.full_history and not plan.as_of_date:
+            raise ValueError("full-history prefix aggregate requires a frozen as-of date")
+        if not plan.full_history and plan.as_of_date is not None:
+            raise ValueError("bounded prefix aggregate cannot declare a full-history as-of date")
         for constraint in plan.constraints:
             if constraint.type is not BOOLEAN:
                 raise ValueError("physical prefix aggregate constraints must be boolean")

@@ -29,6 +29,8 @@ class PhysicalResourceStatistics:
     data_size_bytes: int
     row_count_available: bool
     partition_value_count: Optional[int] = None
+    partition_min: Optional[str] = None
+    partition_max: Optional[str] = None
 
 
 class PhysicalStatisticsSnapshot:
@@ -42,7 +44,7 @@ class PhysicalStatisticsSnapshot:
         resources: Tuple[PhysicalResourceStatistics, ...],
         catalog: PhysicalCatalog,
     ):
-        if schema_version not in {1, 2}:
+        if schema_version not in {1, 2, 3}:
             raise PhysicalStatisticsError(f"unsupported statistics schema version: {schema_version}")
         if not _SHA256.fullmatch(catalog_sha256):
             raise PhysicalStatisticsError("invalid catalog fingerprint")
@@ -62,15 +64,29 @@ class PhysicalStatisticsSnapshot:
             if item.resource_id in index:
                 raise PhysicalStatisticsError(f"duplicate statistics resource: {item.resource_id}")
             try:
-                catalog.resource(item.resource_id)
+                catalog_resource = catalog.resource(item.resource_id)
             except KeyError as exc:
                 raise PhysicalStatisticsError(f"unknown statistics resource: {item.resource_id}") from exc
             if item.row_count < 0 or item.data_size_bytes < 0:
                 raise PhysicalStatisticsError(f"negative statistics value for {item.resource_id}")
-            if item.partition_value_count is not None and item.partition_value_count <= 0:
+            if item.partition_value_count is not None and item.partition_value_count < 0:
                 raise PhysicalStatisticsError(
                     f"invalid partition value count for {item.resource_id}"
                 )
+            if (item.partition_min is None) != (item.partition_max is None):
+                raise PhysicalStatisticsError(
+                    f"incomplete partition bounds for {item.resource_id}"
+                )
+            if item.partition_min is not None and (
+                not item.partition_min.strip()
+                or not item.partition_max.strip()
+                or item.partition_min > item.partition_max
+            ):
+                raise PhysicalStatisticsError(
+                    f"invalid partition bounds for {item.resource_id}"
+                )
+            if schema_version >= 3:
+                _validate_partition_statistics(item, catalog_resource)
             index[item.resource_id] = item
 
         self.schema_version = schema_version
@@ -125,9 +141,34 @@ class PhysicalStatisticsSnapshot:
         return cls.from_dict(raw, catalog)
 
 
+def _validate_partition_statistics(item, resource) -> None:
+    count = item.partition_value_count
+    has_bounds = item.partition_min is not None
+    if resource.partition_key is None:
+        if count is not None or has_bounds:
+            raise PhysicalStatisticsError(
+                f"non-partitioned resource declares partition statistics: {item.resource_id}"
+            )
+        return
+    if count is None:
+        raise PhysicalStatisticsError(
+            f"partitioned resource is missing partition statistics: {item.resource_id}"
+        )
+    if item.row_count == 0:
+        if count != 0 or has_bounds:
+            raise PhysicalStatisticsError(
+                f"empty resource has inconsistent partition statistics: {item.resource_id}"
+            )
+        return
+    if count == 0 or not has_bounds:
+        raise PhysicalStatisticsError(
+            f"non-empty resource has incomplete partition statistics: {item.resource_id}"
+        )
+
+
 def _resource(raw) -> PhysicalResourceStatistics:
     required = {"resource_id", "row_count", "data_size_bytes", "row_count_available"}
-    allowed = required | {"partition_value_count"}
+    allowed = required | {"partition_value_count", "partition_min", "partition_max"}
     if (
         not isinstance(raw, dict)
         or not required.issubset(raw)
@@ -146,17 +187,29 @@ def _resource(raw) -> PhysicalResourceStatistics:
         and (isinstance(partition_value_count, bool) or not isinstance(partition_value_count, int))
     ):
         raise PhysicalStatisticsError("partition_value_count must be an integer or null")
+    partition_min = raw.get("partition_min")
+    partition_max = raw.get("partition_max")
+    if partition_min is not None and not isinstance(partition_min, str):
+        raise PhysicalStatisticsError("partition_min must be a string or null")
+    if partition_max is not None and not isinstance(partition_max, str):
+        raise PhysicalStatisticsError("partition_max must be a string or null")
     return PhysicalResourceStatistics(
         resource_id=str(raw["resource_id"]),
         row_count=raw["row_count"],
         data_size_bytes=raw["data_size_bytes"],
         row_count_available=raw["row_count_available"],
         partition_value_count=partition_value_count,
+        partition_min=partition_min,
+        partition_max=partition_max,
     )
 
 
 def parse_doris_size(value: str) -> int:
-    match = re.fullmatch(r"\s*(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB)\s*", str(value), re.IGNORECASE)
+    match = re.fullmatch(
+        r"\s*(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB)?\s*",
+        str(value),
+        re.IGNORECASE,
+    )
     if not match:
         raise PhysicalStatisticsError(f"invalid Doris data size: {value}")
     factors = {
@@ -166,8 +219,11 @@ def parse_doris_size(value: str) -> int:
         "GB": 1024 ** 3,
         "TB": 1024 ** 4,
     }
+    unit = match.group(2)
+    if unit is None and Decimal(match.group(1)) != 0:
+        raise PhysicalStatisticsError(f"non-zero Doris data size has no unit: {value}")
     try:
-        size = Decimal(match.group(1)) * factors[match.group(2).upper()]
+        size = Decimal(match.group(1)) * factors[(unit or "B").upper()]
     except InvalidOperation as exc:
         raise PhysicalStatisticsError(f"invalid Doris data size: {value}") from exc
     return int(size.to_integral_value(rounding=ROUND_HALF_UP))
@@ -217,12 +273,31 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
             row_count = int(rows[0]["row_count"])
         except ValueError as exc:
             raise PhysicalStatisticsError(f"invalid row_count for {resource.table}") from exc
+        if row_count == 0:
+            exact_rows = _metadata_rows(
+                config,
+                (
+                    "SELECT COUNT(*) AS exact_row_count "
+                    f"FROM `{resource.database}`.`{resource.table}`"
+                ),
+                runner,
+                database=resource.database,
+            )
+            if len(exact_rows) != 1:
+                raise PhysicalStatisticsError(
+                    f"exact row count is unavailable for {resource.table}"
+                )
+            row_count = int(exact_rows[0]["exact_row_count"])
         partition_value_count = None
+        partition_min = None
+        partition_max = None
         if resource.partition_key is not None:
             partition_rows = _metadata_rows(
                 config,
                 (
-                    f"SELECT COUNT(DISTINCT `{resource.partition_key}`) AS partition_value_count "
+                    f"SELECT COUNT(DISTINCT `{resource.partition_key}`) AS partition_value_count, "
+                    f"MIN(`{resource.partition_key}`) AS partition_min, "
+                    f"MAX(`{resource.partition_key}`) AS partition_max "
                     f"FROM `{resource.database}`.`{resource.table}`"
                 ),
                 runner,
@@ -233,6 +308,14 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
                     f"partition value count is unavailable for {resource.table}"
                 )
             partition_value_count = int(partition_rows[0]["partition_value_count"])
+            raw_partition_min = partition_rows[0]["partition_min"]
+            raw_partition_max = partition_rows[0]["partition_max"]
+            partition_min = (
+                None if raw_partition_min in {None, "NULL"} else str(raw_partition_min)
+            )
+            partition_max = (
+                None if raw_partition_max in {None, "NULL"} else str(raw_partition_max)
+            )
         resources.append(
             PhysicalResourceStatistics(
                 resource_id=resource.resource_id,
@@ -240,12 +323,14 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
                 data_size_bytes=sizes[(resource.database, resource.table)],
                 row_count_available=True,
                 partition_value_count=partition_value_count,
+                partition_min=partition_min,
+                partition_max=partition_max,
             )
         )
 
     timestamp = collected_at or datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
     return PhysicalStatisticsSnapshot(
-        schema_version=2,
+        schema_version=3,
         catalog_sha256=catalog.fingerprint,
         collected_at=timestamp,
         doris_version=doris_version,

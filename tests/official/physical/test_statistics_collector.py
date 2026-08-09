@@ -18,10 +18,58 @@ from findsl.official.physical.statistics import (
         ("392.052 MB", 411096318),
         ("1.313 GB", 1409823015),
         ("0.000 B", 0),
+        ("0.000 ", 0),
     ],
 )
 def test_doris_size_units_are_converted_to_bytes(value, expected):
     assert parse_doris_size(value) == expected
+
+
+def test_non_zero_doris_size_requires_an_explicit_unit():
+    with pytest.raises(PhysicalStatisticsError, match="has no unit"):
+        parse_doris_size("1.000")
+
+
+def test_empty_partition_bounds_remain_null():
+    catalog = default_physical_catalog()
+    config = DorisExecutionConfig("127.0.0.1", 9030, "root", "", "newzl")
+
+    def runner(command, **kwargs):
+        sql = command[command.index("--execute") + 1]
+        if sql == "SHOW FRONTENDS":
+            return SimpleNamespace(
+                returncode=0,
+                stdout="Name\tIsMaster\tVersion\nfe-1\ttrue\tdoris-test\n",
+                stderr="",
+            )
+        if sql == "SHOW DATA":
+            database = command[command.index("--database") + 1]
+            tables = {
+                resource.table
+                for resource in catalog.resources
+                if resource.database == database
+            }
+            output = "TableName\tSize\n" + "".join(
+                f"{table}\t0.000 B\n" for table in sorted(tables)
+            )
+            return SimpleNamespace(returncode=0, stdout=output, stderr="")
+        if sql.startswith("SHOW TABLE STATS"):
+            return SimpleNamespace(returncode=0, stdout="row_count\n0\n", stderr="")
+        if sql.startswith("SELECT COUNT(*) AS exact_row_count"):
+            return SimpleNamespace(returncode=0, stdout="exact_row_count\n0\n", stderr="")
+        if sql.startswith("SELECT COUNT(DISTINCT"):
+            return SimpleNamespace(
+                returncode=0,
+                stdout="partition_value_count\tpartition_min\tpartition_max\n0\tNULL\tNULL\n",
+                stderr="",
+            )
+        raise AssertionError(sql)
+
+    snapshot = collect_physical_statistics(catalog, config, runner=runner)
+
+    assert snapshot.resource("official_basic").partition_value_count == 0
+    assert snapshot.resource("official_basic").partition_min is None
+    assert snapshot.resource("official_basic").partition_max is None
 
 
 def test_collector_uses_controlled_metadata_commands_and_hides_password():
@@ -49,7 +97,7 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         "hsj_stock_hq_basic_technical": 13650347,
         "hsj_stock_hq_basic_prefix": 13650347,
         "hsj_stock_hq_ext_prefix": 13650347,
-        "hsj_stock_hq_basic_rollup": 13650347,
+        "hsj_stock_hq_basic_rollup": 0,
         "scope_membership": 35421,
         "industry_membership": 23226,
         "instrument_rule": 5686,
@@ -81,7 +129,16 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
             table = sql.split("`")[5]
             return SimpleNamespace(
                 returncode=0,
-                stdout="partition_value_count\n4631\n",
+                stdout=(
+                    "partition_value_count\tpartition_min\tpartition_max\n"
+                    "4631\t2006-01-04\t2026-04-14\n"
+                ),
+                stderr="",
+            )
+        if sql.startswith("SELECT COUNT(*) AS exact_row_count"):
+            return SimpleNamespace(
+                returncode=0,
+                stdout="exact_row_count\n13650347\n",
                 stderr="",
             )
         table = sql.split("`")[1]
@@ -101,8 +158,11 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
     assert snapshot.resource("official_ext").row_count == 6170822
     assert snapshot.resource("official_basic").data_size_bytes == 411096318
     assert snapshot.resource("official_basic").partition_value_count == 4631
+    assert snapshot.resource("official_basic").partition_min == "2006-01-04"
+    assert snapshot.resource("official_basic").partition_max == "2026-04-14"
+    assert snapshot.resource("official_basic_rollup").row_count == 13650347
     assert snapshot.resource("official_security").partition_value_count is None
-    assert snapshot.schema_version == 2
+    assert snapshot.schema_version == 3
     assert snapshot.doris_version == "doris-4.1.0-rc03-5960d4cea0e"
     assert all("secret" not in part for command, _ in calls for part in command)
     assert all(kwargs["env"]["MYSQL_PWD"] == "secret" for _, kwargs in calls)
@@ -111,6 +171,7 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         + len({resource.database for resource in catalog.resources})
         + len(catalog.resources)
         + sum(resource.partition_key is not None for resource in catalog.resources)
+        + 1
     )
     assert len(calls) == expected_calls
 

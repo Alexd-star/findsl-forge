@@ -33,9 +33,10 @@ def test_long_window_uses_generic_prefix_endpoint_candidate():
 
     assert result["physical"]["selected_strategy"] == "volume_prefix_aggregate"
     assert result["physical"]["plan"]["kind"] == "PhysicalPrefixAggregate"
-    assert "hsj_stock_hq_basic_prefix" in result["backend"]["sql"]
-    assert "`q`.`row_no` - 5000" in result["backend"]["sql"]
-    assert "`q`.`volume_prefix` - COALESCE" in result["backend"]["sql"]
+    assert result["physical"]["plan"]["full_history"] is True
+    assert "hsj_stock_hq_basic_rollup" in result["backend"]["sql"]
+    assert "prefix_previous" not in result["backend"]["sql"]
+    assert "`q`.`volume_prefix` > 10000000" in result["backend"]["sql"]
     assert "GROUP BY" not in result["backend"]["sql"]
 
 

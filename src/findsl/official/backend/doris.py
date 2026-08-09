@@ -905,22 +905,34 @@ def _render_prefix_aggregate(
             ),
         ),
     )
-    sum_delta = exp.Sub(
-        this=exp.column(plan.sum_column, table=current_alias, quoted=True),
-        expression=exp.Coalesce(
-            this=exp.column(plan.sum_column, table=previous_alias, quoted=True),
-            expressions=[exp.convert(0)],
-        ),
-    )
-    metric = sum_delta
-    if plan.function == "AVG":
-        count_delta = exp.Sub(
-            this=exp.column(plan.count_column, table=current_alias, quoted=True),
+    sum_delta = exp.column(plan.sum_column, table=current_alias, quoted=True)
+    if not plan.full_history:
+        sum_delta = exp.Sub(
+            this=sum_delta,
             expression=exp.Coalesce(
-                this=exp.column(plan.count_column, table=previous_alias, quoted=True),
+                this=exp.column(plan.sum_column, table=previous_alias, quoted=True),
                 expressions=[exp.convert(0)],
             ),
         )
+    metric = sum_delta
+    if plan.function == "AVG":
+        count_delta = exp.column(
+            plan.count_column,
+            table=current_alias,
+            quoted=True,
+        )
+        if not plan.full_history:
+            count_delta = exp.Sub(
+                this=count_delta,
+                expression=exp.Coalesce(
+                    this=exp.column(
+                        plan.count_column,
+                        table=previous_alias,
+                        quoted=True,
+                    ),
+                    expressions=[exp.convert(0)],
+                ),
+            )
         metric = exp.Div(
             this=exp.Mul(this=exp.Paren(this=sum_delta), expression=exp.convert(1.0)),
             expression=exp.Nullif(this=count_delta, expression=exp.convert(0)),
@@ -930,7 +942,7 @@ def _render_prefix_aggregate(
             this=exp.Paren(this=metric),
             expression=exp.convert(plan.scale_divisor),
         )
-    latest = exp.Subquery(
+    latest = exp.convert(plan.as_of_date) if plan.full_history else exp.Subquery(
         this=exp.select(
             exp.Max(
                 this=exp.column(
@@ -952,9 +964,10 @@ def _render_prefix_aggregate(
         this=metric,
         expression=exp.convert(plan.bound.value),
     )
+    date_alias = current_alias if plan.full_history else anchor_alias
     predicate = exp.and_(
         exp.EQ(
-            this=exp.column(anchor.partition_key, table=anchor_alias, quoted=True),
+            this=exp.column(anchor.partition_key, table=date_alias, quoted=True),
             expression=latest,
         ),
         predicate,
@@ -970,6 +983,13 @@ def _render_prefix_aggregate(
             predicate,
             _render_expr(constraint, catalog, scan_context),
         )
+    if plan.full_history:
+        return exp.select(
+            *(
+                exp.column(key, table=current_alias, quoted=True)
+                for key in ("mktcode", "tgtcode", "bizdate")
+            )
+        ).from_(current).where(predicate)
     return (
         exp.select(
             *(
