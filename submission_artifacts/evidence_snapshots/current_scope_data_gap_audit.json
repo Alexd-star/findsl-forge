@@ -1,0 +1,1343 @@
+{
+  "schema_version": 1,
+  "verified_source_head": "a1158305022e708163fb6cd06377a0bad00fd5c7",
+  "official_source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
+  "summary": {
+    "migration_gap_rows": 53,
+    "unresolved_targets": 57,
+    "unresolved_occurrences": 76,
+    "categories": {
+      "ambiguous_nonstandard": 18,
+      "derived_semantics": 9,
+      "out_of_official_domain": 4,
+      "suspected_invalid": 10,
+      "vendor_snapshot_candidate": 16
+    },
+    "competition_decisions": {
+      "implement_derived_rule": 9,
+      "optional_domain_extension": 4,
+      "pending_external_dataset": 16,
+      "reject_ambiguous": 18,
+      "reject_invalid": 10
+    },
+    "forced_fuzzy_mappings": 0
+  },
+  "targets": [
+    {
+      "name": "英美贸易业",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "不是可确认的交易所或主流行业分类名称，英美也可能表示地区而非行业。",
+      "next_action": "需要出题方给出分类体系和成员定义；此前保持确定性拒绝。",
+      "candidate_sources": [],
+      "occurrences": 3,
+      "affected_excel_rows": [
+        1386
+      ]
+    },
+    {
+      "name": "音频媒体行业",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可能对应媒体或音频内容板块，但没有唯一行业代码。",
+      "next_action": "只接受完整、带日期的分类来源快照，不做近义词猜测。",
+      "candidate_sources": [
+        "eastmoney",
+        "sina-sector"
+      ],
+      "occurrences": 3,
+      "affected_excel_rows": [
+        1459,
+        1460
+      ]
+    },
+    {
+      "name": "100429",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "不符合当前官方证券代码目录中的可确认标识。",
+      "next_action": "保留原文并返回证券标识无法确认。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 3,
+      "affected_excel_rows": [
+        1508
+      ]
+    },
+    {
+      "name": "上海中环概念",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "名称可能指地区、公司或临时题材，没有统一成员定义。",
+      "next_action": "仅在获得明确板块代码和完整成员表后接入。",
+      "candidate_sources": [],
+      "occurrences": 3,
+      "affected_excel_rows": [
+        1802
+      ]
+    },
+    {
+      "name": "石膏石材板块",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可能存在于供应商行业或题材分类，但不是统一行业标准名。",
+      "next_action": "要求来源给出板块代码、全量成员和快照日期。",
+      "candidate_sources": [
+        "eastmoney",
+        "sina-sector"
+      ],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        177,
+        208
+      ]
+    },
+    {
+      "name": "印花板",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能是错词、材料名称或自定义板块，无法唯一解释。",
+      "next_action": "不做编辑距离映射，等待明确语义。",
+      "candidate_sources": [],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        222
+      ]
+    },
+    {
+      "name": "大订单",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "更像基于订单或资金流字段计算的事件条件，不是静态证券成员集合。",
+      "next_action": "接入有明确大单口径的逐笔或资金流数据后实现事件规则。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        385
+      ]
+    },
+    {
+      "name": "深证龙科",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "无法在证券和指数身份目录中确认该名称。",
+      "next_action": "返回标识无法确认，不自动替换为相似证券。",
+      "candidate_sources": [
+        "sse-szse-bse",
+        "cnindex"
+      ],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        847
+      ]
+    },
+    {
+      "name": "香港金科",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "名称不能唯一对应可交易证券，且可能超出A股范围。",
+      "next_action": "需要完整市场代码后才能进入可选资产扩展。",
+      "candidate_sources": [],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        847
+      ]
+    },
+    {
+      "name": "美的科技",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能指公司简称、供应链或概念，不能唯一对应美的集团。",
+      "next_action": "只接受明确证券代码或板块代码。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        1168
+      ]
+    },
+    {
+      "name": "cvpr",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "会议名称可形成临时题材，但没有稳定、统一的上市公司成员标准。",
+      "next_action": "如使用资讯平台口径，必须固定来源和采集日期。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        1540
+      ]
+    },
+    {
+      "name": "连扳概念",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "疑似“连板”错写，核心语义应由连续涨停行情推导，而不是静态概念表。",
+      "next_action": "先记录错词裁决，再按涨停规则和连续交易日实现事件算子。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        1749,
+        1773
+      ]
+    },
+    {
+      "name": "深鱼子油",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "无法确认是证券、行业或公开概念名称。",
+      "next_action": "保持拒绝并要求明确原始名称。",
+      "candidate_sources": [],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        1758
+      ]
+    },
+    {
+      "name": "北京国投",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能对应多家机构或国资关系，缺少唯一证券代码。",
+      "next_action": "需要法人主体代码或明确控股关系口径。",
+      "candidate_sources": [],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        1758
+      ]
+    },
+    {
+      "name": "科技电池",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "是多个宽泛词的组合，不能确定具体行业或概念。",
+      "next_action": "不得拆词后任意取并集；需要正式板块代码。",
+      "candidate_sources": [],
+      "occurrences": 2,
+      "affected_excel_rows": [
+        5313
+      ]
+    },
+    {
+      "name": "幕墙板块",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可以作为供应商板块，但缺少统一行业代码和历史成员。",
+      "next_action": "获取完整快照后按供应商口径接入。",
+      "candidate_sources": [
+        "eastmoney",
+        "sina-sector"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        229
+      ]
+    },
+    {
+      "name": "能源技术服务",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "接近行业描述，但不同分类体系的边界不同。",
+      "next_action": "绑定明确分类体系、层级和行业代码后导入。",
+      "candidate_sources": [
+        "baostock-industry",
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        251
+      ]
+    },
+    {
+      "name": "混凝土概念",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "属于供应商题材口径，没有跨平台唯一成员集。",
+      "next_action": "只接入完整、带日期的概念快照。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        264
+      ]
+    },
+    {
+      "name": "白酒ETF",
+      "category": "out_of_official_domain",
+      "competition_decision": "optional_domain_extension",
+      "reason": "ETF不属于官方A股个股行情主域，且名称可能对应多只基金。",
+      "next_action": "作为独立基金资产插件处理，必须提供基金代码和基金行情表。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        288
+      ]
+    },
+    {
+      "name": "大订单概念",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "“大订单”应有成交或订单阈值，不应伪装为静态概念成员。",
+      "next_action": "明确阈值和数据字段后实现事件筛选。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        386
+      ]
+    },
+    {
+      "name": "东方空间",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能指未上市商业航天企业或相关产业链，不能当作单一A股证券。",
+      "next_action": "需要明确是公司主体还是供应链概念。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        406
+      ]
+    },
+    {
+      "name": "影子股",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "属于策略关系概念，成员取决于参照公司和关联规则。",
+      "next_action": "定义关联关系、参照标的和有效期后形成关系算子。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        411
+      ]
+    },
+    {
+      "name": "SaaS产品",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可作为主题分类，但供应商口径和时间变化明显。",
+      "next_action": "仅使用版本化概念快照，不倒推历史成员。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        422
+      ]
+    },
+    {
+      "name": "第十代火箭",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "没有可核验的标准证券范围或行业定义。",
+      "next_action": "按噪声或错误输入拒绝。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        425
+      ]
+    },
+    {
+      "name": "深远光大",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "无法对应官方证券身份，可能由多个名称片段误拼接。",
+      "next_action": "不做相似名称替换。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        430
+      ]
+    },
+    {
+      "name": "第一代锂电池",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "“第一代”没有统一行业边界，无法形成确定成员集。",
+      "next_action": "需要出题方给出技术分类标准。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        445
+      ]
+    },
+    {
+      "name": "第十代半导体",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "不是通行的半导体代际分类名称。",
+      "next_action": "作为语义异常拒绝。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        451
+      ]
+    },
+    {
+      "name": "国企重组",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可形成事件主题，但成员随公告和供应商口径变化。",
+      "next_action": "使用公告事件或版本化概念快照，禁止使用无日期常量名单。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        516
+      ]
+    },
+    {
+      "name": "成都国资委",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "需要股权控制链和报告期，不能仅靠公司简称推断。",
+      "next_action": "接入带日期的实控人或股东关系数据后实现。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        516
+      ]
+    },
+    {
+      "name": "高薪华为链",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "疑似错词且“华为链”本身为供应商主题口径。",
+      "next_action": "要求确认原词和成员定义。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        516
+      ]
+    },
+    {
+      "name": "擒牛火箭",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "属于策略黑话，不是数据供应商可权威给出的证券范围。",
+      "next_action": "只有在给出价格形态公式后才能实现为技术模式。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        519
+      ]
+    },
+    {
+      "name": "高温超导带材",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "属于细分产业主题，缺少统一上市公司成员标准。",
+      "next_action": "采用带日期的产业链快照并标明供应商口径。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        575
+      ]
+    },
+    {
+      "name": "真空室内的第一壁",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "属于核聚变设备细分术语，不等于稳定证券板块。",
+      "next_action": "需要可核验产业链数据集和成分依据。",
+      "candidate_sources": [
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        575
+      ]
+    },
+    {
+      "name": "偏滤器",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "属于核聚变设备部件，证券映射依赖产业链研究口径。",
+      "next_action": "仅接入有来源和日期的产业链成员表。",
+      "candidate_sources": [
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        575
+      ]
+    },
+    {
+      "name": "AI加行业板块",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "缺少被组合的具体行业，无法确定集合交并关系。",
+      "next_action": "要求输入改写为明确的AI概念与具体行业表达式。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        609
+      ]
+    },
+    {
+      "name": "光铜共进概念",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "属于通信产业主题口径，不是统一行业分类。",
+      "next_action": "使用完整概念快照并固定采集日期。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        613
+      ]
+    },
+    {
+      "name": "短线",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "表示交易周期或策略风格，不是证券成员范围。",
+      "next_action": "需要配置明确的交易日窗口，不能当作scope_membership。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        615
+      ]
+    },
+    {
+      "name": "腾讯蓝包概念",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "名称无法对应稳定公开概念，可能是临时事件或错词。",
+      "next_action": "要求提供正式概念名、代码或成员表。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        636
+      ]
+    },
+    {
+      "name": "龙回头",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "属于价格和涨停序列形成的策略形态，不是静态板块。",
+      "next_action": "明确涨停、回撤和再次走强的参数后实现事件算子。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        638
+      ]
+    },
+    {
+      "name": "火箭阳",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "属于K线策略术语，定义依赖涨幅、实体和成交量阈值。",
+      "next_action": "得到公式后通过日行情实现技术模式。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        750
+      ]
+    },
+    {
+      "name": "BLacKweLL",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可对应Blackwell产业链主题，但成员属于供应商研究口径。",
+      "next_action": "规范大小写后仍需完整、带日期的概念成员表。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        763
+      ]
+    },
+    {
+      "name": "二十几题财",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "无法形成可解释的金融实体或范围，疑似噪声文本。",
+      "next_action": "保留输入证据并拒绝。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        773
+      ]
+    },
+    {
+      "name": "腾讯霸主",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "属于描述性短语，没有可验证成员规则。",
+      "next_action": "要求改写为明确证券、概念或业务指标。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        773
+      ]
+    },
+    {
+      "name": "深圳电信",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能是分公司或地区业务主体，不是可唯一确认的独立A股证券。",
+      "next_action": "需要统一社会信用代码或明确上市公司代码。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        788
+      ]
+    },
+    {
+      "name": "MATE70",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "属于产品产业链主题，成员随供应商口径和时间变化。",
+      "next_action": "仅使用带版本的产业链快照。",
+      "candidate_sources": [
+        "eastmoney",
+        "ths-concept"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        929
+      ]
+    },
+    {
+      "name": "腾讯控股",
+      "category": "out_of_official_domain",
+      "competition_decision": "optional_domain_extension",
+      "reason": "是港股证券，不在官方A股日行情主表范围内。",
+      "next_action": "作为港股资产插件接入独立行情表，不能映射成A股。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1275
+      ]
+    },
+    {
+      "name": "杨氏纸业",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "无法在官方证券身份目录中确认。",
+      "next_action": "返回证券不存在或待确认。",
+      "candidate_sources": [
+        "sse-szse-bse"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1292
+      ]
+    },
+    {
+      "name": "沪上阿姨",
+      "category": "out_of_official_domain",
+      "competition_decision": "optional_domain_extension",
+      "reason": "对应港股上市主体时仍超出官方A股数据域。",
+      "next_action": "只有提供港股代码和港股行情表后才启用。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1297
+      ]
+    },
+    {
+      "name": "港湾经济",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能是区域经济概念，但没有统一边界和成员标准。",
+      "next_action": "需要明确区域范围、产业口径和有效期。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1385
+      ]
+    },
+    {
+      "name": "994338",
+      "category": "suspected_invalid",
+      "competition_decision": "reject_invalid",
+      "reason": "不符合当前可确认证券或指数代码。",
+      "next_action": "不自动纠错为相近数字代码。",
+      "candidate_sources": [
+        "sse-szse-bse",
+        "csindex",
+        "cnindex"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1505
+      ]
+    },
+    {
+      "name": "破镜",
+      "category": "derived_semantics",
+      "competition_decision": "implement_derived_rule",
+      "reason": "更像策略形态简称，不是证券成员范围。",
+      "next_action": "要求提供可计算的价格序列定义。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1647
+      ]
+    },
+    {
+      "name": "推进",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "普通动词不能唯一解析为证券范围。",
+      "next_action": "要求补全上下文。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1697
+      ]
+    },
+    {
+      "name": "能源",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "可能指行业、主题或指数，范围过宽且分类体系未指定。",
+      "next_action": "要求指定中证、申万、证监会或供应商板块代码。",
+      "candidate_sources": [
+        "csindex",
+        "baostock-industry"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1752
+      ]
+    },
+    {
+      "name": "深海鱼处理行业",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "不是可确认的标准行业分类名称。",
+      "next_action": "需要给出分类代码或成员清单。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        1759
+      ]
+    },
+    {
+      "name": "运动用品",
+      "category": "vendor_snapshot_candidate",
+      "competition_decision": "pending_external_dataset",
+      "reason": "可对应消费品细分行业，但不同分类体系边界不同。",
+      "next_action": "绑定明确行业体系和代码后接入。",
+      "candidate_sources": [
+        "baostock-industry",
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        3382
+      ]
+    },
+    {
+      "name": "指数基金",
+      "category": "out_of_official_domain",
+      "competition_decision": "optional_domain_extension",
+      "reason": "是资产类别而非唯一证券范围，官方主数据未提供基金域。",
+      "next_action": "建立基金主表、跟踪指数关系和基金行情后作为独立插件启用。",
+      "candidate_sources": [
+        "tushare-optional"
+      ],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        3702
+      ]
+    },
+    {
+      "name": "螃蟹",
+      "category": "ambiguous_nonstandard",
+      "competition_decision": "reject_ambiguous",
+      "reason": "普通名词没有可验证的金融范围定义。",
+      "next_action": "不构造臆测概念成员，要求明确语义。",
+      "candidate_sources": [],
+      "occurrences": 1,
+      "affected_excel_rows": [
+        3981
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "excel_row": 177,
+      "source": "indicator('科创板', '石膏石材板块', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "石膏石材板块"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 208,
+      "source": "indicator('京', '沪深300能源&石膏石材板块', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "石膏石材板块"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 222,
+      "source": "indicator('深', '印花板', '成交额', '这六个月', '', '', '') > 100000000000 and indicator('深', '印花板', '流通市值', '', '', '', '') between '[1000000000,1500000000]'",
+      "unresolved_targets": [
+        "印花板"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 229,
+      "source": "indicator('深', '幕墙板块|沪深300能源', '', '', '', '', '') = 'all' limit 0,22",
+      "unresolved_targets": [
+        "幕墙板块"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 251,
+      "source": "rank('', '金属管件制品行业&能源技术服务', '开盘价', 'desc', '今天', '', '', '') > 0 limit 0,10",
+      "unresolved_targets": [
+        "能源技术服务"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 264,
+      "source": "indicator('^创业板&^科创板', '^混凝土概念', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "混凝土概念"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 288,
+      "source": "indicator('', '白酒ETF', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "白酒ETF"
+      ],
+      "decisions": [
+        "optional_domain_extension"
+      ]
+    },
+    {
+      "excel_row": 385,
+      "source": "indicator('', '大订单', '深股通标识', '', '', '', '') = True then rank('', '大订单', '', 'desc', '', '', '', '') <= 10",
+      "unresolved_targets": [
+        "大订单"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 386,
+      "source": "rank('', '大订单概念', '', 'desc', '', '', '', '') <= 10",
+      "unresolved_targets": [
+        "大订单概念"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 406,
+      "source": "indicator('', '东方空间', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "东方空间"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 411,
+      "source": "indicator('', '华为概念&AI应用&影子股', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "影子股"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 422,
+      "source": "indicator('创业板', 'SaaS产品', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "SaaS产品"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 425,
+      "source": "rank('', '第十代火箭', '', 'desc', '', '', '', '') <= 5",
+      "unresolved_targets": [
+        "第十代火箭"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 430,
+      "source": "indicator('', '^深远光大', '成交额', '', '', '', '') < 10000000",
+      "unresolved_targets": [
+        "深远光大"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 445,
+      "source": "rank('', '第一代锂电池', '', 'desc', '', '', '', '') <= 3",
+      "unresolved_targets": [
+        "第一代锂电池"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 451,
+      "source": "rank('', '第十代半导体', '', 'desc', '', '', '', '') <= 9",
+      "unresolved_targets": [
+        "第十代半导体"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 516,
+      "source": "indicator('', '国企重组&成都国资委&高薪华为链', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "国企重组",
+        "成都国资委",
+        "高薪华为链"
+      ],
+      "decisions": [
+        "pending_external_dataset",
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 519,
+      "source": "indicator('', '擒牛火箭', '首板涨停', '', '', '', '') = True",
+      "unresolved_targets": [
+        "擒牛火箭"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 575,
+      "source": "indicator('', '高温超导带材&真空室内的第一壁&偏滤器', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "高温超导带材",
+        "真空室内的第一壁",
+        "偏滤器"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 609,
+      "source": "indicator('', 'AI加行业板块', '主力净流入', '2024年12月23号', '', '', '') > 0",
+      "unresolved_targets": [
+        "AI加行业板块"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 613,
+      "source": "indicator('', '光铜共进概念', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "光铜共进概念"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 615,
+      "source": "indicator('', '短线&算力', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "短线"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 636,
+      "source": "indicator('', '腾讯蓝包概念', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "腾讯蓝包概念"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 638,
+      "source": "rank('', '龙回头', '', 'desc', '', '', '', '') = 5",
+      "unresolved_targets": [
+        "龙回头"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 750,
+      "source": "indicator('', '火箭阳', '', '昨日', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "火箭阳"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 763,
+      "source": "indicator('', 'BLacKweLL', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "BLacKweLL"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 773,
+      "source": "indicator('', '二十几题财|腾讯霸主', '最低价', '', '', '', '') = 4",
+      "unresolved_targets": [
+        "二十几题财",
+        "腾讯霸主"
+      ],
+      "decisions": [
+        "reject_ambiguous",
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 788,
+      "source": "indicator('', '深圳电信', '市盈率', '', '', '', '') > queryData('', '白酒行业', '市盈率', '', '')",
+      "unresolved_targets": [
+        "深圳电信"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 847,
+      "source": "indicator('', '深证龙科&香港金科', '成交量', '本季度', '', '', '') > 1000000000 then rank('', '深证龙科&香港金科', '成交量', 'desc', '本季度', '', '', '') > 10%",
+      "unresolved_targets": [
+        "深证龙科",
+        "香港金科"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 929,
+      "source": "indicator('', 'MATE70|s板', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "MATE70"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 1168,
+      "source": "indicator('', '美的科技', '成交额', '', '', '', '') < queryData('', '白酒行业', '成交额', '本周', 'MIN') then rank('', '美的科技', '成交额', 'desc', '本周', '', '', '') <= 10",
+      "unresolved_targets": [
+        "美的科技"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 1275,
+      "source": "indicator('', '', '市净率', '22年', '', 'AVG', '') < queryData('', '腾讯控股', '市净率', '22年', 'AVG')",
+      "unresolved_targets": [
+        "腾讯控股"
+      ],
+      "decisions": [
+        "optional_domain_extension"
+      ]
+    },
+    {
+      "excel_row": 1292,
+      "source": "indicator('^沪主板', '智谱ai概念', '涨停', '', '', '', 'CONS=4') = True and indicator('^沪主板', '智谱ai概念', 'ST股票标识', '', '', '', '') = False and indicator('^沪主板', '智谱ai概念', '涨幅', '本月', '', 'AVG', '') > queryData('', '杨氏纸业', '涨幅', '本月', 'AVG')",
+      "unresolved_targets": [
+        "杨氏纸业"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 1297,
+      "source": "indicator('', '沪上阿姨', '市盈率', '', '', '', '') > queryData('', 'S板&贵金属&新能源', '市盈率', '', 'AVG')",
+      "unresolved_targets": [
+        "沪上阿姨"
+      ],
+      "decisions": [
+        "optional_domain_extension"
+      ]
+    },
+    {
+      "excel_row": 1385,
+      "source": "indicator('', '港湾经济', '主力成交量', '', '', '', '') > queryData('', '300084', '主力成交量', '近10天', 'SUM') limit 0,7",
+      "unresolved_targets": [
+        "港湾经济"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 1386,
+      "source": "indicator('', '英美贸易业', '成交量', '三月', '', 'SUM', '') > (indicator('', '英美贸易业', '成交量', '二月', '', '', '') + indicator('', '英美贸易业', '成交量', '一月', '', '', '')) * 4",
+      "unresolved_targets": [
+        "英美贸易业"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 1459,
+      "source": "indicator('', '', '流通市值', '年初至今', '', '', '') between '[-500000000,284000000]' or rank('', '音频媒体行业&胎压监测', '流通市值', 'desc', '年初至今', '', '', 'CONS=5周') between '[10,15]'",
+      "unresolved_targets": [
+        "音频媒体行业"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 1460,
+      "source": "indicator('', '', '流通市值', '', '', '', '') between '[-500000000,284000000]' or (rank('', '音频媒体行业&胎压监测', '流通市值', 'desc', '', '', '', '') < 10 or rank('', '音频媒体行业&胎压监测', '流通市值', 'desc', '', '', '', '') > 15)",
+      "unresolved_targets": [
+        "音频媒体行业"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 1505,
+      "source": "record_high('', '994338', '', '2024年', '这个月', '', '', '') = True",
+      "unresolved_targets": [
+        "994338"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 1508,
+      "source": "record_low('', '100429', '', '2024年11月', '本月', '', '', '') = True and indicator('', '100429', '涨停', '今天', '', '', '') = True then rank('', '100429', '涨停时间', 'desc', '今天', '', '', '') > 0",
+      "unresolved_targets": [
+        "100429"
+      ],
+      "decisions": [
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 1540,
+      "source": "record_low('', 'cvpr', '', '十个月', '', '', '', '') = True and rank('', 'cvpr', '连跌天数', 'desc', '', '', '', '') <= 10",
+      "unresolved_targets": [
+        "cvpr"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 1647,
+      "source": "indicator('', '低空经济&低价&破镜', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "破镜"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 1697,
+      "source": "indicator('', '推进', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "推进"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 1749,
+      "source": "indicator('', '连扳概念', '涨跌幅', '近10日', '', '', '') > 1%",
+      "unresolved_targets": [
+        "连扳概念"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 1752,
+      "source": "rank('', '能源|金属板块', '涨幅', 'desc', '', '', '', '') > 0",
+      "unresolved_targets": [
+        "能源"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 1758,
+      "source": "indicator('', '深鱼子油|北京国投', '主力净流入', '本月', '', '', '') > 0 and indicator('', '深鱼子油|北京国投', '涨跌幅', '本月', '', '', '') ~= 0",
+      "unresolved_targets": [
+        "深鱼子油",
+        "北京国投"
+      ],
+      "decisions": [
+        "reject_ambiguous",
+        "reject_invalid"
+      ]
+    },
+    {
+      "excel_row": 1759,
+      "source": "indicator('', 'aigc|深海鱼处理行业', '涨跌幅', '', '', '', '') ~= 0",
+      "unresolved_targets": [
+        "深海鱼处理行业"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 1773,
+      "source": "indicator('', '连扳概念', '涨跌幅', '昨日', '', '', '') > 1%",
+      "unresolved_targets": [
+        "连扳概念"
+      ],
+      "decisions": [
+        "implement_derived_rule"
+      ]
+    },
+    {
+      "excel_row": 1802,
+      "source": "rank('', '上海中环概念', '最新价', 'desc', '', '', 'MIN', '') <= 5 and indicator('', '上海中环概念', '涨幅', '', '', '', '') = 15% and indicator('', '上海中环概念', '涨停', '', '', '', '') = True",
+      "unresolved_targets": [
+        "上海中环概念"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 3382,
+      "source": "indicator('沪|深|京', '^运动用品', '主力成本', '', '', '', '') < 15",
+      "unresolved_targets": [
+        "运动用品"
+      ],
+      "decisions": [
+        "pending_external_dataset"
+      ]
+    },
+    {
+      "excel_row": 3702,
+      "source": "cross_above('^沪', '^指数基金', '', '一周均线', '', '', '') = True",
+      "unresolved_targets": [
+        "指数基金"
+      ],
+      "decisions": [
+        "optional_domain_extension"
+      ]
+    },
+    {
+      "excel_row": 3981,
+      "source": "indicator('沪|深|京', '螃蟹', '', '', '', '', '') = 'all'",
+      "unresolved_targets": [
+        "螃蟹"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    },
+    {
+      "excel_row": 5313,
+      "source": "rank('沪|科创板', '科技电池', '主力净流入', 'desc', '', '', '', '') / rank('沪|科创板', '科技电池', '主力净流出', 'desc', '', '', '', '') <= 3",
+      "unresolved_targets": [
+        "科技电池"
+      ],
+      "decisions": [
+        "reject_ambiguous"
+      ]
+    }
+  ],
+  "input_sha256": {
+    "funnel": "e793ba32ed0bfa02de82c929e194d9d62502f96c3c262f4a205c216106aa2192",
+    "targets": "6008f012b0568c2006343c4878a65b76adbdd20cbe962da82222e589900d45cf",
+    "adjudications": "d7144032c73de2be30036632989108e2c7fd98c98a3922afe8df325766634311",
+    "source_registry": "8952cb4a43189298331235bd40d3a6cadfc0297d5ce72310e62375ff9e2584f0"
+  }
+}
