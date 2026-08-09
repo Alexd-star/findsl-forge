@@ -28,6 +28,14 @@ def test_compile_context_freezes_every_manifest_catalog() -> None:
     context.assert_current()
 
 
+def test_compile_context_uses_explicit_runtime_root(monkeypatch) -> None:
+    monkeypatch.setenv("FINDSL_REPO_ROOT", str(REPO_ROOT))
+
+    context = CompileContext.load()
+
+    assert context.snapshot.repo_root == REPO_ROOT.resolve()
+
+
 def test_pipeline_exposes_versioned_reproducible_plan_id() -> None:
     context = CompileContext.load(REPO_ROOT)
 

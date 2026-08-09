@@ -202,6 +202,86 @@ _SET_AGGREGATE_FUNCTIONS = {
 }
 
 
+def _merge_exist_temporal_union(left, right) -> Optional[PhysicalTemporal]:
+    if not isinstance(left, PhysicalTemporal) or not isinstance(right, PhysicalTemporal):
+        return None
+    if not isinstance(left.input, PhysicalEventProjection) or not isinstance(
+        right.input, PhysicalEventProjection
+    ):
+        return None
+    if (
+        left.mode != "EXIST"
+        or left.comparator != ">"
+        or left.threshold != 0
+        or left.maximum is not None
+        or left.every
+        or right.mode != left.mode
+        or right.comparator != left.comparator
+        or right.threshold != left.threshold
+        or right.maximum != left.maximum
+        or right.every != left.every
+        or right.unit != left.unit
+        or right.window != left.window
+        or right.trading_sequence != left.trading_sequence
+        or right.scalars != left.scalars
+        or right.input.input != left.input.input
+        or right.input.projections != left.input.projections
+    ):
+        return None
+
+    aliases = {event.alias for event in left.input.events}
+    renamed_events = []
+    alias_map = {}
+    for event in right.input.events:
+        alias = event.alias
+        suffix = 1
+        while alias in aliases:
+            alias = f"{event.alias}_{suffix}"
+            suffix += 1
+        aliases.add(alias)
+        alias_map[event.alias] = alias
+        renamed_events.append(replace(event, alias=alias))
+    right_predicate = _rename_event_refs(right.predicate, alias_map)
+    merged_input = PhysicalEventProjection(
+        left.input.input,
+        left.input.events + tuple(renamed_events),
+        left.input.projections,
+    )
+    return replace(
+        left,
+        input=merged_input,
+        predicate=PhysicalBinary(
+            "or",
+            left.predicate,
+            right_predicate,
+            BOOLEAN,
+        ),
+    )
+
+
+def _rename_event_refs(expression, aliases):
+    if isinstance(expression, PhysicalEventRef):
+        return replace(expression, alias=aliases.get(expression.alias, expression.alias))
+    if isinstance(expression, PhysicalBinary):
+        return replace(
+            expression,
+            left=_rename_event_refs(expression.left, aliases),
+            right=_rename_event_refs(expression.right, aliases),
+        )
+    if isinstance(expression, PhysicalComparison):
+        return replace(
+            expression,
+            left=_rename_event_refs(expression.left, aliases),
+            right=_rename_event_refs(expression.right, aliases),
+        )
+    if isinstance(expression, PhysicalNot):
+        return replace(
+            expression,
+            operand=_rename_event_refs(expression.operand, aliases),
+        )
+    return expression
+
+
 def plan_physical(
     lowering: LoweringResult,
     catalog: PhysicalCatalog,
@@ -255,6 +335,29 @@ def plan_physical(
             expressions=expressions,
             allow_shadow_strategies=allow_shadow_strategies,
         )
+        merged_temporal = (
+            _merge_exist_temporal_union(left.plan, right.plan)
+            if lowering.plan.operation == "union"
+            else None
+        )
+        if merged_temporal is not None:
+            validate_physical_plan(merged_temporal, catalog, expressions)
+            decisions = tuple(
+                replace(item, strategy_id=f"shared_left:{item.strategy_id}")
+                for item in left.decisions
+            ) + tuple(
+                replace(item, strategy_id=f"shared_right:{item.strategy_id}")
+                for item in right.decisions
+            )
+            resources = "+".join(
+                sorted({left.selected_resource, right.selected_resource})
+            )
+            return PhysicalPlanningResult(
+                merged_temporal,
+                resources,
+                decisions,
+                "shared_temporal_union",
+            )
         plan = PhysicalSetOperation(left.plan, right.plan, lowering.plan.operation)
         validate_physical_plan(plan, catalog, expressions)
         decisions = tuple(
@@ -1258,6 +1361,11 @@ def _grouped_aggregate_candidates(
                 constraints,
             )
             candidate_resource_id = strategy.prefix_resource_id
+            semantic_eligible = _prefix_aggregate_semantically_eligible(
+                strategy,
+                typed_date.amount,
+                statistics,
+            )
         elif isinstance(strategy, PhysicalMaterializedAggregateStrategy):
             if function != strategy.function or typed_date.amount != strategy.window:
                 continue
@@ -1300,6 +1408,7 @@ def _grouped_aggregate_candidates(
                 catalog,
                 candidate_resource_id,
             )
+            semantic_eligible = False
         else:
             continue
         if contract.limit is not None:
@@ -1314,6 +1423,7 @@ def _grouped_aggregate_candidates(
             catalog,
             statistics,
             allow_shadow_strategies,
+            semantic_eligible=semantic_eligible,
         )
         candidates.append(
             _PlanCandidate(
@@ -3314,6 +3424,8 @@ def _aggregate_strategy_decision(
     catalog,
     statistics,
     allow_shadow_strategies,
+    *,
+    semantic_eligible,
 ):
     if isinstance(strategy, PhysicalPrefixAggregateStrategy):
         resource_id = strategy.prefix_resource_id
@@ -3326,7 +3438,7 @@ def _aggregate_strategy_decision(
         access_multiplier = 1.0
         reason_label = "partition-pruned materialized feature lookup"
     selection_eligible = (
-        strategy.selection_mode == "active"
+        strategy.selection_mode == "active" and semantic_eligible
     ) or allow_shadow_strategies
     resource = catalog.resource(resource_id)
     measured_bytes = None
@@ -3360,7 +3472,8 @@ def _aggregate_strategy_decision(
             ),
             reason=(
                 f"cost models {reason_label}; access fraction {access_fraction:.6f}; "
-                f"selection mode is {strategy.selection_mode}"
+                f"selection mode is {strategy.selection_mode}; "
+                f"semantic equivalence is {'proven' if semantic_eligible else 'shadow-only'}"
             ),
             cost_unit="effective_bytes",
             cost_components=(
@@ -3378,6 +3491,19 @@ def _aggregate_strategy_decision(
         reason_code="PHYSICAL_AGGREGATE_ACCELERATION_STATISTICS_INCOMPLETE",
         reason=f"catalog priority fallback for {reason_label}",
         selection_eligible=selection_eligible,
+    )
+
+
+def _prefix_aggregate_semantically_eligible(strategy, window, statistics) -> bool:
+    if statistics is None:
+        return False
+    try:
+        source = statistics.resource(strategy.scan_resource_id)
+    except KeyError:
+        return False
+    return bool(
+        source.partition_value_count is not None
+        and window >= source.partition_value_count
     )
 
 

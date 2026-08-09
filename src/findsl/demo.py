@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import traceback
+from functools import lru_cache
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -12,7 +13,7 @@ from .diagnostics import diagnose_exception
 from .equivalence import verify_sql_equivalence
 from .evaluation import load_cases
 from .nl2dsl import suggest_dsl
-from .official.pipeline import compile_official
+from .official.service import OfficialCompilerService
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES
 
 
@@ -129,9 +130,14 @@ def analyze_dsl(
 
 
 def analyze_official_dsl(dsl: str) -> Dict[str, Any]:
-    payload = compile_official(dsl).to_dict()
+    payload = _official_service().compile(dsl)["result"]
     payload["pipeline"] = "official-antlr-ir-sqlglot"
     return payload
+
+
+@lru_cache(maxsize=1)
+def _official_service() -> OfficialCompilerService:
+    return OfficialCompilerService()
 
 
 def demo_examples(

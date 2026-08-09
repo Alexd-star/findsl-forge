@@ -23,3 +23,4 @@ outputs/official-clarification-20260713/
 .playwright-cli/
 output/playwright/
 .worktrees/
+deploy/api/service.env

@@ -1,44 +1,85 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "catalog_sha256": "3a852362faafe738938e4a13aa6ca78c58938d8082442f4f493039efe92a5ffd",
-  "collected_at": "2026-07-11T23:23:39+08:00",
+  "collected_at": "2026-08-09T13:59:31+08:00",
   "doris_version": "doris-4.1.0-rc03-5960d4cea0e",
   "resources": [
     {
+      "resource_id": "external_index_quote",
+      "row_count": 23218,
+      "data_size_bytes": 871508,
+      "row_count_available": true,
+      "partition_value_count": 8681
+    },
+    {
+      "resource_id": "external_industry_membership",
+      "row_count": 40907,
+      "data_size_bytes": 280672,
+      "row_count_available": true,
+      "partition_value_count": null
+    },
+    {
+      "resource_id": "external_instrument_rule",
+      "row_count": 5686,
+      "data_size_bytes": 104074,
+      "row_count_available": true,
+      "partition_value_count": null
+    },
+    {
+      "resource_id": "external_scope_membership",
+      "row_count": 220295,
+      "data_size_bytes": 1002113,
+      "row_count_available": true,
+      "partition_value_count": null
+    },
+    {
       "resource_id": "official_basic",
       "row_count": 13650347,
-      "data_size_bytes": 411096318,
-      "row_count_available": true
+      "data_size_bytes": 409561203,
+      "row_count_available": true,
+      "partition_value_count": 4631
     },
     {
       "resource_id": "official_basic_prefix",
       "row_count": 13650347,
-      "data_size_bytes": 393583002,
-      "row_count_available": true
+      "data_size_bytes": 392645575,
+      "row_count_available": true,
+      "partition_value_count": 4631
+    },
+    {
+      "resource_id": "official_basic_rollup",
+      "row_count": 13650347,
+      "data_size_bytes": 239789408,
+      "row_count_available": true,
+      "partition_value_count": 4631
     },
     {
       "resource_id": "official_ext",
       "row_count": 6170822,
-      "data_size_bytes": 306901418,
-      "row_count_available": true
+      "data_size_bytes": 305911562,
+      "row_count_available": true,
+      "partition_value_count": 1847
     },
     {
       "resource_id": "official_ext_prefix",
       "row_count": 13650347,
-      "data_size_bytes": 142328463,
-      "row_count_available": true
+      "data_size_bytes": 145045324,
+      "row_count_available": true,
+      "partition_value_count": 4631
     },
     {
       "resource_id": "official_security",
       "row_count": 5686,
       "data_size_bytes": 303691,
-      "row_count_available": true
+      "row_count_available": true,
+      "partition_value_count": null
     },
     {
       "resource_id": "official_technical",
       "row_count": 13650347,
-      "data_size_bytes": 1409823015,
-      "row_count_available": true
+      "data_size_bytes": 1408749273,
+      "row_count_available": true,
+      "partition_value_count": 4631
     }
   ]
 }

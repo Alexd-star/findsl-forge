@@ -56,6 +56,17 @@ def main() -> None:
     compile_cmd.add_argument("dsl", help="DSL expression")
     compile_cmd.add_argument("--json", action="store_true", help="Print full JSON result")
     compile_cmd.add_argument("--no-prefix-sum", action="store_true", help="Disable prefix-sum optimizer")
+    canonical_compile_cmd = sub.add_parser(
+        "official-compile",
+        help="Compile official DSL through the canonical ANTLR/IR/Doris pipeline",
+    )
+    canonical_compile_cmd.add_argument("dsl")
+    canonical_compile_cmd.add_argument(
+        "--strategy-mode",
+        choices=("auto", "force_baseline", "force_candidate"),
+        default="auto",
+    )
+    canonical_compile_cmd.add_argument("--json", action="store_true")
     official_parse_cmd = sub.add_parser("official-slot-parse", help="Parse official slot DSL into an AST")
     official_parse_cmd.add_argument("dsl", help="Official slot DSL expression")
     official_parse_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
@@ -302,6 +313,10 @@ def main() -> None:
     demo_cmd.add_argument("--port", type=int, default=8765, help="Port for the demo server")
     demo_cmd.add_argument("--data-dir", default="data/samples", help="Directory containing sample CSV tables")
     demo_cmd.add_argument("--input", default="data/samples/queries.jsonl", help="Input JSONL examples")
+    api_cmd = sub.add_parser("serve-api", help="Start the production-oriented official compiler API")
+    api_cmd.add_argument("--host", default="127.0.0.1")
+    api_cmd.add_argument("--port", type=int, default=8766)
+    api_cmd.add_argument("--log-level", choices=("critical", "error", "warning", "info"), default="info")
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -315,6 +330,18 @@ def main() -> None:
             for item in result.trace:
                 print(f"- {item}")
             print(f"Elapsed: {result.elapsed_ms:.3f} ms")
+    elif args.command == "official-compile":
+        from .official.pipeline import OfficialPipelineOptions
+        from .official.service import OfficialCompilerService
+
+        result = OfficialCompilerService().compile(
+            args.dsl,
+            options=OfficialPipelineOptions(strategy_mode=args.strategy_mode),
+        )
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            print(result["result"]["backend"]["sql"])
     elif args.command == "official-slot-parse":
         from .official_slot import OfficialSlotError, parse_official_slot_with_diagnostics
 
@@ -981,6 +1008,17 @@ def main() -> None:
             port=args.port,
             data_dir=Path(args.data_dir),
             cases_path=Path(args.input),
+        )
+    elif args.command == "serve-api":
+        import uvicorn
+
+        from .official.api import ApiSettings, create_app
+
+        uvicorn.run(
+            create_app(settings=ApiSettings.from_env()),
+            host=args.host,
+            port=args.port,
+            log_level=args.log_level,
         )
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -162,7 +163,11 @@ class CompileContext:
         repo_root: Path | None = None,
         manifest_path: Path | None = None,
     ) -> "CompileContext":
-        root = Path(repo_root or Path(__file__).resolve().parents[3]).resolve()
+        root = Path(
+            repo_root
+            or os.getenv("FINDSL_REPO_ROOT")
+            or Path(__file__).resolve().parents[3]
+        ).resolve()
         snapshot = CatalogSnapshot.capture(root, manifest_path)
         paths = snapshot.paths
         registry = OfficialIndicatorRegistry.load(paths["indicator_registry"])

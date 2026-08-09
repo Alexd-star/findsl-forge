@@ -10,7 +10,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 from .catalog import PhysicalCatalog
 
@@ -28,6 +28,7 @@ class PhysicalResourceStatistics:
     row_count: int
     data_size_bytes: int
     row_count_available: bool
+    partition_value_count: Optional[int] = None
 
 
 class PhysicalStatisticsSnapshot:
@@ -41,7 +42,7 @@ class PhysicalStatisticsSnapshot:
         resources: Tuple[PhysicalResourceStatistics, ...],
         catalog: PhysicalCatalog,
     ):
-        if schema_version != 1:
+        if schema_version not in {1, 2}:
             raise PhysicalStatisticsError(f"unsupported statistics schema version: {schema_version}")
         if not _SHA256.fullmatch(catalog_sha256):
             raise PhysicalStatisticsError("invalid catalog fingerprint")
@@ -66,6 +67,10 @@ class PhysicalStatisticsSnapshot:
                 raise PhysicalStatisticsError(f"unknown statistics resource: {item.resource_id}") from exc
             if item.row_count < 0 or item.data_size_bytes < 0:
                 raise PhysicalStatisticsError(f"negative statistics value for {item.resource_id}")
+            if item.partition_value_count is not None and item.partition_value_count <= 0:
+                raise PhysicalStatisticsError(
+                    f"invalid partition value count for {item.resource_id}"
+                )
             index[item.resource_id] = item
 
         self.schema_version = schema_version
@@ -121,8 +126,13 @@ class PhysicalStatisticsSnapshot:
 
 
 def _resource(raw) -> PhysicalResourceStatistics:
-    expected = {"resource_id", "row_count", "data_size_bytes", "row_count_available"}
-    if not isinstance(raw, dict) or set(raw) != expected:
+    required = {"resource_id", "row_count", "data_size_bytes", "row_count_available"}
+    allowed = required | {"partition_value_count"}
+    if (
+        not isinstance(raw, dict)
+        or not required.issubset(raw)
+        or not set(raw).issubset(allowed)
+    ):
         raise PhysicalStatisticsError("invalid resource statistics fields")
     if isinstance(raw["row_count"], bool) or not isinstance(raw["row_count"], int):
         raise PhysicalStatisticsError("resource row_count must be an integer")
@@ -130,11 +140,18 @@ def _resource(raw) -> PhysicalResourceStatistics:
         raise PhysicalStatisticsError("resource data_size_bytes must be an integer")
     if not isinstance(raw["row_count_available"], bool):
         raise PhysicalStatisticsError("resource row_count_available must be a boolean")
+    partition_value_count = raw.get("partition_value_count")
+    if (
+        partition_value_count is not None
+        and (isinstance(partition_value_count, bool) or not isinstance(partition_value_count, int))
+    ):
+        raise PhysicalStatisticsError("partition_value_count must be an integer or null")
     return PhysicalResourceStatistics(
         resource_id=str(raw["resource_id"]),
         row_count=raw["row_count"],
         data_size_bytes=raw["data_size_bytes"],
         row_count_available=raw["row_count_available"],
+        partition_value_count=partition_value_count,
     )
 
 
@@ -200,18 +217,35 @@ def collect_physical_statistics(catalog, config, *, runner=None, collected_at=No
             row_count = int(rows[0]["row_count"])
         except ValueError as exc:
             raise PhysicalStatisticsError(f"invalid row_count for {resource.table}") from exc
+        partition_value_count = None
+        if resource.partition_key is not None:
+            partition_rows = _metadata_rows(
+                config,
+                (
+                    f"SELECT COUNT(DISTINCT `{resource.partition_key}`) AS partition_value_count "
+                    f"FROM `{resource.database}`.`{resource.table}`"
+                ),
+                runner,
+                database=resource.database,
+            )
+            if len(partition_rows) != 1:
+                raise PhysicalStatisticsError(
+                    f"partition value count is unavailable for {resource.table}"
+                )
+            partition_value_count = int(partition_rows[0]["partition_value_count"])
         resources.append(
             PhysicalResourceStatistics(
                 resource_id=resource.resource_id,
                 row_count=row_count,
                 data_size_bytes=sizes[(resource.database, resource.table)],
                 row_count_available=True,
+                partition_value_count=partition_value_count,
             )
         )
 
     timestamp = collected_at or datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
     return PhysicalStatisticsSnapshot(
-        schema_version=1,
+        schema_version=2,
         catalog_sha256=catalog.fingerprint,
         collected_at=timestamp,
         doris_version=doris_version,

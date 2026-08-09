@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "case_count": 126,
-  "approved": 126,
+  "case_count": 127,
+  "approved": 127,
   "cases": {
     "CORR-PHASE10-JOIN-DORIS-001-BASIC-EXT-LATEST": {
       "source_report": "reports/phase10_join_doris.json",
@@ -533,43 +533,43 @@
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-001-EXACT-NAME-UNIVERSE": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "exact_name_universe",
       "source_case_index": 1,
       "historical_matched": true,
-      "historical_expected_count": 3675,
-      "historical_actual_count": 3675,
-      "historical_expected_sha256": "01839b5263d6ffb8726d6a8f88fc7b168ebdf2554c567541bdbb48899118c725",
-      "historical_actual_sha256": "01839b5263d6ffb8726d6a8f88fc7b168ebdf2554c567541bdbb48899118c725",
-      "reference_sha256": "86e49c4b4565a33fbc91784e497e470eaeb3688eb222eb5bbd99df04a91a74af"
+      "historical_expected_count": 1,
+      "historical_actual_count": 1,
+      "historical_expected_sha256": "64ba82d725777d19b5db364d0d81226dcd94f4a54c37a379ef85c6eb4c872ced",
+      "historical_actual_sha256": "64ba82d725777d19b5db364d0d81226dcd94f4a54c37a379ef85c6eb4c872ced",
+      "reference_sha256": "a8e24a8ebb9fe299ecb4dc516b55605a57d6cf7870cd12b855a30f4fc6b28605"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-002-MARKET-AND-EXACT-NAME": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "market_and_exact_name",
       "source_case_index": 2,
       "historical_matched": true,
-      "historical_expected_count": 3681,
-      "historical_actual_count": 3681,
-      "historical_expected_sha256": "3aa5c11d97dc7fd5fd646c1e68f1b89545e3848b52d49b59bd33b83823b455b6",
-      "historical_actual_sha256": "3aa5c11d97dc7fd5fd646c1e68f1b89545e3848b52d49b59bd33b83823b455b6",
-      "reference_sha256": "337093b47cfe578b1c8a2256c3a1c0e68cc04eef71223392347b19ff3a86715f"
+      "historical_expected_count": 1,
+      "historical_actual_count": 1,
+      "historical_expected_sha256": "177cbc12717ecc6d7fc5aabaff6da38aa62b7e0ec92c4fb65d64cb83fc9ab8b1",
+      "historical_actual_sha256": "177cbc12717ecc6d7fc5aabaff6da38aa62b7e0ec92c4fb65d64cb83fc9ab8b1",
+      "reference_sha256": "b725478007d2abf0b9a9d360d714d4227ad9cf9a10cf0fd20814175f0d125854"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-003-EXPLICIT-NAME-AND-CODE": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "explicit_name_and_code",
       "source_case_index": 3,
       "historical_matched": true,
-      "historical_expected_count": 1958,
-      "historical_actual_count": 1958,
-      "historical_expected_sha256": "6d4a47d2726a890f94dc54489847c40a02e0fed7e13e74a125cb815f325f5d0b",
-      "historical_actual_sha256": "6d4a47d2726a890f94dc54489847c40a02e0fed7e13e74a125cb815f325f5d0b",
-      "reference_sha256": "f6a280307de739f36f17ab28bf0f04ab6122da4d7e581a60c383e676b3bb6862"
+      "historical_expected_count": 1,
+      "historical_actual_count": 1,
+      "historical_expected_sha256": "fc22e96028169e3072018eea4ad88dd197e0720ff4a787e25085260efec2d34e",
+      "historical_actual_sha256": "fc22e96028169e3072018eea4ad88dd197e0720ff4a787e25085260efec2d34e",
+      "reference_sha256": "d1201a571ed49ce4eeb133a12786a0509cd901b955586fc8964645dd5cf130fa"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-004-DIRECT-QUERYDATA-SCALAR": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "direct_querydata_scalar",
       "source_case_index": 4,
       "historical_matched": true,
@@ -581,7 +581,7 @@
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-005-GLOBAL-QUERYDATA-AGGREGATE": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "global_querydata_aggregate",
       "source_case_index": 5,
       "historical_matched": true,
@@ -593,7 +593,7 @@
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-006-RANK-WITH-EXACT-NAME-SCOPE": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "rank_with_exact_name_scope",
       "source_case_index": 6,
       "historical_matched": true,
@@ -605,15 +605,15 @@
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-007-EXACT-NAME-UNION": {
       "source_report": "reports/phase19_security_scope_doris.json",
-      "source_git_head": "e39fbacb21ca57fbb51f4a581b56b200d4811e62",
+      "source_git_head": "431f9397a0bd72acae67d377087593e2e9b4491d",
       "source_case_name": "exact_name_union",
       "source_case_index": 7,
       "historical_matched": true,
-      "historical_expected_count": 6290,
-      "historical_actual_count": 6290,
-      "historical_expected_sha256": "ae4921a56a90ec29b0a3db8dc061173ba83c164d47c826e59ca882820e544962",
-      "historical_actual_sha256": "ae4921a56a90ec29b0a3db8dc061173ba83c164d47c826e59ca882820e544962",
-      "reference_sha256": "a814e60b36700ee18f177cfa4e6a06977203d81ae809127dbcf3e0045568f4b1"
+      "historical_expected_count": 2,
+      "historical_actual_count": 2,
+      "historical_expected_sha256": "1598add4221783f05b250a2aae444bb1475dd55fa83e319771ad0a1d2e225e52",
+      "historical_actual_sha256": "1598add4221783f05b250a2aae444bb1475dd55fa83e319771ad0a1d2e225e52",
+      "reference_sha256": "31b8fb1915bc66f6cb0ba2e0fe7c4baf57e65eb1ab49bfe8a5c54736b54b4e57"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-001-CIRCULATING-MARKET-VALUE": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -1514,6 +1514,11 @@
       "historical_expected_sha256": "5a14c369f70c5c8265029695b6f0027b4caee754740833a04354e0306c84917d",
       "historical_actual_sha256": "5a14c369f70c5c8265029695b6f0027b4caee754740833a04354e0306c84917d",
       "reference_sha256": "f76b86724eca0dc8d9854eb6682cd08a68db4edf24077ef910efa672ae510bf8"
+    },
+    "CORR-ADAPTIVE-AGGREGATE-002": {
+      "source_report": "data/official_correctness/manual_cases.jsonl",
+      "source_git_head": "current",
+      "reference_sha256": "2cfeb494ed3d62969f138c457fcab9dfe55ca521280a82b81eb25a3a867676ee"
     }
   }
 }

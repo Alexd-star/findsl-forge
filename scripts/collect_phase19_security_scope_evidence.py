@@ -57,7 +57,7 @@ def main() -> int:
             "reference": (
                 f"SELECT b.mktcode,b.tgtcode,b.bizdate FROM {basic} AS b "
                 f"INNER JOIN {security} AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode "
-                "WHERE s.name='华泰证券'"
+                f"WHERE s.name='华泰证券' AND b.bizdate='{latest}'"
             ),
         },
         {
@@ -67,7 +67,7 @@ def main() -> int:
                 f"SELECT b.mktcode,b.tgtcode,b.bizdate FROM {basic} AS b "
                 f"INNER JOIN {security} AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode "
                 "WHERE s.name='机器人' AND b.mktcode=0 "
-                "AND b.tgtcode>='300000' AND b.tgtcode<='301999'"
+                f"AND b.tgtcode>='300000' AND b.tgtcode<='301999' AND b.bizdate='{latest}'"
             ),
         },
         {
@@ -76,7 +76,8 @@ def main() -> int:
             "reference": (
                 f"SELECT b.mktcode,b.tgtcode,b.bizdate FROM {basic} AS b "
                 f"INNER JOIN {security} AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode "
-                "WHERE s.name='珀莱雅' AND s.mktcode=1 AND s.tgtcode='603605'"
+                f"WHERE s.name='珀莱雅' AND s.mktcode=1 AND s.tgtcode='603605' "
+                f"AND b.bizdate='{latest}'"
             ),
         },
         {
@@ -132,7 +133,7 @@ def main() -> int:
             "reference": (
                 f"SELECT b.mktcode,b.tgtcode,b.bizdate FROM {basic} AS b "
                 f"INNER JOIN {security} AS s ON s.mktcode=b.mktcode AND s.tgtcode=b.tgtcode "
-                "WHERE s.name IN ('华泰证券','中科曙光')"
+                f"WHERE s.name IN ('华泰证券','中科曙光') AND b.bizdate='{latest}'"
             ),
         },
     )

@@ -43,6 +43,12 @@ class DorisDigestResult:
     sha256: str
 
 
+@dataclass(frozen=True)
+class DorisExplainResult:
+    text: str
+    elapsed_ms: float
+
+
 def execute_doris_query(
     config: DorisExecutionConfig,
     sql: str,
@@ -50,14 +56,15 @@ def execute_doris_query(
     runner: Callable = subprocess.run,
 ) -> DorisExecutionResult:
     statements = sqlglot.parse(sql, read="doris")
-    if len(statements) != 1 or not isinstance(statements[0], exp.Select):
-        raise DorisExecutionError("only one Doris SELECT statement may be executed")
+    if len(statements) != 1 or not isinstance(statements[0], exp.Query):
+        raise DorisExecutionError("only one Doris read-only query may be executed")
 
     command = [
         config.mysql_executable,
         "--batch",
         "--raw",
         "--skip-column-names",
+        "--default-character-set=utf8mb4",
         "--host", config.host,
         "--port", str(config.port),
         "--user", config.user,
@@ -72,6 +79,8 @@ def execute_doris_query(
         command,
         env=environment,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         timeout=config.timeout_seconds,
         check=False,
@@ -102,13 +111,14 @@ def execute_doris_query_digest(
     popen_factory=subprocess.Popen,
 ) -> DorisDigestResult:
     statements = sqlglot.parse(sql, read="doris")
-    if len(statements) != 1 or not isinstance(statements[0], exp.Select):
-        raise DorisExecutionError("only one Doris SELECT statement may be executed")
+    if len(statements) != 1 or not isinstance(statements[0], exp.Query):
+        raise DorisExecutionError("only one Doris read-only query may be executed")
     command = [
         config.mysql_executable,
         "--batch",
         "--raw",
         "--skip-column-names",
+        "--default-character-set=utf8mb4",
         "--host", config.host,
         "--port", str(config.port),
         "--user", config.user,
@@ -123,6 +133,8 @@ def execute_doris_query_digest(
         command,
         env=environment,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -141,3 +153,49 @@ def execute_doris_query_digest(
             detail = detail.replace(config.password, "<redacted>")
         raise DorisExecutionError(f"Doris client exited with {process.returncode}: {detail}")
     return DorisDigestResult(row_count=row_count, elapsed_ms=elapsed_ms, sha256=digest.hexdigest())
+
+
+def execute_doris_explain(
+    config: DorisExecutionConfig,
+    sql: str,
+    *,
+    runner: Callable = subprocess.run,
+) -> DorisExplainResult:
+    statement = sqlglot.parse_one("EXPLAIN " + sql.rstrip(";"), read="doris")
+    if not isinstance(statement, exp.Describe) or not isinstance(statement.this, exp.Query):
+        raise DorisExecutionError("only EXPLAIN of one Doris read-only query may be executed")
+    command = [
+        config.mysql_executable,
+        "--batch",
+        "--raw",
+        "--skip-column-names",
+        "--default-character-set=utf8mb4",
+        "--host", config.host,
+        "--port", str(config.port),
+        "--user", config.user,
+        "--database", config.database,
+        "--execute", "EXPLAIN " + sql.rstrip(";"),
+    ]
+    environment = os.environ.copy()
+    if config.password:
+        environment["MYSQL_PWD"] = config.password
+    started = perf_counter()
+    completed = runner(
+        command,
+        env=environment,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        timeout=config.timeout_seconds,
+        check=False,
+    )
+    elapsed_ms = (perf_counter() - started) * 1000.0
+    if completed.returncode != 0:
+        detail = (completed.stderr or "Doris EXPLAIN failed").strip()
+        if config.password:
+            detail = detail.replace(config.password, "<redacted>")
+        raise DorisExecutionError(
+            f"Doris client exited with {completed.returncode}: {detail}"
+        )
+    return DorisExplainResult(completed.stdout.strip(), elapsed_ms)

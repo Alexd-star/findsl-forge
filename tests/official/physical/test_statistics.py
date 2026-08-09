@@ -83,10 +83,5 @@ def test_default_statistics_snapshot_is_bound_to_all_catalog_resources():
 
     assert snapshot.catalog_sha256 == catalog.fingerprint
     assert {item.resource_id for item in snapshot.resources} == {
-        "official_basic",
-        "official_ext",
-        "official_security",
-        "official_technical",
-        "official_basic_prefix",
-        "official_ext_prefix",
+        item.resource_id for item in catalog.resources
     }

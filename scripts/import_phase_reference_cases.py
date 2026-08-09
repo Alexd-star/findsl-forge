@@ -22,6 +22,11 @@ def main() -> None:
     )
     parser.add_argument("--snapshot-id", required=True)
     parser.add_argument("--policy-id", default="official-semantic-policy-v1")
+    parser.add_argument(
+        "--manual-manifest",
+        type=Path,
+        default=Path("data/official_correctness/manual_cases.jsonl"),
+    )
     parser.add_argument("--reviewer", default="")
     parser.add_argument("--approve-matched", action="store_true")
     parser.add_argument("--force", action="store_true")
@@ -122,15 +127,32 @@ def main() -> None:
         reference_path.write_text(reference_sql.rstrip(";") + ";\n", encoding="utf-8")
         manifest_lines.append(json.dumps(item, ensure_ascii=False, sort_keys=True))
         provenance[item["case_id"]] = case_provenance
+    manual_rows = []
+    if args.manual_manifest.is_file():
+        for line in args.manual_manifest.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            manual = json.loads(line)
+            if manual["case_id"] in provenance:
+                raise ValueError(f"duplicate manual correctness case: {manual['case_id']}")
+            manual_rows.append(manual)
+            manifest_lines.append(json.dumps(manual, ensure_ascii=False, sort_keys=True))
+            provenance[manual["case_id"]] = {
+                "source_report": args.manual_manifest.as_posix(),
+                "source_git_head": "current",
+                "reference_sha256": hashlib.sha256(
+                    (output_root / manual["reference_sql_path"]).read_bytes()
+                ).hexdigest(),
+            }
     manifest_path.write_text("\n".join(manifest_lines) + "\n", encoding="utf-8")
     provenance_path.write_text(
         json.dumps(
             {
                 "schema_version": 1,
-                "case_count": len(imported),
+                "case_count": len(imported) + len(manual_rows),
                 "approved": sum(
                     1 for item in imported if item["review_status"] == "approved"
-                ),
+                ) + sum(1 for item in manual_rows if item["review_status"] == "approved"),
                 "cases": provenance,
             },
             ensure_ascii=False,
@@ -145,9 +167,10 @@ def main() -> None:
                 "manifest": str(manifest_path),
                 "provenance": str(provenance_path),
                 "imported": len(imported),
+                "manual": len(manual_rows),
                 "approved": sum(
                     1 for item in imported if item["review_status"] == "approved"
-                ),
+                ) + sum(1 for item in manual_rows if item["review_status"] == "approved"),
             },
             ensure_ascii=False,
         )

@@ -1,0 +1,36 @@
+services:
+  findsl-api:
+    build:
+      context: ../..
+      dockerfile: deploy/api/Dockerfile
+    image: findsl-forge-api:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    ports:
+      - "127.0.0.1:8766:8766"
+    env_file:
+      - service.env
+    volumes:
+      - findsl-audit:/var/log/findsl
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 1g
+    cpus: 2.0
+    pids_limit: 256
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8766/v1/health/ready', timeout=2)
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  findsl-audit:

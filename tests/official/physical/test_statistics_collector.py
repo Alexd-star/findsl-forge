@@ -77,6 +77,13 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
                 f"{name}\t{sizes[name]}\t16\t0.000" for name in sorted(expected)
             )
             return SimpleNamespace(returncode=0, stdout="\n".join(lines) + "\n", stderr="")
+        if sql.startswith("SELECT COUNT(DISTINCT"):
+            table = sql.split("`")[5]
+            return SimpleNamespace(
+                returncode=0,
+                stdout="partition_value_count\n4631\n",
+                stderr="",
+            )
         table = sql.split("`")[1]
         return SimpleNamespace(
             returncode=0,
@@ -93,10 +100,19 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
 
     assert snapshot.resource("official_ext").row_count == 6170822
     assert snapshot.resource("official_basic").data_size_bytes == 411096318
+    assert snapshot.resource("official_basic").partition_value_count == 4631
+    assert snapshot.resource("official_security").partition_value_count is None
+    assert snapshot.schema_version == 2
     assert snapshot.doris_version == "doris-4.1.0-rc03-5960d4cea0e"
     assert all("secret" not in part for command, _ in calls for part in command)
     assert all(kwargs["env"]["MYSQL_PWD"] == "secret" for _, kwargs in calls)
-    assert len(calls) == 14
+    expected_calls = (
+        1
+        + len({resource.database for resource in catalog.resources})
+        + len(catalog.resources)
+        + sum(resource.partition_key is not None for resource in catalog.resources)
+    )
+    assert len(calls) == expected_calls
 
 
 def test_collector_rejects_missing_show_data_resource():

@@ -14,14 +14,17 @@ def _source(window=20, function="SUM", indicator="成交量"):
     )
 
 
-def test_auto_selects_matching_materialized_aggregate_candidate():
+def test_auto_rejects_row_window_materialization_for_global_session_semantics():
     result = compile_official(_source()).to_dict()
 
-    assert result["physical"]["selected_strategy"] == "volume_sum_20_materialized"
-    assert result["physical"]["plan"]["kind"] == "PhysicalFilter"
-    assert "hsj_stock_hq_basic_rollup" in result["backend"]["sql"]
-    assert "volume_sum_20" in result["backend"]["sql"]
-    assert "SUM(" not in result["backend"]["sql"]
+    assert result["physical"]["selected_strategy"] == "grouped_aggregate"
+    materialized = next(
+        item
+        for item in result["physical"]["decisions"]
+        if item["strategy_id"] == "volume_sum_20_materialized"
+    )
+    assert materialized["selection_eligible"] is False
+    assert "SUM(`q`.`volume`)" in result["backend"]["sql"]
     assert result["backend"]["validation_passed"] is True
 
 
@@ -36,8 +39,11 @@ def test_long_window_uses_generic_prefix_endpoint_candidate():
     assert "GROUP BY" not in result["backend"]["sql"]
 
 
-def test_prefix_average_uses_non_null_count_delta():
-    result = compile_official(_source(window=30, function="AVG")).to_dict()
+def test_force_candidate_exposes_short_window_candidate_for_validation_only():
+    result = compile_official(
+        _source(window=30, function="AVG"),
+        OfficialPipelineOptions(strategy_mode="force_candidate"),
+    ).to_dict()
     sql = result["backend"]["sql"]
 
     assert result["physical"]["selected_strategy"] == "volume_prefix_aggregate"
@@ -74,7 +80,8 @@ def test_force_candidate_requires_a_non_baseline_candidate():
 
 def test_materialized_plan_retains_market_constraint():
     result = compile_official(
-        "indicator('沪', '', '成交量', '近20日', '', 'SUM', '') > 100"
+        "indicator('沪', '', '成交量', '近20日', '', 'SUM', '') > 100",
+        OfficialPipelineOptions(strategy_mode="force_candidate"),
     ).to_dict()
     sql = result["backend"]["sql"]
 
@@ -87,9 +94,9 @@ def test_candidate_decisions_preserve_baseline_and_rejected_alternatives():
     decisions = result["physical"]["decisions"]
 
     assert [item["strategy_id"] for item in decisions] == [
+        "grouped_aggregate",
         "volume_sum_20_materialized",
         "volume_prefix_aggregate",
-        "grouped_aggregate",
     ]
     assert sum(item["selected"] for item in decisions) == 1
     assert all(item["cost"] is not None for item in decisions)
