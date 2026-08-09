@@ -9,6 +9,7 @@
     "official_real_data.doris.git_head",
     "official_real_data.performance_matrix.git_head",
     "official_real_data.long_horizon.git_head",
+    "formal_correctness.git_head",
     "doris_cluster.git_head"
   ],
   "datasets": [
@@ -77,7 +78,7 @@
       "denominator_set": "独立判定 eligible 且有冻结 reference SQL 的正式正确率用例",
       "proves": "生成 SQL 与独立真值完整结果行集一致的比例",
       "does_not_prove": "官方未提供数据域的语句已经可执行，或所有未来语句均正确",
-      "required": false
+      "required": true
     },
     {
       "metric_id": "compile_p95_latency",

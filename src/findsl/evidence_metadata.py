@@ -31,6 +31,10 @@ def build_evidence_metadata(
         warn_missing=False,
     )
     official_performance_payload = _read_optional_json(
+        snapshot_dir / "official_full_performance_matrix.json",
+        warnings,
+        warn_missing=False,
+    ) or _read_optional_json(
         snapshot_dir / "official_query_performance_matrix.json",
         warnings,
         warn_missing=False,
@@ -768,6 +772,8 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
         return {
             "available": False,
             "query_count": None,
+            "passed": None,
+            "all_matched_reference": None,
             "all_queries_under_10s": None,
             "max_p95_ms": None,
             "mean_avg_ms": None,
@@ -776,13 +782,41 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
             "baseline_prefix_row_count_match": None,
             "baseline_vs_prefix_speedup": None,
             "baseline_vs_prefix_speedup_display": None,
+            "warmups": None,
+            "repeats": None,
+            "catalog_snapshot_id": None,
             "git_head": None,
+        }
+    if "case_count" in payload:
+        return {
+            "available": True,
+            "query_count": _int_or_none(payload.get("case_count")),
+            "passed": _int_or_none(payload.get("passed")),
+            "all_matched_reference": _bool_or_none(
+                payload.get("all_matched_reference")
+            ),
+            "all_queries_under_10s": _bool_or_none(
+                payload.get("all_queries_under_10s")
+            ),
+            "max_p95_ms": _number_or_none(payload.get("max_p95_ms")),
+            "mean_avg_ms": None,
+            "prefix_query_count": None,
+            "window_query_count": None,
+            "baseline_prefix_row_count_match": None,
+            "baseline_vs_prefix_speedup": None,
+            "baseline_vs_prefix_speedup_display": None,
+            "warmups": _int_or_none(payload.get("warmups")),
+            "repeats": _int_or_none(payload.get("repeats")),
+            "catalog_snapshot_id": payload.get("catalog_snapshot_id"),
+            "git_head": payload.get("git_head"),
         }
     summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
     speedup = _number_or_none(summary.get("baseline_vs_prefix_speedup"))
     return {
         "available": True,
         "query_count": _int_or_none(summary.get("query_count")),
+        "passed": None,
+        "all_matched_reference": None,
         "all_queries_under_10s": _bool_or_none(summary.get("all_queries_under_10s")),
         "max_p95_ms": _number_or_none(summary.get("max_p95_ms")),
         "mean_avg_ms": _number_or_none(summary.get("mean_avg_ms")),
@@ -791,6 +825,9 @@ def _official_performance_matrix_metadata(payload: dict[str, Any] | None) -> dic
         "baseline_prefix_row_count_match": _bool_or_none(summary.get("baseline_prefix_row_count_match")),
         "baseline_vs_prefix_speedup": speedup,
         "baseline_vs_prefix_speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
+        "warmups": None,
+        "repeats": None,
+        "catalog_snapshot_id": None,
         "git_head": payload.get("git_head") or summary.get("git_head"),
     }
 
@@ -1174,6 +1211,9 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
         "official_slot_coverage_json": str(snapshot_dir / "official_slot_coverage.json"),
         "official_query_performance_matrix_json": str(snapshot_dir / "official_query_performance_matrix.json"),
+        "official_full_performance_matrix_json": str(
+            snapshot_dir / "official_full_performance_matrix.json"
+        ),
         "official_compiler_funnel_json": str(snapshot_dir / "official_compiler_funnel.json"),
         "official_correctness_benchmark_json": str(
             snapshot_dir / "official_correctness_benchmark.json"

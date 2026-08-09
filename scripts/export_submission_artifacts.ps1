@@ -26,6 +26,8 @@ $reportFiles = @(
   "official_compiler_funnel.json",
   "official_correctness_benchmark.md",
   "official_correctness_benchmark.json",
+  "official_full_performance_matrix.md",
+  "official_full_performance_matrix.json",
   "official_query_performance_matrix.md",
   "official_query_performance_matrix.json",
   "phase42_long_horizon_doris.md",

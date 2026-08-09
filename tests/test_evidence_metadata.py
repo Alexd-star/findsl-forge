@@ -305,6 +305,37 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["warnings"] == []
 
 
+def test_build_evidence_metadata_prefers_full_performance_matrix(tmp_path: Path) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "official_full_performance_matrix.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 2,
+                "git_head": "f" * 40,
+                "catalog_snapshot_id": "c" * 64,
+                "case_count": 48,
+                "passed": 48,
+                "all_matched_reference": True,
+                "all_queries_under_10s": True,
+                "max_p95_ms": 2856.5635,
+                "warmups": 1,
+                "repeats": 7,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    metadata = build_evidence_metadata(snapshot_dir=snapshot_dir)
+    performance = metadata["official_real_data"]["performance_matrix"]
+
+    assert performance["query_count"] == 48
+    assert performance["passed"] == 48
+    assert performance["all_matched_reference"] is True
+    assert performance["max_p95_ms"] == 2856.5635
+    assert performance["repeats"] == 7
+
+
 def test_build_evidence_metadata_prefers_phase22_and_indexes_stage_rank_evidence(
     tmp_path: Path,
 ) -> None:

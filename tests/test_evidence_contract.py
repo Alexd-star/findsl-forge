@@ -53,6 +53,11 @@ def _metadata() -> dict:
             "legacy_to_new_migrated": 1044,
             "new_backend_success": 1076,
         },
+        "formal_correctness": {
+            "git_head": HEAD,
+            "eligible_total": 127,
+            "matched": 127,
+        },
         "doris_cluster": {"git_head": HEAD},
     }
 
@@ -67,7 +72,7 @@ def test_repository_evidence_contract_is_valid_and_auditable() -> None:
     assert audit["metrics"]["legacy_migration_coverage"]["ratio"] == pytest.approx(
         1044 / 1097
     )
-    assert audit["metrics"]["sql_correctness"]["available"] is False
+    assert audit["metrics"]["sql_correctness"]["ratio"] == 1.0
 
 
 def test_evidence_contract_rejects_mixed_current_heads() -> None:
