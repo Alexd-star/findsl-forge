@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-31T18:12:59Z",
+  "generated_at": "2026-08-09T07:50:51Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "96e0363",
-    "head_at_export": "96e0363",
+    "head_at_report_generation": "6f3bcae",
+    "head_at_export": "6f3bcae",
     "branch": "feat/antlr-calcite-architecture"
   },
   "readiness": {
-    "generated_at": "2026-07-31T18:12:46+00:00",
+    "generated_at": "2026-08-09T07:50:23+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.611,
+    "compile_p95_latency_ms": 1.257,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,8 +23,8 @@
       "total": 13
     },
     "pytest": {
-      "passed": 1040,
-      "elapsed_seconds": 200.84
+      "passed": 1095,
+      "elapsed_seconds": 177.69
     }
   },
   "official_suite": {
@@ -43,19 +43,21 @@
       "available": true,
       "feature_tables_available": true,
       "baseline_prefix_row_count_match": true,
-      "baseline_vs_prefix_speedup": 13.986,
-      "baseline_vs_prefix_speedup_display": "13.99x",
+      "baseline_vs_prefix_speedup": 13.835,
+      "baseline_vs_prefix_speedup_display": "13.84x",
       "row_counts": {
+        "hsj_stock_hq_basic": 13650347,
         "hsj_stock_hq_ext": 6170822,
-        "hsj_stock_code_info": 5686,
-        "hsj_stock_hq_basic": 13650347
+        "hsj_stock_code_info": 5686
       },
       "feature_table_row_counts": {
-        "hsj_stock_hq_basic_rollup": 13650347,
         "hsj_stock_hq_basic_prefix": 13650347,
+        "hsj_stock_hq_basic_technical": 13650347,
         "hsj_stock_hq_ext_prefix": 13650347,
-        "hsj_stock_hq_basic_technical": 13650347
-      }
+        "hsj_stock_hq_basic_rollup": 13650347
+      },
+      "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "snapshot_fingerprint": "9867fffd0f3514d3960679032e1152ec1265cf66f331598f14a26a835567fff6"
     },
     "slot_coverage": {
       "available": true,
@@ -65,37 +67,49 @@
       "compile_ok": 1830,
       "compile_failed": 3969,
       "compile_rate_on_all_rows": 0.315572,
-      "compile_rate_on_parse_ok": 0.315572
+      "compile_rate_on_parse_ok": 0.315572,
+      "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623"
     },
     "performance_matrix": {
       "available": true,
-      "query_count": 6,
+      "query_count": 48,
+      "passed": 48,
+      "all_matched_reference": true,
       "all_queries_under_10s": true,
-      "max_p95_ms": 61.269,
-      "mean_avg_ms": 45.492,
-      "prefix_query_count": 1,
-      "window_query_count": 2,
-      "baseline_prefix_row_count_match": true,
-      "baseline_vs_prefix_speedup": 1.173,
-      "baseline_vs_prefix_speedup_display": "1.17x"
+      "max_p95_ms": 2889.6428,
+      "mean_avg_ms": null,
+      "prefix_query_count": null,
+      "window_query_count": null,
+      "baseline_prefix_row_count_match": null,
+      "baseline_vs_prefix_speedup": null,
+      "baseline_vs_prefix_speedup_display": null,
+      "warmups": 1,
+      "repeats": 7,
+      "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
+      "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9"
     },
     "long_horizon": {
       "available": true,
       "status": "PASS",
-      "speedup": 40.521739,
-      "speedup_display": "40.52x",
+      "speedup": 16.285714,
+      "speedup_display": "16.29x",
       "target_speedup": 10.0,
       "target_met": true,
-      "result_row_count": 5487,
+      "result_row_count": 5614,
       "complete_result_hash_match": true,
-      "baseline_median_ms": 932.0,
-      "optimized_median_ms": 23.0,
-      "rollup_partition_count": 244
+      "baseline_median_ms": 342.0,
+      "optimized_median_ms": 21.0,
+      "rollup_partition_count": 244,
+      "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9"
     }
   },
   "official_migration": {
     "available": true,
-    "git_head": "6163f69c709def8ee28a495e68b03fdd7ca35eb9",
+    "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+    "row_count": 5799,
+    "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
+    "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
     "legacy_strict_success": 1097,
     "legacy_to_new_migrated": 1044,
     "migration_coverage": 0.951686,
@@ -117,7 +131,7 @@
       "total": 7,
       "catalog_rows": 5686,
       "catalog_source_match": true,
-      "max_p95_ms": 194.0904
+      "max_p95_ms": 221.4119
     },
     "mapping_event_evidence": {
       "available": true,
@@ -284,20 +298,31 @@
       "failed": 0
     }
   },
+  "formal_correctness": {
+    "available": true,
+    "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+    "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
+    "policy_id": "official-semantic-policy-v1",
+    "eligible_total": 127,
+    "matched": 127,
+    "accuracy": 1.0,
+    "target_met": true
+  },
   "doris_cluster": {
     "available": true,
     "passed": true,
     "row_counts_match": true,
-    "speedup": 36.2398279300624,
-    "speedup_display": "36.24x",
+    "speedup": 30.062902416916735,
+    "speedup_display": "30.06x",
     "speedup_target_met": true,
     "min_speedup": 10.0,
     "baseline_plan_contains_window": true,
     "optimized_plan_contains_prefix": true,
-    "baseline_avg_execute_ms": 5182.042440000001,
-    "optimized_avg_execute_ms": 142.99302000000083,
-    "baseline_row_count": 88586,
-    "optimized_row_count": 88586
+    "baseline_avg_execute_ms": 4560.926242857144,
+    "optimized_avg_execute_ms": 151.71277142857167,
+    "baseline_row_count": 96061,
+    "optimized_row_count": 96061,
+    "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9"
   },
   "warnings": [],
   "source_files": {
@@ -306,6 +331,9 @@
     "official_doris_evidence_json": "submission_artifacts\\evidence_snapshots\\official_doris_evidence.json",
     "official_slot_coverage_json": "submission_artifacts\\evidence_snapshots\\official_slot_coverage.json",
     "official_query_performance_matrix_json": "submission_artifacts\\evidence_snapshots\\official_query_performance_matrix.json",
+    "official_full_performance_matrix_json": "submission_artifacts\\evidence_snapshots\\official_full_performance_matrix.json",
+    "official_compiler_funnel_json": "submission_artifacts\\evidence_snapshots\\official_compiler_funnel.json",
+    "official_correctness_benchmark_json": "submission_artifacts\\evidence_snapshots\\official_correctness_benchmark.json",
     "phase42_long_horizon_doris_json": "submission_artifacts\\evidence_snapshots\\phase42_long_horizon_doris.json",
     "phase18_dynamic_date_funnel_json": "submission_artifacts\\evidence_snapshots\\phase18_dynamic_date_funnel.json",
     "phase18_dynamic_date_doris_json": "submission_artifacts\\evidence_snapshots\\phase18_dynamic_date_doris.json",
@@ -371,5 +399,135 @@
     "phase6c_set_prefix_doris_json": "submission_artifacts\\evidence_snapshots\\phase6c_set_prefix_doris.json",
     "doris_cluster_evidence_json": "submission_artifacts\\evidence_snapshots\\doris_cluster_evidence.json",
     "evidence_manifest": "submission_artifacts\\evidence_manifest.md"
+  },
+  "evidence_contract": {
+    "schema_version": 1,
+    "contract_id": "competition-current-evidence-v1",
+    "passed": true,
+    "expected_git_head": "6f3bcae",
+    "observed_git_heads": {
+      "git.head_at_report_generation": "6f3bcae",
+      "git.head_at_export": "6f3bcae",
+      "official_migration.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "official_real_data.slot_coverage.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "official_real_data.doris.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "official_real_data.performance_matrix.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "official_real_data.long_horizon.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "formal_correctness.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+      "doris_cluster.git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9"
+    },
+    "datasets": {
+      "official_dsl_workbook": {
+        "fingerprint_path": "official_migration.input_sha256",
+        "fingerprint": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
+        "present": true,
+        "required": true
+      },
+      "official_doris_snapshot": {
+        "fingerprint_path": "official_real_data.doris.snapshot_fingerprint",
+        "fingerprint": "9867fffd0f3514d3960679032e1152ec1265cf66f331598f14a26a835567fff6",
+        "present": true,
+        "required": true
+      }
+    },
+    "metrics": {
+      "official_recovery_parse_coverage": {
+        "metric_type": "coverage",
+        "required": true,
+        "denominator_set": "官方工作簿训练语料全部行",
+        "proves": "恢复模式能够解析的官方语料比例",
+        "does_not_prove": "SQL 语义正确、可在官方三表执行或满足正确率指标",
+        "available": true,
+        "numerator_path": "official_real_data.slot_coverage.parse_ok",
+        "denominator_path": "official_real_data.slot_coverage.row_count",
+        "numerator": 5799,
+        "denominator": 5799,
+        "ratio": 1.0
+      },
+      "official_slot_compile_coverage": {
+        "metric_type": "coverage",
+        "required": true,
+        "denominator_set": "官方工作簿训练语料全部行",
+        "proves": "兼容槽位编译器在当前数据与恢复政策下生成 SQL 的覆盖范围",
+        "does_not_prove": "正式新编译器覆盖率或 SQL 正确率",
+        "available": true,
+        "numerator_path": "official_real_data.slot_coverage.compile_ok",
+        "denominator_path": "official_real_data.slot_coverage.row_count",
+        "numerator": 1830,
+        "denominator": 5799,
+        "ratio": 0.3155716502845318
+      },
+      "legacy_migration_coverage": {
+        "metric_type": "migration",
+        "required": true,
+        "denominator_set": "旧编译器严格模式成功集合",
+        "proves": "旧严格成功集合迁入正式新后端的比例",
+        "does_not_prove": "官方 SQL 正确率、全量 5799 条成功率或业务语义正确性",
+        "available": true,
+        "numerator_path": "official_migration.legacy_to_new_migrated",
+        "denominator_path": "official_migration.legacy_strict_success",
+        "numerator": 1044,
+        "denominator": 1097,
+        "ratio": 0.9516864175022789
+      },
+      "new_backend_coverage": {
+        "metric_type": "coverage",
+        "required": true,
+        "denominator_set": "官方工作簿训练语料全部行",
+        "proves": "正式新后端在官方全量语料上的可编译覆盖范围",
+        "does_not_prove": "缺失数据域可被安全补全或生成 SQL 的结果完全正确",
+        "available": true,
+        "numerator_path": "official_migration.new_backend_success",
+        "denominator_path": "official_migration.row_count",
+        "numerator": 1076,
+        "denominator": 5799,
+        "ratio": 0.18554923262631487
+      },
+      "sql_correctness": {
+        "metric_type": "correctness",
+        "required": true,
+        "denominator_set": "独立判定 eligible 且有冻结 reference SQL 的正式正确率用例",
+        "proves": "生成 SQL 与独立真值完整结果行集一致的比例",
+        "does_not_prove": "官方未提供数据域的语句已经可执行，或所有未来语句均正确",
+        "available": true,
+        "numerator_path": "formal_correctness.matched",
+        "denominator_path": "formal_correctness.eligible_total",
+        "numerator": 127,
+        "denominator": 127,
+        "ratio": 1.0
+      },
+      "compile_p95_latency": {
+        "metric_type": "latency",
+        "required": true,
+        "denominator_set": "readiness 冻结编译基准用例",
+        "proves": "当前基准中的编译 P95 延迟",
+        "does_not_prove": "所有官方复杂语句或并发负载下的尾延迟",
+        "available": true,
+        "value_path": "readiness.compile_p95_latency_ms",
+        "value": 1.257
+      },
+      "long_horizon_speedup_gate": {
+        "metric_type": "performance",
+        "required": true,
+        "denominator_set": "冻结的官方长周期 baseline/optimized 等价查询",
+        "proves": "指定长周期工作负载达到不低于十倍的门禁",
+        "does_not_prove": "所有查询均能获得相同加速或普通查询性能更快",
+        "available": true,
+        "value_path": "official_real_data.long_horizon.target_met",
+        "value": true
+      },
+      "query_under_10s_gate": {
+        "metric_type": "performance",
+        "required": true,
+        "denominator_set": "正式逐问句性能矩阵中的 eligible 查询",
+        "proves": "矩阵内全部查询的 P95 不超过十秒",
+        "does_not_prove": "未进入矩阵的函数族、计划族和并发场景均已达标",
+        "available": true,
+        "value_path": "official_real_data.performance_matrix.all_queries_under_10s",
+        "value": true
+      }
+    },
+    "errors": [],
+    "warnings": []
   }
 }

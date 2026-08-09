@@ -3,7 +3,10 @@
 ## Summary
 
 - Evidence source: official Topic 19 CSV package
-- Generated at: 2026-07-30T12:40:16Z
+- Generated at: 2026-08-09T07:37:20Z
+- Git HEAD: `6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9`
+- Doris version: `VERSION()
+5.7.99`
 - Doris host: `127.0.0.1`
 - Query port: 9030
 - FE HTTP port: 8030
@@ -14,7 +17,7 @@
 - Official feature tables rebuilt in this run: False
 - Official feature tables available: True
 - Baseline/prefix row-count match: True
-- Baseline vs prefix speedup: 13.986x
+- Baseline vs prefix speedup: 13.835x
 
 ## Row Counts
 
@@ -46,12 +49,12 @@ first_ext_date	last_ext_date
 
 | Query | Rows | Avg ms | P95 ms | Prefix plan | Window plan |
 |---|---:|---:|---:|---:|---:|
-| simple_close_price_filter | 3836 | 131.749 | 156.158 | False | False |
-| rank_volume_top10 | 10 | 106.809 | 121.446 | False | True |
-| technical_long_window_feature_filter | 5614 | 158.501 | 226.376 | False | False |
-| ext_main_net_inflow_filter | 2247 | 133.772 | 151.11 | False | False |
-| baseline_window_volume_sum_20 | 5487 | 899.765 | 955.935 | False | True |
-| prefix_optimized_volume_sum_20 | 5487 | 64.333 | 66.347 | True | False |
+| simple_close_price_filter | 3836 | 87.191 | 93.642 | False | False |
+| rank_volume_top10 | 10 | 77.164 | 81.525 | False | True |
+| technical_long_window_feature_filter | 5614 | 122.606 | 175.294 | False | False |
+| ext_main_net_inflow_filter | 2247 | 100.477 | 109.627 | False | False |
+| baseline_window_volume_sum_20 | 5487 | 883.769 | 936.839 | False | True |
+| prefix_optimized_volume_sum_20 | 5487 | 63.877 | 78.549 | True | False |
 
 ## Stream Load Results
 
@@ -539,9 +542,9 @@ SELECT p.mktcode, p.tgtcode, p.bizdate FROM newzl.hsj_stock_hq_basic_rollup AS p
 Explain String(Nereids Planner)
 PLAN FRAGMENT 0
   OUTPUT EXPRS:
-    mktcode[#8]
-    tgtcode[#9]
-    bizdate[#10]
+    mktcode[#14]
+    tgtcode[#15]
+    bizdate[#16]
   PARTITION: HASH_PARTITIONED: mktcode[#1], tgtcode[#2]
 
   HAS_COLO_PLAN_NODE: false
@@ -551,10 +554,10 @@ PLAN FRAGMENT 0
 
   0:VOlapScanNode(114)
      TABLE: newzl.hsj_stock_hq_basic_rollup(hsj_stock_hq_basic_rollup), PREAGGREGATION: ON
-     PREDICATES: (((bizdate[#0] = '2026-04-14') AND (volume_sum_20[#4] > 10000000)) AND (__DORIS_DELETE_SIGN__[#6] = 0))
+     PREDICATES: (((bizdate[#0] = '2026-04-14') AND (volume_sum_20[#10] > 10000000)) AND (__DORIS_DELETE_SIGN__[#12] = 0))
      partitions=1/244 (p20260401000000)
-     tablets=16/16, tabletList=1785410022547,1785410022549,1785410022551 ...
-     cardinality=1, avgRowSize=0.0, numNodes=1
+     tablets=16/16, tabletList=1786254383850,1786254383852,1786254383854 ...
+     cardinality=50446, avgRowSize=192.33081, numNodes=1
      pushAggOp=NONE
      final projections: mktcode[#1], tgtcode[#2], bizdate[#0]
      final project output tuple id: 1

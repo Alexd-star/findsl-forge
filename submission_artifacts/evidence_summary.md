@@ -6,15 +6,16 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 
 | Item | Value |
 |---|---|
+| Evidence contract | PASS |
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 1040 passed in 200.84s |
+| Pytest regression | 1095 passed in 177.69s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
 | ANTLR/IR legacy migration | 1044/1097 (95.17%) |
 | Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
-| Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 194.0904 ms |
+| Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 221.4119 ms |
 | Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
 | Phase 21 aggregate/rank evidence | PASS, 6/6, non-empty 6/6, max P95 527.1584 ms |
 | Phase 22 stage/rank evidence | PASS, 7/7, non-empty 7/7, max P95 411.3313 ms |
@@ -31,17 +32,17 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Phase 47 benchmark-policy evidence | PASS, 3/3 |
 | Phase 48 scope-policy evidence | PASS, 7/7 |
 | Latest phase new-success audit | PASS, 23/23, failed 0 |
-| Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |
+| Official per-query 10s target | PASS, 48 queries, max P95 2889.6428 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
-| Official Doris prefix speedup | 13.99x |
-| Official 20-year long-horizon speedup | PASS, 40.52x, median 932 -> 23 ms |
+| Official Doris prefix speedup | 13.84x |
+| Official 20-year long-horizon speedup | PASS, 16.29x, median 342 -> 21 ms |
 | Defense package checks | 13/13 |
 | Doris evidence | PASS |
-| Doris cluster speedup | 36.24x |
+| Doris cluster speedup | 30.06x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | 96e0363 |
-| Git HEAD at export | 96e0363 |
+| Git HEAD at report generation | 6f3bcae |
+| Git HEAD at export | 6f3bcae |
 
 ## Source Files
 
@@ -52,6 +53,9 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | official_doris_evidence_json | `submission_artifacts\evidence_snapshots\official_doris_evidence.json` |
 | official_slot_coverage_json | `submission_artifacts\evidence_snapshots\official_slot_coverage.json` |
 | official_query_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_query_performance_matrix.json` |
+| official_full_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_full_performance_matrix.json` |
+| official_compiler_funnel_json | `submission_artifacts\evidence_snapshots\official_compiler_funnel.json` |
+| official_correctness_benchmark_json | `submission_artifacts\evidence_snapshots\official_correctness_benchmark.json` |
 | phase42_long_horizon_doris_json | `submission_artifacts\evidence_snapshots\phase42_long_horizon_doris.json` |
 | phase18_dynamic_date_funnel_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_funnel.json` |
 | phase18_dynamic_date_doris_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_doris.json` |

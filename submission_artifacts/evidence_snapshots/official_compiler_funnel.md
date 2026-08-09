@@ -1,28 +1,27 @@
 # 官方编译器迁移覆盖漏斗
 
-- Git HEAD：`1021dd93fe1d89e0519d31f91e20cb318bbc740b`
+- Git HEAD：`6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9`
 - 官方语料：`5799`
 - 旧严格后端成功集：`1097`
-- 新后端成功：`976`
-- 旧严格后端成功集已迁移：`947/1097`（`86.33%`）
+- 新后端成功：`1076`
+- 旧严格后端成功集已迁移：`1044/1097`（`95.17%`）
 
 ## 阶段漏斗
 
 | 阶段 | 成功数 | 占总语料 |
 |---|---:|---:|
 | frontend | 5792 | 99.88% |
-| typed | 5695 | 98.21% |
+| typed | 3333 | 57.48% |
 | logical | 1827 | 31.51% |
 | optimizer | 1827 | 31.51% |
-| physical | 976 | 16.83% |
-| backend | 976 | 16.83% |
+| physical | 1076 | 18.55% |
+| backend | 1076 | 18.55% |
 
 ## 迁移缺口优先级
 
 | 错误码 | 旧后端成功但新后端失败 |
 |---|---:|
-| `PHYSICAL_SCOPE_DATA_UNAVAILABLE` | 148 |
-| `PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE` | 2 |
+| `PHYSICAL_SCOPE_DATA_UNAVAILABLE` | 53 |
 
 ## 口径说明
 

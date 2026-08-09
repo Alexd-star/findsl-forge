@@ -1,0 +1,1221 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-08-09T07:46:33+00:00",
+  "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+  "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
+  "case_count": 48,
+  "passed": 48,
+  "failed": 0,
+  "all_matched_reference": true,
+  "all_queries_under_10s": true,
+  "max_p95_ms": 2889.6428,
+  "warmups": 1,
+  "repeats": 7,
+  "groups": {
+    "function_family": {
+      "belong_industry": {
+        "count": 2,
+        "passed": 2,
+        "max_p95_ms": 39.6695
+      },
+      "close_together": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 1147.1104
+      },
+      "cross_above": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 76.7112
+      },
+      "cross_down": {
+        "count": 4,
+        "passed": 4,
+        "max_p95_ms": 2889.6428
+      },
+      "golden_cross": {
+        "count": 2,
+        "passed": 2,
+        "max_p95_ms": 2115.7716
+      },
+      "indicator": {
+        "count": 28,
+        "passed": 28,
+        "max_p95_ms": 2327.8854
+      },
+      "position": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 1031.7353
+      },
+      "queryData": {
+        "count": 4,
+        "passed": 4,
+        "max_p95_ms": 271.8144
+      },
+      "rank": {
+        "count": 7,
+        "passed": 7,
+        "max_p95_ms": 70.7667
+      },
+      "record_high": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 71.4381
+      },
+      "record_low": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 1292.7414
+      },
+      "reset": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 47.4964
+      }
+    },
+    "plan_family": {
+      "10_join_doris": {
+        "count": 2,
+        "passed": 2,
+        "max_p95_ms": 192.0556
+      },
+      "11_date_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 97.6835
+      },
+      "12_session_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 33.2645
+      },
+      "13_market_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 39.4111
+      },
+      "14_aggregate_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 35.9217
+      },
+      "15_universe_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 138.4863
+      },
+      "16_composite_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 36.6407
+      },
+      "17_rank_doris": {
+        "count": 3,
+        "passed": 3,
+        "max_p95_ms": 61.6215
+      },
+      "18_dynamic_date_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 48.7346
+      },
+      "19_security_scope_doris": {
+        "count": 2,
+        "passed": 2,
+        "max_p95_ms": 37.8748
+      },
+      "20_mapping_event_doris": {
+        "count": 5,
+        "passed": 5,
+        "max_p95_ms": 870.4691
+      },
+      "21_aggregate_rank_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 67.1549
+      },
+      "46_derived_scope_doris": {
+        "count": 2,
+        "passed": 2,
+        "max_p95_ms": 39.6695
+      },
+      "47_benchmark_policy_doris": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 62.969
+      },
+      "composite_grouped_aggregate": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 271.8144
+      },
+      "controlled_expression": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 38.1385
+      },
+      "crossing_window": {
+        "count": 5,
+        "passed": 5,
+        "max_p95_ms": 1031.7353
+      },
+      "crossing_window_absence": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 2889.6428
+      },
+      "direct_column": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 71.5438
+      },
+      "event_candidate_intersect": {
+        "count": 4,
+        "passed": 4,
+        "max_p95_ms": 2327.8854
+      },
+      "grouped_aggregate": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 65.0382
+      },
+      "named_rank_expression": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 70.7667
+      },
+      "prefix_long_horizon": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 48.4812
+      },
+      "set_intersect": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 36.4622
+      },
+      "set_union": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 46.1782
+      },
+      "stable_temporal_join": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 77.4064
+      },
+      "stage_rank": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 35.0076
+      },
+      "temporal_event_projection": {
+        "count": 4,
+        "passed": 4,
+        "max_p95_ms": 2115.7716
+      },
+      "temporal_grouped_aggregate": {
+        "count": 1,
+        "passed": 1,
+        "max_p95_ms": 357.6567
+      }
+    },
+    "load_tier": {
+      "heavy": {
+        "count": 19,
+        "passed": 19,
+        "max_p95_ms": 2889.6428
+      },
+      "light": {
+        "count": 2,
+        "passed": 2,
+        "max_p95_ms": 71.5438
+      },
+      "medium": {
+        "count": 27,
+        "passed": 27,
+        "max_p95_ms": 870.4691
+      }
+    }
+  },
+  "results": [
+    {
+      "case_id": "CORR-ADAPTIVE-AGGREGATE-002",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "prefix_long_horizon",
+      "selected_strategy": "volume_prefix_aggregate",
+      "load_tier": "heavy",
+      "row_count": 5614,
+      "compile_ms": 46.4665,
+      "execute_p50_ms": 47.58860000000009,
+      "execute_p95_ms": 48.4812,
+      "execute_p99_ms": 48.4812,
+      "execute_max_ms": 48.481200000000115,
+      "under_10s": true,
+      "explain_sha256": "73a5c37240d3f4844906a2e94627d418c4e61600f1b153770c66a325b126505a",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE10-JOIN-DORIS-001-BASIC-EXT-LATEST",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "10_join_doris",
+      "selected_strategy": "stable_key_join",
+      "load_tier": "medium",
+      "row_count": 2247,
+      "compile_ms": 31.483,
+      "execute_p50_ms": 33.86010000000006,
+      "execute_p95_ms": 38.9935,
+      "execute_p99_ms": 38.9935,
+      "execute_max_ms": 38.993500000000125,
+      "under_10s": true,
+      "explain_sha256": "f2877090c885d54c5aa65f7d8a8d84b4b28a0e19c9f44f6c9a20cafa90c53a77",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE10-JOIN-DORIS-002-BASIC-SECURITY-LATEST",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "10_join_doris",
+      "selected_strategy": "stable_key_join",
+      "load_tier": "medium",
+      "row_count": 5573,
+      "compile_ms": 44.8044,
+      "execute_p50_ms": 163.45769999999948,
+      "execute_p95_ms": 192.0556,
+      "execute_p99_ms": 192.0556,
+      "execute_max_ms": 192.05559999999977,
+      "under_10s": true,
+      "explain_sha256": "a951afa113bce95311778c79bfd09947bd8795cbef92ffb63bc69b9a33432f29",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE11-DATE-DORIS-001-CHINESE-YEAR-2024",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "11_date_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 16734,
+      "compile_ms": 47.9735,
+      "execute_p50_ms": 91.29439999999977,
+      "execute_p95_ms": 97.6835,
+      "execute_p99_ms": 97.6835,
+      "execute_max_ms": 97.68350000000048,
+      "under_10s": true,
+      "explain_sha256": "90bd01678541993adc9a19f31d591d213241d05aa06a0dd1e10f010fa8e3983b",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE12-SESSION-DORIS-001-RECENT-5-SESSIONS",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "12_session_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 467,
+      "compile_ms": 39.9465,
+      "execute_p50_ms": 32.33480000000011,
+      "execute_p95_ms": 33.2645,
+      "execute_p99_ms": 33.2645,
+      "execute_max_ms": 33.264499999999586,
+      "under_10s": true,
+      "explain_sha256": "6defb5d2b6c621b01e39d7fa9778c78ff068cafe5b8ce67b870a18104a749f3e",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE13-MARKET-DORIS-001-STAR-MARKET",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "13_market_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 606,
+      "compile_ms": 45.6738,
+      "execute_p50_ms": 34.22139999999896,
+      "execute_p95_ms": 39.4111,
+      "execute_p99_ms": 39.4111,
+      "execute_max_ms": 39.41110000000059,
+      "under_10s": true,
+      "explain_sha256": "0cf5bec6d64f56e1f815896df4d4c356813bd1710df4462103d2d7a71e9c3e6d",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE14-AGGREGATE-DORIS-001-SUM-VOLUME-5",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "14_aggregate_doris",
+      "selected_strategy": "grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 574,
+      "compile_ms": 47.2399,
+      "execute_p50_ms": 34.05949999999969,
+      "execute_p95_ms": 35.9217,
+      "execute_p99_ms": 35.9217,
+      "execute_max_ms": 35.92169999999939,
+      "under_10s": true,
+      "explain_sha256": "1d9e8a94b596803e2b905a937ca82c0ec1dd54fa697883835689c3d8c9f1ed9b",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE15-UNIVERSE-DORIS-001-FULL-LATEST-UNIVERSE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "15_universe_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 5614,
+      "compile_ms": 39.6394,
+      "execute_p50_ms": 110.88310000000057,
+      "execute_p95_ms": 138.4863,
+      "execute_p99_ms": 138.4863,
+      "execute_max_ms": 138.4862999999985,
+      "under_10s": true,
+      "explain_sha256": "948b758c36e0aec2322782e00286fdbd186864f6a83ef522737bef69fd718b44",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE16-COMPOSITE-DORIS-001-LATEST-EQUALS-MIN-100-SESSIONS",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "16_composite_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 72,
+      "compile_ms": 48.6328,
+      "execute_p50_ms": 33.011200000000684,
+      "execute_p95_ms": 36.6407,
+      "execute_p99_ms": 36.6407,
+      "execute_max_ms": 36.640699999999526,
+      "under_10s": true,
+      "explain_sha256": "2ac4681abf21d45570db4fe82179dec3032a5a26f8c1cd7c1d36d3f572c1b8f0",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE17-RANK-DORIS-001-DIRECT-TOP-10",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "17_rank_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 10,
+      "compile_ms": 43.9086,
+      "execute_p50_ms": 34.60950000000018,
+      "execute_p95_ms": 37.9844,
+      "execute_p99_ms": 37.9844,
+      "execute_max_ms": 37.98440000000092,
+      "under_10s": true,
+      "explain_sha256": "905ea152c12f67c68e1cd41ae2741726219e1e8595967d2f1c8aad92e0532574",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE17-RANK-DORIS-002-DIRECT-TOP-10-PERCENT",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "17_rank_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 562,
+      "compile_ms": 44.4647,
+      "execute_p50_ms": 33.46569999999893,
+      "execute_p95_ms": 36.1104,
+      "execute_p99_ms": 36.1104,
+      "execute_max_ms": 36.1104000000001,
+      "under_10s": true,
+      "explain_sha256": "ab21332bc9c384b86765f402b6b7d60db3ff83dba69bafa470622b177c796292",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE17-RANK-DORIS-003-AGGREGATE-AVG-TOP-10",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "17_rank_doris",
+      "selected_strategy": "aggregate_rank",
+      "load_tier": "medium",
+      "row_count": 10,
+      "compile_ms": 52.8278,
+      "execute_p50_ms": 35.74959999999905,
+      "execute_p95_ms": 61.6215,
+      "execute_p99_ms": 61.6215,
+      "execute_max_ms": 61.62149999999933,
+      "under_10s": true,
+      "explain_sha256": "9a94c2515ad889d2e0ee8472116f87f3734da0e5c1fc4accb59d4611510cdbfb",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE18-DYNAMIC-DATE-DORIS-001-CURRENT-MONTH",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "18_dynamic_date_doris",
+      "selected_strategy": "direct_column",
+      "load_tier": "medium",
+      "row_count": 867,
+      "compile_ms": 45.0032,
+      "execute_p50_ms": 40.28579999999948,
+      "execute_p95_ms": 48.7346,
+      "execute_p99_ms": 48.7346,
+      "execute_max_ms": 48.73459999999952,
+      "under_10s": true,
+      "explain_sha256": "84a0c1ea046f7eb09f44bdd3626bdf30f7fd33244ca4093911e4ba13679a8308",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE19-SECURITY-SCOPE-DORIS-004-DIRECT-QUERYDATA-SCALAR",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "19_security_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 1896,
+      "compile_ms": 46.7942,
+      "execute_p50_ms": 35.326899999999384,
+      "execute_p95_ms": 37.8748,
+      "execute_p99_ms": 37.8748,
+      "execute_max_ms": 37.8747999999991,
+      "under_10s": true,
+      "explain_sha256": "1f31d60cb67fddf59fb3e345a69de2f87a3aacc4076bd12d8c08dcb9bd1ea5b1",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE19-SECURITY-SCOPE-DORIS-005-GLOBAL-QUERYDATA-AGGREGATE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "19_security_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 1872,
+      "compile_ms": 58.5645,
+      "execute_p50_ms": 34.1029000000006,
+      "execute_p95_ms": 36.44,
+      "execute_p99_ms": 36.44,
+      "execute_max_ms": 36.43999999999892,
+      "under_10s": true,
+      "explain_sha256": "256ef32de147e6d391bcc087b0e3c614443e0593d92d1a3aa07f839ea7cef47c",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-006-TECHNICAL-CROSS-ABOVE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "cross_above"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "load_tier": "medium",
+      "row_count": 887,
+      "compile_ms": 48.7213,
+      "execute_p50_ms": 33.6981999999999,
+      "execute_p95_ms": 41.1258,
+      "execute_p99_ms": 41.1258,
+      "execute_max_ms": 41.12579999999966,
+      "under_10s": true,
+      "explain_sha256": "410a6a6ca9e846b479fb464b22e6f341694e817b9ad934962ce5394408f61d83",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-008-RECORD-HIGH-60-SESSIONS",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "record_high"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "load_tier": "medium",
+      "row_count": 219,
+      "compile_ms": 47.6987,
+      "execute_p50_ms": 32.223999999999364,
+      "execute_p95_ms": 33.5002,
+      "execute_p99_ms": 33.5002,
+      "execute_max_ms": 33.50019999999887,
+      "under_10s": true,
+      "explain_sha256": "54e4dd4240045791da29c71ccc1d4598b7642fec14bfc840355cf91c20467720",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-009-RECORD-LOW-HISTORY",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "record_low"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "load_tier": "medium",
+      "row_count": 4,
+      "compile_ms": 45.9345,
+      "execute_p50_ms": 30.87730000000022,
+      "execute_p95_ms": 32.3967,
+      "execute_p99_ms": 32.3967,
+      "execute_max_ms": 32.39669999999961,
+      "under_10s": true,
+      "explain_sha256": "0b006e8057f552d2d9fe5fefa1098dc4bad4f675af69663c28537e84e5d82b21",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-011-CLOSE-TOGETHER-PATTERN",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "close_together"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "load_tier": "medium",
+      "row_count": 3598,
+      "compile_ms": 43.8035,
+      "execute_p50_ms": 851.3655,
+      "execute_p95_ms": 870.4691,
+      "execute_p99_ms": 870.4691,
+      "execute_max_ms": 870.4691000000012,
+      "under_10s": true,
+      "explain_sha256": "6d7ce1be5ce481f52c8f96cfd718ba653e7c2393baa41c020401c7ca43900017",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-012-RESET-PATTERN",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "reset"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "load_tier": "medium",
+      "row_count": 1449,
+      "compile_ms": 51.8958,
+      "execute_p50_ms": 35.28559999999814,
+      "execute_p95_ms": 47.4964,
+      "execute_p99_ms": 47.4964,
+      "execute_max_ms": 47.496399999999994,
+      "under_10s": true,
+      "explain_sha256": "c5e85faf49e8b5fdf2c52ef5bf3666bb55a5bc36780c34c94b9849860385dded",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE21-AGGREGATE-RANK-DORIS-001-CONFIGURED-RELATIVE-APPROXIMATIO",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "21_aggregate_rank_doris",
+      "selected_strategy": "controlled_expression",
+      "load_tier": "medium",
+      "row_count": 38,
+      "compile_ms": 43.4767,
+      "execute_p50_ms": 35.13569999999788,
+      "execute_p95_ms": 67.1549,
+      "execute_p99_ms": 67.1549,
+      "execute_max_ms": 67.15489999999846,
+      "under_10s": true,
+      "explain_sha256": "26907d78ebc41c71e16be95d76e7aa0fc6d3ec11f871fa052bd03e1893e9d553",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE22-STAGE-RANK-DORIS-001-NAMED-RANK-ARITHMETIC",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "named_rank_expression",
+      "selected_strategy": "named_rank_expression",
+      "load_tier": "medium",
+      "row_count": 2927,
+      "compile_ms": 67.0675,
+      "execute_p50_ms": 38.277599999997136,
+      "execute_p95_ms": 70.7667,
+      "execute_p99_ms": 70.7667,
+      "execute_max_ms": 70.76670000000007,
+      "under_10s": true,
+      "explain_sha256": "d3d6418853c2f809816bfe1134b7b4e682865faa5f7060e2b7e20014022522b3",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE22-STAGE-RANK-DORIS-006-PARENTHESIZED-STAGE-UNION",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "set_union",
+      "selected_strategy": "set_union",
+      "load_tier": "medium",
+      "row_count": 1,
+      "compile_ms": 108.1377,
+      "execute_p50_ms": 34.4914999999979,
+      "execute_p95_ms": 46.1782,
+      "execute_p99_ms": 46.1782,
+      "execute_max_ms": 46.17819999999995,
+      "under_10s": true,
+      "explain_sha256": "7415f442f081c62b5efe92b8ce169fd212aa465130343b9a8ed5915b03485f41",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE23-RELATIONAL-DORIS-001-NOT-EVERY-RECENT-FIVE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "direct_column",
+      "selected_strategy": "direct_column",
+      "load_tier": "light",
+      "row_count": 48,
+      "compile_ms": 75.8938,
+      "execute_p50_ms": 34.48930000000061,
+      "execute_p95_ms": 71.5438,
+      "execute_p99_ms": 71.5438,
+      "execute_max_ms": 71.5438000000006,
+      "under_10s": true,
+      "explain_sha256": "c7829c7c0065e6580767ad8ecfff2ec0567f45720d4113e389a6b9c3c2d2b0c6",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE23-RELATIONAL-DORIS-003-MULTI-RESOURCE-TEMPORAL-JOIN",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "stable_temporal_join",
+      "selected_strategy": "stable_temporal_join",
+      "load_tier": "heavy",
+      "row_count": 2929,
+      "compile_ms": 69.1502,
+      "execute_p50_ms": 34.392300000000375,
+      "execute_p95_ms": 77.4064,
+      "execute_p99_ms": 77.4064,
+      "execute_max_ms": 77.40640000000099,
+      "under_10s": true,
+      "explain_sha256": "3d6782b9988a92d9574b3d38756cbb59003a89388731464a6549b8cac7825a86",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE24-PERIOD-SCALAR-DORIS-003-PERIOD-QUERYDATA-CROSS-SCALAR",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "composite_grouped_aggregate",
+      "selected_strategy": "composite_grouped_aggregate",
+      "load_tier": "heavy",
+      "row_count": 5115,
+      "compile_ms": 71.7455,
+      "execute_p50_ms": 244.68310000000315,
+      "execute_p95_ms": 271.8144,
+      "execute_p99_ms": 271.8144,
+      "execute_max_ms": 271.8144000000038,
+      "under_10s": true,
+      "explain_sha256": "bd218563e8a179dd404408895e401c28804c1208474f86b62e98136c06baee3f",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-001-PERIOD-RECORD-HIGH-AND-GROUPED-A",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "load_tier": "heavy",
+      "row_count": 1196,
+      "compile_ms": 64.8077,
+      "execute_p50_ms": 36.57869999999974,
+      "execute_p95_ms": 71.4381,
+      "execute_p99_ms": 71.4381,
+      "execute_max_ms": 71.43810000000173,
+      "under_10s": true,
+      "explain_sha256": "84da9789155bb293d9086c08b2960ac9440a75ec27c8b2e2da724f253708fad9",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-002-PERIOD-EVENT-ABSENCE-USES-DECIDA",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "load_tier": "heavy",
+      "row_count": 4453,
+      "compile_ms": 78.7365,
+      "execute_p50_ms": 2193.371499999998,
+      "execute_p95_ms": 2327.8854,
+      "execute_p99_ms": 2327.8854,
+      "execute_max_ms": 2327.8853999999997,
+      "under_10s": true,
+      "explain_sha256": "b3070d0bb5ee8789dc4fadc5bd5cb313e01e97f1c115b9b81019a8140494daa9",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-004-EVENT-UNION-AND-MULTI-GROWTH-REL",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "load_tier": "heavy",
+      "row_count": 442,
+      "compile_ms": 124.5048,
+      "execute_p50_ms": 35.13470000000041,
+      "execute_p95_ms": 76.7112,
+      "execute_p99_ms": 76.7112,
+      "execute_max_ms": 76.71119999999831,
+      "under_10s": true,
+      "explain_sha256": "23297760f37bce112fb29ef4095223598ea03b6320f9afa9c5f4894a1fd5db9b",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-005-DIFFERENT-EVENT-AND-INDICATOR-DA",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "load_tier": "heavy",
+      "row_count": 299,
+      "compile_ms": 64.1019,
+      "execute_p50_ms": 33.03379999999834,
+      "execute_p95_ms": 34.6519,
+      "execute_p99_ms": 34.6519,
+      "execute_max_ms": 34.65190000000007,
+      "under_10s": true,
+      "explain_sha256": "481c7839368ed0b3ac807b40231323e498e4cb64f441e252e3300ba1e8127ac0",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE26-DATE-LIMIT-DORIS-001-FIXED-YEAR-FOLLOWING-RANGE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "grouped_aggregate",
+      "selected_strategy": "grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 2933,
+      "compile_ms": 44.004,
+      "execute_p50_ms": 38.96410000000117,
+      "execute_p95_ms": 65.0382,
+      "execute_p99_ms": 65.0382,
+      "execute_max_ms": 65.0382000000036,
+      "under_10s": true,
+      "explain_sha256": "55de6bf067084ec81b388859e6a208e0414c2972391adf5ea38ffe2303d6dc83",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE26-DATE-LIMIT-DORIS-005-FRACTIONAL-YEAR-TO-SIX-MONTH-BUC",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "temporal_grouped_aggregate",
+      "selected_strategy": "temporal_grouped_aggregate",
+      "load_tier": "heavy",
+      "row_count": 5537,
+      "compile_ms": 69.5789,
+      "execute_p50_ms": 320.450699999995,
+      "execute_p95_ms": 357.6567,
+      "execute_p99_ms": 357.6567,
+      "execute_max_ms": 357.6566999999926,
+      "under_10s": true,
+      "explain_sha256": "55803065d6409168390a412acb38428b34964d1d65d108181b763ce29adc0a24",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE27-EVENT-SEMANTICS-DORIS-001-BOUNDED-CROSSING-EXISTENCE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "golden_cross"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "load_tier": "heavy",
+      "row_count": 4870,
+      "compile_ms": 60.2395,
+      "execute_p50_ms": 1939.4990999999918,
+      "execute_p95_ms": 2115.7716,
+      "execute_p99_ms": 2115.7716,
+      "execute_max_ms": 2115.7716000000023,
+      "under_10s": true,
+      "explain_sha256": "8ff0ede8395e5c5589c9f89e9f7fabb527454dc25427849e96c364aedb7ae936",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE27-EVENT-SEMANTICS-DORIS-002-MONTHLY-CROSSING-BUCKET",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "golden_cross"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "load_tier": "heavy",
+      "row_count": 1659,
+      "compile_ms": 70.46,
+      "execute_p50_ms": 39.41030000000012,
+      "execute_p95_ms": 41.2194,
+      "execute_p99_ms": 41.2194,
+      "execute_max_ms": 41.21940000000279,
+      "under_10s": true,
+      "explain_sha256": "bbbf5366d39feeeec41ed2050874f477521c514c30780c8d922cf61383100ebe",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-002-PRICE-DOES-NOT-CROSS-BELOW-MA60",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "cross_down"
+      ],
+      "plan_family": "crossing_window_absence",
+      "selected_strategy": "crossing_window_absence",
+      "load_tier": "heavy",
+      "row_count": 5547,
+      "compile_ms": 61.5291,
+      "execute_p50_ms": 2789.414699999995,
+      "execute_p95_ms": 2889.6428,
+      "execute_p99_ms": 2889.6428,
+      "execute_max_ms": 2889.642800000004,
+      "under_10s": true,
+      "explain_sha256": "f7fe3785cb845e901ecde52ee185f9a033eea2c95706b3693148da42bb8bcd3d",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-003-PRICE-AT-FIVE-SESSION-LOW",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "record_low"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "load_tier": "heavy",
+      "row_count": 919,
+      "compile_ms": 43.1798,
+      "execute_p50_ms": 32.67959999999448,
+      "execute_p95_ms": 34.8801,
+      "execute_p99_ms": 34.8801,
+      "execute_max_ms": 34.880099999995196,
+      "under_10s": true,
+      "explain_sha256": "1bba8d9724abc3fe9192b53e2f01cc3d0d932e286470633b1f953e7157131481",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-004-PRICE-IN-LOW-HISTORICAL-QUARTILE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "position"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "load_tier": "heavy",
+      "row_count": 797,
+      "compile_ms": 55.5507,
+      "execute_p50_ms": 33.18099999999902,
+      "execute_p95_ms": 35.8876,
+      "execute_p99_ms": 35.8876,
+      "execute_max_ms": 35.887599999995246,
+      "under_10s": true,
+      "explain_sha256": "bf5c394604925f2304c1f4cc29eab23649fc175a0a146ccebd51ff368ac48d04",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-005-PRICE-CLOSE-TO-MA20",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "close_together"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "load_tier": "heavy",
+      "row_count": 3018,
+      "compile_ms": 48.9322,
+      "execute_p50_ms": 790.801799999997,
+      "execute_p95_ms": 832.991,
+      "execute_p99_ms": 832.991,
+      "execute_max_ms": 832.9909999999927,
+      "under_10s": true,
+      "explain_sha256": "d38ebc2339e3a878ee575bb8441cccafd768061a6278c37594d42de0ef77eaba",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-006-PRICE-RESETS-TO-MA5",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "reset"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "load_tier": "heavy",
+      "row_count": 2855,
+      "compile_ms": 47.269,
+      "execute_p50_ms": 37.776600000000826,
+      "execute_p95_ms": 41.4012,
+      "execute_p99_ms": 41.4012,
+      "execute_max_ms": 41.40120000000991,
+      "under_10s": true,
+      "explain_sha256": "076d5e4c75af14c2a80fdbf2f05fe3917ac78cb63617cea4143bc26ab0ef9b00",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE29-EVENT-PROJECTION-DORIS-002-REPEATED-TWENTY-SESSION-LOW",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "record_low"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "load_tier": "heavy",
+      "row_count": 4551,
+      "compile_ms": 54.2107,
+      "execute_p50_ms": 981.6422000000102,
+      "execute_p95_ms": 1292.7414,
+      "execute_p99_ms": 1292.7414,
+      "execute_max_ms": 1292.7414000000113,
+      "under_10s": true,
+      "explain_sha256": "4f54098abc7a48662780fe68d5308d6ff15651101dc1324d373c6a9c00b8d021",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE29-EVENT-PROJECTION-DORIS-003-THREE-SESSION-PRICE-MA5-CONVERGE",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "close_together"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "load_tier": "heavy",
+      "row_count": 5444,
+      "compile_ms": 70.127,
+      "execute_p50_ms": 1072.2556000000054,
+      "execute_p95_ms": 1147.1104,
+      "execute_p99_ms": 1147.1104,
+      "execute_max_ms": 1147.1104000000025,
+      "under_10s": true,
+      "explain_sha256": "83fddb868b6f62cfe4c3e9d9635a97f7c23df1d72a3c9bc85daee888e1722fd4",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE30-GROUNDED-EVENT-DORIS-004-SUPPORT-RESET-AND-PRESSURE-CROSS",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "reset"
+      ],
+      "plan_family": "set_intersect",
+      "selected_strategy": "set_intersect",
+      "load_tier": "medium",
+      "row_count": 85,
+      "compile_ms": 90.6628,
+      "execute_p50_ms": 33.7080000000185,
+      "execute_p95_ms": 36.4622,
+      "execute_p99_ms": 36.4622,
+      "execute_max_ms": 36.46219999998834,
+      "under_10s": true,
+      "explain_sha256": "d83717bd5fb15aa53a30857890b8279340c7c3ad457aad14404d3986f0ab7b83",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE30-GROUNDED-EVENT-DORIS-005-UNSEALED-LIMIT-EVENT",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "controlled_expression",
+      "selected_strategy": "controlled_expression",
+      "load_tier": "light",
+      "row_count": 35,
+      "compile_ms": 50.1438,
+      "execute_p50_ms": 35.44320000000312,
+      "execute_p95_ms": 38.1385,
+      "execute_p99_ms": 38.1385,
+      "execute_max_ms": 38.138500000002296,
+      "under_10s": true,
+      "explain_sha256": "3e0a966bf761812f3aa638dcff690db4a84f466d11eb90d883f0abc2954c94ee",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE30-GROUNDED-EVENT-DORIS-006-HALF-YEAR-HISTORICAL-LOW",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "position"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "load_tier": "heavy",
+      "row_count": 3513,
+      "compile_ms": 63.3425,
+      "execute_p50_ms": 857.484999999997,
+      "execute_p95_ms": 1031.7353,
+      "execute_p99_ms": 1031.7353,
+      "execute_max_ms": 1031.7353000000082,
+      "under_10s": true,
+      "explain_sha256": "cb451fded629a671d1009885ed3c2f184c4262f7baf2843bf4d9025d7adcbe9e",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE31-FINAL-GROUNDED-DORIS-002-EVENT-CANDIDATE-THEN-RANK",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "position",
+        "rank"
+      ],
+      "plan_family": "stage_rank",
+      "selected_strategy": "stage_rank",
+      "load_tier": "heavy",
+      "row_count": 2,
+      "compile_ms": 114.554,
+      "execute_p50_ms": 33.510100000000875,
+      "execute_p95_ms": 35.0076,
+      "execute_p99_ms": 35.0076,
+      "execute_max_ms": 35.00760000000014,
+      "under_10s": true,
+      "explain_sha256": "84e99065cc0646ff5dacb11865bbc64f9cd39bd537537d43e62eaa8f04443a53",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE46-DERIVED-SCOPE-DORIS-002-CSI300-SSE-MAIN-BOARD-INDUSTRY-A",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "belong_industry",
+        "indicator"
+      ],
+      "plan_family": "46_derived_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 61,
+      "compile_ms": 101.4911,
+      "execute_p50_ms": 34.56130000000712,
+      "execute_p95_ms": 36.2949,
+      "execute_p99_ms": 36.2949,
+      "execute_max_ms": 36.29490000000146,
+      "under_10s": true,
+      "explain_sha256": "213a81e8ff1edd87e00e362dce683c7b08780dd4cb05170576893195280f54d2",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE46-DERIVED-SCOPE-DORIS-003-STAR-REGISTRATION-INDUSTRY-MIN",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "belong_industry",
+        "indicator"
+      ],
+      "plan_family": "46_derived_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "load_tier": "medium",
+      "row_count": 582,
+      "compile_ms": 61.7987,
+      "execute_p50_ms": 33.88789999999631,
+      "execute_p95_ms": 39.6695,
+      "execute_p99_ms": 39.6695,
+      "execute_max_ms": 39.669500000002245,
+      "under_10s": true,
+      "explain_sha256": "b2e6aeda1ba31379710522ba70fbe53eb7156c24cd0c8a3bae9da73dc09898b4",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE47-BENCHMARK-POLICY-DORIS-001-AI-TOP1-NOT-OUTPERFORM-BENCHMARK",
+      "status": "PASS",
+      "matched_reference": true,
+      "function_families": [
+        "indicator",
+        "queryData",
+        "rank"
+      ],
+      "plan_family": "47_benchmark_policy_doris",
+      "selected_strategy": "set_intersect",
+      "load_tier": "medium",
+      "row_count": 0,
+      "compile_ms": 73.7401,
+      "execute_p50_ms": 34.49490000002697,
+      "execute_p95_ms": 62.969,
+      "execute_p99_ms": 62.969,
+      "execute_max_ms": 62.9690000000096,
+      "under_10s": true,
+      "explain_sha256": "e19252526149e93becf7fcbd6469c51ef4ff1aacd2fcd0f8b7742ca1961ce237",
+      "error": ""
+    }
+  ]
+}
