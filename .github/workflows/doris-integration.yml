@@ -45,8 +45,21 @@ jobs:
           for attempt in $(seq 1 120); do
             backend_status="$(mysql --batch --skip-column-names --host 127.0.0.1 --port 9030 --user root --execute "SHOW BACKENDS" 2>/dev/null || true)"
             if printf '%s\n' "$backend_status" | grep -qE '(^|[[:space:]])true([[:space:]]|$)'; then
-              printf '%s\n' "$backend_status"
-              exit 0
+              # Alive is reported before the BE has necessarily published a usable disk.
+              # A real DDL probe prevents a race that otherwise fails the fixture CREATE TABLE.
+              if mysql --host 127.0.0.1 --port 9030 --user root --execute '
+                CREATE DATABASE IF NOT EXISTS findsl_ci_readiness;
+                CREATE TABLE IF NOT EXISTS findsl_ci_readiness.ddl_probe (
+                  id INTEGER NOT NULL
+                ) DUPLICATE KEY(id)
+                DISTRIBUTED BY HASH(id) BUCKETS 1
+                PROPERTIES ("replication_num" = "1");
+                DROP TABLE findsl_ci_readiness.ddl_probe;
+                DROP DATABASE findsl_ci_readiness;
+              ' >/dev/null 2>&1; then
+                printf '%s\n' "$backend_status"
+                exit 0
+              fi
             fi
             sleep 3
           done
@@ -56,7 +69,15 @@ jobs:
             logs --tail 300 fe be
           exit 1
       - name: Load official-shape CI fixture
-        run: mysql --host 127.0.0.1 --port 9030 --user root < deploy/doris/official/00_ci_fixture.sql
+        run: |
+          for attempt in $(seq 1 6); do
+            if mysql --host 127.0.0.1 --port 9030 --user root < deploy/doris/official/00_ci_fixture.sql; then
+              exit 0
+            fi
+            sleep 5
+          done
+          mysql --batch --raw --host 127.0.0.1 --port 9030 --user root --execute "SHOW BACKENDS" || true
+          exit 1
       - name: Run Hero Query differential and latency gate
         run: >-
           python scripts/run_hero_query.py
