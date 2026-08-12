@@ -924,7 +924,7 @@ def test_universe_selector_does_not_claim_unavailable_filter_scope_membership():
 
 def test_external_scope_membership_is_planned_with_snapshot_provenance():
     result = plan_physical(
-        _lower("indicator('', '软件开发', '', '', '', '', '') = 'all'"),
+        _lower("indicator('', '软件开发', '', '2026-04-14', '', '', '') = 'all'"),
         default_physical_catalog(),
     )
 

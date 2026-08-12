@@ -4585,6 +4585,13 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
     constraints = []
     resource = catalog.resource(resource_id)
     stable_resource_id = resource.anchor_resource_id or resource_id
+    date = str(call.binding.slots.get("date", "")).strip()
+    partition_key = catalog.resource(stable_resource_id).partition_key
+    effective_at = (
+        PhysicalColumn(stable_resource_id, partition_key, TIME)
+        if date and partition_key is not None
+        else None
+    )
     market = str(call.binding.slots.get("market", "")).strip()
     if market:
         market_expression = call.market_expression or parse_market_expression(market)
@@ -4596,11 +4603,10 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                 current_security_scope_catalog(),
                 current_external_scope_catalog(),
                 stable_resource_id,
+                effective_at=effective_at,
             )
         )
-    date = str(call.binding.slots.get("date", "")).strip()
     if date:
-        partition_key = catalog.resource(stable_resource_id).partition_key
         if partition_key is None:
             raise PhysicalPlanningError(
                 "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
@@ -4795,6 +4801,8 @@ def _lower_scope_expression(
     catalog: SecurityScopeCatalog,
     external_catalog,
     anchor_resource_id: str,
+    *,
+    effective_at=None,
 ):
     if isinstance(expression, ScopeAtom):
         derived_market = _DERIVED_SCOPE_MARKETS.get(expression.name)
@@ -4830,7 +4838,7 @@ def _lower_scope_expression(
                     ("scope_code", PhysicalLiteral(external.option.scope_code, STRING)),
                     ("snapshot_id", PhysicalLiteral(external.option.snapshot_id, STRING)),
                 ),
-                PhysicalColumn(anchor_resource_id, "bizdate", STRING),
+                effective_at,
                 policy_id=policy.policy_id if policy is not None else None,
                 policy_semantic_basis=(
                     policy.semantic_basis if policy is not None else None
@@ -4871,17 +4879,29 @@ def _lower_scope_expression(
     if isinstance(expression, ScopeNot):
         return PhysicalNot(
             _lower_scope_expression(
-                expression.operand, catalog, external_catalog, anchor_resource_id
+                expression.operand,
+                catalog,
+                external_catalog,
+                anchor_resource_id,
+                effective_at=effective_at,
             )
         )
     if isinstance(expression, ScopeAnd):
         return PhysicalBinary(
             "and",
             _lower_scope_expression(
-                expression.left, catalog, external_catalog, anchor_resource_id
+                expression.left,
+                catalog,
+                external_catalog,
+                anchor_resource_id,
+                effective_at=effective_at,
             ),
             _lower_scope_expression(
-                expression.right, catalog, external_catalog, anchor_resource_id
+                expression.right,
+                catalog,
+                external_catalog,
+                anchor_resource_id,
+                effective_at=effective_at,
             ),
             BOOLEAN,
         )
@@ -4889,10 +4909,18 @@ def _lower_scope_expression(
         return PhysicalBinary(
             "or",
             _lower_scope_expression(
-                expression.left, catalog, external_catalog, anchor_resource_id
+                expression.left,
+                catalog,
+                external_catalog,
+                anchor_resource_id,
+                effective_at=effective_at,
             ),
             _lower_scope_expression(
-                expression.right, catalog, external_catalog, anchor_resource_id
+                expression.right,
+                catalog,
+                external_catalog,
+                anchor_resource_id,
+                effective_at=effective_at,
             ),
             BOOLEAN,
         )

@@ -113,7 +113,7 @@ def test_numeric_percent_literal_is_rendered_as_number_not_sql_string():
 
 def test_external_scope_membership_renders_correlated_exists_with_snapshot_filter():
     result = render_doris(
-        _physical("indicator('', '软件开发', '', '', '', '', '') = 'all'"),
+        _physical("indicator('', '软件开发', '', '2026-04-14', '', '', '') = 'all'"),
         default_physical_catalog(),
     )
 
@@ -129,6 +129,17 @@ def test_external_scope_membership_renders_correlated_exists_with_snapshot_filte
     assert "`external_lookup`.`effective_to` IS NULL" in result.sql
     assert "`external_lookup`.`effective_to` >= `q`.`bizdate`" in result.sql
     assert result.validation.passed is True
+
+
+def test_current_scope_snapshot_does_not_invent_a_historical_effective_date():
+    result = render_doris(
+        _physical("indicator('', '软件开发', '', '', '', '', '') = 'all'"),
+        default_physical_catalog(),
+    )
+
+    assert "`external_lookup`.`snapshot_id`" in result.sql
+    assert "`external_lookup`.`effective_from`" not in result.sql
+    assert "`external_lookup`.`effective_to`" not in result.sql
 
 
 @pytest.mark.parametrize(
