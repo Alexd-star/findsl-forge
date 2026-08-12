@@ -1,0 +1,21 @@
+services:
+  fe:
+    ulimits:
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    healthcheck:
+      start_period: 240s
+      interval: 10s
+      timeout: 5s
+      retries: 60
+  be:
+    ulimits:
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    healthcheck:
+      start_period: 240s
+      interval: 10s
+      timeout: 5s
+      retries: 60
