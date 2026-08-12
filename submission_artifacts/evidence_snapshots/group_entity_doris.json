@@ -1,32 +1,43 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T20:24:07+00:00",
-  "git_head": "6d8102471b8fd6ef93435536948f594de829b14c",
+  "generated_at": "2026-08-12T21:23:18+00:00",
+  "git_head": "ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b",
   "fixture_snapshot_id": "findsl-group-oracle-2026-04-14-v1",
-  "fixture_group_code": "ORACLE_GROUP_001",
-  "fixture_members": [
-    [
-      0,
-      "000001"
+  "fixture_groups": {
+    "ORACLE_GROUP_001": [
+      [
+        0,
+        "000001"
+      ],
+      [
+        0,
+        "000002"
+      ]
     ],
-    [
-      0,
-      "000002"
+    "ORACLE_GROUP_002": [
+      [
+        0,
+        "000004"
+      ],
+      [
+        0,
+        "000006"
+      ]
     ]
-  ],
+  },
   "fixture_cleaned": true,
   "cases": [
     {
       "case_id": "group_volume_sum",
-      "source": "indicator('', '', '成交量', '今日', '行业', '', '') > 0",
+      "source": "indicator('', '群组真值实验甲', '成交量', '今日', '行业', '', '') > 0",
       "selected_strategy": "group_entity_aggregate",
-      "generated_sql": "SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > 0",
+      "generated_sql": "SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE ((EXISTS(SELECT 1 FROM `findsl_ext`.`scope_membership` AS external_lookup WHERE (((`external_lookup`.`mktcode` = `q`.`mktcode` AND `external_lookup`.`tgtcode` = `q`.`tgtcode`) AND `external_lookup`.`scope_code` = 'ORACLE_GROUP_001') AND `external_lookup`.`snapshot_id` = 'findsl-group-oracle-2026-04-14-v1') AND (`external_lookup`.`effective_from` IS NULL OR `external_lookup`.`effective_from` <= `q`.`bizdate`) AND (`external_lookup`.`effective_to` IS NULL OR `external_lookup`.`effective_to` >= `q`.`bizdate`)) AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1')) AND `group_member`.`scope_code` IN ('ORACLE_GROUP_001') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > 0",
       "reference_sql": "SELECT\n  m.scope_type AS group_type,\n  m.scope_code AS group_code,\n  m.scope_name AS group_name,\n  q.bizdate,\n  SUM(q.volume) AS metric_value,\n  COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode)) AS member_count,\n  COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode)) AS metric_member_count\nFROM newzl.hsj_stock_hq_basic q\nINNER JOIN findsl_ext.scope_membership m\n  ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode\nWHERE q.bizdate='2026-04-14'\n  AND m.snapshot_id='findsl-group-oracle-2026-04-14-v1'\n  AND m.scope_type='industry'\n  AND m.scope_code='ORACLE_GROUP_001'\n  AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)\n  AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)\nGROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate\nHAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2",
       "generated_rows": [
         [
           "industry",
           "ORACLE_GROUP_001",
-          "群组真值实验",
+          "群组真值实验甲",
           "2026-04-14",
           "228314550",
           "2",
@@ -37,32 +48,33 @@
         [
           "industry",
           "ORACLE_GROUP_001",
-          "群组真值实验",
+          "群组真值实验甲",
           "2026-04-14",
           "228314550",
           "2",
           "2"
         ]
       ],
-      "generated_hash": "26cfd72c1f530996b6662aa45a4d5beb78d1a0eabcc3e427716cecefc0b0005a",
-      "reference_hash": "26cfd72c1f530996b6662aa45a4d5beb78d1a0eabcc3e427716cecefc0b0005a",
+      "generated_hash": "131df7c9da5449d6b0e33ad1d5a0da0e0876628003f7a696bdde352b91a4f895",
+      "reference_hash": "131df7c9da5449d6b0e33ad1d5a0da0e0876628003f7a696bdde352b91a4f895",
       "row_count": 1,
+      "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 88.80569999999999,
-      "reference_elapsed_ms": 62.54930000000003,
+      "elapsed_ms": 127.5067999958992,
+      "reference_elapsed_ms": 77.40740000735968,
       "explain_contains_membership_join": true
     },
     {
       "case_id": "group_float_cap_weighted_return",
-      "source": "indicator('', '', '涨幅', '今日', '行业', '', '') > -100",
+      "source": "indicator('', '群组真值实验甲', '涨幅', '今日', '行业', '', '') > -100",
       "selected_strategy": "group_entity_aggregate",
-      "generated_sql": "SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(CASE WHEN `q`.`lastPx` IS NOT NULL AND `q`.`preClosePx` IS NOT NULL AND `q`.`listedShare` IS NOT NULL AND `q`.`preClosePx` <> 0 THEN (`q`.`lastPx` - `q`.`preClosePx`) * `q`.`listedShare` END) / NULLIF(SUM(CASE WHEN `q`.`lastPx` IS NOT NULL AND `q`.`preClosePx` IS NOT NULL AND `q`.`listedShare` IS NOT NULL AND `q`.`preClosePx` <> 0 THEN `q`.`preClosePx` * `q`.`listedShare` END), 0) * 100.0 AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN CASE WHEN `q`.`lastPx` IS NOT NULL AND `q`.`preClosePx` IS NOT NULL AND `q`.`listedShare` IS NOT NULL AND `q`.`preClosePx` <> 0 THEN 1 END IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > -100",
+      "generated_sql": "SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(CASE WHEN `q`.`lastPx` IS NOT NULL AND `q`.`preClosePx` IS NOT NULL AND `q`.`listedShare` IS NOT NULL AND `q`.`preClosePx` <> 0 THEN (`q`.`lastPx` - `q`.`preClosePx`) * `q`.`listedShare` END) / NULLIF(SUM(CASE WHEN `q`.`lastPx` IS NOT NULL AND `q`.`preClosePx` IS NOT NULL AND `q`.`listedShare` IS NOT NULL AND `q`.`preClosePx` <> 0 THEN `q`.`preClosePx` * `q`.`listedShare` END), 0) * 100.0 AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN CASE WHEN `q`.`lastPx` IS NOT NULL AND `q`.`preClosePx` IS NOT NULL AND `q`.`listedShare` IS NOT NULL AND `q`.`preClosePx` <> 0 THEN 1 END IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE ((EXISTS(SELECT 1 FROM `findsl_ext`.`scope_membership` AS external_lookup WHERE (((`external_lookup`.`mktcode` = `q`.`mktcode` AND `external_lookup`.`tgtcode` = `q`.`tgtcode`) AND `external_lookup`.`scope_code` = 'ORACLE_GROUP_001') AND `external_lookup`.`snapshot_id` = 'findsl-group-oracle-2026-04-14-v1') AND (`external_lookup`.`effective_from` IS NULL OR `external_lookup`.`effective_from` <= `q`.`bizdate`) AND (`external_lookup`.`effective_to` IS NULL OR `external_lookup`.`effective_to` >= `q`.`bizdate`)) AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1')) AND `group_member`.`scope_code` IN ('ORACLE_GROUP_001') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > -100",
       "reference_sql": "SELECT\n  m.scope_type AS group_type,\n  m.scope_code AS group_code,\n  m.scope_name AS group_name,\n  q.bizdate,\n  SUM((q.lastPx-q.preClosePx)*q.listedShare) / NULLIF(SUM(q.preClosePx*q.listedShare),0) * 100.0 AS metric_value,\n  COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode)) AS member_count,\n  COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode)) AS metric_member_count\nFROM newzl.hsj_stock_hq_basic q\nINNER JOIN findsl_ext.scope_membership m\n  ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode\nWHERE q.bizdate='2026-04-14'\n  AND m.snapshot_id='findsl-group-oracle-2026-04-14-v1'\n  AND m.scope_type='industry'\n  AND m.scope_code='ORACLE_GROUP_001'\n  AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)\n  AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)\nGROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate\nHAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2",
       "generated_rows": [
         [
           "industry",
           "ORACLE_GROUP_001",
-          "群组真值实验",
+          "群组真值实验甲",
           "2026-04-14",
           "1.113615427821464",
           "2",
@@ -73,22 +85,91 @@
         [
           "industry",
           "ORACLE_GROUP_001",
-          "群组真值实验",
+          "群组真值实验甲",
           "2026-04-14",
           "1.113615427821464",
           "2",
           "2"
         ]
       ],
-      "generated_hash": "552633c8f5779535c2ec4b3e5a4ab68acb961074c7944ccb02bbaed2b569c19e",
-      "reference_hash": "552633c8f5779535c2ec4b3e5a4ab68acb961074c7944ccb02bbaed2b569c19e",
+      "generated_hash": "276c8e3880e92da685ada59d1d6e4ebb43ae05ade429831831ab03d08a27f540",
+      "reference_hash": "276c8e3880e92da685ada59d1d6e4ebb43ae05ade429831831ab03d08a27f540",
       "row_count": 1,
+      "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 85.47710000000008,
-      "reference_elapsed_ms": 74.51950000000008,
+      "elapsed_ms": 126.48809999518562,
+      "reference_elapsed_ms": 79.7652999899583,
+      "explain_contains_membership_join": true
+    },
+    {
+      "case_id": "group_metric_intersection",
+      "source": "indicator('', '', '成交量', '今日', '行业', '', '') > 100000000 and indicator('', '', '总股本', '今日', '行业', '', '') > 5000000000",
+      "selected_strategy": "group_set_intersect",
+      "generated_sql": "SELECT `set_rows`.`group_type`, `set_rows`.`group_code`, `set_rows`.`group_name`, `set_rows`.`bizdate` FROM (SELECT `left_set_input`.`group_type`, `left_set_input`.`group_code`, `left_set_input`.`group_name`, `left_set_input`.`bizdate` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > 100000000) AS left_set_input INTERSECT SELECT `right_set_input`.`group_type`, `right_set_input`.`group_code`, `right_set_input`.`group_name`, `right_set_input`.`bizdate` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`totalShare`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`totalShare` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > 5000000000) AS right_set_input) AS set_rows",
+      "reference_sql": "SELECT DISTINCT\n  m.scope_type AS group_type,\n  m.scope_code AS group_code,\n  m.scope_name AS group_name,\n  q.bizdate\nFROM newzl.hsj_stock_hq_basic q\nINNER JOIN findsl_ext.scope_membership m\n  ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode\nWHERE q.bizdate='2026-04-14'\n  AND m.snapshot_id='findsl-group-oracle-2026-04-14-v1'\n  AND m.scope_type='industry'\n  AND m.scope_code='ORACLE_GROUP_001'\n  AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)\n  AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)",
+      "generated_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_001",
+          "群组真值实验甲",
+          "2026-04-14"
+        ]
+      ],
+      "reference_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_001",
+          "群组真值实验甲",
+          "2026-04-14"
+        ]
+      ],
+      "generated_hash": "6ac76f001a4cf88f244f0dc339df0274d8f900b0d79b25f9095f87696874cc41",
+      "reference_hash": "6ac76f001a4cf88f244f0dc339df0274d8f900b0d79b25f9095f87696874cc41",
+      "row_count": 1,
+      "expected_row_count": 1,
+      "matched": true,
+      "elapsed_ms": 191.07719999738038,
+      "reference_elapsed_ms": 70.32139999500941,
+      "explain_contains_membership_join": true
+    },
+    {
+      "case_id": "group_stage_candidate_rank",
+      "source": "indicator('', '', '成交量', '今日', '行业', '', '') < 100000000 then rank('', '', '成交量', 'desc', '今日', '行业', '', '') = 1",
+      "selected_strategy": "group_stage_1",
+      "generated_sql": "SELECT `ranked_groups`.`group_type`, `ranked_groups`.`group_code`, `ranked_groups`.`group_name`, `ranked_groups`.`bizdate`, `ranked_groups`.`metric_value`, `ranked_groups`.`member_count`, `ranked_groups`.`metric_member_count` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count`, ROW_NUMBER() OVER (PARTITION BY `group_metrics`.`bizdate` ORDER BY `group_metrics`.`metric_value` DESC, `group_metrics`.`group_type` ASC, `group_metrics`.`group_code` ASC) AS `__rank_value` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics INNER JOIN (SELECT DISTINCT `group_candidate_raw`.`group_type`, `group_candidate_raw`.`group_code` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest) AND `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` < 100000000) AS group_candidate_raw) AS group_candidates ON `group_metrics`.`group_type` = `group_candidates`.`group_type` AND `group_metrics`.`group_code` = `group_candidates`.`group_code` WHERE `group_metrics`.`member_count` >= 2) AS ranked_groups WHERE `ranked_groups`.`__rank_value` = 1",
+      "reference_sql": "SELECT\n  m.scope_type AS group_type,\n  m.scope_code AS group_code,\n  m.scope_name AS group_name,\n  q.bizdate,\n  SUM(q.volume) AS metric_value,\n  COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode)) AS member_count,\n  COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode)) AS metric_member_count\nFROM newzl.hsj_stock_hq_basic q\nINNER JOIN findsl_ext.scope_membership m\n  ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode\nWHERE q.bizdate='2026-04-14'\n  AND m.snapshot_id='findsl-group-oracle-2026-04-14-v1'\n  AND m.scope_type='industry'\n  AND m.scope_code='ORACLE_GROUP_002'\n  AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)\n  AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)\nGROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate\nHAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2",
+      "generated_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_002",
+          "群组真值实验乙",
+          "2026-04-14",
+          "32986355",
+          "2",
+          "2"
+        ]
+      ],
+      "reference_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_002",
+          "群组真值实验乙",
+          "2026-04-14",
+          "32986355",
+          "2",
+          "2"
+        ]
+      ],
+      "generated_hash": "22917896bf1d3c0890a4d5ed647d8ce2ba6fd8553e447fc7b3e78defe0576c3a",
+      "reference_hash": "22917896bf1d3c0890a4d5ed647d8ce2ba6fd8553e447fc7b3e78defe0576c3a",
+      "row_count": 1,
+      "expected_row_count": 1,
+      "matched": true,
+      "elapsed_ms": 133.69499999680556,
+      "reference_elapsed_ms": 72.69040000392124,
       "explain_contains_membership_join": true
     }
   ],
   "passed": true,
-  "generated_result_hash": "a34b126551a070dde27f715365dc0129f55f0bcc9a7095ad99d58d71f4847f86"
+  "generated_result_hash": "994449ded0c5791859500d8047c19ee628fc32d164eb1fe8074e491f227c2d9b"
 }

@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T21:06:29+00:00",
-  "git_head": "930fadf5cb4a772c737ee9ff1a9cee4b47babc91",
+  "generated_at": "2026-08-12T21:24:01+00:00",
+  "git_head": "ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b",
   "profile_id": "competition-v1",
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
   "row_count": 5799,
   "status_counts": {
-    "CAPABILITY_GAP": 102,
-    "DATA_UNAVAILABLE": 2040,
-    "INVALID_INPUT": 2399,
-    "SUPPORTED": 1258
+    "CAPABILITY_GAP": 88,
+    "DATA_UNAVAILABLE": 2043,
+    "INVALID_INPUT": 2398,
+    "SUPPORTED": 1270
   },
   "data_domain_counts": [
     {
       "capability_status": "CAPABILITY_GAP",
       "domain_id": "daily_market_quote",
       "profile_status": "available",
-      "query_count": 75
+      "query_count": 70
     },
     {
       "capability_status": "CAPABILITY_GAP",
       "domain_id": "extended_daily_quote",
       "profile_status": "available",
-      "query_count": 25
+      "query_count": 15
     },
     {
       "capability_status": "CAPABILITY_GAP",
       "domain_id": "group_analytics",
       "profile_status": "derived",
-      "query_count": 62
+      "query_count": 48
     },
     {
       "capability_status": "CAPABILITY_GAP",
@@ -82,7 +82,7 @@
       "capability_status": "DATA_UNAVAILABLE",
       "domain_id": "daily_market_quote",
       "profile_status": "available",
-      "query_count": 1673
+      "query_count": 1675
     },
     {
       "capability_status": "DATA_UNAVAILABLE",
@@ -94,7 +94,7 @@
       "capability_status": "DATA_UNAVAILABLE",
       "domain_id": "extended_daily_quote",
       "profile_status": "available",
-      "query_count": 164
+      "query_count": 165
     },
     {
       "capability_status": "DATA_UNAVAILABLE",
@@ -124,7 +124,7 @@
       "capability_status": "DATA_UNAVAILABLE",
       "domain_id": "group_analytics",
       "profile_status": "derived",
-      "query_count": 122
+      "query_count": 125
     },
     {
       "capability_status": "DATA_UNAVAILABLE",
@@ -178,19 +178,13 @@
       "capability_status": "INVALID_INPUT",
       "domain_id": "daily_market_quote",
       "profile_status": "available",
-      "query_count": 29
+      "query_count": 28
     },
     {
       "capability_status": "INVALID_INPUT",
       "domain_id": "extended_daily_quote",
       "profile_status": "available",
       "query_count": 5
-    },
-    {
-      "capability_status": "INVALID_INPUT",
-      "domain_id": "group_analytics",
-      "profile_status": "derived",
-      "query_count": 1
     },
     {
       "capability_status": "INVALID_INPUT",
@@ -235,7 +229,7 @@
     {
       "domain_id": "daily_market_quote",
       "provider_id": "official-package",
-      "query_count": 1777
+      "query_count": 1773
     },
     {
       "domain_id": "derivative_market_data",
@@ -245,12 +239,12 @@
     {
       "domain_id": "extended_daily_quote",
       "provider_id": "official-package",
-      "query_count": 194
+      "query_count": 185
     },
     {
       "domain_id": "extended_daily_quote",
       "provider_id": "tushare-optional",
-      "query_count": 194
+      "query_count": 185
     },
     {
       "domain_id": "financial_statement",
@@ -275,17 +269,17 @@
     {
       "domain_id": "group_analytics",
       "provider_id": "baostock-industry",
-      "query_count": 185
+      "query_count": 173
     },
     {
       "domain_id": "group_analytics",
       "provider_id": "eastmoney",
-      "query_count": 185
+      "query_count": 173
     },
     {
       "domain_id": "group_analytics",
       "provider_id": "sina-sector",
-      "query_count": 185
+      "query_count": 173
     },
     {
       "domain_id": "index_market_data",
@@ -748,7 +742,7 @@
       {
         "excel_row": 563,
         "status": "CAPABILITY_GAP",
-        "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+        "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
         "source": "(indicator('港', '', '收盘价', '', '概念', '', '') < 10 or indicator('港', '', '收盘价', '', '概念', '', '') > 10.02) and indicator('港', '', '股票名称', '', '概念', '', '') != '%三十%' or indicator('港', '', '股票名称', '', '概念', '', '') = '%四十%'"
       },
       {

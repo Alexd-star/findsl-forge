@@ -1,7 +1,7 @@
 # 群组结果实体 Doris 真值证据
 
 - 状态：`PASS`
-- Git HEAD：`6d8102471b8fd6ef93435536948f594de829b14c`
+- Git HEAD：`ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b`
 - 隔离快照：`findsl-group-oracle-2026-04-14-v1`
 - 实验后清理：`True`
 
@@ -9,5 +9,7 @@
 |---|---:|---:|---|---|
 | `group_volume_sum` | 1 | 1 | `True` | `True` |
 | `group_float_cap_weighted_return` | 1 | 1 | `True` | `True` |
+| `group_metric_intersection` | 1 | 1 | `True` | `True` |
+| `group_stage_candidate_rank` | 1 | 1 | `True` | `True` |
 
-> 该证据使用独立两只证券成员夹具，仅用于验证群组计划和聚合公式；它不会被计入公开数据快照，实验结束后自动删除。
+> 该证据使用两个隔离群组夹具，用于验证群组计划、聚合公式、集合运算和候选集阶段排名；它不会被计入公开数据快照，实验结束后自动删除。

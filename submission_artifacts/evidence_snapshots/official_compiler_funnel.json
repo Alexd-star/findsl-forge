@@ -2,9 +2,9 @@
   "schema_version": 1,
   "row_count": 5799,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "git_head": "930fadf5cb4a772c737ee9ff1a9cee4b47babc91",
+  "git_head": "ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b",
   "legacy_strict_success": 1097,
-  "new_backend_success": 1258,
+  "new_backend_success": 1270,
   "legacy_to_new_migrated": 1044,
   "migration_coverage": 0.951686,
   "stage_success": {
@@ -12,35 +12,38 @@
     "typed": 3333,
     "logical": 1826,
     "optimizer": 1826,
-    "physical": 1259,
-    "backend": 1258
+    "physical": 1271,
+    "backend": 1270
   },
   "terminal_errors": {
     "OFFICIAL_TYPE_ERROR": 2459,
     "DOMAIN_DATA_UNAVAILABLE": 1504,
     "PHYSICAL_ENTITY_DATA_UNAVAILABLE": 153,
-    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 115,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 117,
     "PHYSICAL_MARKET_DATA_UNAVAILABLE": 106,
     "PHYSICAL_SCOPE_DATA_UNAVAILABLE": 78,
-    "PHYSICAL_GROUP_PLAN_UNSUPPORTED": 28,
-    "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE": 18,
+    "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE": 20,
+    "PHYSICAL_GROUP_BOUND_UNSUPPORTED": 19,
     "PHYSICAL_ENTITY_TARGET_MISMATCH": 16,
-    "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE": 15,
-    "PHYSICAL_GROUP_BOUND_UNSUPPORTED": 11,
-    "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED": 8,
+    "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE": 13,
+    "PHYSICAL_GROUP_PLAN_UNSUPPORTED": 9,
     "PHYSICAL_ENTITY_MARKET_UNSUPPORTED": 5,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
     "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED": 4,
     "PHYSICAL_EVENT_PERIOD_UNSUPPORTED": 3,
+    "PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE": 2,
     "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED": 2,
     "PHYSICAL_PLAN_UNAVAILABLE": 2,
     "TEMPORAL_SCOPE_MISMATCH": 2,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2,
     "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE": 1,
+    "PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED": 1,
     "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 1,
     "DOMAIN_DATE_INVALID": 1,
     "DORIS_JOIN_SHAPE_UNSUPPORTED": 1,
-    "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED": 1
+    "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED": 1,
+    "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED": 1,
+    "PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED": 1
   },
   "migration_gaps": [
     {
@@ -77,7 +80,7 @@
     "indicator": {
       "rows": 5030,
       "legacy_strict_success": 867,
-      "new_backend_success": 984
+      "new_backend_success": 993
     },
     "position": {
       "rows": 131,
@@ -92,7 +95,7 @@
     "rank": {
       "rows": 1743,
       "legacy_strict_success": 276,
-      "new_backend_success": 331
+      "new_backend_success": 337
     },
     "record_high": {
       "rows": 108,
@@ -8075,7 +8078,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11835,7 +11838,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11905,11 +11908,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_stage_1"
     },
     {
       "excel_row": 834,
@@ -12020,7 +12023,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12192,11 +12195,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+external_scope_membership",
+      "selected_strategy": "group_set_intersect"
     },
     {
       "excel_row": 854,
@@ -12596,11 +12599,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "limit_group_entity_aggregate"
     },
     {
       "excel_row": 882,
@@ -12656,7 +12659,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12714,7 +12717,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12924,11 +12927,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_entity_aggregate"
     },
     {
       "excel_row": 905,
@@ -12954,7 +12957,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13264,7 +13267,7 @@
       "terminal_stage": "backend",
       "terminal_code": "PASS",
       "selected_resource": "official_basic+external_scope_membership",
-      "selected_strategy": "group_entity_aggregate"
+      "selected_strategy": "limit_group_entity_aggregate"
     },
     {
       "excel_row": 929,
@@ -15691,11 +15694,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_entity_aggregate"
     },
     {
       "excel_row": 1100,
@@ -15836,11 +15839,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+external_scope_membership",
+      "selected_strategy": "group_entity_aggregate"
     },
     {
       "excel_row": 1110,
@@ -15910,7 +15913,7 @@
       "terminal_stage": "backend",
       "terminal_code": "PASS",
       "selected_resource": "official_basic+external_scope_membership",
-      "selected_strategy": "group_entity_aggregate"
+      "selected_strategy": "limit_group_entity_aggregate"
     },
     {
       "excel_row": 1115,
@@ -15934,11 +15937,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_entity_aggregate"
     },
     {
       "excel_row": 1117,
@@ -19935,11 +19938,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_stage_1"
     },
     {
       "excel_row": 1394,
@@ -20778,7 +20781,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20822,7 +20825,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24557,7 +24560,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25480,7 +25483,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26012,7 +26015,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -29666,7 +29669,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -30100,7 +30103,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32819,7 +32822,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34255,11 +34258,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_set_union"
     },
     {
       "excel_row": 2390,
@@ -34902,7 +34905,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34961,7 +34964,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -46527,7 +46530,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56263,7 +56266,7 @@
       "terminal_stage": "backend",
       "terminal_code": "PASS",
       "selected_resource": "official_basic+external_scope_membership",
-      "selected_strategy": "group_entity_aggregate"
+      "selected_strategy": "limit_group_entity_aggregate"
     },
     {
       "excel_row": 3921,
@@ -59051,7 +59054,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60201,11 +60204,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+external_scope_membership+official_ext+external_scope_membership",
+      "selected_strategy": "group_set_intersect"
     },
     {
       "excel_row": 4197,
@@ -61029,11 +61032,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+external_scope_membership",
+      "selected_strategy": "group_entity_aggregate"
     },
     {
       "excel_row": 4255,
@@ -63601,7 +63604,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77520,11 +77523,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext+external_scope_membership",
+      "selected_strategy": "group_set_intersect"
     },
     {
       "excel_row": 5407,
@@ -79803,7 +79806,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -80093,7 +80096,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
