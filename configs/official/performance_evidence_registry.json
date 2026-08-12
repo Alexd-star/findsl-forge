@@ -1,51 +1,78 @@
 {
-  "schema_version": 1,
-  "registry_id": "official-performance-evidence-taxonomy-v1",
+  "schema_version": 2,
+  "registry_id": "official-performance-evidence-taxonomy-v2",
   "metrics": [
     {
-      "metric_id": "official_routine_prefix",
-      "workload": "官方真实行情常规 20 日成交量窗口：窗口基线与前缀表路径",
-      "dataset": "官方 A 股日频数据，13,650,347 行",
+      "metric_id": "official_routine_prefix_speedup",
+      "workload": "官方真实行情常规20日成交量窗口：窗口基线与前缀表路径",
+      "dataset": "官方A股日频数据，13,650,347行",
       "source": "reports/official_doris_evidence.json",
       "value_path": "baseline_vs_prefix_speedup",
+      "unit": "x",
+      "comparator": "gte",
+      "threshold": 1.0,
       "score_gate": false,
-      "claim": "证明该常规窗口工作负载的前缀路径更快，不代表所有查询的加速倍数"
+      "claim": "证明常规窗口工作负载的前缀路径没有性能退化，不代表全部查询的加速倍数"
     },
     {
-      "metric_id": "official_long_horizon_gate",
-      "workload": "官方真实行情近 5000 个交易日成交量聚合：全量分组基线与长周期汇总路径",
-      "dataset": "官方 A 股日频数据，覆盖 2006-01-04 至 2026-04-14",
-      "source": "reports/phase42_long_horizon_doris.json",
-      "value_path": "speedup",
+      "metric_id": "official_long_horizon_min_speedup",
+      "workload": "五类官方真实行情5000交易日聚合工作负载中的最低加速比",
+      "dataset": "官方A股日频数据，覆盖2006-01-04至2026-04-14",
+      "source": "reports/official_long_horizon_matrix.json",
+      "value_path": "minimum_speedup",
+      "unit": "x",
+      "comparator": "gte",
+      "threshold": 10.0,
       "score_gate": true,
-      "claim": "用于赛题长周期查询相对全表扫描不低于 10 倍的门禁证据"
+      "claim": "用于赛题长周期查询相对全表扫描不低于10倍的保守门禁，取五类工作负载中的最小值"
     },
     {
-      "metric_id": "synthetic_5m_scalability",
-      "workload": "500 万行确定性合成数据的 120 日滑窗与前缀路径",
+      "metric_id": "synthetic_5m_scalability_speedup",
+      "workload": "500万行确定性合成数据的120日滑窗与前缀路径",
       "dataset": "合成可复现扩展性数据，不是官方语料",
       "source": "reports/doris_cluster_evidence.json",
       "value_path": "speedup",
+      "unit": "x",
+      "comparator": "gte",
+      "threshold": 1.0,
       "score_gate": false,
       "claim": "证明扩展性实验中的优化潜力，不替代官方真实数据门禁"
     },
     {
-      "metric_id": "phase6c_projection_prefix",
-      "workload": "14 条投影列级直接技术表路径与集合式前缀 CTE 路径中位数",
-      "dataset": "官方真实行情，特定投影工作负载",
-      "source": "reports/phase6c_set_prefix_doris.json",
-      "value_path": "median_speedup",
-      "score_gate": false,
-      "claim": "证明 Phase 6C 的集合式前缀路径普遍更快，但不是长周期门禁"
+      "metric_id": "official_full_matrix_max_p95",
+      "workload": "覆盖12类官方函数族和主要物理计划的48条分层Doris执行矩阵",
+      "dataset": "官方A股日频数据与独立Reference SQL",
+      "source": "reports/official_full_performance_matrix.json",
+      "value_path": "max_p95_ms",
+      "unit": "ms",
+      "comparator": "lte",
+      "threshold": 10000.0,
+      "score_gate": true,
+      "claim": "用于赛题SQL执行时间不超过10秒的分层工作负载门禁"
     },
     {
-      "metric_id": "legacy_six_query_matrix_prefix",
-      "workload": "早期六查询矩阵中的单条 baseline/prefix 对比",
-      "dataset": "官方真实行情，早期表布局和测量脚本",
-      "source": "reports/official_query_performance_matrix.json",
-      "value_path": "summary.baseline_vs_prefix_speedup",
+      "metric_id": "official_compile_p95",
+      "workload": "48条分层官方有效问句的正式编译器预热服务请求",
+      "dataset": "每条重复30次，共1440次编译样本",
+      "source": "reports/official_compile_latency.json",
+      "value_path": "p95_ms",
+      "unit": "ms",
+      "comparator": "lt",
+      "threshold": 50.0,
+      "score_gate": true,
+      "claim": "用于赛题正式编译P95低于50毫秒门禁"
+    },
+    {
+      "metric_id": "hero_query_execution",
+      "workload": "then、CONS、EXIST、跨市场集合运算和分阶段排名复合Hero Query",
+      "dataset": "官方A股日频数据与人工冻结Reference SQL",
+      "source": "reports/hero_query.json",
+      "value_path": "execution.generated_elapsed_ms",
+      "unit": "ms",
+      "comparator": "lte",
+      "threshold": 10000.0,
       "score_gate": false,
-      "claim": "保留为历史对照，不能用于否定或替代独立的长周期门禁"
+      "claim": "证明高复杂度组合问句在真实Doris上的完整结果等价和现场可执行性"
     }
   ]
 }
