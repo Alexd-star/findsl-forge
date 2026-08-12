@@ -1,5 +1,0 @@
------ STDOUT -----
-<empty>
-
------ STDERR -----
-<empty>

@@ -1,173 +1,117 @@
 # FinDSL Forge
 
-FinDSL Forge 是第五届中国研究生金融科技创新大赛赛题 19“行情选股 DSL 到高性能 Doris SQL 的自动化编译系统”的工程实现。系统把官方七槽位选股 DSL 编译为经过类型检查、安全校验和物理优化的 Apache Doris SQL，并为正确性、性能、数据来源和比赛交付建立可复现证据。
+[![test](https://github.com/Alexd-star/findsl-forge/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Alexd-star/findsl-forge/actions/workflows/test.yml)
 
-当前开发以 [docs/00_当前开发主线.md](docs/00_当前开发主线.md) 为唯一路线，以 [PROJECT_INDEX.md](PROJECT_INDEX.md) 为文件索引。阶段报告和旧方案已归档到 [docs/history/](docs/history/README.md)，不再与当前实现混用。
+FinDSL Forge 是第五届中国研究生金融科技创新大赛赛题 19“行情选股 DSL 到高性能 Doris SQL 的自动化编译系统”的工程实现。系统接收官方七槽位选股 DSL，经过语法解析、类型与业务语义检查、关系计划优化和物理计划选择，输出经过结构校验的 Apache Doris SQL；同时保留正确性、性能、数据来源和版本身份的可复核证据。
 
-## 当前结论
+## 当前状态
 
-项目已经形成 ANTLR4 前端、强类型 AST、领域绑定、Logical IR、规则优化、Physical IR、SQLGlot Doris 后端和真实 Doris 验证链。P0/P1 集中补强已完成正式正确率扩容、复合布尔作用域修复、异常账本、日期通用规则、复权策略基准、Doris 持久化与水位门禁、幂等装载和性能口径治理。架构方向与赛题要求一致，不需要推倒重来；后续重点是把正式真值集继续扩到内部 240 条目标、完成真正新函数的零核心代码盲扩展，并在功能冻结后统一制作最终材料。
+项目已经完成正式编译器主链路和主要硬指标验证，定位是“高完成度竞赛工程原型”，不是已经上线的证券生产系统，也不提前承诺评委必然满分。当前权威证据基线生成于 Git `414a980`；其后的提交主要是测试隔离和仓库整理，最终提交前仍需在冻结代码与同一 Doris 数据快照上重新采集一次证据。
 
-不得把以下指标混为一个“正确率”：
+| 赛题指标 | 当前证据 | 结论 |
+| --- | --- | --- |
+| ANTLR4/BNF 与复合逻辑 | strict `5792/5799`；7 条可审计恢复后 `5799/5799` | 已实现；严格与恢复口径分开统计 |
+| 12 类函数与正确率 `>=95%` | 独立 reference SQL `157/157`，Wilson 95% 下界 `97.61%` | 达到当前正式基准；内部 240 条规模目标未完成 |
+| 旧能力迁入新架构 | `1044/1097`，`95.17%` | 这是迁移覆盖率，不是 SQL 正确率 |
+| 全量语料新后端成功 | `1083/5799` | 其余包含非法输入、缺失数据域和能力缺口，不强造 SQL |
+| 19 年以上长周期加速 `>=10x` | 官方 2006-01-04 至 2026-04-14 数据，`14.625x`，完整结果哈希一致 | 达标 |
+| SQL 执行 `<10s` | 分层性能矩阵 `48/48`，最大 P95 `2945.10ms` | 对已纳入矩阵的工作负载达标 |
+| 编译 P95 `<50ms` | readiness 冻结集 P95 `1.375ms` | 冻结集达标；复杂官方语句全谱压力验证仍需封板复测 |
+| 新指标/新函数零核心改动 | 指标目录和受控函数模板已具备 | 指标较完整；真正新函数盲扩展仍需补最终证据 |
+| 回归质量 | `1125 passed`，官方正例/负例 `37/37 + 37/37`，warning `0` | 当前证据基线通过 |
 
-| 指标 | 当前证据值 | 正确解释 |
-| --- | ---: | --- |
-| 严格解析 | `5792/5799` | 原始官方 DSL 不经修复的语法通过数。 |
-| 恢复解析 | `5799/5799` | 7 条已知格式缺陷经过可审计恢复后均可解析。 |
-| 旧成功集迁移 | `1044/1097`，`95.17%` | 新后端覆盖旧后端已确认能力的比例，不是 SQL 正确率。 |
-| 新后端总成功 | `1083/5799` | 正式新链路当前生成受控 SQL 的行数；其余包含数据缺失、非法输入和能力缺口。 |
-| 正式 SQL 正确率 | `157/157`，Wilson 95% 下界 `97.61%` | 独立 reference SQL 与生成 SQL 的完整结果集一致；12 类函数每类至少 10 条。 |
-| 官方正负例 | `37/37 + 37/37` | 固定正例编译通过、固定负例按预期拒绝。 |
-| 长周期性能门禁 | 当前源码 HEAD `>=10x PASS` | 同一长周期 DSL 的 baseline/optimized 完整结果哈希一致；精确实测值和原始 Profile 见 `submission_artifacts/evidence_snapshots/phase42_long_horizon_doris.json`。 |
-| 其他性能证据 | 按工作负载动态读取 | 常规官方窗口、500 万行合成扩展、Phase 6C 投影和早期六查询矩阵分别登记，见 `submission_artifacts/evidence_snapshots/performance_evidence_registry.json`，不得写成系统平均值。 |
-| 编译延迟 | 当前源码 HEAD P95 `<50ms PASS` | 精确实测值见 `submission_artifacts/evidence_metadata.json`，避免把单次机器抖动写死在说明文档中。 |
+机器可读口径见 [evidence_metadata.json](submission_artifacts/evidence_metadata.json)，详细评分映射见 [赛题要求与验收](docs/赛题要求与验收.md)。
 
-正式提交前必须在当前 HEAD 和同一数据快照上重新采集证据。现有历史性能数字不能替代最终封板结果。
-
-## 官方语料缺口
-
-官方 5799 条语料已按根因重新分类，开发单位是“能力族”，不是 Excel 行号：
-
-| 分类 | 行数 | 处理方式 |
-| --- | ---: | --- |
-| 已通过 | 1083 | 保持回归，不重复开发。 |
-| 数据不可用错误码 | 1720 | 接入完整且版本化的数据目录，或返回结构化不可用诊断。 |
-| 非法输入错误码 | 2466 | 严格模式稳定拒绝；恢复模式仅允许白名单修复。 |
-| 能力缺口错误码 | 530 | 按约束、日期、时序和排名等通用能力族实现。 |
-
-使用下列命令重建当前分类报告：
-
-```powershell
-$env:PYTHONPATH = "src"
-python scripts/analyze_official_gaps.py reports/phase48_scope_semantic_policy_funnel.json `
-  --json-output reports/current_official_gap_taxonomy.json `
-  --markdown-output reports/current_official_gap_taxonomy.md
-```
-
-任何生产分支都不得匹配完整 DSL 文本、工作簿行号或单个证券名称。数据范围只有在来源、成员完整性、快照日期、许可和历史有效期可说明时，才进入正式目录；否则 fail closed，不生成伪 SQL。
-
-## 架构
+## 编译架构
 
 ```text
 官方 DSL
-  -> OfficialSlot.g4 / ANTLR4
+  -> ANTLR4 Frontend + Source Map
   -> Immutable Typed AST
-  -> Semantic Policy Binder
-  -> Domain Model
-  -> Canonical Relational IR
+  -> Semantic Policy / Domain Binder
+  -> Canonical Logical IR
   -> Equivalence Rewrite Rules
   -> Physical Candidate Planner + Cost/Risk Selector
   -> Validated Physical IR
   -> SQLGlot Doris AST / SQL
   -> Doris Execute / Explain / Profile
-  -> Independent Oracle / Evidence Manifest
+  -> Independent Oracle / Evidence Contract
 ```
 
-正式官方编译器位于 `src/findsl/official/`。手写官方前端和双前端差分已移到 `src/findsl/compat/official_frontend/`；旧 `lexer.py`、`parser.py`、`semantic.py`、`sqlgen.py`、`compiler.py` 和 `official_slot.py` 暂时保留为内部样例、兼容入口和迁移差分基线，不再承接新官方语义。依赖边界由 `import-linter` 强制：整个新官方包不能反向依赖旧管道。决策依据见 [ADR-0001](docs/adr/0001-官方编译器主线与兼容层边界.md)。
+正式实现位于 `src/findsl/official/`。旧手写管道仅保留为兼容入口和差分基线，并被 import-linter 禁止反向进入正式编译器。ANTLR4 负责文法与错误位置，SQLGlot 负责 SQL AST 和 Doris 方言渲染，Apache Doris 负责数据库内执行优化；项目自研部分集中在金融 DSL 语义、关系 IR、候选规划、成本风险和证据合同。
 
-项目复用成熟组件的边界如下：
-
-- ANTLR4 负责文法解析和错误位置，不手写第二套正式语法。
-- SQLGlot 负责 Doris SQL AST 和方言渲染，不拼接任意 SQL 字符串。
-- Apache Doris Nereids、统计、分区和物化视图负责数据库内优化。
-- 项目自研部分聚焦金融 DSL 类型、业务语义、关系 IR、候选规划、成本风险和证据合同。
+架构细节见 [架构设计](docs/架构设计.md)，全部目录职责见 [PROJECT_INDEX.md](PROJECT_INDEX.md)。
 
 ## 快速开始
 
-建议使用 Python 3.11；项目最低支持 Python 3.9。
+建议使用 Python 3.11；最低支持 Python 3.9。
 
 ```powershell
 python -m pip install -e ".[dev]"
+python scripts/generate_antlr.py --check
+python -m ruff check .
+lint-imports
 python -m pytest
+```
+
+编译一条官方 DSL：
+
+```powershell
 $env:PYTHONPATH = "src"
-```
-
-数据运行模式由 `FINDSL_DATA_PROFILE` 显式选择：
-
-```powershell
-# 评委复现与官方数据基线：不引用外部成员、行业、指数行情或交易规则表
-$env:FINDSL_DATA_PROFILE = "official_only"
-
-# 扩展能力验证：使用已经登记的公开数据快照；执行前必须装载相应外部表
-$env:FINDSL_DATA_PROFILE = "enriched_public"
-```
-
-`official_only` 可以随赛题方数据包离线复现；`enriched_public` 的编译请求不会临时联网，但第三方成员数据受许可约束，干净环境必须按来源清单重新同步和装载，不能把本机缓存当成交付依赖。来源清单见 [external_source_registry.json](configs/official/external_source_registry.json)，当前缺口裁决见 [数据缺口逐条审计](submission_artifacts/evidence_snapshots/current_scope_data_gap_audit.md)。
-
-解析、生成 IR 和 Doris SQL：
-
-```powershell
-python -m findsl.cli official-slot-parse `
-  "indicator('', '', '涨幅', '今日', '', '', '') > 5%" `
-  --mode strict --frontend antlr --json
-
-python -m findsl.cli official-slot-ir `
-  "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
-
 python -m findsl.cli official-slot-backend `
   "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
 ```
 
-启动演示：
+启动 Web 演示：
 
 ```powershell
 python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 ```
 
-浏览器访问 `http://127.0.0.1:8765`。比赛演示使用“官方赛题编译链”入口；内部 FinDSL 入口只用于保留的样例和安全辅助说明。
+浏览器访问 `http://127.0.0.1:8765`。完整命令和 Doris 启动流程见 [运行测试与 Doris](docs/运行测试与Doris.md)。
 
-## 质量门禁
-
-```powershell
-python scripts/generate_antlr.py --check
-python -m ruff check .
-lint-imports
-python -m pytest
-python -m findsl.cli official-suite --json
-python -m findsl.cli readiness-report --output reports/submission_readiness.md
-```
-
-`lint-imports` 在 Windows 用户安装后若不在 PATH，可直接调用 `%APPDATA%\Python\Python39\Scripts\lint-imports.exe`，或重新打开终端。CI 使用已安装命令。
-
-门禁分别证明不同事项：测试通过不等于真实 Doris 正确；迁移通过不等于独立真值正确；SQL 能执行不等于业务语义正确；空结果不能作为唯一正确性证据。正式正确性要比较完整有序结果、行数和 SHA-256，并由不复用被测规划器的独立 oracle 产生期望结果。
-
-## Doris
-
-部署资产位于 `deploy/doris/`，完整操作见 [docs/doris_runbook.md](docs/doris_runbook.md)。快速环境使用命名卷保存 FE 元数据与 BE 数据，健康检查同时覆盖 FE HTTP、BE HTTP、查询端口和 alive backend：
+## 数据模式
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\doris_quickstart.ps1 -Action Start
-python scripts\check_official_watermarks.py
+# 仅依赖赛题方数据，适合评委离线复现
+$env:FINDSL_DATA_PROFILE = "official_only"
+
+# 使用已登记、已版本化的公开关系数据
+$env:FINDSL_DATA_PROFILE = "enriched_public"
 ```
 
-正确率和性能脚本默认先执行水位门禁，要求基础、技术、前缀和汇总路径的行数、交易日数及起止日期一致。Stream Load 使用文件 SHA-256 派生标签、`strict_mode:true`、`max_filter_ratio:0` 和 `NumberFilteredRows=0` 门禁；数据已完整时复用现有表，不重复清表。
+外部数据不会在在线编译请求中临时抓取。只有来源、许可、快照日期、成员完整性和历史有效期可说明的数据才能进入正式目录；无法确定的数据返回结构化诊断，不用空集合、全市场或模糊名称映射伪造成功。详见 [数据与证据](docs/数据与证据.md)。
 
-## 文档与证据
+## 仓库导航
+
+| 路径 | 内容 |
+| --- | --- |
+| `src/findsl/official/` | 正式 ANTLR/IR/优化/物理规划/Doris 后端 |
+| `src/findsl/compat/` | 兼容和差分基线，不承接新语义 |
+| `grammar/OfficialSlot.g4` | 官方 DSL 唯一文法源 |
+| `configs/official/` | 指标、函数、物理策略、数据源和证据合同 |
+| `data/official_correctness/` | 独立 reference SQL 正确率基准 |
+| `data/official_performance/` | 分层性能矩阵定义 |
+| `deploy/` | API 与 Doris 部署资产 |
+| `scripts/` | 生成、同步、装载、评测和证据采集脚本 |
+| `tests/` | 单元、集成、架构边界和证据合同测试 |
+| `submission_artifacts/` | 精简后的当前证据快照，不含 PPT、视频和大量截图 |
+
+## 文档
 
 - [文档导航](docs/README.md)
-- [当前开发主线](docs/00_当前开发主线.md)
-- [赛题要求映射](docs/requirement_mapping.md)
-- [严格口径说明](docs/36_严格官方编译基线与口径说明.md)
-- [缺失数据域审计](docs/35_官方三表缺失数据域不可伪造SQL审计报告.md)
-- [操作手册](docs/FinDSL_Forge_中文操作手册.md)
-- [提交说明](docs/17_项目交付说明.md)
-- [机器可读证据](submission_artifacts/evidence_metadata.json)
-- [证据摘要](submission_artifacts/evidence_summary.md)
-- [外部数据来源与快照清单](submission_artifacts/evidence_snapshots/current_external_data_inventory.md)
-- [53条严格迁移缺口逐条审计](submission_artifacts/evidence_snapshots/current_scope_data_gap_audit.md)
+- [赛题要求与验收](docs/赛题要求与验收.md)
+- [架构设计](docs/架构设计.md)
+- [数据与证据](docs/数据与证据.md)
+- [运行测试与 Doris](docs/运行测试与Doris.md)
+- [开发路线](docs/开发路线.md)
 
-`reports/` 是可再生成的本地工作产物；`submission_artifacts/evidence_snapshots/` 是提交用快照。导出前必须确认所有 current 证据使用同一 Git HEAD、配置指纹和数据快照，历史证据只能进入 historical 分组。
+历史阶段报告、旧方案、操作手册、PPT、科研图和截图视频已从当前树移除。需要追溯时使用 Git 历史；功能冻结后再按最终 HEAD 生成一次正式展示材料，避免旧数字和当前代码混用。
 
-## 开发规则
+## 开发原则
 
-1. 先确定失败属于语法、类型、语义、关系表达、物理规划、数据或非法输入，再改代码。
-2. 一次实现一个通用能力族，并回归全部受影响语料；不按单句打补丁。
-3. 新指标优先进入版本化目录；新函数通过受控签名、模板或插件扩展，不能执行任意配置 SQL。
-4. 等价规则只产生语义等价候选，成本模型只负责选择；两者不得混写。
-5. 新官方核心不得依赖旧管道，CI 发现依赖回退直接失败。
-6. 文档只解释当前代码和证据，不得用旧数字覆盖事实。
-7. 完成的含义是实现、测试、真实执行、版本一致证据和可复现说明全部闭环。
-
-## 项目状态
-
-当前是高完成度的竞赛工程原型和企业级内核基线，不应提前宣称评委“必然满分”或已达到生产正式发布。赛题正确率、12 类函数覆盖、官方长周期 `>=10x`、编译 P95、48 条 `<10s` 矩阵和本地 Doris 可复现性已有强证据；剩余高价值工作是把正式正确率集扩到内部 240 条、完成真正新函数/窗口模板的零核心代码盲扩展、在最终提交 HEAD 重采并封装证据。API 安全、完整可观测性和多节点高可用属于产品化增强，不作为本轮竞赛 P0/P1 阻塞。具体顺序和停止条件以 [当前开发主线](docs/00_当前开发主线.md) 为准。
+1. 以能力族为开发单位，不按 Excel 行号或完整 DSL 文本打补丁。
+2. 先判定问题属于语法、类型、语义、关系表达、物理规划、数据还是非法输入，再修改对应层。
+3. 等价规则只生成语义等价候选，成本模型只负责选择，二者保持分离。
+4. 数据不可用时 fail closed；不通过猜测、空结果或假字段提高表面覆盖率。
+5. 每项“完成”必须同时具备实现、回归、真实 Doris 执行、结果集对照和版本化证据。

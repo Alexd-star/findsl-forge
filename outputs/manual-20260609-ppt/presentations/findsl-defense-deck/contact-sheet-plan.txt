@@ -1,4 +1,0 @@
-Deck rhythm: 24 slides, 6 chapters.
-Macro layouts: visual cover, split problem map, requirement matrix, pipeline diagram, scientific chart, table proof, section divider, risk register, speech page.
-No 3 consecutive slides share the same macro layout.
-No pseudo official logos; imagegen only supplies concept visuals without text.

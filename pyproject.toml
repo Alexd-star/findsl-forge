@@ -30,7 +30,6 @@ dev = [
     "import-linter==2.5.2",
     "openpyxl>=3.1",
     "pandas>=2.0",
-    "Pillow>=11.0",
     "pytest>=8.0",
     "ruff==0.15.13",
     "uvicorn[standard]>=0.30,<1",
@@ -49,7 +48,6 @@ extend-exclude = ["src/findsl/official/frontend/generated"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/findsl/**/__init__.py" = ["F401", "F403", "F405"]
-"scripts/build_plottie_style_figures.py" = ["E402"]
 
 [tool.importlinter]
 root_packages = ["findsl"]

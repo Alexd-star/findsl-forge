@@ -14,24 +14,6 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
 | ANTLR/IR legacy migration | 1044/1097 (95.17%) |
-| Phase 18 dynamic date evidence | PASS, 9/9, max P95 181.0921 ms |
-| Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 221.4119 ms |
-| Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 3046.7137 ms |
-| Phase 21 aggregate/rank evidence | PASS, 6/6, non-empty 6/6, max P95 527.1584 ms |
-| Phase 22 stage/rank evidence | PASS, 7/7, non-empty 7/7, max P95 411.3313 ms |
-| Phase 23 temporal/relation evidence | PASS, 6/6, non-empty 6/6, max P95 1122.9697 ms |
-| Phase 24 period-scalar evidence | PASS, 4/4, non-empty 4/4, max P95 472.0212 ms |
-| Phase 25 event-candidate evidence | PASS, 5/5, non-empty 5/5, max P95 2163.5640 ms |
-| Phase 26 date/limit evidence | PASS, 6/6, non-empty 6/6, max P95 732.5326 ms |
-| Phase 27 event-semantics evidence | PASS, 4/4, non-empty 4/4, max P95 2090.4077 ms |
-| Phase 28 default-price event evidence | PASS, 6/6, non-empty 6/6, max P95 3177.3871 ms |
-| Phase 29 generalized event projection evidence | PASS, 4/4, non-empty 4/4, max P95 1512.6686 ms |
-| Phase 30 grounded event evidence | PASS, 6/6, non-empty 6/6, max P95 1024.4798 ms |
-| Phase 31 final grounded evidence | PASS, 2/2, non-empty 2/2, max P95 64.6454 ms |
-| Phase 6C set-prefix evidence | PASS, hash 14/14, faster 14/14, median 1.393x |
-| Phase 47 benchmark-policy evidence | PASS, 3/3 |
-| Phase 48 scope-policy evidence | PASS, 7/7 |
-| Latest phase new-success audit | PASS, 23/23, failed 0 |
 | Official per-query 10s target | PASS, 48 queries, max P95 2945.0978 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
@@ -43,6 +25,9 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Doris row parity | PASS |
 | Git HEAD at report generation | 414a980 |
 | Git HEAD at export | 414a980 |
+| Phase 6C set-prefix evidence | PASS, hash 14/14, faster 14/14, median 1.393x |
+| Phase 48 scope-policy evidence | PASS, 7/7 |
+| Latest phase new-success audit | PASS, 23/23, failed 0 |
 
 ## Source Files
 
@@ -52,68 +37,10 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | official_suite_report | `submission_artifacts\evidence_snapshots\official_suite_report.md` |
 | official_doris_evidence_json | `submission_artifacts\evidence_snapshots\official_doris_evidence.json` |
 | official_slot_coverage_json | `submission_artifacts\evidence_snapshots\official_slot_coverage.json` |
-| official_query_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_query_performance_matrix.json` |
 | official_full_performance_matrix_json | `submission_artifacts\evidence_snapshots\official_full_performance_matrix.json` |
 | official_compiler_funnel_json | `submission_artifacts\evidence_snapshots\official_compiler_funnel.json` |
 | official_correctness_benchmark_json | `submission_artifacts\evidence_snapshots\official_correctness_benchmark.json` |
 | phase42_long_horizon_doris_json | `submission_artifacts\evidence_snapshots\phase42_long_horizon_doris.json` |
-| phase18_dynamic_date_funnel_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_funnel.json` |
-| phase18_dynamic_date_doris_json | `submission_artifacts\evidence_snapshots\phase18_dynamic_date_doris.json` |
-| phase19_security_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase19_security_scope_funnel.json` |
-| phase19_security_scope_doris_json | `submission_artifacts\evidence_snapshots\phase19_security_scope_doris.json` |
-| phase20_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase20_capability_funnel.json` |
-| phase20_mapping_event_doris_json | `submission_artifacts\evidence_snapshots\phase20_mapping_event_doris.json` |
-| phase21_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase21_capability_funnel.json` |
-| phase21_aggregate_rank_doris_json | `submission_artifacts\evidence_snapshots\phase21_aggregate_rank_doris.json` |
-| phase21_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase21_new_success_audit.json` |
-| phase22_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase22_capability_funnel.json` |
-| phase22_stage_rank_doris_json | `submission_artifacts\evidence_snapshots\phase22_stage_rank_doris.json` |
-| phase22_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase22_new_success_audit.json` |
-| phase23_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase23_capability_funnel.json` |
-| phase23_relational_doris_json | `submission_artifacts\evidence_snapshots\phase23_relational_doris.json` |
-| phase23_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase23_new_success_audit.json` |
-| phase24_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase24_capability_funnel.json` |
-| phase24_period_scalar_doris_json | `submission_artifacts\evidence_snapshots\phase24_period_scalar_doris.json` |
-| phase24_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase24_new_success_audit.json` |
-| phase25_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase25_capability_funnel.json` |
-| phase25_event_candidate_doris_json | `submission_artifacts\evidence_snapshots\phase25_event_candidate_doris.json` |
-| phase25_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase25_new_success_audit.json` |
-| phase26_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase26_capability_funnel.json` |
-| phase26_date_limit_doris_json | `submission_artifacts\evidence_snapshots\phase26_date_limit_doris.json` |
-| phase26_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase26_new_success_audit.json` |
-| phase27_capability_funnel_json | `submission_artifacts\evidence_snapshots\phase27_capability_funnel.json` |
-| phase27_event_semantics_doris_json | `submission_artifacts\evidence_snapshots\phase27_event_semantics_doris.json` |
-| phase27_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase27_new_success_audit.json` |
-| phase28_default_price_funnel_json | `submission_artifacts\evidence_snapshots\phase28_default_price_funnel.json` |
-| phase28_default_price_doris_json | `submission_artifacts\evidence_snapshots\phase28_default_price_doris.json` |
-| phase28_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase28_new_success_audit.json` |
-| phase29_event_projection_funnel_json | `submission_artifacts\evidence_snapshots\phase29_event_projection_funnel.json` |
-| phase29_event_projection_doris_json | `submission_artifacts\evidence_snapshots\phase29_event_projection_doris.json` |
-| phase29_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase29_new_success_audit.json` |
-| phase30_grounded_event_funnel_json | `submission_artifacts\evidence_snapshots\phase30_grounded_event_funnel.json` |
-| phase30_grounded_event_doris_json | `submission_artifacts\evidence_snapshots\phase30_grounded_event_doris.json` |
-| phase30_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase30_new_success_audit.json` |
-| phase31_final_grounded_funnel_json | `submission_artifacts\evidence_snapshots\phase31_final_grounded_funnel.json` |
-| phase31_final_grounded_doris_json | `submission_artifacts\evidence_snapshots\phase31_final_grounded_doris.json` |
-| phase31_new_success_audit_json | `submission_artifacts\evidence_snapshots\phase31_new_success_audit.json` |
-| phase41_external_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase41_external_scope_funnel.json` |
-| phase41_external_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase41_external_scope_delta_doris_audit.json` |
-| phase43_external_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase43_external_scope_funnel.json` |
-| phase43_external_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase43_external_scope_delta_doris_audit.json` |
-| phase43_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase43_true_remaining_scope_targets.json` |
-| phase44_composite_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase44_composite_scope_funnel.json` |
-| phase44_composite_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase44_composite_scope_delta_doris_audit.json` |
-| phase44_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase44_true_remaining_scope_targets.json` |
-| phase45_scope_governance_funnel_json | `submission_artifacts\evidence_snapshots\phase45_scope_governance_funnel.json` |
-| phase45_scope_governance_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase45_scope_governance_delta_doris_audit.json` |
-| phase45_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase45_true_remaining_scope_targets.json` |
-| phase46_derived_scope_funnel_json | `submission_artifacts\evidence_snapshots\phase46_derived_scope_funnel.json` |
-| phase46_derived_scope_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase46_derived_scope_delta_doris_audit.json` |
-| phase46_derived_scope_doris_json | `submission_artifacts\evidence_snapshots\phase46_derived_scope_doris.json` |
-| phase46_true_remaining_scope_targets_json | `submission_artifacts\evidence_snapshots\phase46_true_remaining_scope_targets.json` |
-| phase47_benchmark_policy_funnel_json | `submission_artifacts\evidence_snapshots\phase47_benchmark_policy_funnel.json` |
-| phase47_benchmark_policy_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase47_benchmark_policy_delta_doris_audit.json` |
-| phase47_benchmark_policy_doris_json | `submission_artifacts\evidence_snapshots\phase47_benchmark_policy_doris.json` |
 | phase48_scope_semantic_policy_funnel_json | `submission_artifacts\evidence_snapshots\phase48_scope_semantic_policy_funnel.json` |
 | phase48_scope_semantic_policy_delta_doris_audit_json | `submission_artifacts\evidence_snapshots\phase48_scope_semantic_policy_delta_doris_audit.json` |
 | phase48_scope_semantic_policy_doris_json | `submission_artifacts\evidence_snapshots\phase48_scope_semantic_policy_doris.json` |

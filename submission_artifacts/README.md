@@ -1,45 +1,21 @@
-# FinDSL Forge 提交包导览
+# 当前证据包
 
-本目录用于放置可随代码一起提交和回溯的轻量交付材料。`reports/` 目录是本地生成目录，默认被 `.gitignore` 忽略；最终提交前请运行：
+本目录只保存可随源码回溯的当前评分证据。`reports/` 是本地生成区，默认不进入 Git；PPT、长篇手册、截图和视频在功能封板后单独生成，也不进入日常源码版本。
+
+| 文件 | 作用 |
+| --- | --- |
+| `evidence_metadata.json` | 机器可读的门禁、正确率、性能、Git 和数据身份 |
+| `evidence_summary.md` | 从 metadata 自动生成的摘要 |
+| `evidence_manifest.md` | 当前快照文件和导出环境清单 |
+| `evidence_snapshots/` | 正确率、性能、Doris、水位、语料覆盖和数据缺口证据 |
+
+重新导出：
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
 ```
 
-脚本会把当前 readiness、Doris 证据、真实行情样本证据、官方风格套件、答辩包等报告复制到 `submission_artifacts/evidence_snapshots/`，并生成 `evidence_metadata.json` 与 `evidence_summary.md`，避免评审材料只停留在本机临时报告中。
+导出脚本使用白名单，不再复制旧阶段的全部中间报告。证据合同失败时必须修复来源，不得手工篡改 PASS 状态。
 
-## 推荐提交顺序
-
-1. 运行 `scripts/submission_readiness.ps1`，确认 blocking gates 通过、warning 为 0。
-2. 如果需要重做 5M Doris 证据，运行 `scripts/prepare_doris_scale_evidence.ps1`。
-3. 运行 `scripts/export_submission_artifacts.ps1` 导出证据快照。
-4. 按 `demo_script.md` 做一次完整演练。
-5. 结合 `demo_screenshots/` 中的截图和 `defense_video/` 中的一分钟 MP4 制作正式 PPT 或录屏讲解稿。
-
-## 交付物地图
-
-| 文件 | 用途 |
-|---|---|
-| `technical_report.md` | 技术报告正文骨架，覆盖问题、方案、架构、实验、创新点 |
-| `score_mapping.md` | 赛题得分点到实现和证据的映射 |
-| `demo_script.md` | 现场演示脚本和故障兜底顺序 |
-| `defense_ppt_outline.md` | 答辩 PPT 逐页内容 |
-| `defense_video_script.md` | 一分钟答辩视频时间轴、旁白和生成命令 |
-| `real_data_ingestion_plan.md` | 真实行情数据接入方案 |
-| `evidence_summary.md` | 从证据元数据自动生成的一屏式核心证据摘要 |
-| `evidence_metadata.json` | 机器可读证据元数据，汇总门禁、pytest、官方套件和 Doris 加速指标 |
-| `evidence_snapshots/` | 从 `reports/` 导出的可版本化证据快照 |
-| `demo_screenshots/` | Web Demo 正例、真实行情、SQL、AST、Explain、Rows、Evidence 和负例诊断截图 |
-| `defense_video/` | 由截图合成的一分钟答辩视频输出目录 |
-
-## 当前核心证据口径
-
-- 编译正确性：官方风格正例、负例、SQL/reference 等价验证。
-- 安全性：LLM 候选必须经过 DSL 编译器验证，直接 SQL 和错误 DSL 会被拒绝；真实 provider 也只作为候选来源，不改变这条边界。
-- 性能：Doris 5,000,000 行真实集群执行证据，baseline window 与 prefix-sum 优化路径结果一致，优化加速超过 10x。
-- 业务可信度：`data/real_samples/eastmoney_a_share_sample/` 已包含东方财富公开 A 股行情小样本，readiness 会校验 raw JSON、metadata 和 3/3 条真实行情 DSL 等价验证。
-- 展示：Web Demo 截图已进入 `submission_artifacts/demo_screenshots/`，覆盖正例全链路和负例诊断；当前 Demo 的样例下拉框也能直接切换 Eastmoney 真实行情样本，便于现场把业务可信度和验证证据连在一起讲。
-- 视频：`scripts/build_defense_video.py` 已从 8 张版本化截图生成一分钟 MP4，`defense_video_script.md` 提供旁白口径。
-- 可回溯：代码进入 Git；报告快照进入 `submission_artifacts/`；大规模 CSV 由脚本可重建，不进入 Git。
-
-建议评审快速核对时先打开 `evidence_summary.md`，确认 blocking gates、warning count、pytest、官方正负例和 Doris speedup 的核心数字；若需要追溯细节，再打开 `evidence_snapshots/submission_readiness.md`、`evidence_snapshots/official_suite_report.md` 和 `evidence_snapshots/doris_cluster_evidence.md`。
+当前快照基线是 Git `414a980`。后续仓库整理提交不改变该次 Doris 实验事实；最终提交前仍需在冻结功能后的新基线上完整重采。

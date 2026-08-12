@@ -531,24 +531,6 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Official negative diagnostics | {_ratio_display(_dict(official.get('negative')))} |",
         f"| Official slot coverage | {_official_slot_coverage_display(official_slot)} |",
         f"| ANTLR/IR legacy migration | {_official_migration_display(official_migration)} |",
-        f"| Phase 18 dynamic date evidence | {_dynamic_date_display(dynamic_date)} |",
-        f"| Phase 19 security scope evidence | {_security_scope_display(security_scope)} |",
-        f"| Phase 20 mapping/event evidence | {_mapping_event_display(mapping_event)} |",
-        f"| Phase 21 aggregate/rank evidence | {_mapping_event_display(aggregate_rank)} |",
-        f"| Phase 22 stage/rank evidence | {_mapping_event_display(stage_rank)} |",
-        f"| Phase 23 temporal/relation evidence | {_mapping_event_display(relational)} |",
-        f"| Phase 24 period-scalar evidence | {_mapping_event_display(period_scalar)} |",
-        f"| Phase 25 event-candidate evidence | {_mapping_event_display(event_candidate)} |",
-        f"| Phase 26 date/limit evidence | {_mapping_event_display(date_limit)} |",
-        f"| Phase 27 event-semantics evidence | {_mapping_event_display(event_semantics)} |",
-        f"| Phase 28 default-price event evidence | {_mapping_event_display(default_price_event)} |",
-        f"| Phase 29 generalized event projection evidence | {_mapping_event_display(generalized_event)} |",
-        f"| Phase 30 grounded event evidence | {_mapping_event_display(grounded_event)} |",
-        f"| Phase 31 final grounded evidence | {_mapping_event_display(final_grounded)} |",
-        f"| Phase 6C set-prefix evidence | {_prefix_join_display(prefix_join)} |",
-        f"| Phase 47 benchmark-policy evidence | {_mapping_event_display(benchmark_policy)} |",
-        f"| Phase 48 scope-policy evidence | {_mapping_event_display(scope_semantic_policy)} |",
-        f"| Latest phase new-success audit | {_audit_display(new_success_audit)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
@@ -560,12 +542,39 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Doris row parity | {_pass_fail(doris.get('row_counts_match'))} |",
         f"| Git HEAD at report generation | {_display(git.get('head_at_report_generation'))} |",
         f"| Git HEAD at export | {_display(git.get('head_at_export'))} |",
+    ]
+
+    optional_rows = (
+        ("Phase 18 dynamic date evidence", dynamic_date, _dynamic_date_display),
+        ("Phase 19 security scope evidence", security_scope, _security_scope_display),
+        ("Phase 20 mapping/event evidence", mapping_event, _mapping_event_display),
+        ("Phase 21 aggregate/rank evidence", aggregate_rank, _mapping_event_display),
+        ("Phase 22 stage/rank evidence", stage_rank, _mapping_event_display),
+        ("Phase 23 temporal/relation evidence", relational, _mapping_event_display),
+        ("Phase 24 period-scalar evidence", period_scalar, _mapping_event_display),
+        ("Phase 25 event-candidate evidence", event_candidate, _mapping_event_display),
+        ("Phase 26 date/limit evidence", date_limit, _mapping_event_display),
+        ("Phase 27 event-semantics evidence", event_semantics, _mapping_event_display),
+        ("Phase 28 default-price event evidence", default_price_event, _mapping_event_display),
+        ("Phase 29 generalized event projection evidence", generalized_event, _mapping_event_display),
+        ("Phase 30 grounded event evidence", grounded_event, _mapping_event_display),
+        ("Phase 31 final grounded evidence", final_grounded, _mapping_event_display),
+        ("Phase 6C set-prefix evidence", prefix_join, _prefix_join_display),
+        ("Phase 47 benchmark-policy evidence", benchmark_policy, _mapping_event_display),
+        ("Phase 48 scope-policy evidence", scope_semantic_policy, _mapping_event_display),
+        ("Latest phase new-success audit", new_success_audit, _audit_display),
+    )
+    for label, evidence, formatter in optional_rows:
+        if evidence.get("available") is not False:
+            lines.append(f"| {label} | {formatter(evidence)} |")
+
+    lines.extend([
         "",
         "## Source Files",
         "",
         "| Source | Path |",
         "|---|---|",
-    ]
+    ])
     for name, path in sources.items():
         lines.append(f"| {name} | `{_display(path)}` |")
 
@@ -1205,7 +1214,7 @@ def _official_migration_metadata(
 
 
 def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, str | None]:
-    return {
+    candidates = {
         "submission_readiness": str(snapshot_dir / "submission_readiness.md"),
         "official_suite_report": str(snapshot_dir / "official_suite_report.md"),
         "official_doris_evidence_json": str(snapshot_dir / "official_doris_evidence.json"),
@@ -1327,6 +1336,11 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "phase6c_set_prefix_doris_json": str(snapshot_dir / "phase6c_set_prefix_doris.json"),
         "doris_cluster_evidence_json": str(snapshot_dir / "doris_cluster_evidence.json"),
         "evidence_manifest": str(manifest_path) if manifest_path else None,
+    }
+    return {
+        name: path
+        for name, path in candidates.items()
+        if path is not None and Path(path).is_file()
     }
 
 
