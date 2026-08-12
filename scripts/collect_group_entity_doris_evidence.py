@@ -66,6 +66,20 @@ def collect(
                     _reference_sql("SUM(q.volume)", "ORACLE_GROUP_002"),
                     1,
                 ),
+                (
+                    "group_consecutive_trading_sessions",
+                    "indicator('', '', '成交量', '近3日', '行业', '', "
+                    "'CONS=2日') > 100000000",
+                    _temporal_reference_sql(),
+                    1,
+                ),
+                (
+                    "group_exist_zero_hit_preserved",
+                    "indicator('', '', '成交量', '近3日', '行业', '', "
+                    "'EXIST<2日') > 100000000",
+                    _temporal_zero_hit_reference_sql(),
+                    1,
+                ),
             )
             results = []
             for case_id, source, reference_sql, expected_row_count in cases:
@@ -197,6 +211,117 @@ WHERE q.bizdate='2026-04-14'
 """.strip()
 
 
+def _temporal_reference_sql() -> str:
+    return f"""
+WITH latest_dates AS (
+  SELECT bizdate
+  FROM (SELECT DISTINCT bizdate FROM newzl.hsj_stock_hq_basic) dates
+  ORDER BY bizdate DESC
+  LIMIT 3
+),
+calendar AS (
+  SELECT
+    bizdate,
+    DENSE_RANK() OVER (ORDER BY bizdate) AS session_seq
+  FROM (SELECT DISTINCT bizdate FROM newzl.hsj_stock_hq_basic) dates
+),
+daily AS (
+  SELECT
+    m.scope_type AS group_type,
+    m.scope_code AS group_code,
+    m.scope_name AS group_name,
+    q.bizdate,
+    SUM(q.volume) AS metric_value
+  FROM newzl.hsj_stock_hq_basic q
+  INNER JOIN latest_dates d ON q.bizdate=d.bizdate
+  INNER JOIN findsl_ext.scope_membership m
+    ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode
+  WHERE m.snapshot_id='{FIXTURE_SNAPSHOT}'
+    AND m.scope_type='industry'
+    AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)
+    AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)
+  GROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate
+  HAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2
+),
+hits AS (
+  SELECT d.*, c.session_seq
+  FROM daily d
+  INNER JOIN calendar c ON d.bizdate=c.bizdate
+  WHERE d.metric_value>100000000
+),
+numbered AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY group_type,group_code ORDER BY bizdate
+    ) AS hit_seq
+  FROM hits
+),
+runs AS (
+  SELECT
+    group_type,group_code,group_name,
+    COUNT(*) AS run_length
+  FROM numbered
+  GROUP BY group_type,group_code,group_name,session_seq-hit_seq
+),
+metrics AS (
+  SELECT
+    group_type,group_code,group_name,
+    MAX(run_length) AS metric_value
+  FROM runs
+  GROUP BY group_type,group_code,group_name
+)
+SELECT
+  group_type,group_code,group_name,
+  (SELECT MAX(bizdate) FROM newzl.hsj_stock_hq_basic) AS bizdate,
+  metric_value
+FROM metrics
+WHERE metric_value>=2
+""".strip()
+
+
+def _temporal_zero_hit_reference_sql() -> str:
+    return f"""
+WITH latest_dates AS (
+  SELECT bizdate
+  FROM (SELECT DISTINCT bizdate FROM newzl.hsj_stock_hq_basic) dates
+  ORDER BY bizdate DESC
+  LIMIT 3
+),
+daily AS (
+  SELECT
+    m.scope_type AS group_type,
+    m.scope_code AS group_code,
+    m.scope_name AS group_name,
+    q.bizdate,
+    SUM(q.volume) AS daily_volume
+  FROM newzl.hsj_stock_hq_basic q
+  INNER JOIN latest_dates d ON q.bizdate=d.bizdate
+  INNER JOIN findsl_ext.scope_membership m
+    ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode
+  WHERE m.snapshot_id='{FIXTURE_SNAPSHOT}'
+    AND m.scope_type='industry'
+    AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)
+    AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)
+  GROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate
+  HAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2
+),
+metrics AS (
+  SELECT
+    group_type,group_code,group_name,
+    SUM(CASE WHEN daily_volume>100000000 THEN 1 ELSE 0 END) AS metric_value
+  FROM daily
+  GROUP BY group_type,group_code,group_name
+)
+SELECT
+  group_type,group_code,group_name,
+  (SELECT MAX(bizdate) FROM newzl.hsj_stock_hq_basic) AS bizdate,
+  metric_value
+FROM metrics
+WHERE metric_value<2
+""".strip()
+
+
 def _insert_sql() -> str:
     values = ",".join(
         "(" + ",".join(
@@ -207,7 +332,7 @@ def _insert_sql() -> str:
                 f"'{code}'",
                 "'industry'",
                 f"'群组真值实验{name}'",
-                "'2026-04-14'",
+                "'2005-01-01'",
                 "NULL",
                 "NULL",
             )
@@ -305,7 +430,8 @@ def render_markdown(report: dict) -> str:
         [
             "",
             "> 该证据使用两个隔离群组夹具，用于验证群组计划、聚合公式、集合运算和候选集阶段排名；"
-            "它不会被计入公开数据快照，实验结束后自动删除。",
+            "它不会被计入公开数据快照，实验结束后自动删除。连续条件按真实交易日序列计算，"
+            "周末不会被误判为中断。",
         ]
     )
     return "\n".join(lines) + "\n"

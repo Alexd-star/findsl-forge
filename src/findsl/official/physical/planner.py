@@ -55,6 +55,7 @@ from .ir import (
     PhysicalFilter,
     PhysicalGroupedAggregate,
     PhysicalGroupEntityMetric,
+    PhysicalGroupTemporal,
     PhysicalGreatest,
     PhysicalIn,
     PhysicalJoin,
@@ -248,6 +249,54 @@ def _plan_group_entity(
             selected_strategy=f"limit_{inner.selected_strategy}",
         )
 
+    if isinstance(logical_plan, (LogicalConsecutive, LogicalExist)):
+        spec = logical_plan.spec
+        if spec.every or spec.unit not in {"", "日"}:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_TEMPORAL_BUCKET_UNSUPPORTED",
+                "group temporal planning currently admits numeric trading-day quantifiers",
+            )
+        if not (
+            isinstance(spec.predicate, ComparisonExpr)
+            and isinstance(spec.predicate.left, CallExpr)
+            and isinstance(spec.predicate.right, LiteralExpr)
+            and spec.predicate.right.type is NUMERIC
+        ):
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_TEMPORAL_PREDICATE_UNSUPPORTED",
+                "group temporal planning requires one numeric metric comparison",
+            )
+        matched = _plan_group_entity_leaf(
+            LogicalFilter(
+                logical_plan.input,
+                spec.predicate,
+                logical_plan.schema,
+            ),
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            candidate_input,
+            default_latest=False,
+        )
+        window = _lower_temporal_window(spec.window)
+        plan = PhysicalGroupTemporal(
+            matched.plan,
+            "official_basic",
+            "CONS" if isinstance(logical_plan, LogicalConsecutive) else "EXIST",
+            spec.comparator,
+            spec.threshold,
+            spec.maximum,
+            window,
+            spec.trading_sequence,
+        )
+        validate_physical_plan(plan, catalog, expressions)
+        return replace(
+            matched,
+            plan=plan,
+            selected_strategy=f"group_temporal_{plan.mode.lower()}",
+        )
+
     if isinstance(logical_plan, LogicalStage):
         prior = _plan_group_entity(
             logical_plan.input,
@@ -373,6 +422,7 @@ def _plan_group_entity_leaf(
     expressions: Optional[PhysicalExpressionRegistry],
     statistics: Optional[PhysicalStatisticsSnapshot],
     candidate_input: Optional[PhysicalPlan] = None,
+    default_latest: bool = True,
 ) -> PhysicalPlanningResult:
     current = logical_plan
     limit = None
@@ -534,7 +584,7 @@ def _plan_group_entity_leaf(
     )
     for constraint in _call_constraints(call, catalog, selected):
         input_plan = PhysicalFilter(input_plan, constraint)
-    if not str(call.binding.slots.get("date", "")).strip():
+    if default_latest and not str(call.binding.slots.get("date", "")).strip():
         stable_id = resource.anchor_resource_id or selected
         partition_key = catalog.resource(stable_id).partition_key
         if partition_key is None:

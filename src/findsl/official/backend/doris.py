@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Optional, Tuple
 
 from sqlglot import exp
@@ -26,6 +26,7 @@ from ..physical.ir import (
     PhysicalExtreme,
     PhysicalGroupedAggregate,
     PhysicalGroupEntityMetric,
+    PhysicalGroupTemporal,
     PhysicalGreatest,
     PhysicalIn,
     PhysicalJoin,
@@ -55,6 +56,7 @@ from ..physical.ir import (
     PhysicalTemporal,
     PhysicalTemporalAggregate,
     PhysicalTemporalRank,
+    PhysicalTemporalWindow,
     PhysicalUnary,
 )
 from ..physical.validate import validate_physical_plan
@@ -256,6 +258,8 @@ def _render_plan(
         return _render_grouped_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalGroupEntityMetric):
         return _render_group_entity_metric(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalGroupTemporal):
+        return _render_group_temporal(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalCompositeAggregate):
         return _render_composite_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalEventFilter):
@@ -282,7 +286,7 @@ def _render_plan(
 
 
 def _physical_output_keys(plan: PhysicalPlan) -> Tuple[str, ...]:
-    if isinstance(plan, PhysicalGroupEntityMetric):
+    if isinstance(plan, (PhysicalGroupEntityMetric, PhysicalGroupTemporal)):
         return ("group_type", "group_code", "bizdate")
     if isinstance(plan, PhysicalSetOperation):
         return plan.key_columns
@@ -1569,6 +1573,518 @@ def _render_group_entity_metric(
     for cte in candidate_ctes:
         result = result.with_(cte.alias_or_name, as_=cte.this)
     return result
+
+
+def _render_group_temporal(
+    plan: PhysicalGroupTemporal,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    keys = ("group_type", "group_code", "group_name")
+    if not isinstance(plan.input, PhysicalGroupEntityMetric):
+        raise DorisBackendError(
+            "DORIS_GROUP_TEMPORAL_INPUT_UNSUPPORTED",
+            "group temporal rendering requires one group metric input",
+        )
+    universe_plan = replace(
+        plan.input,
+        predicate_comparator=None,
+        predicate_bound=None,
+        rank_direction=None,
+        rank_comparator=None,
+        rank_bound=None,
+        rank_upper_bound=None,
+        rank_percentage=False,
+    )
+    universe_query = _render_group_entity_metric(
+        universe_plan,
+        catalog,
+        f"{cte_prefix}group_temporal_universe_input_",
+    )
+    universe_body, universe_input_ctes = _detach_ctes(universe_query)
+    matched_query = _render_plan(
+        plan.input,
+        catalog,
+        f"{cte_prefix}group_temporal_input_",
+    )
+    matched_body, input_ctes = _detach_ctes(matched_query)
+    universe_raw_name = f"{cte_prefix}group_temporal_universe_raw"
+    universe_name = f"{cte_prefix}group_temporal_universe"
+    universe_groups_name = f"{cte_prefix}group_temporal_universe_groups"
+    matched_raw_name = f"{cte_prefix}group_temporal_matched_raw"
+    matched_name = f"{cte_prefix}group_temporal_matched"
+    eligible_dates_name = f"{cte_prefix}group_temporal_eligible_dates"
+    calendar_dates_name = f"{cte_prefix}group_temporal_calendar_dates"
+    calendar_name = f"{cte_prefix}group_temporal_calendar"
+    sequenced_name = f"{cte_prefix}group_temporal_sequenced"
+    hits_name = f"{cte_prefix}group_temporal_hits"
+    runs_name = f"{cte_prefix}group_temporal_runs"
+    metrics_name = f"{cte_prefix}group_temporal_metrics"
+
+    eligible_dates = _render_group_temporal_eligible_dates(
+        plan.window,
+        catalog,
+        plan.anchor_resource_id,
+        f"{cte_prefix}group_temporal_eligible_anchor",
+    )
+    eligible_date_subquery = exp.select(
+        exp.column("bizdate", table=eligible_dates_name, quoted=True)
+    ).from_(exp.table_(eligible_dates_name, quoted=True))
+    universe = (
+        exp.select(
+            *(
+                exp.column(key, table=universe_raw_name, quoted=True)
+                for key in (*keys, "bizdate")
+            )
+        )
+        .distinct()
+        .from_(universe_body.subquery(alias=universe_raw_name))
+        .where(
+            exp.In(
+                this=exp.column(
+                    "bizdate", table=universe_raw_name, quoted=True
+                ),
+                query=exp.Subquery(this=eligible_date_subquery.copy()),
+            )
+        )
+    )
+    universe_groups = (
+        exp.select(
+            *(
+                exp.column(key, table=universe_name, quoted=True)
+                for key in keys
+            )
+        )
+        .distinct()
+        .from_(exp.table_(universe_name, quoted=True))
+    )
+    matched = (
+        exp.select(
+            *(
+                exp.column(key, table=matched_raw_name, quoted=True)
+                for key in (*keys, "bizdate")
+            )
+        )
+        .distinct()
+        .from_(matched_body.subquery(alias=matched_raw_name))
+        .where(
+            exp.In(
+                this=exp.column(
+                    "bizdate", table=matched_raw_name, quoted=True
+                ),
+                query=exp.Subquery(this=eligible_date_subquery.copy()),
+            )
+        )
+    )
+    anchor = catalog.resource(plan.anchor_resource_id)
+    anchor_alias = f"{cte_prefix}group_temporal_anchor"
+    anchor_date = exp.column(anchor.partition_key, table=anchor_alias, quoted=True)
+    calendar_dates = (
+        exp.select(anchor_date.copy().as_("bizdate", quoted=True))
+        .distinct()
+        .from_(
+            exp.table_(
+                anchor.table,
+                db=anchor.database,
+                quoted=True,
+                alias=anchor_alias,
+            )
+        )
+    )
+    calendar = (
+        exp.select(
+            exp.column("bizdate", table=calendar_dates_name, quoted=True),
+            exp.Window(
+                this=exp.DenseRank(),
+                order=exp.Order(
+                    expressions=[
+                        exp.Ordered(
+                            this=exp.column(
+                                "bizdate", table=calendar_dates_name, quoted=True
+                            ),
+                            desc=False,
+                        )
+                    ]
+                ),
+            ).as_("session_seq", quoted=True),
+        )
+        .from_(exp.table_(calendar_dates_name, quoted=True))
+    )
+    match_predicate = exp.and_(
+        *(
+            exp.EQ(
+                this=exp.column(key, table=universe_name, quoted=True),
+                expression=exp.column(key, table=matched_name, quoted=True),
+            )
+            for key in (*keys, "bizdate")
+        )
+    )
+    sequenced = (
+        exp.select(
+            *(
+                exp.column(key, table=universe_name, quoted=True)
+                for key in (*keys, "bizdate")
+            ),
+            exp.column("session_seq", table=calendar_name, quoted=True),
+            exp.Case(
+                ifs=[
+                    exp.If(
+                        this=exp.Is(
+                            this=exp.column(
+                                "bizdate", table=matched_name, quoted=True
+                            ),
+                            expression=exp.Null(),
+                        ).not_(),
+                        true=exp.convert(1),
+                    )
+                ],
+                default=exp.convert(0),
+            ).as_("matched", quoted=True),
+        )
+        .from_(exp.table_(universe_name, quoted=True))
+        .join(
+            exp.table_(calendar_name, quoted=True),
+            on=exp.EQ(
+                this=exp.column("bizdate", table=universe_name, quoted=True),
+                expression=exp.column(
+                    "bizdate", table=calendar_name, quoted=True
+                ),
+            ),
+            join_type="INNER",
+        )
+        .join(
+            exp.table_(matched_name, quoted=True),
+            on=match_predicate,
+            join_type="LEFT",
+        )
+    )
+
+    if plan.mode == "EXIST":
+        metrics = exp.select(
+            *(
+                exp.column(key, table=sequenced_name, quoted=True)
+                for key in keys
+            ),
+            exp.Sum(
+                this=exp.column("matched", table=sequenced_name, quoted=True)
+            ).as_("metric_value", quoted=True),
+        ).from_(exp.table_(sequenced_name, quoted=True)).group_by(
+            *(
+                exp.column(key, table=sequenced_name, quoted=True)
+                for key in keys
+            )
+        )
+        ctes = [
+            (eligible_dates_name, eligible_dates),
+            (universe_name, universe),
+            (universe_groups_name, universe_groups),
+            (matched_name, matched),
+            (calendar_dates_name, calendar_dates),
+            (calendar_name, calendar),
+            (sequenced_name, sequenced),
+        ]
+    else:
+        row_number = exp.Window(
+            this=exp.RowNumber(),
+            partition_by=[
+                exp.column(key, table=sequenced_name, quoted=True)
+                for key in ("group_type", "group_code")
+            ],
+            order=exp.Order(
+                expressions=[
+                    exp.Ordered(
+                        this=exp.column(
+                            "bizdate", table=sequenced_name, quoted=True
+                        ),
+                        desc=False,
+                    )
+                ]
+            ),
+        )
+        hits = exp.select(
+            *(
+                exp.column(key, table=sequenced_name, quoted=True)
+                for key in keys
+            ),
+            exp.Sub(
+                this=exp.column(
+                    "session_seq", table=sequenced_name, quoted=True
+                ),
+                expression=row_number,
+            ).as_("run_group", quoted=True),
+        ).from_(exp.table_(sequenced_name, quoted=True)).where(
+            exp.EQ(
+                this=exp.column("matched", table=sequenced_name, quoted=True),
+                expression=exp.convert(1),
+            )
+        )
+        runs = exp.select(
+            *(
+                exp.column(key, table=hits_name, quoted=True) for key in keys
+            ),
+            exp.Count(this=exp.Star()).as_("run_length", quoted=True),
+        ).from_(exp.table_(hits_name, quoted=True)).group_by(
+            *(
+                exp.column(key, table=hits_name, quoted=True)
+                for key in (*keys, "run_group")
+            )
+        )
+        run_metrics_name = f"{cte_prefix}group_temporal_run_metrics"
+        run_metrics = exp.select(
+            *(
+                exp.column(key, table=runs_name, quoted=True) for key in keys
+            ),
+            exp.Max(
+                this=exp.column("run_length", table=runs_name, quoted=True)
+            ).as_("metric_value", quoted=True),
+        ).from_(exp.table_(runs_name, quoted=True)).group_by(
+            *(
+                exp.column(key, table=runs_name, quoted=True) for key in keys
+            )
+        )
+        metrics = (
+            exp.select(
+                *(
+                    exp.column(
+                        key, table=universe_groups_name, quoted=True
+                    )
+                    for key in keys
+                ),
+                exp.Coalesce(
+                    this=exp.column(
+                        "metric_value", table=run_metrics_name, quoted=True
+                    ),
+                    expressions=[exp.convert(0)],
+                ).as_("metric_value", quoted=True),
+            )
+            .from_(exp.table_(universe_groups_name, quoted=True))
+            .join(
+                exp.table_(run_metrics_name, quoted=True),
+                on=exp.and_(
+                    *(
+                        exp.EQ(
+                            this=exp.column(
+                                key,
+                                table=universe_groups_name,
+                                quoted=True,
+                            ),
+                            expression=exp.column(
+                                key, table=run_metrics_name, quoted=True
+                            ),
+                        )
+                        for key in keys
+                    )
+                ),
+                join_type="LEFT",
+            )
+        )
+        ctes = [
+            (eligible_dates_name, eligible_dates),
+            (universe_name, universe),
+            (universe_groups_name, universe_groups),
+            (matched_name, matched),
+            (calendar_dates_name, calendar_dates),
+            (calendar_name, calendar),
+            (sequenced_name, sequenced),
+            (hits_name, hits),
+            (runs_name, runs),
+            (run_metrics_name, run_metrics),
+        ]
+
+    metric = exp.column("metric_value", table=metrics_name, quoted=True)
+    comparator = ">=" if plan.mode == "CONS" and plan.comparator == "=" else plan.comparator
+    if plan.maximum is not None or comparator == "between":
+        qualification = exp.and_(
+            exp.GTE(this=metric.copy(), expression=exp.convert(plan.threshold)),
+            exp.LTE(this=metric.copy(), expression=exp.convert(plan.maximum)),
+        )
+    else:
+        qualification = _COMPARISON[comparator](
+            this=metric,
+            expression=exp.convert(plan.threshold),
+        )
+    latest_alias = f"{cte_prefix}group_temporal_latest"
+    latest = exp.select(
+        exp.Max(
+            this=exp.column(anchor.partition_key, table=latest_alias, quoted=True)
+        )
+    ).from_(
+        exp.table_(
+            anchor.table,
+            db=anchor.database,
+            quoted=True,
+            alias=latest_alias,
+        )
+    )
+    result = exp.select(
+        *(
+            exp.column(key, table=metrics_name, quoted=True) for key in keys
+        ),
+        exp.Subquery(this=latest).as_("bizdate", quoted=True),
+        metric.copy(),
+    ).from_(exp.table_(metrics_name, quoted=True)).where(qualification)
+    for cte in (*universe_input_ctes, *input_ctes):
+        result = result.with_(cte.alias_or_name, as_=cte.this)
+    for name, query in (*ctes, (metrics_name, metrics)):
+        result = result.with_(name, as_=query)
+    return result
+
+
+def _render_group_temporal_eligible_dates(
+    window: PhysicalTemporalWindow,
+    catalog: PhysicalCatalog,
+    anchor_resource_id: str,
+    alias: str,
+) -> exp.Select:
+    resource = catalog.resource(anchor_resource_id)
+    column = exp.column(resource.partition_key, table=alias, quoted=True)
+    query = (
+        exp.select(column.copy().as_("bizdate", quoted=True))
+        .distinct()
+        .from_(
+            exp.table_(
+                resource.table,
+                db=resource.database,
+                quoted=True,
+                alias=alias,
+            )
+        )
+    )
+    if window.kind == "all_history":
+        return query
+    if window.kind in {"recent_sessions", "session_slice", "latest_session"}:
+        query = query.order_by(exp.Ordered(this=column.copy(), desc=True)).limit(
+            window.lookback_sessions or 1
+        )
+        return query.offset(window.session_offset) if window.session_offset else query
+    if window.kind == "exact_date":
+        return query.where(
+            exp.EQ(this=column.copy(), expression=exp.convert(window.start))
+        )
+    if window.kind == "calendar_range":
+        return query.where(
+            exp.and_(
+                exp.GTE(this=column.copy(), expression=exp.convert(window.start)),
+                exp.LTE(this=column.copy(), expression=exp.convert(window.end)),
+            )
+        )
+    if window.kind == "calendar_since":
+        return query.where(
+            exp.and_(
+                exp.GTE(this=column.copy(), expression=exp.convert(window.start)),
+                exp.LTE(
+                    this=column.copy(),
+                    expression=_latest_resource_anchor(catalog, anchor_resource_id),
+                ),
+            )
+        )
+    if window.kind == "boundary_sessions":
+        if window.boundary_kind == "period":
+            boundary = _date_shift(
+                _date_trunc(
+                    _latest_resource_anchor(catalog, anchor_resource_id),
+                    window.calendar_unit,
+                ),
+                window.calendar_offset,
+                window.calendar_unit,
+            )
+            validity = None
+        elif window.boundary_kind == "anchor":
+            boundary, _, validity = _dynamic_date_bounds(
+                catalog,
+                anchor_resource_id,
+                "anchor_calendar",
+                "day",
+                1,
+                window.calendar_offset,
+                window.anchor_month,
+                window.anchor_day,
+            )
+        elif window.boundary_kind == "weekday":
+            boundary, _, validity = _dynamic_date_bounds(
+                catalog,
+                anchor_resource_id,
+                "weekday_range",
+                "week",
+                1,
+                window.calendar_offset,
+                None,
+                None,
+                weekday_start=window.weekday_start,
+                weekday_end=window.weekday_start,
+            )
+        else:
+            boundary = exp.convert(window.boundary_date)
+            validity = None
+        comparator = {
+            "before": exp.LT,
+            "after": exp.GT,
+            "from": exp.GTE,
+            "through": exp.LTE,
+        }[window.boundary_direction]
+        predicate = comparator(this=column.copy(), expression=boundary)
+        if validity is not None:
+            predicate = exp.and_(predicate, validity)
+        query = query.where(predicate).order_by(
+            exp.Ordered(
+                this=column.copy(),
+                desc=window.boundary_direction in {"before", "through"},
+            )
+        )
+        query = query.limit(window.lookback_sessions or 1)
+        return query.offset(window.session_offset) if window.session_offset else query
+
+    if window.kind == "recent_calendar":
+        range_kind = "recent"
+    elif window.kind in {
+        "dynamic_period",
+        "dynamic_weekday_range",
+        "year_month_range",
+        "rolling_periods",
+        "period_since",
+        "anchor_since",
+        "month_day_range",
+        "anchor_calendar",
+    }:
+        range_kind = {
+            "dynamic_period": "period",
+            "dynamic_weekday_range": "weekday_range",
+            "year_month_range": "year_month_range",
+            "rolling_periods": "rolling_periods",
+            "period_since": "period_since",
+            "anchor_since": "anchor_since",
+            "month_day_range": "month_day_range",
+            "anchor_calendar": "anchor_calendar",
+        }[window.kind]
+    else:
+        raise DorisBackendError(
+            "DORIS_GROUP_TEMPORAL_WINDOW_UNSUPPORTED",
+            f"unsupported group temporal window {window.kind}",
+        )
+    if window.calendar_unit is None:
+        raise DorisBackendError(
+            "DORIS_GROUP_TEMPORAL_WINDOW_INVALID",
+            "group temporal calendar window is missing its unit",
+        )
+    lower, upper, validity = _dynamic_date_bounds(
+        catalog,
+        anchor_resource_id,
+        range_kind,
+        window.calendar_unit,
+        window.calendar_amount or 1,
+        window.calendar_offset,
+        window.anchor_month,
+        window.anchor_day,
+        window.end_month,
+        weekday_start=window.weekday_start,
+        weekday_end=window.weekday_end,
+        end_day=window.end_day,
+    )
+    predicate = exp.and_(
+        exp.GTE(this=column.copy(), expression=lower),
+        exp.LTE(this=column.copy(), expression=upper),
+    )
+    return query.where(exp.and_(predicate, validity) if validity is not None else predicate)
 
 
 def _render_composite_aggregate(

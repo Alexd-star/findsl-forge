@@ -522,6 +522,33 @@ class PhysicalGroupEntityMetric(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalGroupTemporal(PhysicalPlan):
+    input: PhysicalPlan
+    anchor_resource_id: str
+    mode: str
+    comparator: str
+    threshold: Optional[int]
+    maximum: Optional[int]
+    window: PhysicalTemporalWindow
+    trading_sequence: bool = True
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalGroupTemporal",
+            "input": self.input.to_dict(),
+            "anchor_resource_id": self.anchor_resource_id,
+            "mode": self.mode,
+            "comparator": self.comparator,
+            "threshold": self.threshold,
+            "maximum": self.maximum,
+            "window": self.window.to_dict(),
+            "semantics": (
+                "trading_sequence" if self.trading_sequence else "calendar_sequence"
+            ),
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalAggregateRank(PhysicalPlan):
     input: PhysicalPlan
     measure: PhysicalExpr

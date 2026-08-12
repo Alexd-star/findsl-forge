@@ -212,6 +212,59 @@ def test_group_stage_ranks_only_the_prior_candidate_population() -> None:
     assert "`group_metrics`.`group_code` = `group_candidates`.`group_code`" in sql
 
 
+def test_group_consecutive_metric_uses_dense_trading_session_runs() -> None:
+    context = CompileContext.load(REPO_ROOT)
+    result = compile_official(
+        "indicator('', '', '成交量', '近3日', '行业', '', 'CONS=2日') "
+        "> 100000000",
+        context=context,
+    )
+
+    plan = result.physical["plan"]
+    assert plan["kind"] == "PhysicalGroupTemporal"
+    assert plan["mode"] == "CONS"
+    assert plan["semantics"] == "trading_sequence"
+    assert result.physical["selected_strategy"] == "group_temporal_cons"
+    sql = result.backend["sql"]
+    assert "group_temporal_universe" in sql
+    assert "DENSE_RANK() OVER" in sql
+    assert "ROW_NUMBER() OVER" in sql
+    assert "group_temporal_runs" in sql
+    assert "COALESCE(" in sql
+
+
+def test_group_exist_metric_preserves_zero_hit_groups_for_upper_bounds() -> None:
+    context = CompileContext.load(REPO_ROOT)
+    result = compile_official(
+        "indicator('', '', '成交量', '近3日', '行业', '', 'EXIST<2日') "
+        "> 100000000",
+        context=context,
+    )
+
+    assert result.physical["plan"]["kind"] == "PhysicalGroupTemporal"
+    assert result.physical["plan"]["mode"] == "EXIST"
+    assert result.physical["selected_strategy"] == "group_temporal_exist"
+    sql = result.backend["sql"]
+    assert "LEFT JOIN `group_temporal_matched`" in sql
+    assert "SUM(`group_temporal_sequenced`.`matched`)" in sql
+    assert "`group_temporal_metrics`.`metric_value` < 2" in sql
+
+
+def test_group_temporal_limit_wraps_the_temporal_plan() -> None:
+    context = CompileContext.load(REPO_ROOT)
+    result = compile_official(
+        "indicator('', '', '涨幅', '', '行业', '', 'CONS>1') > 0 limit 0,5",
+        context=context,
+    )
+
+    assert result.physical["plan"]["kind"] == "PhysicalLimit"
+    assert result.physical["plan"]["input"]["kind"] == "PhysicalGroupTemporal"
+    assert result.physical["selected_strategy"] == "limit_group_temporal_cons"
+    assert result.physical["plan"]["offset"] == 0
+    assert result.physical["plan"]["count"] == 5
+    assert result.backend["sql"].endswith("LIMIT 5")
+
+
 def test_group_universe_is_supported_without_inventing_a_metric() -> None:
     context = CompileContext.load(REPO_ROOT)
     result = compile_official(

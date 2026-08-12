@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalCrossing, PhysicalEmpty,
     PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixAggregate, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
-    PhysicalDynamicDateRange, PhysicalExternalExists, PhysicalGroupedAggregate, PhysicalGroupEntityMetric, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
+    PhysicalDynamicDateRange, PhysicalExternalExists, PhysicalGroupedAggregate, PhysicalGroupEntityMetric, PhysicalGroupTemporal, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -39,7 +39,7 @@ def validate_physical_plan(plan: PhysicalPlan, catalog: PhysicalCatalog, express
 
 
 def _is_group_entity_output(plan: PhysicalPlan) -> bool:
-    if isinstance(plan, PhysicalGroupEntityMetric):
+    if isinstance(plan, (PhysicalGroupEntityMetric, PhysicalGroupTemporal)):
         return True
     if isinstance(plan, PhysicalLimit):
         return _is_group_entity_output(plan.input)
@@ -384,6 +384,30 @@ def _validate_plan(plan, catalog, expressions):
         _validate_expr(plan.measure, catalog, expressions)
         if plan.predicate_bound is not None:
             _validate_expr(plan.predicate_bound, catalog, expressions)
+    elif isinstance(plan, PhysicalGroupTemporal):
+        _validate_plan(plan.input, catalog, expressions)
+        if not _is_group_entity_output(plan.input):
+            raise ValueError("group temporal input must preserve group identity")
+        anchor = catalog.resource(plan.anchor_resource_id)
+        if anchor.partition_key is None:
+            raise PhysicalCatalogError(
+                "group temporal anchor requires a partition key"
+            )
+        if plan.mode not in {"CONS", "EXIST"}:
+            raise ValueError("group temporal mode is invalid")
+        if plan.comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
+            raise ValueError("group temporal comparator is invalid")
+        if plan.threshold is None or plan.threshold < 0:
+            raise ValueError("group temporal threshold must be non-negative")
+        if plan.comparator == "between":
+            if plan.maximum is None or plan.maximum < plan.threshold:
+                raise ValueError("group temporal range is invalid")
+        elif plan.maximum is not None:
+            raise ValueError("group temporal maximum requires between comparator")
+        if not plan.trading_sequence:
+            raise ValueError("group temporal route requires trading-session semantics")
+        if plan.window.kind not in _TEMPORAL_WINDOW_KINDS:
+            raise ValueError("group temporal window kind is invalid")
     elif isinstance(plan, PhysicalCompositeAggregate):
         if (not plan.groups and not plan.scalars) or plan.predicate.type is not BOOLEAN:
             raise ValueError("composite named relation plan requires relations and a boolean predicate")
