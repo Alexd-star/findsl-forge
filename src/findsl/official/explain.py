@@ -120,8 +120,13 @@ def build_explain(
             {
                 "selected_route": route.selected_route,
                 "selected_strategy": route.selected_strategy,
+                "selected_candidate_id": route.selected_candidate_id,
+                "selection_reason_code": route.selection_reason_code,
+                "selection_reason": route.selection_reason,
                 "selected_resource": physical.get("selected_resource"),
                 "candidate_count": len(route.candidates),
+                "fallback_chain": list(route.fallback_chain),
+                "fallback_candidates": list(route.fallback_candidates),
             },
         ),
         ExplainStage(
@@ -138,7 +143,7 @@ def build_explain(
         ),
     )
     return FindslExplain(
-        schema_version=1,
+        schema_version=2,
         source=source,
         query_features=feature_payload,
         stages=stages,
@@ -163,52 +168,136 @@ def build_explain(
 
 def render_explain_markdown(explain: Mapping[str, Any]) -> str:
     route = explain["adaptive_route"]
+    fallback = " -> ".join(route["fallback_chain"]) or "<none>"
     lines = [
         "# FINDSL EXPLAIN",
         "",
         f"- 选择路由：`{route['selected_route']}`",
         f"- 选择策略：`{route['selected_strategy']}`",
+        f"- 选择候选：`{route['selected_candidate_id']}`",
+        f"- 选择原因：`{route['selection_reason_code']}` - {_md(route['selection_reason'])}",
+        f"- 回退顺序：`{fallback}`",
         f"- 查询复杂度：`{explain['query_features']['complexity_score']}`",
         "",
-        "## 编译阶段",
+        "## 查询特征",
         "",
-        "| 阶段 | 状态 | 产物标识 | 摘要 |",
-        "|---|---|---|---|",
+        "| 特征 | 值 |",
+        "|---|---|",
     ]
+    for key, value in explain["query_features"].items():
+        lines.append(f"| `{key}` | {_md(_display(value))} |")
+    lines.extend(
+        [
+            "",
+            "## 编译阶段",
+            "",
+            "| 阶段 | 状态 | 产物标识 | 摘要 |",
+            "|---|---|---|---|",
+        ]
+    )
     for stage in explain["stages"]:
         lines.append(
-            f"| {stage['stage']} | {stage['status']} | `{stage['artifact_id'][:16]}` | {stage['summary']} |"
+            f"| {stage['stage']} | {stage['status']} | "
+            f"`{stage['artifact_id'][:16]}` | {_md(stage['summary'])} |"
         )
     lines.extend(
         [
             "",
             "## 自适应候选路由",
             "",
-            "| 路由 | 策略 | 可执行 | 可选 | 已选择 | 成本 | 原因码 |",
-            "|---|---|---:|---:|---:|---:|---|",
+            "| 路由 | 策略 | 可执行 | 可选 | 已选择 | 成本 | 成本分解 | 语义等价 | 水位 | 未选原因 | 原因码 | 回退 |",
+            "|---|---|---:|---:|---:|---:|---|---|---|---|---|---|",
         ]
     )
     for item in route["candidates"]:
-        cost = "-" if item["cost"] is None else f"{item['cost']:.3f} {item['cost_unit']}"
-        lines.append(
-            f"| {item['route_kind']} | {item['strategy_id']} | {item['executable']} | "
-            f"{item['eligible']} | {item['selected']} | {cost} | `{item['reason_code']}` |"
+        cost = (
+            "-"
+            if item["cost"] is None
+            else f"{item['cost']:.3f} {item['cost_unit']}"
         )
+        components = ", ".join(
+            f"{name}={value:.6g}"
+            for name, value in item.get("cost_components", ())
+        ) or "-"
+        lines.append(
+            f"| {item['route_kind']} | `{item['strategy_id']}` | "
+            f"{item['executable']} | {item['eligible']} | {item['selected']} | "
+            f"{cost} | {_md(components)} | `{item['semantic_equivalence']}` | "
+            f"`{item['watermark_status']}` | "
+            f"`{item['rejection_category'] or '-'}` | `{item['reason_code']}` | "
+            f"`{item['fallback_to'] or '-'}` |"
+        )
+    lines.extend(
+        [
+            "",
+            "## 候选资格检查",
+            "",
+            "| 候选 | 检查项 | 状态 | 依据 |",
+            "|---|---|---|---|",
+        ]
+    )
+    for item in route["candidates"]:
+        for check in item.get("eligibility_checks", ()):
+            lines.append(
+                f"| `{item['candidate_id']}` | `{check['check_id']}` | "
+                f"{check['status']} | {_md(check['detail'])} |"
+            )
+    lines.extend(
+        [
+            "",
+            "## 路由决策依据",
+            "",
+        ]
+    )
+    lines.extend(f"- {_md(item)}" for item in route["decision_basis"])
     lines.extend(
         [
             "",
             "## 生效的金融规则",
             "",
-            "| 规则 | 类别 | 语义不变量 | 回退码 |",
-            "|---|---|---|---|",
+            "| 规则 | 类别 | 前置条件 | 语义不变量 | 回退码 | 回退行为 |",
+            "|---|---|---|---|---|---|",
         ]
     )
     for item in explain["applied_financial_rules"]:
         lines.append(
-            f"| `{item['rule_id']}` | {item['category']} | {item['semantic_invariant']} | `{item['fallback_code']}` |"
+            f"| `{item['rule_id']}` | {item['category']} | "
+            f"{_md('; '.join(item['preconditions']))} | "
+            f"{_md(item['semantic_invariant'])} | `{item['fallback_code']}` | "
+            f"{_md(item['fallback_behavior'])} |"
         )
+    lines.extend(
+        [
+            "",
+            "## 优化规则契约",
+            "",
+            "| 规则 | 前置条件 | 语义不变量 | 回退 | 验证方法 |",
+            "|---|---|---|---|---|",
+        ]
+    )
+    for item in explain["optimizer_rule_contracts"]:
+        lines.append(
+            f"| `{item['rule_id']}` | {_md('; '.join(item['preconditions']))} | "
+            f"{_md(item['semantic_invariant'])} | {_md(item['fallback'])} | "
+            f"{_md(item['validation_strategy'])} |"
+        )
+    lines.extend(["", "## 能证明什么", ""])
+    lines.extend(f"- {_md(item)}" for item in explain["guarantees"])
+    lines.extend(["", "## 不能证明什么", ""])
+    lines.extend(f"- {_md(item)}" for item in explain["non_guarantees"])
     return "\n".join(lines) + "\n"
 
+
+def _display(value: Any) -> str:
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, (list, tuple)):
+        return ", ".join(str(item) for item in value) or "<none>"
+    return str(value)
+
+
+def _md(value: Any) -> str:
+    return str(value).replace("|", "\\|").replace("\n", " ")
 
 def _short_hash(value: Any) -> str:
     return hashlib.sha256(repr(value).encode("utf-8")).hexdigest()[:16]

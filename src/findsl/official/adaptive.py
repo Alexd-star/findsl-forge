@@ -46,6 +46,13 @@ class QueryFeatures:
 
 
 @dataclass(frozen=True)
+class EligibilityCheck:
+    check_id: str
+    status: str
+    detail: str
+
+
+@dataclass(frozen=True)
 class RouteCandidate:
     route_kind: str
     candidate_id: str
@@ -61,6 +68,11 @@ class RouteCandidate:
     strategy_id: str
     source: str
     fallback_to: Optional[str]
+    cost_components: Tuple[Tuple[str, float], ...]
+    eligibility_checks: Tuple[EligibilityCheck, ...]
+    semantic_equivalence: str
+    watermark_status: str
+    rejection_category: Optional[str]
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -71,8 +83,12 @@ class AdaptiveRoutePlan:
     planner: str
     selected_route: str
     selected_strategy: str
+    selected_candidate_id: str
+    selection_reason_code: str
+    selection_reason: str
     candidates: Tuple[RouteCandidate, ...]
     fallback_chain: Tuple[str, ...]
+    fallback_candidates: Tuple[str, ...]
     decision_basis: Tuple[str, ...]
 
     def to_dict(self) -> Dict[str, Any]:
@@ -80,8 +96,12 @@ class AdaptiveRoutePlan:
             "planner": self.planner,
             "selected_route": self.selected_route,
             "selected_strategy": self.selected_strategy,
+            "selected_candidate_id": self.selected_candidate_id,
+            "selection_reason_code": self.selection_reason_code,
+            "selection_reason": self.selection_reason,
             "candidates": [item.to_dict() for item in self.candidates],
             "fallback_chain": list(self.fallback_chain),
+            "fallback_candidates": list(self.fallback_candidates),
             "decision_basis": list(self.decision_basis),
         }
 
@@ -121,6 +141,11 @@ class AdaptiveRoutePlanner:
                         if item.selected
                         else item.source
                     ),
+                    rejection_category=(
+                        "subplan_component"
+                        if item.selected
+                        else item.rejection_category
+                    ),
                 )
                 for item in candidates
             ]
@@ -140,38 +165,55 @@ class AdaptiveRoutePlanner:
         selected = [item for item in candidates if item.selected]
         if len(selected) != 1:
             raise ValueError("adaptive route explanation requires exactly one selected candidate")
-        selected_route = selected[0].route_kind
-        fallback_chain_values = []
-        for item in sorted(
+        selected_candidate = selected[0]
+        selected_route = selected_candidate.route_kind
+        fallback_options = sorted(
             (
                 item
                 for item in candidates
                 if item.eligible
                 and item.executable
                 and not item.selected
-                and item.route_kind != selected_route
+                and item.source != "physical_subplan_decision"
             ),
             key=lambda item: (
+                item.route_kind == "RAW",
                 float("inf") if item.cost is None else item.cost,
                 ROUTE_KINDS.index(item.route_kind),
+                item.candidate_id,
             ),
-        ):
-            if item.route_kind not in fallback_chain_values:
+        )
+        fallback_chain_values = []
+        for item in fallback_options:
+            if (
+                item.route_kind != selected_route
+                and item.route_kind not in fallback_chain_values
+            ):
                 fallback_chain_values.append(item.route_kind)
         fallback_chain = tuple(fallback_chain_values)
         basis = (
             f"query_complexity={features.complexity_score}",
             f"long_horizon={str(features.long_horizon).lower()}",
             f"date_constraints={','.join(features.date_kinds) or '<none>'}",
+            f"selected_reason={selected_candidate.reason_code}",
             "only physical decisions with proven semantic equivalence may be selected",
             "ineligible acceleration paths remain visible with deterministic reason codes",
+            "RAW is always the final executable fallback after proven accelerated alternatives",
         )
         return AdaptiveRoutePlan(
-            planner="AdaptiveRoutePlanner/v1",
+            planner="AdaptiveRoutePlanner/v2",
             selected_route=selected_route,
-            selected_strategy=str(physical.get("selected_strategy") or selected[0].strategy_id),
+            selected_strategy=str(
+                physical.get("selected_strategy") or selected_candidate.strategy_id
+            ),
+            selected_candidate_id=selected_candidate.candidate_id,
+            selection_reason_code=selected_candidate.reason_code,
+            selection_reason=selected_candidate.reason,
             candidates=tuple(candidates),
             fallback_chain=fallback_chain,
+            fallback_candidates=tuple(
+                item.candidate_id for item in fallback_options
+            ),
             decision_basis=basis,
         )
 
@@ -205,6 +247,21 @@ class AdaptiveRoutePlanner:
             strategy_id=strategy,
             source="physical_composite_decision",
             fallback_to="RAW" if route != "RAW" else None,
+            cost_components=tuple(
+                (item.candidate_id, item.cost)
+                for item in selected_children
+                if item.cost is not None
+            ),
+            eligibility_checks=_eligibility_checks(
+                executable=True,
+                eligible=True,
+                semantic_equivalence="composed_proven_subplans",
+                watermark_status="inherited",
+                reason_code="COMPOSITE_ROUTE_SELECTED",
+            ),
+            semantic_equivalence="composed_proven_subplans",
+            watermark_status="inherited",
+            rejection_category=None,
         )
 
     def _from_decision(
@@ -214,21 +271,50 @@ class AdaptiveRoutePlanner:
     ) -> RouteCandidate:
         strategy = str(raw.get("strategy_id") or "direct_column")
         route = _route_kind(strategy, raw.get("resource_id"), features, self.context)
+        executable = bool(raw.get("feasible"))
+        eligible = bool(raw.get("selection_eligible", True) and executable)
+        selected = bool(raw.get("selected"))
+        reason_code = str(raw.get("reason_code") or "PHYSICAL_DECISION")
+        reason = str(raw.get("reason") or "physical planner decision")
+        semantic_equivalence = _semantic_equivalence(
+            strategy,
+            reason_code,
+        )
+        watermark_status = _watermark_status(route, reason_code, reason)
         return RouteCandidate(
             route_kind=route,
             candidate_id=f"{route.lower()}:{strategy}:{raw.get('resource_id') or 'none'}",
-            executable=bool(raw.get("feasible")),
-            eligible=bool(raw.get("selection_eligible", True) and raw.get("feasible")),
-            selected=bool(raw.get("selected")),
+            executable=executable,
+            eligible=eligible,
+            selected=selected,
             cost=_optional_float(raw.get("cost")),
             cost_unit=str(raw.get("cost_unit") or "unknown"),
             estimated=bool(raw.get("estimated")),
-            reason_code=str(raw.get("reason_code") or "PHYSICAL_DECISION"),
-            reason=str(raw.get("reason") or "physical planner decision"),
+            reason_code=reason_code,
+            reason=reason,
             resource_id=(None if raw.get("resource_id") is None else str(raw["resource_id"])),
             strategy_id=strategy,
             source="physical_decision",
             fallback_to="RAW" if route != "RAW" else None,
+            cost_components=tuple(
+                (str(name), float(value))
+                for name, value in raw.get("cost_components", ())
+            ),
+            eligibility_checks=_eligibility_checks(
+                executable=executable,
+                eligible=eligible,
+                semantic_equivalence=semantic_equivalence,
+                watermark_status=watermark_status,
+                reason_code=reason_code,
+            ),
+            semantic_equivalence=semantic_equivalence,
+            watermark_status=watermark_status,
+            rejection_category=_rejection_category(
+                selected,
+                executable,
+                eligible,
+                reason_code,
+            ),
         )
 
     def _add_raw_fallback(
@@ -271,6 +357,19 @@ class AdaptiveRoutePlanner:
                 strategy_id="raw_scan_fallback",
                 source="derived_fallback_contract",
                 fallback_to=None,
+                cost_components=(
+                    (("table_bytes", raw_cost),) if raw_cost is not None else ()
+                ),
+                eligibility_checks=_eligibility_checks(
+                    executable=True,
+                    eligible=True,
+                    semantic_equivalence="baseline_reference",
+                    watermark_status="not_required",
+                    reason_code="RAW_BASELINE_FALLBACK",
+                ),
+                semantic_equivalence="baseline_reference",
+                watermark_status="not_required",
+                rejection_category="final_fallback",
             )
         )
         return candidates
@@ -317,7 +416,102 @@ class AdaptiveRoutePlanner:
             strategy_id=f"{kind.lower()}_unavailable",
             source="eligibility_audit",
             fallback_to="RAW" if kind != "RAW" and raw_available else None,
+            cost_components=(),
+            eligibility_checks=_eligibility_checks(
+                executable=False,
+                eligible=False,
+                semantic_equivalence="unavailable",
+                watermark_status="not_applicable",
+                reason_code=code,
+            ),
+            semantic_equivalence="unavailable",
+            watermark_status="not_applicable",
+            rejection_category="route_not_generated",
         )
+
+
+def _semantic_equivalence(strategy: str, reason_code: str) -> str:
+    if strategy in _BASELINE_STRATEGIES or strategy.startswith(
+        ("limit_", "stage_", "set_", "group_")
+    ):
+        return "baseline_reference"
+    if "SHADOW" in reason_code:
+        return "shadow_only_unproven"
+    if "WATERMARK" in reason_code or "ACCELERATION" in reason_code:
+        return "proven_equivalent"
+    return "planner_validated"
+
+
+def _watermark_status(route: str, reason_code: str, reason: str) -> str:
+    if route not in {"MV", "PREFIX"}:
+        return "not_required"
+    if "WATERMARK_INELIGIBLE" in reason_code:
+        return "incompatible"
+    if "watermark is" in reason.casefold():
+        return "compatible"
+    return "not_reported"
+
+
+def _rejection_category(
+    selected: bool,
+    executable: bool,
+    eligible: bool,
+    reason_code: str,
+) -> Optional[str]:
+    if selected:
+        return None
+    if not executable:
+        return "not_executable"
+    if not eligible:
+        if "WATERMARK" in reason_code:
+            return "watermark_incompatible"
+        if "SHADOW" in reason_code:
+            return "semantic_equivalence_shadow_only"
+        return "selection_policy_ineligible"
+    return "higher_cost_or_policy_preference"
+
+
+def _eligibility_checks(
+    *,
+    executable: bool,
+    eligible: bool,
+    semantic_equivalence: str,
+    watermark_status: str,
+    reason_code: str,
+) -> Tuple[EligibilityCheck, ...]:
+    equivalence_passed = semantic_equivalence not in {
+        "shadow_only_unproven",
+        "unavailable",
+    }
+    watermark_check = (
+        "FAIL"
+        if watermark_status == "incompatible"
+        else "PASS"
+        if watermark_status in {"compatible", "inherited"}
+        else "N/A"
+    )
+    return (
+        EligibilityCheck(
+            "physical_plan_generated",
+            "PASS" if executable else "FAIL",
+            reason_code,
+        ),
+        EligibilityCheck(
+            "semantic_equivalence",
+            "PASS" if equivalence_passed else "FAIL",
+            semantic_equivalence,
+        ),
+        EligibilityCheck(
+            "freshness_watermark",
+            watermark_check,
+            watermark_status,
+        ),
+        EligibilityCheck(
+            "selection_policy",
+            "PASS" if eligible else "FAIL",
+            reason_code,
+        ),
+    )
 
 
 def extract_query_features(
