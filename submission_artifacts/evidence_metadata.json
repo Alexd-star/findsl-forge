@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T16:59:44Z",
+  "generated_at": "2026-08-12T17:16:59Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
     "head_at_report_generation": "dd61d10",
@@ -30,12 +30,12 @@
   "official_compile_latency": {
     "available": true,
     "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
-    "catalog_snapshot_id": "20d512c6ad746c913d456fdacfa0e79d7bf5d3a13cfbda457fb78245f0ffefc0",
+    "catalog_snapshot_id": "9410de3a8f759f0c5e486d8db61f01da446aa428d414a8b64e6b87a3afa79783",
     "case_count": 48,
-    "sample_count": 144,
-    "p50_ms": 16.0269,
-    "p95_ms": 47.7078,
-    "p99_ms": 54.4491,
+    "sample_count": 1440,
+    "p50_ms": 10.5165,
+    "p95_ms": 29.7163,
+    "p99_ms": 42.3681,
     "target_p95_ms": 50.0,
     "target_met": true
   },
@@ -465,7 +465,7 @@
         "does_not_prove": "所有官方复杂语句或并发负载下的尾延迟",
         "available": true,
         "value_path": "official_compile_latency.p95_ms",
-        "value": 47.7078
+        "value": 29.7163
       },
       "long_horizon_speedup_gate": {
         "metric_type": "performance",

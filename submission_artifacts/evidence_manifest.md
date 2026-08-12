@@ -1,6 +1,6 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-08-13 00:59:43 +08:00
+- Generated at: 2026-08-13 01:16:59 +08:00
 - Git HEAD at export: dd61d10
 - Core source status when exported, excluding this export script: clean
 - Source reports directory: reports
@@ -25,8 +25,8 @@
 - `hero_query.md` (1218 bytes)
 - `official_capability_matrix.json` (10556 bytes)
 - `official_capability_matrix.md` (4087 bytes)
-- `official_compile_latency.json` (38815 bytes)
-- `official_compile_latency.md` (8619 bytes)
+- `official_compile_latency.json` (38797 bytes)
+- `official_compile_latency.md` (8562 bytes)
 - `official_compiler_funnel.json` (3244917 bytes)
 - `official_compiler_funnel.md` (1091 bytes)
 - `official_correctness_benchmark.json` (166820 bytes)
@@ -59,9 +59,6 @@
 - `phase6c_set_prefix_doris.json` (223385 bytes)
 - `phase6c_set_prefix_doris.md` (1625 bytes)
 - `submission_readiness.md` (13696 bytes)
-- `product_screenshots/delivery-evidence-desktop.png` (159934 bytes)
-- `product_screenshots/hero-route-desktop.png` (135116 bytes)
-- `product_screenshots/hero-route-mobile.png` (113847 bytes)
 
 ## Excluded By Design
 

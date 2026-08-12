@@ -15,7 +15,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Official slot coverage | 1830/5799 compiled |
 | ANTLR/IR legacy migration | 1044/1097 (95.17%) |
 | Formal SQL correctness | PASS, 240/240, Wilson lower 98.42% |
-| Official compile P95 | PASS, 47.7078 ms, 144 samples |
+| Official compile P95 | PASS, 29.7163 ms, 1440 samples |
 | Official per-query 10s target | PASS, 48 queries, max P95 3014.2747 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
