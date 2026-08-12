@@ -25,6 +25,7 @@ from ..physical.ir import (
     PhysicalExternalExists,
     PhysicalExtreme,
     PhysicalGroupedAggregate,
+    PhysicalGroupEntityMetric,
     PhysicalGreatest,
     PhysicalIn,
     PhysicalJoin,
@@ -202,8 +203,13 @@ def _render_plan(
         )
         query = _render_plan(plan.input, catalog, cte_prefix)
         if query.args.get("order") is None:
+            output_keys = (
+                ("group_type", "group_code", "bizdate")
+                if isinstance(plan.input, PhysicalGroupEntityMetric)
+                else ("mktcode", "tgtcode", "bizdate")
+            )
             query = query.order_by(
-                *(exp.column(key, quoted=True) for key in ("mktcode", "tgtcode", "bizdate"))
+                *(exp.column(key, quoted=True) for key in output_keys)
             )
         query = query.limit(count)
         return query.offset(plan.offset) if plan.offset else query
@@ -252,6 +258,8 @@ def _render_plan(
         return _render_aggregate_rank(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalGroupedAggregate):
         return _render_grouped_aggregate(plan, catalog, cte_prefix)
+    if isinstance(plan, PhysicalGroupEntityMetric):
+        return _render_group_entity_metric(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalCompositeAggregate):
         return _render_composite_aggregate(plan, catalog, cte_prefix)
     if isinstance(plan, PhysicalEventFilter):
@@ -1191,6 +1199,319 @@ def _render_bounded_comparison(
             this=column.copy(),
             expression=upper,
         ),
+    )
+
+
+def _render_group_entity_metric(
+    plan: PhysicalGroupEntityMetric,
+    catalog: PhysicalCatalog,
+    cte_prefix: str = "",
+) -> exp.Select:
+    source = _render_plan(plan.input, catalog, cte_prefix)
+    relation = _find_relation(plan.input)
+    stable_alias = _stable_alias(relation)
+    membership = catalog.resource(plan.membership_resource_id)
+    member_alias = "group_member"
+    member_table = exp.table_(
+        membership.table,
+        db=membership.database,
+        quoted=True,
+        alias=member_alias,
+    )
+    join_predicate = exp.and_(
+        exp.EQ(
+            this=exp.column("mktcode", table=stable_alias, quoted=True),
+            expression=exp.column("mktcode", table=member_alias, quoted=True),
+        ),
+        exp.EQ(
+            this=exp.column("tgtcode", table=stable_alias, quoted=True),
+            expression=exp.column("tgtcode", table=member_alias, quoted=True),
+        ),
+        exp.or_(
+            exp.Is(
+                this=exp.column("effective_from", table=member_alias, quoted=True),
+                expression=exp.Null(),
+            ),
+            exp.LTE(
+                this=exp.column("effective_from", table=member_alias, quoted=True),
+                expression=exp.column("bizdate", table=stable_alias, quoted=True),
+            ),
+        ),
+        exp.or_(
+            exp.Is(
+                this=exp.column("effective_to", table=member_alias, quoted=True),
+                expression=exp.Null(),
+            ),
+            exp.GTE(
+                this=exp.column("effective_to", table=member_alias, quoted=True),
+                expression=exp.column("bizdate", table=stable_alias, quoted=True),
+            ),
+        ),
+    )
+    weighted_return = plan.aggregation in {
+        "float_market_cap_weighted_return",
+        "float_market_cap_weighted_loss",
+    }
+    if weighted_return:
+        last_price = exp.column("lastPx", table=stable_alias, quoted=True)
+        previous_close = exp.column("preClosePx", table=stable_alias, quoted=True)
+        listed_share = exp.column("listedShare", table=stable_alias, quoted=True)
+        valid_metric = exp.and_(
+            exp.Is(
+                this=last_price.copy(),
+                expression=exp.Not(this=exp.Null()),
+            ),
+            exp.Is(
+                this=previous_close.copy(),
+                expression=exp.Not(this=exp.Null()),
+            ),
+            exp.Is(
+                this=listed_share.copy(),
+                expression=exp.Not(this=exp.Null()),
+            ),
+            exp.NEQ(
+                this=previous_close.copy(),
+                expression=exp.convert(0),
+            ),
+        )
+        weighted_change = exp.Case(
+            ifs=[
+                exp.If(
+                    this=valid_metric.copy(),
+                    true=exp.Mul(
+                        this=exp.Paren(
+                            this=exp.Sub(
+                                this=last_price.copy(),
+                                expression=previous_close.copy(),
+                            )
+                        ),
+                        expression=listed_share.copy(),
+                    ),
+                )
+            ]
+        )
+        previous_float_value = exp.Case(
+            ifs=[
+                exp.If(
+                    this=valid_metric.copy(),
+                    true=exp.Mul(
+                        this=previous_close.copy(),
+                        expression=listed_share.copy(),
+                    ),
+                )
+            ]
+        )
+        numerator = exp.Sum(
+            this=weighted_change
+        )
+        denominator = exp.Nullif(
+            this=exp.Sum(this=previous_float_value),
+            expression=exp.convert(0),
+        )
+        group_metric = exp.Mul(
+            this=exp.Div(this=numerator, expression=denominator),
+            expression=exp.convert(
+                -100.0
+                if plan.aggregation == "float_market_cap_weighted_loss"
+                else 100.0
+            ),
+        )
+        metric = exp.Case(
+            ifs=[
+                exp.If(
+                    this=valid_metric,
+                    true=exp.convert(1),
+                )
+            ]
+        )
+    else:
+        metric = _render_expr(plan.measure, catalog, relation)
+        aggregate_class = {
+            "sum": exp.Sum,
+            "avg": exp.Avg,
+            "max": exp.Max,
+            "min": exp.Min,
+        }[plan.aggregation]
+        group_metric = aggregate_class(this=metric.copy())
+    security_key = exp.func(
+        "CONCAT",
+        exp.column("mktcode", table=stable_alias, quoted=True),
+        exp.convert(":"),
+        exp.column("tgtcode", table=stable_alias, quoted=True),
+    )
+    member_count = exp.Count(
+        this=exp.Distinct(expressions=[security_key.copy()])
+    ).as_("member_count", quoted=True)
+    coverage_count = exp.Count(
+        this=exp.Distinct(
+            expressions=[
+                exp.Case(
+                    ifs=[
+                        exp.If(
+                            this=exp.Is(
+                                this=metric.copy(),
+                                expression=exp.Not(this=exp.Null()),
+                            ),
+                            true=security_key.copy(),
+                        )
+                    ]
+                )
+            ]
+        )
+    ).as_("metric_member_count", quoted=True)
+    source = source.join(member_table, on=join_predicate, join_type="INNER")
+    source.set(
+        "expressions",
+        [
+            exp.column("scope_type", table=member_alias, quoted=True).as_(
+                "group_type", quoted=True
+            ),
+            exp.column("scope_code", table=member_alias, quoted=True).as_(
+                "group_code", quoted=True
+            ),
+            exp.column("scope_name", table=member_alias, quoted=True).as_(
+                "group_name", quoted=True
+            ),
+            exp.column("bizdate", table=stable_alias, quoted=True),
+            group_metric.as_("metric_value", quoted=True),
+            member_count,
+            coverage_count,
+        ],
+    )
+    source = source.where(
+        exp.In(
+            this=exp.column("scope_type", table=member_alias, quoted=True),
+            expressions=[exp.convert(value) for value in plan.scope_types],
+        ),
+        exp.In(
+            this=exp.column("snapshot_id", table=member_alias, quoted=True),
+            expressions=[exp.convert(value) for value in plan.snapshot_ids],
+        ),
+    )
+    if plan.scope_codes:
+        source = source.where(
+            exp.In(
+                this=exp.column("scope_code", table=member_alias, quoted=True),
+                expressions=[exp.convert(value) for value in plan.scope_codes],
+            )
+        )
+    source = source.group_by(
+        exp.column("scope_type", table=member_alias, quoted=True),
+        exp.column("scope_code", table=member_alias, quoted=True),
+        exp.column("scope_name", table=member_alias, quoted=True),
+        exp.column("bizdate", table=stable_alias, quoted=True),
+    )
+    groups = source.subquery(alias="group_metrics")
+    group_query = exp.select(
+        *(exp.column(name, table="group_metrics", quoted=True) for name in (
+            "group_type",
+            "group_code",
+            "group_name",
+            "bizdate",
+            "metric_value",
+            "member_count",
+            "metric_member_count",
+        ))
+    ).from_(groups).where(
+        exp.GTE(
+            this=exp.column("member_count", table="group_metrics", quoted=True),
+            expression=exp.convert(plan.minimum_member_count),
+        )
+    )
+    if plan.null_policy == "reject_group":
+        group_query = group_query.where(
+            exp.EQ(
+                this=exp.column(
+                    "metric_member_count", table="group_metrics", quoted=True
+                ),
+                expression=exp.column(
+                    "member_count", table="group_metrics", quoted=True
+                ),
+            )
+        )
+    if plan.predicate_comparator is not None:
+        group_query = group_query.where(
+            _COMPARISON[plan.predicate_comparator](
+                this=exp.column("metric_value", table="group_metrics", quoted=True),
+                expression=exp.convert(plan.predicate_bound.value),
+            )
+        )
+    if plan.rank_direction is None:
+        return group_query
+
+    metric = exp.column("metric_value", table="group_metrics", quoted=True)
+    tie_breakers = (
+        exp.Ordered(
+            this=metric.copy(),
+            desc=plan.rank_direction == "desc",
+            nulls_first=False,
+        ),
+        exp.Ordered(
+            this=exp.column("group_type", table="group_metrics", quoted=True),
+            desc=False,
+            nulls_first=True,
+        ),
+        exp.Ordered(
+            this=exp.column("group_code", table="group_metrics", quoted=True),
+            desc=False,
+            nulls_first=True,
+        ),
+    )
+    ranked = group_query.select(
+        exp.Window(
+            this=_rank_function(),
+            partition_by=[
+                exp.column("bizdate", table="group_metrics", quoted=True)
+            ],
+            order=exp.Order(expressions=list(tie_breakers)),
+        ).as_("__rank_value", quoted=True),
+        append=True,
+    )
+    if plan.rank_percentage:
+        ranked = ranked.select(
+            exp.Window(
+                this=exp.Count(this=exp.Star()),
+                partition_by=[
+                    exp.column("bizdate", table="group_metrics", quoted=True)
+                ],
+            ).as_("__partition_count", quoted=True),
+            append=True,
+        )
+    ranked_rows = ranked.subquery(alias="ranked_groups")
+    result = exp.select(
+        *(exp.column(name, table="ranked_groups", quoted=True) for name in (
+            "group_type",
+            "group_code",
+            "group_name",
+            "bizdate",
+            "metric_value",
+            "member_count",
+            "metric_member_count",
+        ))
+    ).from_(ranked_rows)
+    lower = _render_rank_bound(
+        plan.rank_bound,
+        plan.rank_percentage,
+        "ranked_groups",
+    )
+    upper = (
+        _render_rank_bound(
+            plan.rank_upper_bound,
+            plan.rank_percentage,
+            "ranked_groups",
+        )
+        if plan.rank_upper_bound is not None
+        else None
+    )
+    return result.where(
+        _render_bounded_comparison(
+            exp.column("__rank_value", table="ranked_groups", quoted=True),
+            plan.rank_comparator,
+            lower,
+            upper,
+            plan.lower_inclusive,
+            plan.upper_inclusive,
+        )
     )
 
 

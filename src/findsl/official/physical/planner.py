@@ -54,6 +54,7 @@ from .ir import (
     PhysicalExtreme,
     PhysicalFilter,
     PhysicalGroupedAggregate,
+    PhysicalGroupEntityMetric,
     PhysicalGreatest,
     PhysicalIn,
     PhysicalJoin,
@@ -104,6 +105,7 @@ from .runtime import (
     current_function_catalog,
     current_numeric_approximation_policy,
     current_physical_pattern_config,
+    current_group_metric_policy_catalog,
     current_security_scope_catalog,
 )
 from .scopes import SecurityScopeCatalog
@@ -215,6 +217,291 @@ _INDEX_TARGET_FIELDS = {
 }
 
 
+def _plan_group_entity(
+    logical_plan,
+    entity_target,
+    catalog: PhysicalCatalog,
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+) -> PhysicalPlanningResult:
+    current = logical_plan
+    limit = None
+    if isinstance(current, LogicalLimit):
+        limit = (current.offset, current.count)
+        current = current.input
+
+    call = None
+    predicate_comparator = None
+    predicate_bound = None
+    rank_direction = None
+    rank_comparator = None
+    rank_bound = None
+    rank_upper_bound = None
+    rank_percentage = False
+    lower_inclusive = True
+    upper_inclusive = True
+    universe_only = False
+
+    if isinstance(current, LogicalFilter):
+        predicate = current.predicate
+        if not isinstance(predicate, ComparisonExpr) or not isinstance(
+            predicate.left, CallExpr
+        ):
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+                "group result queries currently require one direct indicator comparison",
+            )
+        call = predicate.left
+        if _is_universe_call(call):
+            if not (
+                predicate.op == "="
+                and isinstance(predicate.right, LiteralExpr)
+                and predicate.right.type is STRING
+                and predicate.right.value == "all"
+            ):
+                raise PhysicalPlanningError(
+                    "PHYSICAL_GROUP_UNIVERSE_COMPARISON_UNSUPPORTED",
+                    "group universe selection requires indicator(...) = 'all'",
+                )
+            universe_only = True
+        else:
+            if not isinstance(predicate.right, LiteralExpr) or predicate.right.type is not NUMERIC:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
+                    "group metric comparison requires a numeric literal bound",
+                )
+            predicate_comparator = predicate.op
+            predicate_bound = _physical_literal(predicate.right)
+    elif isinstance(current, LogicalRank):
+        if not isinstance(current.order_by, CallExpr):
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_RANK_UNSUPPORTED",
+                "group ranking requires one direct rank call",
+            )
+        call = current.order_by
+        rank_direction = current.direction
+        rank_comparator = current.comparator
+        rank_bound, rank_percentage, rank_upper_bound = _physical_rank_bounds(
+            current.bound,
+            current.comparator,
+            current.upper_bound,
+        )
+        lower_inclusive = current.lower_inclusive
+        upper_inclusive = current.upper_inclusive
+    else:
+        raise PhysicalPlanningError(
+            "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
+            f"group result route does not support {type(current).__name__}",
+        )
+
+    assert call is not None and call.binding is not None
+    if call.name not in {"indicator", "rank"}:
+        raise PhysicalPlanningError(
+            "PHYSICAL_GROUP_FUNCTION_UNSUPPORTED",
+            f"group result route does not support {call.name}",
+        )
+    policy_catalog = current_group_metric_policy_catalog()
+    target_policy = policy_catalog.combined_target(entity_target.target_ids)
+    external_scopes = current_external_scope_catalog()
+    scope_codes: Tuple[str, ...] = ()
+    if call.scope_expression is not None:
+        scope_codes, snapshot_ids = _resolve_group_result_scope(
+            call.scope_expression,
+            target_policy.scope_types,
+            external_scopes,
+        )
+    else:
+        try:
+            snapshot_ids = external_scopes.latest_snapshots(
+                target_policy.scope_types,
+                target_policy.preferred_sources,
+            )
+        except KeyError as exc:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_MEMBERSHIP_DATA_UNAVAILABLE",
+                f"no admitted membership snapshot for group type {exc.args[0]}",
+            ) from exc
+
+    indicator_id = str(call.binding.slots.get("indicator_name", "")).strip()
+    aggregation = "max"
+    null_policy = "ignore"
+    selected = "official_basic"
+    fields: Tuple[_ResolvedIndicator, ...] = ()
+    weighted_columns: Tuple[Tuple[str, str], ...] = ()
+    measure = PhysicalLiteral(1, NUMERIC)
+    if not universe_only:
+        try:
+            metric_policy = policy_catalog.metric(
+                indicator_id,
+                entity_target.target_ids,
+            )
+        except Exception as exc:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
+                str(exc),
+            ) from exc
+        requested = str(call.binding.slots.get("agg_func", "")).strip().lower()
+        aggregation = requested or metric_policy.default_aggregation
+        if aggregation not in metric_policy.allowed_aggregations:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED",
+                f"group metric {indicator_id} does not admit aggregation {aggregation}",
+            )
+        null_policy = metric_policy.null_policy
+        fields = _collect_fields(logical_plan, catalog, expressions)
+        field = _field_for_indicator(fields, indicator_id)
+        selected = field.resource_id
+        measure = _physical_field_expression(field)
+        if aggregation in {
+            "float_market_cap_weighted_return",
+            "float_market_cap_weighted_loss",
+        }:
+            selected = "official_basic"
+            weighted_columns = (
+                ("lastPx", "numeric"),
+                ("preClosePx", "numeric"),
+                ("listedShare", "numeric"),
+            )
+            measure = PhysicalLiteral(0, NUMERIC)
+
+    resource = catalog.resource(selected)
+    input_plan: PhysicalPlan = PhysicalScan(
+        selected,
+        (
+            tuple(
+                PhysicalColumn(selected, column, _type_from_name(value_type))
+                for column, value_type in weighted_columns
+            )
+            if not universe_only
+            and aggregation in {
+                "float_market_cap_weighted_return",
+                "float_market_cap_weighted_loss",
+            }
+            else _scan_columns(fields)
+        ),
+        None,
+        resource.anchor_resource_id,
+    )
+    for constraint in _call_constraints(call, catalog, selected):
+        input_plan = PhysicalFilter(input_plan, constraint)
+    if not str(call.binding.slots.get("date", "")).strip():
+        stable_id = resource.anchor_resource_id or selected
+        partition_key = catalog.resource(stable_id).partition_key
+        if partition_key is None:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_DATE_UNAVAILABLE",
+                "group entity input requires a dated quote resource",
+            )
+        input_plan = PhysicalFilter(
+            input_plan,
+            PhysicalComparison(
+                "=",
+                PhysicalColumn(stable_id, partition_key, TIME),
+                PhysicalLatestValue(stable_id, partition_key, TIME),
+            ),
+        )
+
+    plan: PhysicalPlan = PhysicalGroupEntityMetric(
+        input_plan,
+        policy_catalog.membership_resource_id,
+        entity_target.target_ids,
+        target_policy.scope_types,
+        scope_codes,
+        snapshot_ids,
+        measure,
+        aggregation,
+        predicate_comparator,
+        predicate_bound,
+        rank_direction,
+        rank_comparator,
+        rank_bound,
+        rank_upper_bound,
+        rank_percentage,
+        lower_inclusive,
+        upper_inclusive,
+        target_policy.minimum_member_count,
+        null_policy,
+    )
+    if limit is not None:
+        plan = PhysicalLimit(plan, limit[0], limit[1])
+    validate_physical_plan(plan, catalog, expressions)
+    decision = replace(
+        _candidate_decision(resource, catalog, statistics),
+        strategy_id="group_entity_aggregate",
+        reason_code="GROUP_POLICY_ELIGIBLE",
+        reason=(
+            "selected explicit group metric policy and versioned membership snapshots"
+        ),
+        selected=True,
+    )
+    selected_resources = "+".join(
+        (selected, policy_catalog.membership_resource_id)
+    )
+    return PhysicalPlanningResult(
+        plan,
+        selected_resources,
+        (decision,),
+        "group_entity_aggregate",
+    )
+
+
+def _resolve_group_result_scope(
+    expression,
+    allowed_scope_types: Tuple[str, ...],
+    external_scopes,
+) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
+    if isinstance(expression, ScopeAtom):
+        atoms = (expression.name,)
+    elif isinstance(expression, ScopeOr):
+        left_codes, left_snapshots = _resolve_group_result_scope(
+            expression.left,
+            allowed_scope_types,
+            external_scopes,
+        )
+        right_codes, right_snapshots = _resolve_group_result_scope(
+            expression.right,
+            allowed_scope_types,
+            external_scopes,
+        )
+        return (
+            tuple(dict.fromkeys((*left_codes, *right_codes))),
+            tuple(dict.fromkeys((*left_snapshots, *right_snapshots))),
+        )
+    elif isinstance(expression, (ScopeAnd, ScopeNot)):
+        raise PhysicalPlanningError(
+            "PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED",
+            "group result intersection or exclusion needs an explicit composite-membership policy",
+        )
+    else:
+        raise PhysicalPlanningError(
+            "PHYSICAL_GROUP_SCOPE_UNSUPPORTED",
+            "group result scope expression is unsupported",
+        )
+    codes = []
+    snapshots = []
+    for atom in atoms:
+        if str(atom).startswith("申万"):
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE",
+                "Shenwan group queries require a versioned Shenwan classification snapshot",
+            )
+        try:
+            resolved = external_scopes.resolve(atom)
+        except KeyError as exc:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE",
+                f"group scope has no admitted membership snapshot: {atom}",
+            ) from exc
+        if resolved.option.scope_type not in allowed_scope_types:
+            raise PhysicalPlanningError(
+                "PHYSICAL_GROUP_SCOPE_TYPE_MISMATCH",
+                f"scope {atom} is {resolved.option.scope_type}, not one of {allowed_scope_types}",
+            )
+        codes.append(resolved.option.scope_code)
+        snapshots.append(resolved.option.snapshot_id)
+    return tuple(dict.fromkeys(codes)), tuple(dict.fromkeys(snapshots))
+
+
 def _merge_exist_temporal_union(left, right) -> Optional[PhysicalTemporal]:
     if not isinstance(left, PhysicalTemporal) or not isinstance(right, PhysicalTemporal):
         return None
@@ -306,6 +593,17 @@ def plan_physical(
 ) -> PhysicalPlanningResult:
     _validate_entity_target_contract(lowering.plan)
     entity_target = _logical_entity_target(lowering.plan)
+    if (
+        entity_target is not None
+        and entity_target.execution_modes == ("group_aggregate",)
+    ):
+        return _plan_group_entity(
+            lowering.plan,
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+        )
     if isinstance(lowering.plan, LogicalLimit) and isinstance(
         lowering.plan.input,
         (LogicalSetOperation, LogicalStage),
@@ -3934,7 +4232,7 @@ def _validate_entity_target_contract(plan) -> None:
     unsupported = sorted(
         domain_id for domain_id, status in statuses.items() if status == "unsupported"
     )
-    if unsupported:
+    if unsupported and target.execution_modes != ("group_aggregate",):
         raise PhysicalPlanningError(
             "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
             "result-entity semantics require an approved aggregation contract: "
@@ -3969,6 +4267,8 @@ def _validate_entity_target_contract(plan) -> None:
                     "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
                     "index result queries require index metadata scope, not stock membership scope",
                 )
+        return
+    if target.execution_modes == ("group_aggregate",):
         return
     raise PhysicalPlanningError(
         "PHYSICAL_ENTITY_PLAN_UNSUPPORTED",

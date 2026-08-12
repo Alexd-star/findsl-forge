@@ -217,6 +217,19 @@ class ExternalScopeRuntimeCatalog:
                 for alias, options in by_alias.items()
             }
         )
+        self._options = tuple(
+            {
+                (
+                    option.scope_type,
+                    option.scope_code,
+                    option.source,
+                    option.as_of_date,
+                    option.snapshot_id,
+                ): option
+                for options in self._by_alias.values()
+                for option in options
+            }.values()
+        )
         self.membership_resource_id = membership_resource_id
         self.semantic_policies = semantic_policies
 
@@ -244,6 +257,48 @@ class ExternalScopeRuntimeCatalog:
                     )
         selected = min(options, key=lambda item: _option_priority(source, item))
         return ResolvedExternalScope(source, selected, policy)
+
+    def latest_snapshots(
+        self,
+        scope_types: Tuple[str, ...],
+        preferred_sources: Tuple[str, ...],
+    ) -> Tuple[str, ...]:
+        selected = []
+        for scope_type in scope_types:
+            candidates = tuple(
+                item
+                for item in self._options
+                if item.scope_type == scope_type
+                and item.source in preferred_sources
+            )
+            if not candidates:
+                raise KeyError(scope_type)
+            best_source = min(
+                (source for source in preferred_sources if any(
+                    item.source == source for item in candidates
+                )),
+                key=preferred_sources.index,
+            )
+            source_candidates = tuple(
+                item for item in candidates if item.source == best_source
+            )
+            latest_date = max(item.as_of_date for item in source_candidates)
+            snapshot_counts: Dict[str, int] = {}
+            for item in source_candidates:
+                if item.as_of_date == latest_date:
+                    snapshot_counts[item.snapshot_id] = (
+                        snapshot_counts.get(item.snapshot_id, 0) + 1
+                    )
+            selected.append(
+                min(
+                    snapshot_counts,
+                    key=lambda snapshot_id: (
+                        -snapshot_counts[snapshot_id],
+                        snapshot_id,
+                    ),
+                )
+            )
+        return tuple(dict.fromkeys(selected))
 
     @classmethod
     def from_dict(cls, raw) -> "ExternalScopeRuntimeCatalog":

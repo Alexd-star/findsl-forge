@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "catalog_id": "official-group-metric-policy-v1",
+  "membership_resource_id": "external_scope_membership",
+  "targets": [
+    {
+      "target_id": "industry",
+      "scope_types": ["industry"],
+      "preferred_sources": ["eastmoney"],
+      "minimum_member_count": 2
+    },
+    {
+      "target_id": "concept",
+      "scope_types": ["concept"],
+      "preferred_sources": ["eastmoney"],
+      "minimum_member_count": 2
+    },
+    {
+      "target_id": "board",
+      "scope_types": ["concept", "industry"],
+      "preferred_sources": ["eastmoney"],
+      "minimum_member_count": 2
+    }
+  ],
+  "metrics": [
+    {
+      "indicator_id": "成交量",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "成交量是可加总量，默认按成员和所选交易日求和。"
+    },
+    {
+      "indicator_id": "成交额",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "成交额是可加总量，默认按成员和所选交易日求和。"
+    },
+    {
+      "indicator_id": "主力净流入",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "资金净流入是有方向的可加金额，群组层按成员求和保留流入与流出的抵消关系。"
+    },
+    {
+      "indicator_id": "总股本",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "股本在同一时点可按成员加总，以形成群组规模指标。"
+    },
+    {
+      "indicator_id": "流通股本",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "流通股本在同一时点可按成员加总，以形成群组可流通规模。"
+    },
+    {
+      "indicator_id": "总市值",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "成员总市值可加，群组总市值为各成员市值之和。"
+    },
+    {
+      "indicator_id": "流通市值",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "成员流通市值可加，群组流通市值为各成员流通市值之和。"
+    },
+    {
+      "indicator_id": "主力净流出",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "资金净流出为净流入的相反数，在群组层按成员求和。"
+    },
+    {
+      "indicator_id": "涨幅",
+      "default_aggregation": "float_market_cap_weighted_return",
+      "allowed_aggregations": ["float_market_cap_weighted_return", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "默认以成员上一收盘价与流通股本之积作权重，计算可投资规模加权的群组收益率。"
+    },
+    {
+      "indicator_id": "涨跌幅",
+      "default_aggregation": "float_market_cap_weighted_return",
+      "allowed_aggregations": ["float_market_cap_weighted_return", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "默认以成员上一收盘价与流通股本之积作权重，计算可投资规模加权的群组收益率。"
+    },
+    {
+      "indicator_id": "跌幅",
+      "default_aggregation": "float_market_cap_weighted_loss",
+      "allowed_aggregations": ["float_market_cap_weighted_loss", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "跌幅是规模加权群组收益率的相反数，保留正数表示下跌的语义。"
+    }
+  ]
+}

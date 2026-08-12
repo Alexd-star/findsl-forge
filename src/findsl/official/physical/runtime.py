@@ -20,6 +20,10 @@ from ..external.runtime import (
 from .approximation import NumericApproximationPolicy, default_numeric_approximation_policy
 from .patterns import PhysicalPatternConfig, default_physical_pattern_config
 from .scopes import SecurityScopeCatalog, default_security_scope_catalog
+from ..group_metric_catalog import (
+    GroupMetricPolicyCatalog,
+    default_group_metric_policy_catalog,
+)
 
 
 @dataclass(frozen=True)
@@ -33,6 +37,7 @@ class PhysicalRuntimeCatalogs:
     benchmark_policy: BenchmarkPolicyCatalog
     approximation_policy: NumericApproximationPolicy
     technical_patterns: PhysicalPatternConfig
+    group_metrics: GroupMetricPolicyCatalog
 
 
 _ACTIVE_RUNTIME: ContextVar[Optional[PhysicalRuntimeCatalogs]] = ContextVar(
@@ -93,3 +98,8 @@ def current_numeric_approximation_policy() -> NumericApproximationPolicy:
 def current_physical_pattern_config() -> PhysicalPatternConfig:
     runtime = _ACTIVE_RUNTIME.get()
     return runtime.technical_patterns if runtime else default_physical_pattern_config()
+
+
+def current_group_metric_policy_catalog() -> GroupMetricPolicyCatalog:
+    runtime = _ACTIVE_RUNTIME.get()
+    return runtime.group_metrics if runtime else default_group_metric_policy_catalog()

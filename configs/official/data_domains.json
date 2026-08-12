@@ -221,8 +221,8 @@
       "primary_keys": ["snapshot_id", "group_type", "group_code", "bizdate"],
       "quality_gates": ["aggregation_policy_explicit", "membership_effective_date", "constituent_coverage", "reference_result_hash"],
       "profiles": [
-        {"profile_id": "competition-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package", "eastmoney", "baostock-industry", "sina-sector"], "reason": "Membership and quotes exist, but the official DSL does not define the default constituent aggregation for a group-valued indicator."},
-        {"profile_id": "competition-official-only-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package"], "reason": "The organizer package has no group membership and no default group aggregation policy."}
+        {"profile_id": "competition-v1", "status": "derived", "active_provider_ids": ["eastmoney"], "candidate_provider_ids": ["baostock-industry", "sina-sector"], "reason": "Versioned membership and quote data are combined only through the explicit group metric policy catalog; indicators without an admitted aggregation remain unsupported."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package has no industry or concept membership snapshot, so group-valued execution is unavailable in this profile."}
       ]
     },
     {

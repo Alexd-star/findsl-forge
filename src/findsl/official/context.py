@@ -32,6 +32,7 @@ from .policy import SemanticPolicySet
 from .registry import OfficialIndicatorRegistry
 from .signatures import OfficialFunctionCatalog
 from .target_catalog import EntityTargetCatalog
+from .group_metric_catalog import GroupMetricPolicyCatalog
 
 
 class CompileContextError(ValueError):
@@ -120,6 +121,7 @@ class CatalogSnapshot:
             "external_source_registry",
             "data_domain_catalog",
             "entity_target_catalog",
+            "group_metric_policy_catalog",
         }
         missing = required_roles - roles
         if missing:
@@ -210,6 +212,7 @@ class CompileContext:
     external_source_registry: ExternalSourceRegistry
     data_domain_catalog: DataDomainCatalog
     entity_target_catalog: EntityTargetCatalog
+    group_metric_policy_catalog: GroupMetricPolicyCatalog
 
     @classmethod
     def load(
@@ -256,6 +259,9 @@ class CompileContext:
             source_registry=external_source_registry,
         )
         entity_target_catalog = EntityTargetCatalog.load(paths["entity_target_catalog"])
+        group_metric_policy_catalog = GroupMetricPolicyCatalog.load(
+            paths["group_metric_policy_catalog"]
+        )
         policies = ScopeSemanticPolicyCatalog.load(paths["scope_semantic_policies"])
         runtime_raw = json.loads(paths["external_scope_runtime"].read_text(encoding="utf-8"))
         if set(runtime_raw) != {"schema_version", "membership_resource_id", "entries"}:
@@ -275,6 +281,7 @@ class CompileContext:
             benchmark_policy=BenchmarkPolicyCatalog.load(paths["benchmark_policy"]),
             approximation_policy=NumericApproximationPolicy.load(paths["approximation_policy"]),
             technical_patterns=PhysicalPatternConfig.load(paths["technical_patterns"]),
+            group_metrics=group_metric_policy_catalog,
         )
         if runtime.semantic_policy.policy_id != snapshot.policy_id:
             raise CompileContextError(
@@ -294,6 +301,7 @@ class CompileContext:
             external_source_registry,
             data_domain_catalog,
             entity_target_catalog,
+            group_metric_policy_catalog,
         )
 
     @property

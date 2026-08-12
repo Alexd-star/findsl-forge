@@ -4,7 +4,7 @@ from .catalog import PhysicalCatalog, PhysicalCatalogError
 from .ir import (
     PhysicalAbs, PhysicalAggregate, PhysicalAggregateRank, PhysicalAggregateRef, PhysicalBinary, PhysicalColumn, PhysicalComparison, PhysicalCompositeAggregate, PhysicalCrossing, PhysicalEmpty,
     PhysicalCandidateSetOperation, PhysicalEventFilter, PhysicalEventProjection, PhysicalEventRef, PhysicalExtreme, PhysicalFilter, PhysicalJoin, PhysicalLimit, PhysicalPlan, PhysicalPrefixAggregate, PhysicalPrefixJoin, PhysicalPrefixLookup, PhysicalPrefixRef, PhysicalProjectedRef,
-    PhysicalDynamicDateRange, PhysicalExternalExists, PhysicalGroupedAggregate, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
+    PhysicalDynamicDateRange, PhysicalExternalExists, PhysicalGroupedAggregate, PhysicalGroupEntityMetric, PhysicalIn, PhysicalLatestValue, PhysicalNamedRank, PhysicalNthLatestValue, PhysicalPrefixAverage, PhysicalRank, PhysicalRankExpression, PhysicalRecentSessions, PhysicalScan, PhysicalSessionBoundaryRange, PhysicalStageRank, PhysicalTableScan, PhysicalWindow,
     PhysicalTemporal, PhysicalTemporalAggregate, PhysicalTemporalRank,
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
@@ -291,6 +291,50 @@ def _validate_plan(plan, catalog, expressions):
             raise PhysicalCatalogError("grouped aggregate anchor requires a partition key")
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.bound, catalog, expressions)
+    elif isinstance(plan, PhysicalGroupEntityMetric):
+        membership = catalog.resource(plan.membership_resource_id)
+        if "scope_membership" not in membership.capabilities:
+            raise PhysicalCatalogError("group entity route requires scope membership")
+        if not plan.target_ids or not plan.scope_types or not plan.snapshot_ids:
+            raise ValueError("group entity route requires targets, scope types and snapshots")
+        if any(not value for value in plan.scope_codes):
+            raise ValueError("group entity scope codes cannot be empty")
+        if plan.aggregation not in {
+            "sum",
+            "avg",
+            "max",
+            "min",
+            "float_market_cap_weighted_return",
+            "float_market_cap_weighted_loss",
+        }:
+            raise ValueError("group entity aggregation is unsupported")
+        if plan.null_policy not in {"ignore", "reject_group"}:
+            raise ValueError("group entity null policy is invalid")
+        if plan.minimum_member_count < 1:
+            raise ValueError("group entity minimum member count must be positive")
+        if (plan.predicate_comparator is None) != (plan.predicate_bound is None):
+            raise ValueError("group entity predicate contract is incomplete")
+        if plan.predicate_comparator not in {None, "=", "!=", ">", ">=", "<", "<="}:
+            raise ValueError("group entity predicate comparator is invalid")
+        rank_values = (plan.rank_direction, plan.rank_comparator, plan.rank_bound)
+        if any(value is not None for value in rank_values):
+            if not all(value is not None for value in rank_values):
+                raise ValueError("group entity rank contract is incomplete")
+            if plan.rank_direction not in {"asc", "desc"}:
+                raise ValueError("group entity rank direction is invalid")
+            if plan.rank_comparator not in {"<", "<=", "=", "!=", ">", ">=", "between"}:
+                raise ValueError("group entity rank comparator is invalid")
+            _validate_rank_bounds(
+                plan.rank_bound,
+                plan.rank_comparator,
+                plan.rank_percentage,
+                plan.rank_upper_bound,
+            )
+        elif plan.rank_upper_bound is not None or plan.rank_percentage:
+            raise ValueError("group entity rank options require a rank contract")
+        _validate_expr(plan.measure, catalog, expressions)
+        if plan.predicate_bound is not None:
+            _validate_expr(plan.predicate_bound, catalog, expressions)
     elif isinstance(plan, PhysicalCompositeAggregate):
         if (not plan.groups and not plan.scalars) or plan.predicate.type is not BOOLEAN:
             raise ValueError("composite named relation plan requires relations and a boolean predicate")

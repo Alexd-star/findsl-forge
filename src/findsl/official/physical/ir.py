@@ -470,6 +470,53 @@ class PhysicalGroupedAggregate(PhysicalPlan):
 
 
 @dataclass(frozen=True)
+class PhysicalGroupEntityMetric(PhysicalPlan):
+    input: PhysicalPlan
+    membership_resource_id: str
+    target_ids: Tuple[str, ...]
+    scope_types: Tuple[str, ...]
+    scope_codes: Tuple[str, ...]
+    snapshot_ids: Tuple[str, ...]
+    measure: PhysicalExpr
+    aggregation: str
+    predicate_comparator: Optional[str]
+    predicate_bound: Optional[PhysicalLiteral]
+    rank_direction: Optional[str]
+    rank_comparator: Optional[str]
+    rank_bound: Optional[PhysicalLiteral]
+    rank_upper_bound: Optional[PhysicalLiteral]
+    rank_percentage: bool
+    lower_inclusive: bool
+    upper_inclusive: bool
+    minimum_member_count: int
+    null_policy: str
+
+    def to_dict(self):
+        return {
+            "kind": "PhysicalGroupEntityMetric",
+            "input": self.input.to_dict(),
+            "membership_resource_id": self.membership_resource_id,
+            "target_ids": list(self.target_ids),
+            "scope_types": list(self.scope_types),
+            "scope_codes": list(self.scope_codes),
+            "snapshot_ids": list(self.snapshot_ids),
+            "measure": self.measure.to_dict(),
+            "aggregation": self.aggregation,
+            "predicate_comparator": self.predicate_comparator,
+            "predicate_bound": self.predicate_bound.to_dict() if self.predicate_bound else None,
+            "rank_direction": self.rank_direction,
+            "rank_comparator": self.rank_comparator,
+            "rank_bound": self.rank_bound.to_dict() if self.rank_bound else None,
+            "rank_upper_bound": self.rank_upper_bound.to_dict() if self.rank_upper_bound else None,
+            "rank_percentage": self.rank_percentage,
+            "lower_inclusive": self.lower_inclusive,
+            "upper_inclusive": self.upper_inclusive,
+            "minimum_member_count": self.minimum_member_count,
+            "null_policy": self.null_policy,
+        }
+
+
+@dataclass(frozen=True)
 class PhysicalAggregateRank(PhysicalPlan):
     input: PhysicalPlan
     measure: PhysicalExpr

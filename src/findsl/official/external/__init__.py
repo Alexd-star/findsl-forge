@@ -22,6 +22,16 @@ from .data_domains import (
     DataDomainDefinition,
     DataDomainProfile,
 )
+from .adapters import (
+    DomainAdapter,
+    DomainAdapterError,
+    DomainAdapterRegistry,
+    DomainAdapterRequest,
+    DomainAdapterRunner,
+    DomainSnapshotArtifact,
+    LocalTabularDomainAdapter,
+    inspect_tabular_artifact,
+)
 
 __all__ = [
     "CatalogSnapshot",
@@ -41,4 +51,12 @@ __all__ = [
     "InstrumentRule",
     "ScopeMembership",
     "audit_domain_snapshot",
+    "DomainAdapter",
+    "DomainAdapterError",
+    "DomainAdapterRegistry",
+    "DomainAdapterRequest",
+    "DomainAdapterRunner",
+    "DomainSnapshotArtifact",
+    "LocalTabularDomainAdapter",
+    "inspect_tabular_artifact",
 ]

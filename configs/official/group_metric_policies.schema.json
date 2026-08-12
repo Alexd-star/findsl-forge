@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_id", "membership_resource_id", "targets", "metrics"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "catalog_id": {"type": "string", "minLength": 1},
+    "membership_resource_id": {"type": "string", "minLength": 1},
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_id", "scope_types", "preferred_sources", "minimum_member_count"],
+        "properties": {
+          "target_id": {"type": "string", "minLength": 1},
+          "scope_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "preferred_sources": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "minimum_member_count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["indicator_id", "default_aggregation", "allowed_aggregations", "allowed_target_ids", "null_policy", "rationale"],
+        "properties": {
+          "indicator_id": {"type": "string", "minLength": 1},
+          "default_aggregation": {"enum": ["sum", "avg", "max", "min", "float_market_cap_weighted_return", "float_market_cap_weighted_loss"]},
+          "allowed_aggregations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["sum", "avg", "max", "min", "float_market_cap_weighted_return", "float_market_cap_weighted_loss"]}},
+          "allowed_target_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "null_policy": {"enum": ["ignore", "reject_group"]},
+          "rationale": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

@@ -21,6 +21,7 @@
     {"role": "technical_patterns", "path": "configs/official_technical_patterns.json"},
     {"role": "external_source_registry", "path": "configs/official/external_source_registry.json"},
     {"role": "data_domain_catalog", "path": "configs/official/data_domains.json"},
-    {"role": "entity_target_catalog", "path": "configs/official/entity_targets.json"}
+    {"role": "entity_target_catalog", "path": "configs/official/entity_targets.json"},
+    {"role": "group_metric_policy_catalog", "path": "configs/official/group_metric_policies.json"}
   ]
 }
