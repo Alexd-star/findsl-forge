@@ -215,6 +215,12 @@ _INDEX_TARGET_FIELDS = {
     "涨幅": ("pct_change", "numeric"),
     "涨跌幅": ("pct_change", "numeric"),
 }
+_GROUP_ENTITY_OUTPUT_KEYS = (
+    "group_type",
+    "group_code",
+    "group_name",
+    "bizdate",
+)
 
 
 def _plan_group_entity(
@@ -223,6 +229,150 @@ def _plan_group_entity(
     catalog: PhysicalCatalog,
     expressions: Optional[PhysicalExpressionRegistry],
     statistics: Optional[PhysicalStatisticsSnapshot],
+    candidate_input: Optional[PhysicalPlan] = None,
+) -> PhysicalPlanningResult:
+    if isinstance(logical_plan, LogicalLimit):
+        inner = _plan_group_entity(
+            logical_plan.input,
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            candidate_input,
+        )
+        plan = PhysicalLimit(inner.plan, logical_plan.offset, logical_plan.count)
+        validate_physical_plan(plan, catalog, expressions)
+        return replace(
+            inner,
+            plan=plan,
+            selected_strategy=f"limit_{inner.selected_strategy}",
+        )
+
+    if isinstance(logical_plan, LogicalStage):
+        prior = _plan_group_entity(
+            logical_plan.input,
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            candidate_input,
+        )
+        stage = _plan_group_entity(
+            logical_plan.operation,
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            prior.plan,
+        )
+        decisions = tuple(
+            replace(item, strategy_id=f"stage_input:{item.strategy_id}")
+            for item in prior.decisions
+        ) + tuple(
+            replace(
+                item,
+                strategy_id=f"stage_{logical_plan.stage_index}:{item.strategy_id}",
+            )
+            for item in stage.decisions
+        )
+        resources = "+".join(
+            sorted({prior.selected_resource, stage.selected_resource})
+        )
+        return replace(
+            stage,
+            selected_resource=resources,
+            decisions=decisions,
+            selected_strategy=f"group_stage_{logical_plan.stage_index}",
+        )
+
+    if isinstance(logical_plan, LogicalSetOperation):
+        left = _plan_group_entity(
+            logical_plan.left,
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            candidate_input,
+        )
+        right = _plan_group_entity(
+            logical_plan.right,
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            candidate_input,
+        )
+        plan = PhysicalSetOperation(
+            left.plan,
+            right.plan,
+            logical_plan.operation,
+            _GROUP_ENTITY_OUTPUT_KEYS,
+        )
+        validate_physical_plan(plan, catalog, expressions)
+        decisions = tuple(
+            replace(item, strategy_id=f"group_left:{item.strategy_id}")
+            for item in left.decisions
+        ) + tuple(
+            replace(item, strategy_id=f"group_right:{item.strategy_id}")
+            for item in right.decisions
+        )
+        resources = "+".join(
+            sorted({left.selected_resource, right.selected_resource})
+        )
+        return PhysicalPlanningResult(
+            plan,
+            resources,
+            decisions,
+            f"group_set_{logical_plan.operation}",
+        )
+
+    if (
+        isinstance(logical_plan, LogicalFilter)
+        and isinstance(logical_plan.predicate, BinaryExpr)
+        and logical_plan.predicate.op in {"and", "or"}
+    ):
+        operation = (
+            "intersect" if logical_plan.predicate.op == "and" else "union"
+        )
+        return _plan_group_entity(
+            LogicalSetOperation(
+                LogicalFilter(
+                    logical_plan.input,
+                    logical_plan.predicate.left,
+                    logical_plan.schema,
+                ),
+                LogicalFilter(
+                    logical_plan.input,
+                    logical_plan.predicate.right,
+                    logical_plan.schema,
+                ),
+                operation,
+                logical_plan.schema,
+            ),
+            entity_target,
+            catalog,
+            expressions,
+            statistics,
+            candidate_input,
+        )
+
+    return _plan_group_entity_leaf(
+        logical_plan,
+        entity_target,
+        catalog,
+        expressions,
+        statistics,
+        candidate_input,
+    )
+
+
+def _plan_group_entity_leaf(
+    logical_plan,
+    entity_target,
+    catalog: PhysicalCatalog,
+    expressions: Optional[PhysicalExpressionRegistry],
+    statistics: Optional[PhysicalStatisticsSnapshot],
+    candidate_input: Optional[PhysicalPlan] = None,
 ) -> PhysicalPlanningResult:
     current = logical_plan
     limit = None
@@ -403,6 +553,7 @@ def _plan_group_entity(
 
     plan: PhysicalPlan = PhysicalGroupEntityMetric(
         input_plan,
+        candidate_input,
         policy_catalog.membership_resource_id,
         entity_target.target_ids,
         target_policy.scope_types,

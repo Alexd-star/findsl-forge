@@ -38,6 +38,19 @@ def validate_physical_plan(plan: PhysicalPlan, catalog: PhysicalCatalog, express
     return plan
 
 
+def _is_group_entity_output(plan: PhysicalPlan) -> bool:
+    if isinstance(plan, PhysicalGroupEntityMetric):
+        return True
+    if isinstance(plan, PhysicalLimit):
+        return _is_group_entity_output(plan.input)
+    return isinstance(plan, PhysicalSetOperation) and tuple(plan.key_columns) == (
+        "group_type",
+        "group_code",
+        "group_name",
+        "bizdate",
+    )
+
+
 def _validate_plan(plan, catalog, expressions):
     if isinstance(plan, PhysicalTableScan):
         catalog.resource(plan.resource_id)
@@ -68,6 +81,16 @@ def _validate_plan(plan, catalog, expressions):
     if isinstance(plan, PhysicalSetOperation):
         if plan.operation not in {"intersect", "union"}:
             raise ValueError("unsupported physical set operation")
+        if (
+            not plan.key_columns
+            or len(plan.key_columns) != len(set(plan.key_columns))
+            or tuple(plan.key_columns)
+            not in {
+                ("mktcode", "tgtcode", "bizdate"),
+                ("group_type", "group_code", "group_name", "bizdate"),
+            }
+        ):
+            raise ValueError("physical set operation has invalid entity keys")
         _validate_plan(plan.left, catalog, expressions)
         _validate_plan(plan.right, catalog, expressions)
         return
@@ -313,6 +336,11 @@ def _validate_plan(plan, catalog, expressions):
         _validate_expr(plan.measure, catalog, expressions)
         _validate_expr(plan.bound, catalog, expressions)
     elif isinstance(plan, PhysicalGroupEntityMetric):
+        _validate_plan(plan.input, catalog, expressions)
+        if plan.candidate_input is not None:
+            _validate_plan(plan.candidate_input, catalog, expressions)
+            if not _is_group_entity_output(plan.candidate_input):
+                raise ValueError("group entity candidates must preserve group identity")
         membership = catalog.resource(plan.membership_resource_id)
         if "scope_membership" not in membership.capabilities:
             raise PhysicalCatalogError("group entity route requires scope membership")

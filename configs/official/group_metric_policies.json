@@ -110,6 +110,54 @@
       "allowed_target_ids": ["industry", "concept", "board"],
       "null_policy": "ignore",
       "rationale": "跌幅是规模加权群组收益率的相反数，保留正数表示下跌的语义。"
+    },
+    {
+      "indicator_id": "外盘",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "外盘为成员证券主动买入成交量，群组总量按成员加总。"
+    },
+    {
+      "indicator_id": "大单净流入",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "大单净流入为有方向的可加金额，群组层按成员求和。"
+    },
+    {
+      "indicator_id": "集合竞价金额",
+      "default_aggregation": "sum",
+      "allowed_aggregations": ["sum", "avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "集合竞价金额是同一交易时段内可按成员汇总的成交金额。"
+    },
+    {
+      "indicator_id": "静态市盈率",
+      "default_aggregation": "avg",
+      "allowed_aggregations": ["avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "静态市盈率不可加总；在缺少总市值与归母净利润重算口径时，仅允许显式均值或极值统计。"
+    },
+    {
+      "indicator_id": "主力买入占比",
+      "default_aggregation": "avg",
+      "allowed_aggregations": ["avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "成员占比不可加总；当前群组口径采用横截面均值并允许极值分析。"
+    },
+    {
+      "indicator_id": "主力卖出占比",
+      "default_aggregation": "avg",
+      "allowed_aggregations": ["avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "成员占比不可加总；当前群组口径采用横截面均值并允许极值分析。"
     }
   ]
 }

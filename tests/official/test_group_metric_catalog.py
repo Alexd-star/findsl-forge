@@ -42,3 +42,23 @@ def test_group_return_policy_is_explicitly_float_cap_weighted() -> None:
 
     policy = catalog.metric("涨跌幅", ("industry",))
     assert policy.default_aggregation == "float_market_cap_weighted_return"
+
+
+@pytest.mark.parametrize("indicator", ["外盘", "大单净流入", "集合竞价金额"])
+def test_group_additive_flow_metrics_default_to_sum(indicator) -> None:
+    catalog = GroupMetricPolicyCatalog.load(
+        REPO_ROOT / "configs/official/group_metric_policies.json"
+    )
+
+    assert catalog.metric(indicator, ("industry",)).default_aggregation == "sum"
+
+
+@pytest.mark.parametrize("indicator", ["静态市盈率", "主力买入占比", "主力卖出占比"])
+def test_group_non_additive_ratios_forbid_sum(indicator) -> None:
+    catalog = GroupMetricPolicyCatalog.load(
+        REPO_ROOT / "configs/official/group_metric_policies.json"
+    )
+
+    policy = catalog.metric(indicator, ("industry",))
+    assert policy.default_aggregation == "avg"
+    assert "sum" not in policy.allowed_aggregations

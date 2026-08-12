@@ -20,11 +20,10 @@ from findsl.official.pipeline import compile_official
 
 
 FIXTURE_SNAPSHOT = "findsl-group-oracle-2026-04-14-v1"
-FIXTURE_GROUP = "ORACLE_GROUP_001"
-FIXTURE_ROWS = (
-    (0, "000001"),
-    (0, "000002"),
-)
+FIXTURE_GROUPS = {
+    "ORACLE_GROUP_001": ((0, "000001"), (0, "000002")),
+    "ORACLE_GROUP_002": ((0, "000004"), (0, "000006")),
+}
 
 
 def collect(
@@ -39,20 +38,37 @@ def collect(
             cases = (
                 (
                     "group_volume_sum",
-                    "indicator('', '', '成交量', '今日', '行业', '', '') > 0",
-                    _reference_sql("SUM(q.volume)"),
+                    "indicator('', '群组真值实验甲', '成交量', '今日', '行业', '', '') > 0",
+                    _reference_sql("SUM(q.volume)", "ORACLE_GROUP_001"),
+                    1,
                 ),
                 (
                     "group_float_cap_weighted_return",
-                    "indicator('', '', '涨幅', '今日', '行业', '', '') > -100",
+                    "indicator('', '群组真值实验甲', '涨幅', '今日', '行业', '', '') > -100",
                     _reference_sql(
                         "SUM((q.lastPx-q.preClosePx)*q.listedShare) / "
-                        "NULLIF(SUM(q.preClosePx*q.listedShare),0) * 100.0"
+                        "NULLIF(SUM(q.preClosePx*q.listedShare),0) * 100.0",
+                        "ORACLE_GROUP_001",
                     ),
+                    1,
+                ),
+                (
+                    "group_metric_intersection",
+                    "indicator('', '', '成交量', '今日', '行业', '', '') > 100000000 "
+                    "and indicator('', '', '总股本', '今日', '行业', '', '') > 5000000000",
+                    _group_key_reference("ORACLE_GROUP_001"),
+                    1,
+                ),
+                (
+                    "group_stage_candidate_rank",
+                    "indicator('', '', '成交量', '今日', '行业', '', '') < 100000000 "
+                    "then rank('', '', '成交量', 'desc', '今日', '行业', '', '') = 1",
+                    _reference_sql("SUM(q.volume)", "ORACLE_GROUP_002"),
+                    1,
                 ),
             )
             results = []
-            for case_id, source, reference_sql in cases:
+            for case_id, source, reference_sql, expected_row_count in cases:
                 compiled = compile_official(source, context=context)
                 generated = execute_doris_query(doris, compiled.backend["sql"])
                 reference = execute_doris_query(doris, reference_sql)
@@ -70,6 +86,7 @@ def collect(
                         "generated_hash": generated.ordered_hash,
                         "reference_hash": reference.ordered_hash,
                         "row_count": len(generated.rows),
+                        "expected_row_count": expected_row_count,
                         "matched": matched,
                         "elapsed_ms": generated.elapsed_ms,
                         "reference_elapsed_ms": reference.elapsed_ms,
@@ -87,13 +104,15 @@ def collect(
         .isoformat(),
         "git_head": _git_head(repo_root),
         "fixture_snapshot_id": FIXTURE_SNAPSHOT,
-        "fixture_group_code": FIXTURE_GROUP,
-        "fixture_members": [list(row) for row in FIXTURE_ROWS],
+        "fixture_groups": {
+            group_code: [list(row) for row in rows]
+            for group_code, rows in FIXTURE_GROUPS.items()
+        },
         "fixture_cleaned": _fixture_count(doris) == 0,
         "cases": results,
         "passed": all(
             item["matched"]
-            and item["row_count"] == 1
+            and item["row_count"] == item["expected_row_count"]
             and item["explain_contains_membership_join"]
             for item in results
         ),
@@ -118,14 +137,15 @@ def _fixture_context(repo_root: Path, temp_root: Path) -> CompileContext:
     runtime["entries"] = [
         {
             "scope_type": "industry",
-            "scope_code": FIXTURE_GROUP,
-            "scope_name": "群组真值实验",
-            "alias": "群组真值实验",
-            "normalized_alias": "群组真值实验",
+            "scope_code": group_code,
+            "scope_name": f"群组真值实验{name}",
+            "alias": f"群组真值实验{name}",
+            "normalized_alias": f"群组真值实验{name}",
             "source": "eastmoney",
             "as_of_date": "2026-04-14",
             "snapshot_id": FIXTURE_SNAPSHOT,
         }
+        for group_code, name in zip(FIXTURE_GROUPS, ("甲", "乙"))
     ]
     runtime_path.write_text(
         json.dumps(runtime, ensure_ascii=False, indent=2),
@@ -134,7 +154,7 @@ def _fixture_context(repo_root: Path, temp_root: Path) -> CompileContext:
     return CompileContext.load(temp_root)
 
 
-def _reference_sql(metric: str) -> str:
+def _reference_sql(metric: str, group_code: str) -> str:
     return f"""
 SELECT
   m.scope_type AS group_type,
@@ -150,11 +170,30 @@ INNER JOIN findsl_ext.scope_membership m
 WHERE q.bizdate='2026-04-14'
   AND m.snapshot_id='{FIXTURE_SNAPSHOT}'
   AND m.scope_type='industry'
-  AND m.scope_code='{FIXTURE_GROUP}'
+  AND m.scope_code='{group_code}'
   AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)
   AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)
 GROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate
 HAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2
+""".strip()
+
+
+def _group_key_reference(group_code: str) -> str:
+    return f"""
+SELECT DISTINCT
+  m.scope_type AS group_type,
+  m.scope_code AS group_code,
+  m.scope_name AS group_name,
+  q.bizdate
+FROM newzl.hsj_stock_hq_basic q
+INNER JOIN findsl_ext.scope_membership m
+  ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode
+WHERE q.bizdate='2026-04-14'
+  AND m.snapshot_id='{FIXTURE_SNAPSHOT}'
+  AND m.scope_type='industry'
+  AND m.scope_code='{group_code}'
+  AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)
+  AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)
 """.strip()
 
 
@@ -163,17 +202,20 @@ def _insert_sql() -> str:
         "(" + ",".join(
             (
                 f"'{FIXTURE_SNAPSHOT}'",
-                f"'{FIXTURE_GROUP}'",
+                f"'{group_code}'",
                 str(market),
                 f"'{code}'",
                 "'industry'",
-                "'群组真值实验'",
+                f"'群组真值实验{name}'",
                 "'2026-04-14'",
                 "NULL",
                 "NULL",
             )
         ) + ")"
-        for market, code in FIXTURE_ROWS
+        for (group_code, rows), name in zip(
+            FIXTURE_GROUPS.items(), ("甲", "乙")
+        )
+        for market, code in rows
     )
     return (
         "INSERT INTO findsl_ext.scope_membership "
@@ -262,7 +304,7 @@ def render_markdown(report: dict) -> str:
     lines.extend(
         [
             "",
-            "> 该证据使用独立两只证券成员夹具，仅用于验证群组计划和聚合公式；"
+            "> 该证据使用两个隔离群组夹具，用于验证群组计划、聚合公式、集合运算和候选集阶段排名；"
             "它不会被计入公开数据快照，实验结束后自动删除。",
         ]
     )

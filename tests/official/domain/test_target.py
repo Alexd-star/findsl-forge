@@ -1,6 +1,8 @@
 from pathlib import Path
 
 import pytest
+import sqlglot
+from sqlglot import exp
 
 from findsl.official.context import CompileContext
 from findsl.official.domain.target import (
@@ -157,6 +159,57 @@ def test_group_rank_returns_group_keys_and_deterministic_tie_breakers() -> None:
     assert "ROW_NUMBER() OVER" in sql
     assert "`group_metrics`.`group_type` ASC" in sql
     assert "`group_metrics`.`group_code` ASC" in sql
+
+
+def test_group_boolean_composition_uses_group_identity_set_keys() -> None:
+    context = CompileContext.load(REPO_ROOT)
+    result = compile_official(
+        "indicator('', '', '总股本', '', '行业', '', '') >= 100000000 and "
+        "indicator('', '', '总市值', '', '行业', '', '') <= 200000000",
+        context=context,
+    )
+
+    plan = result.physical["plan"]
+    assert plan["kind"] == "PhysicalSetOperation"
+    assert plan["operation"] == "intersect"
+    assert plan["key_columns"] == [
+        "group_type",
+        "group_code",
+        "group_name",
+        "bizdate",
+    ]
+    assert result.physical["selected_strategy"] == "group_set_intersect"
+    sql = result.backend["sql"]
+    assert " INTERSECT " in sql
+    assert "`left_set_input`.`group_code`" in sql
+    assert "`right_set_input`.`group_code`" in sql
+    assert "metric_value` INTERSECT" not in sql
+
+
+def test_group_stage_ranks_only_the_prior_candidate_population() -> None:
+    context = CompileContext.load(REPO_ROOT)
+    result = compile_official(
+        "indicator('', '', '主力净流出', '', '行业', '', '') = 1000000000 "
+        "then rank('', '', '主力净流出', 'desc', '', '行业', '', '') = 1",
+        context=context,
+    )
+
+    plan = result.physical["plan"]
+    assert plan["kind"] == "PhysicalGroupEntityMetric"
+    assert plan["candidate_input"]["kind"] == "PhysicalGroupEntityMetric"
+    assert result.physical["selected_strategy"] == "group_stage_1"
+    sql = result.backend["sql"]
+    parsed = sqlglot.parse_one(sql, read="doris")
+    ranked_select = next(
+        select
+        for select in parsed.find_all(exp.Select)
+        if any(item.alias_or_name == "__rank_value" for item in select.expressions)
+    )
+    assert any(
+        join.this.alias_or_name == "group_candidates"
+        for join in ranked_select.args.get("joins", ())
+    )
+    assert "`group_metrics`.`group_code` = `group_candidates`.`group_code`" in sql
 
 
 def test_group_universe_is_supported_without_inventing_a_metric() -> None:

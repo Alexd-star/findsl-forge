@@ -475,6 +475,7 @@ class PhysicalGroupedAggregate(PhysicalPlan):
 @dataclass(frozen=True)
 class PhysicalGroupEntityMetric(PhysicalPlan):
     input: PhysicalPlan
+    candidate_input: Optional[PhysicalPlan]
     membership_resource_id: str
     target_ids: Tuple[str, ...]
     scope_types: Tuple[str, ...]
@@ -498,6 +499,7 @@ class PhysicalGroupEntityMetric(PhysicalPlan):
         return {
             "kind": "PhysicalGroupEntityMetric",
             "input": self.input.to_dict(),
+            "candidate_input": self.candidate_input.to_dict() if self.candidate_input else None,
             "membership_resource_id": self.membership_resource_id,
             "target_ids": list(self.target_ids),
             "scope_types": list(self.scope_types),
@@ -965,6 +967,7 @@ class PhysicalSetOperation(PhysicalPlan):
     left: PhysicalPlan
     right: PhysicalPlan
     operation: str
+    key_columns: Tuple[str, ...] = ("mktcode", "tgtcode", "bizdate")
 
     def to_dict(self):
         return {
@@ -972,6 +975,7 @@ class PhysicalSetOperation(PhysicalPlan):
             "left": self.left.to_dict(),
             "right": self.right.to_dict(),
             "operation": self.operation,
+            "key_columns": list(self.key_columns),
         }
 
 

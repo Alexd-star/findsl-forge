@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from sqlglot import exp
 
@@ -203,11 +203,7 @@ def _render_plan(
         )
         query = _render_plan(plan.input, catalog, cte_prefix)
         if query.args.get("order") is None:
-            output_keys = (
-                ("group_type", "group_code", "bizdate")
-                if isinstance(plan.input, PhysicalGroupEntityMetric)
-                else ("mktcode", "tgtcode", "bizdate")
-            )
+            output_keys = _physical_output_keys(plan.input)
             query = query.order_by(
                 *(exp.column(key, quoted=True) for key in output_keys)
             )
@@ -283,6 +279,16 @@ def _render_plan(
     if isinstance(plan, PhysicalPrefixJoin):
         return _render_prefix_join(plan, catalog, cte_prefix)
     raise DorisBackendError("DORIS_PLAN_UNSUPPORTED", f"unsupported physical node {type(plan).__name__}")
+
+
+def _physical_output_keys(plan: PhysicalPlan) -> Tuple[str, ...]:
+    if isinstance(plan, PhysicalGroupEntityMetric):
+        return ("group_type", "group_code", "bizdate")
+    if isinstance(plan, PhysicalSetOperation):
+        return plan.key_columns
+    if isinstance(plan, PhysicalLimit):
+        return _physical_output_keys(plan.input)
+    return ("mktcode", "tgtcode", "bizdate")
 
 
 def _render_event_filter(
@@ -1418,6 +1424,50 @@ def _render_group_entity_metric(
             expression=exp.convert(plan.minimum_member_count),
         )
     )
+    candidate_ctes = ()
+    if plan.candidate_input is not None:
+        candidate_query = _render_plan(
+            plan.candidate_input,
+            catalog,
+            f"{cte_prefix}group_candidate_",
+        )
+        candidate_body, candidate_ctes = _detach_ctes(candidate_query)
+        candidate_raw_alias = f"{cte_prefix}group_candidate_raw"
+        candidate_alias = f"{cte_prefix}group_candidates"
+        candidate_keys = (
+            exp.select(
+                exp.column(
+                    "group_type", table=candidate_raw_alias, quoted=True
+                ),
+                exp.column(
+                    "group_code", table=candidate_raw_alias, quoted=True
+                ),
+            )
+            .distinct()
+            .from_(candidate_body.subquery(alias=candidate_raw_alias))
+        )
+        group_query = group_query.join(
+            candidate_keys.subquery(alias=candidate_alias),
+            on=exp.and_(
+                exp.EQ(
+                    this=exp.column(
+                        "group_type", table="group_metrics", quoted=True
+                    ),
+                    expression=exp.column(
+                        "group_type", table=candidate_alias, quoted=True
+                    ),
+                ),
+                exp.EQ(
+                    this=exp.column(
+                        "group_code", table="group_metrics", quoted=True
+                    ),
+                    expression=exp.column(
+                        "group_code", table=candidate_alias, quoted=True
+                    ),
+                ),
+            ),
+            join_type="INNER",
+        )
     if plan.null_policy == "reject_group":
         group_query = group_query.where(
             exp.EQ(
@@ -1437,7 +1487,10 @@ def _render_group_entity_metric(
             )
         )
     if plan.rank_direction is None:
-        return group_query
+        result = group_query
+        for cte in candidate_ctes:
+            result = result.with_(cte.alias_or_name, as_=cte.this)
+        return result
 
     metric = exp.column("metric_value", table="group_metrics", quoted=True)
     tie_breakers = (
@@ -1503,7 +1556,7 @@ def _render_group_entity_metric(
         if plan.rank_upper_bound is not None
         else None
     )
-    return result.where(
+    result = result.where(
         _render_bounded_comparison(
             exp.column("__rank_value", table="ranked_groups", quoted=True),
             plan.rank_comparator,
@@ -1513,6 +1566,9 @@ def _render_group_entity_metric(
             plan.upper_inclusive,
         )
     )
+    for cte in candidate_ctes:
+        result = result.with_(cte.alias_or_name, as_=cte.this)
+    return result
 
 
 def _render_composite_aggregate(
@@ -2919,13 +2975,30 @@ def _render_set_operation(
     right = _render_plan(plan.right, catalog, f"{cte_prefix}right_")
     left_body, left_ctes = _detach_ctes(left)
     right_body, right_ctes = _detach_ctes(right)
+    left_alias = f"{cte_prefix}left_set_input"
+    right_alias = f"{cte_prefix}right_set_input"
+    left_keys = exp.select(
+        *(
+            exp.column(name, table=left_alias, quoted=True)
+            for name in plan.key_columns
+        )
+    ).from_(left_body.subquery(alias=left_alias))
+    right_keys = exp.select(
+        *(
+            exp.column(name, table=right_alias, quoted=True)
+            for name in plan.key_columns
+        )
+    ).from_(right_body.subquery(alias=right_alias))
     if plan.operation == "intersect":
-        combined = exp.Intersect(this=left_body, expression=right_body, distinct=True)
+        combined = exp.Intersect(this=left_keys, expression=right_keys, distinct=True)
     else:
-        combined = exp.Union(this=left_body, expression=right_body, distinct=True)
+        combined = exp.Union(this=left_keys, expression=right_keys, distinct=True)
     alias = f"{cte_prefix}set_rows"
     result = exp.select(
-        *(exp.column(name, table=alias, quoted=True) for name in ("mktcode", "tgtcode", "bizdate"))
+        *(
+            exp.column(name, table=alias, quoted=True)
+            for name in plan.key_columns
+        )
     ).from_(combined.subquery(alias=alias))
     for cte in (*left_ctes, *right_ctes):
         result = result.with_(cte.alias_or_name, as_=cte.this)
