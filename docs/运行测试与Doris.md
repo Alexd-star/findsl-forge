@@ -48,6 +48,8 @@ python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 powershell -ExecutionPolicy Bypass -File .\scripts\demo_stack.ps1
 ```
 
+如 Docker 构建访问 PyPI 需要本机代理，使用 `-ProxyUrl http://127.0.0.1:7897`。脚本会将回环地址转换为容器可访问的 `host.docker.internal`，不会把代理固化进镜像运行环境。
+
 脚本在保留 Doris 命名卷的前提下完成健康等待、样例装载、Demo 构建与 `/health` 核验。只查看状态使用 `-Action Status`，停止使用 `-Action Stop`。
 
 ## 4. 代码质量门禁

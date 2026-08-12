@@ -63,7 +63,7 @@ $reportFiles = @(
 
 $status = ""
 try {
-  $statusLines = & git status --short
+  $statusLines = & git status --short -- src grammar configs data tests deploy .github scripts pyproject.toml
   $status = ($statusLines | Where-Object {
       $_ -notmatch "submission_artifacts/evidence_manifest\.md" -and
       $_ -notmatch "submission_artifacts/evidence_snapshots" -and
@@ -106,13 +106,23 @@ $copied = @(
 
 $screenshotSource = Join-Path (Get-Location) "output/playwright"
 $screenshotDestination = Join-Path $ArtifactsDir "product_screenshots"
+$approvedScreenshots = @(
+  "delivery-evidence-desktop.png",
+  "hero-route-desktop.png",
+  "hero-route-mobile.png"
+)
 if (Test-Path -LiteralPath $screenshotDestination) {
   Remove-Item -LiteralPath $screenshotDestination -Recurse -Force
 }
 if (Test-Path -LiteralPath $screenshotSource) {
   New-Item -ItemType Directory -Force -Path $screenshotDestination | Out-Null
-  Get-ChildItem -LiteralPath $screenshotSource -File -Filter *.png |
-    Copy-Item -Destination $screenshotDestination -Force
+  foreach ($imageName in $approvedScreenshots) {
+    $imagePath = Join-Path $screenshotSource $imageName
+    if (-not (Test-Path -LiteralPath $imagePath)) {
+      throw "Approved product screenshot is missing: $imagePath"
+    }
+    Copy-Item -LiteralPath $imagePath -Destination $screenshotDestination -Force
+  }
 }
 
 $readinessSnapshot = Join-Path $snapshotDir "submission_readiness.md"
@@ -134,7 +144,7 @@ $manifest += "# Evidence Snapshot Manifest"
 $manifest += ""
 $manifest += "- Generated at: $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss zzz'))"
 $manifest += "- Git HEAD at export: $head"
-$manifest += "- Git status when exported, excluding evidence snapshots and this export script: $status"
+$manifest += "- Core source status when exported, excluding this export script: $status"
 $manifest += "- Source reports directory: $ReportsDir"
 $manifest += "- Snapshot directory: $snapshotDir"
 $manifest += ""

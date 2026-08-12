@@ -3,8 +3,8 @@
 ## Summary
 
 - Evidence source: Apache Doris MySQL-compatible query port
-- Generated at: 2026-08-12T11:14:02Z
-- Git HEAD: `a531f1c42169199bc958ffcbafbf122f0f4928d7`
+- Generated at: 2026-08-12T13:05:49Z
+- Git HEAD: `5bde41c87fa3769b73f4abc5188b0fc2a81f5e82`
 - Database: `findsl_demo`
 - Iterations: 3
 - Client command template: `mysql -h 127.0.0.1 -P 9030 -u root --connect-timeout 10 --init-command 'SET enable_sql_cache=false' --batch --raw --skip-column-names findsl_demo -e 'SELECT 1'`
@@ -14,13 +14,13 @@
 - Row counts match: True
 - Baseline row count: 4540562
 - Optimized row count: 4540562
-- Doris cluster speedup: 13.30x
+- Doris cluster speedup: 16.39x
 - Minimum Doris speedup target: 10.00x
 - Doris speedup target met: True
-- Baseline avg execute ms: 4995.362
-- Optimized avg execute ms: 375.595
-- Baseline P95 execute ms: 5187.648
-- Optimized P95 execute ms: 406.596
+- Baseline avg execute ms: 4757.762
+- Optimized avg execute ms: 290.213
+- Baseline P95 execute ms: 4840.811
+- Optimized P95 execute ms: 324.702
 - Optimized plan contains prefix table: True
 - Baseline plan contains window: True
 
@@ -37,8 +37,8 @@ filter(SUM(indicator("volume"), 120) > 420000)
 
 | Variant | Success | Avg execute ms | P95 execute ms | Rows | Prefix plan | Window plan |
 |---|---:|---:|---:|---:|---:|---:|
-| baseline_window | True | 4995.362 | 5187.648 | 4540562 | False | True |
-| optimized_prefix_sum | True | 375.595 | 406.596 | 4540562 | True | False |
+| baseline_window | True | 4757.762 | 4840.811 | 4540562 | False | True |
+| optimized_prefix_sum | True | 290.213 | 324.702 | 4540562 | True | False |
 
 ## EXPLAIN Output
 

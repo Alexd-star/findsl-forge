@@ -3,8 +3,8 @@
 ## Summary
 
 - Evidence source: official Topic 19 CSV package
-- Generated at: 2026-08-12T11:13:37Z
-- Git HEAD: `a531f1c42169199bc958ffcbafbf122f0f4928d7`
+- Generated at: 2026-08-12T13:05:25Z
+- Git HEAD: `5bde41c87fa3769b73f4abc5188b0fc2a81f5e82`
 - Doris version: `VERSION()
 5.7.99`
 - Doris host: `127.0.0.1`
@@ -17,7 +17,7 @@
 - Official feature tables rebuilt in this run: False
 - Official feature tables available: True
 - Baseline/prefix row-count match: True
-- Baseline vs prefix speedup: 13.032x
+- Baseline vs prefix speedup: 12.631x
 
 ## Row Counts
 
@@ -49,12 +49,12 @@ first_ext_date	last_ext_date
 
 | Query | Rows | Avg ms | P95 ms | Prefix plan | Window plan |
 |---|---:|---:|---:|---:|---:|
-| simple_close_price_filter | 3836 | 76.631 | 102.758 | False | False |
-| rank_volume_top10 | 10 | 92.561 | 96.236 | False | True |
-| technical_long_window_feature_filter | 5614 | 200.996 | 253.142 | False | False |
-| ext_main_net_inflow_filter | 2247 | 154.735 | 187.473 | False | False |
-| baseline_window_volume_sum_20 | 5487 | 994.981 | 1067.269 | False | True |
-| prefix_optimized_volume_sum_20 | 5487 | 76.35 | 83.937 | True | False |
+| simple_close_price_filter | 3836 | 83.213 | 92.946 | False | False |
+| rank_volume_top10 | 10 | 90.315 | 104.985 | False | True |
+| technical_long_window_feature_filter | 5614 | 122.602 | 180.069 | False | False |
+| ext_main_net_inflow_filter | 2247 | 107.924 | 119.876 | False | False |
+| baseline_window_volume_sum_20 | 5487 | 846.624 | 887.068 | False | True |
+| prefix_optimized_volume_sum_20 | 5487 | 67.03 | 72.54 | True | False |
 
 ## Stream Load Results
 
