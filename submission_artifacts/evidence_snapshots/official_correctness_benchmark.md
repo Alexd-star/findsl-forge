@@ -1,13 +1,13 @@
 # 官方 SQL 正确率冻结基准
 
-- Git HEAD：`6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9`
+- Git HEAD：`414a9803964a61ffa1876b9d1bbda0fba0e6a298`
 - Catalog snapshot：`0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636`
 - Policy：`official-semantic-policy-v1`
 - Dataset snapshot：`official-doris-20260414-c36a993257a1e152`
-- Eligible：`127`
-- 完整行集一致：`127`
+- Eligible：`157`
+- 完整行集一致：`157`
 - 正确率：`100.00%`
-- Wilson 95% 下界：`97.06%`
+- Wilson 95% 下界：`97.61%`
 - 95% 门禁：`PASS`
 - 十二类函数覆盖：`True`
 - 内部 240 条/98% 门禁：`FAIL`
@@ -16,18 +16,18 @@
 
 | 维度 | 分组 | 匹配 | 总数 | 正确率 |
 |---|---|---:|---:|---:|
-| function_family | belong_industry | 2 | 2 | 100.00% |
-| function_family | close_together | 3 | 3 | 100.00% |
-| function_family | cross_above | 6 | 6 | 100.00% |
-| function_family | cross_down | 5 | 5 | 100.00% |
-| function_family | golden_cross | 2 | 2 | 100.00% |
-| function_family | indicator | 91 | 91 | 100.00% |
-| function_family | position | 6 | 6 | 100.00% |
-| function_family | queryData | 7 | 7 | 100.00% |
+| function_family | belong_industry | 11 | 11 | 100.00% |
+| function_family | close_together | 11 | 11 | 100.00% |
+| function_family | cross_above | 10 | 10 | 100.00% |
+| function_family | cross_down | 11 | 11 | 100.00% |
+| function_family | golden_cross | 11 | 11 | 100.00% |
+| function_family | indicator | 121 | 121 | 100.00% |
+| function_family | position | 11 | 11 | 100.00% |
+| function_family | queryData | 11 | 11 | 100.00% |
 | function_family | rank | 21 | 21 | 100.00% |
-| function_family | record_high | 7 | 7 | 100.00% |
-| function_family | record_low | 5 | 5 | 100.00% |
-| function_family | reset | 4 | 4 | 100.00% |
+| function_family | record_high | 11 | 11 | 100.00% |
+| function_family | record_low | 10 | 10 | 100.00% |
+| function_family | reset | 10 | 10 | 100.00% |
 | plan_family | 10_join_doris | 5 | 5 | 100.00% |
 | plan_family | 11_date_doris | 5 | 5 | 100.00% |
 | plan_family | 12_session_doris | 3 | 3 | 100.00% |
@@ -42,6 +42,7 @@
 | plan_family | 21_aggregate_rank_doris | 6 | 6 | 100.00% |
 | plan_family | 46_derived_scope_doris | 3 | 3 | 100.00% |
 | plan_family | 47_benchmark_policy_doris | 3 | 3 | 100.00% |
+| plan_family | balanced_cross_function_composition | 30 | 30 | 100.00% |
 | plan_family | composite_grouped_aggregate | 3 | 3 | 100.00% |
 | plan_family | controlled_expression | 1 | 1 | 100.00% |
 | plan_family | crossing_window | 9 | 9 | 100.00% |
@@ -190,3 +191,33 @@
 | CORR-PHASE47-BENCHMARK-POLICY-DORIS-002-TODAY-GAIN-BETWEEN-BENCHMARK-AND | PASS | True | 0 | 0 |  |
 | CORR-PHASE47-BENCHMARK-POLICY-DORIS-003-RECENT-MONTH-BENCHMARK-AND-MA60 | PASS | True | 786 | 786 |  |
 | CORR-ADAPTIVE-AGGREGATE-002 | PASS | True | 5614 | 5614 |  |
+| CORR-BALANCED-COMPOSITION-001 | PASS | True | 4930 | 4930 |  |
+| CORR-BALANCED-COMPOSITION-002 | PASS | True | 3354 | 3354 |  |
+| CORR-BALANCED-COMPOSITION-003 | PASS | True | 4618 | 4618 |  |
+| CORR-BALANCED-COMPOSITION-004 | PASS | True | 4423 | 4423 |  |
+| CORR-BALANCED-COMPOSITION-005 | PASS | True | 1055 | 1055 |  |
+| CORR-BALANCED-COMPOSITION-006 | PASS | True | 1940 | 1940 |  |
+| CORR-BALANCED-COMPOSITION-007 | PASS | True | 4618 | 4618 |  |
+| CORR-BALANCED-COMPOSITION-008 | PASS | True | 1919 | 1919 |  |
+| CORR-BALANCED-COMPOSITION-009 | PASS | True | 2036 | 2036 |  |
+| CORR-BALANCED-COMPOSITION-010 | PASS | True | 4620 | 4620 |  |
+| CORR-BALANCED-COMPOSITION-011 | PASS | True | 1680 | 1680 |  |
+| CORR-BALANCED-COMPOSITION-012 | PASS | True | 1919 | 1919 |  |
+| CORR-BALANCED-COMPOSITION-013 | PASS | True | 2036 | 2036 |  |
+| CORR-BALANCED-COMPOSITION-014 | PASS | True | 4620 | 4620 |  |
+| CORR-BALANCED-COMPOSITION-015 | PASS | True | 1678 | 1678 |  |
+| CORR-BALANCED-COMPOSITION-016 | PASS | True | 221 | 221 |  |
+| CORR-BALANCED-COMPOSITION-017 | PASS | True | 1055 | 1055 |  |
+| CORR-BALANCED-COMPOSITION-018 | PASS | True | 2215 | 2215 |  |
+| CORR-BALANCED-COMPOSITION-019 | PASS | True | 2618 | 2618 |  |
+| CORR-BALANCED-COMPOSITION-020 | PASS | True | 3022 | 3022 |  |
+| CORR-BALANCED-COMPOSITION-021 | PASS | True | 95 | 95 |  |
+| CORR-BALANCED-COMPOSITION-022 | PASS | True | 1366 | 1366 |  |
+| CORR-BALANCED-COMPOSITION-023 | PASS | True | 3361 | 3361 |  |
+| CORR-BALANCED-COMPOSITION-024 | PASS | True | 2098 | 2098 |  |
+| CORR-BALANCED-COMPOSITION-025 | PASS | True | 2012 | 2012 |  |
+| CORR-BALANCED-COMPOSITION-026 | PASS | True | 129 | 129 |  |
+| CORR-BALANCED-COMPOSITION-027 | PASS | True | 1367 | 1367 |  |
+| CORR-BALANCED-COMPOSITION-028 | PASS | True | 2285 | 2285 |  |
+| CORR-BALANCED-COMPOSITION-029 | PASS | True | 3679 | 3679 |  |
+| CORR-BALANCED-COMPOSITION-030 | PASS | True | 1063 | 1063 |  |

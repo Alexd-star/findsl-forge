@@ -9,7 +9,7 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Evidence contract | PASS |
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 1095 passed in 177.69s |
+| Pytest regression | 1125 passed in 148.63s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
@@ -32,17 +32,17 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Phase 47 benchmark-policy evidence | PASS, 3/3 |
 | Phase 48 scope-policy evidence | PASS, 7/7 |
 | Latest phase new-success audit | PASS, 23/23, failed 0 |
-| Official per-query 10s target | PASS, 48 queries, max P95 2889.6428 ms |
+| Official per-query 10s target | PASS, 48 queries, max P95 2945.0978 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
-| Official Doris prefix speedup | 13.84x |
-| Official 20-year long-horizon speedup | PASS, 16.29x, median 342 -> 21 ms |
+| Official Doris prefix speedup | 12.11x |
+| Official 20-year long-horizon speedup | PASS, 14.62x, median 234 -> 16 ms |
 | Defense package checks | 13/13 |
 | Doris evidence | PASS |
-| Doris cluster speedup | 30.06x |
+| Doris cluster speedup | 17.78x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | 6f3bcae |
-| Git HEAD at export | 6f3bcae |
+| Git HEAD at report generation | 414a980 |
+| Git HEAD at export | 414a980 |
 
 ## Source Files
 

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-09T07:43:37+00:00",
-  "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+  "generated_at": "2026-08-09T12:49:38+00:00",
+  "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
   "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
   "policy_id": "official-semantic-policy-v1",
   "dataset_snapshot_id": "official-doris-20260414-c36a993257a1e152",
-  "eligible_total": 127,
-  "matched": 127,
+  "eligible_total": 157,
+  "matched": 157,
   "mismatched": 0,
   "accuracy": 1.0,
   "wilson_95": {
-    "lower": 0.9706403547062367,
-    "upper": 1.0
+    "lower": 0.976116488566691,
+    "upper": 0.9999999999999999
   },
   "target_accuracy": 0.95,
   "internal_target_accuracy": 0.98,
@@ -21,53 +21,53 @@
   "internal_target_met": false,
   "contract": {
     "passed": true,
-    "eligible": 127,
+    "eligible": 157,
     "pending": 0,
     "errors": [],
     "warnings": [
-      "formal benchmark has 127 eligible cases; target is at least 240"
+      "formal benchmark has 157 eligible cases; target is at least 240"
     ]
   },
   "groups": {
     "function_family": {
       "belong_industry": {
-        "matched": 2,
-        "total": 2,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "close_together": {
-        "matched": 3,
-        "total": 3,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "cross_above": {
-        "matched": 6,
-        "total": 6,
+        "matched": 10,
+        "total": 10,
         "accuracy": 1.0
       },
       "cross_down": {
-        "matched": 5,
-        "total": 5,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "golden_cross": {
-        "matched": 2,
-        "total": 2,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "indicator": {
-        "matched": 91,
-        "total": 91,
+        "matched": 121,
+        "total": 121,
         "accuracy": 1.0
       },
       "position": {
-        "matched": 6,
-        "total": 6,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "queryData": {
-        "matched": 7,
-        "total": 7,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "rank": {
@@ -76,18 +76,18 @@
         "accuracy": 1.0
       },
       "record_high": {
-        "matched": 7,
-        "total": 7,
+        "matched": 11,
+        "total": 11,
         "accuracy": 1.0
       },
       "record_low": {
-        "matched": 5,
-        "total": 5,
+        "matched": 10,
+        "total": 10,
         "accuracy": 1.0
       },
       "reset": {
-        "matched": 4,
-        "total": 4,
+        "matched": 10,
+        "total": 10,
         "accuracy": 1.0
       }
     },
@@ -160,6 +160,11 @@
       "47_benchmark_policy_doris": {
         "matched": 3,
         "total": 3,
+        "accuracy": 1.0
+      },
+      "balanced_cross_function_composition": {
+        "matched": 30,
+        "total": 30,
         "accuracy": 1.0
       },
       "composite_grouped_aggregate": {
@@ -253,9 +258,9 @@
       "reference_row_count": 2247,
       "generated_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
       "reference_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
-      "compile_ms": 41.0809,
-      "generated_execute_ms": 279.65549999999996,
-      "reference_execute_ms": 84.77810000000008,
+      "compile_ms": 44.5795,
+      "generated_execute_ms": 296.69730000000015,
+      "reference_execute_ms": 83.30139999999986,
       "function_families": [
         "indicator"
       ],
@@ -270,9 +275,9 @@
       "reference_row_count": 5573,
       "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
       "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
-      "compile_ms": 29.7721,
-      "generated_execute_ms": 206.1428999999999,
-      "reference_execute_ms": 82.31729999999993,
+      "compile_ms": 30.8818,
+      "generated_execute_ms": 220.3222,
+      "reference_execute_ms": 72.37409999999977,
       "function_families": [
         "indicator"
       ],
@@ -287,9 +292,9 @@
       "reference_row_count": 2247,
       "generated_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
       "reference_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
-      "compile_ms": 34.6897,
-      "generated_execute_ms": 270.3815000000001,
-      "reference_execute_ms": 115.14000000000001,
+      "compile_ms": 33.8791,
+      "generated_execute_ms": 276.9396999999998,
+      "reference_execute_ms": 118.68480000000004,
       "function_families": [
         "indicator"
       ],
@@ -304,9 +309,9 @@
       "reference_row_count": 2247,
       "generated_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
       "reference_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
-      "compile_ms": 35.7759,
-      "generated_execute_ms": 310.7795,
-      "reference_execute_ms": 134.35560000000012,
+      "compile_ms": 34.5782,
+      "generated_execute_ms": 363.68089999999984,
+      "reference_execute_ms": 119.2546000000001,
       "function_families": [
         "indicator"
       ],
@@ -321,9 +326,9 @@
       "reference_row_count": 5573,
       "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
       "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
-      "compile_ms": 33.0115,
-      "generated_execute_ms": 825.3971,
-      "reference_execute_ms": 101.17519999999969,
+      "compile_ms": 35.6484,
+      "generated_execute_ms": 890.8756999999996,
+      "reference_execute_ms": 106.90379999999955,
       "function_families": [
         "indicator"
       ],
@@ -338,9 +343,9 @@
       "reference_row_count": 16734,
       "generated_hash": "6ff347c840c26398ed2f5c7d6e889a53bf5cc9e97aed699f3502ba94ddb5b75a",
       "reference_hash": "6ff347c840c26398ed2f5c7d6e889a53bf5cc9e97aed699f3502ba94ddb5b75a",
-      "compile_ms": 59.303,
-      "generated_execute_ms": 96.46230000000023,
-      "reference_execute_ms": 84.23280000000011,
+      "compile_ms": 34.1572,
+      "generated_execute_ms": 76.1377999999997,
+      "reference_execute_ms": 66.29949999999951,
       "function_families": [
         "indicator"
       ],
@@ -355,9 +360,9 @@
       "reference_row_count": 813,
       "generated_hash": "db6fcec21845096d71d9698667ab0f44bbba546fbf3547f2f9c1f20510b1d77d",
       "reference_hash": "db6fcec21845096d71d9698667ab0f44bbba546fbf3547f2f9c1f20510b1d77d",
-      "compile_ms": 49.0,
-      "generated_execute_ms": 78.17539999999923,
-      "reference_execute_ms": 71.43209999999999,
+      "compile_ms": 28.4187,
+      "generated_execute_ms": 58.97379999999952,
+      "reference_execute_ms": 83.94749999999985,
       "function_families": [
         "indicator"
       ],
@@ -372,9 +377,9 @@
       "reference_row_count": 55,
       "generated_hash": "14582001276a2409eaed01a059044678762c67b92b11cdc61ec0e0b195c1fbc1",
       "reference_hash": "14582001276a2409eaed01a059044678762c67b92b11cdc61ec0e0b195c1fbc1",
-      "compile_ms": 41.6291,
-      "generated_execute_ms": 54.06569999999977,
-      "reference_execute_ms": 55.816599999999994,
+      "compile_ms": 36.592,
+      "generated_execute_ms": 78.83170000000028,
+      "reference_execute_ms": 70.77320000000054,
       "function_families": [
         "indicator"
       ],
@@ -389,9 +394,9 @@
       "reference_row_count": 100,
       "generated_hash": "c6e0897952fcd65f150dbdc9d1ae2e45369ef01720768c4e2807eaf6f1cdd5a8",
       "reference_hash": "c6e0897952fcd65f150dbdc9d1ae2e45369ef01720768c4e2807eaf6f1cdd5a8",
-      "compile_ms": 43.8122,
-      "generated_execute_ms": 82.69550000000069,
-      "reference_execute_ms": 56.083000000000105,
+      "compile_ms": 38.881,
+      "generated_execute_ms": 82.70390000000027,
+      "reference_execute_ms": 54.557899999999826,
       "function_families": [
         "indicator"
       ],
@@ -406,9 +411,9 @@
       "reference_row_count": 109,
       "generated_hash": "276533e989da2f48f7a01602994a1b536845989877814e59a9254abf11020b98",
       "reference_hash": "276533e989da2f48f7a01602994a1b536845989877814e59a9254abf11020b98",
-      "compile_ms": 47.4576,
-      "generated_execute_ms": 86.41580000000016,
-      "reference_execute_ms": 59.84540000000038,
+      "compile_ms": 44.2017,
+      "generated_execute_ms": 77.8281999999999,
+      "reference_execute_ms": 51.42670000000038,
       "function_families": [
         "indicator"
       ],
@@ -423,9 +428,9 @@
       "reference_row_count": 467,
       "generated_hash": "48a1df64b5461c078574ba61c8b53f8f7dfb0fb640e735113cfdde517db5774b",
       "reference_hash": "48a1df64b5461c078574ba61c8b53f8f7dfb0fb640e735113cfdde517db5774b",
-      "compile_ms": 40.5027,
-      "generated_execute_ms": 71.86130000000013,
-      "reference_execute_ms": 59.475899999999804,
+      "compile_ms": 38.4872,
+      "generated_execute_ms": 89.45439999999927,
+      "reference_execute_ms": 53.060499999999955,
       "function_families": [
         "indicator"
       ],
@@ -440,9 +445,9 @@
       "reference_row_count": 993,
       "generated_hash": "9189933a169993e1e4b2c95b862d67d5fc16af011d1ccddac317aa55d75a826b",
       "reference_hash": "9189933a169993e1e4b2c95b862d67d5fc16af011d1ccddac317aa55d75a826b",
-      "compile_ms": 42.8768,
-      "generated_execute_ms": 70.84420000000068,
-      "reference_execute_ms": 55.73490000000003,
+      "compile_ms": 40.526,
+      "generated_execute_ms": 77.89560000000063,
+      "reference_execute_ms": 67.45529999999977,
       "function_families": [
         "indicator"
       ],
@@ -457,9 +462,9 @@
       "reference_row_count": 3923,
       "generated_hash": "501848160dc184f7b9182a0b2f4e3db01c88dee1ca0d8421ae96a14118c4867a",
       "reference_hash": "501848160dc184f7b9182a0b2f4e3db01c88dee1ca0d8421ae96a14118c4867a",
-      "compile_ms": 42.5956,
-      "generated_execute_ms": 80.65920000000037,
-      "reference_execute_ms": 61.54930000000025,
+      "compile_ms": 40.0865,
+      "generated_execute_ms": 78.76499999999976,
+      "reference_execute_ms": 63.53140000000046,
       "function_families": [
         "indicator"
       ],
@@ -474,9 +479,9 @@
       "reference_row_count": 606,
       "generated_hash": "b9d756e45260118ac06dce0b614f08b54c94918b03f33b9857c9a157371956e8",
       "reference_hash": "b9d756e45260118ac06dce0b614f08b54c94918b03f33b9857c9a157371956e8",
-      "compile_ms": 55.9366,
-      "generated_execute_ms": 76.93700000000004,
-      "reference_execute_ms": 55.60459999999967,
+      "compile_ms": 35.0135,
+      "generated_execute_ms": 91.45829999999933,
+      "reference_execute_ms": 55.94840000000012,
       "function_families": [
         "indicator"
       ],
@@ -491,9 +496,9 @@
       "reference_row_count": 1392,
       "generated_hash": "1bc2f20b31f7eb7860b4d792189e3ad5821a21ee93d8c07398615ad85eada5c7",
       "reference_hash": "1bc2f20b31f7eb7860b4d792189e3ad5821a21ee93d8c07398615ad85eada5c7",
-      "compile_ms": 48.6868,
-      "generated_execute_ms": 97.23090000000045,
-      "reference_execute_ms": 57.9774000000004,
+      "compile_ms": 34.5895,
+      "generated_execute_ms": 88.48500000000037,
+      "reference_execute_ms": 60.379300000000136,
       "function_families": [
         "indicator"
       ],
@@ -508,9 +513,9 @@
       "reference_row_count": 3190,
       "generated_hash": "5135829793b8c71fb2efeafd1b93940445a7d3524a039a87a3c4335b229acad2",
       "reference_hash": "5135829793b8c71fb2efeafd1b93940445a7d3524a039a87a3c4335b229acad2",
-      "compile_ms": 53.6811,
-      "generated_execute_ms": 130.6965,
-      "reference_execute_ms": 70.72669999999981,
+      "compile_ms": 35.7645,
+      "generated_execute_ms": 142.2334000000003,
+      "reference_execute_ms": 64.74279999999943,
       "function_families": [
         "indicator"
       ],
@@ -525,9 +530,9 @@
       "reference_row_count": 3875,
       "generated_hash": "28f814ec64cd273bd115abcd1530da09005ba3f305f58e83ae23d054d4d48515",
       "reference_hash": "28f814ec64cd273bd115abcd1530da09005ba3f305f58e83ae23d054d4d48515",
-      "compile_ms": 44.0427,
-      "generated_execute_ms": 151.94050000000027,
-      "reference_execute_ms": 61.59610000000004,
+      "compile_ms": 32.7894,
+      "generated_execute_ms": 112.63549999999967,
+      "reference_execute_ms": 58.798499999999976,
       "function_families": [
         "indicator"
       ],
@@ -542,9 +547,9 @@
       "reference_row_count": 306,
       "generated_hash": "8e46dd212c921e61c815b43ad5e88db1714d864dc0bb7ca21f8d045e61bb6157",
       "reference_hash": "8e46dd212c921e61c815b43ad5e88db1714d864dc0bb7ca21f8d045e61bb6157",
-      "compile_ms": 44.0422,
-      "generated_execute_ms": 83.78789999999992,
-      "reference_execute_ms": 57.043900000000036,
+      "compile_ms": 32.5659,
+      "generated_execute_ms": 83.40079999999972,
+      "reference_execute_ms": 62.11469999999952,
       "function_families": [
         "indicator"
       ],
@@ -559,9 +564,9 @@
       "reference_row_count": 574,
       "generated_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
       "reference_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
-      "compile_ms": 41.2701,
-      "generated_execute_ms": 138.20799999999966,
-      "reference_execute_ms": 73.91340000000035,
+      "compile_ms": 33.7042,
+      "generated_execute_ms": 109.96149999999983,
+      "reference_execute_ms": 77.06709999999984,
       "function_families": [
         "indicator"
       ],
@@ -576,9 +581,9 @@
       "reference_row_count": 574,
       "generated_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
       "reference_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
-      "compile_ms": 52.9775,
-      "generated_execute_ms": 117.18720000000005,
-      "reference_execute_ms": 80.05989999999929,
+      "compile_ms": 35.3703,
+      "generated_execute_ms": 131.0715999999994,
+      "reference_execute_ms": 68.63609999999909,
       "function_families": [
         "indicator"
       ],
@@ -593,9 +598,9 @@
       "reference_row_count": 382,
       "generated_hash": "234aac30718805f2ffab1733cfd9971cbfbe84f4a1816353c88e7a0bfb0c486a",
       "reference_hash": "234aac30718805f2ffab1733cfd9971cbfbe84f4a1816353c88e7a0bfb0c486a",
-      "compile_ms": 46.6328,
-      "generated_execute_ms": 122.81999999999994,
-      "reference_execute_ms": 66.45710000000005,
+      "compile_ms": 36.8561,
+      "generated_execute_ms": 102.86160000000066,
+      "reference_execute_ms": 77.87189999999988,
       "function_families": [
         "indicator"
       ],
@@ -610,9 +615,9 @@
       "reference_row_count": 1478,
       "generated_hash": "31802d0d9d761f15dec93004cea87eca27775e2c07705a13bf218027cfeb21aa",
       "reference_hash": "31802d0d9d761f15dec93004cea87eca27775e2c07705a13bf218027cfeb21aa",
-      "compile_ms": 47.8279,
-      "generated_execute_ms": 134.3734999999997,
-      "reference_execute_ms": 71.78180000000012,
+      "compile_ms": 35.8583,
+      "generated_execute_ms": 130.60890000000035,
+      "reference_execute_ms": 82.84849999999899,
       "function_families": [
         "indicator"
       ],
@@ -627,9 +632,9 @@
       "reference_row_count": 5614,
       "generated_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
       "reference_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
-      "compile_ms": 39.518,
-      "generated_execute_ms": 97.6454000000011,
-      "reference_execute_ms": 51.42329999999973,
+      "compile_ms": 32.6752,
+      "generated_execute_ms": 110.10450000000027,
+      "reference_execute_ms": 70.87200000000138,
       "function_families": [
         "indicator"
       ],
@@ -644,9 +649,9 @@
       "reference_row_count": 1718,
       "generated_hash": "44dcfcb26ac0d3e149c23de30a1f4cdafe9cc470e0df0c309271da6ca2ad72df",
       "reference_hash": "44dcfcb26ac0d3e149c23de30a1f4cdafe9cc470e0df0c309271da6ca2ad72df",
-      "compile_ms": 38.133,
-      "generated_execute_ms": 87.92270000000002,
-      "reference_execute_ms": 57.98820000000049,
+      "compile_ms": 32.2651,
+      "generated_execute_ms": 101.67039999999972,
+      "reference_execute_ms": 61.18570000000112,
       "function_families": [
         "indicator"
       ],
@@ -661,9 +666,9 @@
       "reference_row_count": 4213,
       "generated_hash": "ba5d1dfdbb1f971607d7e7d15d310b6e089d73eb901ef409476710f8cb089805",
       "reference_hash": "ba5d1dfdbb1f971607d7e7d15d310b6e089d73eb901ef409476710f8cb089805",
-      "compile_ms": 43.0701,
-      "generated_execute_ms": 112.50139999999931,
-      "reference_execute_ms": 60.71990000000049,
+      "compile_ms": 35.791,
+      "generated_execute_ms": 121.2736999999997,
+      "reference_execute_ms": 69.36609999999988,
       "function_families": [
         "indicator"
       ],
@@ -678,9 +683,9 @@
       "reference_row_count": 28061,
       "generated_hash": "5e396e78a53a379a29137a88f536835d3650cb9fb0dc9e02f96f4c7f2b23d212",
       "reference_hash": "5e396e78a53a379a29137a88f536835d3650cb9fb0dc9e02f96f4c7f2b23d212",
-      "compile_ms": 41.4999,
-      "generated_execute_ms": 114.64630000000042,
-      "reference_execute_ms": 76.57769999999964,
+      "compile_ms": 34.3577,
+      "generated_execute_ms": 129.4499000000009,
+      "reference_execute_ms": 85.50190000000057,
       "function_families": [
         "indicator"
       ],
@@ -695,9 +700,9 @@
       "reference_row_count": 72,
       "generated_hash": "6bd5308494b9d240b42593740ec9e50d7c3e647a35345eb68f7901004de08154",
       "reference_hash": "6bd5308494b9d240b42593740ec9e50d7c3e647a35345eb68f7901004de08154",
-      "compile_ms": 34.5825,
-      "generated_execute_ms": 124.23760000000073,
-      "reference_execute_ms": 85.84959999999953,
+      "compile_ms": 32.5679,
+      "generated_execute_ms": 127.08310000000012,
+      "reference_execute_ms": 86.10499999999988,
       "function_families": [
         "indicator"
       ],
@@ -712,9 +717,9 @@
       "reference_row_count": 5269,
       "generated_hash": "e1495f490e00f4b501926c41b5dda058bd20083204c091919acc5e49b807c02c",
       "reference_hash": "e1495f490e00f4b501926c41b5dda058bd20083204c091919acc5e49b807c02c",
-      "compile_ms": 65.5936,
-      "generated_execute_ms": 480.15499999999986,
-      "reference_execute_ms": 109.99490000000023,
+      "compile_ms": 48.699,
+      "generated_execute_ms": 513.6021999999994,
+      "reference_execute_ms": 113.25800000000008,
       "function_families": [
         "indicator"
       ],
@@ -729,9 +734,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 43.9068,
-      "generated_execute_ms": 254.26960000000065,
-      "reference_execute_ms": 88.23190000000025,
+      "compile_ms": 48.9859,
+      "generated_execute_ms": 257.73940000000016,
+      "reference_execute_ms": 124.61219999999962,
       "function_families": [
         "indicator"
       ],
@@ -746,9 +751,9 @@
       "reference_row_count": 5539,
       "generated_hash": "c599c56702b3b2899c77cb45ea06815722007d374fc4d00348520cf4c25fdf25",
       "reference_hash": "c599c56702b3b2899c77cb45ea06815722007d374fc4d00348520cf4c25fdf25",
-      "compile_ms": 54.4725,
-      "generated_execute_ms": 298.6537999999985,
-      "reference_execute_ms": 79.89900000000105,
+      "compile_ms": 50.4974,
+      "generated_execute_ms": 329.5987999999994,
+      "reference_execute_ms": 85.26970000000134,
       "function_families": [
         "indicator"
       ],
@@ -763,9 +768,9 @@
       "reference_row_count": 10,
       "generated_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
       "reference_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
-      "compile_ms": 33.5727,
-      "generated_execute_ms": 132.22789999999839,
-      "reference_execute_ms": 76.38869999999898,
+      "compile_ms": 28.4788,
+      "generated_execute_ms": 128.26570000000004,
+      "reference_execute_ms": 68.31120000000013,
       "function_families": [
         "rank"
       ],
@@ -780,9 +785,9 @@
       "reference_row_count": 562,
       "generated_hash": "a50c23ccd025569ea68cc1fa5ff0c94c04d7bc160dabbd8f7a500741e662d8c2",
       "reference_hash": "a50c23ccd025569ea68cc1fa5ff0c94c04d7bc160dabbd8f7a500741e662d8c2",
-      "compile_ms": 47.5371,
-      "generated_execute_ms": 153.02750000000032,
-      "reference_execute_ms": 70.88430000000123,
+      "compile_ms": 32.9775,
+      "generated_execute_ms": 139.46299999999923,
+      "reference_execute_ms": 76.45899999999983,
       "function_families": [
         "rank"
       ],
@@ -797,9 +802,9 @@
       "reference_row_count": 10,
       "generated_hash": "b75424a2e44b3b29902e7ac80c30291cb667d392873d395929ab6ee9203dbe48",
       "reference_hash": "b75424a2e44b3b29902e7ac80c30291cb667d392873d395929ab6ee9203dbe48",
-      "compile_ms": 51.1002,
-      "generated_execute_ms": 110.38879999999907,
-      "reference_execute_ms": 67.87910000000075,
+      "compile_ms": 42.5242,
+      "generated_execute_ms": 120.4282999999986,
+      "reference_execute_ms": 77.20789999999944,
       "function_families": [
         "rank"
       ],
@@ -814,9 +819,9 @@
       "reference_row_count": 562,
       "generated_hash": "31381101f3244741355a836bdc3dda6bfd4bd4648498633571c23eabdb3adeb2",
       "reference_hash": "31381101f3244741355a836bdc3dda6bfd4bd4648498633571c23eabdb3adeb2",
-      "compile_ms": 50.2854,
-      "generated_execute_ms": 147.44289999999972,
-      "reference_execute_ms": 108.70300000000022,
+      "compile_ms": 42.0575,
+      "generated_execute_ms": 135.7739999999996,
+      "reference_execute_ms": 86.32060000000052,
       "function_families": [
         "rank"
       ],
@@ -831,9 +836,9 @@
       "reference_row_count": 10,
       "generated_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
       "reference_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
-      "compile_ms": 49.9793,
-      "generated_execute_ms": 216.8165000000002,
-      "reference_execute_ms": 78.30929999999903,
+      "compile_ms": 42.7578,
+      "generated_execute_ms": 250.6409000000005,
+      "reference_execute_ms": 89.12799999999876,
       "function_families": [
         "indicator",
         "rank"
@@ -849,9 +854,9 @@
       "reference_row_count": 867,
       "generated_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
       "reference_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
-      "compile_ms": 43.9221,
-      "generated_execute_ms": 106.56769999999938,
-      "reference_execute_ms": 56.25530000000012,
+      "compile_ms": 44.8383,
+      "generated_execute_ms": 102.93059999999876,
+      "reference_execute_ms": 65.96810000000097,
       "function_families": [
         "indicator"
       ],
@@ -866,9 +871,9 @@
       "reference_row_count": 346,
       "generated_hash": "39da3ccc95c7afaa945b58f268384b46f5c330cd19e66adb1addce92b6047933",
       "reference_hash": "39da3ccc95c7afaa945b58f268384b46f5c330cd19e66adb1addce92b6047933",
-      "compile_ms": 38.0241,
-      "generated_execute_ms": 94.76460000000131,
-      "reference_execute_ms": 62.331399999999704,
+      "compile_ms": 37.6065,
+      "generated_execute_ms": 92.73579999999981,
+      "reference_execute_ms": 54.09870000000083,
       "function_families": [
         "indicator"
       ],
@@ -883,9 +888,9 @@
       "reference_row_count": 22026,
       "generated_hash": "dae031d11f9ee69f320107b232655c9d7928b5891d60c49e1bc1cee33e32c1f0",
       "reference_hash": "dae031d11f9ee69f320107b232655c9d7928b5891d60c49e1bc1cee33e32c1f0",
-      "compile_ms": 45.0054,
-      "generated_execute_ms": 112.44090000000106,
-      "reference_execute_ms": 112.1325000000013,
+      "compile_ms": 40.721,
+      "generated_execute_ms": 103.32580000000036,
+      "reference_execute_ms": 74.64419999999983,
       "function_families": [
         "indicator"
       ],
@@ -900,9 +905,9 @@
       "reference_row_count": 4430,
       "generated_hash": "36da6416a6420e2998f8ca597538b790948ee281c1fbdeafefda6484df7c1b20",
       "reference_hash": "36da6416a6420e2998f8ca597538b790948ee281c1fbdeafefda6484df7c1b20",
-      "compile_ms": 36.7672,
-      "generated_execute_ms": 120.5803999999997,
-      "reference_execute_ms": 87.9095000000003,
+      "compile_ms": 32.0318,
+      "generated_execute_ms": 107.28510000000036,
+      "reference_execute_ms": 64.61410000000001,
       "function_families": [
         "indicator"
       ],
@@ -917,9 +922,9 @@
       "reference_row_count": 867,
       "generated_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
       "reference_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
-      "compile_ms": 45.4022,
-      "generated_execute_ms": 87.3507,
-      "reference_execute_ms": 44.003799999998705,
+      "compile_ms": 30.9637,
+      "generated_execute_ms": 89.86800000000095,
+      "reference_execute_ms": 37.06539999999947,
       "function_families": [
         "indicator"
       ],
@@ -934,9 +939,9 @@
       "reference_row_count": 3,
       "generated_hash": "4652d10364c47c69b3fe91fe400bbad41a102e3b25956e3b72f4b32b882138fd",
       "reference_hash": "4652d10364c47c69b3fe91fe400bbad41a102e3b25956e3b72f4b32b882138fd",
-      "compile_ms": 48.9276,
-      "generated_execute_ms": 134.17229999999947,
-      "reference_execute_ms": 46.42169999999979,
+      "compile_ms": 32.6505,
+      "generated_execute_ms": 94.67210000000037,
+      "reference_execute_ms": 57.92369999999991,
       "function_families": [
         "indicator"
       ],
@@ -951,9 +956,9 @@
       "reference_row_count": 260,
       "generated_hash": "cf0d1895f2b2290e0af6949a36b0abca5d8e49d7efa98042de12386d2664e7af",
       "reference_hash": "cf0d1895f2b2290e0af6949a36b0abca5d8e49d7efa98042de12386d2664e7af",
-      "compile_ms": 38.2072,
-      "generated_execute_ms": 413.60619999999847,
-      "reference_execute_ms": 67.18850000000032,
+      "compile_ms": 37.0347,
+      "generated_execute_ms": 370.552,
+      "reference_execute_ms": 57.287099999999924,
       "function_families": [
         "indicator"
       ],
@@ -968,9 +973,9 @@
       "reference_row_count": 250,
       "generated_hash": "7012a08019ae5c598935417880a3ed42d6152988da92081ee5070f47d8de62cc",
       "reference_hash": "7012a08019ae5c598935417880a3ed42d6152988da92081ee5070f47d8de62cc",
-      "compile_ms": 33.5027,
-      "generated_execute_ms": 91.87999999999974,
-      "reference_execute_ms": 53.07460000000219,
+      "compile_ms": 34.7696,
+      "generated_execute_ms": 84.60589999999968,
+      "reference_execute_ms": 51.9141999999988,
       "function_families": [
         "indicator"
       ],
@@ -985,9 +990,9 @@
       "reference_row_count": 237,
       "generated_hash": "a766e30f104c216daa0daaae5066c69a009ec01acdc10fec9aa5cba2ecebe9ec",
       "reference_hash": "a766e30f104c216daa0daaae5066c69a009ec01acdc10fec9aa5cba2ecebe9ec",
-      "compile_ms": 39.027,
-      "generated_execute_ms": 76.06469999999987,
-      "reference_execute_ms": 60.42340000000124,
+      "compile_ms": 28.9554,
+      "generated_execute_ms": 71.79760000000002,
+      "reference_execute_ms": 54.75140000000067,
       "function_families": [
         "indicator"
       ],
@@ -1002,9 +1007,9 @@
       "reference_row_count": 1,
       "generated_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
       "reference_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
-      "compile_ms": 45.7702,
-      "generated_execute_ms": 102.68560000000093,
-      "reference_execute_ms": 62.34840000000119,
+      "compile_ms": 43.7043,
+      "generated_execute_ms": 77.41959999999892,
+      "reference_execute_ms": 66.62079999999904,
       "function_families": [
         "indicator"
       ],
@@ -1019,9 +1024,9 @@
       "reference_row_count": 1,
       "generated_hash": "d7808731798cf8c3a5d459bfeb50c8bba4191dc2425cccabe5a48c1787103a92",
       "reference_hash": "d7808731798cf8c3a5d459bfeb50c8bba4191dc2425cccabe5a48c1787103a92",
-      "compile_ms": 46.1966,
-      "generated_execute_ms": 74.7499999999981,
-      "reference_execute_ms": 66.37539999999831,
+      "compile_ms": 39.376,
+      "generated_execute_ms": 93.41169999999721,
+      "reference_execute_ms": 60.9737999999993,
       "function_families": [
         "indicator"
       ],
@@ -1036,9 +1041,9 @@
       "reference_row_count": 1,
       "generated_hash": "bbd367a14e513832c225019f900cd400de2ac42dbbda1d4972c68a3cc20e8901",
       "reference_hash": "bbd367a14e513832c225019f900cd400de2ac42dbbda1d4972c68a3cc20e8901",
-      "compile_ms": 40.276,
-      "generated_execute_ms": 83.01859999999905,
-      "reference_execute_ms": 91.02560000000182,
+      "compile_ms": 36.0875,
+      "generated_execute_ms": 78.8977000000024,
+      "reference_execute_ms": 52.5979999999997,
       "function_families": [
         "indicator"
       ],
@@ -1053,9 +1058,9 @@
       "reference_row_count": 1896,
       "generated_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
       "reference_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
-      "compile_ms": 51.8102,
-      "generated_execute_ms": 119.42810000000037,
-      "reference_execute_ms": 73.89419999999802,
+      "compile_ms": 44.8703,
+      "generated_execute_ms": 123.41849999999965,
+      "reference_execute_ms": 68.71209999999905,
       "function_families": [
         "indicator",
         "queryData"
@@ -1071,9 +1076,9 @@
       "reference_row_count": 1872,
       "generated_hash": "0fe21b1b8c3864c6b64d8fc6ae04e54fd1a4372cbccb8b3229ca89181a85b66b",
       "reference_hash": "0fe21b1b8c3864c6b64d8fc6ae04e54fd1a4372cbccb8b3229ca89181a85b66b",
-      "compile_ms": 56.5519,
-      "generated_execute_ms": 207.89419999999836,
-      "reference_execute_ms": 124.39000000000178,
+      "compile_ms": 44.7503,
+      "generated_execute_ms": 192.6684000000023,
+      "reference_execute_ms": 95.03229999999974,
       "function_families": [
         "indicator",
         "queryData"
@@ -1089,9 +1094,9 @@
       "reference_row_count": 1,
       "generated_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
       "reference_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
-      "compile_ms": 46.2532,
-      "generated_execute_ms": 143.55839999999986,
-      "reference_execute_ms": 63.17070000000058,
+      "compile_ms": 30.5628,
+      "generated_execute_ms": 97.59019999999907,
+      "reference_execute_ms": 63.99380000000221,
       "function_families": [
         "rank"
       ],
@@ -1106,9 +1111,9 @@
       "reference_row_count": 2,
       "generated_hash": "d3f20e612efc56133f28089abc3d3ec5a867c1819e1b8518d2e9e571770a5955",
       "reference_hash": "d3f20e612efc56133f28089abc3d3ec5a867c1819e1b8518d2e9e571770a5955",
-      "compile_ms": 42.8618,
-      "generated_execute_ms": 73.63250000000221,
-      "reference_execute_ms": 59.89990000000134,
+      "compile_ms": 30.3408,
+      "generated_execute_ms": 73.74770000000197,
+      "reference_execute_ms": 61.95770000000067,
       "function_families": [
         "indicator"
       ],
@@ -1123,9 +1128,9 @@
       "reference_row_count": 3083,
       "generated_hash": "f0da3ff23447948581ddcf7462fed877182f365580e1efd5ebfdb7747cc06149",
       "reference_hash": "f0da3ff23447948581ddcf7462fed877182f365580e1efd5ebfdb7747cc06149",
-      "compile_ms": 41.5244,
-      "generated_execute_ms": 125.9871999999973,
-      "reference_execute_ms": 56.13829999999709,
+      "compile_ms": 41.8207,
+      "generated_execute_ms": 124.13510000000016,
+      "reference_execute_ms": 65.78030000000012,
       "function_families": [
         "indicator"
       ],
@@ -1140,9 +1145,9 @@
       "reference_row_count": 210,
       "generated_hash": "55b0dde76da407a1b3b44366e5d9f3be821102e8c07469f2ec0bfce1f454e30a",
       "reference_hash": "55b0dde76da407a1b3b44366e5d9f3be821102e8c07469f2ec0bfce1f454e30a",
-      "compile_ms": 41.0832,
-      "generated_execute_ms": 135.58300000000045,
-      "reference_execute_ms": 53.595699999998914,
+      "compile_ms": 26.8068,
+      "generated_execute_ms": 102.05219999999926,
+      "reference_execute_ms": 57.224000000001496,
       "function_families": [
         "indicator"
       ],
@@ -1157,9 +1162,9 @@
       "reference_row_count": 47,
       "generated_hash": "b3a12744a5b6557c5a8aadfee7c7b4ebd43fc8fbe36227694725abab146aca8d",
       "reference_hash": "b3a12744a5b6557c5a8aadfee7c7b4ebd43fc8fbe36227694725abab146aca8d",
-      "compile_ms": 45.3392,
-      "generated_execute_ms": 205.81749999999843,
-      "reference_execute_ms": 85.07630000000077,
+      "compile_ms": 35.7786,
+      "generated_execute_ms": 187.43149999999886,
+      "reference_execute_ms": 92.88789999999736,
       "function_families": [
         "indicator"
       ],
@@ -1174,9 +1179,9 @@
       "reference_row_count": 154,
       "generated_hash": "75504163331c44448757ea11bdca7802898c23864b9114919f3cbde3f667082c",
       "reference_hash": "75504163331c44448757ea11bdca7802898c23864b9114919f3cbde3f667082c",
-      "compile_ms": 51.8103,
-      "generated_execute_ms": 157.10169999999835,
-      "reference_execute_ms": 99.18639999999712,
+      "compile_ms": 31.1399,
+      "generated_execute_ms": 144.85720000000057,
+      "reference_execute_ms": 56.63720000000083,
       "function_families": [
         "indicator"
       ],
@@ -1191,9 +1196,9 @@
       "reference_row_count": 70,
       "generated_hash": "02380adfdbfb751992c14e203345c670ccc04b1be6a71410317fd231bf530088",
       "reference_hash": "02380adfdbfb751992c14e203345c670ccc04b1be6a71410317fd231bf530088",
-      "compile_ms": 47.0665,
-      "generated_execute_ms": 504.0554000000021,
-      "reference_execute_ms": 53.84330000000048,
+      "compile_ms": 33.0363,
+      "generated_execute_ms": 473.48790000000207,
+      "reference_execute_ms": 59.70139999999802,
       "function_families": [
         "indicator"
       ],
@@ -1208,9 +1213,9 @@
       "reference_row_count": 887,
       "generated_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
       "reference_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
-      "compile_ms": 49.0577,
-      "generated_execute_ms": 2686.518399999997,
-      "reference_execute_ms": 1063.1039000000014,
+      "compile_ms": 46.2379,
+      "generated_execute_ms": 1768.4921000000031,
+      "reference_execute_ms": 1030.7648,
       "function_families": [
         "cross_above"
       ],
@@ -1225,9 +1230,9 @@
       "reference_row_count": 94,
       "generated_hash": "113a0dce1459b55f77688a7fb6a5ece15646f380e2dfeaa56a32d972ce371036",
       "reference_hash": "113a0dce1459b55f77688a7fb6a5ece15646f380e2dfeaa56a32d972ce371036",
-      "compile_ms": 45.9994,
-      "generated_execute_ms": 1844.5810999999992,
-      "reference_execute_ms": 1773.2740999999983,
+      "compile_ms": 44.4316,
+      "generated_execute_ms": 1853.3617999999983,
+      "reference_execute_ms": 1711.5109000000004,
       "function_families": [
         "cross_down"
       ],
@@ -1242,9 +1247,9 @@
       "reference_row_count": 219,
       "generated_hash": "861a4978ced9629577bc221bb6dc44ac1f7990b3149787191f403096f535d241",
       "reference_hash": "861a4978ced9629577bc221bb6dc44ac1f7990b3149787191f403096f535d241",
-      "compile_ms": 50.0429,
-      "generated_execute_ms": 928.998700000001,
-      "reference_execute_ms": 775.9229000000012,
+      "compile_ms": 30.3272,
+      "generated_execute_ms": 902.5924999999972,
+      "reference_execute_ms": 803.9918999999998,
       "function_families": [
         "record_high"
       ],
@@ -1259,9 +1264,9 @@
       "reference_row_count": 4,
       "generated_hash": "de954d86c52cee504971a2653f3a4178ca3c78fd32d5014ed61fe45714c9244c",
       "reference_hash": "de954d86c52cee504971a2653f3a4178ca3c78fd32d5014ed61fe45714c9244c",
-      "compile_ms": 45.7564,
-      "generated_execute_ms": 942.7079999999996,
-      "reference_execute_ms": 778.7003000000005,
+      "compile_ms": 28.1626,
+      "generated_execute_ms": 1074.4450000000008,
+      "reference_execute_ms": 867.7637999999988,
       "function_families": [
         "record_low"
       ],
@@ -1276,9 +1281,9 @@
       "reference_row_count": 887,
       "generated_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
       "reference_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
-      "compile_ms": 65.594,
-      "generated_execute_ms": 1519.734500000002,
-      "reference_execute_ms": 2173.862800000002,
+      "compile_ms": 33.9646,
+      "generated_execute_ms": 1739.1508000000008,
+      "reference_execute_ms": 1669.6304000000027,
       "function_families": [
         "cross_above",
         "indicator"
@@ -1294,9 +1299,9 @@
       "reference_row_count": 3598,
       "generated_hash": "8f157d543c35a341412ca3ac8ee680e26f840bc36c27b17f2a480660f6286a70",
       "reference_hash": "8f157d543c35a341412ca3ac8ee680e26f840bc36c27b17f2a480660f6286a70",
-      "compile_ms": 50.3353,
-      "generated_execute_ms": 942.8259000000025,
-      "reference_execute_ms": 109.3467999999973,
+      "compile_ms": 38.6711,
+      "generated_execute_ms": 863.8909000000012,
+      "reference_execute_ms": 159.84630000000521,
       "function_families": [
         "close_together"
       ],
@@ -1311,9 +1316,9 @@
       "reference_row_count": 1449,
       "generated_hash": "6ba108009783088947f56607a78e513e2086ea34e0b9db1cba78cbf16d35bfae",
       "reference_hash": "6ba108009783088947f56607a78e513e2086ea34e0b9db1cba78cbf16d35bfae",
-      "compile_ms": 47.6054,
-      "generated_execute_ms": 784.1117999999981,
-      "reference_execute_ms": 115.24539999999917,
+      "compile_ms": 32.1528,
+      "generated_execute_ms": 831.4068999999974,
+      "reference_execute_ms": 134.12459999999982,
       "function_families": [
         "reset"
       ],
@@ -1328,9 +1333,9 @@
       "reference_row_count": 1720,
       "generated_hash": "6906846381edd2123691319979ac479b837f2167b1c323cfdfd9234777e824a8",
       "reference_hash": "6906846381edd2123691319979ac479b837f2167b1c323cfdfd9234777e824a8",
-      "compile_ms": 41.9886,
-      "generated_execute_ms": 906.9584000000007,
-      "reference_execute_ms": 821.3335000000015,
+      "compile_ms": 41.4384,
+      "generated_execute_ms": 969.721700000001,
+      "reference_execute_ms": 875.2382999999995,
       "function_families": [
         "position"
       ],
@@ -1345,9 +1350,9 @@
       "reference_row_count": 38,
       "generated_hash": "6615b2a69472e11b218af080e82fe48f91e8d872a6832aa9d51a6ae96738ab01",
       "reference_hash": "6615b2a69472e11b218af080e82fe48f91e8d872a6832aa9d51a6ae96738ab01",
-      "compile_ms": 38.3336,
-      "generated_execute_ms": 245.55320000000336,
-      "reference_execute_ms": 81.2820999999957,
+      "compile_ms": 27.9047,
+      "generated_execute_ms": 214.1890999999987,
+      "reference_execute_ms": 57.057200000002695,
       "function_families": [
         "indicator"
       ],
@@ -1362,9 +1367,9 @@
       "reference_row_count": 1663,
       "generated_hash": "bb9b06b2d8d5f252397310f8f23a38282e2c45f368b397727272531c2168c388",
       "reference_hash": "bb9b06b2d8d5f252397310f8f23a38282e2c45f368b397727272531c2168c388",
-      "compile_ms": 48.4443,
-      "generated_execute_ms": 181.2176999999977,
-      "reference_execute_ms": 118.94780000000083,
+      "compile_ms": 39.816,
+      "generated_execute_ms": 162.3330999999979,
+      "reference_execute_ms": 98.99509999999623,
       "function_families": [
         "indicator"
       ],
@@ -1379,9 +1384,9 @@
       "reference_row_count": 4854,
       "generated_hash": "229798a92bc9a5ed4d4b8707aafe6e4d2d60d350db0d44d2c3451aed02b03225",
       "reference_hash": "229798a92bc9a5ed4d4b8707aafe6e4d2d60d350db0d44d2c3451aed02b03225",
-      "compile_ms": 61.0353,
-      "generated_execute_ms": 569.0632999999963,
-      "reference_execute_ms": 378.83129999999454,
+      "compile_ms": 41.9113,
+      "generated_execute_ms": 474.57990000000194,
+      "reference_execute_ms": 350.7946000000004,
       "function_families": [
         "indicator"
       ],
@@ -1396,9 +1401,9 @@
       "reference_row_count": 5590,
       "generated_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
       "reference_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
-      "compile_ms": 54.6331,
-      "generated_execute_ms": 433.78489999999914,
-      "reference_execute_ms": 370.0751000000011,
+      "compile_ms": 48.2521,
+      "generated_execute_ms": 398.4812000000062,
+      "reference_execute_ms": 349.7869999999992,
       "function_families": [
         "indicator"
       ],
@@ -1413,9 +1418,9 @@
       "reference_row_count": 10,
       "generated_hash": "c960d7097b48efdb59142cf353f1cebd8716f82f85c2d2310ba2e12dc89b0109",
       "reference_hash": "c960d7097b48efdb59142cf353f1cebd8716f82f85c2d2310ba2e12dc89b0109",
-      "compile_ms": 43.2435,
-      "generated_execute_ms": 138.84800000000297,
-      "reference_execute_ms": 103.35639999999557,
+      "compile_ms": 35.3767,
+      "generated_execute_ms": 122.48579999999976,
+      "reference_execute_ms": 140.69429999999983,
       "function_families": [
         "rank"
       ],
@@ -1430,9 +1435,9 @@
       "reference_row_count": 5258,
       "generated_hash": "85f343a8dcfe60a2e7fa05dee278c29ec9eacd86ec6566545bfa3062932fcfe5",
       "reference_hash": "85f343a8dcfe60a2e7fa05dee278c29ec9eacd86ec6566545bfa3062932fcfe5",
-      "compile_ms": 91.7756,
-      "generated_execute_ms": 407.3313999999968,
-      "reference_execute_ms": 324.1548000000023,
+      "compile_ms": 62.8493,
+      "generated_execute_ms": 416.07490000000524,
+      "reference_execute_ms": 311.42030000000176,
       "function_families": [
         "rank"
       ],
@@ -1447,9 +1452,9 @@
       "reference_row_count": 2927,
       "generated_hash": "c78f5c968b7db273c7a641c1ffe6a40b93222b47de40f809f596029765e25302",
       "reference_hash": "c78f5c968b7db273c7a641c1ffe6a40b93222b47de40f809f596029765e25302",
-      "compile_ms": 59.0916,
-      "generated_execute_ms": 286.633099999996,
-      "reference_execute_ms": 87.53810000000328,
+      "compile_ms": 41.7254,
+      "generated_execute_ms": 272.6341999999988,
+      "reference_execute_ms": 110.70010000000252,
       "function_families": [
         "rank"
       ],
@@ -1464,9 +1469,9 @@
       "reference_row_count": 2937,
       "generated_hash": "f25485c7ef9f464115f6474b5e0af45950f47a26b001033148825ed010a846df",
       "reference_hash": "f25485c7ef9f464115f6474b5e0af45950f47a26b001033148825ed010a846df",
-      "compile_ms": 65.4505,
-      "generated_execute_ms": 230.97609999999946,
-      "reference_execute_ms": 167.79739999999777,
+      "compile_ms": 45.1949,
+      "generated_execute_ms": 220.48909999999466,
+      "reference_execute_ms": 202.92870000000107,
       "function_families": [
         "rank"
       ],
@@ -1481,9 +1486,9 @@
       "reference_row_count": 5,
       "generated_hash": "3b6f41ae2d702cf2c71f272774f3628e881e5181788ca01460e1ce7652bd56b1",
       "reference_hash": "3b6f41ae2d702cf2c71f272774f3628e881e5181788ca01460e1ce7652bd56b1",
-      "compile_ms": 81.2558,
-      "generated_execute_ms": 292.9934000000003,
-      "reference_execute_ms": 161.44090000000233,
+      "compile_ms": 55.0535,
+      "generated_execute_ms": 270.6153000000029,
+      "reference_execute_ms": 222.62920000000008,
       "function_families": [
         "indicator",
         "rank"
@@ -1499,9 +1504,9 @@
       "reference_row_count": 80,
       "generated_hash": "be21bb2703b4522d61cf686bf2031ed1b01dc6ea4941f245cdb7457f7c38bd6b",
       "reference_hash": "be21bb2703b4522d61cf686bf2031ed1b01dc6ea4941f245cdb7457f7c38bd6b",
-      "compile_ms": 58.3651,
-      "generated_execute_ms": 235.25479999999988,
-      "reference_execute_ms": 98.0597000000003,
+      "compile_ms": 50.2865,
+      "generated_execute_ms": 209.4141000000036,
+      "reference_execute_ms": 120.60859999999707,
       "function_families": [
         "indicator",
         "rank"
@@ -1517,9 +1522,9 @@
       "reference_row_count": 278,
       "generated_hash": "229577864ffa800f62bdc15632cb47ae0a20402208948d99146cff15aadd8e25",
       "reference_hash": "229577864ffa800f62bdc15632cb47ae0a20402208948d99146cff15aadd8e25",
-      "compile_ms": 81.8418,
-      "generated_execute_ms": 446.64799999999616,
-      "reference_execute_ms": 380.35839999999865,
+      "compile_ms": 67.499,
+      "generated_execute_ms": 561.1023999999958,
+      "reference_execute_ms": 376.7697000000041,
       "function_families": [
         "indicator",
         "rank"
@@ -1535,9 +1540,9 @@
       "reference_row_count": 1,
       "generated_hash": "3f94a87a370c91b098cb00f17c9c5b1bb6d2b72056bc595248db33a4b1e20205",
       "reference_hash": "3f94a87a370c91b098cb00f17c9c5b1bb6d2b72056bc595248db33a4b1e20205",
-      "compile_ms": 108.2699,
-      "generated_execute_ms": 281.83469999999744,
-      "reference_execute_ms": 237.47660000000081,
+      "compile_ms": 69.7475,
+      "generated_execute_ms": 288.6428000000052,
+      "reference_execute_ms": 325.21900000000414,
       "function_families": [
         "indicator",
         "rank"
@@ -1553,9 +1558,9 @@
       "reference_row_count": 377,
       "generated_hash": "f4073c6375f08f073600ec541b9577143c90897268a5480c77b76bc6fd179d74",
       "reference_hash": "f4073c6375f08f073600ec541b9577143c90897268a5480c77b76bc6fd179d74",
-      "compile_ms": 79.0532,
-      "generated_execute_ms": 393.31939999999577,
-      "reference_execute_ms": 408.62979999999993,
+      "compile_ms": 49.3519,
+      "generated_execute_ms": 397.8817999999933,
+      "reference_execute_ms": 419.2928000000009,
       "function_families": [
         "rank"
       ],
@@ -1570,9 +1575,9 @@
       "reference_row_count": 48,
       "generated_hash": "03dd2001e2ce338ee1d5637d341deb5a8591b19ab919d49e91ace2abcb520382",
       "reference_hash": "03dd2001e2ce338ee1d5637d341deb5a8591b19ab919d49e91ace2abcb520382",
-      "compile_ms": 53.8655,
-      "generated_execute_ms": 344.16339999999934,
-      "reference_execute_ms": 367.486999999997,
+      "compile_ms": 41.4588,
+      "generated_execute_ms": 364.5329000000004,
+      "reference_execute_ms": 346.16660000000365,
       "function_families": [
         "indicator"
       ],
@@ -1587,9 +1592,9 @@
       "reference_row_count": 5590,
       "generated_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
       "reference_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
-      "compile_ms": 42.7481,
-      "generated_execute_ms": 501.8821000000031,
-      "reference_execute_ms": 410.00319999999846,
+      "compile_ms": 49.0198,
+      "generated_execute_ms": 488.2477000000023,
+      "reference_execute_ms": 424.28819999999945,
       "function_families": [
         "indicator"
       ],
@@ -1604,9 +1609,9 @@
       "reference_row_count": 2929,
       "generated_hash": "5ff5016c335f6ab90fab95412011490cc907faa2275a4301e632784982113850",
       "reference_hash": "5ff5016c335f6ab90fab95412011490cc907faa2275a4301e632784982113850",
-      "compile_ms": 64.7721,
-      "generated_execute_ms": 1081.5510000000045,
-      "reference_execute_ms": 968.9935999999975,
+      "compile_ms": 42.9713,
+      "generated_execute_ms": 1064.6871000000006,
+      "reference_execute_ms": 984.9020999999993,
       "function_families": [
         "indicator"
       ],
@@ -1621,9 +1626,9 @@
       "reference_row_count": 282,
       "generated_hash": "7c95813a4b08e4d10bd8bffc290eb28c7f3e8f311ae055180235d462c8bd6954",
       "reference_hash": "7c95813a4b08e4d10bd8bffc290eb28c7f3e8f311ae055180235d462c8bd6954",
-      "compile_ms": 40.4787,
-      "generated_execute_ms": 170.59079999999938,
-      "reference_execute_ms": 89.63020000000199,
+      "compile_ms": 31.6913,
+      "generated_execute_ms": 139.7092999999998,
+      "reference_execute_ms": 77.42770000000121,
       "function_families": [
         "rank"
       ],
@@ -1638,9 +1643,9 @@
       "reference_row_count": 6,
       "generated_hash": "b4a0a57a0915546aa633ab1d2405ac6579e16c5da50beb27d33a19846bc54fd6",
       "reference_hash": "b4a0a57a0915546aa633ab1d2405ac6579e16c5da50beb27d33a19846bc54fd6",
-      "compile_ms": 69.9494,
-      "generated_execute_ms": 278.0202000000003,
-      "reference_execute_ms": 175.797799999998,
+      "compile_ms": 59.2356,
+      "generated_execute_ms": 235.72019999999583,
+      "reference_execute_ms": 124.21959999999643,
       "function_families": [
         "indicator",
         "rank"
@@ -1656,9 +1661,9 @@
       "reference_row_count": 3,
       "generated_hash": "50cd01f4aa16457419409affee28e9ae51101772be70b1e779a3a8e41b73827f",
       "reference_hash": "50cd01f4aa16457419409affee28e9ae51101772be70b1e779a3a8e41b73827f",
-      "compile_ms": 74.9573,
-      "generated_execute_ms": 264.91670000000056,
-      "reference_execute_ms": 63.99539999999604,
+      "compile_ms": 54.5893,
+      "generated_execute_ms": 334.08810000000244,
+      "reference_execute_ms": 61.943299999995816,
       "function_families": [
         "indicator",
         "rank"
@@ -1674,9 +1679,9 @@
       "reference_row_count": 2633,
       "generated_hash": "e04ca8f13d03e8267aba75999596a898e7453800cb452da51c832d7e9d839ae5",
       "reference_hash": "e04ca8f13d03e8267aba75999596a898e7453800cb452da51c832d7e9d839ae5",
-      "compile_ms": 56.1243,
-      "generated_execute_ms": 333.14980000000105,
-      "reference_execute_ms": 101.95010000000337,
+      "compile_ms": 41.4242,
+      "generated_execute_ms": 323.3153999999985,
+      "reference_execute_ms": 100.51319999999464,
       "function_families": [
         "indicator"
       ],
@@ -1691,9 +1696,9 @@
       "reference_row_count": 5575,
       "generated_hash": "57dd258d03cbfc5a17823c5fe44c40a4ff505ef547c94ea2a001212bad69043e",
       "reference_hash": "57dd258d03cbfc5a17823c5fe44c40a4ff505ef547c94ea2a001212bad69043e",
-      "compile_ms": 47.5289,
-      "generated_execute_ms": 460.00489999999417,
-      "reference_execute_ms": 114.67580000000055,
+      "compile_ms": 45.573,
+      "generated_execute_ms": 401.8250999999964,
+      "reference_execute_ms": 113.32509999999729,
       "function_families": [
         "indicator"
       ],
@@ -1708,9 +1713,9 @@
       "reference_row_count": 5115,
       "generated_hash": "f004caae55ec77763079be42b4e65c773b78942d863cae99807fc9dd12de286e",
       "reference_hash": "f004caae55ec77763079be42b4e65c773b78942d863cae99807fc9dd12de286e",
-      "compile_ms": 56.8145,
-      "generated_execute_ms": 259.4282000000021,
-      "reference_execute_ms": 171.87830000000304,
+      "compile_ms": 44.4679,
+      "generated_execute_ms": 232.96159999999588,
+      "reference_execute_ms": 129.4877999999997,
       "function_families": [
         "indicator",
         "queryData"
@@ -1726,9 +1731,9 @@
       "reference_row_count": 2888,
       "generated_hash": "6d8712ccf7e37d3bebc1e3705ea82489dc89b8adcb65fa06b958464ae9bde3f8",
       "reference_hash": "6d8712ccf7e37d3bebc1e3705ea82489dc89b8adcb65fa06b958464ae9bde3f8",
-      "compile_ms": 56.5665,
-      "generated_execute_ms": 324.081299999996,
-      "reference_execute_ms": 149.35710000000313,
+      "compile_ms": 56.2042,
+      "generated_execute_ms": 297.8706000000031,
+      "reference_execute_ms": 150.55930000000473,
       "function_families": [
         "indicator",
         "rank"
@@ -1744,9 +1749,9 @@
       "reference_row_count": 1196,
       "generated_hash": "0322cf020c7858f95aedac2944bb3230f400252af1c719408a7b11887807ee31",
       "reference_hash": "0322cf020c7858f95aedac2944bb3230f400252af1c719408a7b11887807ee31",
-      "compile_ms": 46.2759,
-      "generated_execute_ms": 966.3858000000048,
-      "reference_execute_ms": 752.5216000000014,
+      "compile_ms": 51.5848,
+      "generated_execute_ms": 940.3588999999997,
+      "reference_execute_ms": 826.2041999999994,
       "function_families": [
         "indicator",
         "record_high"
@@ -1762,9 +1767,9 @@
       "reference_row_count": 4453,
       "generated_hash": "73043bb242ec15faed7cb9424d1453fa1f151954223524366d392c93655c1cd0",
       "reference_hash": "73043bb242ec15faed7cb9424d1453fa1f151954223524366d392c93655c1cd0",
-      "compile_ms": 77.9687,
-      "generated_execute_ms": 3922.5086000000006,
-      "reference_execute_ms": 1900.270599999999,
+      "compile_ms": 62.2996,
+      "generated_execute_ms": 2429.123000000004,
+      "reference_execute_ms": 1840.4148999999989,
       "function_families": [
         "cross_down",
         "indicator"
@@ -1780,9 +1785,9 @@
       "reference_row_count": 78,
       "generated_hash": "eac25d0dbcdbd8f6de793b32260b5d4e72656d796f493b10d925e09c12cfba62",
       "reference_hash": "eac25d0dbcdbd8f6de793b32260b5d4e72656d796f493b10d925e09c12cfba62",
-      "compile_ms": 66.0791,
-      "generated_execute_ms": 1163.443100000002,
-      "reference_execute_ms": 902.8280999999936,
+      "compile_ms": 71.366,
+      "generated_execute_ms": 1198.0707999999963,
+      "reference_execute_ms": 922.1379999999967,
       "function_families": [
         "indicator",
         "position",
@@ -1799,9 +1804,9 @@
       "reference_row_count": 442,
       "generated_hash": "cd2e75058f4712759976a9c9482c18e82bc723714984543d618103b8d2b77fb0",
       "reference_hash": "cd2e75058f4712759976a9c9482c18e82bc723714984543d618103b8d2b77fb0",
-      "compile_ms": 119.0686,
-      "generated_execute_ms": 2142.3676999999943,
-      "reference_execute_ms": 1662.583799999993,
+      "compile_ms": 71.9298,
+      "generated_execute_ms": 1893.4227000000021,
+      "reference_execute_ms": 1764.8933000000113,
       "function_families": [
         "cross_above",
         "cross_down",
@@ -1818,9 +1823,9 @@
       "reference_row_count": 299,
       "generated_hash": "595165140ebc7f352d6f75fba126fcdad193d8ce1948de3db85055ed7aa9d46f",
       "reference_hash": "595165140ebc7f352d6f75fba126fcdad193d8ce1948de3db85055ed7aa9d46f",
-      "compile_ms": 57.2533,
-      "generated_execute_ms": 891.8673999999953,
-      "reference_execute_ms": 755.5809999999923,
+      "compile_ms": 40.4965,
+      "generated_execute_ms": 887.4239000000017,
+      "reference_execute_ms": 767.8611999999987,
       "function_families": [
         "indicator",
         "record_high"
@@ -1836,9 +1841,9 @@
       "reference_row_count": 2933,
       "generated_hash": "96914e285eac12f4db6edbddaf3ea6b442150e54615997eeefe9f62c0128988d",
       "reference_hash": "96914e285eac12f4db6edbddaf3ea6b442150e54615997eeefe9f62c0128988d",
-      "compile_ms": 51.5977,
-      "generated_execute_ms": 198.00360000000694,
-      "reference_execute_ms": 118.2443999999947,
+      "compile_ms": 38.5055,
+      "generated_execute_ms": 187.64519999999152,
+      "reference_execute_ms": 85.55690000000027,
       "function_families": [
         "indicator"
       ],
@@ -1853,9 +1858,9 @@
       "reference_row_count": 5562,
       "generated_hash": "19e58437a311a96257687f8cc73e1c2f64b55b65e5f4b9dce89d2ade49c98f19",
       "reference_hash": "19e58437a311a96257687f8cc73e1c2f64b55b65e5f4b9dce89d2ade49c98f19",
-      "compile_ms": 46.0352,
-      "generated_execute_ms": 631.4849000000038,
-      "reference_execute_ms": 122.22510000000852,
+      "compile_ms": 34.7586,
+      "generated_execute_ms": 665.1542999999975,
+      "reference_execute_ms": 91.08410000000333,
       "function_families": [
         "indicator"
       ],
@@ -1870,9 +1875,9 @@
       "reference_row_count": 5556,
       "generated_hash": "ede4e1804c6d13953f95b5c7c2f973a15a7a5d740b14d9cd11ddea653f4cc2da",
       "reference_hash": "ede4e1804c6d13953f95b5c7c2f973a15a7a5d740b14d9cd11ddea653f4cc2da",
-      "compile_ms": 43.6314,
-      "generated_execute_ms": 185.13109999999244,
-      "reference_execute_ms": 88.74779999999305,
+      "compile_ms": 38.2173,
+      "generated_execute_ms": 212.44190000000174,
+      "reference_execute_ms": 102.54299999999716,
       "function_families": [
         "indicator"
       ],
@@ -1887,9 +1892,9 @@
       "reference_row_count": 5587,
       "generated_hash": "1c2794ce71a5ff25dc96983aef9b334ba6058c41b3c461f113be6ecd6415b6e5",
       "reference_hash": "1c2794ce71a5ff25dc96983aef9b334ba6058c41b3c461f113be6ecd6415b6e5",
-      "compile_ms": 41.1722,
-      "generated_execute_ms": 225.02099999999814,
-      "reference_execute_ms": 80.52000000000703,
+      "compile_ms": 31.5612,
+      "generated_execute_ms": 287.16350000000546,
+      "reference_execute_ms": 108.19309999999405,
       "function_families": [
         "indicator"
       ],
@@ -1904,9 +1909,9 @@
       "reference_row_count": 5537,
       "generated_hash": "96ee119012c01d59d77b975ac04c6051c92dc07817ca1c8af172d680798c7ab4",
       "reference_hash": "96ee119012c01d59d77b975ac04c6051c92dc07817ca1c8af172d680798c7ab4",
-      "compile_ms": 48.9065,
-      "generated_execute_ms": 383.6237999999952,
-      "reference_execute_ms": 123.21769999999788,
+      "compile_ms": 46.1882,
+      "generated_execute_ms": 341.0137999999989,
+      "reference_execute_ms": 136.77119999999832,
       "function_families": [
         "indicator"
       ],
@@ -1921,9 +1926,9 @@
       "reference_row_count": 5566,
       "generated_hash": "4c4bcec837d033308b56aa119507daa7ecc2e66f9b339cdfb68454225ebb552b",
       "reference_hash": "4c4bcec837d033308b56aa119507daa7ecc2e66f9b339cdfb68454225ebb552b",
-      "compile_ms": 37.1403,
-      "generated_execute_ms": 127.65319999999747,
-      "reference_execute_ms": 71.39620000000946,
+      "compile_ms": 44.2262,
+      "generated_execute_ms": 144.94999999999436,
+      "reference_execute_ms": 63.52859999999794,
       "function_families": [
         "indicator"
       ],
@@ -1938,9 +1943,9 @@
       "reference_row_count": 4870,
       "generated_hash": "5d7b538b1d1e9dd18dc0275769c2d60b6b3a756249403dd23f12e9e2f3032637",
       "reference_hash": "5d7b538b1d1e9dd18dc0275769c2d60b6b3a756249403dd23f12e9e2f3032637",
-      "compile_ms": 47.0719,
-      "generated_execute_ms": 1938.7919999999922,
-      "reference_execute_ms": 865.7872999999938,
+      "compile_ms": 40.6056,
+      "generated_execute_ms": 1988.0777999999991,
+      "reference_execute_ms": 1239.0443999999975,
       "function_families": [
         "golden_cross"
       ],
@@ -1955,9 +1960,9 @@
       "reference_row_count": 1659,
       "generated_hash": "960e8c0bb87c8a6183f413f41b41045594f629f933c95b7235eaf284839ce8fb",
       "reference_hash": "960e8c0bb87c8a6183f413f41b41045594f629f933c95b7235eaf284839ce8fb",
-      "compile_ms": 76.2554,
-      "generated_execute_ms": 1874.5442999999966,
-      "reference_execute_ms": 817.3946999999941,
+      "compile_ms": 42.8466,
+      "generated_execute_ms": 2125.9766999999956,
+      "reference_execute_ms": 920.2037000000018,
       "function_families": [
         "golden_cross"
       ],
@@ -1972,9 +1977,9 @@
       "reference_row_count": 5570,
       "generated_hash": "893382a3f7f85db9a9970d28203be0a0e017bc25effb2b8d4b5a3a493b5ee8cc",
       "reference_hash": "893382a3f7f85db9a9970d28203be0a0e017bc25effb2b8d4b5a3a493b5ee8cc",
-      "compile_ms": 49.7215,
-      "generated_execute_ms": 1980.6573000000044,
-      "reference_execute_ms": 108.70979999999975,
+      "compile_ms": 43.5563,
+      "generated_execute_ms": 1894.0550000000087,
+      "reference_execute_ms": 94.42160000000399,
       "function_families": [
         "record_high"
       ],
@@ -1989,9 +1994,9 @@
       "reference_row_count": 57,
       "generated_hash": "318aac595662bce20c6ae78681b084a7612a5e1050ddb9dac14ceb65c69dac4f",
       "reference_hash": "318aac595662bce20c6ae78681b084a7612a5e1050ddb9dac14ceb65c69dac4f",
-      "compile_ms": 52.4144,
-      "generated_execute_ms": 1021.7764000000074,
-      "reference_execute_ms": 802.7227000000039,
+      "compile_ms": 43.0886,
+      "generated_execute_ms": 1011.4360999999974,
+      "reference_execute_ms": 754.2938999999933,
       "function_families": [
         "indicator",
         "record_high"
@@ -2007,9 +2012,9 @@
       "reference_row_count": 768,
       "generated_hash": "d43fd5596ac1bf18007e02381cfed6a9b9ce38788ebfa93ea792f7e1833d7866",
       "reference_hash": "d43fd5596ac1bf18007e02381cfed6a9b9ce38788ebfa93ea792f7e1833d7866",
-      "compile_ms": 61.2444,
-      "generated_execute_ms": 1983.4753000000092,
-      "reference_execute_ms": 1612.3205000000098,
+      "compile_ms": 40.2219,
+      "generated_execute_ms": 1798.1601000000041,
+      "reference_execute_ms": 1647.3505999999957,
       "function_families": [
         "cross_above"
       ],
@@ -2024,9 +2029,9 @@
       "reference_row_count": 5547,
       "generated_hash": "3344053b2b2e61ccb3aee351a084403447c0466be72c0bf9df19a2ea9b96b584",
       "reference_hash": "3344053b2b2e61ccb3aee351a084403447c0466be72c0bf9df19a2ea9b96b584",
-      "compile_ms": 54.438,
-      "generated_execute_ms": 2681.7338999999974,
-      "reference_execute_ms": 1687.9392000000025,
+      "compile_ms": 54.8159,
+      "generated_execute_ms": 2865.7635,
+      "reference_execute_ms": 1583.4501000000073,
       "function_families": [
         "cross_down"
       ],
@@ -2041,9 +2046,9 @@
       "reference_row_count": 919,
       "generated_hash": "d21ffed1287c3dee0db45d36cb1a0679fa2206bd2391edd61c263537a1ebf88d",
       "reference_hash": "d21ffed1287c3dee0db45d36cb1a0679fa2206bd2391edd61c263537a1ebf88d",
-      "compile_ms": 51.6422,
-      "generated_execute_ms": 824.005200000002,
-      "reference_execute_ms": 752.2603999999973,
+      "compile_ms": 29.6567,
+      "generated_execute_ms": 880.6272000000064,
+      "reference_execute_ms": 715.062599999996,
       "function_families": [
         "record_low"
       ],
@@ -2058,9 +2063,9 @@
       "reference_row_count": 797,
       "generated_hash": "e40dfc2f55eaf3bc48fa6a0d0286d313c6ceef735e0e6c641b4aa641d69c8af3",
       "reference_hash": "e40dfc2f55eaf3bc48fa6a0d0286d313c6ceef735e0e6c641b4aa641d69c8af3",
-      "compile_ms": 54.8998,
-      "generated_execute_ms": 933.3754000000027,
-      "reference_execute_ms": 860.3848999999997,
+      "compile_ms": 69.403,
+      "generated_execute_ms": 1005.5253000000022,
+      "reference_execute_ms": 810.9424999999959,
       "function_families": [
         "position"
       ],
@@ -2075,9 +2080,9 @@
       "reference_row_count": 3018,
       "generated_hash": "50e1cd08dd2a7f7c37723d40c0228bb7e62dc04c2a19e36cf46b6c86eb5b4787",
       "reference_hash": "50e1cd08dd2a7f7c37723d40c0228bb7e62dc04c2a19e36cf46b6c86eb5b4787",
-      "compile_ms": 50.1167,
-      "generated_execute_ms": 798.4014999999971,
-      "reference_execute_ms": 138.48880000000463,
+      "compile_ms": 47.9649,
+      "generated_execute_ms": 905.950599999997,
+      "reference_execute_ms": 123.15230000000099,
       "function_families": [
         "close_together"
       ],
@@ -2092,9 +2097,9 @@
       "reference_row_count": 2855,
       "generated_hash": "37df470d0a4b99c35c3c84517f484f63eba5e2a8b9dbc65c7c170b3a93ff17d5",
       "reference_hash": "37df470d0a4b99c35c3c84517f484f63eba5e2a8b9dbc65c7c170b3a93ff17d5",
-      "compile_ms": 38.1271,
-      "generated_execute_ms": 831.8500999999969,
-      "reference_execute_ms": 135.0774999999942,
+      "compile_ms": 35.222,
+      "generated_execute_ms": 864.1724000000011,
+      "reference_execute_ms": 127.53620000000865,
       "function_families": [
         "reset"
       ],
@@ -2109,9 +2114,9 @@
       "reference_row_count": 1071,
       "generated_hash": "0e7299981f51870b3351d55ef2b06e05aef5c7ce3c9649a91e81bfdbdf922770",
       "reference_hash": "0e7299981f51870b3351d55ef2b06e05aef5c7ce3c9649a91e81bfdbdf922770",
-      "compile_ms": 65.6891,
-      "generated_execute_ms": 1183.7388999999944,
-      "reference_execute_ms": 978.9009999999934,
+      "compile_ms": 54.9576,
+      "generated_execute_ms": 1179.3229999999967,
+      "reference_execute_ms": 941.3384000000065,
       "function_families": [
         "position"
       ],
@@ -2126,9 +2131,9 @@
       "reference_row_count": 4551,
       "generated_hash": "3827954a63a9c058d7ad4f42eb3d00f98361fbf379e1d4746c41e00f28e93a77",
       "reference_hash": "3827954a63a9c058d7ad4f42eb3d00f98361fbf379e1d4746c41e00f28e93a77",
-      "compile_ms": 54.1343,
-      "generated_execute_ms": 985.6730999999996,
-      "reference_execute_ms": 877.0044000000041,
+      "compile_ms": 41.535,
+      "generated_execute_ms": 1035.6804000000038,
+      "reference_execute_ms": 867.4883000000051,
       "function_families": [
         "record_low"
       ],
@@ -2143,9 +2148,9 @@
       "reference_row_count": 5444,
       "generated_hash": "c4178a10ad81c701e5a8f9f4ea3c26ffa85f63855ddc3f16ca36ccec4305a643",
       "reference_hash": "c4178a10ad81c701e5a8f9f4ea3c26ffa85f63855ddc3f16ca36ccec4305a643",
-      "compile_ms": 91.3717,
-      "generated_execute_ms": 1189.2050000000013,
-      "reference_execute_ms": 998.4912999999978,
+      "compile_ms": 47.8335,
+      "generated_execute_ms": 1055.052500000002,
+      "reference_execute_ms": 1057.5646000000063,
       "function_families": [
         "close_together"
       ],
@@ -2160,9 +2165,9 @@
       "reference_row_count": 3250,
       "generated_hash": "892ea0304355fa3bac444adeef724e234402dea25312328a61b022339f11fe62",
       "reference_hash": "892ea0304355fa3bac444adeef724e234402dea25312328a61b022339f11fe62",
-      "compile_ms": 47.0096,
-      "generated_execute_ms": 1095.575100000005,
-      "reference_execute_ms": 924.9633999999958,
+      "compile_ms": 45.9376,
+      "generated_execute_ms": 994.486699999996,
+      "reference_execute_ms": 1003.4596999999934,
       "function_families": [
         "reset"
       ],
@@ -2177,9 +2182,9 @@
       "reference_row_count": 304,
       "generated_hash": "6c80cd508d55732451354a3e44b1f14c6a1dfdb4528884949f71afaf7c6a57d4",
       "reference_hash": "6c80cd508d55732451354a3e44b1f14c6a1dfdb4528884949f71afaf7c6a57d4",
-      "compile_ms": 43.7928,
-      "generated_execute_ms": 787.3021000000051,
-      "reference_execute_ms": 688.321700000003,
+      "compile_ms": 32.8923,
+      "generated_execute_ms": 787.6490999999959,
+      "reference_execute_ms": 811.8922000000026,
       "function_families": [
         "record_low"
       ],
@@ -2194,9 +2199,9 @@
       "reference_row_count": 837,
       "generated_hash": "099f207b0d6fdd0041bfb629372a3cdbcc52711a0ed4b0158e51ed9b12e0b188",
       "reference_hash": "099f207b0d6fdd0041bfb629372a3cdbcc52711a0ed4b0158e51ed9b12e0b188",
-      "compile_ms": 46.4929,
-      "generated_execute_ms": 918.1594999999874,
-      "reference_execute_ms": 782.331499999998,
+      "compile_ms": 42.3322,
+      "generated_execute_ms": 924.239600000007,
+      "reference_execute_ms": 764.1725000000008,
       "function_families": [
         "record_high",
         "record_low"
@@ -2212,9 +2217,9 @@
       "reference_row_count": 1,
       "generated_hash": "a9fbcb50f1f05c6ee63751f1b65f37273008adc63c59a488efeec8b0c71854e3",
       "reference_hash": "a9fbcb50f1f05c6ee63751f1b65f37273008adc63c59a488efeec8b0c71854e3",
-      "compile_ms": 52.4668,
-      "generated_execute_ms": 505.98039999999855,
-      "reference_execute_ms": 436.9656000000077,
+      "compile_ms": 40.4121,
+      "generated_execute_ms": 475.6702999999902,
+      "reference_execute_ms": 472.95139999999947,
       "function_families": [
         "cross_above"
       ],
@@ -2229,9 +2234,9 @@
       "reference_row_count": 85,
       "generated_hash": "552ebd2638b2d194b9622136909b19c1d2484327cd83c42081d4c7564ff06370",
       "reference_hash": "552ebd2638b2d194b9622136909b19c1d2484327cd83c42081d4c7564ff06370",
-      "compile_ms": 87.3713,
-      "generated_execute_ms": 1547.3241999999914,
-      "reference_execute_ms": 115.23059999998964,
+      "compile_ms": 59.8763,
+      "generated_execute_ms": 1530.9562999999998,
+      "reference_execute_ms": 103.04330000001016,
       "function_families": [
         "cross_above",
         "cross_down",
@@ -2248,9 +2253,9 @@
       "reference_row_count": 35,
       "generated_hash": "b5c13cd01c4695cfbf7dc19e41eebbd07d61f035f0a0f49e6a14c71e7c2d5802",
       "reference_hash": "b5c13cd01c4695cfbf7dc19e41eebbd07d61f035f0a0f49e6a14c71e7c2d5802",
-      "compile_ms": 55.3729,
-      "generated_execute_ms": 118.88860000000534,
-      "reference_execute_ms": 59.70689999999479,
+      "compile_ms": 31.6102,
+      "generated_execute_ms": 95.71210000000008,
+      "reference_execute_ms": 57.38990000000399,
       "function_families": [
         "indicator"
       ],
@@ -2265,9 +2270,9 @@
       "reference_row_count": 3513,
       "generated_hash": "06757c03484a0ac8c2042c403e32882efcb38bfbb4d89d17cc87d460ba7fed5c",
       "reference_hash": "06757c03484a0ac8c2042c403e32882efcb38bfbb4d89d17cc87d460ba7fed5c",
-      "compile_ms": 70.004,
-      "generated_execute_ms": 943.1821000000014,
-      "reference_execute_ms": 687.7731999999952,
+      "compile_ms": 43.9678,
+      "generated_execute_ms": 853.0899000000005,
+      "reference_execute_ms": 668.5733999999997,
       "function_families": [
         "position"
       ],
@@ -2282,9 +2287,9 @@
       "reference_row_count": 34,
       "generated_hash": "23b6258334156bc4663ebf42237831d867b47cd35c2ccb1b004ddfe4ba2b5080",
       "reference_hash": "23b6258334156bc4663ebf42237831d867b47cd35c2ccb1b004ddfe4ba2b5080",
-      "compile_ms": 58.8077,
-      "generated_execute_ms": 184.26619999999616,
-      "reference_execute_ms": 134.91870000000006,
+      "compile_ms": 35.6461,
+      "generated_execute_ms": 135.88299999999265,
+      "reference_execute_ms": 106.6521999999992,
       "function_families": [
         "indicator",
         "record_high"
@@ -2300,9 +2305,9 @@
       "reference_row_count": 2,
       "generated_hash": "f0d5bae8142c78479fa542d1eb73b893c1cee62a7d07203b8988534dcf37e2e6",
       "reference_hash": "f0d5bae8142c78479fa542d1eb73b893c1cee62a7d07203b8988534dcf37e2e6",
-      "compile_ms": 104.0953,
-      "generated_execute_ms": 248.00340000000176,
-      "reference_execute_ms": 108.07919999999172,
+      "compile_ms": 73.2391,
+      "generated_execute_ms": 224.3601000000126,
+      "reference_execute_ms": 117.43579999999554,
       "function_families": [
         "indicator",
         "position",
@@ -2319,9 +2324,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 41.5049,
-      "generated_execute_ms": 131.8835000000007,
-      "reference_execute_ms": 56.45450000000096,
+      "compile_ms": 42.3227,
+      "generated_execute_ms": 73.73980000001268,
+      "reference_execute_ms": 62.97119999999268,
       "function_families": [
         "indicator"
       ],
@@ -2336,9 +2341,9 @@
       "reference_row_count": 61,
       "generated_hash": "d6577ce44e963ef53f90e43ca4be28b54a900a0e91fbb8f77cc505b4c1f340ff",
       "reference_hash": "d6577ce44e963ef53f90e43ca4be28b54a900a0e91fbb8f77cc505b4c1f340ff",
-      "compile_ms": 80.0814,
-      "generated_execute_ms": 184.9696000000023,
-      "reference_execute_ms": 151.35719999999253,
+      "compile_ms": 65.8316,
+      "generated_execute_ms": 209.75869999999475,
+      "reference_execute_ms": 120.00290000000291,
       "function_families": [
         "belong_industry",
         "indicator"
@@ -2354,9 +2359,9 @@
       "reference_row_count": 582,
       "generated_hash": "670e980d383ed5616fc518c84aecbb2319c195663c33ed92129b4abc3b06bc82",
       "reference_hash": "670e980d383ed5616fc518c84aecbb2319c195663c33ed92129b4abc3b06bc82",
-      "compile_ms": 71.7959,
-      "generated_execute_ms": 168.61279999999113,
-      "reference_execute_ms": 113.79549999999483,
+      "compile_ms": 60.8456,
+      "generated_execute_ms": 138.50909999999317,
+      "reference_execute_ms": 103.52780000000905,
       "function_families": [
         "belong_industry",
         "indicator"
@@ -2372,9 +2377,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 89.4527,
-      "generated_execute_ms": 292.71350000000496,
-      "reference_execute_ms": 88.1960000000106,
+      "compile_ms": 57.2378,
+      "generated_execute_ms": 282.38640000000714,
+      "reference_execute_ms": 102.03300000000581,
       "function_families": [
         "indicator",
         "queryData",
@@ -2391,9 +2396,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 54.8668,
-      "generated_execute_ms": 148.29770000000053,
-      "reference_execute_ms": 57.909899999998515,
+      "compile_ms": 45.4276,
+      "generated_execute_ms": 176.51449999999613,
+      "reference_execute_ms": 83.56709999999623,
       "function_families": [
         "indicator",
         "queryData"
@@ -2409,9 +2414,9 @@
       "reference_row_count": 786,
       "generated_hash": "350d0204e92eb5a7f9dcda9d3af6570b303a747a9644e588cf0b6b4225211647",
       "reference_hash": "350d0204e92eb5a7f9dcda9d3af6570b303a747a9644e588cf0b6b4225211647",
-      "compile_ms": 69.3686,
-      "generated_execute_ms": 938.3949999999999,
-      "reference_execute_ms": 144.31020000000672,
+      "compile_ms": 76.285,
+      "generated_execute_ms": 993.5059999999964,
+      "reference_execute_ms": 158.11109999999928,
       "function_families": [
         "indicator",
         "queryData"
@@ -2427,13 +2432,583 @@
       "reference_row_count": 5614,
       "generated_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
       "reference_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
-      "compile_ms": 37.8287,
-      "generated_execute_ms": 61.94599999999184,
-      "reference_execute_ms": 295.26810000000125,
+      "compile_ms": 27.5003,
+      "generated_execute_ms": 55.09699999998929,
+      "reference_execute_ms": 274.40099999999745,
       "function_families": [
         "indicator"
       ],
       "plan_family": "prefix_long_horizon",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-001",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4930,
+      "reference_row_count": 4930,
+      "generated_hash": "fc9d2f771af4526a1b6b97ab99d647577b65f4813c41df81ffe234465496b376",
+      "reference_hash": "fc9d2f771af4526a1b6b97ab99d647577b65f4813c41df81ffe234465496b376",
+      "compile_ms": 108.7364,
+      "generated_execute_ms": 2145.678799999999,
+      "reference_execute_ms": 1315.5594000000121,
+      "function_families": [
+        "belong_industry",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-002",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 3354,
+      "reference_row_count": 3354,
+      "generated_hash": "8a27683262565bed4f009ca063129503e53990806b7f11ccf3d0a8f3a4aa707f",
+      "reference_hash": "8a27683262565bed4f009ca063129503e53990806b7f11ccf3d0a8f3a4aa707f",
+      "compile_ms": 76.0076,
+      "generated_execute_ms": 1121.7048999999975,
+      "reference_execute_ms": 297.50149999999564,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-003",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4618,
+      "reference_row_count": 4618,
+      "generated_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "reference_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "compile_ms": 78.5563,
+      "generated_execute_ms": 2321.5124000000033,
+      "reference_execute_ms": 1118.1986999999936,
+      "function_families": [
+        "belong_industry",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-004",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4423,
+      "reference_row_count": 4423,
+      "generated_hash": "bf804e34dbae93a16808074e98a3fd7c957a72354160005c4db7a12ca57c5678",
+      "reference_hash": "bf804e34dbae93a16808074e98a3fd7c957a72354160005c4db7a12ca57c5678",
+      "compile_ms": 69.9777,
+      "generated_execute_ms": 2143.9304999999963,
+      "reference_execute_ms": 615.9138000000013,
+      "function_families": [
+        "close_together",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-005",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1055,
+      "reference_row_count": 1055,
+      "generated_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
+      "reference_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
+      "compile_ms": 63.2131,
+      "generated_execute_ms": 582.6872000000094,
+      "reference_execute_ms": 326.1481000000117,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-006",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1940,
+      "reference_row_count": 1940,
+      "generated_hash": "021636d354ddd54ac223c1ad02b6c97b3f5119086f593daced07b4d6b7fd6fb7",
+      "reference_hash": "021636d354ddd54ac223c1ad02b6c97b3f5119086f593daced07b4d6b7fd6fb7",
+      "compile_ms": 45.3121,
+      "generated_execute_ms": 3752.72480000001,
+      "reference_execute_ms": 2022.6637000000096,
+      "function_families": [
+        "close_together",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-007",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4618,
+      "reference_row_count": 4618,
+      "generated_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "reference_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "compile_ms": 91.4698,
+      "generated_execute_ms": 2925.5110999999943,
+      "reference_execute_ms": 1354.3814999999881,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "record_low"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-008",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1919,
+      "reference_row_count": 1919,
+      "generated_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
+      "reference_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
+      "compile_ms": 76.1835,
+      "generated_execute_ms": 1354.2525000000012,
+      "reference_execute_ms": 313.23150000000055,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-009",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2036,
+      "reference_row_count": 2036,
+      "generated_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
+      "reference_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
+      "compile_ms": 43.4578,
+      "generated_execute_ms": 3294.8156999999865,
+      "reference_execute_ms": 1075.7400999999902,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-010",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4620,
+      "reference_row_count": 4620,
+      "generated_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
+      "reference_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
+      "compile_ms": 66.3681,
+      "generated_execute_ms": 3356.9102000000157,
+      "reference_execute_ms": 1986.2555999999927,
+      "function_families": [
+        "cross_down",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-011",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1680,
+      "reference_row_count": 1680,
+      "generated_hash": "14c6faf262c9e2a775063fa7ef6f572e27d96d81f9a4d2595c4c43a4c3640e70",
+      "reference_hash": "14c6faf262c9e2a775063fa7ef6f572e27d96d81f9a4d2595c4c43a4c3640e70",
+      "compile_ms": 62.8468,
+      "generated_execute_ms": 1977.2832000000164,
+      "reference_execute_ms": 1227.3156999999912,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-012",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1919,
+      "reference_row_count": 1919,
+      "generated_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
+      "reference_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
+      "compile_ms": 71.8883,
+      "generated_execute_ms": 1120.1971000000128,
+      "reference_execute_ms": 345.28069999998934,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-013",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2036,
+      "reference_row_count": 2036,
+      "generated_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
+      "reference_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
+      "compile_ms": 71.0226,
+      "generated_execute_ms": 3293.0549000000156,
+      "reference_execute_ms": 975.1525999999728,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-014",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4620,
+      "reference_row_count": 4620,
+      "generated_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
+      "reference_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
+      "compile_ms": 71.7691,
+      "generated_execute_ms": 3186.7124999999987,
+      "reference_execute_ms": 2024.7573999999986,
+      "function_families": [
+        "cross_down",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-015",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1678,
+      "reference_row_count": 1678,
+      "generated_hash": "0a1948492e8026ab1d7390042b9eab73edd1ddc35662a528e55c7ab0f7f34fc7",
+      "reference_hash": "0a1948492e8026ab1d7390042b9eab73edd1ddc35662a528e55c7ab0f7f34fc7",
+      "compile_ms": 78.9703,
+      "generated_execute_ms": 1061.9918000000155,
+      "reference_execute_ms": 797.9448000000104,
+      "function_families": [
+        "indicator",
+        "position",
+        "queryData"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-016",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 221,
+      "reference_row_count": 221,
+      "generated_hash": "f53da04e195d8c3b4f5c017a68175d9d9fd8fda9e72d03b821c650f443147117",
+      "reference_hash": "f53da04e195d8c3b4f5c017a68175d9d9fd8fda9e72d03b821c650f443147117",
+      "compile_ms": 47.0843,
+      "generated_execute_ms": 1945.031599999993,
+      "reference_execute_ms": 1221.1441000000036,
+      "function_families": [
+        "indicator",
+        "record_high",
+        "record_low"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-017",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1055,
+      "reference_row_count": 1055,
+      "generated_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
+      "reference_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
+      "compile_ms": 63.2089,
+      "generated_execute_ms": 600.6339000000196,
+      "reference_execute_ms": 260.62900000002287,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-018",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2215,
+      "reference_row_count": 2215,
+      "generated_hash": "f6d813c89e8f368625d751d8358e793a9cf846d4d11aa9d500baf8cd5f1ee787",
+      "reference_hash": "f6d813c89e8f368625d751d8358e793a9cf846d4d11aa9d500baf8cd5f1ee787",
+      "compile_ms": 47.3096,
+      "generated_execute_ms": 3538.5638999999856,
+      "reference_execute_ms": 972.0240999999987,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-019",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2618,
+      "reference_row_count": 2618,
+      "generated_hash": "0326797a586c21b8f6ae324c4da895bfb48d2917a819728053a76744cac420e1",
+      "reference_hash": "0326797a586c21b8f6ae324c4da895bfb48d2917a819728053a76744cac420e1",
+      "compile_ms": 102.8224,
+      "generated_execute_ms": 3168.3543000000045,
+      "reference_execute_ms": 2200.472399999995,
+      "function_families": [
+        "cross_down",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-020",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 3022,
+      "reference_row_count": 3022,
+      "generated_hash": "25d713b60725d371b05de380ab4b9b4b7b79dd004584b3474534054f4d142672",
+      "reference_hash": "25d713b60725d371b05de380ab4b9b4b7b79dd004584b3474534054f4d142672",
+      "compile_ms": 70.8708,
+      "generated_execute_ms": 1502.6708000000042,
+      "reference_execute_ms": 950.2998000000105,
+      "function_families": [
+        "indicator",
+        "position",
+        "queryData"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-021",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 95,
+      "reference_row_count": 95,
+      "generated_hash": "dd20becbb91969ec3f7a71efa52012db77815aff140ca6aa1fbcfa91f7d4493c",
+      "reference_hash": "dd20becbb91969ec3f7a71efa52012db77815aff140ca6aa1fbcfa91f7d4493c",
+      "compile_ms": 44.1552,
+      "generated_execute_ms": 1912.6377000000048,
+      "reference_execute_ms": 1129.9987000000158,
+      "function_families": [
+        "indicator",
+        "record_high",
+        "record_low"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-022",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1366,
+      "reference_row_count": 1366,
+      "generated_hash": "4b7e97511903ae49995a9325869c91226bf8c7181483963bcf4862fa8d456e26",
+      "reference_hash": "4b7e97511903ae49995a9325869c91226bf8c7181483963bcf4862fa8d456e26",
+      "compile_ms": 73.5061,
+      "generated_execute_ms": 695.7563999999934,
+      "reference_execute_ms": 279.83950000000846,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-023",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 3361,
+      "reference_row_count": 3361,
+      "generated_hash": "69501ec20f50109497a422a43dbc0fdb5b7d9c4ba343467776495b0f142957e2",
+      "reference_hash": "69501ec20f50109497a422a43dbc0fdb5b7d9c4ba343467776495b0f142957e2",
+      "compile_ms": 49.0517,
+      "generated_execute_ms": 3383.7247999999818,
+      "reference_execute_ms": 635.8188000000098,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-024",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2098,
+      "reference_row_count": 2098,
+      "generated_hash": "af9ca33743f733c4067e573285cb110c3a40fed31fce19ac472c636a0ec5387e",
+      "reference_hash": "af9ca33743f733c4067e573285cb110c3a40fed31fce19ac472c636a0ec5387e",
+      "compile_ms": 68.4565,
+      "generated_execute_ms": 3379.61279999999,
+      "reference_execute_ms": 2183.3645000000106,
+      "function_families": [
+        "cross_down",
+        "golden_cross",
+        "indicator"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-025",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2012,
+      "reference_row_count": 2012,
+      "generated_hash": "50184eff069289d127142fc9d2c94cf7b801e8a398860c146e5ded69acdb03b0",
+      "reference_hash": "50184eff069289d127142fc9d2c94cf7b801e8a398860c146e5ded69acdb03b0",
+      "compile_ms": 61.1671,
+      "generated_execute_ms": 760.6571999999971,
+      "reference_execute_ms": 530.3439999999853,
+      "function_families": [
+        "indicator",
+        "position",
+        "queryData"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-026",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 129,
+      "reference_row_count": 129,
+      "generated_hash": "fa120f5dc159a9d4ac8a8c9054739e0e60ba03523bf13d0821805888a9bc68b7",
+      "reference_hash": "fa120f5dc159a9d4ac8a8c9054739e0e60ba03523bf13d0821805888a9bc68b7",
+      "compile_ms": 43.7493,
+      "generated_execute_ms": 2132.5022000000044,
+      "reference_execute_ms": 1227.0737000000054,
+      "function_families": [
+        "indicator",
+        "record_high",
+        "record_low"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-027",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1367,
+      "reference_row_count": 1367,
+      "generated_hash": "b0665fc4faf3fe8126e20b7268fee115412d4daea349b06264682e9bdd26448e",
+      "reference_hash": "b0665fc4faf3fe8126e20b7268fee115412d4daea349b06264682e9bdd26448e",
+      "compile_ms": 71.2545,
+      "generated_execute_ms": 938.4340000000009,
+      "reference_execute_ms": 293.5034999999857,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-028",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2285,
+      "reference_row_count": 2285,
+      "generated_hash": "fc5b21a8544a3b87ace0d2ff60bbfb50d479892d9d19730e46a8905cafe5c833",
+      "reference_hash": "fc5b21a8544a3b87ace0d2ff60bbfb50d479892d9d19730e46a8905cafe5c833",
+      "compile_ms": 63.7162,
+      "generated_execute_ms": 1218.28450000001,
+      "reference_execute_ms": 555.6569000000025,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-029",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 3679,
+      "reference_row_count": 3679,
+      "generated_hash": "f071b8c9d13879d0f1fc77b1f10601e761afc01d2f506e71c872218bc4bed806",
+      "reference_hash": "f071b8c9d13879d0f1fc77b1f10601e761afc01d2f506e71c872218bc4bed806",
+      "compile_ms": 57.4702,
+      "generated_execute_ms": 3605.9072000000187,
+      "reference_execute_ms": 523.8603000000239,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-BALANCED-COMPOSITION-030",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1063,
+      "reference_row_count": 1063,
+      "generated_hash": "db2ed3baa64b8d892f44db50117fd3a4d75eb066d2d084fc210b9b3306bc9dad",
+      "reference_hash": "db2ed3baa64b8d892f44db50117fd3a4d75eb066d2d084fc210b9b3306bc9dad",
+      "compile_ms": 62.565,
+      "generated_execute_ms": 2442.314100000004,
+      "reference_execute_ms": 2056.3801999999782,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "position"
+      ],
+      "plan_family": "balanced_cross_function_composition",
       "error": ""
     }
   ]

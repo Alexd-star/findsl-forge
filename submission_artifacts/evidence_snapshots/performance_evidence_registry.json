@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-09T12:53:22+00:00",
+  "registry_id": "official-performance-evidence-taxonomy-v1",
+  "packaging_git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+  "verified_source_heads_are_historical": true,
+  "status": "PASS",
+  "passed": true,
+  "metrics": [
+    {
+      "metric_id": "official_routine_prefix",
+      "workload": "官方真实行情常规 20 日成交量窗口：窗口基线与前缀表路径",
+      "dataset": "官方 A 股日频数据，13,650,347 行",
+      "source": "reports/official_doris_evidence.json",
+      "value_path": "baseline_vs_prefix_speedup",
+      "score_gate": false,
+      "claim": "证明该常规窗口工作负载的前缀路径更快，不代表所有查询的加速倍数",
+      "speedup": 12.107,
+      "source_value": 12.107,
+      "source_value_matched": true,
+      "evidence_git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+    },
+    {
+      "metric_id": "official_long_horizon_gate",
+      "workload": "官方真实行情近 5000 个交易日成交量聚合：全量分组基线与长周期汇总路径",
+      "dataset": "官方 A 股日频数据，覆盖 2006-01-04 至 2026-04-14",
+      "source": "reports/phase42_long_horizon_doris.json",
+      "value_path": "speedup",
+      "score_gate": true,
+      "claim": "用于赛题长周期查询相对全表扫描不低于 10 倍的门禁证据",
+      "speedup": 14.625,
+      "source_value": 14.625,
+      "source_value_matched": true,
+      "evidence_git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+    },
+    {
+      "metric_id": "synthetic_5m_scalability",
+      "workload": "500 万行确定性合成数据的 120 日滑窗与前缀路径",
+      "dataset": "合成可复现扩展性数据，不是官方语料",
+      "source": "reports/doris_cluster_evidence.json",
+      "value_path": "speedup",
+      "score_gate": false,
+      "claim": "证明扩展性实验中的优化潜力，不替代官方真实数据门禁",
+      "speedup": 17.775210720385996,
+      "source_value": 17.775210720385996,
+      "source_value_matched": true,
+      "evidence_git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+    },
+    {
+      "metric_id": "phase6c_projection_prefix",
+      "workload": "14 条投影列级直接技术表路径与集合式前缀 CTE 路径中位数",
+      "dataset": "官方真实行情，特定投影工作负载",
+      "source": "reports/phase6c_set_prefix_doris.json",
+      "value_path": "median_speedup",
+      "score_gate": false,
+      "claim": "证明 Phase 6C 的集合式前缀路径普遍更快，但不是长周期门禁",
+      "speedup": 1.393279,
+      "source_value": 1.393279,
+      "source_value_matched": true,
+      "evidence_git_head": "8abbac990610e3554a81a74faab659ec6b21d42b"
+    },
+    {
+      "metric_id": "legacy_six_query_matrix_prefix",
+      "workload": "早期六查询矩阵中的单条 baseline/prefix 对比",
+      "dataset": "官方真实行情，早期表布局和测量脚本",
+      "source": "reports/official_query_performance_matrix.json",
+      "value_path": "summary.baseline_vs_prefix_speedup",
+      "score_gate": false,
+      "claim": "保留为历史对照，不能用于否定或替代独立的长周期门禁",
+      "speedup": 1.173,
+      "source_value": 1.173,
+      "source_value_matched": true,
+      "evidence_git_head": null
+    }
+  ]
+}

@@ -3,24 +3,24 @@
 ## Summary
 
 - Evidence source: Apache Doris MySQL-compatible query port
-- Generated at: 2026-08-09T07:41:17Z
-- Git HEAD: `6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9`
+- Generated at: 2026-08-09T12:52:49Z
+- Git HEAD: `414a9803964a61ffa1876b9d1bbda0fba0e6a298`
 - Database: `findsl_demo`
-- Iterations: 7
-- Client command template: `'C:\Program Files\MySQL\MySQL Workbench 8.0\mysql.exe' -h 127.0.0.1 -P 9030 -u root --connect-timeout 10 --init-command 'SET enable_sql_cache=false' --batch --raw --skip-column-names findsl_demo -e 'SELECT 1'`
+- Iterations: 3
+- Client command template: `mysql -h 127.0.0.1 -P 9030 -u root --connect-timeout 10 --init-command 'SET enable_sql_cache=false' --batch --raw --skip-column-names findsl_demo -e 'SELECT 1'`
 - Evidence passed: True
 - Baseline success: True
 - Optimized success: True
 - Row counts match: True
-- Baseline row count: 96061
-- Optimized row count: 96061
-- Doris cluster speedup: 30.06x
+- Baseline row count: 4540562
+- Optimized row count: 4540562
+- Doris cluster speedup: 17.78x
 - Minimum Doris speedup target: 10.00x
 - Doris speedup target met: True
-- Baseline avg execute ms: 4560.926
-- Optimized avg execute ms: 151.713
-- Baseline P95 execute ms: 4830.103
-- Optimized P95 execute ms: 165.115
+- Baseline avg execute ms: 4628.109
+- Optimized avg execute ms: 260.369
+- Baseline P95 execute ms: 4823.614
+- Optimized P95 execute ms: 274.037
 - Optimized plan contains prefix table: True
 - Baseline plan contains window: True
 
@@ -30,15 +30,15 @@ Only generate it after loading schema, sample or scale data, and prefix tables i
 ## DSL
 
 ```text
-filter(SUM(indicator(volume), 120) > 1000000)
+filter(SUM(indicator("volume"), 120) > 420000)
 ```
 
 ## Variant Metrics
 
 | Variant | Success | Avg execute ms | P95 execute ms | Rows | Prefix plan | Window plan |
 |---|---:|---:|---:|---:|---:|---:|
-| baseline_window | True | 4560.926 | 4830.103 | 96061 | False | True |
-| optimized_prefix_sum | True | 151.713 | 165.115 | 96061 | True | False |
+| baseline_window | True | 4628.109 | 4823.614 | 4540562 | False | True |
+| optimized_prefix_sum | True | 260.369 | 274.037 | 4540562 | True | False |
 
 ## EXPLAIN Output
 
@@ -65,7 +65,7 @@ PLAN FRAGMENT 0
   |  partition by: ts_code[#5]
   |  order by: trade_date[#6] ASC NULLS FIRST
   |  window: ROWS BETWEEN 119 PRECEDING AND CURRENT ROW
-  |  predicates: (__win_1[#10] > 1000000)
+  |  predicates: (__win_1[#10] > 420000)
   |  distribute expr lists: ts_code[#5]
   |  
   1:VSORT(165)
@@ -78,7 +78,7 @@ PLAN FRAGMENT 0
      TABLE: findsl_demo.dwd_stock_daily_quote(dwd_stock_daily_quote), PREAGGREGATION: ON
      partitions=83/83 (p20230301000000,p20280601000000,p20241001000000,p20250201000000,p20280401000000,p20240801000000,p20260701000000,p20220701000000,p20251101000000,p20260301000000,p20220901000000,p20240401000000,p20271001000000,p20260501000000,p20271201000000,p20221101000000,p20270801000000,p20280201000000,p20240601000000,p20230101000000,p20220301000000,p20250901000000,p20240201000000,p20231101000000,p20260101000000,p20250701000000,p20251001000000,p20270601000000,p20220501000000,p20270201000000,p20230601000000,p20241201000000,p20250301000000,p20230801000000,p20261101000000,p20270401000000,p20280901000000,p20220101000000,p20280701000000,p20250501000000,p20281001000000,p20260801000000,p20221001000000,p20230201000000,p20280501000000,p20221201000000,p20230401000000,p20260601000000,p20250101000000,p20240901000000,p20241101000000,p20280101000000,p20240501000000,p20260201000000,p20220601000000,p20251201000000,p20240701000000,p20280301000000,p20270901000000,p20260401000000,p20220801000000,p20271101000000,p20240101000000,p20220401000000,p20270701000000,p20240301000000,p20270501000000,p20230901000000,p20231201000000,p20250801000000,p20250401000000,p20261001000000,p20270101000000,p20230501000000,p20250601000000,p20280801000000,p20281101000000,p20231001000000,p20260901000000,p20270301000000,p20230701000000,p20261201000000,p20220201000000)
      tablets=664/664, tabletList=1786254387732,1786254387734,1786254387736 ...
-     cardinality=1, avgRowSize=0.0, numNodes=1
+     cardinality=5000000, avgRowSize=45.93208, numNodes=1
      pushAggOp=NONE
 
 
@@ -90,7 +90,7 @@ planned with unknown column statistics
 SQL:
 
 ```sql
-SELECT * FROM (SELECT base_features.*, SUM(volume) OVER (PARTITION BY ts_code ORDER BY trade_date ROWS BETWEEN 119 PRECEDING AND CURRENT ROW) AS __win_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features) numeric_features_1 WHERE __win_1 > 1000000
+SELECT * FROM (SELECT base_features.*, SUM(volume) OVER (PARTITION BY ts_code ORDER BY trade_date ROWS BETWEEN 119 PRECEDING AND CURRENT ROW) AS __win_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features) numeric_features_1 WHERE __win_1 > 420000
 ```
 
 ### optimized_prefix_sum
@@ -111,36 +111,36 @@ PLAN FRAGMENT 0
   VRESULT SINK
      MYSQL_PROTOCOL
 
-  2:VHASH JOIN(272)
+  2:VHASH JOIN(285)
   |  join op: INNER JOIN(COLOCATE[])[]
   |  equal join conjunct: (ts_code[#8] = ts_code[#5])
   |  equal join conjunct: (trade_date[#9] = trade_date[#6])
-  |  cardinality=1
+  |  cardinality=5,000,000
   |  vec output tuple id: 4
   |  output tuple id: 4
   |  vIntermediate tuple ids: 3 
   |  hash output slot ids: 7 8 9 10 11 12 
-  |  runtime filters: RF000[min_max] <- ts_code[#5](1/1/1048576), RF001[in_or_bloom] <- ts_code[#5](1/1/1048576), RF002[min_max] <- trade_date[#6](1/1/1048576), RF003[in_or_bloom] <- trade_date[#6](1/1/1048576)
+  |  runtime filters: RF000[min_max] <- ts_code[#5](2500000/4194304/4194304), RF001[in_or_bloom] <- ts_code[#5](2500000/4194304/4194304), RF002[min_max] <- trade_date[#6](2500000/4194304/4194304), RF003[in_or_bloom] <- trade_date[#6](2500000/4194304/4194304)
   |  final projections: ts_code[#13], trade_date[#14], close[#15], turnover_rate[#16], volume[#17], __psum_1[#20]
   |  final project output tuple id: 4
   |  distribute expr lists: ts_code[#8]
   |  distribute expr lists: ts_code[#5]
   |  
-  |----0:VOlapScanNode(260)
+  |----0:VOlapScanNode(273)
   |       TABLE: findsl_demo.dwd_stock_daily_quote_prefix(dwd_stock_daily_quote_prefix), PREAGGREGATION: ON
-  |       PREDICATES: (volume_sum_120[#4] > 1000000)
+  |       PREDICATES: (volume_sum_120[#4] > 420000)
   |       partitions=83/83 (p20230301000000,p20280601000000,p20241001000000,p20250201000000,p20280401000000,p20240801000000,p20260701000000,p20220701000000,p20251101000000,p20260301000000,p20220901000000,p20240401000000,p20271001000000,p20260501000000,p20271201000000,p20221101000000,p20270801000000,p20280201000000,p20240601000000,p20230101000000,p20220301000000,p20250901000000,p20240201000000,p20231101000000,p20260101000000,p20250701000000,p20251001000000,p20270601000000,p20220501000000,p20270201000000,p20230601000000,p20241201000000,p20250301000000,p20230801000000,p20261101000000,p20270401000000,p20280901000000,p20220101000000,p20280701000000,p20250501000000,p20281001000000,p20260801000000,p20221001000000,p20230201000000,p20280501000000,p20221201000000,p20230401000000,p20260601000000,p20250101000000,p20240901000000,p20241101000000,p20280101000000,p20240501000000,p20260201000000,p20220601000000,p20251201000000,p20240701000000,p20280301000000,p20270901000000,p20260401000000,p20220801000000,p20271101000000,p20240101000000,p20220401000000,p20270701000000,p20240301000000,p20270501000000,p20230901000000,p20231201000000,p20250801000000,p20250401000000,p20261001000000,p20270101000000,p20230501000000,p20250601000000,p20280801000000,p20281101000000,p20231001000000,p20260901000000,p20270301000000,p20230701000000,p20261201000000,p20220201000000)
   |       tablets=664/664, tabletList=1786254392210,1786254392212,1786254392214 ...
-  |       cardinality=1, avgRowSize=0.0, numNodes=1
+  |       cardinality=5000000, avgRowSize=26.393747, numNodes=1
   |       pushAggOp=NONE
   |       final projections: ts_code[#0], trade_date[#1], volume_sum_120[#4]
   |       final project output tuple id: 1
   |    
-  1:VOlapScanNode(259)
+  1:VOlapScanNode(272)
      TABLE: findsl_demo.dwd_stock_daily_quote(dwd_stock_daily_quote), PREAGGREGATION: ON
      partitions=83/83 (p20230301000000,p20280601000000,p20241001000000,p20250201000000,p20280401000000,p20240801000000,p20260701000000,p20220701000000,p20251101000000,p20260301000000,p20220901000000,p20240401000000,p20271001000000,p20260501000000,p20271201000000,p20221101000000,p20270801000000,p20280201000000,p20240601000000,p20230101000000,p20220301000000,p20250901000000,p20240201000000,p20231101000000,p20260101000000,p20250701000000,p20251001000000,p20270601000000,p20220501000000,p20270201000000,p20230601000000,p20241201000000,p20250301000000,p20230801000000,p20261101000000,p20270401000000,p20280901000000,p20220101000000,p20280701000000,p20250501000000,p20281001000000,p20260801000000,p20221001000000,p20230201000000,p20280501000000,p20221201000000,p20230401000000,p20260601000000,p20250101000000,p20240901000000,p20241101000000,p20280101000000,p20240501000000,p20260201000000,p20220601000000,p20251201000000,p20240701000000,p20280301000000,p20270901000000,p20260401000000,p20220801000000,p20271101000000,p20240101000000,p20220401000000,p20270701000000,p20240301000000,p20270501000000,p20230901000000,p20231201000000,p20250801000000,p20250401000000,p20261001000000,p20270101000000,p20230501000000,p20250601000000,p20280801000000,p20281101000000,p20231001000000,p20260901000000,p20270301000000,p20230701000000,p20261201000000,p20220201000000)
      tablets=664/664, tabletList=1786254387732,1786254387734,1786254387736 ...
-     cardinality=1, avgRowSize=0.0, numNodes=1
+     cardinality=5000000, avgRowSize=45.93208, numNodes=1
      pushAggOp=NONE
      runtime filters: RF000[min_max] -> ts_code[#8], RF001[in_or_bloom] -> ts_code[#8], RF002[min_max] -> trade_date[#9], RF003[in_or_bloom] -> trade_date[#9]
 
@@ -153,5 +153,5 @@ planned with unknown column statistics
 SQL:
 
 ```sql
-SELECT * FROM (SELECT base_features.*, __pref_curr_1.volume_sum_120 AS __psum_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_curr_1 ON __pref_curr_1.ts_code = base_features.ts_code AND __pref_curr_1.trade_date = base_features.trade_date) numeric_features_1 WHERE __psum_1 > 1000000
+SELECT * FROM (SELECT base_features.*, __pref_curr_1.volume_sum_120 AS __psum_1 FROM (SELECT base.* FROM dwd_stock_daily_quote AS base) base_features LEFT JOIN dwd_stock_daily_quote_prefix AS __pref_curr_1 ON __pref_curr_1.ts_code = base_features.ts_code AND __pref_curr_1.trade_date = base_features.trade_date) numeric_features_1 WHERE __psum_1 > 420000
 ```

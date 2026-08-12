@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
+  "source_git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+  "row_count": 5799,
+  "category_counts": {
+    "capability_gap": 530,
+    "data_unavailable": 1720,
+    "invalid_input": 2466,
+    "passed": 1083
+  },
+  "migration_gap_count": 53,
+  "migration_gap_codes": [
+    "PHYSICAL_SCOPE_DATA_UNAVAILABLE"
+  ],
+  "clusters": [
+    {
+      "code": "OFFICIAL_TYPE_ERROR",
+      "category": "invalid_input",
+      "row_count": 2459,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "golden_cross",
+        "indicator",
+        "position",
+        "queryData",
+        "rank",
+        "record_high",
+        "record_low",
+        "reset"
+      ],
+      "sample_rows": [
+        3,
+        5,
+        9,
+        10,
+        15
+      ]
+    },
+    {
+      "code": "DOMAIN_DATA_UNAVAILABLE",
+      "category": "data_unavailable",
+      "row_count": 1504,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "golden_cross",
+        "indicator",
+        "position",
+        "queryData",
+        "rank",
+        "record_high",
+        "record_low",
+        "reset"
+      ],
+      "sample_rows": [
+        2,
+        4,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 282,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "indicator",
+        "position",
+        "queryData",
+        "rank",
+        "record_high",
+        "record_low"
+      ],
+      "sample_rows": [
+        18,
+        39,
+        296,
+        299,
+        310
+      ]
+    },
+    {
+      "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 239,
+      "function_families": [
+        "belong_industry",
+        "cross_above",
+        "cross_down",
+        "golden_cross",
+        "indicator",
+        "position",
+        "queryData",
+        "rank",
+        "record_high",
+        "record_low",
+        "reset"
+      ],
+      "sample_rows": [
+        112,
+        183,
+        196,
+        237,
+        271
+      ]
+    },
+    {
+      "code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "category": "data_unavailable",
+      "row_count": 119,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "indicator",
+        "queryData",
+        "rank",
+        "record_high",
+        "record_low",
+        "reset"
+      ],
+      "sample_rows": [
+        65,
+        83,
+        177,
+        204,
+        208
+      ]
+    },
+    {
+      "code": "PHYSICAL_MARKET_DATA_UNAVAILABLE",
+      "category": "data_unavailable",
+      "row_count": 96,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "indicator",
+        "position",
+        "queryData",
+        "rank",
+        "record_high",
+        "reset"
+      ],
+      "sample_rows": [
+        53,
+        242,
+        278,
+        285,
+        560
+      ]
+    },
+    {
+      "code": "OFFICIAL_ANTLR_LEX_ERROR",
+      "category": "invalid_input",
+      "row_count": 5,
+      "function_families": [],
+      "sample_rows": [
+        2122,
+        2194,
+        2466,
+        5328,
+        5753
+      ]
+    },
+    {
+      "code": "PHYSICAL_EVENT_PERIOD_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 3,
+      "function_families": [
+        "indicator",
+        "position"
+      ],
+      "sample_rows": [
+        3929,
+        3976,
+        5504
+      ]
+    },
+    {
+      "code": "OFFICIAL_ANTLR_PARSE_ERROR",
+      "category": "invalid_input",
+      "row_count": 2,
+      "function_families": [],
+      "sample_rows": [
+        3785,
+        5521
+      ]
+    },
+    {
+      "code": "PHYSICAL_PLAN_UNAVAILABLE",
+      "category": "capability_gap",
+      "row_count": 2,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        2143,
+        4050
+      ]
+    },
+    {
+      "code": "TEMPORAL_SCOPE_MISMATCH",
+      "category": "capability_gap",
+      "row_count": 2,
+      "function_families": [
+        "indicator"
+      ],
+      "sample_rows": [
+        2439,
+        2509
+      ]
+    },
+    {
+      "code": "DOMAIN_DATE_INVALID",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "indicator"
+      ],
+      "sample_rows": [
+        3639
+      ]
+    },
+    {
+      "code": "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE",
+      "category": "data_unavailable",
+      "row_count": 1,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "sample_rows": [
+        307
+      ]
+    },
+    {
+      "code": "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        1198
+      ]
+    }
+  ],
+  "semantic_subclusters": [
+    {
+      "key": "invalid_dsl_or_type",
+      "category": "invalid_input",
+      "row_count": 2466,
+      "terminal_codes": [
+        "OFFICIAL_ANTLR_LEX_ERROR",
+        "OFFICIAL_ANTLR_PARSE_ERROR",
+        "OFFICIAL_TYPE_ERROR"
+      ],
+      "sample_rows": [
+        3,
+        5,
+        9,
+        10,
+        15
+      ],
+      "examples": [
+        "indicator('沪主板|深主板|新三板', '', '基本每股收益', '1周内', '', '', '') <= 22 * indicator('沪主板|深主板|新三板', '', '每手股数', '1周内', '', '', '') and indicator('沪主板|深主板|新三板', '', '周均线空头排列', '1周内', '', '', '') = True",
+        "indicator('京|深', '', '上市日期', '', '', '', '') > '21年' and indicator('京|深', '', '上市日期', '', '', '', '') < queryData('京|深', '300691', '上市日期', '', '') and indicator('京|深', '', '跌幅', '上市次日', '', '', '') = 5% and indicator('京|深', '', '历史最高价', '', '', '', '') > 15"
+      ]
+    },
+    {
+      "key": "declared_data_unavailable",
+      "category": "data_unavailable",
+      "row_count": 1720,
+      "terminal_codes": [
+        "DOMAIN_DATA_UNAVAILABLE",
+        "PHYSICAL_MARKET_DATA_UNAVAILABLE",
+        "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE",
+        "PHYSICAL_SCOPE_DATA_UNAVAILABLE"
+      ],
+      "sample_rows": [
+        2,
+        4,
+        6,
+        7,
+        8
+      ],
+      "examples": [
+        "indicator('深', '', '个人持有比例', '5日内', '', '', '') > 5% and indicator('深', '', '均线多头排列', '5日内', '', '', '') = True",
+        "rank('沪', '白酒行业', '资产回报率', 'desc', '最近一周', '', '', '') = 1 and indicator('沪', '白酒行业', '归母净利润', '', '', '', '') >= 0"
+      ]
+    },
+    {
+      "key": "other_date_algebra",
+      "category": "capability_gap",
+      "row_count": 165,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        196,
+        271,
+        342,
+        361,
+        370
+      ],
+      "examples": [
+        "indicator('', '', '最新价', '', '', '', '') <= indicator('', '', '最新价', '22年', '', '', '') + 30.52 and indicator('', '', '最新价', '', '', '', '') < indicator('', '', '最新价', '22年后2年', '', '', '')",
+        "indicator('', '', '成交额', '上周五到0926', '', '', '') > 10000000 and indicator('', '', '成交额', '上周五到0926', '', '', '') <= 12000000"
+      ]
+    },
+    {
+      "key": "unsupported_asset_domain",
+      "category": "data_unavailable",
+      "row_count": 143,
+      "terminal_codes": [
+        "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        18,
+        39,
+        296,
+        299,
+        310
+      ],
+      "examples": [
+        "indicator('', '', '港股通标识', '2000年', '场外基金', '', '') = True and indicator('', '', '最高价', '2000年', '场外基金', '', '') < 200.7",
+        "indicator('创业板&沪&深', '', '收盘价', '近3个月', '可转债', '', '') = 5"
+      ]
+    },
+    {
+      "key": "physical_constraint_unsupported",
+      "category": "capability_gap",
+      "row_count": 139,
+      "terminal_codes": [
+        "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        365,
+        563,
+        778,
+        828,
+        833
+      ],
+      "examples": [
+        "indicator('', '', '跌幅', '', '概念', '', 'CONS=6日') > 0 and rank('', '', '涨幅', 'desc', '本周', '概念', '', '') > 0",
+        "(indicator('港', '', '收盘价', '', '概念', '', '') < 10 or indicator('港', '', '收盘价', '', '概念', '', '') > 10.02) and indicator('港', '', '股票名称', '', '概念', '', '') != '%三十%' or indicator('港', '', '股票名称', '', '概念', '', '') = '%四十%'"
+      ]
+    },
+    {
+      "key": "intraday_data_domain",
+      "category": "data_unavailable",
+      "row_count": 27,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        237,
+        505,
+        1006,
+        1228,
+        1248
+      ],
+      "examples": [
+        "indicator('^京', '', '收盘价', '收盘后', '', '', '') between '[10,10.02]' limit 0,20",
+        "rank('', '', '主力净流入', 'desc', '今天开盘30分钟以内', '', '', '') = 1"
+      ]
+    },
+    {
+      "key": "fundamental_reporting_calendar",
+      "category": "data_unavailable",
+      "row_count": 24,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        308,
+        320,
+        529,
+        658,
+        752
+      ],
+      "examples": [
+        "indicator('沪|深', '', '市盈率', '年报', '', '', '') > 0.9",
+        "record_low('', '', '最低价', '历史', '年报', '', '', '') = True"
+      ]
+    },
+    {
+      "key": "ambiguous_recent_date",
+      "category": "invalid_input",
+      "row_count": 23,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        112,
+        183,
+        298,
+        413,
+        1017
+      ],
+      "examples": [
+        "indicator('', '', '涨幅', '最近', '', '', '') >= 8% and indicator('', '', '跌幅', '最近的第二天', '', '', 'CONS=3日') >= 0 and indicator('', '', '跌幅', '最近的第二天的后3日', '', 'SUM', '') > 8%",
+        "indicator('', '', '深港通标识', '近期', '', '', '') = True then rank('', '', '总市值', 'asc', '近期', '', '', '') <= 15"
+      ]
+    },
+    {
+      "key": "physical_event_period_unsupported",
+      "category": "capability_gap",
+      "row_count": 3,
+      "terminal_codes": [
+        "PHYSICAL_EVENT_PERIOD_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        3929,
+        3976,
+        5504
+      ],
+      "examples": [
+        "position('', '', '', '阶段', '', '', '', '') = '低' and indicator('', '', '主力净流入', '近五天', '', '', 'CONS=每日') > 0",
+        "position('', '', '成交量', '本周内', '', '', '', '') = '低' and indicator('', '', '放量', '盘前', '', '', 'CONS>1') = True"
+      ]
+    },
+    {
+      "key": "physical_plan_unavailable",
+      "category": "capability_gap",
+      "row_count": 2,
+      "terminal_codes": [
+        "PHYSICAL_PLAN_UNAVAILABLE"
+      ],
+      "sample_rows": [
+        2143,
+        4050
+      ],
+      "examples": [
+        "rank('深主板', '', '主力净流入', 'desc', '', '', '', '') <= 24% and indicator('深主板', '', '主力成本', '今年第一个季度', '', '', 'CONS=每季度') ~= 15.94",
+        "rank('', '', '5分钟涨速', 'desc', '早盘竞价', '', '', '') > 0"
+      ]
+    },
+    {
+      "key": "temporal_scope_mismatch",
+      "category": "capability_gap",
+      "row_count": 2,
+      "terminal_codes": [
+        "TEMPORAL_SCOPE_MISMATCH"
+      ],
+      "sample_rows": [
+        2439,
+        2509
+      ],
+      "examples": [
+        "indicator('其他', '', '最新价', '9:15~9:25', '', '', 'CONS=10分钟') = indicator('其他', '', '最新价', '9:15', '', '', '')",
+        "indicator('', '', '一个季度均线', '本季度', '', '', '') > indicator('', '', '一个季度均线', '前三个季度', '', '', 'CONS=每季度')"
+      ]
+    },
+    {
+      "key": "domain_date_invalid",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "DOMAIN_DATE_INVALID"
+      ],
+      "sample_rows": [
+        3639
+      ],
+      "examples": [
+        "indicator('沪', '', '主力买入手数', '上周五到本周一', 'ETF', 'AVG', '') > 5000"
+      ]
+    },
+    {
+      "key": "physical_rank_expression_unsupported",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        1198
+      ],
+      "examples": [
+        "indicator('港', '', '市净率', '近一个月', '', '', '') < 1 and indicator('港', '', '涨幅', '近一个月', '', 'AVG', '') > 5% then rank('港', '', '涨幅', 'desc', '近一个月', '', '', '') <= 5 and indicator('港', '', '市净率', '近一个月', '', '', '') between '(0,1)'"
+      ]
+    }
+  ],
+  "development_policy": {
+    "unit": "capability_cluster",
+    "row_level_patches_allowed": false,
+    "priority": [
+      "architecture_convergence",
+      "eligible_correctness",
+      "capability_gap",
+      "versioned_data_provider"
+    ]
+  }
+}

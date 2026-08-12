@@ -1,31 +1,48 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-08-09 15:50:50 +08:00
-- Git HEAD at export: 6f3bcae
-- Git status when exported, excluding evidence snapshots and this export script: clean
+- Generated at: 2026-08-12 16:25:25 +08:00
+- Git HEAD at export: 414a980
+- Git status when exported, excluding evidence snapshots and this export script:  M README.md
+ M "docs/00_\345\275\223\345\211\215\345\274\200\345\217\221\344\270\273\347\272\277.md"
+ M submission_artifacts/evidence_metadata.json
+ M submission_artifacts/evidence_summary.md
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
 
 ## Included Files
 
+- `adjustment_policy_doris.json` (1753 bytes)
+- `adjustment_policy_doris.md` (822 bytes)
+- `current_external_data_inventory.json` (20797 bytes)
+- `current_external_data_inventory.md` (4016 bytes)
+- `current_official_gap_taxonomy.json` (14199 bytes)
+- `current_official_gap_taxonomy.md` (4390 bytes)
+- `current_scope_data_gap_audit.json` (42924 bytes)
+- `current_scope_data_gap_audit.md` (13022 bytes)
 - `defense_package.md` (9754 bytes)
-- `doris_cluster_evidence.json` (9071 bytes)
-- `doris_cluster_evidence.md` (9465 bytes)
+- `doris_cluster_evidence.json` (9103 bytes)
+- `doris_cluster_evidence.md` (9511 bytes)
 - `evaluation_report.md` (12366 bytes)
-- `external_catalog_doris_load.json` (1479 bytes)
-- `official_compiler_funnel.json` (3244928 bytes)
+- `external_catalog_doris_load.json` (888 bytes)
+- `official_compiler_funnel.json` (3244917 bytes)
 - `official_compiler_funnel.md` (1091 bytes)
-- `official_correctness_benchmark.json` (89539 bytes)
-- `official_correctness_benchmark.md` (14971 bytes)
-- `official_doris_evidence.json` (22114 bytes)
-- `official_doris_evidence.md` (20018 bytes)
-- `official_full_performance_matrix.json` (39072 bytes)
+- `official_correctness_benchmark.json` (110486 bytes)
+- `official_correctness_benchmark.md` (17040 bytes)
+- `official_doris_evidence.json` (22112 bytes)
+- `official_doris_evidence.md` (20017 bytes)
+- `official_doris_watermark.json` (2571 bytes)
+- `official_doris_watermark.md` (875 bytes)
+- `official_full_performance_matrix.json` (39083 bytes)
 - `official_full_performance_matrix.md` (8768 bytes)
 - `official_query_performance_matrix.json` (3656 bytes)
 - `official_query_performance_matrix.md` (1792 bytes)
 - `official_slot_coverage.json` (439612 bytes)
 - `official_slot_coverage.md` (71770 bytes)
 - `official_suite_report.md` (7549 bytes)
+- `p0p1_date_scope_delta_doris.json` (6581 bytes)
+- `p0p1_date_scope_delta_doris.md` (818 bytes)
+- `performance_evidence_registry.json` (3449 bytes)
+- `performance_evidence_registry.md` (1453 bytes)
 - `phase15_universe_doris.json` (5452 bytes)
 - `phase15_universe_doris.md` (959 bytes)
 - `phase15_universe_funnel.json` (3256285 bytes)
@@ -116,7 +133,7 @@
 - `phase31_final_grounded_funnel.md` (1285 bytes)
 - `phase31_new_success_audit.json` (2240 bytes)
 - `phase31_new_success_audit.md` (802 bytes)
-- `phase42_long_horizon_doris.json` (19923 bytes)
+- `phase42_long_horizon_doris.json` (19922 bytes)
 - `phase42_long_horizon_doris.md` (2741 bytes)
 - `phase43_curated_scope_alias.json` (13791 bytes)
 - `phase43_eastmoney_exact_batch.json` (12445 bytes)
@@ -172,7 +189,7 @@
 - `prefix_sum_scale_benchmark.md` (3037 bytes)
 - `real_market_sample_report.md` (957 bytes)
 - `sql_equivalence_report.md` (1365 bytes)
-- `submission_readiness.md` (13381 bytes)
+- `submission_readiness.md` (13379 bytes)
 
 ## Excluded By Design
 

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-09T12:49:46+00:00",
+  "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+  "statistics_collected_at": "2026-08-09T15:04:56+08:00",
+  "statistics_catalog_sha256": "ee58f58a0d54ee1e2eaf1deb4bcef89ab1826e0296df2619278a019e0bf585a1",
+  "resources": [
+    {
+      "resource_id": "official_basic",
+      "table": "newzl.hsj_stock_hq_basic",
+      "row_count": 13650347,
+      "distinct_dates": 4631,
+      "min_date": "2006-01-04",
+      "max_date": "2026-04-14",
+      "expected_row_count": 13650347,
+      "expected_distinct_dates": 4631,
+      "expected_min_date": "2006-01-04",
+      "expected_max_date": "2026-04-14",
+      "matched_statistics": true
+    },
+    {
+      "resource_id": "official_technical",
+      "table": "newzl.hsj_stock_hq_basic_technical",
+      "row_count": 13650347,
+      "distinct_dates": 4631,
+      "min_date": "2006-01-04",
+      "max_date": "2026-04-14",
+      "expected_row_count": 13650347,
+      "expected_distinct_dates": 4631,
+      "expected_min_date": "2006-01-04",
+      "expected_max_date": "2026-04-14",
+      "matched_statistics": true
+    },
+    {
+      "resource_id": "official_basic_prefix",
+      "table": "newzl.hsj_stock_hq_basic_prefix",
+      "row_count": 13650347,
+      "distinct_dates": 4631,
+      "min_date": "2006-01-04",
+      "max_date": "2026-04-14",
+      "expected_row_count": 13650347,
+      "expected_distinct_dates": 4631,
+      "expected_min_date": "2006-01-04",
+      "expected_max_date": "2026-04-14",
+      "matched_statistics": true
+    },
+    {
+      "resource_id": "official_ext_prefix",
+      "table": "newzl.hsj_stock_hq_ext_prefix",
+      "row_count": 13650347,
+      "distinct_dates": 4631,
+      "min_date": "2006-01-04",
+      "max_date": "2026-04-14",
+      "expected_row_count": 13650347,
+      "expected_distinct_dates": 4631,
+      "expected_min_date": "2006-01-04",
+      "expected_max_date": "2026-04-14",
+      "matched_statistics": true
+    },
+    {
+      "resource_id": "official_basic_rollup",
+      "table": "newzl.hsj_stock_hq_basic_rollup",
+      "row_count": 13650347,
+      "distinct_dates": 4631,
+      "min_date": "2006-01-04",
+      "max_date": "2026-04-14",
+      "expected_row_count": 13650347,
+      "expected_distinct_dates": 4631,
+      "expected_min_date": "2006-01-04",
+      "expected_max_date": "2026-04-14",
+      "matched_statistics": true
+    }
+  ],
+  "cross_resource_watermark_coherent": true,
+  "status": "PASS",
+  "passed": true
+}

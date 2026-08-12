@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+  "previous_funnel": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\reports\\p0p1_current_funnel.json",
+  "current_funnel": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\reports\\official_compiler_funnel.json",
+  "previous_git_head": "1b01b9bb1430478ade73fce8388db8a6128e7731",
+  "current_git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+  "repeats": 3,
+  "performance_target_ms": 10000.0,
+  "total": 7,
+  "new_successes": 7,
+  "passed": 7,
+  "failed": 0,
+  "status": "PASS",
+  "cases": [
+    {
+      "excel_row": 194,
+      "source": "rank('京', '', '最新价', 'asc', '上周二至周四', '', '', '') > 0",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 911,
+      "result_sha256": "abb8b9847b50b81058953ba899fe3f16b987beab3aa48a9100b8685c01fe220a",
+      "sql_sha256": "e5777a32acec4c0c1e96ac3dee2d8f61f5f67f2ab4db38e0df6ca697935f5f20",
+      "execution_sql_sha256": "bb98912c53175e5b96e04bd9bf96b5b5dd588365eb64da8bba7ea9f2938c058b",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        130.115,
+        43.772,
+        55.17
+      ],
+      "p50_ms": 55.17,
+      "p95_ms": 130.115,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 195,
+      "source": "rank('^沪&^深&^京', 'S板', '最新价', 'asc', '本周一至周五', '', '', '') = 1",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 0,
+      "result_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sql_sha256": "feaf1fe287a17285cb657d66a56e85ed440d78d0b1786847a5618f7b493c8db3",
+      "execution_sql_sha256": "c2fb48bc1059d28a7fd779be13153ba4930dff7aea07ff26ae647382af6ffb0a",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        120.068,
+        38.762,
+        37.508
+      ],
+      "p50_ms": 38.762,
+      "p95_ms": 120.068,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 238,
+      "source": "indicator('京', '', '振幅', '本周一到本周五', '', '', '') < 3% and indicator('京', '', '振幅', '本周一到本周五', '', '', '') > 10.03%",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 0,
+      "result_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sql_sha256": "9d13a02ac8918dae2a7f224c0ad1f2fd0bd55a7132bd1c51c42036656ca4c643",
+      "execution_sql_sha256": "b620a1690ebeada9038b85cc2cc6c96384b07ff97199e395fea70bbcc0dce1c8",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        41.577,
+        37.642,
+        38.45
+      ],
+      "p50_ms": 38.45,
+      "p95_ms": 41.577,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 268,
+      "source": "indicator('', 'S板', '总市值', '本周一至周三', '', '', '') > 1092000000",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 2,
+      "result_sha256": "6e5ceeef311d26c3f4ce6fae2a04bc43fe260afecdd94f4a02761e259b5c74fd",
+      "sql_sha256": "f4981149225e42f3b083351644d87b8f6a440171c85e89c485ead7eac2c82858",
+      "execution_sql_sha256": "f2610f2eed0f161698bfdb326973dbd6c4d6412613f6499438cef08f1e0cf52d",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        93.352,
+        33.969,
+        35.194
+      ],
+      "p50_ms": 35.194,
+      "p95_ms": 93.352,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 649,
+      "source": "indicator('深主板', '', '市净率', '上周二到上周四', '', '', '') > 2 and indicator('深', '', '成交额', '上周二到上周四', '', '', '') between '(10000000,1500000000)'",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 30,
+      "result_sha256": "9e7ace4b505d47dead1a30bad543ec269d201f2511e78c01c5a4a83343862416",
+      "sql_sha256": "dde91b7a8d8e0d7fa5bf582676965780fad00949fe6f60ea2f4c4f22203d8ced",
+      "execution_sql_sha256": "8858961863a9563b56ecb58f51bfabcf0511374581a117e7b3ab8aff892c12ec",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        105.387,
+        34.819,
+        35.22
+      ],
+      "p50_ms": 35.22,
+      "p95_ms": 105.387,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 1179,
+      "source": "indicator('沪|深|京', '', '成交额', '上上周一到周四', '', '', '') > 420000000",
+      "selected_strategy": "direct_column",
+      "status": "PASS",
+      "row_count": 21908,
+      "result_sha256": "ded2f8a25674cfbe9406386e0af21ea835f85636f26159dfd8baba0db0267601",
+      "sql_sha256": "8f67eea01291a0902afa79d2edf7a43ac626d745337a7ead3a34b7ba9e9100d0",
+      "execution_sql_sha256": "d56e2c139df2c8e332f13c22da3afa0c7a33e2a16ed47cca3f2f38fb5ed67044",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        120.397,
+        107.836,
+        126.426
+      ],
+      "p50_ms": 120.397,
+      "p95_ms": 126.426,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    },
+    {
+      "excel_row": 1736,
+      "source": "rank('创业板', '', '涨幅', 'asc', '上周三至周五', '', '', '') > 0",
+      "selected_strategy": "controlled_expression",
+      "status": "PASS",
+      "row_count": 4198,
+      "result_sha256": "116104df03e76eb6d8bfeef69709ef541192c75ae93996060d7a2f4967dad23e",
+      "sql_sha256": "76da21f363b2e7563c2577555d4d16f96da45338c49098ece2248aabba3c25f9",
+      "execution_sql_sha256": "e07fe5551a294975a3fcfaa4d1ad7ae4b1f67ba9b6f2e7836eaa9a3478b87692",
+      "result_order_contract": "canonical_full_row_order",
+      "elapsed_ms": [
+        106.067,
+        100.837,
+        94.396
+      ],
+      "p50_ms": 100.837,
+      "p95_ms": 106.067,
+      "stable_result": true,
+      "under_performance_target": true,
+      "error": ""
+    }
+  ]
+}

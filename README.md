@@ -18,9 +18,9 @@ FinDSL Forge 是第五届中国研究生金融科技创新大赛赛题 19“行�
 | 新后端总成功 | `1083/5799` | 正式新链路当前生成受控 SQL 的行数；其余包含数据缺失、非法输入和能力缺口。 |
 | 正式 SQL 正确率 | `157/157`，Wilson 95% 下界 `97.61%` | 独立 reference SQL 与生成 SQL 的完整结果集一致；12 类函数每类至少 10 条。 |
 | 官方正负例 | `37/37 + 37/37` | 固定正例编译通过、固定负例按预期拒绝。 |
-| 长周期性能门禁 | 官方真实数据本轮 `14.381x` | 同一长周期 DSL 的 baseline/optimized 完整结果哈希一致，达到赛题 `>=10x`。 |
-| 其他性能证据 | `12.182x` / `24.510x` / `1.393x` / `1.173x` | 分别属于常规官方窗口、500 万行合成扩展、Phase 6C 投影和早期六查询矩阵，不得写成系统平均值。 |
-| 编译延迟 | P95 `1.257ms` | 当前冻结基准远低于赛题 `<50ms` 门槛。 |
+| 长周期性能门禁 | 当前源码 HEAD `>=10x PASS` | 同一长周期 DSL 的 baseline/optimized 完整结果哈希一致；精确实测值和原始 Profile 见 `submission_artifacts/evidence_snapshots/phase42_long_horizon_doris.json`。 |
+| 其他性能证据 | 按工作负载动态读取 | 常规官方窗口、500 万行合成扩展、Phase 6C 投影和早期六查询矩阵分别登记，见 `submission_artifacts/evidence_snapshots/performance_evidence_registry.json`，不得写成系统平均值。 |
+| 编译延迟 | 当前源码 HEAD P95 `<50ms PASS` | 精确实测值见 `submission_artifacts/evidence_metadata.json`，避免把单次机器抖动写死在说明文档中。 |
 
 正式提交前必须在当前 HEAD 和同一数据快照上重新采集证据。现有历史性能数字不能替代最终封板结果。
 

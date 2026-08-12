@@ -2,24 +2,24 @@
   "schema_version": 1,
   "row_count": 5799,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+  "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
   "legacy_strict_success": 1097,
-  "new_backend_success": 1076,
+  "new_backend_success": 1083,
   "legacy_to_new_migrated": 1044,
   "migration_coverage": 0.951686,
   "stage_success": {
     "frontend": 5792,
     "typed": 3333,
-    "logical": 1827,
-    "optimizer": 1827,
-    "physical": 1076,
-    "backend": 1076
+    "logical": 1826,
+    "optimizer": 1826,
+    "physical": 1083,
+    "backend": 1083
   },
   "terminal_errors": {
     "OFFICIAL_TYPE_ERROR": 2459,
     "DOMAIN_DATA_UNAVAILABLE": 1504,
-    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 283,
-    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 246,
+    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 282,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 239,
     "PHYSICAL_SCOPE_DATA_UNAVAILABLE": 119,
     "PHYSICAL_MARKET_DATA_UNAVAILABLE": 96,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
@@ -28,7 +28,8 @@
     "TEMPORAL_SCOPE_MISMATCH": 2,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2,
     "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE": 1,
-    "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 1
+    "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 1,
+    "DOMAIN_DATE_INVALID": 1
   },
   "migration_gaps": [
     {
@@ -65,7 +66,7 @@
     "indicator": {
       "rows": 5030,
       "legacy_strict_success": 867,
-      "new_backend_success": 854
+      "new_backend_success": 858
     },
     "position": {
       "rows": 131,
@@ -80,7 +81,7 @@
     "rank": {
       "rows": 1743,
       "legacy_strict_success": 276,
-      "new_backend_success": 269
+      "new_backend_success": 272
     },
     "record_high": {
       "rows": 108,
@@ -2857,11 +2858,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 195,
@@ -2871,11 +2872,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 196,
@@ -3482,11 +3483,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 239,
@@ -3907,11 +3908,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 269,
@@ -9271,11 +9272,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 650,
@@ -16840,11 +16841,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 1180,
@@ -24846,11 +24847,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 1737,
@@ -52158,8 +52159,8 @@
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_stage": "logical",
+      "terminal_code": "DOMAIN_DATE_INVALID",
       "selected_resource": null,
       "selected_strategy": null
     },

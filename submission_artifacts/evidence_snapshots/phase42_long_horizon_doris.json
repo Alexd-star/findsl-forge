@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-09T07:37:27.112089+00:00",
-  "git_head": "6f3bcaee5fb3b0fbd81d0f37984f55f964a7d0a9",
+  "generated_at": "2026-08-09T12:52:34.891973+00:00",
+  "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
   "status": "PASS",
   "target_speedup": 10.0,
-  "speedup": 16.285714,
+  "speedup": 14.625,
   "target_met": true,
   "dsl": "indicator('', '', '成交量', '近5000日', '', 'SUM', '') > 10000000",
   "compiler_context_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
@@ -125,15 +125,15 @@
   "baseline": {
     "sql": "SELECT result_rows.mktcode,result_rows.tgtcode,result_rows.bizdate\nFROM (\nSELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN (SELECT `aggregate_rows`.`mktcode`, `aggregate_rows`.`tgtcode` FROM (SELECT `q`.`mktcode`, `q`.`tgtcode`, SUM(`q`.`volume`) AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`bizdate` IN (SELECT `calendar_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS calendar_sessions GROUP BY `calendar_sessions`.`bizdate` ORDER BY `calendar_sessions`.`bizdate` DESC LIMIT 5000) GROUP BY `q`.`mktcode`, `q`.`tgtcode`) AS aggregate_rows WHERE `aggregate_rows`.`metric_value` > 10000000) AS qualified_result ON `anchor_out`.`mktcode` = `qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)\n) AS result_rows\nORDER BY result_rows.mktcode,result_rows.tgtcode,result_rows.bizdate",
     "explain": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#273]\n    tgtcode[#274]\n    bizdate[#275]\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  VRESULT SINK\n     MYSQL_PROTOCOL\n\n  19:VMERGING-EXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#273], tgtcode[#274]\n\nPLAN FRAGMENT 1\n\n  PARTITION: HASH_PARTITIONED: mktcode[#197], tgtcode[#198]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 19\n    UNPARTITIONED\nIS_MERGE: true\n\n  18:VSORT(2149)\n  |  order by: mktcode[#273] ASC, tgtcode[#274] ASC\n  |  algorithm: full sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  distribute expr lists: \n  |  \n  17:VHASH JOIN(2141)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#265] = MAX(`latest_anchor`.`bizdate`)[#60])\n  |  cardinality=13,650,347\n  |  vec output tuple id: 20\n  |  output tuple id: 20\n  |  vIntermediate tuple ids: 19 \n  |  hash output slot ids: 263 264 265 \n  |  final projections: mktcode[#266], tgtcode[#267], bizdate[#268]\n  |  final project output tuple id: 20\n  |  distribute expr lists: mktcode[#263], tgtcode[#264]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  16:VHASH JOIN(2108)\n  |  join op: INNER JOIN(COLOCATE[])[]\n  |  equal join conjunct: (mktcode[#255] = mktcode[#195])\n  |  equal join conjunct: (tgtcode[#256] = tgtcode[#196])\n  |  cardinality=13,650,347\n  |  vec output tuple id: 18\n  |  output tuple id: 18\n  |  vIntermediate tuple ids: 17 \n  |  hash output slot ids: 256 257 255 \n  |  runtime filters: RF002[min_max] <- mktcode[#195](1137528/1048576/1048576), RF003[in_or_bloom] <- mktcode[#195](1137528/1048576/1048576), RF004[min_max] <- tgtcode[#196](1137528/1048576/1048576), RF005[in_or_bloom] <- tgtcode[#196](1137528/1048576/1048576)\n  |  final projections: mktcode[#258], tgtcode[#259], bizdate[#260]\n  |  final project output tuple id: 18\n  |  distribute expr lists: mktcode[#255], tgtcode[#256]\n  |  distribute expr lists: mktcode[#195], tgtcode[#196]\n  |  \n  |----14:VAGGREGATE (merge finalize)(2096)\n  |    |  output: sum(volume[#191])[#194]\n  |    |  group by: mktcode[#189], tgtcode[#190]\n  |    |  having: (metric_value[#194] > 10000000)\n  |    |  sortByGroupKey:false\n  |    |  cardinality=2,275,057\n  |    |  final projections: mktcode[#192], tgtcode[#193]\n  |    |  final project output tuple id: 14\n  |    |  distribute expr lists: mktcode[#189], tgtcode[#190]\n  |    |  \n  |    13:VHASH JOIN(2088)\n  |    |  join op: LEFT SEMI JOIN(BROADCAST)[]\n  |    |  equal join conjunct: (bizdate[#183] = bizdate[#122])\n  |    |  cardinality=6,825,173\n  |    |  vec output tuple id: 12\n  |    |  output tuple id: 12\n  |    |  vIntermediate tuple ids: 11 \n  |    |  hash output slot ids: 181 182 184 \n  |    |  runtime filters: RF000[min_max] <- bizdate[#122](5000/8192/1048576), RF001[in_or_bloom] <- bizdate[#122](5000/8192/1048576)\n  |    |  final projections: mktcode[#185], tgtcode[#186], volume[#188]\n  |    |  final project output tuple id: 12\n  |    |  distribute expr lists: mktcode[#181], tgtcode[#182]\n  |    |  distribute expr lists: \n  |    |  \n  |    |----11:VEXCHANGE\n  |    |       offset: 0\n  |    |       distribute expr lists: \n  |    |    \n  |    12:VOlapScanNode(2039)\n  |       TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n  |       PREDICATES: (__DORIS_DELETE_SIGN__[#179] = 0)\n  |       partitions=1/1 (hsj_stock_hq_basic)\n  |       tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n  |       cardinality=13650347, avgRowSize=150.01868, numNodes=1\n  |       pushAggOp=NONE\n  |       runtime filters: RF000[min_max] -> bizdate[#125], RF001[in_or_bloom] -> bizdate[#125]\n  |       final projections: mktcode[#123], tgtcode[#124], bizdate[#125], volume[#132]\n  |       final project output tuple id: 10\n  |    \n  15:VOlapScanNode(2030)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#253] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF002[min_max] -> mktcode[#197], RF003[in_or_bloom] -> mktcode[#197], RF004[min_max] -> tgtcode[#198], RF005[in_or_bloom] -> tgtcode[#198]\n     final projections: mktcode[#197], tgtcode[#198], bizdate[#199]\n     final project output tuple id: 16\n\nPLAN FRAGMENT 2\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 11\n    UNPARTITIONED\n\n  10:VMERGING-EXCHANGE\n     offset: 0\n     limit: 5000\n     distribute expr lists: \n\nPLAN FRAGMENT 3\n\n  PARTITION: HASH_PARTITIONED: bizdate[#120]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 10\n    UNPARTITIONED\nIS_MERGE: true\n\n  9:VTOP-N(2072)\n  |  order by: bizdate[#122] DESC\n  |  TOPN filter targets: [5:63]\n  |  algorithm: heap sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  limit: 5000\n  |  distribute expr lists: bizdate[#121]\n  |  \n  8:VAGGREGATE (merge finalize)(2068)\n  |  group by: bizdate[#120]\n  |  sortByGroupKey:true\n  |  cardinality=4,550,115\n  |  limit: 5000\n  |  distribute expr lists: bizdate[#120]\n  |  \n  7:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 4\n\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 07\n    HASH_PARTITIONED: bizdate[#120]\n\n  6:VAGGREGATE (update serialize)(2060)\n  |  STREAMING\n  |  group by: bizdate[#119]\n  |  sortByGroupKey:true\n  |  cardinality=4,550,115\n  |  limit: 5000\n  |  distribute expr lists: \n  |  \n  5:VOlapScanNode(2048)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     TOPN OPT:9\n     PREDICATES: (__DORIS_DELETE_SIGN__[#117] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#63]\n     final project output tuple id: 5\n\nPLAN FRAGMENT 5\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n\n  3:VAGGREGATE (merge finalize)(2133)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  2:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 6\n\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\n\n  1:VAGGREGATE (update serialize)(2125)\n  |  output: partial_max(bizdate[#58])[#59]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  0:VOlapScanNode(2113)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#56] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#2]\n     final project output tuple id: 1\n\n\n\n========== STATISTICS ==========\nplanned with unknown column statistics",
-    "median_ms": 342.0,
-    "p95_ms": 371.0,
-    "min_ms": 246.0,
-    "max_ms": 371.0,
+    "median_ms": 234.0,
+    "p95_ms": 250.0,
+    "min_ms": 221.0,
+    "max_ms": 250.0,
     "runs": [
       {
-        "query_id": "d637e9a810fc4ce2-85a8bb7036d169bf",
-        "total_ms": 371.0,
-        "total_text": "371ms",
+        "query_id": "25ed0837295d4ff4-ba916851f4293038",
+        "total_ms": 226.0,
+        "total_text": "226ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -141,9 +141,9 @@
         "profile_path": "reports\\phase42_query_profiles\\baseline_1.txt"
       },
       {
-        "query_id": "55836ebcf2104580-a58e2c19bb6776ab",
-        "total_ms": 342.0,
-        "total_text": "342ms",
+        "query_id": "f6642bcc63064819-804ed99aeefe5772",
+        "total_ms": 237.0,
+        "total_text": "237ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -151,9 +151,9 @@
         "profile_path": "reports\\phase42_query_profiles\\baseline_2.txt"
       },
       {
-        "query_id": "ea88b7611433438f-9f5da2ad91b4cb16",
-        "total_ms": 332.0,
-        "total_text": "332ms",
+        "query_id": "6ebfac91d1144c7f-961b0d75182f788b",
+        "total_ms": 221.0,
+        "total_text": "221ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -161,9 +161,9 @@
         "profile_path": "reports\\phase42_query_profiles\\baseline_3.txt"
       },
       {
-        "query_id": "878eeacdf604537-9825c348df766106",
-        "total_ms": 246.0,
-        "total_text": "246ms",
+        "query_id": "203aa0adf07d490d-915e4eaf4eb17a22",
+        "total_ms": 250.0,
+        "total_text": "250ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -171,9 +171,9 @@
         "profile_path": "reports\\phase42_query_profiles\\baseline_4.txt"
       },
       {
-        "query_id": "2c3b8ba470c3401e-bf6e706d4b6ab3f7",
-        "total_ms": 261.0,
-        "total_text": "261ms",
+        "query_id": "2e742d8d00134158-ae22ccaa44ae8795",
+        "total_ms": 232.0,
+        "total_text": "232ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -181,9 +181,9 @@
         "profile_path": "reports\\phase42_query_profiles\\baseline_5.txt"
       },
       {
-        "query_id": "f89606811094f60-8606e15405795009",
-        "total_ms": 343.0,
-        "total_text": "343ms",
+        "query_id": "2706f6e291704561-850679c0f6aabd21",
+        "total_ms": 234.0,
+        "total_text": "234ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -191,9 +191,9 @@
         "profile_path": "reports\\phase42_query_profiles\\baseline_6.txt"
       },
       {
-        "query_id": "14fb8886666242b5-bd59ebf6edcd4712",
-        "total_ms": 368.0,
-        "total_text": "368ms",
+        "query_id": "a9c3974a18804100-8cb22ea8f3bca280",
+        "total_ms": 234.0,
+        "total_text": "234ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -205,15 +205,15 @@
   "optimized": {
     "sql": "SELECT result_rows.mktcode,result_rows.tgtcode,result_rows.bizdate\nFROM (\nSELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic_rollup` AS q WHERE `q`.`bizdate` = '2026-04-14' AND `q`.`volume_prefix` > 10000000\n) AS result_rows\nORDER BY result_rows.mktcode,result_rows.tgtcode,result_rows.bizdate",
     "explain": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#17]\n    tgtcode[#18]\n    bizdate[#19]\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  VRESULT SINK\n     MYSQL_PROTOCOL\n\n  2:VMERGING-EXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#17], tgtcode[#18]\n\nPLAN FRAGMENT 1\n\n  PARTITION: HASH_PARTITIONED: mktcode[#1], tgtcode[#2]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\nIS_MERGE: true\n\n  1:VSORT(203)\n  |  order by: mktcode[#17] ASC, tgtcode[#18] ASC\n  |  algorithm: full sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  distribute expr lists: \n  |  \n  0:VOlapScanNode(191)\n     TABLE: newzl.hsj_stock_hq_basic_rollup(hsj_stock_hq_basic_rollup), PREAGGREGATION: ON\n     PREDICATES: (((bizdate[#0] = '2026-04-14') AND (volume_prefix[#6] > 10000000)) AND (__DORIS_DELETE_SIGN__[#12] = 0))\n     partitions=1/244 (p20260401000000)\n     tablets=16/16, tabletList=1786254383850,1786254383852,1786254383854 ...\n     cardinality=50446, avgRowSize=192.33081, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#1], tgtcode[#2], bizdate[#0]\n     final project output tuple id: 1\n\n\n\n========== STATISTICS ==========\nplanned with unknown column statistics",
-    "median_ms": 21.0,
-    "p95_ms": 36.0,
-    "min_ms": 16.0,
-    "max_ms": 36.0,
+    "median_ms": 16.0,
+    "p95_ms": 20.0,
+    "min_ms": 14.0,
+    "max_ms": 20.0,
     "runs": [
       {
-        "query_id": "321c3abf846f4aef-be1e55c3b4cdc062",
-        "total_ms": 27.0,
-        "total_text": "27ms",
+        "query_id": "7b417479786845a1-802ff41dfe0bd041",
+        "total_ms": 16.0,
+        "total_text": "16ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -221,9 +221,9 @@
         "profile_path": "reports\\phase42_query_profiles\\optimized_1.txt"
       },
       {
-        "query_id": "aa7a6f814a484b2c-b34afba825efa2b9",
-        "total_ms": 36.0,
-        "total_text": "36ms",
+        "query_id": "17fa9b5e97f7400a-9b6cd327940760b1",
+        "total_ms": 20.0,
+        "total_text": "20ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -231,9 +231,9 @@
         "profile_path": "reports\\phase42_query_profiles\\optimized_2.txt"
       },
       {
-        "query_id": "7483f54c611347b3-9dd74d81fb023cab",
-        "total_ms": 26.0,
-        "total_text": "26ms",
+        "query_id": "626bc2bbabb64749-aed09ddb7a335d13",
+        "total_ms": 16.0,
+        "total_text": "16ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -241,9 +241,9 @@
         "profile_path": "reports\\phase42_query_profiles\\optimized_3.txt"
       },
       {
-        "query_id": "4a36c16488a94bc5-9895d769a224bbb7",
-        "total_ms": 16.0,
-        "total_text": "16ms",
+        "query_id": "65f7e80801454cb7-a422f66ee73a8d7f",
+        "total_ms": 14.0,
+        "total_text": "14ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -251,7 +251,7 @@
         "profile_path": "reports\\phase42_query_profiles\\optimized_4.txt"
       },
       {
-        "query_id": "b57861f205904e82-b4b144380180deae",
+        "query_id": "7c1dc9ac5fde43fb-b891cb698a5d7de1",
         "total_ms": 18.0,
         "total_text": "18ms",
         "row_count": 5614,
@@ -261,9 +261,9 @@
         "profile_path": "reports\\phase42_query_profiles\\optimized_5.txt"
       },
       {
-        "query_id": "6a3cad48c411484a-b205d1d3b7f98050",
-        "total_ms": 21.0,
-        "total_text": "21ms",
+        "query_id": "8bd2ad1f29974bef-8206a5c0364ddf9f",
+        "total_ms": 14.0,
+        "total_text": "14ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
@@ -271,9 +271,9 @@
         "profile_path": "reports\\phase42_query_profiles\\optimized_6.txt"
       },
       {
-        "query_id": "b804375b5b1246cd-92b78853c9e13806",
-        "total_ms": 20.0,
-        "total_text": "20ms",
+        "query_id": "239946bf48cd4c02-a0353e2390bb358a",
+        "total_ms": 18.0,
+        "total_text": "18ms",
         "row_count": 5614,
         "sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
         "is_cached": false,
