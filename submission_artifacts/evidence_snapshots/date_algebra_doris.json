@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-12T21:05:35+00:00",
+  "git_head": "930fadf5cb4a772c737ee9ff1a9cee4b47babc91",
+  "database": "newzl",
+  "case_count": 4,
+  "cases": [
+    {
+      "case_id": "calendar_week_ago",
+      "dsl": "indicator('', '', '成交量', '一周前', '', '', '') > 0",
+      "selected_strategy": "direct_column",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`volume` > 0 AND `q`.`bizdate` IN (SELECT `boundary_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS boundary_sessions WHERE `boundary_sessions`.`bizdate` <= DATE_SUB((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), INTERVAL '1' WEEK) GROUP BY `boundary_sessions`.`bizdate` ORDER BY `boundary_sessions`.`bizdate` DESC LIMIT 1)",
+      "reference_sql": "WITH anchor AS (SELECT MAX(bizdate) AS d FROM newzl.hsj_stock_hq_basic),\ntarget AS (\n  SELECT MAX(q.bizdate) AS d\n  FROM newzl.hsj_stock_hq_basic q CROSS JOIN anchor a\n  WHERE q.bizdate <= DATE_SUB(a.d, INTERVAL 1 WEEK)\n)\nSELECT q.mktcode,q.tgtcode,q.bizdate\nFROM newzl.hsj_stock_hq_basic q CROSS JOIN target t\nWHERE q.volume > 0 AND q.bizdate=t.d",
+      "generated_row_count": 5556,
+      "reference_row_count": 5556,
+      "generated_hash": "5c8d790985a7b1e9fee000b05a1fc3bfca53cd704ea9190e336ed8b1a1975766",
+      "reference_hash": "5c8d790985a7b1e9fee000b05a1fc3bfca53cd704ea9190e336ed8b1a1975766",
+      "row_set_matched": true,
+      "generated_dates": [
+        "2026-04-07"
+      ],
+      "reference_dates": [
+        "2026-04-07"
+      ],
+      "elapsed_ms": 459.9347999901511,
+      "reference_elapsed_ms": 501.27799999609124,
+      "explain_contains_date_predicate": true
+    },
+    {
+      "case_id": "previous_session_before_explicit_date",
+      "dsl": "indicator('', '', '成交量', '2025年5月6日的前1日', '', '', '') > 0",
+      "selected_strategy": "direct_column",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`volume` > 0 AND `q`.`bizdate` IN (SELECT `boundary_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS boundary_sessions WHERE `boundary_sessions`.`bizdate` < '2025-05-06' GROUP BY `boundary_sessions`.`bizdate` ORDER BY `boundary_sessions`.`bizdate` DESC LIMIT 1)",
+      "reference_sql": "WITH target AS (\n  SELECT MAX(bizdate) AS d FROM newzl.hsj_stock_hq_basic WHERE bizdate < '2025-05-06'\n)\nSELECT q.mktcode,q.tgtcode,q.bizdate\nFROM newzl.hsj_stock_hq_basic q CROSS JOIN target t\nWHERE q.volume > 0 AND q.bizdate=t.d",
+      "generated_row_count": 5440,
+      "reference_row_count": 5440,
+      "generated_hash": "119312c6f0bf4115d6de23b611e751c25ce3e4e795304191ac78178e6407b1c0",
+      "reference_hash": "119312c6f0bf4115d6de23b611e751c25ce3e4e795304191ac78178e6407b1c0",
+      "row_set_matched": true,
+      "generated_dates": [
+        "2025-04-30"
+      ],
+      "reference_dates": [
+        "2025-04-30"
+      ],
+      "elapsed_ms": 100.50649999175221,
+      "reference_elapsed_ms": 92.8561000037007,
+      "explain_contains_date_predicate": true
+    },
+    {
+      "case_id": "previous_week_last_session",
+      "dsl": "indicator('', '', '成交量', '上周五最后一个交易日', '', '', '') > 0",
+      "selected_strategy": "direct_column",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`volume` > 0 AND `q`.`bizdate` IN (SELECT `boundary_sessions`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS boundary_sessions WHERE `boundary_sessions`.`bizdate` <= DATE_SUB(DATE_TRUNC((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), 'WEEK'), INTERVAL '1' DAY) GROUP BY `boundary_sessions`.`bizdate` ORDER BY `boundary_sessions`.`bizdate` DESC LIMIT 1)",
+      "reference_sql": "WITH anchor AS (SELECT MAX(bizdate) AS d FROM newzl.hsj_stock_hq_basic),\ntarget AS (\n  SELECT MAX(q.bizdate) AS d\n  FROM newzl.hsj_stock_hq_basic q CROSS JOIN anchor a\n  WHERE q.bizdate <= DATE_SUB(DATE_TRUNC(a.d, 'WEEK'), INTERVAL 1 DAY)\n)\nSELECT q.mktcode,q.tgtcode,q.bizdate\nFROM newzl.hsj_stock_hq_basic q CROSS JOIN target t\nWHERE q.volume > 0 AND q.bizdate=t.d",
+      "generated_row_count": 5572,
+      "reference_row_count": 5572,
+      "generated_hash": "5f1e98547983ad951830544caaf5b277bafdc4f0b1c61e09ddb1ec7a267b584d",
+      "reference_hash": "5f1e98547983ad951830544caaf5b277bafdc4f0b1c61e09ddb1ec7a267b584d",
+      "row_set_matched": true,
+      "generated_dates": [
+        "2026-04-10"
+      ],
+      "reference_dates": [
+        "2026-04-10"
+      ],
+      "elapsed_ms": 431.4287000015611,
+      "reference_elapsed_ms": 472.8335999971023,
+      "explain_contains_date_predicate": true
+    },
+    {
+      "case_id": "current_month_anchor_day",
+      "dsl": "indicator('', '', '成交量', '本月13日', '', '', '') > 0",
+      "selected_strategy": "direct_column",
+      "generated_sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`volume` > 0 AND (`q`.`bizdate` >= DATE_ADD(DATE_TRUNC((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), 'MONTH'), INTERVAL '12' DAY) AND `q`.`bizdate` <= DATE_ADD(DATE_TRUNC((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), 'MONTH'), INTERVAL '12' DAY)) AND MONTH(DATE_ADD(DATE_TRUNC((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), 'MONTH'), INTERVAL '12' DAY)) = MONTH(DATE_TRUNC((SELECT MAX(`calendar_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS calendar_anchor), 'MONTH'))",
+      "reference_sql": "WITH anchor AS (SELECT MAX(bizdate) AS d FROM newzl.hsj_stock_hq_basic),\ntarget AS (\n  SELECT DATE_ADD(DATE_TRUNC(d, 'MONTH'), INTERVAL 12 DAY) AS d FROM anchor\n)\nSELECT q.mktcode,q.tgtcode,q.bizdate\nFROM newzl.hsj_stock_hq_basic q CROSS JOIN target t\nWHERE q.volume > 0 AND q.bizdate=t.d",
+      "generated_row_count": 5571,
+      "reference_row_count": 5571,
+      "generated_hash": "e2319551f53ba478d81426a4ea1c204ab5f54893c154dc4a6dff69c1c56ba357",
+      "reference_hash": "e2319551f53ba478d81426a4ea1c204ab5f54893c154dc4a6dff69c1c56ba357",
+      "row_set_matched": true,
+      "generated_dates": [
+        "2026-04-13"
+      ],
+      "reference_dates": [
+        "2026-04-13"
+      ],
+      "elapsed_ms": 140.9604000073159,
+      "reference_elapsed_ms": 133.36039999558125,
+      "explain_contains_date_predicate": true
+    }
+  ],
+  "passed": true
+}
