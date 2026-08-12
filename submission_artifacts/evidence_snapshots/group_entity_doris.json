@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T21:23:18+00:00",
-  "git_head": "ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b",
+  "generated_at": "2026-08-12T22:44:25+00:00",
+  "git_head": "56430ca07c40e211bae9650c79be0e67ba125d11",
   "fixture_snapshot_id": "findsl-group-oracle-2026-04-14-v1",
   "fixture_groups": {
     "ORACLE_GROUP_001": [
@@ -60,8 +60,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 127.5067999958992,
-      "reference_elapsed_ms": 77.40740000735968,
+      "elapsed_ms": 168.88020000000003,
+      "reference_elapsed_ms": 118.44480000000013,
       "explain_contains_membership_join": true
     },
     {
@@ -97,8 +97,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 126.48809999518562,
-      "reference_elapsed_ms": 79.7652999899583,
+      "elapsed_ms": 220.71890000000005,
+      "reference_elapsed_ms": 91.56030000000004,
       "explain_contains_membership_join": true
     },
     {
@@ -128,8 +128,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 191.07719999738038,
-      "reference_elapsed_ms": 70.32139999500941,
+      "elapsed_ms": 240.13799999999998,
+      "reference_elapsed_ms": 104.38429999999977,
       "explain_contains_membership_join": true
     },
     {
@@ -165,11 +165,77 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 133.69499999680556,
-      "reference_elapsed_ms": 72.69040000392124,
+      "elapsed_ms": 174.30639999999985,
+      "reference_elapsed_ms": 100.33700000000012,
+      "explain_contains_membership_join": true
+    },
+    {
+      "case_id": "group_consecutive_trading_sessions",
+      "source": "indicator('', '', '成交量', '近3日', '行业', '', 'CONS=2日') > 100000000",
+      "selected_strategy": "group_temporal_cons",
+      "generated_sql": "WITH group_temporal_eligible_dates AS (SELECT DISTINCT `group_temporal_eligible_anchor`.`bizdate` AS `bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS group_temporal_eligible_anchor ORDER BY `group_temporal_eligible_anchor`.`bizdate` DESC LIMIT 3), group_temporal_universe AS (SELECT DISTINCT `group_temporal_universe_raw`.`group_type`, `group_temporal_universe_raw`.`group_code`, `group_temporal_universe_raw`.`group_name`, `group_temporal_universe_raw`.`bizdate` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2) AS group_temporal_universe_raw WHERE `group_temporal_universe_raw`.`bizdate` IN (SELECT `group_temporal_eligible_dates`.`bizdate` FROM `group_temporal_eligible_dates`)), group_temporal_universe_groups AS (SELECT DISTINCT `group_temporal_universe`.`group_type`, `group_temporal_universe`.`group_code`, `group_temporal_universe`.`group_name` FROM `group_temporal_universe`), group_temporal_matched AS (SELECT DISTINCT `group_temporal_matched_raw`.`group_type`, `group_temporal_matched_raw`.`group_code`, `group_temporal_matched_raw`.`group_name`, `group_temporal_matched_raw`.`bizdate` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > 100000000) AS group_temporal_matched_raw WHERE `group_temporal_matched_raw`.`bizdate` IN (SELECT `group_temporal_eligible_dates`.`bizdate` FROM `group_temporal_eligible_dates`)), group_temporal_calendar_dates AS (SELECT DISTINCT `group_temporal_anchor`.`bizdate` AS `bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS group_temporal_anchor), group_temporal_calendar AS (SELECT `group_temporal_calendar_dates`.`bizdate`, DENSE_RANK() OVER (ORDER BY CASE WHEN `group_temporal_calendar_dates`.`bizdate` IS NULL THEN 1 ELSE 0 END, `group_temporal_calendar_dates`.`bizdate` ASC) AS `session_seq` FROM `group_temporal_calendar_dates`), group_temporal_sequenced AS (SELECT `group_temporal_universe`.`group_type`, `group_temporal_universe`.`group_code`, `group_temporal_universe`.`group_name`, `group_temporal_universe`.`bizdate`, `group_temporal_calendar`.`session_seq`, CASE WHEN NOT `group_temporal_matched`.`bizdate` IS NULL THEN 1 ELSE 0 END AS `matched` FROM `group_temporal_universe` INNER JOIN `group_temporal_calendar` ON `group_temporal_universe`.`bizdate` = `group_temporal_calendar`.`bizdate` LEFT JOIN `group_temporal_matched` ON `group_temporal_universe`.`group_type` = `group_temporal_matched`.`group_type` AND `group_temporal_universe`.`group_code` = `group_temporal_matched`.`group_code` AND `group_temporal_universe`.`group_name` = `group_temporal_matched`.`group_name` AND `group_temporal_universe`.`bizdate` = `group_temporal_matched`.`bizdate`), group_temporal_hits AS (SELECT `group_temporal_sequenced`.`group_type`, `group_temporal_sequenced`.`group_code`, `group_temporal_sequenced`.`group_name`, `group_temporal_sequenced`.`session_seq` - ROW_NUMBER() OVER (PARTITION BY `group_temporal_sequenced`.`group_type`, `group_temporal_sequenced`.`group_code` ORDER BY CASE WHEN `group_temporal_sequenced`.`bizdate` IS NULL THEN 1 ELSE 0 END, `group_temporal_sequenced`.`bizdate` ASC) AS `run_group` FROM `group_temporal_sequenced` WHERE `group_temporal_sequenced`.`matched` = 1), group_temporal_runs AS (SELECT `group_temporal_hits`.`group_type`, `group_temporal_hits`.`group_code`, `group_temporal_hits`.`group_name`, COUNT(*) AS `run_length` FROM `group_temporal_hits` GROUP BY `group_temporal_hits`.`group_type`, `group_temporal_hits`.`group_code`, `group_temporal_hits`.`group_name`, `group_temporal_hits`.`run_group`), group_temporal_run_metrics AS (SELECT `group_temporal_runs`.`group_type`, `group_temporal_runs`.`group_code`, `group_temporal_runs`.`group_name`, MAX(`group_temporal_runs`.`run_length`) AS `metric_value` FROM `group_temporal_runs` GROUP BY `group_temporal_runs`.`group_type`, `group_temporal_runs`.`group_code`, `group_temporal_runs`.`group_name`), group_temporal_metrics AS (SELECT `group_temporal_universe_groups`.`group_type`, `group_temporal_universe_groups`.`group_code`, `group_temporal_universe_groups`.`group_name`, COALESCE(`group_temporal_run_metrics`.`metric_value`, 0) AS `metric_value` FROM `group_temporal_universe_groups` LEFT JOIN `group_temporal_run_metrics` ON `group_temporal_universe_groups`.`group_type` = `group_temporal_run_metrics`.`group_type` AND `group_temporal_universe_groups`.`group_code` = `group_temporal_run_metrics`.`group_code` AND `group_temporal_universe_groups`.`group_name` = `group_temporal_run_metrics`.`group_name`) SELECT `group_temporal_metrics`.`group_type`, `group_temporal_metrics`.`group_code`, `group_temporal_metrics`.`group_name`, (SELECT MAX(`group_temporal_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS group_temporal_latest) AS `bizdate`, `group_temporal_metrics`.`metric_value` FROM `group_temporal_metrics` WHERE `group_temporal_metrics`.`metric_value` >= 2",
+      "reference_sql": "WITH latest_dates AS (\n  SELECT bizdate\n  FROM (SELECT DISTINCT bizdate FROM newzl.hsj_stock_hq_basic) dates\n  ORDER BY bizdate DESC\n  LIMIT 3\n),\ncalendar AS (\n  SELECT\n    bizdate,\n    DENSE_RANK() OVER (ORDER BY bizdate) AS session_seq\n  FROM (SELECT DISTINCT bizdate FROM newzl.hsj_stock_hq_basic) dates\n),\ndaily AS (\n  SELECT\n    m.scope_type AS group_type,\n    m.scope_code AS group_code,\n    m.scope_name AS group_name,\n    q.bizdate,\n    SUM(q.volume) AS metric_value\n  FROM newzl.hsj_stock_hq_basic q\n  INNER JOIN latest_dates d ON q.bizdate=d.bizdate\n  INNER JOIN findsl_ext.scope_membership m\n    ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode\n  WHERE m.snapshot_id='findsl-group-oracle-2026-04-14-v1'\n    AND m.scope_type='industry'\n    AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)\n    AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)\n  GROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate\n  HAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2\n),\nhits AS (\n  SELECT d.*, c.session_seq\n  FROM daily d\n  INNER JOIN calendar c ON d.bizdate=c.bizdate\n  WHERE d.metric_value>100000000\n),\nnumbered AS (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (\n      PARTITION BY group_type,group_code ORDER BY bizdate\n    ) AS hit_seq\n  FROM hits\n),\nruns AS (\n  SELECT\n    group_type,group_code,group_name,\n    COUNT(*) AS run_length\n  FROM numbered\n  GROUP BY group_type,group_code,group_name,session_seq-hit_seq\n),\nmetrics AS (\n  SELECT\n    group_type,group_code,group_name,\n    MAX(run_length) AS metric_value\n  FROM runs\n  GROUP BY group_type,group_code,group_name\n)\nSELECT\n  group_type,group_code,group_name,\n  (SELECT MAX(bizdate) FROM newzl.hsj_stock_hq_basic) AS bizdate,\n  metric_value\nFROM metrics\nWHERE metric_value>=2",
+      "generated_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_001",
+          "群组真值实验甲",
+          "2026-04-14",
+          "3"
+        ]
+      ],
+      "reference_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_001",
+          "群组真值实验甲",
+          "2026-04-14",
+          "3"
+        ]
+      ],
+      "generated_hash": "4109945ff7524cd8f5cb258fb93e37d2a5f13a7e29407c2a9858da589193e9a1",
+      "reference_hash": "4109945ff7524cd8f5cb258fb93e37d2a5f13a7e29407c2a9858da589193e9a1",
+      "row_count": 1,
+      "expected_row_count": 1,
+      "matched": true,
+      "elapsed_ms": 304.0795000000003,
+      "reference_elapsed_ms": 167.48940000000002,
+      "explain_contains_membership_join": true
+    },
+    {
+      "case_id": "group_exist_zero_hit_preserved",
+      "source": "indicator('', '', '成交量', '近3日', '行业', '', 'EXIST<2日') > 100000000",
+      "selected_strategy": "group_temporal_exist",
+      "generated_sql": "WITH group_temporal_eligible_dates AS (SELECT DISTINCT `group_temporal_eligible_anchor`.`bizdate` AS `bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS group_temporal_eligible_anchor ORDER BY `group_temporal_eligible_anchor`.`bizdate` DESC LIMIT 3), group_temporal_universe AS (SELECT DISTINCT `group_temporal_universe_raw`.`group_type`, `group_temporal_universe_raw`.`group_code`, `group_temporal_universe_raw`.`group_name`, `group_temporal_universe_raw`.`bizdate` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2) AS group_temporal_universe_raw WHERE `group_temporal_universe_raw`.`bizdate` IN (SELECT `group_temporal_eligible_dates`.`bizdate` FROM `group_temporal_eligible_dates`)), group_temporal_universe_groups AS (SELECT DISTINCT `group_temporal_universe`.`group_type`, `group_temporal_universe`.`group_code`, `group_temporal_universe`.`group_name` FROM `group_temporal_universe`), group_temporal_matched AS (SELECT DISTINCT `group_temporal_matched_raw`.`group_type`, `group_temporal_matched_raw`.`group_code`, `group_temporal_matched_raw`.`group_name`, `group_temporal_matched_raw`.`bizdate` FROM (SELECT `group_metrics`.`group_type`, `group_metrics`.`group_code`, `group_metrics`.`group_name`, `group_metrics`.`bizdate`, `group_metrics`.`metric_value`, `group_metrics`.`member_count`, `group_metrics`.`metric_member_count` FROM (SELECT `group_member`.`scope_type` AS `group_type`, `group_member`.`scope_code` AS `group_code`, `group_member`.`scope_name` AS `group_name`, `q`.`bizdate`, SUM(`q`.`volume`) AS `metric_value`, COUNT(DISTINCT CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`)) AS `member_count`, COUNT(DISTINCT CASE WHEN `q`.`volume` IS NOT NULL THEN CONCAT(`q`.`mktcode`, ':', `q`.`tgtcode`) END) AS `metric_member_count` FROM `newzl`.`hsj_stock_hq_basic` AS q INNER JOIN `findsl_ext`.`scope_membership` AS group_member ON `q`.`mktcode` = `group_member`.`mktcode` AND `q`.`tgtcode` = `group_member`.`tgtcode` AND (`group_member`.`effective_from` IS NULL OR `group_member`.`effective_from` <= `q`.`bizdate`) AND (`group_member`.`effective_to` IS NULL OR `group_member`.`effective_to` >= `q`.`bizdate`) WHERE `group_member`.`scope_type` IN ('industry') AND `group_member`.`snapshot_id` IN ('findsl-group-oracle-2026-04-14-v1') GROUP BY `group_member`.`scope_type`, `group_member`.`scope_code`, `group_member`.`scope_name`, `q`.`bizdate`) AS group_metrics WHERE `group_metrics`.`member_count` >= 2 AND `group_metrics`.`metric_value` > 100000000) AS group_temporal_matched_raw WHERE `group_temporal_matched_raw`.`bizdate` IN (SELECT `group_temporal_eligible_dates`.`bizdate` FROM `group_temporal_eligible_dates`)), group_temporal_calendar_dates AS (SELECT DISTINCT `group_temporal_anchor`.`bizdate` AS `bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS group_temporal_anchor), group_temporal_calendar AS (SELECT `group_temporal_calendar_dates`.`bizdate`, DENSE_RANK() OVER (ORDER BY CASE WHEN `group_temporal_calendar_dates`.`bizdate` IS NULL THEN 1 ELSE 0 END, `group_temporal_calendar_dates`.`bizdate` ASC) AS `session_seq` FROM `group_temporal_calendar_dates`), group_temporal_sequenced AS (SELECT `group_temporal_universe`.`group_type`, `group_temporal_universe`.`group_code`, `group_temporal_universe`.`group_name`, `group_temporal_universe`.`bizdate`, `group_temporal_calendar`.`session_seq`, CASE WHEN NOT `group_temporal_matched`.`bizdate` IS NULL THEN 1 ELSE 0 END AS `matched` FROM `group_temporal_universe` INNER JOIN `group_temporal_calendar` ON `group_temporal_universe`.`bizdate` = `group_temporal_calendar`.`bizdate` LEFT JOIN `group_temporal_matched` ON `group_temporal_universe`.`group_type` = `group_temporal_matched`.`group_type` AND `group_temporal_universe`.`group_code` = `group_temporal_matched`.`group_code` AND `group_temporal_universe`.`group_name` = `group_temporal_matched`.`group_name` AND `group_temporal_universe`.`bizdate` = `group_temporal_matched`.`bizdate`), group_temporal_metrics AS (SELECT `group_temporal_sequenced`.`group_type`, `group_temporal_sequenced`.`group_code`, `group_temporal_sequenced`.`group_name`, SUM(`group_temporal_sequenced`.`matched`) AS `metric_value` FROM `group_temporal_sequenced` GROUP BY `group_temporal_sequenced`.`group_type`, `group_temporal_sequenced`.`group_code`, `group_temporal_sequenced`.`group_name`) SELECT `group_temporal_metrics`.`group_type`, `group_temporal_metrics`.`group_code`, `group_temporal_metrics`.`group_name`, (SELECT MAX(`group_temporal_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS group_temporal_latest) AS `bizdate`, `group_temporal_metrics`.`metric_value` FROM `group_temporal_metrics` WHERE `group_temporal_metrics`.`metric_value` < 2",
+      "reference_sql": "WITH latest_dates AS (\n  SELECT bizdate\n  FROM (SELECT DISTINCT bizdate FROM newzl.hsj_stock_hq_basic) dates\n  ORDER BY bizdate DESC\n  LIMIT 3\n),\ndaily AS (\n  SELECT\n    m.scope_type AS group_type,\n    m.scope_code AS group_code,\n    m.scope_name AS group_name,\n    q.bizdate,\n    SUM(q.volume) AS daily_volume\n  FROM newzl.hsj_stock_hq_basic q\n  INNER JOIN latest_dates d ON q.bizdate=d.bizdate\n  INNER JOIN findsl_ext.scope_membership m\n    ON q.mktcode=m.mktcode AND q.tgtcode=m.tgtcode\n  WHERE m.snapshot_id='findsl-group-oracle-2026-04-14-v1'\n    AND m.scope_type='industry'\n    AND (m.effective_from IS NULL OR m.effective_from<=q.bizdate)\n    AND (m.effective_to IS NULL OR m.effective_to>=q.bizdate)\n  GROUP BY m.scope_type,m.scope_code,m.scope_name,q.bizdate\n  HAVING COUNT(DISTINCT CONCAT(q.mktcode, ':', q.tgtcode))>=2\n),\nmetrics AS (\n  SELECT\n    group_type,group_code,group_name,\n    SUM(CASE WHEN daily_volume>100000000 THEN 1 ELSE 0 END) AS metric_value\n  FROM daily\n  GROUP BY group_type,group_code,group_name\n)\nSELECT\n  group_type,group_code,group_name,\n  (SELECT MAX(bizdate) FROM newzl.hsj_stock_hq_basic) AS bizdate,\n  metric_value\nFROM metrics\nWHERE metric_value<2",
+      "generated_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_002",
+          "群组真值实验乙",
+          "2026-04-14",
+          "0"
+        ]
+      ],
+      "reference_rows": [
+        [
+          "industry",
+          "ORACLE_GROUP_002",
+          "群组真值实验乙",
+          "2026-04-14",
+          "0"
+        ]
+      ],
+      "generated_hash": "c75cc1e05b5b3f6377b580cdb6b64a1c6b0c4e421cff7f90cd2c2899c44e06d8",
+      "reference_hash": "c75cc1e05b5b3f6377b580cdb6b64a1c6b0c4e421cff7f90cd2c2899c44e06d8",
+      "row_count": 1,
+      "expected_row_count": 1,
+      "matched": true,
+      "elapsed_ms": 175.1996,
+      "reference_elapsed_ms": 132.36669999999995,
       "explain_contains_membership_join": true
     }
   ],
   "passed": true,
-  "generated_result_hash": "994449ded0c5791859500d8047c19ee628fc32d164eb1fe8074e491f227c2d9b"
+  "generated_result_hash": "c78cc0d8c0d32a104f8ec909181a7eedc731c164a0664e0096c7f9c3c0e86a60"
 }

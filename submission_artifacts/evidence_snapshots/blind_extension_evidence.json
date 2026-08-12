@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-08-12T19:38:30+00:00",
-  "git_head": "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
-  "extension": {
-    "name": "blind_demo_margin",
+  "schema_version": 2,
+  "generated_at": "2026-08-12T22:44:26+00:00",
+  "git_head": "56430ca07c40e211bae9650c79be0e67ba125d11",
+  "function_extension": {
+    "name": "blind_demo_in_band",
     "aliases": [],
     "argument_mode": "expressions",
     "arg_types": [
@@ -13,46 +13,86 @@
     ],
     "result_kind": "boolean",
     "expression_template": {
-      "op": "greater_equal",
+      "op": "and",
       "args": [
         {
-          "op": "safe_divide",
+          "op": "greater_equal",
           "args": [
             {
-              "op": "subtract",
-              "args": [
-                {
-                  "arg": 0
-                },
-                {
-                  "arg": 1
-                }
-              ]
+              "arg": 0
             },
             {
-              "op": "abs",
-              "args": [
-                {
-                  "arg": 1
-                }
-              ]
+              "arg": 1
             }
           ]
         },
         {
-          "arg": 2
+          "op": "less_equal",
+          "args": [
+            {
+              "arg": 0
+            },
+            {
+              "arg": 2
+            }
+          ]
         }
       ]
     },
-    "version": "blind-demo-v1"
+    "version": "blind-demo-v2"
   },
-  "dsl": "blind_demo_margin(indicator('', '', '收盘价', '今日', '', '', ''), indicator('', '', '最低价', '今日', '', '', ''), 0.01) = True",
-  "core_tree_sha256_before": "93ee33f10a153ccff2a68d4b05ed23083140bb0af75c72378e3f23b778fa38e5",
-  "core_tree_sha256_after": "93ee33f10a153ccff2a68d4b05ed23083140bb0af75c72378e3f23b778fa38e5",
+  "indicator_extension": {
+    "canonical_name": "盲扩展成交量",
+    "aliases": [
+      "blind_extension_volume"
+    ],
+    "value_type": "numeric",
+    "domain": "quote",
+    "logical_field": "volume",
+    "unit": "shares",
+    "scale": 1.0,
+    "nullable": true,
+    "availability": "official_provided",
+    "capabilities": [
+      "aggregate",
+      "approximate",
+      "ordered"
+    ]
+  },
+  "physical_field_extension": {
+    "indicator_id": "盲扩展成交量",
+    "resource_id": "official_basic",
+    "column": "volume",
+    "value_type": "numeric",
+    "scale": 1.0,
+    "nullable": true
+  },
+  "dsl": "blind_demo_in_band(indicator('', '', '盲扩展成交量', '今日', '', '', ''), 1000000, 100000000) = True",
+  "catalog_fingerprint": "7a2c23644b561b77d130c6c73cc67127194a90630a6cca03bf0cbb8e1a0635b9",
+  "changed_config_files": [
+    "official/functions.json",
+    "official/indicators.json",
+    "official/physical_catalog.json",
+    "official/physical_statistics.json",
+    "official/physical_strategies.json"
+  ],
+  "expected_changed_config_files": [
+    "official/functions.json",
+    "official/indicators.json",
+    "official/physical_catalog.json",
+    "official/physical_statistics.json",
+    "official/physical_strategies.json"
+  ],
+  "only_declared_configs_changed": true,
+  "core_tree_sha256_before": "42a425224651366805ac07639f479ab7352b05ce8177dcb4e593608778054780",
+  "core_tree_sha256_after": "42a425224651366805ac07639f479ab7352b05ce8177dcb4e593608778054780",
   "core_code_unchanged": true,
   "compile_passed": true,
-  "selected_strategy": "controlled_expression",
-  "sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (((`q`.`closePx` / 10000.0) - (`q`.`lowPx` / 10000.0)) / NULLIF(ABS(`q`.`lowPx` / 10000.0), 0)) >= 0.01 = TRUE AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
+  "typed_template_kind": "expression_tree",
+  "type_guard_error_code": "OFFICIAL_FUNCTION_ARG_TYPE",
+  "type_guard_passed": true,
+  "selected_strategy": "direct_column",
+  "sql": "SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE (`q`.`volume` >= 1000000 AND `q`.`volume` <= 100000000) = TRUE AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)",
   "gate": {
     "passed": true
   }
