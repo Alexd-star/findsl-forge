@@ -127,6 +127,7 @@ class PhysicalExternalExists(PhysicalExpr):
     lookup_resource_id: str
     anchor_resource_id: str
     filters: Tuple[Tuple[str, PhysicalLiteral], ...]
+    effective_at: Optional[PhysicalExpr] = None
     type: OfficialType = BOOLEAN
     policy_id: Optional[str] = None
     policy_semantic_basis: Optional[str] = None
@@ -144,6 +145,8 @@ class PhysicalExternalExists(PhysicalExpr):
             ],
             "type": self.type.to_dict(),
         }
+        if self.effective_at is not None:
+            payload["effective_at"] = self.effective_at.to_dict()
         if self.policy_id is not None:
             payload["semantic_policy"] = {
                 "policy_id": self.policy_id,

@@ -267,6 +267,11 @@ def create_app(
             "configured_functions": [
                 item.name for item in service.context.function_catalog.configured
             ],
+            "financial_rule_release": {
+                **service.context.financial_rules.release.to_dict(),
+                "catalog_id": service.context.financial_rules.catalog_id,
+                "fingerprint": service.context.financial_rules.fingerprint,
+            },
             "resources": [
                 {
                     "resource_id": item.resource_id,
@@ -288,6 +293,26 @@ def create_app(
         )
         result = await run_bounded(
             lambda: service.compile(
+                payload.dsl,
+                options=options,
+                request_id=request.state.request_id,
+                principal=principal,
+            )
+        )
+        return {"ok": True, **result}
+
+    @app.post("/v1/capabilities/query")
+    async def query_capability_endpoint(
+        payload: CompileRequest,
+        request: Request,
+        principal: str = Depends(authenticate),
+    ):
+        options = OfficialPipelineOptions(
+            use_statistics=payload.use_statistics,
+            strategy_mode=payload.strategy_mode,
+        )
+        result = await run_bounded(
+            lambda: service.negotiate(
                 payload.dsl,
                 options=options,
                 request_id=request.state.request_id,

@@ -42,6 +42,19 @@ python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 
 访问 `http://127.0.0.1:8765`。API 容器资产位于 `deploy/api/`；本地密钥和 `service.env` 不进入 Git。
 
+API 启动后可在不执行 Doris 的情况下协商单条 DSL 能力。本地开发模式可使用：
+
+```powershell
+$env:FINDSL_ENV = "development"
+python -m findsl.cli serve-api --host 127.0.0.1 --port 8766
+
+$body = @{ dsl = "indicator('', '', '成交量', '今日', '', '', '') > 100" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8766/v1/capabilities/query `
+  -ContentType "application/json" -Body $body
+```
+
+返回状态为 `SUPPORTED`、`DATA_UNAVAILABLE`、`INVALID_INPUT` 或 `CAPABILITY_GAP`。它与正式编译共用上下文和计划，不是宽松兼容入口。
+
 一键启动 Doris、样例数据和容器化 Demo：
 
 ```powershell
@@ -67,6 +80,17 @@ python -m findsl.cli official-suite --json
 - import-linter 证明正式编译器没有反向依赖旧管道。
 - Pytest 证明已有断言未回归，不单独证明业务正确率。
 - official-suite 证明固定正例和负例行为稳定，不单独证明真实 Doris 语义。
+
+金融规则候选发布使用：
+
+```powershell
+python scripts/validate_financial_rule_release.py `
+  --baseline configs/official/financial_rules.json `
+  --candidate path/to/candidate-financial-rules.json `
+  --output reports/financial-rule-release-validation.json
+```
+
+候选校验通过不等于自动生效；只有状态、审批标识和生效区间满足要求的 `active` 发布才能进入正式编译上下文。
 
 ## 5. 启动 Doris
 

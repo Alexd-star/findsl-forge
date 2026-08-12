@@ -9,7 +9,7 @@ from .ir import (
     PhysicalSetOperation, PhysicalGreatest, PhysicalPattern, PhysicalPosition,
     PhysicalCoalesce, PhysicalNot, PhysicalNullIf, PhysicalUnary,
 )
-from ..types import BOOLEAN, NUMERIC
+from ..types import BOOLEAN, NUMERIC, STRING, TIME
 
 
 def validate_physical_plan(plan: PhysicalPlan, catalog: PhysicalCatalog, expressions=None) -> PhysicalPlan:
@@ -744,6 +744,14 @@ def _validate_expr(expression, catalog, expressions=None):
             if not column.isidentifier():
                 raise PhysicalCatalogError("invalid external lookup filter column")
             _validate_expr(value, catalog, expressions)
+        if expression.effective_at is not None:
+            if "effective_dating" not in lookup.capabilities:
+                raise PhysicalCatalogError(
+                    "effective-dated external lookup requires effective_dating capability"
+                )
+            if expression.effective_at.type not in {STRING, TIME}:
+                raise ValueError("external lookup effective time must be string or time")
+            _validate_expr(expression.effective_at, catalog, expressions)
         if expression.policy_id is not None:
             if (
                 not expression.policy_id.strip()

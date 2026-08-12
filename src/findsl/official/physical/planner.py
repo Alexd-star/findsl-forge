@@ -2302,6 +2302,7 @@ def _physical_field_expression(field: _ResolvedIndicator):
                 ("snapshot_id", PhysicalLiteral(policy.snapshot_id, STRING)),
                 ("t0_eligible", PhysicalLiteral(True, BOOLEAN)),
             ),
+            PhysicalColumn("official_basic", "bizdate", STRING),
         )
     if field.prefix_average is not None:
         return PhysicalPrefixRef(_dynamic_prefix_alias(field), NUMERIC)
@@ -3453,8 +3454,16 @@ def _prefix_candidate_decision(
 ):
     scan = catalog.resource(strategy.scan_resource_id)
     prefix = catalog.resource(strategy.prefix_resource_id)
+    freshness = (
+        statistics.acceleration_freshness(scan.resource_id, prefix.resource_id)
+        if statistics is not None
+        else None
+    )
     selection_eligible = (
-        strategy.selection_mode == "active" and default_eligible
+        strategy.selection_mode == "active"
+        and default_eligible
+        and freshness is not None
+        and freshness.fresh
     ) or allow_shadow_strategies
     if statistics is not None:
         try:
@@ -3475,13 +3484,24 @@ def _prefix_candidate_decision(
                     estimated=False,
                     reason_code=(
                         "PHYSICAL_PREFIX_CANDIDATE_SELECTED"
-                        if selection_eligible
-                        else "PHYSICAL_PREFIX_SHADOW_CANDIDATE"
+                        if freshness is not None and freshness.fresh and selection_eligible
+                        else (
+                            "PHYSICAL_PREFIX_STALE_SHADOW_CANDIDATE"
+                            if allow_shadow_strategies
+                            and freshness is not None
+                            and not freshness.fresh
+                            else (
+                                "PHYSICAL_PREFIX_WATERMARK_INELIGIBLE"
+                                if freshness is not None and not freshness.fresh
+                                else "PHYSICAL_PREFIX_SHADOW_CANDIDATE"
+                            )
+                        )
                     ),
                     reason=(
                         "cost is scan bytes plus two conservative prefix resource accesses; "
                         f"selection mode is {strategy.selection_mode}; "
-                        f"plan-shape calibration is {'eligible' if default_eligible else 'shadow'}"
+                        f"plan-shape calibration is {'eligible' if default_eligible else 'shadow'}; "
+                        f"watermark is {freshness.reason if freshness is not None else 'unavailable'}"
                     ),
                     cost_unit="bytes",
                     cost_components=components,
@@ -3493,7 +3513,10 @@ def _prefix_candidate_decision(
         cost=float(scan.priority + prefix.priority * 2),
         estimated=True,
         reason_code="PHYSICAL_PREFIX_STATISTICS_INCOMPLETE",
-        reason="catalog priority fallback for prefix candidate",
+        reason=(
+            "catalog priority fallback for prefix candidate; acceleration is shadow-only "
+            "until source and prefix watermarks are available"
+        ),
         selection_eligible=selection_eligible,
     )
 
@@ -3522,8 +3545,16 @@ def _aggregate_strategy_decision(
         reason_label = "partition-pruned materialized feature lookup"
     selection_eligible = (
         strategy.selection_mode == "active" and semantic_eligible
-    ) or allow_shadow_strategies
+    )
     resource = catalog.resource(resource_id)
+    freshness = (
+        statistics.acceleration_freshness(strategy.scan_resource_id, resource_id)
+        if statistics is not None
+        else None
+    )
+    selection_eligible = bool(
+        selection_eligible and freshness is not None and freshness.fresh
+    ) or allow_shadow_strategies
     measured_bytes = None
     estimated = True
     if statistics is not None:
@@ -3550,13 +3581,24 @@ def _aggregate_strategy_decision(
             estimated=estimated,
             reason_code=(
                 "PHYSICAL_AGGREGATE_ACCELERATION_SELECTED"
-                if selection_eligible
-                else "PHYSICAL_AGGREGATE_ACCELERATION_SHADOW"
+                if freshness is not None and freshness.fresh and selection_eligible
+                else (
+                    "PHYSICAL_AGGREGATE_ACCELERATION_STALE_SHADOW"
+                    if allow_shadow_strategies
+                    and freshness is not None
+                    and not freshness.fresh
+                    else (
+                        "PHYSICAL_AGGREGATE_ACCELERATION_WATERMARK_INELIGIBLE"
+                        if freshness is not None and not freshness.fresh
+                        else "PHYSICAL_AGGREGATE_ACCELERATION_SHADOW"
+                    )
+                )
             ),
             reason=(
                 f"cost models {reason_label}; access fraction {access_fraction:.6f}; "
                 f"selection mode is {strategy.selection_mode}; "
-                f"semantic equivalence is {'proven' if semantic_eligible else 'shadow-only'}"
+                f"semantic equivalence is {'proven' if semantic_eligible else 'shadow-only'}; "
+                f"watermark is {freshness.reason if freshness is not None else 'unavailable'}"
             ),
             cost_unit="effective_bytes",
             cost_components=(
@@ -3572,7 +3614,10 @@ def _aggregate_strategy_decision(
         cost=float(resource.priority),
         estimated=True,
         reason_code="PHYSICAL_AGGREGATE_ACCELERATION_STATISTICS_INCOMPLETE",
-        reason=f"catalog priority fallback for {reason_label}",
+        reason=(
+            f"catalog priority fallback for {reason_label}; acceleration is shadow-only "
+            "until source and acceleration watermarks are available"
+        ),
         selection_eligible=selection_eligible,
     )
 
@@ -4771,6 +4816,7 @@ def _lower_scope_expression(
                     ("snapshot_id", PhysicalLiteral(policy.snapshot_id, STRING)),
                     ("t0_eligible", PhysicalLiteral(True, BOOLEAN)),
                 ),
+                PhysicalColumn(anchor_resource_id, "bizdate", STRING),
             )
         try:
             resolved = catalog.resolve(expression.name)
@@ -4784,6 +4830,7 @@ def _lower_scope_expression(
                     ("scope_code", PhysicalLiteral(external.option.scope_code, STRING)),
                     ("snapshot_id", PhysicalLiteral(external.option.snapshot_id, STRING)),
                 ),
+                PhysicalColumn(anchor_resource_id, "bizdate", STRING),
                 policy_id=policy.policy_id if policy is not None else None,
                 policy_semantic_basis=(
                     policy.semantic_basis if policy is not None else None

@@ -2799,6 +2799,21 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
                     expression=_render_expr(value, catalog, scan),
                 ),
             )
+        if expression.effective_at is not None:
+            effective_at = _render_expr(expression.effective_at, catalog, scan)
+            effective_from = exp.column("effective_from", table=alias, quoted=True)
+            effective_to = exp.column("effective_to", table=alias, quoted=True)
+            predicate = exp.and_(
+                predicate,
+                exp.or_(
+                    exp.Is(this=effective_from.copy(), expression=exp.Null()),
+                    exp.LTE(this=effective_from, expression=effective_at.copy()),
+                ),
+                exp.or_(
+                    exp.Is(this=effective_to.copy(), expression=exp.Null()),
+                    exp.GTE(this=effective_to, expression=effective_at.copy()),
+                ),
+            )
         query = exp.select(exp.convert(1)).from_(table).where(predicate)
         return exp.Exists(this=query)
     if isinstance(expression, PhysicalLatestValue):

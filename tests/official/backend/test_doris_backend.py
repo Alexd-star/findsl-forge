@@ -124,6 +124,10 @@ def test_external_scope_membership_renders_correlated_exists_with_snapshot_filte
     assert "`external_lookup`.`tgtcode` = `q`.`tgtcode`" in result.sql
     assert "`external_lookup`.`scope_code`" in result.sql
     assert "`external_lookup`.`snapshot_id`" in result.sql
+    assert "`external_lookup`.`effective_from` IS NULL" in result.sql
+    assert "`external_lookup`.`effective_from` <= `q`.`bizdate`" in result.sql
+    assert "`external_lookup`.`effective_to` IS NULL" in result.sql
+    assert "`external_lookup`.`effective_to` >= `q`.`bizdate`" in result.sql
     assert result.validation.passed is True
 
 

@@ -42,6 +42,8 @@ FinDSL Forge 是第五届中国研究生金融科技创新大赛赛题 19“行�
 
 每次正式编译都会生成结构化 `FINDSL EXPLAIN`，按 Parser、Semantic、Logical IR、Rewrite、Route、Doris SQL 六个阶段记录产物标识。`AdaptiveRoutePlanner` 将实际物理决策统一投影为 `RAW / PARTITION / MV / PREFIX` 四类路由；未生成或不满足等价条件的候选仍会显示原因码，但不会被伪装成可执行路径。金融规则来自版本化 `FinancialRuleCatalog`，优化规则具有前置条件、语义不变量、回退和验证契约。
 
+外部行业、概念、指数成员和交易规则在 SQL 中按行情日期应用历史有效期；PREFIX/MV 与基础表水位不一致时保留为不可选候选并自动回退。服务端 `/v1/capabilities/query` 复用同一正式编译链，将单条 DSL 明确分类为支持、缺数据、输入无效或能力缺口，不通过宽松旁路制造成功。
+
 架构细节见 [架构设计](docs/架构设计.md)，全部目录职责见 [PROJECT_INDEX.md](PROJECT_INDEX.md)。
 
 ## 快速开始

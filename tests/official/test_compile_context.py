@@ -24,7 +24,8 @@ def test_compile_context_freezes_every_manifest_catalog() -> None:
     assert context.snapshot.profile_id == "competition-v1"
     assert context.snapshot.policy_id == "official-semantic-policy-v1"
     assert len(context.snapshot.files) == 16
-    assert context.financial_rules.catalog_id == "financial-rule-catalog-v1"
+    assert context.financial_rules.catalog_id == "financial-rule-catalog-v2"
+    assert context.financial_rules.release.status == "active"
     assert len(context.context_id) == 64
     context.assert_current()
 

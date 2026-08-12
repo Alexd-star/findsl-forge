@@ -10,7 +10,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from .catalog import PhysicalCatalog
 
@@ -31,6 +31,16 @@ class PhysicalResourceStatistics:
     partition_value_count: Optional[int] = None
     partition_min: Optional[str] = None
     partition_max: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class AccelerationFreshness:
+    source_resource_id: str
+    acceleration_resource_id: str
+    fresh: bool
+    reason_code: str
+    reason: str
+    checks: Tuple[Tuple[str, Any, Any, bool], ...]
 
 
 class PhysicalStatisticsSnapshot:
@@ -97,6 +107,82 @@ class PhysicalStatisticsSnapshot:
 
     def resource(self, resource_id: str) -> PhysicalResourceStatistics:
         return self._resources[resource_id]
+
+    def acceleration_freshness(
+        self,
+        source_resource_id: str,
+        acceleration_resource_id: str,
+    ) -> AccelerationFreshness:
+        try:
+            source = self.resource(source_resource_id)
+            acceleration = self.resource(acceleration_resource_id)
+        except KeyError as exc:
+            missing = str(exc.args[0])
+            return AccelerationFreshness(
+                source_resource_id,
+                acceleration_resource_id,
+                False,
+                "ACCELERATION_WATERMARK_MISSING",
+                f"statistics are missing for {missing}",
+                (),
+            )
+        if not source.row_count_available or not acceleration.row_count_available:
+            return AccelerationFreshness(
+                source_resource_id,
+                acceleration_resource_id,
+                False,
+                "ACCELERATION_WATERMARK_INCOMPLETE",
+                "exact row-count statistics are unavailable",
+                (),
+            )
+        required_partition_values = (
+            source.partition_value_count,
+            source.partition_min,
+            source.partition_max,
+            acceleration.partition_value_count,
+            acceleration.partition_min,
+            acceleration.partition_max,
+        )
+        if any(value is None for value in required_partition_values):
+            return AccelerationFreshness(
+                source_resource_id,
+                acceleration_resource_id,
+                False,
+                "ACCELERATION_WATERMARK_INCOMPLETE",
+                "partition count or date bounds are unavailable",
+                (),
+            )
+        checks = tuple(
+            (name, source_value, acceleration_value, source_value == acceleration_value)
+            for name, source_value, acceleration_value in (
+                ("row_count", source.row_count, acceleration.row_count),
+                (
+                    "partition_value_count",
+                    source.partition_value_count,
+                    acceleration.partition_value_count,
+                ),
+                ("partition_min", source.partition_min, acceleration.partition_min),
+                ("partition_max", source.partition_max, acceleration.partition_max),
+            )
+        )
+        mismatches = tuple(name for name, _, _, matched in checks if not matched)
+        if mismatches:
+            return AccelerationFreshness(
+                source_resource_id,
+                acceleration_resource_id,
+                False,
+                "ACCELERATION_WATERMARK_STALE",
+                "watermark mismatch: " + ", ".join(mismatches),
+                checks,
+            )
+        return AccelerationFreshness(
+            source_resource_id,
+            acceleration_resource_id,
+            True,
+            "ACCELERATION_WATERMARK_FRESH",
+            "row count and partition date watermarks match the source resource",
+            checks,
+        )
 
     @property
     def resources(self) -> Tuple[PhysicalResourceStatistics, ...]:

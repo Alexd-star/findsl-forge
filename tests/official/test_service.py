@@ -95,3 +95,24 @@ def test_service_metrics_expose_compile_latency():
     assert metrics["counters"]["compile:ok"] == 1
     assert metrics["durations_ms"]["compile"]["p95"] >= 0
     assert "findsl_requests_total" in service.metrics.prometheus()
+
+
+def test_service_negotiates_supported_data_invalid_and_capability_cases():
+    service = OfficialCompilerService()
+
+    supported = service.negotiate(DSL)["capability"]
+    unavailable = service.negotiate(
+        "indicator('', '', '营业收入', '', '', '', '') > 1"
+    )["capability"]
+    invalid = service.negotiate("indicator(")["capability"]
+    gap = service.negotiate(
+        "indicator('', '', '涨幅', '', 'AVG', '', '') > 1"
+    )["capability"]
+
+    assert supported["status"] == "SUPPORTED"
+    assert supported["plan_id"]
+    assert "official_basic" in supported["required_resources"]
+    assert unavailable["status"] == "DATA_UNAVAILABLE"
+    assert invalid["status"] == "INVALID_INPUT"
+    assert gap["status"] == "CAPABILITY_GAP"
+    assert service.metrics.snapshot()["counters"]["negotiate:supported"] == 1

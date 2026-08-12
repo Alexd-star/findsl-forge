@@ -163,6 +163,49 @@ def test_statistics_select_calibrated_set_prefix_candidate():
     assert result.decisions[0].cost < result.decisions[1].cost
 
 
+def test_stale_prefix_watermark_is_visible_but_cannot_replace_baseline():
+    catalog = default_physical_catalog()
+    statistics = _statistics(
+        catalog,
+        [
+            {
+                "resource_id": "official_basic",
+                "row_count": 100,
+                "data_size_bytes": 400,
+                "row_count_available": True,
+                "partition_value_count": 10,
+                "partition_min": "2026-01-01",
+                "partition_max": "2026-01-10",
+            },
+            {
+                "resource_id": "official_basic_prefix",
+                "row_count": 90,
+                "data_size_bytes": 100,
+                "row_count_available": True,
+                "partition_value_count": 9,
+                "partition_min": "2026-01-01",
+                "partition_max": "2026-01-09",
+            },
+        ],
+    )
+
+    result = plan_physical(
+        _lower("indicator('', '', '5日均线', '', '', '', '') > 10"),
+        catalog,
+        statistics=statistics,
+        strategies=default_physical_strategies(catalog),
+    )
+
+    assert result.selected_strategy == "direct_column"
+    prefix = next(
+        item for item in result.decisions if item.strategy_id == "ma5_prefix_average"
+    )
+    assert prefix.selection_eligible is False
+    assert prefix.reason_code == "PHYSICAL_PREFIX_WATERMARK_INELIGIBLE"
+    assert "row_count" in prefix.reason
+    assert "partition_max" in prefix.reason
+
+
 def test_shadow_prefix_candidate_can_be_selected_for_explicit_validation():
     catalog = default_physical_catalog()
     result = plan_physical(
@@ -890,6 +933,7 @@ def test_external_scope_membership_is_planned_with_snapshot_provenance():
     assert "external_scope_membership" in payload
     assert '"column":"scope_code"' in payload
     assert '"column":"snapshot_id"' in payload
+    assert '"effective_at":{"column":"bizdate","kind":"PhysicalColumn"' in payload
 
 
 def test_semantic_scope_policy_is_auditable_in_physical_ir_but_not_sql_filters():

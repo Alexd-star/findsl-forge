@@ -68,6 +68,26 @@ def test_api_exposes_structured_explain_and_markdown_result():
     assert "## 自适应路由候选" in result.json()["markdown"]
 
 
+def test_api_exposes_query_capability_without_executing_doris():
+    client = TestClient(
+        create_app(
+            service=OfficialCompilerService(),
+            settings=ApiSettings(environment="test"),
+        )
+    )
+
+    supported = client.post("/v1/capabilities/query", json={"dsl": DSL})
+    unavailable = client.post(
+        "/v1/capabilities/query",
+        json={"dsl": "indicator('', '', '营业收入', '', '', '', '') > 1"},
+    )
+
+    assert supported.status_code == 200
+    assert supported.json()["capability"]["status"] == "SUPPORTED"
+    assert unavailable.status_code == 200
+    assert unavailable.json()["capability"]["status"] == "DATA_UNAVAILABLE"
+
+
 def test_api_accepts_valid_hs256_bearer_and_rejects_bad_signature():
     settings = ApiSettings(
         environment="test",

@@ -1,6 +1,17 @@
 {
-  "schema_version": 1,
-  "catalog_id": "financial-rule-catalog-v1",
+  "schema_version": 2,
+  "catalog_id": "financial-rule-catalog-v2",
+  "release": {
+    "release_id": "financial-rules-2026-08-12",
+    "status": "active",
+    "effective_from": "2026-08-12",
+    "effective_to": null,
+    "approved_by": "competition-governance",
+    "change_ticket": "FINDSL-RULES-001",
+    "previous_catalog_id": null,
+    "rollback_catalog_id": null,
+    "retired_rule_ids": []
+  },
   "rules": [
     {
       "rule_id": "FR-ADJUSTMENT-001",

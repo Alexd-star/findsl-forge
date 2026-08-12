@@ -11,6 +11,7 @@ from time import perf_counter
 from typing import Any, Callable, Dict, Mapping, Optional
 
 from .backend.executor import DorisExecutionConfig, execute_doris_query
+from .capability import rejected_capability_report, supported_capability_report
 from .context import CompileContext, default_compile_context
 from .pipeline import (
     OfficialPipelineError,
@@ -188,6 +189,52 @@ class OfficialCompilerService:
             "request_id": request_id,
             "generated_at": _utc_now(),
             "result": result.to_dict(),
+        }
+
+    def negotiate(
+        self,
+        dsl: str,
+        *,
+        options: OfficialPipelineOptions = OfficialPipelineOptions(),
+        request_id: str | None = None,
+        principal: str = "local",
+    ) -> Dict[str, Any]:
+        request_id = request_id or uuid.uuid4().hex
+        normalized = self._validate_dsl(dsl)
+        started = perf_counter()
+        try:
+            result = compile_official(normalized, options=options, context=self.context)
+        except OfficialPipelineError as exc:
+            elapsed_ms = (perf_counter() - started) * 1000.0
+            report = rejected_capability_report(exc, self.context)
+            self.metrics.record("negotiate", report["status"].lower(), elapsed_ms)
+            self._audit(
+                request_id,
+                principal,
+                "negotiate",
+                report["status"].lower(),
+                normalized,
+                elapsed_ms,
+                code=report["code"],
+                stage=report["stage"],
+            )
+        else:
+            elapsed_ms = (perf_counter() - started) * 1000.0
+            report = supported_capability_report(result, self.context)
+            self.metrics.record("negotiate", "supported", elapsed_ms)
+            self._audit(
+                request_id,
+                principal,
+                "negotiate",
+                "supported",
+                normalized,
+                elapsed_ms,
+                plan_id=report["plan_id"],
+            )
+        return {
+            "request_id": request_id,
+            "generated_at": _utc_now(),
+            "capability": report,
         }
 
     def execute(
