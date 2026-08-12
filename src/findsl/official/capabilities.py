@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Mapping
@@ -109,6 +110,7 @@ def build_capability_matrix(
     return {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "git_head": _git_head(),
         "catalog_snapshot_id": compile_context.context_id,
         "eligible_case_count": len(eligible),
         "compiled_case_count": compiled_cases,
@@ -127,6 +129,16 @@ def build_capability_matrix(
     }
 
 
+def _git_head() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "unavailable"
+
+
 def write_capability_matrix(
     report: Mapping[str, Any],
     json_path: Path,
@@ -141,6 +153,7 @@ def write_capability_matrix(
     lines = [
         "# 十二类函数 Capability Matrix",
         "",
+        f"- Git HEAD：`{report['git_head']}`",
         f"- 正式样例：`{report['eligible_case_count']}`",
         f"- 编译成功：`{report['compiled_case_count']}`",
         f"- 十二类覆盖：`{report['gate']['all_12_families']}`",

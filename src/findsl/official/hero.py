@@ -11,6 +11,7 @@ from .backend.executor import (
     execute_doris_explain,
     execute_doris_query,
 )
+from .context import default_compile_context
 from .pipeline import compile_official
 
 
@@ -27,7 +28,14 @@ def run_hero_query(
     explainer: Callable[..., Any] = execute_doris_explain,
 ) -> Dict[str, Any]:
     spec = _load_spec(spec_path)
-    compiled = compiler(spec["dsl"])
+    if compiler is compile_official:
+        context = default_compile_context()
+        compiler(spec["dsl"], context=context)
+        compiled = compiler(spec["dsl"], context=context)
+        compile_warmups = 1
+    else:
+        compiled = compiler(spec["dsl"])
+        compile_warmups = 0
     features = compiled.explain["query_features"]
     feature_checks = {
         name: bool(features.get(name)) for name in spec["required_features"]
@@ -75,7 +83,7 @@ def run_hero_query(
             "doris_explain": explain.text,
         }
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "git_head": _git_head(spec_path.parents[2]),
         "hero_id": spec["hero_id"],
@@ -87,8 +95,12 @@ def run_hero_query(
         "boolean_operators_passed": boolean_check,
         "query_features": features,
         "compile_elapsed_ms": compiled.elapsed_ms,
+        "compile_warmups": compile_warmups,
+        "compile_latency_scope": "warmed_service_request",
         "selected_route": compiled.explain["adaptive_route"]["selected_route"],
         "selected_strategy": compiled.physical["selected_strategy"],
+        "adaptive_route": compiled.explain["adaptive_route"],
+        "catalog_snapshot_id": compiled.compile_context["context_id"],
         "generated_sql": compiled.backend["sql"],
         "reference_sql_path": str(reference_path),
         "execution": execution,
@@ -115,8 +127,12 @@ def write_hero_report(
         f"- 查询：`{report['hero_id']}`",
         f"- Git HEAD：`{report['git_head']}`",
         f"- 编译耗时：`{report['compile_elapsed_ms']:.4f} ms`",
+        f"- 编译口径：`{report['compile_latency_scope']}`（warmups={report['compile_warmups']}）",
         f"- 选择路由：`{report['selected_route']}`",
         f"- 选择策略：`{report['selected_strategy']}`",
+        f"- 选择候选：`{report['adaptive_route']['selected_candidate_id']}`",
+        f"- 选择原因：`{report['adaptive_route']['selection_reason_code']}`",
+        f"- 回退顺序：`{' -> '.join(report['adaptive_route']['fallback_chain']) or '<none>'}`",
         f"- 编译/特征门禁：`{'PASS' if report['gate']['compile_and_feature_gate'] else 'FAIL'}`",
         f"- Doris 运行门禁：`{execution['status']}`",
         "",
