@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalog_sha256": "ee58f58a0d54ee1e2eaf1deb4bcef89ab1826e0296df2619278a019e0bf585a1",
+  "catalog_sha256": "1a71b685e4e637e1ece8caf60910b7372cda693d6be07181b972d07faab4203d",
   "strategies": [
     {
       "strategy_id": "ma10_prefix_average",

@@ -89,6 +89,7 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         "industry_membership": "2.000 MB",
         "instrument_rule": "512.000 KB",
         "index_quote": "1.000 MB",
+        "index_quote_security_shape": "1.000 MB",
     }
     rows = {
         "hsj_stock_hq_basic": 13650347,
@@ -102,6 +103,7 @@ def test_collector_uses_controlled_metadata_commands_and_hides_password():
         "industry_membership": 23226,
         "instrument_rule": 5686,
         "index_quote": 14533,
+        "index_quote_security_shape": 14533,
     }
 
     def runner(command, **kwargs):

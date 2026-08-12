@@ -45,6 +45,8 @@ from .domain.binder import (
 )
 from .domain.expressions import ConsecutiveSpec, DataRequirement, ExistSpec
 from .registry import OfficialIndicatorRegistry
+from .target_catalog import EntityTargetCatalog
+from .external.data_domains import DataDomainCatalog
 
 
 class OfficialLoweringError(ValueError):
@@ -85,6 +87,9 @@ def lower_official_ast(
     *,
     strict: bool = True,
     domain_registry: Optional[OfficialIndicatorRegistry] = None,
+    entity_target_catalog: Optional[EntityTargetCatalog] = None,
+    data_domain_catalog: Optional[DataDomainCatalog] = None,
+    profile_id: str = "competition-v1",
 ) -> LoweringResult:
     started = perf_counter_ns()
     functions = frozenset(
@@ -97,7 +102,16 @@ def lower_official_ast(
             scan = LogicalScan("market_observation", DEFAULT_SCHEMA)
         else:
             bound_nodes = tuple(
-                (node, bind_function(node, domain_registry))
+                (
+                    node,
+                    bind_function(
+                        node,
+                        domain_registry,
+                        entity_targets=entity_target_catalog,
+                        data_domains=data_domain_catalog,
+                        profile_id=profile_id,
+                    ),
+                )
                 for node in _walk_typed(typed)
                 if isinstance(node.node, OfficialFunctionCall)
                 and node.binding is not None
@@ -108,6 +122,11 @@ def lower_official_ast(
             requirement = DataRequirement(
                 frozenset(domain for binding in bindings for domain in binding.requirement.domains),
                 frozenset(capability for binding in bindings for capability in binding.requirement.capabilities),
+                frozenset(
+                    domain
+                    for binding in bindings
+                    for domain in binding.requirement.data_domains
+                ),
             )
             scan = LogicalDomainScan("market_observation", requirement, DEFAULT_SCHEMA)
         plan = _lower_root(typed, scan, binding_by_node)
@@ -289,6 +308,7 @@ def _lower_expr(
         date_constraint = None
         market_expression = domain_binding.market_expression if domain_binding else None
         scope_expression = domain_binding.scope_expression if domain_binding else None
+        entity_target = domain_binding.entity_target if domain_binding else None
         if domain_binding is not None and not strip_count_exp:
             date_constraint = domain_binding.date_constraint
         return CallExpr(
@@ -306,6 +326,7 @@ def _lower_expr(
             date_constraint,
             market_expression,
             scope_expression,
+            entity_target,
         )
     if isinstance(node, OfficialBinaryOp):
         return BinaryExpr(node.op, _lower_expr(typed.children[0], strip_count_exp=strip_count_exp, bindings=bindings), _lower_expr(typed.children[1], strip_count_exp=strip_count_exp, bindings=bindings), typed.type)

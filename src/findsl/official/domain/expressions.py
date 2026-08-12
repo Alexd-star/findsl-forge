@@ -63,11 +63,13 @@ class DateConstraint(CanonicalIr):
     offset: int = 0
     month: Optional[int] = None
     day: Optional[int] = None
+    end_month: Optional[int] = None
+    end_day: Optional[int] = None
     weekday_start: Optional[int] = None
     weekday_end: Optional[int] = None
 
     def to_dict(self):
-        return {"kind": "DateConstraint", "constraint_kind": self.kind, "start": self.start, "end": self.end, "anchor": self.anchor, "amount": self.amount, "unit": self.unit, "trading_day_based": self.trading_day_based, "offset": self.offset, "month": self.month, "day": self.day, "weekday_start": self.weekday_start, "weekday_end": self.weekday_end}
+        return {"kind": "DateConstraint", "constraint_kind": self.kind, "start": self.start, "end": self.end, "anchor": self.anchor, "amount": self.amount, "unit": self.unit, "trading_day_based": self.trading_day_based, "offset": self.offset, "month": self.month, "day": self.day, "end_month": self.end_month, "end_day": self.end_day, "weekday_start": self.weekday_start, "weekday_end": self.weekday_end}
 
 
 @dataclass(frozen=True)
@@ -138,6 +140,12 @@ class RankSpec(CanonicalIr):
 class DataRequirement(CanonicalIr):
     domains: FrozenSet[str]
     capabilities: FrozenSet[str]
+    data_domains: FrozenSet[str] = frozenset()
 
     def to_dict(self):
-        return {"kind": "DataRequirement", "domains": sorted(self.domains), "capabilities": sorted(self.capabilities)}
+        return {
+            "kind": "DataRequirement",
+            "domains": sorted(self.domains),
+            "capabilities": sorted(self.capabilities),
+            "data_domains": sorted(self.data_domains),
+        }

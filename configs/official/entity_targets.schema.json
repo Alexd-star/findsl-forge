@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "default_target", "targets"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "default_target": {"$ref": "#/$defs/target"},
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/target"}
+    }
+  },
+  "$defs": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token", "target_id", "logical_entity", "execution_mode", "required_data_domains", "result_keys"],
+      "properties": {
+        "token": {"type": "string"},
+        "target_id": {"type": "string", "minLength": 1},
+        "logical_entity": {"type": "string", "minLength": 1},
+        "execution_mode": {"type": "string", "minLength": 1},
+        "required_data_domains": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "result_keys": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

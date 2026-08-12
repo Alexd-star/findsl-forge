@@ -10,7 +10,9 @@ from types import MappingProxyType
 from typing import Any, Dict, Mapping, Tuple
 
 from .external.policy import ScopeSemanticPolicyCatalog
+from .external.data_domains import DataDomainCatalog
 from .external.profiles import DataProfileCatalog, DataProfileError
+from .external.source_registry import ExternalSourceRegistry
 from .external.runtime import (
     BenchmarkPolicyCatalog,
     ExternalDataPolicy,
@@ -29,6 +31,7 @@ from .physical.strategies import PhysicalStrategyRegistry
 from .policy import SemanticPolicySet
 from .registry import OfficialIndicatorRegistry
 from .signatures import OfficialFunctionCatalog
+from .target_catalog import EntityTargetCatalog
 
 
 class CompileContextError(ValueError):
@@ -114,6 +117,9 @@ class CatalogSnapshot:
             "benchmark_policy",
             "approximation_policy",
             "technical_patterns",
+            "external_source_registry",
+            "data_domain_catalog",
+            "entity_target_catalog",
         }
         missing = required_roles - roles
         if missing:
@@ -201,6 +207,9 @@ class CompileContext:
     physical_strategies: PhysicalStrategyRegistry
     financial_rules: FinancialRuleCatalog
     physical_runtime: PhysicalRuntimeCatalogs
+    external_source_registry: ExternalSourceRegistry
+    data_domain_catalog: DataDomainCatalog
+    entity_target_catalog: EntityTargetCatalog
 
     @classmethod
     def load(
@@ -239,6 +248,14 @@ class CompileContext:
         financial_rules = FinancialRuleCatalog.load(
             paths["financial_rules"], available_roles=paths
         )
+        external_source_registry = ExternalSourceRegistry.load(
+            paths["external_source_registry"]
+        )
+        data_domain_catalog = DataDomainCatalog.load(
+            paths["data_domain_catalog"],
+            source_registry=external_source_registry,
+        )
+        entity_target_catalog = EntityTargetCatalog.load(paths["entity_target_catalog"])
         policies = ScopeSemanticPolicyCatalog.load(paths["scope_semantic_policies"])
         runtime_raw = json.loads(paths["external_scope_runtime"].read_text(encoding="utf-8"))
         if set(runtime_raw) != {"schema_version", "membership_resource_id", "entries"}:
@@ -274,6 +291,9 @@ class CompileContext:
             strategies,
             financial_rules,
             runtime,
+            external_source_registry,
+            data_domain_catalog,
+            entity_target_catalog,
         )
 
     @property

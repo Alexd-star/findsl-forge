@@ -272,6 +272,22 @@ def create_app(
                 "catalog_id": service.context.financial_rules.catalog_id,
                 "fingerprint": service.context.financial_rules.fingerprint,
             },
+            "data_domains": list(
+                service.context.data_domain_catalog.profile_summary(
+                    service.context.snapshot.profile_id
+                )
+            ),
+            "entity_targets": [
+                {
+                    "token": item.token,
+                    "target_id": item.target_id,
+                    "logical_entity": item.logical_entity,
+                    "execution_mode": item.execution_mode,
+                    "required_data_domains": list(item.required_data_domains),
+                    "result_keys": list(item.result_keys),
+                }
+                for item in service.context.entity_target_catalog.definitions
+            ],
             "resources": [
                 {
                     "resource_id": item.resource_id,

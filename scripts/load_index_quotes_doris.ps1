@@ -50,6 +50,15 @@ $actualText = Invoke-DorisSql "SELECT COUNT(*) FROM findsl_ext.index_quote;"
 $actual = [int64](($actualText -split "\r?\n")[-1])
 }
 if ($actual -ne $expected) { throw "Index quote row mismatch: $expected/$actual" }
+Invoke-DorisSql "TRUNCATE TABLE findsl_ext.index_quote_security_shape;" | Out-Null
+Invoke-DorisSql @"
+INSERT INTO findsl_ext.index_quote_security_shape
+SELECT 0,index_code,bizdate,snapshot_id,open,high,low,close,volume,pct_change
+FROM findsl_ext.index_quote;
+"@ | Out-Null
+$shapeText = Invoke-DorisSql "SELECT COUNT(*) FROM findsl_ext.index_quote_security_shape;"
+$shapeRows = [int64](($shapeText -split "\r?\n")[-1])
+if ($shapeRows -ne $expected) { throw "Index quote shape row mismatch: $expected/$shapeRows" }
 $evidence = [ordered]@{
   schema_version = 1
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
@@ -57,6 +66,7 @@ $evidence = [ordered]@{
   status = "PASS"
   expected_rows = $expected
   actual_rows = $actual
+  shape_rows = $shapeRows
   filtered_rows = [int64]$load.NumberFilteredRows
 }
 $evidence | ConvertTo-Json -Depth 6 | Set-Content reports/index_quote_doris_load.json -Encoding utf8

@@ -59,3 +59,19 @@ CREATE TABLE IF NOT EXISTS findsl_ext.index_quote (
 DUPLICATE KEY(snapshot_id, index_code, bizdate)
 DISTRIBUTED BY HASH(index_code) BUCKETS 8
 PROPERTIES ("replication_num" = "1");
+
+CREATE TABLE IF NOT EXISTS findsl_ext.index_quote_security_shape (
+  mktcode INT NOT NULL,
+  tgtcode VARCHAR(32) NOT NULL,
+  bizdate DATE NOT NULL,
+  snapshot_id VARCHAR(128) NOT NULL,
+  open DOUBLE NULL,
+  high DOUBLE NULL,
+  low DOUBLE NULL,
+  close DOUBLE NULL,
+  volume BIGINT NULL,
+  pct_change DOUBLE NULL
+)
+DUPLICATE KEY(mktcode, tgtcode, bizdate)
+DISTRIBUTED BY HASH(tgtcode) BUCKETS 8
+PROPERTIES ("replication_num" = "1");

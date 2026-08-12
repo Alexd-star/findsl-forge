@@ -204,6 +204,26 @@
       ],
       "anchor_resource_id": null,
       "priority": 5
+    },
+    {
+      "resource_id": "external_index_quote_shape",
+      "database": "findsl_ext",
+      "table": "index_quote_security_shape",
+      "logical_entity": "index_observation",
+      "partition_key": "bizdate",
+      "distribution_key": "tgtcode",
+      "capabilities": [
+        "entity_target",
+        "index_quote",
+        "scan"
+      ],
+      "stable_keys": [
+        "mktcode",
+        "tgtcode",
+        "bizdate"
+      ],
+      "anchor_resource_id": null,
+      "priority": 5
     }
   ],
   "fields": [
@@ -387,6 +407,62 @@
       "indicator_id": "__index_volume",
       "resource_id": "external_index_quote",
       "column": "volume",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__target_index_snapshot_id",
+      "resource_id": "external_index_quote_shape",
+      "column": "snapshot_id",
+      "value_type": "string",
+      "scale": 1.0,
+      "nullable": false
+    },
+    {
+      "indicator_id": "__target_index_open",
+      "resource_id": "external_index_quote_shape",
+      "column": "open",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__target_index_high",
+      "resource_id": "external_index_quote_shape",
+      "column": "high",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__target_index_low",
+      "resource_id": "external_index_quote_shape",
+      "column": "low",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__target_index_close",
+      "resource_id": "external_index_quote_shape",
+      "column": "close",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__target_index_volume",
+      "resource_id": "external_index_quote_shape",
+      "column": "volume",
+      "value_type": "numeric",
+      "scale": 1.0,
+      "nullable": true
+    },
+    {
+      "indicator_id": "__target_index_pct_change",
+      "resource_id": "external_index_quote_shape",
+      "column": "pct_change",
       "value_type": "numeric",
       "scale": 1.0,
       "nullable": true

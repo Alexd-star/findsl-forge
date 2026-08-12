@@ -160,6 +160,10 @@ class ExternalIndexQuoteCatalog:
         except KeyError as exc:
             raise KeyError(str(scope_code)) from exc
 
+    @property
+    def entries(self) -> Tuple[ExternalIndexQuoteOption, ...]:
+        return tuple(self._entries[key] for key in sorted(self._entries))
+
     @classmethod
     def from_dict(cls, raw) -> "ExternalIndexQuoteCatalog":
         if set(raw) != {"schema_version", "resource_id", "entries"}:

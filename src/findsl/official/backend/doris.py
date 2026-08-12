@@ -1865,7 +1865,7 @@ def _render_temporal(
                 ),
             )
         )
-    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range"}:
+    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range", "year_month_range"}:
         amount = plan.window.calendar_amount or 1
         unit = plan.window.calendar_unit
         if unit is None:
@@ -1881,6 +1881,8 @@ def _render_temporal(
                 if plan.window.kind == "dynamic_period"
                 else "weekday_range"
                 if plan.window.kind == "dynamic_weekday_range"
+                else "year_month_range"
+                if plan.window.kind == "year_month_range"
                 else "anchor_calendar"
             ),
             unit,
@@ -1888,6 +1890,7 @@ def _render_temporal(
             plan.window.calendar_offset,
             plan.window.anchor_month,
             plan.window.anchor_day,
+            plan.window.end_month,
             weekday_start=plan.window.weekday_start,
             weekday_end=plan.window.weekday_end,
         )
@@ -2161,7 +2164,7 @@ def _render_temporal_aggregate(
                 ),
             )
         )
-    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range"}:
+    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range", "year_month_range"}:
         lower, upper, validity = _dynamic_date_bounds(
             catalog,
             scan.anchor_resource_id or scan.resource_id,
@@ -2170,6 +2173,8 @@ def _render_temporal_aggregate(
                 if plan.window.kind == "dynamic_period"
                 else "weekday_range"
                 if plan.window.kind == "dynamic_weekday_range"
+                else "year_month_range"
+                if plan.window.kind == "year_month_range"
                 else "anchor_calendar"
             ),
             plan.window.calendar_unit,
@@ -2177,6 +2182,7 @@ def _render_temporal_aggregate(
             plan.window.calendar_offset,
             plan.window.anchor_month,
             plan.window.anchor_day,
+            plan.window.end_month,
             weekday_start=plan.window.weekday_start,
             weekday_end=plan.window.weekday_end,
         )
@@ -2884,6 +2890,7 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             expression.anchor_resource_id,
             expression.weekday_start,
             expression.weekday_end,
+            expression.end_day,
         )
         predicate = exp.and_(
             exp.GTE(this=column.copy(), expression=lower),

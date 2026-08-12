@@ -212,10 +212,17 @@ def test_invalid_count_expression_preserves_temporal_diagnostic():
         ("2011年3月25日", "exact", None, None),
         ("昨天", "relative_session", 1, "session"),
         ("上个交易日", "relative_session", 1, "session"),
+        ("上一交易日", "relative_session", 1, "session"),
         ("前天", "relative_session", 2, "session"),
         ("当天", "relative", None, None),
         ("目前", "relative", None, None),
         ("四天", "recent_sessions", 4, "session"),
+        ("最近连续7个交易日", "recent_sessions", 7, "session"),
+        ("前5日", "session_slice", 5, "session"),
+        ("近半个月", "recent_calendar", 15, "day"),
+        ("3个交易日前", "relative_session", 3, "session"),
+        ("连续6天", "recent_sessions", 6, "session"),
+        ("近3个季度", "recent_calendar", 9, "month"),
     ],
 )
 def test_date_slot_binds_to_typed_window_contract(date, kind, amount, unit):
@@ -271,6 +278,102 @@ def test_dynamic_date_contract_preserves_anchor_components(date, kind, offset, m
     assert bound.date_constraint.offset == offset
     assert bound.date_constraint.month == month
     assert bound.date_constraint.day == day
+
+
+@pytest.mark.parametrize(
+    ("date", "kind", "month", "end_month"),
+    [
+        ("上半年", "year_month_range", 1, 6),
+        ("今年二季度", "year_month_range", 4, 6),
+        ("3-7月", "year_month_range", 3, 7),
+        ("Q2", "year_month_range", 4, 6),
+    ],
+)
+def test_current_year_ranges_keep_both_month_boundaries(
+    date, kind, month, end_month
+):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == kind
+    assert bound.date_constraint.month == month
+    assert bound.date_constraint.end_month == end_month
+
+
+@pytest.mark.parametrize(
+    ("date", "normalized"),
+    [
+        ("2025/5/7", "2025-05-07"),
+        ("20260313", "2026-03-13"),
+        ("2026.3.13", "2026-03-13"),
+    ],
+)
+def test_alternate_exact_date_formats_are_normalized(date, normalized):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert (bound.date_constraint.start, bound.date_constraint.end) == (
+        normalized,
+        normalized,
+    )
+
+
+@pytest.mark.parametrize(
+    "date,start,end",
+    [
+        ("20240101-20241231", "2024-01-01", "2024-12-31"),
+        ("2024年1月1日至2024年3月31日", "2024-01-01", "2024-03-31"),
+        ("2022-2025年", "2022-01-01", "2025-12-31"),
+        ("2024年第二季度", "2024-04-01", "2024-06-30"),
+        ("2024Q3", "2024-07-01", "2024-09-30"),
+        ("2023年第四季度至2024年第一季度", "2023-10-01", "2024-03-31"),
+    ],
+)
+def test_explicit_calendar_ranges_are_normalized(date, start, end):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == "calendar_range"
+    assert (bound.date_constraint.start, bound.date_constraint.end) == (start, end)
+
+
+@pytest.mark.parametrize(
+    "date,kind,month,day,end_month,end_day,unit,offset,start",
+    [
+        ("4月20日-6月16日", "month_day_range", 4, 20, 6, 16, "day", 0, None),
+        ("本月7日到13日", "month_day_range", None, 7, None, 13, "day", 0, None),
+        ("八日到二十二日", "month_day_range", None, 8, None, 22, "day", 0, None),
+        ("年初至今", "dynamic_period", None, None, None, None, "year", 0, None),
+        ("月初至今", "dynamic_period", None, None, None, None, "month", 0, None),
+        ("上月至今", "period_since", None, None, None, None, "month", -1, None),
+        ("今年4月份以来", "anchor_since", 4, 1, None, None, "day", 0, None),
+        ("9.24以来", "anchor_since", 9, 24, None, None, "day", 0, None),
+        ("2024年10月1日至今", "calendar_since", None, None, None, None, "day", 0, "2024-10-01"),
+    ],
+)
+def test_open_ended_and_month_day_ranges_are_typed(
+    date, kind, month, day, end_month, end_day, unit, offset, start
+):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    constraint = bound.date_constraint
+    assert constraint.kind == kind
+    assert constraint.month == month
+    assert constraint.day == day
+    assert constraint.end_month == end_month
+    assert constraint.end_day == end_day
+    assert constraint.unit == unit
+    assert constraint.offset == offset
+    assert constraint.start == start
 
 
 @pytest.mark.parametrize(
@@ -342,7 +445,19 @@ def test_extended_date_algebra_preserves_typed_boundaries(
     assert bound.date_constraint.day == day
 
 
-@pytest.mark.parametrize("date", ["2024年13月", "2024年2月30日"])
+@pytest.mark.parametrize(
+    "date",
+    [
+        "2024年13月",
+        "2024年2月30日",
+        "2024-02-30",
+        "2024年第四季度至2024年第一季度",
+        "20241231-20240101",
+        "周五到周一",
+        "6月20日到4月10日",
+        "本月20日到10日",
+    ],
+)
 def test_invalid_calendar_date_is_rejected_with_stable_domain_code(date):
     with pytest.raises(DomainBindingError) as excinfo:
         bind_function(
@@ -360,6 +475,7 @@ def test_invalid_calendar_date_is_rejected_with_stable_domain_code(date):
         ("本周一至周五", 0, 1, 5),
         ("本周一到本周三", 0, 1, 3),
         ("上上周一到周四", -2, 1, 4),
+        ("周三到周五", 0, 3, 5),
     ],
 )
 def test_weekday_ranges_are_typed_without_row_specific_rules(source, offset, start, end):

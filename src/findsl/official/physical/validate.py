@@ -473,7 +473,7 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("invalid temporal aggregate count comparator")
         if plan.unit not in {"", "日", "周", "月", "季度", "年"}:
             raise ValueError("temporal aggregate bucket unit is not implemented")
-        if plan.window.kind not in {"all_history", "recent_sessions", "session_slice", "boundary_sessions", "recent_calendar", "dynamic_period", "anchor_calendar", "calendar_range", "exact_date", "latest_session"}:
+        if plan.window.kind not in {"all_history", "recent_sessions", "session_slice", "boundary_sessions", "recent_calendar", "dynamic_period", "anchor_calendar", "year_month_range", "calendar_range", "exact_date", "latest_session"}:
             raise ValueError("invalid temporal aggregate window")
         if plan.every:
             if plan.threshold is not None or plan.comparator not in {"=", "!="}:
@@ -512,7 +512,7 @@ def _validate_plan(plan, catalog, expressions):
             raise ValueError("invalid physical temporal comparator")
         if plan.unit not in {"", "日", "周", "月", "季度", "年"}:
             raise ValueError("physical temporal bucket unit is not implemented")
-        if plan.window.kind not in {"all_history", "recent_sessions", "session_slice", "boundary_sessions", "recent_calendar", "dynamic_period", "anchor_calendar", "calendar_range", "exact_date", "latest_session"}:
+        if plan.window.kind not in {"all_history", "recent_sessions", "session_slice", "boundary_sessions", "recent_calendar", "dynamic_period", "anchor_calendar", "year_month_range", "calendar_range", "exact_date", "latest_session"}:
             raise ValueError("invalid physical temporal window")
         if plan.window.kind in {"recent_sessions", "session_slice"} and (plan.window.lookback_sessions is None or plan.window.lookback_sessions <= 0):
             raise ValueError("recent temporal window requires positive trading sessions")
@@ -555,6 +555,12 @@ def _validate_plan(plan, catalog, expressions):
             or (plan.window.anchor_day is not None and not 1 <= plan.window.anchor_day <= 31)
         ):
             raise ValueError("anchor calendar window has invalid components")
+        if plan.window.kind == "year_month_range" and (
+            plan.window.anchor_month is None
+            or plan.window.end_month is None
+            or not 1 <= plan.window.anchor_month <= plan.window.end_month <= 12
+        ):
+            raise ValueError("year month range window has invalid boundaries")
         if plan.window.kind in {"calendar_range", "exact_date"} and (
             not plan.window.start or not plan.window.end
         ):
@@ -662,16 +668,22 @@ def _validate_expr(expression, catalog, expressions=None):
             "anchor_calendar",
             "year_month_range",
             "weekday_range",
+            "period_since",
+            "anchor_since",
+            "month_day_range",
         }:
             raise ValueError("unsupported dynamic date range kind")
         if expression.amount <= 0 or expression.offset > 0:
             raise ValueError("dynamic date range cannot be empty or future-relative")
         allowed_units = {
             "period": {"week", "month", "quarter", "year"},
-            "recent": {"week", "month", "year"},
+            "recent": {"day", "week", "month", "year"},
             "anchor_calendar": {"day", "month"},
             "year_month_range": {"month"},
             "weekday_range": {"week"},
+            "period_since": {"week", "month", "quarter", "year"},
+            "anchor_since": {"day"},
+            "month_day_range": {"day"},
         }
         if expression.unit not in allowed_units[expression.range_kind]:
             raise ValueError("dynamic date range unit does not match its kind")
@@ -689,6 +701,15 @@ def _validate_expr(expression, catalog, expressions=None):
                 raise ValueError("weekday range requires both weekday boundaries")
             if not 1 <= expression.weekday_start <= expression.weekday_end <= 7:
                 raise ValueError("weekday range boundaries are invalid")
+        if expression.range_kind == "anchor_since" and expression.day is None:
+            raise ValueError("anchor-since range requires a day boundary")
+        if expression.range_kind == "month_day_range":
+            if expression.day is None or expression.end_day is None:
+                raise ValueError("month-day range requires both day boundaries")
+            if not 1 <= expression.day <= 31 or not 1 <= expression.end_day <= 31:
+                raise ValueError("month-day range day boundary is invalid")
+            if expression.end_month is not None and not 1 <= expression.end_month <= 12:
+                raise ValueError("month-day range end month is invalid")
         if expression.anchor_resource_id is not None:
             anchor = catalog.resource(expression.anchor_resource_id)
             if anchor.partition_key is None:

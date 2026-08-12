@@ -1,0 +1,299 @@
+{
+  "schema_version": 1,
+  "domains": [
+    {
+      "domain_id": "daily_market_quote",
+      "indicator_domains": ["quote"],
+      "provider_domain_ids": ["daily_quote"],
+      "description": "A-share daily OHLCV and turnover observations from the competition package.",
+      "granularity": "daily",
+      "temporal_model": "historical_series",
+      "primary_keys": ["mktcode", "tgtcode", "bizdate"],
+      "quality_gates": ["primary_key_unique", "official_row_count", "date_watermark", "null_ratio"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "available", "active_provider_ids": ["official-package"], "candidate_provider_ids": [], "reason": "The official daily quote table is loaded and versioned."},
+        {"profile_id": "competition-official-only-v1", "status": "available", "active_provider_ids": ["official-package"], "candidate_provider_ids": [], "reason": "The official daily quote table is part of the organizer package."}
+      ]
+    },
+    {
+      "domain_id": "extended_daily_quote",
+      "indicator_domains": ["order_book"],
+      "provider_domain_ids": ["extended_daily_quote", "money_flow"],
+      "description": "Daily extended quotation and capital-flow observations; intraday wording is not implied by this domain.",
+      "granularity": "daily",
+      "temporal_model": "historical_series",
+      "primary_keys": ["mktcode", "tgtcode", "bizdate"],
+      "quality_gates": ["primary_key_unique", "official_row_count", "date_watermark", "anchor_join_coverage"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "available", "active_provider_ids": ["official-package"], "candidate_provider_ids": ["tushare-optional"], "reason": "Official extended daily data is active; licensed data may extend but never overwrite it."},
+        {"profile_id": "competition-official-only-v1", "status": "available", "active_provider_ids": ["official-package"], "candidate_provider_ids": [], "reason": "Only daily observations supplied by the organizer are available."}
+      ]
+    },
+    {
+      "domain_id": "security_identity",
+      "indicator_domains": ["security_master"],
+      "provider_domain_ids": ["security_identity"],
+      "description": "Security code, name, market and listing identity with exchange-governed normalization.",
+      "granularity": "static",
+      "temporal_model": "effective_dated",
+      "primary_keys": ["mktcode", "tgtcode"],
+      "quality_gates": ["primary_key_unique", "exchange_code_valid", "name_non_empty", "effective_range_valid"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "available", "active_provider_ids": ["official-package", "sse-szse-bse"], "candidate_provider_ids": ["akshare-security-identity"], "reason": "Official identity is authoritative and exchange snapshots can enrich trading rules."},
+        {"profile_id": "competition-official-only-v1", "status": "available", "active_provider_ids": ["official-package"], "candidate_provider_ids": [], "reason": "The organizer security master is active."}
+      ]
+    },
+    {
+      "domain_id": "technical_indicator",
+      "indicator_domains": ["technical"],
+      "provider_domain_ids": ["daily_quote"],
+      "description": "Deterministic moving averages, rolling statistics and technical features derived from official daily quotes.",
+      "granularity": "daily",
+      "temporal_model": "derived",
+      "primary_keys": ["mktcode", "tgtcode", "bizdate"],
+      "quality_gates": ["derivation_sql_frozen", "source_watermark_match", "reference_hash_match", "warmup_null_policy"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "derived", "active_provider_ids": ["official-package"], "candidate_provider_ids": [], "reason": "Features are reproducibly materialized from official daily quotes."},
+        {"profile_id": "competition-official-only-v1", "status": "derived", "active_provider_ids": ["official-package"], "candidate_provider_ids": [], "reason": "No external facts are needed for deterministic technical derivation."}
+      ]
+    },
+    {
+      "domain_id": "financial_statement",
+      "indicator_domains": ["financial"],
+      "provider_domain_ids": ["financial_statement"],
+      "description": "Point-in-time financial statements, report periods, announcement dates and restatement versions.",
+      "granularity": "reporting_period",
+      "temporal_model": "effective_dated",
+      "primary_keys": ["mktcode", "tgtcode", "report_period", "announcement_date", "version"],
+      "quality_gates": ["announcement_time_no_lookahead", "restatement_versioned", "unit_normalized", "cross_statement_reconciled"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "The organizer package has no financial statements; a licensed, point-in-time snapshot must be supplied before compilation is enabled."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The official three-table package does not contain financial statements."}
+      ]
+    },
+    {
+      "domain_id": "fund_reference",
+      "indicator_domains": ["fund"],
+      "provider_domain_ids": ["fund_identity", "fund_portfolio"],
+      "description": "Fund identity, exchange/off-exchange classification, portfolio holdings and effective report periods.",
+      "granularity": "mixed",
+      "temporal_model": "effective_dated",
+      "primary_keys": ["fund_code", "effective_from", "holding_code"],
+      "quality_gates": ["fund_type_normalized", "holding_weight_range", "effective_range_valid", "report_period_complete"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Fund facts require a separately licensed snapshot and are not inferred from stock quotes."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package is an A-share quote package, not a fund database."}
+      ]
+    },
+    {
+      "domain_id": "index_reference",
+      "indicator_domains": ["index"],
+      "provider_domain_ids": ["index_identity", "index_membership"],
+      "description": "Index identity, constituents, weights and effective membership intervals.",
+      "granularity": "daily",
+      "temporal_model": "effective_dated",
+      "primary_keys": ["index_code", "mktcode", "tgtcode", "effective_from"],
+      "quality_gates": ["publisher_identity", "constituent_set_complete", "weight_range", "effective_range_valid"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "available", "active_provider_ids": ["csindex", "cnindex"], "candidate_provider_ids": ["akshare-index", "akshare-eastmoney-index", "tushare-optional"], "reason": "Versioned publisher constituent snapshots are active for registered indices."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "Index constituents are not present in the organizer package."}
+      ]
+    },
+    {
+      "domain_id": "scope_membership",
+      "indicator_domains": [],
+      "provider_domain_ids": ["concept_membership", "industry_membership", "region_membership", "sector_membership", "scope_alias"],
+      "description": "Industry, concept, region and curated scope membership with source and snapshot identity.",
+      "granularity": "static",
+      "temporal_model": "dated_snapshot",
+      "primary_keys": ["snapshot_id", "scope_type", "scope_code", "mktcode", "tgtcode"],
+      "quality_gates": ["source_registered", "member_set_non_empty", "security_identity_join", "snapshot_fingerprint"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "available", "active_provider_ids": ["baostock-industry", "eastmoney", "baidu-related-block", "sina-sector", "ths-concept", "curated-scope-alias"], "candidate_provider_ids": ["tushare-optional"], "reason": "Only frozen and registered external snapshots are eligible."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package does not include industry or concept membership."}
+      ]
+    },
+    {
+      "domain_id": "intraday_quote",
+      "indicator_domains": [],
+      "provider_domain_ids": ["intraday_quote"],
+      "description": "Timestamped minute/tick observations for auction, opening, closing and intraday windows.",
+      "granularity": "intraday",
+      "temporal_model": "historical_series",
+      "primary_keys": ["mktcode", "tgtcode", "event_time"],
+      "quality_gates": ["timezone_fixed", "session_calendar_valid", "timestamp_unique", "no_daily_forward_fill"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Daily closing data cannot truthfully answer minute or auction semantics."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package is daily-frequency only."}
+      ]
+    },
+    {
+      "domain_id": "shareholder_data",
+      "indicator_domains": [],
+      "provider_domain_ids": ["shareholder_data"],
+      "description": "Shareholder counts, holder types and ownership ratios by disclosure date.",
+      "granularity": "reporting_period",
+      "temporal_model": "effective_dated",
+      "primary_keys": ["mktcode", "tgtcode", "report_period", "holder_type"],
+      "quality_gates": ["disclosure_date_present", "ratio_range", "holder_type_normalized", "no_lookahead"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Ownership facts are absent from the official quote tables."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "Ownership facts are absent from the organizer package."}
+      ]
+    },
+    {
+      "domain_id": "corporate_event",
+      "indicator_domains": [],
+      "provider_domain_ids": ["corporate_event"],
+      "description": "Dividends, suspensions, corporate actions and disclosure events with event and publication times.",
+      "granularity": "event",
+      "temporal_model": "effective_dated",
+      "primary_keys": ["mktcode", "tgtcode", "event_type", "event_date", "version"],
+      "quality_gates": ["event_type_normalized", "publication_time_present", "revision_versioned", "no_lookahead"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Corporate events require a separately governed disclosure snapshot."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "Corporate event tables are not supplied by the organizer."}
+      ]
+    },
+    {
+      "domain_id": "cross_market_quote",
+      "indicator_domains": ["cross_market"],
+      "provider_domain_ids": ["cross_market_quote"],
+      "description": "Non-A-share instruments and cross-market calendars, currencies and identifiers.",
+      "granularity": "mixed",
+      "temporal_model": "historical_series",
+      "primary_keys": ["venue", "instrument_code", "event_time"],
+      "quality_gates": ["venue_calendar_valid", "currency_explicit", "identifier_normalized", "timezone_fixed"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Cross-market facts need an explicitly licensed market feed."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package only covers the declared A-share domain."}
+      ]
+    },
+    {
+      "domain_id": "advanced_pattern",
+      "indicator_domains": ["advanced_pattern"],
+      "provider_domain_ids": ["daily_quote"],
+      "description": "Business-defined chart and event patterns that require a frozen mathematical definition before derivation.",
+      "granularity": "daily",
+      "temporal_model": "derived",
+      "primary_keys": ["mktcode", "tgtcode", "bizdate", "pattern_id", "rule_version"],
+      "quality_gates": ["semantic_definition_approved", "rule_versioned", "reference_cases", "source_watermark_match"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package"], "reason": "Raw quotes exist, but undefined business patterns must not be invented by the compiler."},
+        {"profile_id": "competition-official-only-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package"], "reason": "A reviewed semantic rule is required before deterministic derivation."}
+      ]
+    },
+    {
+      "domain_id": "unclassified_indicator",
+      "indicator_domains": ["missing_other"],
+      "provider_domain_ids": ["daily_quote"],
+      "description": "Unclassified legacy indicator names that require business definition and explicit field lineage.",
+      "granularity": "mixed",
+      "temporal_model": "derived",
+      "primary_keys": ["indicator_id", "rule_version"],
+      "quality_gates": ["business_definition_present", "value_type_known", "field_lineage_present", "reference_cases"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package"], "reason": "Unknown semantics cannot be inferred safely from a similar indicator name."},
+        {"profile_id": "competition-official-only-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package"], "reason": "Unknown semantics require adjudication, not fuzzy SQL generation."}
+      ]
+    },
+    {
+      "domain_id": "private_account",
+      "indicator_domains": [],
+      "provider_domain_ids": ["private_account"],
+      "description": "User holdings, watchlists and account-specific facts supplied per authorized request.",
+      "granularity": "event",
+      "temporal_model": "request_scoped",
+      "primary_keys": ["principal_id", "account_id", "instrument_code", "effective_at"],
+      "quality_gates": ["principal_authorized", "purpose_limited", "not_persisted_in_evidence", "audit_recorded"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "private_required", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "Private account data cannot be obtained from public sources or bundled in the project."},
+        {"profile_id": "competition-official-only-v1", "status": "private_required", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package cannot contain a judge's private account state."}
+      ]
+    },
+    {
+      "domain_id": "group_analytics",
+      "indicator_domains": [],
+      "provider_domain_ids": ["daily_quote", "industry_membership", "concept_membership", "sector_membership"],
+      "description": "Industry, concept and board result entities derived from constituent membership and security observations under an explicit aggregation policy.",
+      "granularity": "mixed",
+      "temporal_model": "derived",
+      "primary_keys": ["snapshot_id", "group_type", "group_code", "bizdate"],
+      "quality_gates": ["aggregation_policy_explicit", "membership_effective_date", "constituent_coverage", "reference_result_hash"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package", "eastmoney", "baostock-industry", "sina-sector"], "reason": "Membership and quotes exist, but the official DSL does not define the default constituent aggregation for a group-valued indicator."},
+        {"profile_id": "competition-official-only-v1", "status": "unsupported", "active_provider_ids": [], "candidate_provider_ids": ["official-package"], "reason": "The organizer package has no group membership and no default group aggregation policy."}
+      ]
+    },
+    {
+      "domain_id": "index_market_data",
+      "indicator_domains": [],
+      "provider_domain_ids": ["index_quote"],
+      "description": "Versioned index OHLCV observations with publisher identity and an auditable snapshot watermark.",
+      "granularity": "daily",
+      "temporal_model": "historical_series",
+      "primary_keys": ["snapshot_id", "index_code", "bizdate"],
+      "quality_gates": ["index_identity_join", "date_watermark", "primary_key_unique", "source_fingerprint"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "available", "active_provider_ids": ["akshare-index"], "candidate_provider_ids": ["tushare-optional"], "reason": "A frozen public index-quote snapshot is active for registered indices; unsupported indices remain unavailable."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "The organizer package has no index quote table."}
+      ]
+    },
+    {
+      "domain_id": "fund_market_data",
+      "indicator_domains": [],
+      "provider_domain_ids": ["fund_identity", "fund_portfolio", "fund_quote"],
+      "description": "Fund identity and market or NAV observations with fund-type and venue semantics.",
+      "granularity": "mixed",
+      "temporal_model": "historical_series",
+      "primary_keys": ["fund_code", "bizdate"],
+      "quality_gates": ["fund_type_normalized", "venue_calendar_valid", "nav_price_semantics_explicit", "primary_key_unique"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "The official package contains stock facts only; fund market facts require a separately admitted snapshot."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "No fund market table is present in the organizer package."}
+      ]
+    },
+    {
+      "domain_id": "fixed_income_market_data",
+      "indicator_domains": [],
+      "provider_domain_ids": ["fixed_income_quote"],
+      "description": "Bond and convertible-bond observations with instrument type, venue and trading calendar.",
+      "granularity": "daily",
+      "temporal_model": "historical_series",
+      "primary_keys": ["venue", "instrument_code", "bizdate"],
+      "quality_gates": ["instrument_type_normalized", "venue_calendar_valid", "price_basis_explicit", "primary_key_unique"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Bond observations are not part of the official A-share package."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "No fixed-income table is present in the organizer package."}
+      ]
+    },
+    {
+      "domain_id": "derivative_market_data",
+      "indicator_domains": [],
+      "provider_domain_ids": ["futures_quote"],
+      "description": "Futures observations with exchange calendar, contract multiplier and expiry metadata.",
+      "granularity": "daily",
+      "temporal_model": "historical_series",
+      "primary_keys": ["venue", "instrument_code", "bizdate"],
+      "quality_gates": ["contract_identity_valid", "multiplier_present", "continuous_contract_policy", "primary_key_unique"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Futures data and continuous-contract semantics are outside the organizer package."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "No derivatives table is present in the organizer package."}
+      ]
+    },
+    {
+      "domain_id": "currency_market_data",
+      "indicator_domains": [],
+      "provider_domain_ids": ["currency_quote"],
+      "description": "Currency or money-market instrument observations with explicit quote convention and timezone.",
+      "granularity": "daily",
+      "temporal_model": "historical_series",
+      "primary_keys": ["venue", "instrument_code", "bizdate"],
+      "quality_gates": ["quote_convention_explicit", "currency_pair_normalized", "timezone_fixed", "primary_key_unique"],
+      "profiles": [
+        {"profile_id": "competition-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": ["tushare-optional"], "reason": "Currency and money-market data are not contained in the organizer package."},
+        {"profile_id": "competition-official-only-v1", "status": "not_loaded", "active_provider_ids": [], "candidate_provider_ids": [], "reason": "No currency market table is present in the organizer package."}
+      ]
+    }
+  ]
+}

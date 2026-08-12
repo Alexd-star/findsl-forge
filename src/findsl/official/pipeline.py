@@ -137,7 +137,14 @@ def compile_official(
 
     stage_started = perf_counter_ns()
     try:
-        logical = lower_official_ast(typed, strict=True, domain_registry=registry)
+        logical = lower_official_ast(
+            typed,
+            strict=True,
+            domain_registry=registry,
+            entity_target_catalog=compile_context.entity_target_catalog,
+            data_domain_catalog=compile_context.data_domain_catalog,
+            profile_id=compile_context.snapshot.profile_id,
+        )
     except Exception as exc:
         _raise_pipeline_error("logical", exc, partial)
     timings["logical"] = perf_counter_ns() - stage_started

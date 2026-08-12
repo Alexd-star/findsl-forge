@@ -18,6 +18,9 @@
     {"role": "external_index_quotes", "path": "configs/official/external_index_quotes.json"},
     {"role": "benchmark_policy", "path": "configs/official/benchmark_policy.json"},
     {"role": "approximation_policy", "path": "configs/official/approximation_policy.json"},
-    {"role": "technical_patterns", "path": "configs/official_technical_patterns.json"}
+    {"role": "technical_patterns", "path": "configs/official_technical_patterns.json"},
+    {"role": "external_source_registry", "path": "configs/official/external_source_registry.json"},
+    {"role": "data_domain_catalog", "path": "configs/official/data_domains.json"},
+    {"role": "entity_target_catalog", "path": "configs/official/entity_targets.json"}
   ]
 }

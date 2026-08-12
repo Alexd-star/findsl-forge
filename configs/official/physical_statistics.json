@@ -1,11 +1,20 @@
 {
   "schema_version": 3,
-  "catalog_sha256": "ee58f58a0d54ee1e2eaf1deb4bcef89ab1826e0296df2619278a019e0bf585a1",
+  "catalog_sha256": "1a71b685e4e637e1ece8caf60910b7372cda693d6be07181b972d07faab4203d",
   "collected_at": "2026-08-09T15:04:56+08:00",
   "doris_version": "doris-4.1.0-rc03-5960d4cea0e",
   "resources": [
     {
       "resource_id": "external_index_quote",
+      "row_count": 23218,
+      "data_size_bytes": 871508,
+      "row_count_available": true,
+      "partition_value_count": 8681,
+      "partition_min": "1990-12-19",
+      "partition_max": "2026-07-14"
+    },
+    {
+      "resource_id": "external_index_quote_shape",
       "row_count": 23218,
       "data_size_bytes": 871508,
       "row_count_available": true,

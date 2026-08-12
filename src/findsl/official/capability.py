@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Set
+import re
+from typing import Any, Dict, Mapping, Set, Tuple
 
 from .context import CompileContext
 from .pipeline import OfficialPipelineError, OfficialPipelineResult
@@ -19,6 +20,7 @@ def supported_capability_report(
     explain = result.explain
     physical = result.physical
     rules = explain.get("applied_financial_rules") or ()
+    indicator_ids = list(explain["query_features"]["indicator_ids"])
     return {
         "supported": True,
         "status": SUPPORTED,
@@ -32,7 +34,16 @@ def supported_capability_report(
         "selected_route": explain["adaptive_route"]["selected_route"],
         "selected_strategy": physical["selected_strategy"],
         "function_families": list(explain["query_features"]["function_families"]),
-        "indicator_ids": list(explain["query_features"]["indicator_ids"]),
+        "indicator_ids": indicator_ids,
+        "data_requirements": list(
+            _domain_payloads(
+                (
+                    *_indicator_domain_definitions(indicator_ids, context),
+                    *_target_domain_definitions(result.typed_ast, context),
+                ),
+                context,
+            )
+        ),
         "required_resources": sorted(_physical_resources(physical["plan"])),
         "applied_financial_rule_ids": [item["rule_id"] for item in rules],
         "compile_elapsed_ms": result.elapsed_ms,
@@ -43,7 +54,8 @@ def rejected_capability_report(
     error: OfficialPipelineError,
     context: CompileContext,
 ) -> Dict[str, Any]:
-    status = classify_pipeline_error(error)
+    requirements = _rejected_data_requirements(error, context)
+    status = classify_pipeline_error(error, data_requirements=requirements)
     return {
         "supported": False,
         "status": status,
@@ -58,19 +70,31 @@ def rejected_capability_report(
         "selected_strategy": None,
         "function_families": [],
         "indicator_ids": [],
+        "data_requirements": list(requirements),
         "required_resources": [],
         "applied_financial_rule_ids": [],
         "compile_elapsed_ms": _partial_elapsed_ms(error.partial),
     }
 
 
-def classify_pipeline_error(error: OfficialPipelineError) -> str:
+def classify_pipeline_error(
+    error: OfficialPipelineError,
+    *,
+    data_requirements: Tuple[Dict[str, Any], ...] = (),
+) -> str:
     code = str(error.code).upper()
     if "DATA_UNAVAILABLE" in code or code in {
         "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
         "PHYSICAL_RESOURCE_DATA_UNAVAILABLE",
     }:
         return DATA_UNAVAILABLE
+    if any(
+        item["profile"]["status"] in {"not_loaded", "private_required"}
+        for item in data_requirements
+    ):
+        return DATA_UNAVAILABLE
+    if _has_ambiguous_date(error):
+        return INVALID_INPUT
     if error.stage == "frontend":
         return INVALID_INPUT
     if error.stage in {"typed", "logical"} and not any(
@@ -117,4 +141,135 @@ def _remediation(status: str) -> str:
     return (
         "use a supported capability or add a declarative mapping, controlled function "
         "template, optimizer rule or reviewed physical plugin"
+    )
+
+
+_INTRADAY_DATE = re.compile(
+    r"(?:\d{1,2}:\d{2}|分钟|早盘|尾盘|盘前|盘后|开盘后|收盘后|集合竞价|刚刚|此时)"
+)
+_REPORTING_DATE = re.compile(r"(?:年报|季报|半年报|一季报|三季报|报告期)")
+_AMBIGUOUS_DATE = {"最近", "近期", "前期", "当前阶段"}
+_FUND_TYPES = re.compile(r"(?:ETF|LOF|基金|REITs|货币)", re.IGNORECASE)
+_CROSS_MARKET_TYPES = re.compile(r"(?:港股|美股|期货|债券|可转债)")
+_PRIVATE_TERMS = re.compile(r"(?:我的|自选股|持仓|账户|组合)")
+
+
+def _indicator_domain_definitions(indicator_ids, context):
+    definitions = []
+    for indicator_id in indicator_ids:
+        definition = context.registry.resolve_optional(indicator_id)
+        if definition is None:
+            continue
+        domain = context.data_domain_catalog.resolve_indicator_domain(definition.domain)
+        if domain is not None:
+            definitions.append(domain)
+    return tuple(definitions)
+
+
+def _rejected_data_requirements(error, context):
+    definitions = []
+    code = str(error.code).upper()
+    if code in {
+        "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+        "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE",
+    }:
+        definitions.append(context.data_domain_catalog.resolve("scope_membership"))
+    if code == "PHYSICAL_MARKET_DATA_UNAVAILABLE":
+        definitions.append(
+            context.data_domain_catalog.resolve("cross_market_quote")
+        )
+    slots = tuple(_binding_slots(error.partial.get("typed_ast")))
+    for item in slots:
+        for key, value in item.items():
+            if not key.startswith("indicator_name") or not str(value).strip():
+                continue
+            definition = context.registry.resolve_optional(str(value))
+            if definition is None:
+                continue
+            domain = context.data_domain_catalog.resolve_indicator_domain(
+                definition.domain
+            )
+            if domain is not None:
+                definitions.append(domain)
+        date_value = str(item.get("date", item.get("period", ""))).strip()
+        if _INTRADAY_DATE.search(date_value):
+            definitions.append(context.data_domain_catalog.resolve("intraday_quote"))
+        if _REPORTING_DATE.search(date_value):
+            definitions.append(
+                context.data_domain_catalog.resolve("financial_statement")
+            )
+    definitions.extend(_target_domain_definitions(error.partial.get("typed_ast"), context))
+    source = str(error.partial.get("source", ""))
+    if _PRIVATE_TERMS.search(source):
+        definitions.append(context.data_domain_catalog.resolve("private_account"))
+    return _domain_payloads(definitions, context)
+
+
+def _target_domain_definitions(typed_ast, context):
+    definitions = []
+    for slots in _binding_slots(typed_ast):
+        try:
+            target = context.entity_target_catalog.bind(
+                str(slots.get("select_type", "")),
+                data_domains=context.data_domain_catalog,
+                profile_id=context.snapshot.profile_id,
+            )
+        except (KeyError, ValueError):
+            continue
+        definitions.extend(
+            context.data_domain_catalog.resolve(domain_id)
+            for domain_id in target.required_data_domains
+        )
+    return tuple(definitions)
+
+
+def _domain_payloads(definitions, context):
+    payloads = []
+    seen = set()
+    for definition in definitions:
+        if definition.domain_id in seen:
+            continue
+        seen.add(definition.domain_id)
+        payload = definition.to_dict(profile_id=context.snapshot.profile_id)
+        profile = payload["profile"]
+        provider_ids = tuple(
+            dict.fromkeys(
+                (*profile["active_provider_ids"], *profile["candidate_provider_ids"])
+            )
+        )
+        payload["providers"] = [
+            _provider_payload(context.external_source_registry.resolve(provider_id))
+            for provider_id in provider_ids
+        ]
+        payloads.append(payload)
+    return tuple(payloads)
+
+
+def _provider_payload(provider):
+    return {
+        "provider_id": provider.provider_id,
+        "authority_level": provider.authority_level,
+        "temporal_model": provider.temporal_model,
+        "redistribution": provider.redistribution,
+        "source_url": provider.source_url,
+    }
+
+
+def _binding_slots(value):
+    if isinstance(value, Mapping):
+        binding = value.get("binding")
+        if isinstance(binding, Mapping) and isinstance(binding.get("slots"), Mapping):
+            yield binding["slots"]
+        for child in value.values():
+            yield from _binding_slots(child)
+    elif isinstance(value, (list, tuple)):
+        for child in value:
+            yield from _binding_slots(child)
+
+
+def _has_ambiguous_date(error):
+    return any(
+        str(slots.get("date", slots.get("period", ""))).strip()
+        in _AMBIGUOUS_DATE
+        for slots in _binding_slots(error.partial.get("typed_ast"))
     )

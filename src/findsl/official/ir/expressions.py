@@ -40,6 +40,7 @@ class CallExpr(LogicalExpr):
     date_constraint: Optional[Any] = None
     market_expression: Optional[Any] = None
     scope_expression: Optional[Any] = None
+    entity_target: Optional[Any] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -51,6 +52,7 @@ class CallExpr(LogicalExpr):
             "date_constraint": self.date_constraint.to_dict() if self.date_constraint else None,
             "market_expression": self.market_expression.to_dict() if self.market_expression else None,
             "scope_expression": self.scope_expression.to_dict() if self.scope_expression else None,
+            "entity_target": self.entity_target.to_dict() if self.entity_target else None,
         }
 
 

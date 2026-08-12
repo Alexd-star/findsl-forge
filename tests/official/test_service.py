@@ -113,6 +113,28 @@ def test_service_negotiates_supported_data_invalid_and_capability_cases():
     assert supported["plan_id"]
     assert "official_basic" in supported["required_resources"]
     assert unavailable["status"] == "DATA_UNAVAILABLE"
+    assert unavailable["data_requirements"][0]["domain_id"] == "financial_statement"
+    assert unavailable["data_requirements"][0]["profile"]["status"] == "not_loaded"
+    assert unavailable["data_requirements"][0]["providers"][0]["provider_id"] == "tushare-optional"
     assert invalid["status"] == "INVALID_INPUT"
     assert gap["status"] == "CAPABILITY_GAP"
     assert service.metrics.snapshot()["counters"]["negotiate:supported"] == 1
+
+
+def test_service_distinguishes_missing_intraday_data_from_ambiguous_date() -> None:
+    service = OfficialCompilerService()
+
+    intraday = service.negotiate(
+        "rank('', '', '主力净流入', 'desc', '今天开盘30分钟以内', '', '', '') = 1"
+    )["capability"]
+    ambiguous = service.negotiate(
+        "indicator('', '', '涨幅', '最近', '', '', '') > 1"
+    )["capability"]
+
+    assert intraday["status"] == "DATA_UNAVAILABLE"
+    assert any(
+        item["domain_id"] == "intraday_quote"
+        and item["profile"]["status"] == "not_loaded"
+        for item in intraday["data_requirements"]
+    )
+    assert ambiguous["status"] == "INVALID_INPUT"

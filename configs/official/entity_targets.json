@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "default_target": {
+    "token": "",
+    "target_id": "security",
+    "logical_entity": "security_observation",
+    "execution_mode": "security_scan",
+    "required_data_domains": ["daily_market_quote"],
+    "result_keys": ["mktcode", "tgtcode"]
+  },
+  "targets": [
+    {"token": "行业", "target_id": "industry", "logical_entity": "classified_group", "execution_mode": "group_aggregate", "required_data_domains": ["group_analytics"], "result_keys": ["group_type", "group_code"]},
+    {"token": "概念", "target_id": "concept", "logical_entity": "classified_group", "execution_mode": "group_aggregate", "required_data_domains": ["group_analytics"], "result_keys": ["group_type", "group_code"]},
+    {"token": "板块", "target_id": "board", "logical_entity": "classified_group", "execution_mode": "group_aggregate", "required_data_domains": ["group_analytics"], "result_keys": ["group_type", "group_code"]},
+    {"token": "指数", "target_id": "index", "logical_entity": "index_observation", "execution_mode": "index_scan", "required_data_domains": ["index_market_data"], "result_keys": ["index_code"]},
+    {"token": "可转债", "target_id": "convertible_bond", "logical_entity": "fixed_income_observation", "execution_mode": "fixed_income_scan", "required_data_domains": ["fixed_income_market_data"], "result_keys": ["venue", "instrument_code"]},
+    {"token": "债券", "target_id": "bond", "logical_entity": "fixed_income_observation", "execution_mode": "fixed_income_scan", "required_data_domains": ["fixed_income_market_data"], "result_keys": ["venue", "instrument_code"]},
+    {"token": "场内基金", "target_id": "exchange_fund", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "场外基金", "target_id": "otc_fund", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "公募基金", "target_id": "public_fund", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "私募基金", "target_id": "private_fund", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "ETF", "target_id": "etf", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "LOF", "target_id": "lof", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "REITs", "target_id": "reits", "logical_entity": "fund_observation", "execution_mode": "fund_scan", "required_data_domains": ["fund_market_data"], "result_keys": ["venue", "fund_code"]},
+    {"token": "期货", "target_id": "futures", "logical_entity": "derivative_observation", "execution_mode": "derivative_scan", "required_data_domains": ["derivative_market_data"], "result_keys": ["venue", "instrument_code"]},
+    {"token": "货币", "target_id": "currency", "logical_entity": "currency_observation", "execution_mode": "currency_scan", "required_data_domains": ["currency_market_data"], "result_keys": ["venue", "instrument_code"]}
+  ]
+}

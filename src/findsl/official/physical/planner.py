@@ -202,6 +202,17 @@ _SET_AGGREGATE_FUNCTIONS = {
     "GROWTH_RISE",
     "GROWTH_FALL",
 }
+_INDEX_TARGET_RESOURCE = "external_index_quote_shape"
+_INDEX_TARGET_FIELDS = {
+    "最新价": ("close", "numeric"),
+    "收盘价": ("close", "numeric"),
+    "开盘价": ("open", "numeric"),
+    "最高价": ("high", "numeric"),
+    "最低价": ("low", "numeric"),
+    "成交量": ("volume", "numeric"),
+    "涨幅": ("pct_change", "numeric"),
+    "涨跌幅": ("pct_change", "numeric"),
+}
 
 
 def _merge_exist_temporal_union(left, right) -> Optional[PhysicalTemporal]:
@@ -293,6 +304,8 @@ def plan_physical(
     expressions: Optional[PhysicalExpressionRegistry] = None,
     allow_shadow_strategies: bool = False,
 ) -> PhysicalPlanningResult:
+    _validate_entity_target_contract(lowering.plan)
+    entity_target = _logical_entity_target(lowering.plan)
     if isinstance(lowering.plan, LogicalLimit) and isinstance(
         lowering.plan.input,
         (LogicalSetOperation, LogicalStage),
@@ -435,7 +448,12 @@ def plan_physical(
     resource_ids = tuple(sorted({field.resource_id for field in fields}))
     if not resource_ids:
         if _contains_universe_selector(lowering.plan):
-            resource_ids = ("official_basic",)
+            resource_ids = (
+                (_INDEX_TARGET_RESOURCE,)
+                if entity_target is not None
+                and entity_target.execution_modes == ("index_scan",)
+                else ("official_basic",)
+            )
         else:
             raise PhysicalPlanningError("PHYSICAL_PLAN_UNAVAILABLE", "logical plan has no directly mapped physical indicator")
     if _is_top_level_stage_rank(lowering.plan):
@@ -3710,10 +3728,19 @@ def _collect_fields(
                     fields.append(
                         _ResolvedIndicator(
                             "稳定证券顺序",
-                            "official_basic",
+                            _INDEX_TARGET_RESOURCE
+                            if call.entity_target is not None
+                            and call.entity_target.execution_modes == ("index_scan",)
+                            else "official_basic",
                             "numeric",
                         )
                     )
+                    continue
+                if (
+                    call.entity_target is not None
+                    and call.entity_target.execution_modes == ("index_scan",)
+                ):
+                    fields.append(_resolve_index_target_indicator(indicator_id))
                     continue
                 try:
                     fields.append(_resolve_indicator(indicator_id, catalog, expressions))
@@ -3856,7 +3883,14 @@ def _contains_universe_call(expression) -> bool:
 
 
 def _reject_unmaterialized_constraints(call: CallExpr) -> None:
-    materialized = {"indicator_name", "market", "date", "direction", "agg_func"}
+    materialized = {
+        "indicator_name",
+        "market",
+        "date",
+        "direction",
+        "agg_func",
+        "select_type",
+    }
     if call.name in _CROSSING_CALLS | _PATTERN_CALLS:
         materialized.update({"indicator_name_1", "indicator_name_2"})
     if call.name in _EXTREME_CALLS | _POSITION_CALLS:
@@ -3874,6 +3908,73 @@ def _reject_unmaterialized_constraints(call: CallExpr) -> None:
             "PHYSICAL_CONSTRAINT_UNSUPPORTED",
             f"physical planner cannot yet materialize non-empty slot(s): {names}",
         )
+
+
+def _validate_entity_target_contract(plan) -> None:
+    calls = tuple(
+        call
+        for expression in _logical_expressions(plan)
+        for call in _walk_calls(expression)
+        if call.entity_target is not None
+    )
+    if not calls:
+        return
+    targets = {call.entity_target.canonical_json() for call in calls}
+    if len(targets) > 1:
+        sources = sorted({call.entity_target.source or "股票" for call in calls})
+        raise PhysicalPlanningError(
+            "PHYSICAL_ENTITY_TARGET_MISMATCH",
+            "one query stage cannot mix incompatible result entities: "
+            + ", ".join(sources),
+        )
+    target = calls[0].entity_target
+    if target.is_security:
+        return
+    statuses = dict(target.data_domain_statuses)
+    unsupported = sorted(
+        domain_id for domain_id, status in statuses.items() if status == "unsupported"
+    )
+    if unsupported:
+        raise PhysicalPlanningError(
+            "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
+            "result-entity semantics require an approved aggregation contract: "
+            + ", ".join(unsupported),
+        )
+    unavailable = sorted(
+        domain_id
+        for domain_id, status in statuses.items()
+        if status in {"not_loaded", "private_required"}
+    )
+    if unavailable:
+        raise PhysicalPlanningError(
+            "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
+            "result-entity data is not admitted in the active profile: "
+            + ", ".join(unavailable),
+        )
+    if len(target.logical_entities) > 1 or len(target.execution_modes) > 1:
+        raise PhysicalPlanningError(
+            "PHYSICAL_ENTITY_SET_UNSUPPORTED",
+            "select_type set expression spans incompatible physical entity families",
+        )
+    if target.execution_modes == ("index_scan",):
+        for call in calls:
+            market = str(call.binding.slots.get("market", "")).strip()
+            if market:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
+                    "index result queries require an index-market mapping instead of a stock market filter",
+                )
+            if call.scope_expression is not None:
+                raise PhysicalPlanningError(
+                    "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
+                    "index result queries require index metadata scope, not stock membership scope",
+                )
+        return
+    raise PhysicalPlanningError(
+        "PHYSICAL_ENTITY_PLAN_UNSUPPORTED",
+        "the active catalog declares this result entity, but its physical route is not enabled: "
+        + ", ".join(target.target_ids),
+    )
 
 
 def _build_stage_rank(
@@ -4172,6 +4273,18 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             calendar_unit=window.unit,
             anchor_month=window.month,
             anchor_day=window.day,
+        )
+    if (
+        window.kind == "year_month_range"
+        and window.month is not None
+        and window.end_month is not None
+    ):
+        return PhysicalTemporalWindow(
+            "year_month_range",
+            calendar_amount=1,
+            calendar_unit="month",
+            anchor_month=window.month,
+            end_month=window.end_month,
         )
     if window.kind == "expression" and window.anchor:
         text = str(window.anchor).strip()
@@ -4583,6 +4696,31 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
     if call.binding is None:
         return ()
     constraints = []
+    if resource_id == _INDEX_TARGET_RESOURCE:
+        index_catalog = current_external_index_quote_catalog()
+        entries = index_catalog.entries if index_catalog is not None else ()
+        if not entries:
+            raise PhysicalPlanningError(
+                "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
+                "the active profile has no registered index quote snapshots",
+            )
+        constraints.extend(
+            (
+                PhysicalIn(
+                    PhysicalColumn(resource_id, "snapshot_id", STRING),
+                    tuple(
+                        PhysicalLiteral(value, STRING)
+                        for value in sorted({item.snapshot_id for item in entries})
+                    ),
+                ),
+                PhysicalIn(
+                    PhysicalColumn(resource_id, "tgtcode", STRING),
+                    tuple(
+                        PhysicalLiteral(item.scope_code, STRING) for item in entries
+                    ),
+                ),
+            )
+        )
     resource = catalog.resource(resource_id)
     stable_resource_id = resource.anchor_resource_id or resource_id
     date = str(call.binding.slots.get("date", "")).strip()
@@ -4728,6 +4866,68 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     amount=typed_date.amount,
                 )
             )
+        elif typed_date.kind == "period_since" and typed_date.unit:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "period_since",
+                    typed_date.unit,
+                    offset=typed_date.offset,
+                )
+            )
+        elif typed_date.kind == "anchor_since" and typed_date.day is not None:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "anchor_since",
+                    "day",
+                    month=typed_date.month,
+                    day=typed_date.day,
+                )
+            )
+        elif typed_date.kind == "month_day_range" and typed_date.day is not None:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "month_day_range",
+                    "day",
+                    month=typed_date.month,
+                    day=typed_date.day,
+                    end_month=typed_date.end_month,
+                    end_day=typed_date.end_day,
+                )
+            )
+        elif typed_date.kind == "calendar_since" and typed_date.start:
+            constraints.append(
+                PhysicalBinary(
+                    "and",
+                    PhysicalComparison(">=", column, PhysicalLiteral(typed_date.start, TIME)),
+                    PhysicalComparison(
+                        "<=",
+                        column,
+                        PhysicalLatestValue(stable_resource_id, partition_key, TIME),
+                    ),
+                    BOOLEAN,
+                )
+            )
+        elif (
+            typed_date.kind == "year_month_range"
+            and typed_date.month is not None
+            and typed_date.end_month is not None
+        ):
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "year_month_range",
+                    "month",
+                    month=typed_date.month,
+                    end_month=typed_date.end_month,
+                )
+            )
         elif typed_date.kind == "anchor_calendar" and typed_date.unit:
             constraints.append(
                 PhysicalDynamicDateRange(
@@ -4754,6 +4954,30 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                 f"typed date constraint is not materialized for scalar planning: {date}",
             )
     return tuple(constraints)
+
+
+def _logical_entity_target(plan):
+    for expression in _logical_expressions(plan):
+        for call in _walk_calls(expression):
+            if call.entity_target is not None:
+                return call.entity_target
+    return None
+
+
+def _resolve_index_target_indicator(indicator_id: str) -> _ResolvedIndicator:
+    try:
+        column, value_type = _INDEX_TARGET_FIELDS[str(indicator_id).strip()]
+    except KeyError as exc:
+        raise PhysicalPlanningError(
+            "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
+            f"index target has no admitted field mapping for indicator {indicator_id}",
+        ) from exc
+    return _ResolvedIndicator(
+        str(indicator_id).strip(),
+        _INDEX_TARGET_RESOURCE,
+        value_type,
+        direct_column=column,
+    )
 
 
 def _resolve_scope_atoms(expression, catalog: SecurityScopeCatalog, external_catalog):

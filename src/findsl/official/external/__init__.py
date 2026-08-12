@@ -11,6 +11,17 @@ from .source_registry import (
     ExternalSourceRegistry,
     ExternalSourceRegistryError,
 )
+from .admission import (
+    DomainSnapshotAdmissionError,
+    DomainSnapshotManifest,
+    audit_domain_snapshot,
+)
+from .data_domains import (
+    DataDomainCatalog,
+    DataDomainCatalogError,
+    DataDomainDefinition,
+    DataDomainProfile,
+)
 
 __all__ = [
     "CatalogSnapshot",
@@ -20,7 +31,14 @@ __all__ = [
     "ExternalSource",
     "ExternalSourceRegistry",
     "ExternalSourceRegistryError",
+    "DataDomainCatalog",
+    "DataDomainCatalogError",
+    "DataDomainDefinition",
+    "DataDomainProfile",
+    "DomainSnapshotAdmissionError",
+    "DomainSnapshotManifest",
     "IndustryMembership",
     "InstrumentRule",
     "ScopeMembership",
+    "audit_domain_snapshot",
 ]

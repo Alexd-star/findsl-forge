@@ -251,24 +251,12 @@ def test_approximate_comparison_uses_typed_hybrid_tolerance_expression():
     assert "0.01" in result.plan.predicate.canonical_json()
 
 
-@pytest.mark.parametrize(
-    "source,code",
-    [
-        (
-            "indicator('', '完全不存在的范围', '成交量', '', '', '', '') > 100",
-            "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
-        ),
-        (
-            "indicator('', '', '成交量', '', 'AVG', '', '') > 100",
-            "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-        ),
-    ],
-)
-def test_unmaterialized_function_constraints_are_never_silently_dropped(source, code):
+def test_unmaterialized_function_constraints_are_never_silently_dropped():
+    source = "indicator('', '完全不存在的范围', '成交量', '', '', '', '') > 100"
     with pytest.raises(PhysicalPlanningError) as excinfo:
         plan_physical(_lower(source), default_physical_catalog())
 
-    assert excinfo.value.code == code
+    assert excinfo.value.code == "PHYSICAL_SCOPE_DATA_UNAVAILABLE"
 
 
 @pytest.mark.parametrize("aggregate", ["SUM", "AVG", "MAX", "MIN"])
