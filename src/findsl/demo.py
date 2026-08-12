@@ -960,7 +960,7 @@ def render_demo_html() -> str:
         </div>
         <div class="section metrics">
           <div class="metric"><strong id="metricStatus">-</strong><span>验证状态</span></div>
-          <div class="metric"><strong id="metricLatency">-</strong><span>编译耗时</span></div>
+          <div class="metric"><strong id="metricLatency">-</strong><span>正式编译总耗时</span></div>
           <div class="metric"><strong id="metricRows">-</strong><span id="metricRowsLabel">结果行数</span></div>
           <div class="metric"><strong id="metricPrefix">-</strong><span>执行策略</span></div>
           <div class="metric"><strong id="metricDataset">-</strong><span>数据口径</span></div>
@@ -1127,13 +1127,14 @@ def render_demo_html() -> str:
       wrap.className = "structured";
       const summary = document.createElement("div");
       summary.className = "stage-summary";
+      const timings = result.timings_ns || {};
       const stages = [
-        ["ANTLR 前端", result.frontend && result.frontend.ok, result.frontend && result.frontend.elapsed_ns],
-        ["Typed AST", Boolean(result.typed_ast), null],
-        ["Logical IR", Boolean(result.logical), result.logical && result.logical.elapsed_ns],
-        ["优化器", Boolean(result.optimized), null],
-        ["Physical IR", Boolean(result.physical), result.physical && result.physical.elapsed_ns],
-        ["SQLGlot 后端", result.backend && result.backend.validation_passed, result.backend && result.backend.elapsed_ns]
+        ["ANTLR 前端", result.frontend && result.frontend.ok, timings.frontend || (result.frontend && result.frontend.elapsed_ns)],
+        ["Typed AST", Boolean(result.typed_ast), timings.typed],
+        ["Logical IR", Boolean(result.logical), timings.logical || (result.logical && result.logical.elapsed_ns)],
+        ["优化器", Boolean(result.optimized), timings.optimizer],
+        ["Physical IR", Boolean(result.physical), timings.physical],
+        ["SQLGlot 后端", result.backend && result.backend.validation_passed, timings.backend]
       ];
       stages.forEach(([name, passed, elapsed]) => {
         const item = document.createElement("div");
@@ -1343,17 +1344,14 @@ def render_demo_html() -> str:
     }
 
     function normalizeOfficialResult(result) {
-      const elapsedNs = [
-        result.frontend && result.frontend.elapsed_ns,
-        result.logical && result.logical.elapsed_ns,
-        result.physical && result.physical.elapsed_ns,
-        result.backend && result.backend.elapsed_ns
-      ].filter(value => typeof value === "number").reduce((sum, value) => sum + value, 0);
+      const elapsedMs = typeof result.elapsed_ms === "number"
+        ? result.elapsed_ms
+        : ((result.timings_ns && result.timings_ns.total) || 0) / 1000000;
       return {
         ok: true,
         official: result,
         compile: {
-          elapsed_ms: elapsedNs / 1000000,
+          elapsed_ms: elapsedMs,
           ast: result.frontend && result.frontend.ast,
           sql: result.backend && result.backend.sql || "",
           trace: [],

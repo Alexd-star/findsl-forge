@@ -190,6 +190,9 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "data-tab=\"logical\"" in html
     assert "data-tab=\"physical\"" in html
     assert "normalizeOfficialResult" in html
+    assert "正式编译总耗时" in html
+    assert "result.timings_ns || {}" in html
+    assert 'typeof result.elapsed_ms === "number"' in html
     assert "height: clamp(420px, 62vh, 760px)" in html
     assert 'id="copyButton" type="button" disabled' in html
     assert 'aria-controls="outputPane"' in html

@@ -40,6 +40,10 @@ def build_evidence_metadata(
         warn_missing=False,
     )
     long_horizon_payload = _read_optional_json(
+        snapshot_dir / "official_long_horizon_matrix.json",
+        warnings,
+        warn_missing=False,
+    ) or _read_optional_json(
         snapshot_dir / "phase42_long_horizon_doris.json",
         warnings,
         warn_missing=False,
@@ -51,6 +55,11 @@ def build_evidence_metadata(
     )
     correctness_payload = _read_optional_json(
         snapshot_dir / "official_correctness_benchmark.json",
+        warnings,
+        warn_missing=False,
+    )
+    compile_latency_payload = _read_optional_json(
+        snapshot_dir / "official_compile_latency.json",
         warnings,
         warn_missing=False,
     )
@@ -393,6 +402,9 @@ def build_evidence_metadata(
             "branch": _extract_value(readiness_text, r"- Git branch:\s*`?([^`\n]+?)`?\s*$"),
         },
         "readiness": _readiness_metadata(readiness_text),
+        "official_compile_latency": _official_compile_latency_metadata(
+            compile_latency_payload
+        ),
         "official_suite": _official_suite_metadata(official_text or readiness_text),
         "official_real_data": {
             "doris": _official_doris_metadata(official_doris_payload),
@@ -715,6 +727,8 @@ def _long_horizon_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
         return {
             "available": False,
             "status": None,
+            "workload_count": None,
+            "median_speedup": None,
             "speedup": None,
             "speedup_display": None,
             "target_speedup": None,
@@ -726,13 +740,18 @@ def _long_horizon_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
             "rollup_partition_count": None,
             "git_head": None,
         }
-    speedup = _number_or_none(payload.get("speedup"))
+    matrix = "workload_count" in payload
+    speedup = _number_or_none(
+        payload.get("minimum_speedup") if matrix else payload.get("speedup")
+    )
     baseline = payload.get("baseline") if isinstance(payload.get("baseline"), dict) else {}
     optimized = payload.get("optimized") if isinstance(payload.get("optimized"), dict) else {}
     tables = payload.get("table_evidence") if isinstance(payload.get("table_evidence"), dict) else {}
     return {
         "available": True,
         "status": payload.get("status"),
+        "workload_count": _int_or_none(payload.get("workload_count")),
+        "median_speedup": _number_or_none(payload.get("median_speedup")),
         "speedup": speedup,
         "speedup_display": f"{speedup:.2f}x" if speedup is not None else None,
         "target_speedup": _number_or_none(payload.get("target_speedup")),
@@ -745,6 +764,33 @@ def _long_horizon_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
         "optimized_median_ms": _number_or_none(optimized.get("median_ms")),
         "rollup_partition_count": _int_or_none(tables.get("rollup_partition_count")),
         "git_head": payload.get("git_head"),
+    }
+
+
+def _official_compile_latency_metadata(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if payload is None:
+        return {
+            "available": False,
+            "git_head": None,
+            "case_count": None,
+            "sample_count": None,
+            "p50_ms": None,
+            "p95_ms": None,
+            "p99_ms": None,
+            "target_p95_ms": None,
+            "target_met": None,
+        }
+    return {
+        "available": True,
+        "git_head": payload.get("git_head"),
+        "catalog_snapshot_id": payload.get("catalog_snapshot_id"),
+        "case_count": _int_or_none(payload.get("case_count")),
+        "sample_count": _int_or_none(payload.get("sample_count")),
+        "p50_ms": _number_or_none(payload.get("p50_ms")),
+        "p95_ms": _number_or_none(payload.get("p95_ms")),
+        "p99_ms": _number_or_none(payload.get("p99_ms")),
+        "target_p95_ms": _number_or_none(payload.get("target_p95_ms")),
+        "target_met": _bool_or_none(payload.get("target_met")),
     }
 
 
@@ -1226,6 +1272,12 @@ def _source_files(snapshot_dir: Path, manifest_path: Path | None) -> dict[str, s
         "official_compiler_funnel_json": str(snapshot_dir / "official_compiler_funnel.json"),
         "official_correctness_benchmark_json": str(
             snapshot_dir / "official_correctness_benchmark.json"
+        ),
+        "official_compile_latency_json": str(
+            snapshot_dir / "official_compile_latency.json"
+        ),
+        "official_long_horizon_matrix_json": str(
+            snapshot_dir / "official_long_horizon_matrix.json"
         ),
         "phase42_long_horizon_doris_json": str(
             snapshot_dir / "phase42_long_horizon_doris.json"

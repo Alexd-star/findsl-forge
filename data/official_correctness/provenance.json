@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "case_count": 127,
-  "approved": 127,
+  "schema_version": 2,
+  "case_count": 240,
+  "approved": 240,
   "cases": {
     "CORR-PHASE10-JOIN-DORIS-001-BASIC-EXT-LATEST": {
       "source_report": "reports/phase10_join_doris.json",
@@ -13,7 +13,7 @@
       "historical_actual_count": 2247,
       "historical_expected_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
       "historical_actual_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
-      "reference_sha256": "d68f2c88682f6edf40daa9ecc2492f25ed1d70119cc3c9a1d2903092a7eeda7e"
+      "reference_sha256": "4f5d4608c21a048b71c5ca0b3061f6aed2964e9b66f168c4c632e1eed13d8eb0"
     },
     "CORR-PHASE10-JOIN-DORIS-002-BASIC-SECURITY-LATEST": {
       "source_report": "reports/phase10_join_doris.json",
@@ -25,7 +25,7 @@
       "historical_actual_count": 5573,
       "historical_expected_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
       "historical_actual_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
-      "reference_sha256": "cfb1b98c997e58c30c78e3e9fa8d35e64b865f0acc8660ee6daf0b523b070b2b"
+      "reference_sha256": "560a966474fca3e1ef0f3be05d2e4304ca323865ea3cf0ff00a835169d161bed"
     },
     "CORR-PHASE10-JOIN-DORIS-003-EXT-SECURITY-LATEST": {
       "source_report": "reports/phase10_join_doris.json",
@@ -37,7 +37,7 @@
       "historical_actual_count": 2247,
       "historical_expected_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
       "historical_actual_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
-      "reference_sha256": "f08039106c9b1706be58bb28e7cb82f6c4e9b7a6987bb5d5d67bc872609aef1f"
+      "reference_sha256": "60a6586ca8bf0d6c59e926b31320dfbe02e5bcd10799883eb34ee4dc982c9569"
     },
     "CORR-PHASE10-JOIN-DORIS-004-BASIC-EXT-SECURITY-LATEST": {
       "source_report": "reports/phase10_join_doris.json",
@@ -49,7 +49,7 @@
       "historical_actual_count": 2247,
       "historical_expected_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
       "historical_actual_sha256": "f33140870d8dc164a055d6c52472b28b0b638501293eadad7625fac4f71eeb4f",
-      "reference_sha256": "cd30f420dffd591182f9c619b752a7d458ff992d7faa1245724cabd32bfadfc6"
+      "reference_sha256": "2b6403c34121025a6e128d7a14ad7a51e52fc3f26b202d19bb2fbc3ccc57903c"
     },
     "CORR-PHASE10-JOIN-DORIS-005-BASIC-TECHNICAL-LATEST": {
       "source_report": "reports/phase10_join_doris.json",
@@ -61,7 +61,7 @@
       "historical_actual_count": 5573,
       "historical_expected_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
       "historical_actual_sha256": "0d7b427f75283683a8ece53b35f5a869ceabd6dc686d03daae869af51b4d13ad",
-      "reference_sha256": "247fe46f9161b776f63bc2a4a247ff8c3c3bc392a61b8506cb1a33f1fab88f9e"
+      "reference_sha256": "6737f86840f98883a0c5fa69ba1346daca26b2f6eee9204d3bc390c45bf73522"
     },
     "CORR-PHASE11-DATE-DORIS-001-CHINESE-YEAR-2024": {
       "source_report": "reports/phase11_date_doris.json",
@@ -73,7 +73,7 @@
       "historical_actual_count": 16734,
       "historical_expected_sha256": "2473561c64caa1533b3cdb209257247dd36aa4cdecedeacd852f819edf30973e",
       "historical_actual_sha256": "2473561c64caa1533b3cdb209257247dd36aa4cdecedeacd852f819edf30973e",
-      "reference_sha256": "cd1b227205b124b5b31bc3b504f482a138f048dd83b264483128dd7c27b1cd2b"
+      "reference_sha256": "548eb2a03939525c8f96675f507981565b6f6a6fdc5cabb553148d00047bf334"
     },
     "CORR-PHASE11-DATE-DORIS-002-CALENDAR-MONTH-2024-08": {
       "source_report": "reports/phase11_date_doris.json",
@@ -85,7 +85,7 @@
       "historical_actual_count": 813,
       "historical_expected_sha256": "c0afe3824bab581592aa946bf9ef190b9646e4793087ee43b349a3aed37ed170",
       "historical_actual_sha256": "c0afe3824bab581592aa946bf9ef190b9646e4793087ee43b349a3aed37ed170",
-      "reference_sha256": "ab4e4f8b0887821ebdf7e6e692e9e502e8da36af854932aff54932fbe8c82fcd"
+      "reference_sha256": "f400786a8ffff3ff3ad81773ef0c8948a68704668baf976549ae3dba6d87b035"
     },
     "CORR-PHASE11-DATE-DORIS-003-CALENDAR-DAY-2024-08-01": {
       "source_report": "reports/phase11_date_doris.json",
@@ -97,7 +97,7 @@
       "historical_actual_count": 55,
       "historical_expected_sha256": "72cdd6f7f469b3e27f0da6e0bb6eaf34b48a7b7436a071c156637e55ff8241ac",
       "historical_actual_sha256": "72cdd6f7f469b3e27f0da6e0bb6eaf34b48a7b7436a071c156637e55ff8241ac",
-      "reference_sha256": "96d498577037dc1f3c1b60f8cc2727cf05e0480696e64c525eb797ad43d7f9c5"
+      "reference_sha256": "a2b54beb660b73045bf79b3be8f4abee0f9ef61653b2b9ece63004e4c13d93fa"
     },
     "CORR-PHASE11-DATE-DORIS-004-PREVIOUS-TRADING-SESSION": {
       "source_report": "reports/phase11_date_doris.json",
@@ -109,7 +109,7 @@
       "historical_actual_count": 100,
       "historical_expected_sha256": "7e461191dfbee4206aeee9f2b2dd6611dc55f639a9b7b144c6f6eef158d6884a",
       "historical_actual_sha256": "7e461191dfbee4206aeee9f2b2dd6611dc55f639a9b7b144c6f6eef158d6884a",
-      "reference_sha256": "e06776e8e910ab6dd0a0362a58c45c9f3160d3f22389c0db7b2de732b1ff82b5"
+      "reference_sha256": "6fc7378658823c6d80920ac839659682c6f35ddee4e445c27c680a67d3c0c353"
     },
     "CORR-PHASE11-DATE-DORIS-005-TWO-TRADING-SESSIONS-AGO": {
       "source_report": "reports/phase11_date_doris.json",
@@ -121,7 +121,7 @@
       "historical_actual_count": 109,
       "historical_expected_sha256": "e6e6a6aa2b0886d67b70e571a4781dd9e155e18043f6fa2b3a703245a621373c",
       "historical_actual_sha256": "e6e6a6aa2b0886d67b70e571a4781dd9e155e18043f6fa2b3a703245a621373c",
-      "reference_sha256": "139d720acf1a560521c9ed758203328a55110214d02aed70d6e02750531d370e"
+      "reference_sha256": "1220f493da9a0261bcb7ded0506e7288cce4aa75ace400419a1e2c3151ba2b90"
     },
     "CORR-PHASE12-SESSION-DORIS-001-RECENT-5-SESSIONS": {
       "source_report": "reports/phase12_session_doris.json",
@@ -133,7 +133,7 @@
       "historical_actual_count": 467,
       "historical_expected_sha256": "53829ac7de1cabbf65ec25e0650f239767553babe2d7338c9125fcf1dc1af857",
       "historical_actual_sha256": "53829ac7de1cabbf65ec25e0650f239767553babe2d7338c9125fcf1dc1af857",
-      "reference_sha256": "b52ea405dfa919481859e3d207a574c433fb5ba1dfb476a6fdf47c8e3a6e271d"
+      "reference_sha256": "6ce6bb45b05745e269d4c3398ac267f20d3ed4a1e56d6b22e4d02a7d54a4bcf3"
     },
     "CORR-PHASE12-SESSION-DORIS-002-RECENT-10-SESSIONS": {
       "source_report": "reports/phase12_session_doris.json",
@@ -145,7 +145,7 @@
       "historical_actual_count": 993,
       "historical_expected_sha256": "1e9e50c0e31d2afc7900b894e28c16fc2f14d244a6854e1f33085103fa3f67c5",
       "historical_actual_sha256": "1e9e50c0e31d2afc7900b894e28c16fc2f14d244a6854e1f33085103fa3f67c5",
-      "reference_sha256": "d46c6744fbb377433bf71a44f0ca40e55adb50cd76431be348b50292f4806541"
+      "reference_sha256": "dd4da71b1bed6546a376aa99dc60c15c43fb2cc23802c6e2ab6f5bfc52c2ddc7"
     },
     "CORR-PHASE12-SESSION-DORIS-003-RECENT-30-SESSIONS": {
       "source_report": "reports/phase12_session_doris.json",
@@ -157,7 +157,7 @@
       "historical_actual_count": 3923,
       "historical_expected_sha256": "1308db1319129113fb41797e76e47c43ff223dc666ce01a4afbd0178d6bcea76",
       "historical_actual_sha256": "1308db1319129113fb41797e76e47c43ff223dc666ce01a4afbd0178d6bcea76",
-      "reference_sha256": "5281f8711f255f747a7ff29aa428341b79161458352c5dfca845ecadbb712ebb"
+      "reference_sha256": "d9c52fbd1850a9c54a0cc42f3363129980bef34414a037386cca74bc06d8421c"
     },
     "CORR-PHASE13-MARKET-DORIS-001-STAR-MARKET": {
       "source_report": "reports/phase13_market_doris.json",
@@ -169,7 +169,7 @@
       "historical_actual_count": 606,
       "historical_expected_sha256": "d9d87ec956456f84472353c6fa5b31f46123da1b06639a9e2911201826cc661a",
       "historical_actual_sha256": "d9d87ec956456f84472353c6fa5b31f46123da1b06639a9e2911201826cc661a",
-      "reference_sha256": "d514c720488e2d886a15c0dbea0138f228245e03cdf1f8055f92aca0120ea5f7"
+      "reference_sha256": "2ea1564c91e9de1aa7f49cba8c9cc6a77f96556ae1e61757ae19a6e30f380bba"
     },
     "CORR-PHASE13-MARKET-DORIS-002-CHINEXT-MARKET": {
       "source_report": "reports/phase13_market_doris.json",
@@ -181,7 +181,7 @@
       "historical_actual_count": 1392,
       "historical_expected_sha256": "e2b2340ddb88d4d1107019c8ae23dbe6667bdb5bb8809b8c717ea5f5568c820d",
       "historical_actual_sha256": "e2b2340ddb88d4d1107019c8ae23dbe6667bdb5bb8809b8c717ea5f5568c820d",
-      "reference_sha256": "628dd9aed94aaa064ef159f17128be2b73b015c1bd58064da7c872188b475c8a"
+      "reference_sha256": "081d82607d0cfa548008c58d36b809a6171726d69262cf1a24ce18fce3560c37"
     },
     "CORR-PHASE13-MARKET-DORIS-003-MAIN-BOARD-UNION": {
       "source_report": "reports/phase13_market_doris.json",
@@ -193,7 +193,7 @@
       "historical_actual_count": 3190,
       "historical_expected_sha256": "dedd3bb2a065926c89f3f558c607e5798db167290878c111d7b6ec1dd2c44a50",
       "historical_actual_sha256": "dedd3bb2a065926c89f3f558c607e5798db167290878c111d7b6ec1dd2c44a50",
-      "reference_sha256": "79d84896997af5aaa69290678f60f15c2933d44d4e3a5ee5ff187dbd1ba36b4f"
+      "reference_sha256": "d4956bb7fee20c87cf6180f9b6d863fbf77116f8fd02e9a80fc382a4e15bccda"
     },
     "CORR-PHASE13-MARKET-DORIS-004-PRECEDENCE-UNION-INTERSECTION-NO": {
       "source_report": "reports/phase13_market_doris.json",
@@ -205,7 +205,7 @@
       "historical_actual_count": 3875,
       "historical_expected_sha256": "f27efbebc862b7713bb969d54b4e23f0d18d9be62b1bb4488e92fabcbb72b7d4",
       "historical_actual_sha256": "f27efbebc862b7713bb969d54b4e23f0d18d9be62b1bb4488e92fabcbb72b7d4",
-      "reference_sha256": "4182e2a933ca4cb5a93e39b3227eebe5eb2bf8a5264b4c7be5108b2cb113835e"
+      "reference_sha256": "1f2b7f580c26360df819557a782afb2d82791a0d1b184c52f7f20821e8c822f4"
     },
     "CORR-PHASE13-MARKET-DORIS-005-DOUBLE-EXCLUSION-BEIJING": {
       "source_report": "reports/phase13_market_doris.json",
@@ -217,7 +217,7 @@
       "historical_actual_count": 306,
       "historical_expected_sha256": "25b09274ce3b427159ec15206b1a6b67949619f7ca371afc0d8e9ca3c7e92592",
       "historical_actual_sha256": "25b09274ce3b427159ec15206b1a6b67949619f7ca371afc0d8e9ca3c7e92592",
-      "reference_sha256": "8d0858e4577daac69ad4059890de63330ea887442c9a3d0a4b909dd7fe274060"
+      "reference_sha256": "64f6dd888818770d4cad8a1c250aafcb95e6221588870655c60bca0659905cfb"
     },
     "CORR-PHASE14-AGGREGATE-DORIS-001-SUM-VOLUME-5": {
       "source_report": "reports/phase14_aggregate_doris.json",
@@ -229,7 +229,7 @@
       "historical_actual_count": 574,
       "historical_expected_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
       "historical_actual_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
-      "reference_sha256": "3ec79c6d6a1b056a4c156f5d1d0e177aae867271d4445bd14057be953898a513"
+      "reference_sha256": "99ad5df3a649f87ffb6382c3303c3a355ce3ed87f3567e9db0eabf1edde2d4a3"
     },
     "CORR-PHASE14-AGGREGATE-DORIS-002-AVG-VOLUME-5": {
       "source_report": "reports/phase14_aggregate_doris.json",
@@ -241,7 +241,7 @@
       "historical_actual_count": 574,
       "historical_expected_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
       "historical_actual_sha256": "add6d3601538e00accc5bb012306f75ea87c41a44aaed610b598f9ff2405f29a",
-      "reference_sha256": "049273141a55004f3287fc78ad82139bc7a7faa3a889a3a3b1ed05b590dac52c"
+      "reference_sha256": "608426b3a71fbde76b99421fee90de927d933ba763312bb1a03065a5bd511e28"
     },
     "CORR-PHASE14-AGGREGATE-DORIS-003-MAX-VOLUME-5": {
       "source_report": "reports/phase14_aggregate_doris.json",
@@ -253,7 +253,7 @@
       "historical_actual_count": 382,
       "historical_expected_sha256": "53f84dcc1474be1410f85959ace32d6c7f790acaedd3573c87fef231672873c8",
       "historical_actual_sha256": "53f84dcc1474be1410f85959ace32d6c7f790acaedd3573c87fef231672873c8",
-      "reference_sha256": "0a0bea6d5f356244e2f814783e5ae8a0eeb0f51bfe45a71c79bd3e6de661151b"
+      "reference_sha256": "481cc1a1957d825d76aba3140cb14305f618eeafe170112380682d6ae7b1bcab"
     },
     "CORR-PHASE14-AGGREGATE-DORIS-004-MIN-VOLUME-5": {
       "source_report": "reports/phase14_aggregate_doris.json",
@@ -265,7 +265,7 @@
       "historical_actual_count": 1478,
       "historical_expected_sha256": "8c3a49cfc805613d97276296ea3c4915360676c9f221c7f42d901ab425b75475",
       "historical_actual_sha256": "8c3a49cfc805613d97276296ea3c4915360676c9f221c7f42d901ab425b75475",
-      "reference_sha256": "07dac7034f77f8c99fbc546941183c8886f89ef50ac0a66b3dd8b8a192f1661a"
+      "reference_sha256": "4b6c335bda5d16bc186134569519096849fbee56e979890abbfa446e778fd53e"
     },
     "CORR-PHASE15-UNIVERSE-DORIS-001-FULL-LATEST-UNIVERSE": {
       "source_report": "reports/phase15_universe_doris.json",
@@ -277,7 +277,7 @@
       "historical_actual_count": 5614,
       "historical_expected_sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
       "historical_actual_sha256": "b1e7d8532ec2c5e6f12ffa9cdf2d241c150efdcf8e83830a5a27d891a049a57b",
-      "reference_sha256": "bf2a94130d5704f901300ef5996ecf36a41e46306223d71b16b4e4967c53714a"
+      "reference_sha256": "d1e04b83505a0683fcaa090c1b365c49224330d7cc7566c75fe5120ebb7051bc"
     },
     "CORR-PHASE15-UNIVERSE-DORIS-002-SHANGHAI-MAIN-LATEST-UNIVERSE": {
       "source_report": "reports/phase15_universe_doris.json",
@@ -289,7 +289,7 @@
       "historical_actual_count": 1718,
       "historical_expected_sha256": "ddb7f66902a6318021426eabe6b402f9d8bc389ef81006a80dd1d0f50a831f56",
       "historical_actual_sha256": "ddb7f66902a6318021426eabe6b402f9d8bc389ef81006a80dd1d0f50a831f56",
-      "reference_sha256": "d7509c036bf1957a5f91d304bd489fe73aa9cd5762f0a5f3048fd9cd202e84e9"
+      "reference_sha256": "a2a493b85d99ed1bf64eacab943c17d81062dca297dd7b6064769179a02c0112"
     },
     "CORR-PHASE15-UNIVERSE-DORIS-003-EXCLUDE-CHINEXT-LATEST-UNIVERSE": {
       "source_report": "reports/phase15_universe_doris.json",
@@ -301,7 +301,7 @@
       "historical_actual_count": 4213,
       "historical_expected_sha256": "fa183b103f9e826824a5842ce9b8b328caf6efe91813ff144e52a59a11f2624a",
       "historical_actual_sha256": "fa183b103f9e826824a5842ce9b8b328caf6efe91813ff144e52a59a11f2624a",
-      "reference_sha256": "231109c28b7be5eb2a9383b568f5edec3df04ec3028cf598bf14023f99417844"
+      "reference_sha256": "21193f42f59dbf076fc8a43ba5d76aca2bbb79b1a26dbca8a2f60c4f30207cdc"
     },
     "CORR-PHASE15-UNIVERSE-DORIS-004-RECENT-FIVE-SESSION-UNIVERSE": {
       "source_report": "reports/phase15_universe_doris.json",
@@ -313,7 +313,7 @@
       "historical_actual_count": 28061,
       "historical_expected_sha256": "e9d3abe9507aa01856f39b752c49b73a6ac37e14f4edef018a6bc039db754951",
       "historical_actual_sha256": "e9d3abe9507aa01856f39b752c49b73a6ac37e14f4edef018a6bc039db754951",
-      "reference_sha256": "5375299ba2fd33a82ef9e7ea0b8884f4e25f0fb840aa1fae6ef440d35bfcd909"
+      "reference_sha256": "6a6a74896f96208b50b055d5c153ae80bde0bf408993789f51aece6cc3c88d6f"
     },
     "CORR-PHASE16-COMPOSITE-DORIS-001-LATEST-EQUALS-MIN-100-SESSIONS": {
       "source_report": "reports/phase16_composite_doris.json",
@@ -325,7 +325,7 @@
       "historical_actual_count": 72,
       "historical_expected_sha256": "36b8607a8a046c42db2069d8dbe8a2893ae419af21910153d7f94f6d0bc9825c",
       "historical_actual_sha256": "36b8607a8a046c42db2069d8dbe8a2893ae419af21910153d7f94f6d0bc9825c",
-      "reference_sha256": "cf63d64d8eea5d3f2b7ebd0b07876f23ac02b57272b7656999a94f37e042e758"
+      "reference_sha256": "8e1f861d93ccaf59975742e8066672e4a614b69ff20712038150cf18d06db980"
     },
     "CORR-PHASE16-COMPOSITE-DORIS-002-CROSS-RESOURCE-AVERAGE-RATIO": {
       "source_report": "reports/phase16_composite_doris.json",
@@ -337,7 +337,7 @@
       "historical_actual_count": 5269,
       "historical_expected_sha256": "8c944ed621711f387ce95b1f6429f6cbdc485c0babc308668e8e0ba7165a8943",
       "historical_actual_sha256": "8c944ed621711f387ce95b1f6429f6cbdc485c0babc308668e8e0ba7165a8943",
-      "reference_sha256": "e51349e2fc6f37be44e5a382f9aac20652e3be9aef3166b7066edc590017181d"
+      "reference_sha256": "9035693b91db78dab2d874674791a5f255a5fbd1f0eec3c06d9babd7ab8ae9af"
     },
     "CORR-PHASE16-COMPOSITE-DORIS-003-TWO-WINDOWS-WITH-LATEST-SCALAR": {
       "source_report": "reports/phase16_composite_doris.json",
@@ -349,7 +349,7 @@
       "historical_actual_count": 0,
       "historical_expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "historical_actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reference_sha256": "b70a66b441350e3d1f701415c4f1e8e2b8cf061e16da8cf619a84b6319efb76a"
+      "reference_sha256": "67584cdf0db6ac7510d836160a28a9613f86f0a76cfed2eea45b79c3f4665162"
     },
     "CORR-PHASE16-COMPOSITE-DORIS-004-NONEMPTY-TWO-WINDOW-COMPARISON": {
       "source_report": "reports/phase16_composite_doris.json",
@@ -361,7 +361,7 @@
       "historical_actual_count": 5539,
       "historical_expected_sha256": "3a9785842b089d83a97c1856cfc42e7951e4445a5c1801047d2f0e5edd02d04c",
       "historical_actual_sha256": "3a9785842b089d83a97c1856cfc42e7951e4445a5c1801047d2f0e5edd02d04c",
-      "reference_sha256": "a650ea26ff9fc3a12bf14743c3602598abe6fc43576d4ebf07b0886572cfba9d"
+      "reference_sha256": "99ec375b65e9b6368931d923d01d4b671d9ced021dcd712723aa2d648e39a0d8"
     },
     "CORR-PHASE17-RANK-DORIS-001-DIRECT-TOP-10": {
       "source_report": "reports/phase17_rank_doris.json",
@@ -373,7 +373,7 @@
       "historical_actual_count": 10,
       "historical_expected_sha256": "0a2c2e4b12fab6c4a07db301ae4c9c145022356513b9e4752a16cf26a8ef42cd",
       "historical_actual_sha256": "0a2c2e4b12fab6c4a07db301ae4c9c145022356513b9e4752a16cf26a8ef42cd",
-      "reference_sha256": "47b4fbb68eb61b8d57f3ca623569919e8f5fd49b4fba6c6171e7be9308475649"
+      "reference_sha256": "5c879e0ab684c6be62b3df122413a9252dd0e8835aa75cfeafbaa91fdab85e64"
     },
     "CORR-PHASE17-RANK-DORIS-002-DIRECT-TOP-10-PERCENT": {
       "source_report": "reports/phase17_rank_doris.json",
@@ -385,7 +385,7 @@
       "historical_actual_count": 562,
       "historical_expected_sha256": "1a27a44fb513e1fe75ae7ac4e3dceffc8c5cddb61348c86efb5d859d368a1594",
       "historical_actual_sha256": "1a27a44fb513e1fe75ae7ac4e3dceffc8c5cddb61348c86efb5d859d368a1594",
-      "reference_sha256": "5b74aefe847130a801468a3eb48e1a017a5142b51197d7c29072006ad538890b"
+      "reference_sha256": "fd234e38b3924ea1f886a0db53b8e3e738a97423007b64be8251f76d872a1eb3"
     },
     "CORR-PHASE17-RANK-DORIS-003-AGGREGATE-AVG-TOP-10": {
       "source_report": "reports/phase17_rank_doris.json",
@@ -397,7 +397,7 @@
       "historical_actual_count": 10,
       "historical_expected_sha256": "cd5c318311d56adc31a8b5968ee48d6980bc14e5d4b7f38b9027d3049a1a74c2",
       "historical_actual_sha256": "cd5c318311d56adc31a8b5968ee48d6980bc14e5d4b7f38b9027d3049a1a74c2",
-      "reference_sha256": "e83bfcde01823b0ead70f0a1996d782a7691ebcc4da2927922a1386a12f154b5"
+      "reference_sha256": "d8f7122ec9da21be8d1e574452b42efc1cc4c9a181c53b02a62a921fbac58e80"
     },
     "CORR-PHASE17-RANK-DORIS-004-AGGREGATE-AVG-TOP-10-PERCENT": {
       "source_report": "reports/phase17_rank_doris.json",
@@ -409,7 +409,7 @@
       "historical_actual_count": 562,
       "historical_expected_sha256": "8d6133f8dc34767fd047962d37bf0520f03c9d7b8181cbe6180551b30a2e7b6f",
       "historical_actual_sha256": "8d6133f8dc34767fd047962d37bf0520f03c9d7b8181cbe6180551b30a2e7b6f",
-      "reference_sha256": "042e74573b5eed533d79a2a1c75a4fc77855cc837a345b86a63164b9bec03d97"
+      "reference_sha256": "8ef924ad3eff38a234a3f02d492a23d4cee8b9f43dda1a79944abbdee82c3089"
     },
     "CORR-PHASE17-RANK-DORIS-005-RANK-SCALAR-INTERSECTION": {
       "source_report": "reports/phase17_rank_doris.json",
@@ -421,7 +421,7 @@
       "historical_actual_count": 10,
       "historical_expected_sha256": "0a2c2e4b12fab6c4a07db301ae4c9c145022356513b9e4752a16cf26a8ef42cd",
       "historical_actual_sha256": "0a2c2e4b12fab6c4a07db301ae4c9c145022356513b9e4752a16cf26a8ef42cd",
-      "reference_sha256": "d2faf5b0e50fae40e47e7e963344a80150bc6f124b66e3fbcbe06cf8d4edb616"
+      "reference_sha256": "3573776bc1ca05a5e4257fdba4b3837268c6983130acf32acaffc70b04e0faf8"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-001-CURRENT-MONTH": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -433,7 +433,7 @@
       "historical_actual_count": 867,
       "historical_expected_sha256": "b40f8b710ba35bf87a198e370e89d6c74b9f61ec477ba7fd2bc12f2a078024af",
       "historical_actual_sha256": "b40f8b710ba35bf87a198e370e89d6c74b9f61ec477ba7fd2bc12f2a078024af",
-      "reference_sha256": "4944fa502e5729c5b64590670cba7d9ae21689dc84439617b5c6b053fe409294"
+      "reference_sha256": "817dfc03c8e61f3013c7d58ac86335cb43f7ca82a5804334e0882129a7cae2f7"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-002-PREVIOUS-WEEK": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -445,7 +445,7 @@
       "historical_actual_count": 346,
       "historical_expected_sha256": "89c0be74bf5016a596a1d7f936c30cc034cb35197e33a50d66ee57fae71485ee",
       "historical_actual_sha256": "89c0be74bf5016a596a1d7f936c30cc034cb35197e33a50d66ee57fae71485ee",
-      "reference_sha256": "5fcf8ba6857161f36c22cd06daefad5203919d392d66151c0bba0179cec995c8"
+      "reference_sha256": "a91cb17c81e907179ebc5f4642ff722c56e97af2c97c212aa358463873faa0a4"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-003-PREVIOUS-YEAR": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -457,7 +457,7 @@
       "historical_actual_count": 22026,
       "historical_expected_sha256": "444ddec22047c2c92f655ee58e0c328b72c73dbf52e557fcdf816a61494169c4",
       "historical_actual_sha256": "444ddec22047c2c92f655ee58e0c328b72c73dbf52e557fcdf816a61494169c4",
-      "reference_sha256": "fc8bd3f5c4f48dd44c4a1cf1b092bd384efc3744d4ae5dfea7775d27759a0146"
+      "reference_sha256": "dece4b7786634f63a998ab8945cac066b4515830f1f31af6829d57e5da97443a"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-004-RECENT-TWO-MONTHS": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -469,7 +469,7 @@
       "historical_actual_count": 4430,
       "historical_expected_sha256": "e654019e33fc6abf5d9aa8049a1d9db662db77fcafbb817cc252321a7ec68164",
       "historical_actual_sha256": "e654019e33fc6abf5d9aa8049a1d9db662db77fcafbb817cc252321a7ec68164",
-      "reference_sha256": "0980ded56d0be50c9c7214d821e1f1efdc3965c7057bda5e29c5ea43c4d28ec7"
+      "reference_sha256": "0220d01db5ebdf1f122b6c4aa47868f666a36ebceba9bd4a0f31b9ce780105cd"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-005-CURRENT-QUARTER": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -481,7 +481,7 @@
       "historical_actual_count": 867,
       "historical_expected_sha256": "b40f8b710ba35bf87a198e370e89d6c74b9f61ec477ba7fd2bc12f2a078024af",
       "historical_actual_sha256": "b40f8b710ba35bf87a198e370e89d6c74b9f61ec477ba7fd2bc12f2a078024af",
-      "reference_sha256": "4944fa502e5729c5b64590670cba7d9ae21689dc84439617b5c6b053fe409294"
+      "reference_sha256": "817dfc03c8e61f3013c7d58ac86335cb43f7ca82a5804334e0882129a7cae2f7"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-006-ANCHOR-MONTH-DAY": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -493,7 +493,7 @@
       "historical_actual_count": 3,
       "historical_expected_sha256": "085a6b4c0c4f541d84473c0b823bb2c9a5603f81b4d2d4c662c033a127dce9f3",
       "historical_actual_sha256": "085a6b4c0c4f541d84473c0b823bb2c9a5603f81b4d2d4c662c033a127dce9f3",
-      "reference_sha256": "1c0ad7ed82cfd0db366a71b2ba6a7e86dd63ca7b0bf89de6701d4f979a4ba11e"
+      "reference_sha256": "25d9f6add2386287c6001e7aee98a291b11a1896dfaa77a70dd015b8e524f0a8"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-007-THREE-SESSIONS-BEFORE-WEEK": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -505,7 +505,7 @@
       "historical_actual_count": 260,
       "historical_expected_sha256": "8fb44c15c1cd600395a9d01e5899af7179fca4006b94ae98d784beb83667d8f9",
       "historical_actual_sha256": "8fb44c15c1cd600395a9d01e5899af7179fca4006b94ae98d784beb83667d8f9",
-      "reference_sha256": "65e8d8f82d844815802ed1c593fcc5af82a8db62d0ee3b60543c6058d85d24a4"
+      "reference_sha256": "164e77ac2e4340ea80f7e805fd28fc5aacb38dce4968f8b9d909b16b732847a8"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-008-FIVE-SESSIONS-AFTER-DATE": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -517,7 +517,7 @@
       "historical_actual_count": 250,
       "historical_expected_sha256": "d4337d28d3d5cd2e13e0ec2238ceedab5adfba91203e1bbbc2bb4bfcc7af2cc7",
       "historical_actual_sha256": "d4337d28d3d5cd2e13e0ec2238ceedab5adfba91203e1bbbc2bb4bfcc7af2cc7",
-      "reference_sha256": "eed5b014b422b2ed34987fded8afce44dc5e9c1ac5485bfc3b757cafcb83127d"
+      "reference_sha256": "9ad1f903b8525852db0163627fe73d3a2933f19a5eb105beb6728cb180395385"
     },
     "CORR-PHASE18-DYNAMIC-DATE-DORIS-009-PRECEDING-SESSION-SLICE": {
       "source_report": "reports/phase18_dynamic_date_doris.json",
@@ -529,7 +529,7 @@
       "historical_actual_count": 237,
       "historical_expected_sha256": "97f9f996f78bd18054c839c8d5185a70dfab41bcec9dfdaf5ad24dccdd9d68b0",
       "historical_actual_sha256": "97f9f996f78bd18054c839c8d5185a70dfab41bcec9dfdaf5ad24dccdd9d68b0",
-      "reference_sha256": "76108a7375a25e6d965311980c52f332a861e34aed532988b934e94d84704687"
+      "reference_sha256": "0065f8b254a921728caad3b960452b9f872e9aab40ee6534dc2daac7e5c78dd1"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-001-EXACT-NAME-UNIVERSE": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -541,7 +541,7 @@
       "historical_actual_count": 1,
       "historical_expected_sha256": "64ba82d725777d19b5db364d0d81226dcd94f4a54c37a379ef85c6eb4c872ced",
       "historical_actual_sha256": "64ba82d725777d19b5db364d0d81226dcd94f4a54c37a379ef85c6eb4c872ced",
-      "reference_sha256": "a8e24a8ebb9fe299ecb4dc516b55605a57d6cf7870cd12b855a30f4fc6b28605"
+      "reference_sha256": "83c27fd7bc535ad39bba0889b3dcfe0297c2d80e98601664aceb5016675af56c"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-002-MARKET-AND-EXACT-NAME": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -553,7 +553,7 @@
       "historical_actual_count": 1,
       "historical_expected_sha256": "177cbc12717ecc6d7fc5aabaff6da38aa62b7e0ec92c4fb65d64cb83fc9ab8b1",
       "historical_actual_sha256": "177cbc12717ecc6d7fc5aabaff6da38aa62b7e0ec92c4fb65d64cb83fc9ab8b1",
-      "reference_sha256": "b725478007d2abf0b9a9d360d714d4227ad9cf9a10cf0fd20814175f0d125854"
+      "reference_sha256": "11d51b89f765cf7d6a00e64bdee59ba3bc8ff58d4f6f6bb3cc56b3e50b835ba5"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-003-EXPLICIT-NAME-AND-CODE": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -565,7 +565,7 @@
       "historical_actual_count": 1,
       "historical_expected_sha256": "fc22e96028169e3072018eea4ad88dd197e0720ff4a787e25085260efec2d34e",
       "historical_actual_sha256": "fc22e96028169e3072018eea4ad88dd197e0720ff4a787e25085260efec2d34e",
-      "reference_sha256": "d1201a571ed49ce4eeb133a12786a0509cd901b955586fc8964645dd5cf130fa"
+      "reference_sha256": "b08dd3a1e04fc86a3873e991fa39925a65e69e47539e8214f04cf6889cf0d970"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-004-DIRECT-QUERYDATA-SCALAR": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -577,7 +577,7 @@
       "historical_actual_count": 1896,
       "historical_expected_sha256": "d03b095ed5e456728973ab8813d0c9827b09fed2ee9bd8510cab670caf83adc5",
       "historical_actual_sha256": "d03b095ed5e456728973ab8813d0c9827b09fed2ee9bd8510cab670caf83adc5",
-      "reference_sha256": "5d86f81e17b2f91aa34837750e0834004ebefc3a06cbc9ddbebad92b7c87af99"
+      "reference_sha256": "24d74c09bd8cd02a4a53d79e0416019791cc1dd4024b09eacd1551e3daf57f50"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-005-GLOBAL-QUERYDATA-AGGREGATE": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -589,7 +589,7 @@
       "historical_actual_count": 1872,
       "historical_expected_sha256": "5ae043fe47e8f0a4d15aaddc300d5c67a30254e019252de4c117ba1b66d4676c",
       "historical_actual_sha256": "5ae043fe47e8f0a4d15aaddc300d5c67a30254e019252de4c117ba1b66d4676c",
-      "reference_sha256": "5ab2b047b32c8062fb79451b41c3651ef33eac32ee40614d89f08fc70a6900e3"
+      "reference_sha256": "ce67444ea51926d262fbceabc55fe0ea268986c8d6d8af48bd3c458bec596b96"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-006-RANK-WITH-EXACT-NAME-SCOPE": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -601,7 +601,7 @@
       "historical_actual_count": 1,
       "historical_expected_sha256": "64ba82d725777d19b5db364d0d81226dcd94f4a54c37a379ef85c6eb4c872ced",
       "historical_actual_sha256": "64ba82d725777d19b5db364d0d81226dcd94f4a54c37a379ef85c6eb4c872ced",
-      "reference_sha256": "d3dcb42a5cd1dde2f20483a9c785d90c1ebe93516d06d5e32d5c00a13719d70f"
+      "reference_sha256": "5aac5ae2c875efabd31c764d810d1d1fc49781dee25e648cf9e1fff994d84c13"
     },
     "CORR-PHASE19-SECURITY-SCOPE-DORIS-007-EXACT-NAME-UNION": {
       "source_report": "reports/phase19_security_scope_doris.json",
@@ -613,7 +613,7 @@
       "historical_actual_count": 2,
       "historical_expected_sha256": "1598add4221783f05b250a2aae444bb1475dd55fa83e319771ad0a1d2e225e52",
       "historical_actual_sha256": "1598add4221783f05b250a2aae444bb1475dd55fa83e319771ad0a1d2e225e52",
-      "reference_sha256": "31b8fb1915bc66f6cb0ba2e0fe7c4baf57e65eb1ab49bfe8a5c54736b54b4e57"
+      "reference_sha256": "b2048c7273b32f5676b20ecd30ee02342abd6c054c4c141894cdea131ab4d5d9"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-001-CIRCULATING-MARKET-VALUE": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -625,7 +625,7 @@
       "historical_actual_count": 3083,
       "historical_expected_sha256": "5e6fc9c75e41b07f5d73c319ce719328a102b3347ab26ed294333ef6990e062c",
       "historical_actual_sha256": "5e6fc9c75e41b07f5d73c319ce719328a102b3347ab26ed294333ef6990e062c",
-      "reference_sha256": "ef1a6ff498f5f65a5de8fbfdfdea881d64c7ab25488dbebc9517b508b3d4f6f2"
+      "reference_sha256": "5862395cc400bd38663291cd420068b3b0da7259e1b2e632f65837932d735423"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-002-ORDER-IMBALANCE-RATIO": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -637,7 +637,7 @@
       "historical_actual_count": 210,
       "historical_expected_sha256": "ad5767d97f50e223469579a466f41008d6dfdfa6f8126bff5e5baf90986fae65",
       "historical_actual_sha256": "ad5767d97f50e223469579a466f41008d6dfdfa6f8126bff5e5baf90986fae65",
-      "reference_sha256": "d1c87c641c77b8e1d162c8b5b38e63eafb9c8275c3572795838c6ab010148e65"
+      "reference_sha256": "fc1a512f48f3b4c1fde47a8c97879ad70578c258901dc2bcd8c34c395d867649"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-003-TECHNICAL-BOOLEAN-COMPOSITION": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -649,7 +649,7 @@
       "historical_actual_count": 47,
       "historical_expected_sha256": "b42a3793f3559e0acf9ab474e47184bb39a15b13aa4f4fcd477215dbc5611676",
       "historical_actual_sha256": "b42a3793f3559e0acf9ab474e47184bb39a15b13aa4f4fcd477215dbc5611676",
-      "reference_sha256": "cd3cc54cb3bf0452d6d805d9cc2419acac25eee2982591e08dd092d0c386c238"
+      "reference_sha256": "230884903c9c76cc4da368562061b5ceb0b363d85fc7254c9408313fb54ea3a8"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-004-MAIN-BUY-PERCENTAGE": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -661,7 +661,7 @@
       "historical_actual_count": 154,
       "historical_expected_sha256": "d828d73e04789950219dd495d1977065262ce69753d56337c52f93b0f6301b54",
       "historical_actual_sha256": "d828d73e04789950219dd495d1977065262ce69753d56337c52f93b0f6301b54",
-      "reference_sha256": "f79e9da19ed69c45177dfced5382f65ea5a13f337faa95a9ffb04544b37dac60"
+      "reference_sha256": "1e2274edf376ea5bca8655232e9ad7d691ddbed849f75b73dfcd4e91e2afd52b"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-005-LIMIT-BREAK-EVENT": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -673,7 +673,7 @@
       "historical_actual_count": 70,
       "historical_expected_sha256": "2e19651d07971033500c31c20e4a58fb90897bf191f46f421cdc48fb886967ba",
       "historical_actual_sha256": "2e19651d07971033500c31c20e4a58fb90897bf191f46f421cdc48fb886967ba",
-      "reference_sha256": "5de3e64babf27e2ff747e46cc37df7a21327a8d2626f4f7c47cb3d4ff04f76e3"
+      "reference_sha256": "41f39a66c54cf127bd186698914791cbd3bf0fe85db2a8f0263621932aee9240"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-006-TECHNICAL-CROSS-ABOVE": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -685,7 +685,7 @@
       "historical_actual_count": 887,
       "historical_expected_sha256": "9821204426d521a7de8f2f3f357d7f70de8ff5126dce4fa0e315aeeab58032b9",
       "historical_actual_sha256": "9821204426d521a7de8f2f3f357d7f70de8ff5126dce4fa0e315aeeab58032b9",
-      "reference_sha256": "a28b922524d4630d63e97184dcee409355df9680d21ace4068ab431bf5b12d4c"
+      "reference_sha256": "d2fbdc412fa4c2840c69c5c71adcce63089b3ed3230927244af81d20c8d71c57"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-007-CROSS-RESOURCE-CROSS-DOWN": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -697,7 +697,7 @@
       "historical_actual_count": 94,
       "historical_expected_sha256": "0c7076b5b5f9f85e1da2b32602532bad37d1733514024650e0d3c675859da703",
       "historical_actual_sha256": "0c7076b5b5f9f85e1da2b32602532bad37d1733514024650e0d3c675859da703",
-      "reference_sha256": "64857f560e68aff6e11ff7a594cd2b3900fab951e467a5a89565b750855a6071"
+      "reference_sha256": "527ab54f6f470219b3ff52c2d1a63107f778f770902e0f79a021752e7576d881"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-008-RECORD-HIGH-60-SESSIONS": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -709,7 +709,7 @@
       "historical_actual_count": 219,
       "historical_expected_sha256": "ad2a6c879608436b4f2b281826026f337d5defa77203021d481716c3738667f2",
       "historical_actual_sha256": "ad2a6c879608436b4f2b281826026f337d5defa77203021d481716c3738667f2",
-      "reference_sha256": "43f4c9ef775daea0c079b3e0a3fd6410bc824c330ae4d60bc73bfba0673bf699"
+      "reference_sha256": "186340b37c8beb2480978ae5c55a1750101e57baa7c63930442997f39f1d03b9"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-009-RECORD-LOW-HISTORY": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -721,7 +721,7 @@
       "historical_actual_count": 4,
       "historical_expected_sha256": "78c50c02af52598195364cca2f2d7c5f25f33f275c8b157f2949c06ad7312194",
       "historical_actual_sha256": "78c50c02af52598195364cca2f2d7c5f25f33f275c8b157f2949c06ad7312194",
-      "reference_sha256": "825f5c59d99adb1ede903b8b2207b969f2c088b8980a6dd76da29a5f882decdc"
+      "reference_sha256": "dd2d44334e503fcbd775200f1640c2a3c0aef6ac9d470668acff3cce558d83d3"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-010-EVENT-WITH-SCALAR-PROJECTION": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -733,7 +733,7 @@
       "historical_actual_count": 887,
       "historical_expected_sha256": "9821204426d521a7de8f2f3f357d7f70de8ff5126dce4fa0e315aeeab58032b9",
       "historical_actual_sha256": "9821204426d521a7de8f2f3f357d7f70de8ff5126dce4fa0e315aeeab58032b9",
-      "reference_sha256": "47f514982f87f7ad4f863f54e42b1ccfe43561247334f019461837163f0fc1ba"
+      "reference_sha256": "b4fb57f0cc15a7034216f2139740f3aa1db6926d258ab3e0adaab7066682a7d2"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-011-CLOSE-TOGETHER-PATTERN": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -745,7 +745,7 @@
       "historical_actual_count": 3598,
       "historical_expected_sha256": "312690c655ddac39f13abd8be450ab66755724c688de59b909c20cd7c779ca26",
       "historical_actual_sha256": "312690c655ddac39f13abd8be450ab66755724c688de59b909c20cd7c779ca26",
-      "reference_sha256": "0ac08863d252e4f1626bd3ce2a2f400c34cc94d12c222d580ac5746625c08503"
+      "reference_sha256": "bacaa5356312e5d9a7920e99327532d5c74d46db0afc0282d93ed76c85bcfa04"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-012-RESET-PATTERN": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -757,7 +757,7 @@
       "historical_actual_count": 1449,
       "historical_expected_sha256": "6c6f2b1f3e8a782f173171050b5aff4a51f9509731388a14be3a79017361647f",
       "historical_actual_sha256": "6c6f2b1f3e8a782f173171050b5aff4a51f9509731388a14be3a79017361647f",
-      "reference_sha256": "9ef7a0372aedc96d041b66a920d18f07b79626e55a114b0f69aa94d240adb5f9"
+      "reference_sha256": "9531f628948be7750da450ece542b146c0b60041fbd8df5087c67f2483818a14"
     },
     "CORR-PHASE20-MAPPING-EVENT-DORIS-013-POSITION-10-SESSIONS": {
       "source_report": "reports/phase20_mapping_event_doris.json",
@@ -769,7 +769,7 @@
       "historical_actual_count": 1720,
       "historical_expected_sha256": "0b8fec8d27f42cb02c76959e58b9a76a3a9fc21da5b70c522af2d323d0ab44f7",
       "historical_actual_sha256": "0b8fec8d27f42cb02c76959e58b9a76a3a9fc21da5b70c522af2d323d0ab44f7",
-      "reference_sha256": "ff835684171684870b288cfa02b7c8d4e4c3d61b942a0e41612d168ae0bdde0f"
+      "reference_sha256": "45e2b43cce47374863b513d1635c5a76847787cda7dc8e77d0d5bd8599890892"
     },
     "CORR-PHASE21-AGGREGATE-RANK-DORIS-001-CONFIGURED-RELATIVE-APPROXIMATIO": {
       "source_report": "reports/phase21_aggregate_rank_doris.json",
@@ -781,7 +781,7 @@
       "historical_actual_count": 38,
       "historical_expected_sha256": "b0ec5f0d9ae6f4c70a07b0579492caca21b3f86e4b07b7714eb8e695be029bc6",
       "historical_actual_sha256": "b0ec5f0d9ae6f4c70a07b0579492caca21b3f86e4b07b7714eb8e695be029bc6",
-      "reference_sha256": "df493c931bf7ab259eb6b42b7f346ca3a0a55d66412dfa7813e673585e487293"
+      "reference_sha256": "63d7583c77a31967d07fef2fe911f092899346e56fb4ab311a44705bd7ef9df3"
     },
     "CORR-PHASE21-AGGREGATE-RANK-DORIS-002-FIVE-SESSION-GROWTH-FILTER": {
       "source_report": "reports/phase21_aggregate_rank_doris.json",
@@ -793,7 +793,7 @@
       "historical_actual_count": 1663,
       "historical_expected_sha256": "be44aaebcc008c59af6ecc50ff358077aed47396d3f1edf1dafbfeb942ade4b4",
       "historical_actual_sha256": "be44aaebcc008c59af6ecc50ff358077aed47396d3f1edf1dafbfeb942ade4b4",
-      "reference_sha256": "6e82ec35cf1c40eba08184cfbec457323f660b375bf0f94f4000ce6d58aff6d6"
+      "reference_sha256": "b4c1144fb77dc2576dd4e7d246ad867d2f4e583c6496a7a068d32950ff7afe05"
     },
     "CORR-PHASE21-AGGREGATE-RANK-DORIS-003-DAILY-GROWTH-EXIST": {
       "source_report": "reports/phase21_aggregate_rank_doris.json",
@@ -805,7 +805,7 @@
       "historical_actual_count": 4854,
       "historical_expected_sha256": "c2e4dcc366619d8b29179e4d8691732736dd594325cf6997a8aad263075b2d54",
       "historical_actual_sha256": "c2e4dcc366619d8b29179e4d8691732736dd594325cf6997a8aad263075b2d54",
-      "reference_sha256": "23b9bf0873be857df6980959ed75cdb423c3cd8e17c985f00529a66bb586c474"
+      "reference_sha256": "f0aedeac2f543910db2ea29194c920b1ab7014a7f12ec6bd21b37467a8a84cc8"
     },
     "CORR-PHASE21-AGGREGATE-RANK-DORIS-004-DAILY-MAX-CONSECUTIVE": {
       "source_report": "reports/phase21_aggregate_rank_doris.json",
@@ -817,7 +817,7 @@
       "historical_actual_count": 5590,
       "historical_expected_sha256": "e119981b04ef7e814f2e67717e5a7282d0519c9e9de663cc762a403b88270a29",
       "historical_actual_sha256": "e119981b04ef7e814f2e67717e5a7282d0519c9e9de663cc762a403b88270a29",
-      "reference_sha256": "364568a618116cf292e060e24af87a82a66da0c12cff8bc3b8a6ab5808357c55"
+      "reference_sha256": "61ee6a4b3cdc3d6c0aff14d2db587ca37327b77908b88f9c62c079eead562fb4"
     },
     "CORR-PHASE21-AGGREGATE-RANK-DORIS-005-GROWTH-RANK-TOP10": {
       "source_report": "reports/phase21_aggregate_rank_doris.json",
@@ -829,7 +829,7 @@
       "historical_actual_count": 10,
       "historical_expected_sha256": "c2c3768bf0ac3be97e11fe8fc7cb30ec7255936e0a3faae1aa49a6bc66574ee9",
       "historical_actual_sha256": "c2c3768bf0ac3be97e11fe8fc7cb30ec7255936e0a3faae1aa49a6bc66574ee9",
-      "reference_sha256": "60e2bec8bb05787def0a1deec513b16d31afef3ee3dcb6644fd93a1a0a344d71"
+      "reference_sha256": "3ed974018a566e38f94ad698094cab6faeee15535f6c67e7dda4944499f510cf"
     },
     "CORR-PHASE21-AGGREGATE-RANK-DORIS-006-DAILY-GROWTH-TEMPORAL-RANK": {
       "source_report": "reports/phase21_aggregate_rank_doris.json",
@@ -841,7 +841,7 @@
       "historical_actual_count": 5258,
       "historical_expected_sha256": "06ec7aa75570a9e1b713b4e43ef4cf78a9f7ef1ddcee8a2d463561c9cf5bbe38",
       "historical_actual_sha256": "06ec7aa75570a9e1b713b4e43ef4cf78a9f7ef1ddcee8a2d463561c9cf5bbe38",
-      "reference_sha256": "b1c73b1e59097097b50eadf7d641dcfa9d1137b765e95e5cb35faf95d31c60cd"
+      "reference_sha256": "673aa62dc4042bb2f91bf0dc8630294506a9c7604bf4952b4f1bdf087cd44c3a"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-001-NAMED-RANK-ARITHMETIC": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -853,7 +853,7 @@
       "historical_actual_count": 2927,
       "historical_expected_sha256": "f311b0bc577b968dd570334bceb19b9ab7241a847f5ff8e503f430b447a30f7e",
       "historical_actual_sha256": "f311b0bc577b968dd570334bceb19b9ab7241a847f5ff8e503f430b447a30f7e",
-      "reference_sha256": "ff518b243607b47cc3f2aeb052f08e878f46eba0a5d0c4cc16f2469d6c69ea0a"
+      "reference_sha256": "3f13a6c89faeb854854971115494769b5a4583c86a53192bfe3f1d8eba2ddf68"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-002-NAMED-RANK-PERIOD-END-ARITHMETIC": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -865,7 +865,7 @@
       "historical_actual_count": 2937,
       "historical_expected_sha256": "023300645d82176ebc50f39a387afcf1633ab1682c8cea36eca20a4c6eedc734",
       "historical_actual_sha256": "023300645d82176ebc50f39a387afcf1633ab1682c8cea36eca20a4c6eedc734",
-      "reference_sha256": "acd6203254133eb3cb5115b69b5b5ac215814214ff3fbed1a7ee474ca592ca88"
+      "reference_sha256": "2ad51244b80eca9d04f4fb4cbd1946a3ce09516a7f412395e06568d6654d9ba9"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-003-CHAINED-CANDIDATE-RANK": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -877,7 +877,7 @@
       "historical_actual_count": 5,
       "historical_expected_sha256": "d0d0af67466b3fbfe07a27779e2c67fbb2bb684a52f229f95520f91a4be8e513",
       "historical_actual_sha256": "d0d0af67466b3fbfe07a27779e2c67fbb2bb684a52f229f95520f91a4be8e513",
-      "reference_sha256": "07d93f7bc572d94aceba05e79d3c6120e719bb3ce423d3ac1fa38dc96b11b645"
+      "reference_sha256": "2f18b365d1c44aa3ea9a13869475163ea8b52177a695b556ccd005a2a78eea40"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-004-AGGREGATE-FILTER-THEN-RANK": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -889,7 +889,7 @@
       "historical_actual_count": 80,
       "historical_expected_sha256": "69343bf8c2bf746c818612b895463968b8a171e3c422afd76600c8969c6b6445",
       "historical_actual_sha256": "69343bf8c2bf746c818612b895463968b8a171e3c422afd76600c8969c6b6445",
-      "reference_sha256": "f69ed807cd403e52eb65031e58998f6c8ab85144a4979d65bde1d78c4e3ac73b"
+      "reference_sha256": "352c3db528e9e7edbfed519fed4a16b5af1836896636aad6c74bdc0f89242cbd"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-005-TEMPORAL-FILTER-THEN-PERIOD-RANK": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -901,7 +901,7 @@
       "historical_actual_count": 278,
       "historical_expected_sha256": "b65f50f8fe132ec536a3d716cf85df16fe89e4d30be74de1196ef0a79197b1a5",
       "historical_actual_sha256": "b65f50f8fe132ec536a3d716cf85df16fe89e4d30be74de1196ef0a79197b1a5",
-      "reference_sha256": "68fe434cd160271f4ddd6d4884859183ac484748adc00c89bdfd782009df5ed7"
+      "reference_sha256": "2ddc9d55a37eb0dddebbf92e8f9897f8ed8cfd893dd527ae3b21e096989a10c0"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-006-PARENTHESIZED-STAGE-UNION": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -913,7 +913,7 @@
       "historical_actual_count": 1,
       "historical_expected_sha256": "835f56fd3410ac090a1e4f1ea99e71d871c01c4a850c940fb5e633914f11c100",
       "historical_actual_sha256": "835f56fd3410ac090a1e4f1ea99e71d871c01c4a850c940fb5e633914f11c100",
-      "reference_sha256": "506560ff437086f91a4b1827b553bf4ca2ca2dbf71180ab633bc77eae380265d"
+      "reference_sha256": "7e33e96307c4b2dfca65938bbbfe79564390dc6eb81a274252561b15bbb07fe5"
     },
     "CORR-PHASE22-STAGE-RANK-DORIS-007-TEMPORAL-RANK-PERCENTAGE-RANGE": {
       "source_report": "reports/phase22_stage_rank_doris.json",
@@ -925,7 +925,7 @@
       "historical_actual_count": 377,
       "historical_expected_sha256": "49d82fe2293251978fdb07cc7ba56cf934e3fba0e314d21bd1c157849c32907b",
       "historical_actual_sha256": "49d82fe2293251978fdb07cc7ba56cf934e3fba0e314d21bd1c157849c32907b",
-      "reference_sha256": "de96f54cb6225c8ef25837a019e61141c134a0ba139d46723b1d8725490e5022"
+      "reference_sha256": "96347348e91f3473d41142a1848ee20abee0af0c20375e31073268ab6bfa3aff"
     },
     "CORR-PHASE23-RELATIONAL-DORIS-001-NOT-EVERY-RECENT-FIVE": {
       "source_report": "reports/phase23_relational_doris.json",
@@ -937,7 +937,7 @@
       "historical_actual_count": 48,
       "historical_expected_sha256": "2a5fa976229fbe0ea7060ad2e8ef3300f7b676df71fbfa04fec25aaf02dc45c1",
       "historical_actual_sha256": "2a5fa976229fbe0ea7060ad2e8ef3300f7b676df71fbfa04fec25aaf02dc45c1",
-      "reference_sha256": "68cb2a2315578c540b66696111f1eb5a08ca11216e906252a63c1c187f1f5529"
+      "reference_sha256": "c3b4bab8a9a626cd9a76e8e393abf50b9854652e331bb0cf4b2910467cf25c48"
     },
     "CORR-PHASE23-RELATIONAL-DORIS-002-ALIGNED-TEMPORAL-ARITHMETIC": {
       "source_report": "reports/phase23_relational_doris.json",
@@ -949,7 +949,7 @@
       "historical_actual_count": 5590,
       "historical_expected_sha256": "e119981b04ef7e814f2e67717e5a7282d0519c9e9de663cc762a403b88270a29",
       "historical_actual_sha256": "e119981b04ef7e814f2e67717e5a7282d0519c9e9de663cc762a403b88270a29",
-      "reference_sha256": "9516c1e62508427dd2578b4afb533909081d2ef857dbe7ec91e09f7f7d1b5fa8"
+      "reference_sha256": "ec5068512c6440515c18aaa9fee79414cb5813064f0dbd6d0f748b902f6088f2"
     },
     "CORR-PHASE23-RELATIONAL-DORIS-003-MULTI-RESOURCE-TEMPORAL-JOIN": {
       "source_report": "reports/phase23_relational_doris.json",
@@ -961,7 +961,7 @@
       "historical_actual_count": 2929,
       "historical_expected_sha256": "718e40912e6bed5c6a7a50fd7ae06d749cc8144ed550e4667986d99915fd93c0",
       "historical_actual_sha256": "718e40912e6bed5c6a7a50fd7ae06d749cc8144ed550e4667986d99915fd93c0",
-      "reference_sha256": "f9fe7ed8ac75766676232bc04b64231e35175955b3efbf29a7fec3eec32d8202"
+      "reference_sha256": "9c06307ce298d8f8a8032ed2a8cbffa4f806c1a74bd8e163b4dd4a134faa2d60"
     },
     "CORR-PHASE23-RELATIONAL-DORIS-004-DIRECT-RANK-PERCENTAGE-RANGE": {
       "source_report": "reports/phase23_relational_doris.json",
@@ -973,7 +973,7 @@
       "historical_actual_count": 282,
       "historical_expected_sha256": "c6a5f99f20911d0bc3574a4373322460cdb9090d7e7ff88a892f9f12f80ad28d",
       "historical_actual_sha256": "c6a5f99f20911d0bc3574a4373322460cdb9090d7e7ff88a892f9f12f80ad28d",
-      "reference_sha256": "183938612b5da2bf5ae4ece26843c5a5d759d6739e294f05a0960f5adad9bcd0"
+      "reference_sha256": "266a7a9928353b25a7c60801bb142a4a6b361f8160f245877eb2e48d317fb954"
     },
     "CORR-PHASE23-RELATIONAL-DORIS-005-CANDIDATE-STAGE-RANK-RANGE": {
       "source_report": "reports/phase23_relational_doris.json",
@@ -985,7 +985,7 @@
       "historical_actual_count": 6,
       "historical_expected_sha256": "d2fda1b1cfb168dcc204b39f9d3a6100894685971aeb5de6469f586ad236b874",
       "historical_actual_sha256": "d2fda1b1cfb168dcc204b39f9d3a6100894685971aeb5de6469f586ad236b874",
-      "reference_sha256": "f300cd0d45142101c1b3149873cecf7ae5bb601626c5fd38add730a93de40f27"
+      "reference_sha256": "4856be9b270869e304a7e7fde58f84770d5b3a82f06b4dcf0e7a75614895b942"
     },
     "CORR-PHASE23-RELATIONAL-DORIS-006-SET-CANDIDATES-THEN-RANK": {
       "source_report": "reports/phase23_relational_doris.json",
@@ -997,7 +997,7 @@
       "historical_actual_count": 3,
       "historical_expected_sha256": "0b93d4cee3d1d603806d43c537da3d29c8beec68b506e5dff48aa5a2830e6966",
       "historical_actual_sha256": "0b93d4cee3d1d603806d43c537da3d29c8beec68b506e5dff48aa5a2830e6966",
-      "reference_sha256": "d3efd8e2f9c7eebfe87263f167977dcec86ab0d6a8976857401dcd52fc2334f2"
+      "reference_sha256": "ffea388098b403d9a0601fed2e87531cabfc3d47cd3665eb41f1d9e9060961cb"
     },
     "CORR-PHASE24-PERIOD-SCALAR-DORIS-001-PERIOD-SCALAR-VS-PERIOD-AVERAGE": {
       "source_report": "reports/phase24_period_scalar_doris.json",
@@ -1009,7 +1009,7 @@
       "historical_actual_count": 2633,
       "historical_expected_sha256": "8134f59e4e13866a086117973c515e80cfac6c912c886026df96b27cdd92d372",
       "historical_actual_sha256": "8134f59e4e13866a086117973c515e80cfac6c912c886026df96b27cdd92d372",
-      "reference_sha256": "dc69afce72570c88a30fbbeedb12432126f3ff09237c7d0ea7af1d6e5ff269d4"
+      "reference_sha256": "c65144b9c0dfc347eb92d4fbb279ae3f7159a745450aecea534aa860ae304df3"
     },
     "CORR-PHASE24-PERIOD-SCALAR-DORIS-002-TWO-PERIOD-SCALARS-AND-AGGREGATE": {
       "source_report": "reports/phase24_period_scalar_doris.json",
@@ -1021,7 +1021,7 @@
       "historical_actual_count": 5575,
       "historical_expected_sha256": "f4e79be088a8cfe1a4b5bee87aa0a3eec9a708e3ba20dda425cf3bbd15040271",
       "historical_actual_sha256": "f4e79be088a8cfe1a4b5bee87aa0a3eec9a708e3ba20dda425cf3bbd15040271",
-      "reference_sha256": "a5ae691c101bbb3bc09f5d7ecb050f9ea4c1ef7d9a51fe0e972545e001f5af2a"
+      "reference_sha256": "09a029d7e13d3253960f262ab58bb9aeb9d45e46a3b1a0a9d2f8b63f02bb462d"
     },
     "CORR-PHASE24-PERIOD-SCALAR-DORIS-003-PERIOD-QUERYDATA-CROSS-SCALAR": {
       "source_report": "reports/phase24_period_scalar_doris.json",
@@ -1033,7 +1033,7 @@
       "historical_actual_count": 5115,
       "historical_expected_sha256": "5a8480f1f5b5073c35f549ed9000c6e91a196ffac97e31f85bf2f48f19a66308",
       "historical_actual_sha256": "5a8480f1f5b5073c35f549ed9000c6e91a196ffac97e31f85bf2f48f19a66308",
-      "reference_sha256": "4e02164f72ca28eaae6deba97b3503d46ca11b957a7279eeef08dbda66d2b8ff"
+      "reference_sha256": "07c22298b22e39c2ba0abd8f1924a40c79ed273d5cd4788ef65a21aa4621556f"
     },
     "CORR-PHASE24-PERIOD-SCALAR-DORIS-004-PERIOD-SCALAR-WITH-RANK-ARITHMET": {
       "source_report": "reports/phase24_period_scalar_doris.json",
@@ -1045,7 +1045,7 @@
       "historical_actual_count": 2888,
       "historical_expected_sha256": "9e5173e2524d1c50131ac7c3d4952b6a0aee00d8295fd29fc55e4e7619820612",
       "historical_actual_sha256": "9e5173e2524d1c50131ac7c3d4952b6a0aee00d8295fd29fc55e4e7619820612",
-      "reference_sha256": "105496c9f0083c8bfb661a704a2a858335b83058937c14a3c2be1febbfb87393"
+      "reference_sha256": "9bf7dad1a3b990b6f562f31e493c18c1e14ed10124a9c6fe638a421d47e65743"
     },
     "CORR-PHASE25-EVENT-CANDIDATE-DORIS-001-PERIOD-RECORD-HIGH-AND-GROUPED-A": {
       "source_report": "reports/phase25_event_candidate_doris.json",
@@ -1057,7 +1057,7 @@
       "historical_actual_count": 1196,
       "historical_expected_sha256": "80c8e1fcedc7efb0405c3b41ab96c942f9ccaae24d28b95dbf6a9f43b0f4cfb8",
       "historical_actual_sha256": "80c8e1fcedc7efb0405c3b41ab96c942f9ccaae24d28b95dbf6a9f43b0f4cfb8",
-      "reference_sha256": "5b7b61e9e45cd6db15e20aa3a10c2b25d381a1ea1a6e299074e44b8f49c2bd33"
+      "reference_sha256": "91148ea67b4b42945217c7fdd98eddcd392b33c4df6490caa0d719b600d91c26"
     },
     "CORR-PHASE25-EVENT-CANDIDATE-DORIS-002-PERIOD-EVENT-ABSENCE-USES-DECIDA": {
       "source_report": "reports/phase25_event_candidate_doris.json",
@@ -1069,7 +1069,7 @@
       "historical_actual_count": 4453,
       "historical_expected_sha256": "c94e91f207a42da6696140c7ac1f7df225680706ccd4aa8d300719794bb8b853",
       "historical_actual_sha256": "c94e91f207a42da6696140c7ac1f7df225680706ccd4aa8d300719794bb8b853",
-      "reference_sha256": "c4fd68f60640601fb946f9191ca4af2251cedbb495bedc2a5cd840594d8d555f"
+      "reference_sha256": "316e97eb0276e00aa6a4e69ea53d406d47ed147fd4102bf0bf6d93eea59596fe"
     },
     "CORR-PHASE25-EVENT-CANDIDATE-DORIS-003-LATEST-POSITION-AND-EXACT-SECURI": {
       "source_report": "reports/phase25_event_candidate_doris.json",
@@ -1081,7 +1081,7 @@
       "historical_actual_count": 78,
       "historical_expected_sha256": "0c16202a8a9a992d3268b2a90936dd668cb86201eee700c6187b355e9a14008c",
       "historical_actual_sha256": "0c16202a8a9a992d3268b2a90936dd668cb86201eee700c6187b355e9a14008c",
-      "reference_sha256": "683518c405d7d66983d22adf4c2a90763cd33db5cc56506dcb31586533ebb231"
+      "reference_sha256": "69562e7873fc8460cd8ccba31dc208e5054a86db7a636b4e69cd4f8a0b56df92"
     },
     "CORR-PHASE25-EVENT-CANDIDATE-DORIS-004-EVENT-UNION-AND-MULTI-GROWTH-REL": {
       "source_report": "reports/phase25_event_candidate_doris.json",
@@ -1093,7 +1093,7 @@
       "historical_actual_count": 442,
       "historical_expected_sha256": "7453387662e324fcdd25ce297e568b15f7a22e75db2e5ada1022c5dad2630113",
       "historical_actual_sha256": "7453387662e324fcdd25ce297e568b15f7a22e75db2e5ada1022c5dad2630113",
-      "reference_sha256": "ce25186aceb8581cf9ce57cb7f19a3558ac4dbcfd1ea4c417cbace2bccf167e6"
+      "reference_sha256": "1896e0c8d8f6ab5fba3df3b38edb406d2ae0ebf257c9bf1f4288099497f89f08"
     },
     "CORR-PHASE25-EVENT-CANDIDATE-DORIS-005-DIFFERENT-EVENT-AND-INDICATOR-DA": {
       "source_report": "reports/phase25_event_candidate_doris.json",
@@ -1105,7 +1105,7 @@
       "historical_actual_count": 299,
       "historical_expected_sha256": "318d2d91586f49414388179c57fe0c425263f6c2f7c8cae4e380869011ca809c",
       "historical_actual_sha256": "318d2d91586f49414388179c57fe0c425263f6c2f7c8cae4e380869011ca809c",
-      "reference_sha256": "339b735f82b953eed9a401d67ea452233382c597f080957ff1af417cb6601948"
+      "reference_sha256": "e7d2fed08c50b8b17e9e3e782237a0e7b2816c00dc90e4f23b1a1ae1f58fac0b"
     },
     "CORR-PHASE26-DATE-LIMIT-DORIS-001-FIXED-YEAR-FOLLOWING-RANGE": {
       "source_report": "reports/phase26_date_limit_doris.json",
@@ -1117,7 +1117,7 @@
       "historical_actual_count": 2933,
       "historical_expected_sha256": "f6e559f7bb1dcfb825f618bff62e2aa62eeb98717ecbd23e2ca47e5ba1c2b8cb",
       "historical_actual_sha256": "f6e559f7bb1dcfb825f618bff62e2aa62eeb98717ecbd23e2ca47e5ba1c2b8cb",
-      "reference_sha256": "41fe19a441adc622bac65dcf153804c88d7e1fbab6832e29b2959b8e61cc75ab"
+      "reference_sha256": "7c626052f1234fd706d1114a7413bf09ddc468b9ea61cff7053e4aa3d33e8a97"
     },
     "CORR-PHASE26-DATE-LIMIT-DORIS-002-SESSION-BEFORE-ANCHOR-DAY": {
       "source_report": "reports/phase26_date_limit_doris.json",
@@ -1129,7 +1129,7 @@
       "historical_actual_count": 5562,
       "historical_expected_sha256": "15fce38337e6661e57f696c4aca6d3c13237a5a0b2d9ecfc7f4de36704a067d8",
       "historical_actual_sha256": "15fce38337e6661e57f696c4aca6d3c13237a5a0b2d9ecfc7f4de36704a067d8",
-      "reference_sha256": "59fe402fbb2e7d691fb037fd9e5317b41fcb54df079230e136fa4843a12d5162"
+      "reference_sha256": "b4cfdf5f02b394af34b0948c68811f0a1db94f4e909be3541209c54bc696017f"
     },
     "CORR-PHASE26-DATE-LIMIT-DORIS-003-SESSIONS-AFTER-ANCHOR-DAY-EVERY": {
       "source_report": "reports/phase26_date_limit_doris.json",
@@ -1141,7 +1141,7 @@
       "historical_actual_count": 5556,
       "historical_expected_sha256": "f7200a140d53b8463fa70471a6285aa22c1aacdcaca51e0b1d22e2cb2e3f8573",
       "historical_actual_sha256": "f7200a140d53b8463fa70471a6285aa22c1aacdcaca51e0b1d22e2cb2e3f8573",
-      "reference_sha256": "14b445d3d318e53b25c58aaf54581e81d00dcf90dc75106f8af3cf7cdcad224b"
+      "reference_sha256": "1872e690eaa6e9c192a66823326e759b57cfa4cd82c8dc74db0ded871ed00413"
     },
     "CORR-PHASE26-DATE-LIMIT-DORIS-004-RECENT-HALF-YEAR-AGGREGATE": {
       "source_report": "reports/phase26_date_limit_doris.json",
@@ -1153,7 +1153,7 @@
       "historical_actual_count": 5587,
       "historical_expected_sha256": "854d06019851194a5bfa26b79ce1bdc567193a088c4c69544802bc278bac85cf",
       "historical_actual_sha256": "854d06019851194a5bfa26b79ce1bdc567193a088c4c69544802bc278bac85cf",
-      "reference_sha256": "8af16cc9ae5c33a214d026fcbc65df160ea76f780d75db5349cd944482a01b32"
+      "reference_sha256": "d1fe2faa67e733cc72bf3aaf5baede2ef49bc682e1bb46a0c4af6163b046e16f"
     },
     "CORR-PHASE26-DATE-LIMIT-DORIS-005-FRACTIONAL-YEAR-TO-SIX-MONTH-BUC": {
       "source_report": "reports/phase26_date_limit_doris.json",
@@ -1165,7 +1165,7 @@
       "historical_actual_count": 5537,
       "historical_expected_sha256": "78d3c1b77f12142be6c75ae2f480ad928a1ca50dbb2be7debb0145fce5395b83",
       "historical_actual_sha256": "78d3c1b77f12142be6c75ae2f480ad928a1ca50dbb2be7debb0145fce5395b83",
-      "reference_sha256": "8aa8d3236f2151f48a2a029ec282d03d5fd130fdede703a7e709241949ed423d"
+      "reference_sha256": "71e37d1b17323a73fe218c03ba7f13aa240aaaf54923163dcea30d7fe91ff708"
     },
     "CORR-PHASE26-DATE-LIMIT-DORIS-006-DETERMINISTIC-OPEN-ENDED-LIMIT": {
       "source_report": "reports/phase26_date_limit_doris.json",
@@ -1177,7 +1177,7 @@
       "historical_actual_count": 5566,
       "historical_expected_sha256": "caa9d6fe5ed098a05568f5092de09c6912119866131f7c185fd0d10ba1a416f9",
       "historical_actual_sha256": "caa9d6fe5ed098a05568f5092de09c6912119866131f7c185fd0d10ba1a416f9",
-      "reference_sha256": "494f3ef4752a49f7cea9de1807087c6c4a427b98e15fdd55ec96ed7d2011046f"
+      "reference_sha256": "6d7fe701231f886345c3be4726fe0839e6aa036de8d14bef564eec71ec182abd"
     },
     "CORR-PHASE27-EVENT-SEMANTICS-DORIS-001-BOUNDED-CROSSING-EXISTENCE": {
       "source_report": "reports/phase27_event_semantics_doris.json",
@@ -1189,7 +1189,7 @@
       "historical_actual_count": 4870,
       "historical_expected_sha256": "c4fc9d69ba2613905f3b0a8f519114c3c9462f0b16b8145cd2be27800ab6637d",
       "historical_actual_sha256": "c4fc9d69ba2613905f3b0a8f519114c3c9462f0b16b8145cd2be27800ab6637d",
-      "reference_sha256": "e2de353285fdfc28997af06ffbae19424dbb3370f684b466949b911217ef808b"
+      "reference_sha256": "8f36a5f95947d5c7c6aa764b4ef73c95022b7cddcdf4119b424a3a9a842155a4"
     },
     "CORR-PHASE27-EVENT-SEMANTICS-DORIS-002-MONTHLY-CROSSING-BUCKET": {
       "source_report": "reports/phase27_event_semantics_doris.json",
@@ -1201,7 +1201,7 @@
       "historical_actual_count": 1659,
       "historical_expected_sha256": "066dc12c50c8eb76f0f0730300ff070e5285bdec9678ecb0f42b81c1c975ba43",
       "historical_actual_sha256": "066dc12c50c8eb76f0f0730300ff070e5285bdec9678ecb0f42b81c1c975ba43",
-      "reference_sha256": "4f29cc4bcafb517f8d765561d3a8e5d93657ef57b7a8db9568659e9ef57fc9b9"
+      "reference_sha256": "5df40890e3fb2d9b37b27c72d6314c11ee7123c235a87f97871aee2c32fed244"
     },
     "CORR-PHASE27-EVENT-SEMANTICS-DORIS-003-CROSS-DATE-EVENT-INTERSECTION": {
       "source_report": "reports/phase27_event_semantics_doris.json",
@@ -1213,7 +1213,7 @@
       "historical_actual_count": 5570,
       "historical_expected_sha256": "b9a10a843e26ca23031616e9710eb560d7cdfd4a0846703a70d1e5094674c225",
       "historical_actual_sha256": "b9a10a843e26ca23031616e9710eb560d7cdfd4a0846703a70d1e5094674c225",
-      "reference_sha256": "bef1c4a2a2912f969aedf3d28a8349d95f409886e0a9fff86ede4a9e7355a854"
+      "reference_sha256": "55a689cd82b6a9ee84e2976f99451fd4e06788241eb0673d59ffd08f9f060d2b"
     },
     "CORR-PHASE27-EVENT-SEMANTICS-DORIS-004-EIGHTY-SESSION-EXTREME-WITH-LATE": {
       "source_report": "reports/phase27_event_semantics_doris.json",
@@ -1225,7 +1225,7 @@
       "historical_actual_count": 57,
       "historical_expected_sha256": "2865d03dc6a1c8e74962c6d94f8cbde3b85211382184646bc27210256d8f6ee5",
       "historical_actual_sha256": "2865d03dc6a1c8e74962c6d94f8cbde3b85211382184646bc27210256d8f6ee5",
-      "reference_sha256": "fa0822128520c4f4c98904125a29850b4cce2891031fac7f7a4097dcb6818643"
+      "reference_sha256": "70dacb458cd633860cfcc8f56f54116fea5527dd223ce84bb3f3f34d1d5a58e7"
     },
     "CORR-PHASE28-DEFAULT-PRICE-DORIS-001-PRICE-CROSSES-ABOVE-MA20": {
       "source_report": "reports/phase28_default_price_doris.json",
@@ -1237,7 +1237,7 @@
       "historical_actual_count": 768,
       "historical_expected_sha256": "4d9b4da7bb02ceba50cedd0fcb601f4a1b227fb53907e24ac889192f2ff0f89a",
       "historical_actual_sha256": "4d9b4da7bb02ceba50cedd0fcb601f4a1b227fb53907e24ac889192f2ff0f89a",
-      "reference_sha256": "4a84a7fb52bab46e0b5320a6e7d6ccb229bfe175e83b7fad7b42b1ad21301ac9"
+      "reference_sha256": "2dac619f646b4eef502eee4945c0a04f0114e5d9af7e549693a39571ed64445c"
     },
     "CORR-PHASE28-DEFAULT-PRICE-DORIS-002-PRICE-DOES-NOT-CROSS-BELOW-MA60": {
       "source_report": "reports/phase28_default_price_doris.json",
@@ -1249,7 +1249,7 @@
       "historical_actual_count": 5547,
       "historical_expected_sha256": "5bcc80567b9d6debf2d0fbad44bcaccf3ac9e27431d5cc398d8f87ccf451f46a",
       "historical_actual_sha256": "5bcc80567b9d6debf2d0fbad44bcaccf3ac9e27431d5cc398d8f87ccf451f46a",
-      "reference_sha256": "ffbff0cdc86ea5f2b8a7ddd87e2a5f98133ad71c70ab51752d93e878322e20c6"
+      "reference_sha256": "18a30b85801fdbad3a55ea0e8e5ec2c4318635478de362d6f0d58c40860cae3a"
     },
     "CORR-PHASE28-DEFAULT-PRICE-DORIS-003-PRICE-AT-FIVE-SESSION-LOW": {
       "source_report": "reports/phase28_default_price_doris.json",
@@ -1261,7 +1261,7 @@
       "historical_actual_count": 919,
       "historical_expected_sha256": "0878e4c5954abd75d912d38c818d1c18897d6845d1e8d5819f109bfd1111c6f7",
       "historical_actual_sha256": "0878e4c5954abd75d912d38c818d1c18897d6845d1e8d5819f109bfd1111c6f7",
-      "reference_sha256": "4434a4092d649f06d277f4c50657fc7eef6aca8eef3d53bdc7107b32bfd35f56"
+      "reference_sha256": "680e5abe5724065f1d75e056f7a324a6e6aba2f911977c746507e204c11681aa"
     },
     "CORR-PHASE28-DEFAULT-PRICE-DORIS-004-PRICE-IN-LOW-HISTORICAL-QUARTILE": {
       "source_report": "reports/phase28_default_price_doris.json",
@@ -1273,7 +1273,7 @@
       "historical_actual_count": 797,
       "historical_expected_sha256": "edf47ad99b677b135e173e6f25101cf030724c84e312e9ca29e963d99d16257d",
       "historical_actual_sha256": "edf47ad99b677b135e173e6f25101cf030724c84e312e9ca29e963d99d16257d",
-      "reference_sha256": "e86b4bb55f2e9af95e0d4fbbb3d96cd561226893d6b14ade6c6e867a6c464ce4"
+      "reference_sha256": "bceb6a2b8f9016d69b10ad2dd7975ceb29ec9b1fbcb802fa29f24a54f84958e5"
     },
     "CORR-PHASE28-DEFAULT-PRICE-DORIS-005-PRICE-CLOSE-TO-MA20": {
       "source_report": "reports/phase28_default_price_doris.json",
@@ -1285,7 +1285,7 @@
       "historical_actual_count": 3018,
       "historical_expected_sha256": "d8346f11e357f478c2cd6f253a6fdba1d0361268429809750b76211001f2fb19",
       "historical_actual_sha256": "d8346f11e357f478c2cd6f253a6fdba1d0361268429809750b76211001f2fb19",
-      "reference_sha256": "b5a35b76263b1906e6fa107d8c96c53b5f1ef5a15e82bf4adc1149e13325ca4e"
+      "reference_sha256": "70ef1b91d88c7efc516e6e22be1caecf091aaff3c8d83feb5fde94e6a80b5751"
     },
     "CORR-PHASE28-DEFAULT-PRICE-DORIS-006-PRICE-RESETS-TO-MA5": {
       "source_report": "reports/phase28_default_price_doris.json",
@@ -1297,7 +1297,7 @@
       "historical_actual_count": 2855,
       "historical_expected_sha256": "c7766387c1c3538d64e1d308e292af24495953f8655db2638edc0cad64d04b10",
       "historical_actual_sha256": "c7766387c1c3538d64e1d308e292af24495953f8655db2638edc0cad64d04b10",
-      "reference_sha256": "e6bab5faab60b3a8a229f5b3af75f78663de04eabae8752aec93f32403a00ba4"
+      "reference_sha256": "d6ed8559b32b18cfe42aef834503783f758799b3da1a45ceb9c10f1869e4c30a"
     },
     "CORR-PHASE29-EVENT-PROJECTION-DORIS-001-CONSECUTIVE-HISTORICAL-LOW-POSIT": {
       "source_report": "reports/phase29_event_projection_doris.json",
@@ -1309,7 +1309,7 @@
       "historical_actual_count": 1071,
       "historical_expected_sha256": "ca14cd7074da56c62a7b9f594d2ca3b170ae5ba3b9ca656e3e54ef22fb8256c9",
       "historical_actual_sha256": "ca14cd7074da56c62a7b9f594d2ca3b170ae5ba3b9ca656e3e54ef22fb8256c9",
-      "reference_sha256": "810273375942fd466260aa5f7b8ba8ae4e393b01823d2c88c703414c4924849d"
+      "reference_sha256": "0e7c9c1176cc76c0e7e566847e46b8b0457f44b686afd4937f37941d072b4cce"
     },
     "CORR-PHASE29-EVENT-PROJECTION-DORIS-002-REPEATED-TWENTY-SESSION-LOW": {
       "source_report": "reports/phase29_event_projection_doris.json",
@@ -1321,7 +1321,7 @@
       "historical_actual_count": 4551,
       "historical_expected_sha256": "8f9ec3a7b19e15b5909ffb1df244c9e9f4e61725162b7249fed0d79a20e8d07e",
       "historical_actual_sha256": "8f9ec3a7b19e15b5909ffb1df244c9e9f4e61725162b7249fed0d79a20e8d07e",
-      "reference_sha256": "51299e8c334ecbf60cad09658230ea3f48c6fed12edf7d27a6f4b4482988dd63"
+      "reference_sha256": "b0a45a22b868cab87766816daf1b88d435da8e5272b81ba0e357fca9962cb1f8"
     },
     "CORR-PHASE29-EVENT-PROJECTION-DORIS-003-THREE-SESSION-PRICE-MA5-CONVERGE": {
       "source_report": "reports/phase29_event_projection_doris.json",
@@ -1333,7 +1333,7 @@
       "historical_actual_count": 5444,
       "historical_expected_sha256": "05f027ffc5dc33dd68dcbddad633ba80572a7d909016561df9ac9deec96a452c",
       "historical_actual_sha256": "05f027ffc5dc33dd68dcbddad633ba80572a7d909016561df9ac9deec96a452c",
-      "reference_sha256": "43c0e95f2fd365be11547753d2ebbfe88d4be7515aa31cdd49c04bae83402e81"
+      "reference_sha256": "ac54a551bb8189d2ee93ef14d102100f2a8a559f130903b9b1e6e1a8f82f328c"
     },
     "CORR-PHASE29-EVENT-PROJECTION-DORIS-004-REPEATED-PRICE-RESET-TO-MA20": {
       "source_report": "reports/phase29_event_projection_doris.json",
@@ -1345,7 +1345,7 @@
       "historical_actual_count": 3250,
       "historical_expected_sha256": "88148fe6d3ba1a5831ae36f5d90e01828a8ff15294d5138b86c2589f2f71a8d9",
       "historical_actual_sha256": "88148fe6d3ba1a5831ae36f5d90e01828a8ff15294d5138b86c2589f2f71a8d9",
-      "reference_sha256": "393984762ddc49a58d3a7666347ee55424f00b28ba007019345b17362bfd279d"
+      "reference_sha256": "0945a0d062ee1bfff3051bc419d8e4e3eb90dd5504b3c464a736bf03880a0cbe"
     },
     "CORR-PHASE30-GROUNDED-EVENT-DORIS-001-HALF-MONTH-PRICE-LOW": {
       "source_report": "reports/phase30_grounded_event_doris.json",
@@ -1357,7 +1357,7 @@
       "historical_actual_count": 304,
       "historical_expected_sha256": "f06904828e7a4f653815045adf0146755670f0217862ebc4637156d55090d107",
       "historical_actual_sha256": "f06904828e7a4f653815045adf0146755670f0217862ebc4637156d55090d107",
-      "reference_sha256": "5dcb65c83fb0e48fc28e2eaebc0c2fe79667ea69866c94b6c23116d052089fe8"
+      "reference_sha256": "ec2e7a0bcc2baa9d758054497cb8cb465b59ef5a4dd4fb079f6af8c0dbc6be52"
     },
     "CORR-PHASE30-GROUNDED-EVENT-DORIS-002-PREVIOUS-MONTH-PRICE-EXTREME": {
       "source_report": "reports/phase30_grounded_event_doris.json",
@@ -1369,7 +1369,7 @@
       "historical_actual_count": 837,
       "historical_expected_sha256": "e133c30d9c27e1125faaebe76058a7fce0d73c8e5182166b9a92c2b39ef10030",
       "historical_actual_sha256": "e133c30d9c27e1125faaebe76058a7fce0d73c8e5182166b9a92c2b39ef10030",
-      "reference_sha256": "eff6d601e69541392d96b0a73c21b93756ecc866add4433ebc403fce3c27f5e5"
+      "reference_sha256": "e51a9f343ebd1afb82c00b1e890b7e627bd43ce1c6cea2c883489e730a091008"
     },
     "CORR-PHASE30-GROUNDED-EVENT-DORIS-003-EXACT-SECURITY-REPEATED-CROSSING": {
       "source_report": "reports/phase30_grounded_event_doris.json",
@@ -1381,7 +1381,7 @@
       "historical_actual_count": 1,
       "historical_expected_sha256": "fa22483d4908768eaf829c6e5ac14b1a6ba9ff5acb96db00424f12a54d3b1562",
       "historical_actual_sha256": "fa22483d4908768eaf829c6e5ac14b1a6ba9ff5acb96db00424f12a54d3b1562",
-      "reference_sha256": "c88a31bb5ebef94968ad870b65b4bb05ab9604c6ee33ced7ca25e010472ed818"
+      "reference_sha256": "8e612650f12071e936e51b806bb3b5e2e555dd0a91a313ad7223183cc45530d7"
     },
     "CORR-PHASE30-GROUNDED-EVENT-DORIS-004-SUPPORT-RESET-AND-PRESSURE-CROSS": {
       "source_report": "reports/phase30_grounded_event_doris.json",
@@ -1393,7 +1393,7 @@
       "historical_actual_count": 85,
       "historical_expected_sha256": "a383551a4183cb9d083d9d84f577438b8b7bb2db6688d1f369218dee270868fa",
       "historical_actual_sha256": "a383551a4183cb9d083d9d84f577438b8b7bb2db6688d1f369218dee270868fa",
-      "reference_sha256": "15ca0e9484e969fee26fe7768438057e1ffdceb70fdcae7c7d951e5726b0b920"
+      "reference_sha256": "9bf8a78613b0b39fa7aaf973d10e95ca1305623a374d50a826f4b9b1dcd84668"
     },
     "CORR-PHASE30-GROUNDED-EVENT-DORIS-005-UNSEALED-LIMIT-EVENT": {
       "source_report": "reports/phase30_grounded_event_doris.json",
@@ -1405,7 +1405,7 @@
       "historical_actual_count": 35,
       "historical_expected_sha256": "4cb1b8917e52375784ec46194aa9109814a4db48e9ed156df3ad35d16cc98392",
       "historical_actual_sha256": "4cb1b8917e52375784ec46194aa9109814a4db48e9ed156df3ad35d16cc98392",
-      "reference_sha256": "0610197bddf391314c6e46379a2d06abfe475ac7ab70a45826b940047ae07991"
+      "reference_sha256": "5dfaa826dc64f10dc1729d1888da12bd2472d789633dfb05946fb00a98bfbde5"
     },
     "CORR-PHASE30-GROUNDED-EVENT-DORIS-006-HALF-YEAR-HISTORICAL-LOW": {
       "source_report": "reports/phase30_grounded_event_doris.json",
@@ -1417,7 +1417,7 @@
       "historical_actual_count": 3513,
       "historical_expected_sha256": "7d6d95d7b7a88c7529c68abeb8862753d16d202adf39be2aa3f219a18fffe08b",
       "historical_actual_sha256": "7d6d95d7b7a88c7529c68abeb8862753d16d202adf39be2aa3f219a18fffe08b",
-      "reference_sha256": "0524b0c9768dda0eea6538e173ba7c91da154a32e5e2022bd28a7969f5cd5313"
+      "reference_sha256": "8b03be4645f5ee0b562488e22dfec8e3b2ee94990f99249444d666dfaa3ba28c"
     },
     "CORR-PHASE31-FINAL-GROUNDED-DORIS-001-FIXED-SINCE-RECORD-HIGH": {
       "source_report": "reports/phase31_final_grounded_doris.json",
@@ -1429,7 +1429,7 @@
       "historical_actual_count": 34,
       "historical_expected_sha256": "990a4f7375d4eb4ec10a875a5337ad35585ea83f072765cf751f88001198a264",
       "historical_actual_sha256": "990a4f7375d4eb4ec10a875a5337ad35585ea83f072765cf751f88001198a264",
-      "reference_sha256": "5a6d5c7338271eac6611231c2dbe9db2faf4207cd21d83878675e1aeb7379ab0"
+      "reference_sha256": "8ff843abd4ce4ad3b599f94532d740a099f71a97eb7a921fb116aab14d2d36de"
     },
     "CORR-PHASE31-FINAL-GROUNDED-DORIS-002-EVENT-CANDIDATE-THEN-RANK": {
       "source_report": "reports/phase31_final_grounded_doris.json",
@@ -1441,7 +1441,7 @@
       "historical_actual_count": 2,
       "historical_expected_sha256": "0ea918ad5ba434b35f9c40b8464982ed50213a407ddf68ac1ccb303d25929f78",
       "historical_actual_sha256": "0ea918ad5ba434b35f9c40b8464982ed50213a407ddf68ac1ccb303d25929f78",
-      "reference_sha256": "2207641d4a962d2a3562d46d17f48e689c15c9d0dfff1feaf3dc08eb9557da26"
+      "reference_sha256": "7227650173036ec9142d5e98ddd954e33830ddc72776321a9697f67478c414a8"
     },
     "CORR-PHASE46-DERIVED-SCOPE-DORIS-001-T0-INSTRUMENT-RULE": {
       "source_report": "reports/phase46_derived_scope_doris.json",
@@ -1453,7 +1453,7 @@
       "historical_actual_count": 0,
       "historical_expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "historical_actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reference_sha256": "d78dc7ab58c44f3ca187ee55e3ad8f1941d08031a199cafb4a9d253de44c80e5"
+      "reference_sha256": "efd4993c387a7579f3d3ca5894bd7d7101cd42bfef467f68f2ab199c84aecfd9"
     },
     "CORR-PHASE46-DERIVED-SCOPE-DORIS-002-CSI300-SSE-MAIN-BOARD-INDUSTRY-A": {
       "source_report": "reports/phase46_derived_scope_doris.json",
@@ -1465,7 +1465,7 @@
       "historical_actual_count": 61,
       "historical_expected_sha256": "3509470741d49e30e3dcaebb3228c3e18aa2d2b5b843c6291a8db9344e3890c1",
       "historical_actual_sha256": "3509470741d49e30e3dcaebb3228c3e18aa2d2b5b843c6291a8db9344e3890c1",
-      "reference_sha256": "e69d30b4c9be9a17b43ac0e2eeca32393f2dcf7b828ecac565bd944dcaecac08"
+      "reference_sha256": "eb2a8e686379abc9f2b6e95b1b4d27056e102f119b9755bac7026af3778f08a3"
     },
     "CORR-PHASE46-DERIVED-SCOPE-DORIS-003-STAR-REGISTRATION-INDUSTRY-MIN": {
       "source_report": "reports/phase46_derived_scope_doris.json",
@@ -1477,7 +1477,7 @@
       "historical_actual_count": 582,
       "historical_expected_sha256": "e85dc314b3b8504ea30b69ca5e3484100c63910ac8587ccfd17983bbf3225e01",
       "historical_actual_sha256": "e85dc314b3b8504ea30b69ca5e3484100c63910ac8587ccfd17983bbf3225e01",
-      "reference_sha256": "9d4ad7b632c21cd2fe5759bac5a60e639d72a7cc7ec1645e49b998528e02931e"
+      "reference_sha256": "34de5404b0dedff1d8f3838e06532747a37b9bfc7151861e16abade672954fac"
     },
     "CORR-PHASE47-BENCHMARK-POLICY-DORIS-001-AI-TOP1-NOT-OUTPERFORM-BENCHMARK": {
       "source_report": "reports/phase47_benchmark_policy_doris.json",
@@ -1489,7 +1489,7 @@
       "historical_actual_count": 0,
       "historical_expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "historical_actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reference_sha256": "bb20805e226cf505303a3f69058a1b6047bde41e5b66232f7d6f31dafdae2d9d"
+      "reference_sha256": "bf3f76135b46eb982604d422a8bd1f00bce0ac0122e66c0ecf0650ffe001787f"
     },
     "CORR-PHASE47-BENCHMARK-POLICY-DORIS-002-TODAY-GAIN-BETWEEN-BENCHMARK-AND": {
       "source_report": "reports/phase47_benchmark_policy_doris.json",
@@ -1501,7 +1501,7 @@
       "historical_actual_count": 0,
       "historical_expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "historical_actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reference_sha256": "8e970ee64d15c12dedaa39790bed150ce112e0a7ed5bafa30666f5dc2789b3b1"
+      "reference_sha256": "2ff5f1590a7de77e1710a40bab7bbec39ed74982c3805039bc53ece8a143690f"
     },
     "CORR-PHASE47-BENCHMARK-POLICY-DORIS-003-RECENT-MONTH-BENCHMARK-AND-MA60": {
       "source_report": "reports/phase47_benchmark_policy_doris.json",
@@ -1513,12 +1513,683 @@
       "historical_actual_count": 786,
       "historical_expected_sha256": "5a14c369f70c5c8265029695b6f0027b4caee754740833a04354e0306c84917d",
       "historical_actual_sha256": "5a14c369f70c5c8265029695b6f0027b4caee754740833a04354e0306c84917d",
-      "reference_sha256": "f76b86724eca0dc8d9854eb6682cd08a68db4edf24077ef910efa672ae510bf8"
+      "reference_sha256": "50c2e455be7cfadcebc2155ebb6b9b5260de1b64ab4b03bbc3649499f358f3f9"
     },
     "CORR-ADAPTIVE-AGGREGATE-002": {
       "source_report": "data/official_correctness/manual_cases.jsonl",
       "source_git_head": "current",
       "reference_sha256": "2cfeb494ed3d62969f138c457fcab9dfe55ca521280a82b81eb25a3a867676ee"
+    },
+    "CORR-BALANCED-COMPOSITION-001": {
+      "reference_sha256": "ae6ea6e3a7604924216efe9e24a9eaa596af2e0451f3b92383099feb159daf41"
+    },
+    "CORR-BALANCED-COMPOSITION-002": {
+      "reference_sha256": "8fd50de2d628c8846afc5f3a193e1980b40daf1cb278054fb1325a188374e2c8"
+    },
+    "CORR-BALANCED-COMPOSITION-003": {
+      "reference_sha256": "2b07cbc57f42a76678e2f0cc0fff94526e59da512cba659561ea5b59f3d26b4d"
+    },
+    "CORR-BALANCED-COMPOSITION-004": {
+      "reference_sha256": "aaaa7fbfd42dc0ff9e74bb00c9a3b63fb91c1a70aa7c608587f320fe08a6ded3"
+    },
+    "CORR-BALANCED-COMPOSITION-005": {
+      "reference_sha256": "e7c7264eab1efc1cfc079c5054f3d2d2ef3f0fbc91f73965771512f05106b1e6"
+    },
+    "CORR-BALANCED-COMPOSITION-006": {
+      "reference_sha256": "71372b7e1b1f2fb107f5e0b86c2c3793e60d6325d65e9f5c63d3389f1189ae06"
+    },
+    "CORR-BALANCED-COMPOSITION-007": {
+      "reference_sha256": "e7ac9cee5a178ec3f9f7597aefe6657b1f7fdd35545acfc67ecceea171906343"
+    },
+    "CORR-BALANCED-COMPOSITION-008": {
+      "reference_sha256": "6b3d29a1870763d6ee2d2921c9d3402f282bb5e188bb48c16632165c194e7ff0"
+    },
+    "CORR-BALANCED-COMPOSITION-009": {
+      "reference_sha256": "fce3016e06609b2c451c9034a025a08add47db6f384a86a2f668b4033ca2787a"
+    },
+    "CORR-BALANCED-COMPOSITION-010": {
+      "reference_sha256": "48d3c5bee4605df1f8216f5e9b00de6db3acddf5175845b91d70177243fc26a4"
+    },
+    "CORR-BALANCED-COMPOSITION-011": {
+      "reference_sha256": "d8fc60f888b5121bc619857333fe60a0e9ac037c337538fcab8555ee77a22ac2"
+    },
+    "CORR-BALANCED-COMPOSITION-012": {
+      "reference_sha256": "48ea076a9277dc3709bc5b148f91d76b8204d13bcff6ec4844302637a72e7dda"
+    },
+    "CORR-BALANCED-COMPOSITION-013": {
+      "reference_sha256": "40eae76c30df7a30d07426127900718101e10de0047a7c4598f723a1cb81c56e"
+    },
+    "CORR-BALANCED-COMPOSITION-014": {
+      "reference_sha256": "d90fa7298bc8ecc9eb73a6e8d0cdc1722d84192ec9126f6df18bfa2c649d9a85"
+    },
+    "CORR-BALANCED-COMPOSITION-015": {
+      "reference_sha256": "ccba16d4cb9b2a15b7d5366de37f8d3679798082d6161f1a7cf465d26da79d36"
+    },
+    "CORR-BALANCED-COMPOSITION-016": {
+      "reference_sha256": "290efddc29d1a4056778868d49ab11d3e25b65f10e8b5c7de5c088030113f06e"
+    },
+    "CORR-BALANCED-COMPOSITION-017": {
+      "reference_sha256": "1487937e7e1682bb748d999e3229df5cb17308cbf7a485d0f500048e20b90d83"
+    },
+    "CORR-BALANCED-COMPOSITION-018": {
+      "reference_sha256": "d8a83f242d96d4bd415f0378331f91b5e390275081c1d2b3d36218a7994bc2f3"
+    },
+    "CORR-BALANCED-COMPOSITION-019": {
+      "reference_sha256": "46282a93d090aaa3f8f664849dd1d28d50379a7b18907939b07bf4f5a8e15429"
+    },
+    "CORR-BALANCED-COMPOSITION-020": {
+      "reference_sha256": "adaabcbd8c317f4937fbeafd2f0c277745af0abc637fc4247c1ac2310dc1e464"
+    },
+    "CORR-BALANCED-COMPOSITION-021": {
+      "reference_sha256": "3dda0cc44a4f58205b809c33b8685dee5cba097647ad0cb836f293b7e16da291"
+    },
+    "CORR-BALANCED-COMPOSITION-022": {
+      "reference_sha256": "9b62213fe65a3cef08a234d6bf68fc157dc8190c14cf55ac76441919502b9c7a"
+    },
+    "CORR-BALANCED-COMPOSITION-023": {
+      "reference_sha256": "d1c831c925dc44ceaeac298174bb1c1fe89de18c47e9a4bf7aaa4754475dd986"
+    },
+    "CORR-BALANCED-COMPOSITION-024": {
+      "reference_sha256": "22feb6d2bb1cce3d0b01e363817f01d6c05d6860bcf74e182ac7e7c719f54ba4"
+    },
+    "CORR-BALANCED-COMPOSITION-025": {
+      "reference_sha256": "83b357508c0b740b51929292c05c1aa223c620485317057a8f002023ef19d96b"
+    },
+    "CORR-BALANCED-COMPOSITION-026": {
+      "reference_sha256": "cce4ef71f884ff7889f05f1723dea5fc7995053d019a5ce922707d17d5e7225c"
+    },
+    "CORR-BALANCED-COMPOSITION-027": {
+      "reference_sha256": "ea0292fd7c8ac80b382cc378c3b02806e44976e00519475b88e66eaf73d561bd"
+    },
+    "CORR-BALANCED-COMPOSITION-028": {
+      "reference_sha256": "45d193174a6bdfa80d058d7245717f00ef9e8f3c4ba2d6d73ee08d4d8469eaed"
+    },
+    "CORR-BALANCED-COMPOSITION-029": {
+      "reference_sha256": "b27196f76a19442eb9ce3fc6a2e5c35a0c01f6ae35c7bf8062be1fd1b840a5f1"
+    },
+    "CORR-BALANCED-COMPOSITION-030": {
+      "reference_sha256": "8c701b0fa00b6dc3575fed77e8d49ce69e929708057814984292696fbe35f362"
+    },
+    "CORR-ADVERSARIAL-001-INTERSECTION": {
+      "reference_sha256": "132a5e1b750d04f87056e95fdf413ce77cf6f9b799bb78a480ea2d88851001ee",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-002-INTERSECTION": {
+      "reference_sha256": "44e0683ebab0c973af678c5ad3c4354ab64f2e20e04d06efb82d984809ef49de",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-003-INTERSECTION": {
+      "reference_sha256": "f2f459d59185dcfd3e243a1feab0ceeb0d30fb0b1c7749b94f4bbc25955a5903",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-004-INTERSECTION": {
+      "reference_sha256": "bb2f0097bc82730a2a0467d84b703d716b81b8966cc68688f0dcf6a110346450",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-005-INTERSECTION": {
+      "reference_sha256": "cf19939bbf1ad8ecba854af5b5d5ab68a283ab089a67b8c5c3deb6e32ffc14cc",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-006-INTERSECTION": {
+      "reference_sha256": "5a8913362897316848a99ce03130893bd4bbefc4c3200c57856393ed9c9ac625",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-007-INTERSECTION": {
+      "reference_sha256": "457e1b535910195f0b7ca9735a58550c774df2e0540516af85fb9072f09d5d3b",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-008-INTERSECTION": {
+      "reference_sha256": "24c16df4c91323e3b5ae05090c021a5873922487de2e59eefbc6f30ec558d9e0",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-009-INTERSECTION": {
+      "reference_sha256": "48578cd435c72bd5cd1999532bdc8ee4b1063632f7d78143b3f3541f23a8d886",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-010-INTERSECTION": {
+      "reference_sha256": "57ccb81ea540a2af8d4c4b3d08e8967e97456f7d5d218a123a87a1aac41e673d",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-011-INTERSECTION": {
+      "reference_sha256": "2cc0da0f627b59d72df4298b10052a454d4766b268c87c7d520e9b93916af85d",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-012-INTERSECTION": {
+      "reference_sha256": "91ec0ad3b955227090ff1f4d9be010a234d025a36476ddc3c69850c29e6721f8",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-013-INTERSECTION": {
+      "reference_sha256": "d1220061ee38b4d842a07dd098a302df0fc6fb0e09bd226eb7917da058214ca9",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-014-INTERSECTION": {
+      "reference_sha256": "659f4ed0a6de6a3df6f66cd66f14ba4f2ca60df1cb44191476e64318adc2cc9e",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-015-INTERSECTION": {
+      "reference_sha256": "03d214dddfa90c5d284d114c4228cfdfe066c4d5149bbe4ea159803394ee87f3",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-016-INTERSECTION": {
+      "reference_sha256": "23c6b873de85a6d086af80365abe3623ff6f895c51b917836ec3839fbee6405c",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-017-INTERSECTION": {
+      "reference_sha256": "fbe07b01dec625b559ae717c425638422130213835674108b85aac222b25e8a3",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-018-INTERSECTION": {
+      "reference_sha256": "f4dd37685ee1f5850d9d3c31bf74cd40842d85bbdd5a95adac7148f0dc58d162",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-019-INTERSECTION": {
+      "reference_sha256": "9ea44a675216075c7011dc710747deffe0195bf0128cb8b3c317d601bf36d848",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-020-INTERSECTION": {
+      "reference_sha256": "e8668574295ce5ed82157bddd23e6bfdfafe980709ddf3df26a276adee54a966",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-021-INTERSECTION": {
+      "reference_sha256": "290748dd8d7bd0d60af3b3d8c1405447d2aaa8aa922c06d9ff59715dcfe9ef32",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-022-INTERSECTION": {
+      "reference_sha256": "62db26f222c1e461ae35cac6a15bbe21e7c5c662f694c3cf2d350add39ddc592",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-023-INTERSECTION": {
+      "reference_sha256": "8d6932582347cb633dd44247560a7fd42fd48ca3ecbf4b349dab9f4579a67ad8",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-024-INTERSECTION": {
+      "reference_sha256": "8eaacb566e7141fe4ea5fe02feca177ff63a1e2e13f560f60c51912298d513ba",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-025-INTERSECTION": {
+      "reference_sha256": "d6e21aa9fa843a99d6b32624e1bf9a06e0a86fdde3993467bfd1140b7f9d557b",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-026-INTERSECTION": {
+      "reference_sha256": "8dfce8cdaab7f006af00cada1f1a0a69e7fbfce8cf2e2f7f14dff4d6430ea8df",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-027-INTERSECTION": {
+      "reference_sha256": "fa8edd514b2676a989d619f2350a5f231e94b38db4ac59dc9dec2ca8419a8c72",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-028-INTERSECTION": {
+      "reference_sha256": "1cb30eef686f936eb8067d3c870c384baa5e16ebc381e42ba4207555f2a250a5",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-029-INTERSECTION": {
+      "reference_sha256": "207905bca045e25774322b349633fe0ca0f224ffca61cc9842f539076934159c",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-030-INTERSECTION": {
+      "reference_sha256": "362836da794419722b00ca1564a99b8ee0aa88432552918e2e961af25b5cf0cc",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-031-INTERSECTION": {
+      "reference_sha256": "2093c1dcee3cee8171e58b323b9553e51c64beda49f8e69cb39477819dc4d3e4",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-032-INTERSECTION": {
+      "reference_sha256": "f8c05189996849edb332e4b92c47181f06ae3f7d8a27a9baaf73942c2bb0071b",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_intersection",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-033-UNION": {
+      "reference_sha256": "c414785411f0233fd93c0255d5cb20f4ce179f190e342961c7d0707c477c92de",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-034-UNION": {
+      "reference_sha256": "f36bd0d34e992859fb874c4302ade82ed60496d27614fb60a28b403a0f2eade4",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-035-UNION": {
+      "reference_sha256": "40725a005aa22a5de591d6380bc0f24ddf6e2271865726b323ec3b5de8c45b48",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-036-UNION": {
+      "reference_sha256": "e5bb9798bb2abafde017e4823d56aa5360f04f3ac6a2384697549186a4242157",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-037-UNION": {
+      "reference_sha256": "ccf9a50e9358b84d225f101e74ccfc95cd4516d6848e5d837ba7ffcac21c2f61",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-038-UNION": {
+      "reference_sha256": "b78f3f52d3f85d3b674e0bec9b35f97bdb321e2ff4e3c1bea9b6862c3ff1d721",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-039-UNION": {
+      "reference_sha256": "a114c7fb4fbd0b1091aa232e305bbc26101ceb037d831540d50bc7aa138b5220",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-040-UNION": {
+      "reference_sha256": "33a04a717fd2dcbf14150f199168a7355d5f71b161580c54a25cab1dfa4a8372",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-041-UNION": {
+      "reference_sha256": "ab5d0709b78b8e45f5ce4b1b7523f143ea33d079cb28690ee8afc2ab6ad02116",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-042-UNION": {
+      "reference_sha256": "7f1ffdc5ff5d68424bb7358e3325397db04a1e6b83ce850295d7b98bff761bbd",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-043-UNION": {
+      "reference_sha256": "4ce14095ed5997e26c577a20d9c875d06c3e5dcb56a5c2e26c816d79b742cc19",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-044-UNION": {
+      "reference_sha256": "9bc6f2c03201fb9c51bf95a3223aecfb8233568c45687151ec2bf6b3abb0fbb2",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-045-UNION": {
+      "reference_sha256": "8035c188deba7c53c8ce2dfc7fad63edcb7d5d5fee66a4e1122f01b4a3e13a10",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-046-UNION": {
+      "reference_sha256": "389be987c5bfe37c92d8aaeb4a39b1e6f1736f7e88c4cf844db28e64051e4187",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-047-UNION": {
+      "reference_sha256": "f2ed22150c5f26ce100a4794ee7b611c2f59f6a7cedf4c4235e27ff7c358b223",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-048-UNION": {
+      "reference_sha256": "04182f1dbe2a20ffdbc6accca6e7eae2d5fdc02dbcaadd1c993500689aaae302",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-049-UNION": {
+      "reference_sha256": "c2e4b69ddb8d791ab80c8ba19b70c073831bb3ef451c5859c95364841ff96f65",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-050-UNION": {
+      "reference_sha256": "618ff5982ee634291a23850cb385c1ff4bad0518237bfa4e90b7f6e9c1416dd3",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-051-UNION": {
+      "reference_sha256": "37931790a04b17cd757833e0ccb16bebdf6ec69605756b1dac8c30d6ef6c3670",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-052-UNION": {
+      "reference_sha256": "2da460f65c11274f2ba83738851d330c111658bc8b8497ea18c61fc38d6a3a40",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-053-UNION": {
+      "reference_sha256": "2717e408849314a186b890dc6e877d5dd6342e97888bb0bd7b201898d3b5a580",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-054-UNION": {
+      "reference_sha256": "2200d80661a9fec6778d6a2444a3864e6974a321ce8659e28224fcc28089d5c4",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-055-UNION": {
+      "reference_sha256": "f8e2113384af72e2f2c958f38e450cab84e0bb03d07ba5590b5bc5c1741b9291",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-056-UNION": {
+      "reference_sha256": "3b1f96ed9ce9a0c1be201105545a6bc423967dc3c7be66c87e6a7fbb49058051",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_union",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-057-AND-OR": {
+      "reference_sha256": "6f0366a12d4e1897bbb6af0af0946c6b5ca4904f730e4e5c6bd31d92fee70306",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-058-AND-OR": {
+      "reference_sha256": "f8acf2e4fd9aa16c180a5fd96566cbe6bc70295cae91a0888b65a861d6890a46",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-059-AND-OR": {
+      "reference_sha256": "e8c2361baec8e7574d401987448ab3837b0e0b5c6ab4b0421c07b48b4c0fc690",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-060-AND-OR": {
+      "reference_sha256": "d047f17a26aef251cb8db7e2035ffd7cf5460f6b3f5bbe29a91b6a6e4047a3c3",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-061-AND-OR": {
+      "reference_sha256": "c9b734687df40bff3922e207fb600f2ba3cbb7bc28ade80e71489a9a0d33bb61",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-062-AND-OR": {
+      "reference_sha256": "7ef94ac443ad5e89ce647b061056834622f0793242a9cb4587c6063343d4ddd9",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-063-AND-OR": {
+      "reference_sha256": "4a515fbe973c89e3f60fad23aab4fcedc0066cff47b94f13385edaba9d093989",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-064-AND-OR": {
+      "reference_sha256": "f8ed253dd4326531ba16705cbd47dd02df9d5eae9fb415154af468e9443f0c33",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-065-AND-OR": {
+      "reference_sha256": "576bd7b3acdf89f491b2075c8db2ddbf8c9f2b4572a6363ee9f894efd1e42f78",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-066-AND-OR": {
+      "reference_sha256": "1b63221faa1233b236c58320770cfd9ef2d7390e9ec0a7f5a63208ca83fc3789",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-067-AND-OR": {
+      "reference_sha256": "e60be03a49c6202238f4772759ee977a4742426a908763cb336cd18624a3edf8",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-068-AND-OR": {
+      "reference_sha256": "c84965505361caf106aee1b98ea9fa363bfb492bef8ceab7c1aebdaecfe9aed9",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-069-AND-OR": {
+      "reference_sha256": "06828b92a3a59c4871912ae66c46c7aa1bebfab0aeebeabda84bd0134d431a56",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-070-AND-OR": {
+      "reference_sha256": "8b0b248d6c3113294e08e3df6f2a0a1e10ea0d3f70d0e663698c66f3cc8fb699",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-071-AND-OR": {
+      "reference_sha256": "3e9523dc6c7b21fde57168d7a07341c7d65d229d6f08fae5651a82711812b463",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_and_or",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-072-OR-AND": {
+      "reference_sha256": "76369d3e1637e7dd26759e7c17fb8b5dfa0bf33f229dbf965ff488ca43d535c9",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-073-OR-AND": {
+      "reference_sha256": "b89308d18c530a8b36c435ed97be69d7f78bbb717ecf436cd42ea64d31b1e8c8",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-074-OR-AND": {
+      "reference_sha256": "7e293a507a77b07a2997f5b559e1a56571012f1ff534ddce67c621e30c5976dc",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-075-OR-AND": {
+      "reference_sha256": "77367800b715e61edc117ce3db6a75bd910da2d976d009d880a10f499a242505",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-076-OR-AND": {
+      "reference_sha256": "e1f93badb2b3061f5db02d6fab3c43e51132a8a42cdb62a98b86547004c88b40",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-077-OR-AND": {
+      "reference_sha256": "67f303bf230f09624b43df203f068cad2332730a3b48643d6fce7263f31ee4a1",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-078-OR-AND": {
+      "reference_sha256": "daf16e256ae5faedff42bfc9b7d3a54ef17ab2b461734338b3968393fa371bea",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-079-OR-AND": {
+      "reference_sha256": "e7ccc6b912c246665509e906467b15506d7611bcf1693d08d39859a9d5581584",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-080-OR-AND": {
+      "reference_sha256": "106a24841632888824d1999d50c7095c6d336993519732a938ba54190f7c3032",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-081-OR-AND": {
+      "reference_sha256": "49d721e2722689c199253e22e0d968cf4bd81effb15adf57ba55bddb6eeee4df",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-ADVERSARIAL-082-OR-AND": {
+      "reference_sha256": "169acbe37fb3fe6926bb75aa97906107877608172f7218f4ea986bb21bede8b6",
+      "source_kind": "independent_relational_oracle_composition",
+      "derivation_version": "v2",
+      "plan_family": "adversarial_or_and",
+      "reviewer": "independent-relational-oracle-composition-v2"
+    },
+    "CORR-CONFIG-FUNCTION-RELATIVE-GAP-001": {
+      "reference_sha256": "ed14158a3c5ed32eb90b34b6735fb26b3e910170471bd04277b55c1175f9a619",
+      "source_kind": "config_only_expression_template_oracle",
+      "derivation_version": "v2",
+      "plan_family": "configured_expression_template",
+      "reviewer": "config-only-blind-extension-oracle-review-v1"
     }
   }
 }

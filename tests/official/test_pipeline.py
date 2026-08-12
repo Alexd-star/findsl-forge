@@ -20,10 +20,23 @@ def test_official_pipeline_exposes_every_compiler_stage_and_safe_doris_sql():
     assert payload["physical"]["selected_resource"] == "official_basic"
     assert payload["physical"]["selected_strategy"] == "direct_column"
     assert payload["physical"]["decisions"][0]["selected"] is True
-    assert payload["backend"]["round_trip_stable"] is True
+    assert payload["backend"]["round_trip_checked"] is False
+    assert payload["backend"]["round_trip_stable"] is None
     assert payload["backend"]["validation_passed"] is True
     assert "`newzl`.`hsj_stock_hq_basic`" in payload["backend"]["sql"]
     assert payload["elapsed_ms"] >= 0
+    assert payload["timings_ns"]["total"] == result.elapsed_ns
+    assert {
+        "context_preflight",
+        "frontend",
+        "typed",
+        "logical",
+        "optimizer",
+        "physical",
+        "backend",
+        "context_postflight",
+        "total",
+    } <= set(payload["timings_ns"])
 
 
 def test_pipeline_compiles_previous_close_from_official_basic_table():

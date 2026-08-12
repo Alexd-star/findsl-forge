@@ -29,8 +29,10 @@ class FunctionBinding:
                 if name in self.slots
             },
             "argument_mode": self.signature.argument_mode,
-            "template_kind": self.signature.template_kind,
-            "lowering_op": self.signature.lowering_op,
+            "template_kind": "expression_tree"
+            if self.signature.expression_template is not None
+            else None,
+            "expression_template": self.signature.expression_template,
         }
 
 

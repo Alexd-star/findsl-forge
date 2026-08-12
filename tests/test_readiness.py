@@ -69,11 +69,14 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.blocking_passed
     assert output.exists()
     assert (reports_dir / "evaluation_report.md").exists()
+    assert (reports_dir / "official_compile_latency.md").exists()
     assert (reports_dir / "sql_equivalence_report.md").exists()
     assert (reports_dir / "official_suite_report.md").exists()
     assert (reports_dir / "defense_package.md").exists()
     assert (reports_dir / "prefix_sum_benchmark.md").exists()
     assert report.evaluation.failed == 0
+    assert report.official_compile_latency["target_met"] is True
+    assert report.official_compile_latency["case_count"] == 48
     assert report.equivalence.passed
     assert report.benchmark.optimized_matches_reference
     assert all(asset.passed for asset in report.doris_assets)

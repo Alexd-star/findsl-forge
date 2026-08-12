@@ -79,7 +79,8 @@ python scripts\check_official_watermarks.py
 ```powershell
 python scripts\run_official_correctness_benchmark.py
 python scripts\run_official_full_performance_matrix.py
-python scripts\collect_phase42_long_horizon_evidence.py
+python scripts\run_official_compile_latency_benchmark.py --repeats 30
+python scripts\run_official_long_horizon_matrix.py --repeats 5
 ```
 
 执行前先通过水位门禁。正确率比较完整结果集；性能矩阵至少包含一次预热和多次重复，并保存结果哈希、P95 和 Git HEAD。任何失败都应先判断是代码、数据水位、连接、缓存还是资源问题，不要直接改阈值。

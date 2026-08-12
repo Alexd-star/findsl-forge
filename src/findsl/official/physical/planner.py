@@ -19,6 +19,7 @@ from ..ir import (
     LogicalSetOperation,
     RangeExpr,
 )
+from ..template_language import FunctionTemplateError
 from ..lowering import LoweringResult
 from ..domain.binder import parse_date_constraint
 from ..domain.market import (
@@ -31,6 +32,7 @@ from ..domain.market import (
 from ..domain.scope import ScopeAnd, ScopeAtom, ScopeNot, ScopeOr
 from ..types import BOOLEAN, NUMERIC, STRING, TIME, OfficialType
 from .catalog import PhysicalCatalog
+from .function_templates import instantiate_expression_template
 from .expressions import PhysicalExpressionNode, PhysicalExpressionRegistry
 from .ir import (
     PhysicalAbs,
@@ -2053,6 +2055,7 @@ def _plan_composite_aggregate(
         fields,
         refs,
         frozenset(allowed_resource_ids),
+        frozenset(call.node_id for call in scalar_calls),
     )
     plan: PhysicalPlan = PhysicalCompositeAggregate(
         anchor_input,
@@ -2237,6 +2240,7 @@ def _plan_rank_expression(
         fields,
         refs,
         frozenset(allowed_resource_ids),
+        frozenset(call.node_id for call in scalar_calls),
     )
     plan: PhysicalPlan = PhysicalRankExpression(
         anchor_input,
@@ -2357,24 +2361,17 @@ def _composite_anchor_relation(
             catalog,
         )
 
-    constraints = []
-    for call in scalar_calls:
-        constraints.extend(_call_constraints(call, catalog, root_id))
     if not dated:
         stable_id = catalog.resource(root_id).anchor_resource_id or root_id
         partition_key = catalog.resource(stable_id).partition_key
-        constraints.append(
+        relation = PhysicalFilter(
+            relation,
             PhysicalComparison(
                 "=",
                 PhysicalColumn(stable_id, partition_key, TIME),
                 PhysicalLatestValue(stable_id, partition_key, TIME),
-            )
+            ),
         )
-    if constraints:
-        combined = constraints[0]
-        for constraint in constraints[1:]:
-            combined = PhysicalBinary("and", combined, constraint, BOOLEAN)
-        relation = PhysicalFilter(relation, _deduplicate_and(combined))
     relation = _with_dynamic_prefixes(relation, scalar_fields)
     return relation, root_id, allowed
 
@@ -2386,6 +2383,7 @@ def _lower_composite_expr(
     fields,
     refs,
     allowed_resource_ids,
+    scoped_call_ids,
 ):
     if isinstance(expression, LiteralExpr):
         return _physical_literal(expression)
@@ -2402,6 +2400,7 @@ def _lower_composite_expr(
                     fields,
                     refs,
                     allowed_resource_ids,
+                    scoped_call_ids,
                 ),
             )
         if expression.name not in _DIRECT_FIELD_CALLS or expression.binding is None:
@@ -2418,32 +2417,42 @@ def _lower_composite_expr(
             )
         return _physical_field_expression(field)
     if isinstance(expression, BinaryExpr):
-        left = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids)
-        right = _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids)
+        left = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids)
+        right = _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids)
         if expression.op == "/":
             right = PhysicalNullIf(right, PhysicalLiteral(0, right.type), right.type)
         return PhysicalBinary(expression.op, left, right, expression.type)
     if isinstance(expression, ComparisonExpr):
         if expression.op == "~=":
-            return _lower_approximate_comparison(
-                _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids),
-                _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids),
+            result = _lower_approximate_comparison(
+                _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids),
+                _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids),
             )
-        if isinstance(expression.right, RangeExpr) and expression.op == "between":
-            value = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids)
-            lower = _lower_composite_expr(expression.right.lower, catalog, resource_id, fields, refs, allowed_resource_ids)
-            upper = _lower_composite_expr(expression.right.upper, catalog, resource_id, fields, refs, allowed_resource_ids)
-            return PhysicalBinary(
+        elif isinstance(expression.right, RangeExpr) and expression.op == "between":
+            value = _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids)
+            lower = _lower_composite_expr(expression.right.lower, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids)
+            upper = _lower_composite_expr(expression.right.upper, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids)
+            result = PhysicalBinary(
                 "and",
                 PhysicalComparison(">=" if expression.right.lower_inclusive else ">", value, lower),
                 PhysicalComparison("<=" if expression.right.upper_inclusive else "<", value, upper),
                 BOOLEAN,
             )
-        return PhysicalComparison(
-            expression.op,
-            _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids),
-            _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids),
-        )
+        else:
+            result = PhysicalComparison(
+                expression.op,
+                _lower_composite_expr(expression.left, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids),
+                _lower_composite_expr(expression.right, catalog, resource_id, fields, refs, allowed_resource_ids, scoped_call_ids),
+            )
+        constraints = {
+            constraint.node_id: constraint
+            for call in _walk_calls(expression)
+            if call.node_id in scoped_call_ids
+            for constraint in _call_constraints(call, catalog, resource_id)
+        }
+        for constraint in constraints.values():
+            result = PhysicalBinary("and", result, constraint, BOOLEAN)
+        return result
     raise PhysicalPlanningError(
         "PHYSICAL_EXPRESSION_UNSUPPORTED",
         f"unsupported composite aggregate expression {type(expression).__name__}",
@@ -4493,36 +4502,22 @@ def _lower_configured_function(expression: CallExpr, lower_argument):
             f"configured function is unavailable: {expression.name}",
         )
     arguments = tuple(lower_argument(item) for item in expression.args)
-    operation = signature.lowering_op
-    if operation == "abs" and len(arguments) == 1:
-        return PhysicalAbs(arguments[0], expression.type)
-    if operation == "greatest" and len(arguments) == 2:
-        return PhysicalGreatest(arguments, expression.type)
-    binary = {
-        "add": "+",
-        "subtract": "-",
-        "multiply": "*",
-    }
-    if operation in binary and len(arguments) == 2:
-        return PhysicalBinary(binary[operation], arguments[0], arguments[1], expression.type)
-    if operation == "safe_divide" and len(arguments) == 2:
-        return PhysicalBinary(
-            "/",
-            arguments[0],
-            PhysicalNullIf(
-                arguments[1],
-                PhysicalLiteral(0, arguments[1].type),
-                arguments[1].type,
-            ),
+    if signature.expression_template is None:
+        raise PhysicalPlanningError(
+            "PHYSICAL_FUNCTION_TEMPLATE_UNAVAILABLE",
+            f"configured function has no expression template: {expression.name}",
+        )
+    try:
+        return instantiate_expression_template(
+            signature.expression_template,
+            arguments,
             expression.type,
         )
-    comparison = {"greater_than": ">", "less_than": "<"}
-    if operation in comparison and len(arguments) == 2:
-        return PhysicalComparison(comparison[operation], arguments[0], arguments[1])
-    raise PhysicalPlanningError(
-        "PHYSICAL_FUNCTION_TEMPLATE_UNSUPPORTED",
-        f"unsupported configured function template {signature.template_kind}/{operation}",
-    )
+    except FunctionTemplateError as exc:
+        raise PhysicalPlanningError(
+            "PHYSICAL_FUNCTION_TEMPLATE_UNSUPPORTED",
+            str(exc),
+        ) from exc
 
 
 def _apply_call_constraints(predicate, logical_expression, catalog: PhysicalCatalog, resource_id: str):

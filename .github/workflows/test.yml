@@ -25,5 +25,7 @@ jobs:
         run: python -m ruff check .
       - name: Verify architecture boundaries
         run: lint-imports
+      - name: Verify canonical compiler P95
+        run: python scripts/run_official_compile_latency_benchmark.py --repeats 5
       - name: Test
         run: python -m pytest -q

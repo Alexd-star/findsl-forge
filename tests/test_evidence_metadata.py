@@ -277,6 +277,8 @@ def test_build_evidence_metadata_extracts_readiness_official_and_doris_metrics(t
     assert metadata["official_real_data"]["long_horizon"] == {
         "available": True,
         "status": "PASS",
+        "workload_count": None,
+        "median_speedup": None,
         "speedup": 41.913043,
         "speedup_display": "41.91x",
         "target_speedup": 10.0,
@@ -334,6 +336,42 @@ def test_build_evidence_metadata_prefers_full_performance_matrix(tmp_path: Path)
     assert performance["all_matched_reference"] is True
     assert performance["max_p95_ms"] == 2856.5635
     assert performance["repeats"] == 7
+
+
+def test_build_evidence_metadata_prefers_stratified_long_horizon_matrix(
+    tmp_path: Path,
+) -> None:
+    snapshot_dir = tmp_path / "snapshots"
+    _write_minimal_snapshots(snapshot_dir)
+    (snapshot_dir / "official_long_horizon_matrix.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "git_head": "f" * 40,
+                "workload_count": 5,
+                "status": "PASS",
+                "target_speedup": 10.0,
+                "target_met": True,
+                "minimum_speedup": 11.28,
+                "median_speedup": 13.0,
+                "all_complete_result_hashes_match": True,
+                "all_row_counts_match": True,
+                "all_optimized_p95_under_10s": True,
+                "workloads": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    evidence = build_evidence_metadata(snapshot_dir=snapshot_dir)["official_real_data"][
+        "long_horizon"
+    ]
+
+    assert evidence["workload_count"] == 5
+    assert evidence["speedup"] == 11.28
+    assert evidence["median_speedup"] == 13.0
+    assert evidence["target_met"] is True
+    assert evidence["git_head"] == "f" * 40
 
 
 def test_build_evidence_metadata_prefers_phase22_and_indexes_stage_rank_evidence(

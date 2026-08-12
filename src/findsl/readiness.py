@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from .benchmark import PrefixSumBenchmarkResult, benchmark_prefix_sum_file
 from .compiler import Compiler
@@ -20,6 +20,11 @@ from .equivalence import EquivalenceResult, verify_sql_equivalence
 from .evaluation import EvaluationResult, evaluate_file
 from .llm_adapter import DEFAULT_LLM_CANDIDATE_RESPONSE, validate_llm_candidates
 from .official_suite import OfficialSuiteResult, run_official_suite
+from .official.compile_latency import (
+    run_compile_latency_benchmark,
+    write_compile_latency_report,
+)
+from .official.performance import load_performance_manifest
 
 
 DEFAULT_EQUIVALENCE_DSL = (
@@ -193,6 +198,7 @@ class ReadinessReport:
     git: GitState
     pytest: Optional[CommandCheck]
     evaluation: EvaluationResult
+    official_compile_latency: Dict[str, Any]
     equivalence: EquivalenceResult
     benchmark: PrefixSumBenchmarkResult
     doris_assets: List[DorisAssetCheck]
@@ -244,7 +250,8 @@ class ReadinessReport:
                 "",
                 f"- Compile success rate: {self.evaluation.compile_success_rate:.2%}",
                 f"- SQL fragment accuracy: {self.evaluation.fragment_accuracy:.2%}",
-                f"- Compile P95 latency: {self.evaluation.p95_elapsed_ms:.3f} ms",
+                f"- Compile P95 latency: {self.official_compile_latency['p95_ms']:.3f} ms",
+                f"- Compile latency cases: {self.official_compile_latency['case_count']}",
                 f"- Evaluation cases passed: {self.evaluation.passed}/{self.evaluation.total}",
                 f"- SQL/reference equivalence: {self.equivalence.passed}",
                 f"- Equivalence SQL rows: {self.equivalence.sql_row_count}",
@@ -270,6 +277,7 @@ class ReadinessReport:
                 "",
                 f"- Readiness report: `{self.output_path}`",
                 f"- Evaluation report: `{self.reports_dir / 'evaluation_report.md'}`",
+                f"- Official compile latency report: `{self.reports_dir / 'official_compile_latency.md'}`",
                 f"- SQL equivalence report: `{self.reports_dir / 'sql_equivalence_report.md'}`",
                 f"- Official-style coverage suite report: `{self.official_suite.output_path}`",
                 f"- Defense package report: `{self.defense_package.output_path}`",
@@ -475,6 +483,17 @@ def generate_readiness_report(
     git = _git_state(repo_root)
     pytest_check = _run_pytest(repo_root) if run_pytest else None
     evaluation = evaluate_file(cases_path, reports_dir / "evaluation_report.md")
+    official_compile_latency = run_compile_latency_benchmark(
+        load_performance_manifest(repo_root / "data/official_performance/matrix.jsonl"),
+        warmups=1,
+        repeats=3,
+        target_p95_ms=50.0,
+    )
+    write_compile_latency_report(
+        official_compile_latency,
+        reports_dir / "official_compile_latency.json",
+        reports_dir / "official_compile_latency.md",
+    )
     equivalence = verify_sql_equivalence(equivalence_dsl, data_dir)
     (reports_dir / "sql_equivalence_report.md").write_text(equivalence.to_markdown(), encoding="utf-8")
     benchmark = benchmark_prefix_sum_file(
@@ -538,6 +557,7 @@ def generate_readiness_report(
         git=git,
         pytest=pytest_check,
         evaluation=evaluation,
+        official_compile_latency=official_compile_latency,
         equivalence=equivalence,
         benchmark=benchmark,
         doris_assets=doris_assets,
@@ -555,6 +575,7 @@ def generate_readiness_report(
             git,
             pytest_check,
             evaluation,
+            official_compile_latency,
             equivalence,
             benchmark,
             doris_assets,
@@ -580,6 +601,7 @@ def _build_gates(
     git: GitState,
     pytest_check: Optional[CommandCheck],
     evaluation: EvaluationResult,
+    official_compile_latency: Dict[str, Any],
     equivalence: EquivalenceResult,
     benchmark: PrefixSumBenchmarkResult,
     doris_assets: List[DorisAssetCheck],
@@ -608,11 +630,12 @@ def _build_gates(
             evaluation.failed == 0
             and evaluation.compile_success_rate == 1.0
             and evaluation.fragment_accuracy == 1.0
-            and evaluation.p95_elapsed_ms < 50,
+            and official_compile_latency["target_met"],
             (
                 f"{evaluation.passed}/{evaluation.total} cases, "
                 f"fragments {evaluation.fragment_accuracy:.2%}, "
-                f"P95 {evaluation.p95_elapsed_ms:.3f} ms"
+                f"canonical {official_compile_latency['case_count']} cases, "
+                f"P95 {official_compile_latency['p95_ms']:.3f} ms"
             ),
         ),
         ReadinessGate(

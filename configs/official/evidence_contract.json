@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_id": "competition-current-evidence-v1",
+  "contract_id": "competition-current-evidence-v2",
   "required_git_paths": [
     "git.head_at_report_generation",
     "git.head_at_export",
@@ -9,6 +9,7 @@
     "official_real_data.doris.git_head",
     "official_real_data.performance_matrix.git_head",
     "official_real_data.long_horizon.git_head",
+    "official_compile_latency.git_head",
     "formal_correctness.git_head",
     "doris_cluster.git_head"
   ],
@@ -85,9 +86,9 @@
       "metric_type": "latency",
       "numerator_path": null,
       "denominator_path": null,
-      "value_path": "readiness.compile_p95_latency_ms",
-      "denominator_set": "readiness 冻结编译基准用例",
-      "proves": "当前基准中的编译 P95 延迟",
+      "value_path": "official_compile_latency.p95_ms",
+      "denominator_set": "48 条分层官方性能语句、每条固定重复次数的正式编译样本",
+      "proves": "覆盖 12 类函数和主要计划族的正式编译 P95 延迟",
       "does_not_prove": "所有官方复杂语句或并发负载下的尾延迟",
       "required": true
     },
@@ -97,8 +98,8 @@
       "numerator_path": null,
       "denominator_path": null,
       "value_path": "official_real_data.long_horizon.target_met",
-      "denominator_set": "冻结的官方长周期 baseline/optimized 等价查询",
-      "proves": "指定长周期工作负载达到不低于十倍的门禁",
+      "denominator_set": "五类冻结的官方长周期 baseline/optimized 等价工作负载",
+      "proves": "成交量、成交额和收盘价 SUM/AVG 长周期工作负载均达到不低于十倍的门禁",
       "does_not_prove": "所有查询均能获得相同加速或普通查询性能更快",
       "required": true
     },

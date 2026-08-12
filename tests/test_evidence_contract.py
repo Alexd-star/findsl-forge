@@ -25,6 +25,10 @@ def _metadata() -> dict:
             "head_at_export": HEAD[:7],
         },
         "readiness": {"compile_p95_latency_ms": 1.5},
+        "official_compile_latency": {
+            "git_head": HEAD,
+            "p95_ms": 42.0,
+        },
         "official_real_data": {
             "slot_coverage": {
                 "git_head": HEAD,

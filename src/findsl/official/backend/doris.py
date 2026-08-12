@@ -6,7 +6,6 @@ from typing import Optional
 from sqlglot import exp
 
 from ..physical.catalog import PhysicalCatalog
-from ..physical.runtime import current_semantic_policy
 from ..physical.ir import (
     PhysicalAbs,
     PhysicalBinary,
@@ -58,20 +57,24 @@ from ..physical.ir import (
     PhysicalUnary,
 )
 from ..physical.validate import validate_physical_plan
+from .errors import DorisBackendError
+from .ranking_sql import rank_function as _rank_function
+from .ranking_sql import rank_order as _rank_order
+from .temporal_sql import calendar_bucket_key as _calendar_bucket_key
+from .temporal_sql import calendar_bucket_ordinal as _calendar_bucket_ordinal
+from .temporal_sql import date_shift as _date_shift
+from .temporal_sql import date_trunc as _date_trunc
+from .temporal_sql import dynamic_date_bounds as _dynamic_date_bounds
+from .temporal_sql import latest_resource_anchor as _latest_resource_anchor
 from .validation import DorisAstValidation, validate_doris_ast
-
-
-class DorisBackendError(ValueError):
-    def __init__(self, code: str, message: str):
-        super().__init__(message)
-        self.code = code
 
 
 @dataclass(frozen=True)
 class DorisRenderResult:
     ast: exp.Select
     sql: str
-    round_trip_stable: bool
+    round_trip_checked: bool
+    round_trip_stable: Optional[bool]
     validation: object
     ast_validation: DorisAstValidation
 
@@ -101,14 +104,32 @@ _COMPARISON = {
 }
 
 
-def render_doris(plan: PhysicalPlan, catalog: PhysicalCatalog, expressions=None) -> DorisRenderResult:
+def render_doris(
+    plan: PhysicalPlan,
+    catalog: PhysicalCatalog,
+    expressions=None,
+    *,
+    verify_round_trip: bool = True,
+) -> DorisRenderResult:
     validate_physical_plan(plan, catalog, expressions)
     ast = _render_plan(plan, catalog)
     sql = ast.sql(dialect="doris")
-    validation = validate_doris_ast(sql, catalog)
+    validation = validate_doris_ast(
+        ast,
+        sql,
+        catalog,
+        verify_round_trip=verify_round_trip,
+    )
     if not validation.passed:
         raise DorisBackendError("DORIS_AST_VALIDATION_FAILED", ", ".join(validation.issues))
-    return DorisRenderResult(ast, sql, validation.round_trip_stable, validation.safety, validation)
+    return DorisRenderResult(
+        ast,
+        sql,
+        validation.round_trip_checked,
+        validation.round_trip_stable,
+        validation.safety,
+        validation,
+    )
 
 
 def _render_plan(
@@ -2632,195 +2653,6 @@ def _render_exist_metrics(
     )
 
 
-def _calendar_bucket_key(relation_name: str, unit: str):
-    granularity = {
-        "周": "WEEK",
-        "月": "MONTH",
-        "季度": "QUARTER",
-        "年": "YEAR",
-    }[unit]
-    return exp.DateTrunc(
-        this=exp.column("bizdate", table=relation_name, quoted=True),
-        unit=exp.Literal.string(granularity),
-    )
-
-
-def _calendar_bucket_ordinal(bucket_key, unit: str):
-    if unit == "年":
-        return exp.func("YEAR", bucket_key.copy())
-    if unit == "月":
-        return exp.Add(
-            this=exp.Mul(
-                this=exp.func("YEAR", bucket_key.copy()),
-                expression=exp.convert(12),
-            ),
-            expression=exp.func("MONTH", bucket_key.copy()),
-        )
-    if unit == "季度":
-        return exp.Add(
-            this=exp.Mul(
-                this=exp.func("YEAR", bucket_key.copy()),
-                expression=exp.convert(4),
-            ),
-            expression=exp.func("QUARTER", bucket_key.copy()),
-        )
-    return exp.Floor(
-        this=exp.Div(
-            this=exp.func("UNIX_TIMESTAMP", bucket_key.copy()),
-            expression=exp.convert(604800),
-        )
-    )
-
-
-def _latest_calendar_anchor(catalog: PhysicalCatalog, scan: PhysicalScan) -> exp.Subquery:
-    resource = catalog.resource(scan.anchor_resource_id or scan.resource_id)
-    query = exp.select(
-        exp.Max(this=exp.column("bizdate", table="calendar_anchor", quoted=True))
-    ).from_(
-        exp.table_(
-            resource.table,
-            db=resource.database,
-            quoted=True,
-            alias="calendar_anchor",
-        )
-    )
-    return exp.Subquery(this=query)
-
-
-def _latest_resource_anchor(catalog: PhysicalCatalog, resource_id: str) -> exp.Subquery:
-    resource = catalog.resource(resource_id)
-    if resource.partition_key is None:
-        raise DorisBackendError(
-            "DORIS_DATE_ANCHOR_UNAVAILABLE",
-            f"resource {resource_id} has no partition key",
-        )
-    query = exp.select(
-        exp.Max(this=exp.column(resource.partition_key, table="calendar_anchor", quoted=True))
-    ).from_(
-        exp.table_(
-            resource.table,
-            db=resource.database,
-            quoted=True,
-            alias="calendar_anchor",
-        )
-    )
-    return exp.Subquery(this=query)
-
-
-def _date_shift(value, amount: int, unit: str):
-    if amount == 0:
-        return value
-    operator = exp.DateAdd if amount > 0 else exp.DateSub
-    return operator(
-        this=value,
-        expression=exp.Literal.string(str(abs(amount))),
-        unit=exp.Var(this=unit.upper()),
-    )
-
-
-def _date_trunc(value, unit: str):
-    return exp.DateTrunc(this=value, unit=exp.Literal.string(unit.upper()))
-
-
-def _dynamic_date_bounds(
-    catalog: PhysicalCatalog,
-    resource_id: str,
-    range_kind: str,
-    unit: str,
-    amount: int,
-    offset: int,
-    month: Optional[int],
-    day: Optional[int],
-    end_month: Optional[int] = None,
-    anchor_resource_id: Optional[str] = None,
-    weekday_start: Optional[int] = None,
-    weekday_end: Optional[int] = None,
-):
-    anchor = _latest_resource_anchor(catalog, anchor_resource_id or resource_id)
-    validity = None
-    if range_kind == "period":
-        current_start = _date_trunc(anchor.copy(), unit)
-        lower = _date_shift(current_start.copy(), offset, unit)
-        upper = (
-            anchor.copy()
-            if offset == 0
-            else _date_shift(
-                _date_shift(current_start.copy(), offset + 1, unit),
-                -1,
-                "day",
-            )
-        )
-        return lower, upper, validity
-    if range_kind == "weekday_range":
-        if weekday_start is None or weekday_end is None or weekday_start > weekday_end:
-            raise DorisBackendError(
-                "DORIS_DATE_RANGE_UNSUPPORTED",
-                "weekday range requires ordered weekday boundaries",
-            )
-        week_start = _date_shift(_date_trunc(anchor.copy(), "week"), offset, "week")
-        lower = _date_shift(week_start.copy(), weekday_start - 1, "day")
-        upper = _date_shift(week_start.copy(), weekday_end - 1, "day")
-        return lower, upper, validity
-    if range_kind == "recent":
-        if unit == "week":
-            lower = _date_shift(anchor.copy(), -(amount * 7 - 1), "day")
-        elif unit == "month":
-            lower = _date_shift(_date_shift(anchor.copy(), -amount, "month"), 1, "day")
-        elif unit == "year":
-            lower = _date_trunc(
-                _date_shift(anchor.copy(), -(amount - 1), "year"),
-                "year",
-            )
-        else:
-            raise DorisBackendError(
-                "DORIS_DATE_RANGE_UNSUPPORTED",
-                f"unsupported recent calendar unit {unit}",
-            )
-        return lower, anchor.copy(), validity
-    if range_kind == "anchor_calendar":
-        base = (
-            _date_trunc(anchor.copy(), "month")
-            if month is None
-            else _date_shift(
-                _date_trunc(anchor.copy(), "year"),
-                month - 1 + offset,
-                "month",
-            )
-        )
-        if day is not None:
-            lower = _date_shift(base.copy(), day - 1, "day")
-            upper = lower.copy()
-            expected_month = (
-                exp.convert(month)
-                if month is not None
-                else exp.func("MONTH", anchor.copy())
-            )
-            validity = exp.EQ(
-                this=exp.func("MONTH", lower.copy()),
-                expression=expected_month,
-            )
-        else:
-            lower = base.copy()
-            upper = _date_shift(_date_shift(base.copy(), 1, "month"), -1, "day")
-        return lower, upper, validity
-    if range_kind == "year_month_range":
-        if month is None or end_month is None:
-            raise DorisBackendError(
-                "DORIS_DATE_RANGE_UNSUPPORTED",
-                "year month range requires both month boundaries",
-            )
-        year_start = _date_trunc(anchor.copy(), "year")
-        lower = _date_shift(year_start.copy(), month - 1, "month")
-        upper = _date_shift(
-            _date_shift(year_start.copy(), end_month, "month"), -1, "day"
-        )
-        return lower, upper, validity
-    raise DorisBackendError(
-        "DORIS_DATE_RANGE_UNSUPPORTED",
-        f"unsupported dynamic date range kind {range_kind}",
-    )
-
-
 def _row_number(table: str, keys, order_column: str, descending: bool = False) -> exp.Window:
     return exp.Window(
         this=exp.RowNumber(),
@@ -2834,48 +2666,6 @@ def _row_number(table: str, keys, order_column: str, descending: bool = False) -
             ]
         ),
     )
-
-
-def _rank_function():
-    policy = current_semantic_policy()
-    method = policy.ranking.method if policy else "row_number"
-    if method == "row_number":
-        return exp.RowNumber()
-    if method == "rank":
-        return exp.Rank()
-    if method == "dense_rank":
-        return exp.DenseRank()
-    raise DorisBackendError("DORIS_RANK_POLICY_UNSUPPORTED", f"unsupported rank method {method}")
-
-
-def _rank_order(metric, descending: bool, table: str) -> exp.Order:
-    policy = current_semantic_policy()
-    method = policy.ranking.method if policy else "row_number"
-    null_order = policy.ranking.metric_null_order if policy else "engine_default"
-    if null_order == "exclude":
-        raise DorisBackendError(
-            "DORIS_RANK_NULL_POLICY_UNSUPPORTED",
-            "rank NULL exclusion requires an explicit pre-rank filter",
-        )
-    expressions = []
-    if metric is not None:
-        kwargs = {"this": metric, "desc": descending}
-        if null_order == "first":
-            kwargs["nulls_first"] = True
-        elif null_order == "last":
-            kwargs["nulls_first"] = False
-        expressions.append(exp.Ordered(**kwargs))
-    if method == "row_number":
-        tie_breakers = policy.ranking.tie_breakers if policy else ("mktcode", "tgtcode")
-        expressions.extend(
-            exp.Ordered(
-                this=exp.column(name, table=table, quoted=True),
-                desc=False,
-                nulls_first=True,
-            )
-            for name in tie_breakers
-        )
-    return exp.Order(expressions=expressions)
 
 
 def _temporal_metric_predicate(plan: PhysicalTemporal, metrics_name: str):

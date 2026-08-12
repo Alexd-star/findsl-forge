@@ -23,7 +23,7 @@ def test_configured_numeric_scalar_runs_through_official_main_pipeline() -> None
     assert "ABS(" in result["backend"]["sql"]
     assert result["backend"]["validation_passed"] is True
     assert result["backend"]["safety_passed"] is True
-    assert result["typed_ast"]["children"][0]["binding"]["template_kind"] == "numeric_scalar"
+    assert result["typed_ast"]["children"][0]["binding"]["template_kind"] == "expression_tree"
 
 
 def test_configured_safe_ratio_inserts_zero_division_guard() -> None:
@@ -62,24 +62,42 @@ def test_blind_config_only_function_extension_keeps_core_tree_hash(tmp_path: Pat
     payload = json.loads(function_path.read_text(encoding="utf-8"))
     payload["functions"].append(
         {
-            "name": "sum_pair",
+            "name": "weighted_spread",
             "aliases": [],
             "argument_mode": "expressions",
             "arg_types": ["numeric", "numeric"],
             "result_kind": "numeric",
-            "template_kind": "numeric_binary",
-            "lowering_op": "add",
-            "reference_op": "add",
+            "expression_template": {
+                "op": "subtract",
+                "args": [
+                    {"op": "multiply", "args": [{"arg": 0}, {"literal": 2}]},
+                    {"arg": 1},
+                ],
+            },
             "version": "blind-test-v1",
         }
     )
     function_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     context = CompileContext.load(tmp_path)
 
-    result = compile_official(f"sum_pair({INDICATOR}, {INDICATOR}) > 1", context=context)
+    result = compile_official(
+        f"weighted_spread({INDICATOR}, {INDICATOR}) > 1",
+        context=context,
+    )
 
-    assert "+" in result.backend["sql"]
+    assert "* 2" in result.backend["sql"]
+    assert "- `q`.`volume`" in result.backend["sql"]
     assert _core_tree_hash(REPO_ROOT / "src/findsl/official") == before
+
+
+def test_nested_configured_function_template_compiles_without_function_branch() -> None:
+    result = compile_official(
+        f"relative_gap({INDICATOR}, {INDICATOR}) >= 0"
+    ).to_dict()
+
+    assert "ABS(`q`.`volume` - `q`.`volume`)" in result["backend"]["sql"]
+    assert "NULLIF(ABS(`q`.`volume`), 0)" in result["backend"]["sql"]
+    assert result["backend"]["validation_passed"] is True
 
 
 def test_function_catalog_rejects_arbitrary_sql_template(tmp_path: Path) -> None:
@@ -89,6 +107,41 @@ def test_function_catalog_rejects_arbitrary_sql_template(tmp_path: Path) -> None
     path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
     with pytest.raises(FunctionCatalogError, match="fields"):
+        OfficialFunctionCatalog.load(path)
+
+
+@pytest.mark.parametrize(
+    ("template", "message"),
+    [
+        ({"op": "raw_sql", "args": [{"arg": 0}]}, "unsupported"),
+        ({"op": "not", "args": [{"arg": 0}]}, "requires boolean"),
+        ({"arg": 9}, "invalid function template argument"),
+    ],
+)
+def test_function_catalog_rejects_unsafe_or_ill_typed_templates(
+    tmp_path: Path,
+    template: dict,
+    message: str,
+) -> None:
+    payload = json.loads(Path("configs/official/functions.json").read_text(encoding="utf-8"))
+    payload["functions"][0]["expression_template"] = template
+    path = tmp_path / "functions.json"
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(FunctionCatalogError, match=message):
+        OfficialFunctionCatalog.load(path)
+
+
+def test_function_catalog_rejects_excessive_template_depth(tmp_path: Path) -> None:
+    expression: dict = {"arg": 0}
+    for _ in range(18):
+        expression = {"op": "abs", "args": [expression]}
+    payload = json.loads(Path("configs/official/functions.json").read_text(encoding="utf-8"))
+    payload["functions"][0]["expression_template"] = expression
+    path = tmp_path / "functions.json"
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+    with pytest.raises(FunctionCatalogError, match="depth or node limit"):
         OfficialFunctionCatalog.load(path)
 
 

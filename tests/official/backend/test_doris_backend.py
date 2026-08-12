@@ -1261,6 +1261,28 @@ def test_temporal_or_branches_render_as_distinct_union_across_resources():
     assert result.validation.passed is True
 
 
+def test_composite_scalar_or_keeps_market_constraints_inside_each_branch():
+    result = render_doris(
+        _physical(
+            "indicator('沪', '', '成交量', '今日', '', '', '') > "
+            "queryData('', '贵州茅台', '成交量', '今日', '') or "
+            "indicator('深', '', '成交量', '今日', '', '', '') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    where = sqlglot.parse_one(result.sql, read="doris").find(exp.Where)
+    assert where is not None
+    assert where.find(exp.Or) is not None
+    market_values = sorted(
+        int(node.expressions[0].this)
+        for node in where.find_all(exp.In)
+        if isinstance(node.this, exp.Column) and node.this.name == "mktcode"
+    )
+    assert market_values == [0, 1]
+    assert "IN (1)) AND `official_basic`.`mktcode` IN (0)" not in result.sql
+
+
 def test_nested_temporal_or_chain_has_unique_cte_names_and_two_unions():
     result = render_doris(
         _physical(

@@ -5,7 +5,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
-from typing import Dict, Literal, Mapping, Optional, Tuple
+from typing import Any, Dict, Literal, Mapping, Optional, Tuple
+
+from .template_language import FunctionTemplateError, validate_expression_template
 
 
 ResultKind = Literal["dynamic", "numeric", "boolean", "string"]
@@ -18,9 +20,7 @@ class FunctionSignature:
     result_kind: ResultKind
     argument_mode: str = "slot_literals"
     arg_types: Tuple[str, ...] = ()
-    template_kind: Optional[str] = None
-    lowering_op: Optional[str] = None
-    reference_op: Optional[str] = None
+    expression_template: Optional[Mapping[str, Any]] = None
     version: str = "builtin"
 
     @property
@@ -213,7 +213,7 @@ class OfficialFunctionCatalog:
 def _configured_function(raw, index):
     expected = {
         "name", "aliases", "argument_mode", "arg_types", "result_kind",
-        "template_kind", "lowering_op", "reference_op", "version",
+        "expression_template", "version",
     }
     if not isinstance(raw, dict) or set(raw) != expected:
         raise FunctionCatalogError(f"invalid configured function fields at index {index}")
@@ -224,28 +224,28 @@ def _configured_function(raw, index):
     ):
         raise FunctionCatalogError(f"invalid configured function identifier: {name}")
     arg_types = tuple(str(item) for item in raw["arg_types"])
-    if raw["argument_mode"] != "expressions" or not 1 <= len(arg_types) <= 2:
+    if raw["argument_mode"] != "expressions" or not 1 <= len(arg_types) <= 8:
         raise FunctionCatalogError(f"unsupported configured function argument mode: {name}")
     if any(item not in {"numeric", "boolean", "string"} for item in arg_types):
         raise FunctionCatalogError(f"unsupported configured function argument type: {name}")
-    template = str(raw["template_kind"])
-    operation = str(raw["lowering_op"])
-    allowed = {
-        "numeric_scalar": {"abs"},
-        "numeric_binary": {"add", "subtract", "multiply", "safe_divide", "greatest"},
-        "boolean_event": {"greater_than", "less_than"},
-    }
-    if operation not in allowed.get(template, set()):
-        raise FunctionCatalogError(f"operation {operation} is not allowed for template {template}")
+    result_kind = str(raw["result_kind"])
+    if result_kind not in {"numeric", "boolean", "string"}:
+        raise FunctionCatalogError(f"unsupported configured function result kind: {name}")
+    try:
+        expression_template = validate_expression_template(
+            raw["expression_template"],
+            arg_types=arg_types,
+            result_kind=result_kind,
+        )
+    except FunctionTemplateError as exc:
+        raise FunctionCatalogError(f"invalid function template {name}: {exc}") from exc
     signature = FunctionSignature(
         name=name,
         slots=(),
-        result_kind=str(raw["result_kind"]),
+        result_kind=result_kind,
         argument_mode="expressions",
         arg_types=arg_types,
-        template_kind=template,
-        lowering_op=operation,
-        reference_op=str(raw["reference_op"]),
+        expression_template=expression_template,
         version=str(raw["version"]),
     )
     return signature, aliases

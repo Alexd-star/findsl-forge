@@ -7,10 +7,8 @@
       "argument_mode": "expressions",
       "arg_types": ["numeric"],
       "result_kind": "numeric",
-      "template_kind": "numeric_scalar",
-      "lowering_op": "abs",
-      "reference_op": "abs",
-      "version": "1"
+      "expression_template": {"op": "abs", "args": [{"arg": 0}]},
+      "version": "2"
     },
     {
       "name": "safe_ratio",
@@ -18,10 +16,8 @@
       "argument_mode": "expressions",
       "arg_types": ["numeric", "numeric"],
       "result_kind": "numeric",
-      "template_kind": "numeric_binary",
-      "lowering_op": "safe_divide",
-      "reference_op": "safe_divide",
-      "version": "1"
+      "expression_template": {"op": "safe_divide", "args": [{"arg": 0}, {"arg": 1}]},
+      "version": "2"
     },
     {
       "name": "above_value",
@@ -29,10 +25,23 @@
       "argument_mode": "expressions",
       "arg_types": ["numeric", "numeric"],
       "result_kind": "boolean",
-      "template_kind": "boolean_event",
-      "lowering_op": "greater_than",
-      "reference_op": "greater_than",
-      "version": "1"
+      "expression_template": {"op": "greater_than", "args": [{"arg": 0}, {"arg": 1}]},
+      "version": "2"
+    },
+    {
+      "name": "relative_gap",
+      "aliases": [],
+      "argument_mode": "expressions",
+      "arg_types": ["numeric", "numeric"],
+      "result_kind": "numeric",
+      "expression_template": {
+        "op": "safe_divide",
+        "args": [
+          {"op": "abs", "args": [{"op": "subtract", "args": [{"arg": 0}, {"arg": 1}]}]},
+          {"op": "abs", "args": [{"arg": 1}]}
+        ]
+      },
+      "version": "blind-extension-v1"
     }
   ]
 }

@@ -62,6 +62,19 @@ def test_catalog_snapshot_detects_mid_lifetime_config_change(tmp_path: Path) -> 
         snapshot.assert_current()
 
 
+def test_catalog_snapshot_hot_check_avoids_rehash_when_file_metadata_is_stable(
+    monkeypatch,
+) -> None:
+    snapshot = CatalogSnapshot.capture(REPO_ROOT)
+
+    def unexpected_capture(*args, **kwargs):
+        raise AssertionError("stable catalog metadata must not trigger a full rehash")
+
+    monkeypatch.setattr(CatalogSnapshot, "capture", unexpected_capture)
+
+    snapshot.assert_current()
+
+
 def test_physical_runtime_is_request_scoped_and_restored() -> None:
     context = CompileContext.load(REPO_ROOT)
     default_version = current_numeric_approximation_policy().version

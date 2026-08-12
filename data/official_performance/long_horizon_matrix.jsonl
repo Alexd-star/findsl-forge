@@ -1,0 +1,5 @@
+{"aggregation": "SUM", "case_id": "LONG-HORIZON-VOLUME-SUM", "dsl": "indicator('', '', '成交量', '近5000日', '', 'SUM', '') > 10000000", "indicator": "成交量", "target_speedup": 10.0}
+{"aggregation": "AVG", "case_id": "LONG-HORIZON-VOLUME-AVG", "dsl": "indicator('', '', '成交量', '近5000日', '', 'AVG', '') > 0", "indicator": "成交量", "target_speedup": 10.0}
+{"aggregation": "SUM", "case_id": "LONG-HORIZON-TURNOVER-SUM", "dsl": "indicator('', '', '成交额', '近5000日', '', 'SUM', '') > 0", "indicator": "成交额", "target_speedup": 10.0}
+{"aggregation": "SUM", "case_id": "LONG-HORIZON-CLOSE-SUM", "dsl": "indicator('', '', '收盘价', '近5000日', '', 'SUM', '') > 0", "indicator": "收盘价", "target_speedup": 10.0}
+{"aggregation": "AVG", "case_id": "LONG-HORIZON-CLOSE-AVG", "dsl": "indicator('', '', '收盘价', '近5000日', '', 'AVG', '') > 0", "indicator": "收盘价", "target_speedup": 10.0}

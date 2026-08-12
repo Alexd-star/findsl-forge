@@ -20,6 +20,7 @@ class OfficialPipelineOptions:
     use_strategies: bool = True
     allow_shadow_strategies: bool = False
     strategy_mode: str = "auto"
+    verify_sql_round_trip: bool = False
 
     def __post_init__(self):
         if self.strategy_mode not in {"auto", "force_baseline", "force_candidate"}:
@@ -65,6 +66,7 @@ class OfficialPipelineResult:
     physical: Dict[str, Any]
     backend: Dict[str, Any]
     compile_context: Dict[str, Any]
+    timings_ns: Dict[str, int]
     elapsed_ns: int
 
     @property
@@ -82,6 +84,7 @@ class OfficialPipelineResult:
             "physical": self.physical,
             "backend": self.backend,
             "compile_context": self.compile_context,
+            "timings_ns": self.timings_ns,
             "elapsed_ms": self.elapsed_ms,
         }
 
@@ -92,15 +95,20 @@ def compile_official(
     context: CompileContext | None = None,
 ) -> OfficialPipelineResult:
     started = perf_counter_ns()
-    partial: Dict[str, Any] = {"source": source}
+    timings: Dict[str, int] = {}
+    partial: Dict[str, Any] = {"source": source, "timings_ns": timings}
+    stage_started = perf_counter_ns()
     try:
         compile_context = context or default_compile_context()
         compile_context.assert_current()
     except Exception as exc:
         _raise_pipeline_error("context", exc, partial)
+    timings["context_preflight"] = perf_counter_ns() - stage_started
     partial["compile_context"] = compile_context.to_dict()
 
+    stage_started = perf_counter_ns()
     frontend = AntlrOfficialFrontend().parse(str(source or ""), original_source=source)
+    timings["frontend"] = perf_counter_ns() - stage_started
     partial["frontend"] = frontend.to_dict()
     if not frontend.ok:
         diagnostic = frontend.diagnostics[0]
@@ -113,6 +121,7 @@ def compile_official(
         )
 
     registry = compile_context.registry
+    stage_started = perf_counter_ns()
     try:
         typed = OfficialSemanticAnalyzer(
             registry.resolve_optional,
@@ -120,15 +129,20 @@ def compile_official(
         ).analyze(frontend.ast)
     except Exception as exc:
         _raise_pipeline_error("typed", exc, partial)
+    timings["typed"] = perf_counter_ns() - stage_started
     partial["typed_ast"] = typed.to_dict()
 
+    stage_started = perf_counter_ns()
     try:
         logical = lower_official_ast(typed, strict=True, domain_registry=registry)
     except Exception as exc:
         _raise_pipeline_error("logical", exc, partial)
+    timings["logical"] = perf_counter_ns() - stage_started
     partial["logical"] = logical.to_dict()
 
+    stage_started = perf_counter_ns()
     optimized = Optimizer(DEFAULT_RULES).optimize(logical.plan)
+    timings["optimizer"] = perf_counter_ns() - stage_started
     partial["optimized"] = optimized.to_dict()
     if optimized.diagnostics:
         raise OfficialPipelineError(
@@ -148,6 +162,7 @@ def compile_official(
         if options.use_strategies and options.strategy_mode != "force_baseline"
         else None
     )
+    stage_started = perf_counter_ns()
     try:
         with use_physical_runtime(compile_context.physical_runtime):
             physical = plan_physical(
@@ -176,15 +191,24 @@ def compile_official(
     except Exception as exc:
         decisions = tuple(asdict(item) for item in getattr(exc, "decisions", ()))
         _raise_pipeline_error("physical", exc, partial, diagnostics=decisions)
+    timings["physical"] = perf_counter_ns() - stage_started
     partial["physical"] = _physical_payload(physical, compile_context, options)
 
+    stage_started = perf_counter_ns()
     try:
         with use_physical_runtime(compile_context.physical_runtime):
-            rendered = render_doris(physical.plan, catalog, expressions)
+            rendered = render_doris(
+                physical.plan,
+                catalog,
+                expressions,
+                verify_round_trip=options.verify_sql_round_trip,
+            )
     except Exception as exc:
         _raise_pipeline_error("backend", exc, partial)
+    timings["backend"] = perf_counter_ns() - stage_started
     backend = {
         "sql": rendered.sql,
+        "round_trip_checked": rendered.round_trip_checked,
         "round_trip_stable": rendered.round_trip_stable,
         "validation_passed": rendered.ast_validation.passed,
         "validation_issues": list(rendered.ast_validation.issues),
@@ -192,10 +216,14 @@ def compile_official(
         "safety_issues": [item.to_dict() for item in rendered.validation.issues],
         "table_references": list(rendered.validation.table_references),
     }
+    stage_started = perf_counter_ns()
     try:
         compile_context.assert_current()
     except Exception as exc:
         _raise_pipeline_error("context", exc, partial)
+    timings["context_postflight"] = perf_counter_ns() - stage_started
+    elapsed_ns = perf_counter_ns() - started
+    timings["total"] = elapsed_ns
     return OfficialPipelineResult(
         source,
         partial["frontend"],
@@ -205,7 +233,8 @@ def compile_official(
         partial["physical"],
         backend,
         partial["compile_context"],
-        perf_counter_ns() - started,
+        dict(timings),
+        elapsed_ns,
     )
 
 

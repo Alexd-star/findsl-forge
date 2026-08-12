@@ -40,6 +40,7 @@ class CatalogFile:
     relative_path: str
     sha256: str
     size: int
+    mtime_ns: int
 
 
 @dataclass(frozen=True)
@@ -50,6 +51,8 @@ class CatalogSnapshot:
     policy_id: str
     files: Tuple[CatalogFile, ...]
     fingerprint: str
+    manifest_size: int
+    manifest_mtime_ns: int
 
     @classmethod
     def capture(
@@ -59,7 +62,9 @@ class CatalogSnapshot:
     ) -> "CatalogSnapshot":
         root = Path(repo_root).resolve()
         manifest = Path(manifest_path or root / "configs/official/compiler_manifest.json").resolve()
-        raw = json.loads(manifest.read_text(encoding="utf-8"))
+        manifest_payload = manifest.read_bytes()
+        manifest_stat = manifest.stat()
+        raw = json.loads(manifest_payload.decode("utf-8"))
         expected = {"schema_version", "profile_id", "policy_id", "entries"}
         if not isinstance(raw, dict) or set(raw) != expected or raw["schema_version"] != 1:
             raise CompileContextError("invalid compiler manifest root")
@@ -79,12 +84,14 @@ class CatalogSnapshot:
             if root not in absolute.parents or not absolute.is_file():
                 raise CompileContextError(f"compiler config is missing or outside repository: {relative}")
             payload = absolute.read_bytes()
+            stat = absolute.stat()
             files.append(
                 CatalogFile(
                     role,
                     relative,
                     hashlib.sha256(payload).hexdigest(),
                     len(payload),
+                    stat.st_mtime_ns,
                 )
             )
             roles.add(role)
@@ -112,8 +119,16 @@ class CatalogSnapshot:
         canonical = {
             "profile_id": profile_id,
             "policy_id": policy_id,
-            "manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
-            "files": [item.__dict__ for item in sorted(files, key=lambda value: value.role)],
+            "manifest_sha256": hashlib.sha256(manifest_payload).hexdigest(),
+            "files": [
+                {
+                    "role": item.role,
+                    "relative_path": item.relative_path,
+                    "sha256": item.sha256,
+                    "size": item.size,
+                }
+                for item in sorted(files, key=lambda value: value.role)
+            ],
         }
         encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode("utf-8")
         return cls(
@@ -123,6 +138,8 @@ class CatalogSnapshot:
             policy_id,
             tuple(sorted(files, key=lambda value: value.role)),
             hashlib.sha256(encoded).hexdigest(),
+            manifest_stat.st_size,
+            manifest_stat.st_mtime_ns,
         )
 
     @property
@@ -132,6 +149,22 @@ class CatalogSnapshot:
         )
 
     def assert_current(self) -> None:
+        try:
+            manifest_stat = self.manifest_path.stat()
+            manifest_unchanged = (
+                manifest_stat.st_size == self.manifest_size
+                and manifest_stat.st_mtime_ns == self.manifest_mtime_ns
+            )
+            files_unchanged = all(
+                (stat := (self.repo_root / item.relative_path).stat()).st_size
+                == item.size
+                and stat.st_mtime_ns == item.mtime_ns
+                for item in self.files
+            )
+        except OSError:
+            manifest_unchanged = files_unchanged = False
+        if manifest_unchanged and files_unchanged:
+            return
         current = CatalogSnapshot.capture(self.repo_root, self.manifest_path)
         if current.fingerprint != self.fingerprint:
             raise CompileContextError(
@@ -143,7 +176,15 @@ class CatalogSnapshot:
             "profile_id": self.profile_id,
             "policy_id": self.policy_id,
             "fingerprint": self.fingerprint,
-            "files": [item.__dict__ for item in self.files],
+            "files": [
+                {
+                    "role": item.role,
+                    "relative_path": item.relative_path,
+                    "sha256": item.sha256,
+                    "size": item.size,
+                }
+                for item in self.files
+            ],
         }
 
 
