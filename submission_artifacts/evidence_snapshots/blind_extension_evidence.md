@@ -1,9 +1,9 @@
 # 声明式新函数盲扩展证据
 
-- Git HEAD：`5bde41c87fa3769b73f4abc5188b0fc2a81f5e82`
+- Git HEAD：`dd61d10a39adfaf720720254df0a9bb557255b25`
 - 新函数：`blind_demo_margin`
-- 核心代码哈希（扩展前）：`c91a0cd57e334e8f032e824ac88609e183613e355a3468eeeea3c53cd034f810`
-- 核心代码哈希（扩展后）：`c91a0cd57e334e8f032e824ac88609e183613e355a3468eeeea3c53cd034f810`
+- 核心代码哈希（扩展前）：`1b9b91f0db5ddc371453f5cca4eb5d20a20e383601383062f4f9cc55b242db01`
+- 核心代码哈希（扩展后）：`1b9b91f0db5ddc371453f5cca4eb5d20a20e383601383062f4f9cc55b242db01`
 - 核心代码未修改：`True`
 - 编译与 SQL 安全校验：`True`
 - Gate：`PASS`

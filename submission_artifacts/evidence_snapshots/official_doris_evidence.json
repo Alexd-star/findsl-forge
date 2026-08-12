@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T13:05:25Z",
-  "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
+  "generated_at": "2026-08-12T16:49:50Z",
+  "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
   "doris_version": "VERSION()\r\n5.7.99",
   "database": "newzl",
   "official_root": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统",
@@ -12,20 +12,20 @@
   "stream_load_port": 8040,
   "row_counts": {
     "hsj_stock_code_info": 5686,
-    "hsj_stock_hq_ext": 6170822,
-    "hsj_stock_hq_basic": 13650347
+    "hsj_stock_hq_basic": 13650347,
+    "hsj_stock_hq_ext": 6170822
   },
   "feature_tables_available": true,
   "feature_table_row_counts": {
     "hsj_stock_hq_basic_technical": 13650347,
-    "hsj_stock_hq_basic_prefix": 13650347,
     "hsj_stock_hq_ext_prefix": 13650347,
+    "hsj_stock_hq_basic_prefix": 13650347,
     "hsj_stock_hq_basic_rollup": 13650347
   },
   "basic_date_range": "first_basic_date\tlast_basic_date\r\n2006-01-04\t2026-04-14",
   "ext_date_range": "first_ext_date\tlast_ext_date\r\n2018-08-20\t2026-04-14",
   "baseline_prefix_row_count_match": true,
-  "baseline_vs_prefix_speedup": 12.631,
+  "baseline_vs_prefix_speedup": 12.165,
   "queries": [
     {
       "name": "simple_close_price_filter",
@@ -33,12 +33,12 @@
       "explain": "Explain String(Nereids Planner)\r\nPLAN FRAGMENT 0\r\n  OUTPUT EXPRS:\r\n    mktcode[#89]\r\n    tgtcode[#90]\r\n    bizdate[#91]\r\n    name[#92]\r\n  PARTITION: HASH_PARTITIONED: mktcode[#22], tgtcode[#23]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  VRESULT SINK\r\n     MYSQL_PROTOCOL\r\n\r\n  3:VHASH JOIN(285)\r\n  |  join op: LEFT OUTER JOIN(BROADCAST)[]\r\n  |  equal join conjunct: (mktcode[#80] = mktcode[#19])\r\n  |  equal join conjunct: (tgtcode[#81] = tgtcode[#20])\r\n  |  cardinality=3,412,586\r\n  |  vec output tuple id: 5\r\n  |  output tuple id: 5\r\n  |  vIntermediate tuple ids: 4 \r\n  |  hash output slot ids: 80 81 82 21 \r\n  |  final projections: mktcode[#83], tgtcode[#84], bizdate[#85], name[#88]\r\n  |  final project output tuple id: 5\r\n  |  distribute expr lists: mktcode[#80], tgtcode[#81]\r\n  |  distribute expr lists: \r\n  |  \r\n  |----1:VEXCHANGE\r\n  |       offset: 0\r\n  |       distribute expr lists: mktcode[#19], tgtcode[#20]\r\n  |    \r\n  2:VOlapScanNode(260)\r\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\r\n     PREDICATES: (((closePx[#30] > 100000) AND (bizdate[#24] = '2026-04-14')) AND (__DORIS_DELETE_SIGN__[#78] = 0))\r\n     partitions=1/1 (hsj_stock_hq_basic)\r\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\r\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#22], tgtcode[#23], bizdate[#24]\r\n     final project output tuple id: 3\r\n\r\nPLAN FRAGMENT 1\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 01\r\n    UNPARTITIONED\r\n\r\n  0:VOlapScanNode(269)\r\n     TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON\r\n     PREDICATES: (__DORIS_DELETE_SIGN__[#17] = 0)\r\n     partitions=1/1 (hsj_stock_code_info)\r\n     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...\r\n     cardinality=5686, avgRowSize=267.0515, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#0], tgtcode[#1], name[#2]\r\n     final project output tuple id: 1\r\n\r\n\r\n\r\n========== STATISTICS ==========\r\nplanned with unknown column statistics",
       "row_count": 3836,
       "execute_ms": [
-        83.1155,
-        92.9465,
-        73.5775
+        61.8726,
+        68.8611,
+        70.7619
       ],
-      "avg_ms": 83.213,
-      "p95_ms": 92.946,
+      "avg_ms": 67.165,
+      "p95_ms": 70.762,
       "plan_contains_prefix": false,
       "plan_contains_window": false
     },
@@ -48,12 +48,12 @@
       "explain": "Explain String(Nereids Planner)\r\nPLAN FRAGMENT 0\r\n  OUTPUT EXPRS:\r\n    mktcode[#107]\r\n    tgtcode[#108]\r\n    bizdate[#109]\r\n    name[#110]\r\n    rank_no[#111]\r\n  PARTITION: HASH_PARTITIONED: bizdate[#98]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  VRESULT SINK\r\n     MYSQL_PROTOCOL\r\n\r\n  7:VANALYTIC(557)\r\n  |  functions: [row_number()]\r\n  |  partition by: bizdate[#103]\r\n  |  order by: volume[#105] DESC NULLS LAST, tgtcode[#102] ASC NULLS FIRST\r\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\r\n  |  predicates: (rank_no[#106] <= 10)\r\n  |  final projections: mktcode[#101], tgtcode[#102], bizdate[#103], name[#104], rank_no[#106]\r\n  |  final project output tuple id: 9\r\n  |  distribute expr lists: bizdate[#103]\r\n  |  \r\n  6:VSORT(553)\r\n  |  order by: bizdate[#103] ASC, volume[#105] DESC, tgtcode[#102] ASC\r\n  |  algorithm: full sort\r\n  |  offset: 0\r\n  |  distribute expr lists: bizdate[#98]\r\n  |  \r\n  5:VEXCHANGE\r\n     offset: 0\r\n     distribute expr lists: mktcode[#96], tgtcode[#97]\r\n\r\nPLAN FRAGMENT 1\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#22], tgtcode[#23]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 05\r\n    HASH_PARTITIONED: bizdate[#98]\r\n\r\n  4:VPartitionTopN(545)\r\n  |  functions: row_number\r\n  |  partition by: bizdate[#93]\r\n  |  order by: volume[#100] DESC, tgtcode[#97] ASC\r\n  |  has global limit: false\r\n  |  partition limit: 10\r\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\r\n  |  distribute expr lists: mktcode[#91], tgtcode[#92]\r\n  |  \r\n  3:VHASH JOIN(537)\r\n  |  join op: LEFT OUTER JOIN(BROADCAST)[]\r\n  |  equal join conjunct: (mktcode[#80] = mktcode[#19])\r\n  |  equal join conjunct: (tgtcode[#81] = tgtcode[#20])\r\n  |  cardinality=6,825,173\r\n  |  vec output tuple id: 5\r\n  |  output tuple id: 5\r\n  |  vIntermediate tuple ids: 4 \r\n  |  hash output slot ids: 80 81 82 83 21 \r\n  |  final projections: mktcode[#84], tgtcode[#85], bizdate[#86], name[#90], volume[#87]\r\n  |  final project output tuple id: 5\r\n  |  distribute expr lists: mktcode[#80], tgtcode[#81]\r\n  |  distribute expr lists: \r\n  |  \r\n  |----1:VEXCHANGE\r\n  |       offset: 0\r\n  |       distribute expr lists: mktcode[#19], tgtcode[#20]\r\n  |    \r\n  2:VOlapScanNode(512)\r\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\r\n     PREDICATES: ((bizdate[#24] = '2026-04-14') AND (__DORIS_DELETE_SIGN__[#78] = 0))\r\n     partitions=1/1 (hsj_stock_hq_basic)\r\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\r\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#22], tgtcode[#23], bizdate[#24], volume[#31]\r\n     final project output tuple id: 3\r\n\r\nPLAN FRAGMENT 2\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 01\r\n    UNPARTITIONED\r\n\r\n  0:VOlapScanNode(521)\r\n     TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON\r\n     PREDICATES: (__DORIS_DELETE_SIGN__[#17] = 0)\r\n     partitions=1/1 (hsj_stock_code_info)\r\n     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...\r\n     cardinality=5686, avgRowSize=267.0515, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#0], tgtcode[#1], name[#2]\r\n     final project output tuple id: 1\r\n\r\n\r\n\r\n========== STATISTICS ==========\r\nplanned with unknown column statistics",
       "row_count": 10,
       "execute_ms": [
-        71.231,
-        94.7279,
-        104.9854
+        64.9598,
+        69.825,
+        75.5675
       ],
-      "avg_ms": 90.315,
-      "p95_ms": 104.985,
+      "avg_ms": 70.117,
+      "p95_ms": 75.568,
       "plan_contains_prefix": false,
       "plan_contains_window": true
     },
@@ -63,12 +63,12 @@
       "explain": "Explain String(Nereids Planner)\r\nPLAN FRAGMENT 0\r\n  OUTPUT EXPRS:\r\n    mktcode[#137]\r\n    tgtcode[#138]\r\n    bizdate[#139]\r\n    name[#140]\r\n  PARTITION: HASH_PARTITIONED: mktcode[#60], tgtcode[#61]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  VRESULT SINK\r\n     MYSQL_PROTOCOL\r\n\r\n  6:VHASH JOIN(678)\r\n  |  join op: INNER JOIN(BUCKET_SHUFFLE)[]\r\n  |  equal join conjunct: (mktcode[#127] = mktcode[#36])\r\n  |  equal join conjunct: (tgtcode[#128] = tgtcode[#37])\r\n  |  cardinality=6,825,173\r\n  |  vec output tuple id: 9\r\n  |  output tuple id: 9\r\n  |  vIntermediate tuple ids: 8 \r\n  |  hash output slot ids: 128 129 130 127 \r\n  |  runtime filters: RF000[min_max] <- mktcode[#36](1706293/2097152/2097152), RF001[in_or_bloom] <- mktcode[#36](1706293/2097152/2097152), RF002[min_max] <- tgtcode[#37](1706293/2097152/2097152), RF003[in_or_bloom] <- tgtcode[#37](1706293/2097152/2097152)\r\n  |  final projections: mktcode[#131], tgtcode[#132], bizdate[#133], name[#134]\r\n  |  final project output tuple id: 9\r\n  |  distribute expr lists: mktcode[#127], tgtcode[#128]\r\n  |  distribute expr lists: mktcode[#36], tgtcode[#37]\r\n  |  \r\n  |----1:VEXCHANGE\r\n  |       offset: 0\r\n  |       distribute expr lists: mktcode[#36], tgtcode[#37]\r\n  |    \r\n  5:VHASH JOIN(657)\r\n  |  join op: LEFT OUTER JOIN(BROADCAST)[]\r\n  |  equal join conjunct: (mktcode[#118] = mktcode[#57])\r\n  |  equal join conjunct: (tgtcode[#119] = tgtcode[#58])\r\n  |  cardinality=6,825,173\r\n  |  vec output tuple id: 7\r\n  |  output tuple id: 7\r\n  |  vIntermediate tuple ids: 6 \r\n  |  hash output slot ids: 118 119 120 59 \r\n  |  final projections: mktcode[#121], tgtcode[#122], bizdate[#123], name[#126]\r\n  |  final project output tuple id: 7\r\n  |  distribute expr lists: mktcode[#118], tgtcode[#119]\r\n  |  distribute expr lists: \r\n  |  \r\n  |----3:VEXCHANGE\r\n  |       offset: 0\r\n  |       distribute expr lists: mktcode[#57], tgtcode[#58]\r\n  |    \r\n  4:VOlapScanNode(632)\r\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\r\n     PREDICATES: ((bizdate[#62] = '2026-04-14') AND (__DORIS_DELETE_SIGN__[#116] = 0))\r\n     partitions=1/1 (hsj_stock_hq_basic)\r\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\r\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\r\n     pushAggOp=NONE\r\n     runtime filters: RF000[min_max] -> mktcode[#60], RF001[in_or_bloom] -> mktcode[#60], RF002[min_max] -> tgtcode[#61], RF003[in_or_bloom] -> tgtcode[#61]\r\n     final projections: mktcode[#60], tgtcode[#61], bizdate[#62]\r\n     final project output tuple id: 5\r\n\r\nPLAN FRAGMENT 1\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#38], tgtcode[#39]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 03\r\n    UNPARTITIONED\r\n\r\n  2:VOlapScanNode(641)\r\n     TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON\r\n     PREDICATES: (__DORIS_DELETE_SIGN__[#55] = 0)\r\n     partitions=1/1 (hsj_stock_code_info)\r\n     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...\r\n     cardinality=5686, avgRowSize=267.0515, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#38], tgtcode[#39], name[#40]\r\n     final project output tuple id: 3\r\n\r\nPLAN FRAGMENT 2\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 01\r\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#36], tgtcode[#37]\r\n\r\n  0:VOlapScanNode(662)\r\n     TABLE: newzl.hsj_stock_hq_basic_technical(hsj_stock_hq_basic_technical), PREAGGREGATION: ON\r\n     PREDICATES: (((bizdate[#2] = '2026-04-14') AND (ma250[#19] > 0)) AND ((volume_avg_60[#24] > 0) AND (__DORIS_DELETE_SIGN__[#34] = 0)))\r\n     partitions=1/1 (hsj_stock_hq_basic_technical)\r\n     tablets=16/16, tabletList=1785410008975,1785410008977,1785410008979 ...\r\n     cardinality=13650347, avgRowSize=515.9676, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#0], tgtcode[#1]\r\n     final project output tuple id: 1\r\n\r\n\r\n\r\n========== STATISTICS ==========\r\nplanned with unknown column statistics",
       "row_count": 5614,
       "execute_ms": [
-        180.0688,
-        102.0355,
-        85.7026
+        201.9482,
+        104.7478,
+        98.5455
       ],
-      "avg_ms": 122.602,
-      "p95_ms": 180.069,
+      "avg_ms": 135.08,
+      "p95_ms": 201.948,
       "plan_contains_prefix": false,
       "plan_contains_window": false
     },
@@ -78,12 +78,12 @@
       "explain": "Explain String(Nereids Planner)\r\nPLAN FRAGMENT 0\r\n  OUTPUT EXPRS:\r\n    mktcode[#167]\r\n    tgtcode[#168]\r\n    bizdate[#169]\r\n    name[#170]\r\n  PARTITION: HASH_PARTITIONED: mktcode[#90], tgtcode[#91]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  VRESULT SINK\r\n     MYSQL_PROTOCOL\r\n\r\n  6:VHASH JOIN(678)\r\n  |  join op: INNER JOIN(BUCKET_SHUFFLE)[]\r\n  |  equal join conjunct: (mktcode[#157] = mktcode[#66])\r\n  |  equal join conjunct: (tgtcode[#158] = tgtcode[#67])\r\n  |  cardinality=6,825,173\r\n  |  vec output tuple id: 9\r\n  |  output tuple id: 9\r\n  |  vIntermediate tuple ids: 8 \r\n  |  hash output slot ids: 160 157 158 159 \r\n  |  runtime filters: RF000[min_max] <- mktcode[#66](1542705/2097152/2097152), RF001[in_or_bloom] <- mktcode[#66](1542705/2097152/2097152), RF002[min_max] <- tgtcode[#67](1542705/2097152/2097152), RF003[in_or_bloom] <- tgtcode[#67](1542705/2097152/2097152)\r\n  |  final projections: mktcode[#161], tgtcode[#162], bizdate[#163], name[#164]\r\n  |  final project output tuple id: 9\r\n  |  distribute expr lists: mktcode[#157], tgtcode[#158]\r\n  |  distribute expr lists: mktcode[#66], tgtcode[#67]\r\n  |  \r\n  |----1:VEXCHANGE\r\n  |       offset: 0\r\n  |       distribute expr lists: mktcode[#66], tgtcode[#67]\r\n  |    \r\n  5:VHASH JOIN(657)\r\n  |  join op: LEFT OUTER JOIN(BROADCAST)[]\r\n  |  equal join conjunct: (mktcode[#148] = mktcode[#87])\r\n  |  equal join conjunct: (tgtcode[#149] = tgtcode[#88])\r\n  |  cardinality=6,825,173\r\n  |  vec output tuple id: 7\r\n  |  output tuple id: 7\r\n  |  vIntermediate tuple ids: 6 \r\n  |  hash output slot ids: 148 149 150 89 \r\n  |  final projections: mktcode[#151], tgtcode[#152], bizdate[#153], name[#156]\r\n  |  final project output tuple id: 7\r\n  |  distribute expr lists: mktcode[#148], tgtcode[#149]\r\n  |  distribute expr lists: \r\n  |  \r\n  |----3:VEXCHANGE\r\n  |       offset: 0\r\n  |       distribute expr lists: mktcode[#87], tgtcode[#88]\r\n  |    \r\n  4:VOlapScanNode(632)\r\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\r\n     PREDICATES: ((bizdate[#92] = '2026-04-14') AND (__DORIS_DELETE_SIGN__[#146] = 0))\r\n     partitions=1/1 (hsj_stock_hq_basic)\r\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\r\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\r\n     pushAggOp=NONE\r\n     runtime filters: RF000[min_max] -> mktcode[#90], RF001[in_or_bloom] -> mktcode[#90], RF002[min_max] -> tgtcode[#91], RF003[in_or_bloom] -> tgtcode[#91]\r\n     final projections: mktcode[#90], tgtcode[#91], bizdate[#92]\r\n     final project output tuple id: 5\r\n\r\nPLAN FRAGMENT 1\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#68], tgtcode[#69]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 03\r\n    UNPARTITIONED\r\n\r\n  2:VOlapScanNode(641)\r\n     TABLE: newzl.hsj_stock_code_info(hsj_stock_code_info), PREAGGREGATION: ON\r\n     PREDICATES: (__DORIS_DELETE_SIGN__[#85] = 0)\r\n     partitions=1/1 (hsj_stock_code_info)\r\n     tablets=16/16, tabletList=1785410008689,1785410008691,1785410008693 ...\r\n     cardinality=5686, avgRowSize=267.0515, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#68], tgtcode[#69], name[#70]\r\n     final project output tuple id: 3\r\n\r\nPLAN FRAGMENT 2\r\n\r\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  STREAM DATA SINK\r\n    EXCHANGE ID: 01\r\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#66], tgtcode[#67]\r\n\r\n  0:VOlapScanNode(662)\r\n     TABLE: newzl.hsj_stock_hq_ext(hsj_stock_hq_ext), PREAGGREGATION: ON\r\n     PREDICATES: (((bizdate[#2] = '2026-04-14') AND (ZJLXMainNetTur[#14] > 0)) AND (__DORIS_DELETE_SIGN__[#64] = 0))\r\n     partitions=1/1 (hsj_stock_hq_ext)\r\n     tablets=16/16, tabletList=1785410008759,1785410008761,1785410008763 ...\r\n     cardinality=6170822, avgRowSize=247.86974, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#0], tgtcode[#1]\r\n     final project output tuple id: 1\r\n\r\n\r\n\r\n========== STATISTICS ==========\r\nplanned with unknown column statistics",
       "row_count": 2247,
       "execute_ms": [
-        107.6524,
-        96.2442,
-        119.8756
+        134.8815,
+        90.5686,
+        97.2551
       ],
-      "avg_ms": 107.924,
-      "p95_ms": 119.876,
+      "avg_ms": 107.568,
+      "p95_ms": 134.882,
       "plan_contains_prefix": false,
       "plan_contains_window": false
     },
@@ -93,12 +93,12 @@
       "explain": "Explain String(Nereids Planner)\r\nPLAN FRAGMENT 0\r\n  OUTPUT EXPRS:\r\n    mktcode[#67]\r\n    tgtcode[#68]\r\n    bizdate[#69]\r\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\r\n\r\n  HAS_COLO_PLAN_NODE: true\r\n\r\n  VRESULT SINK\r\n     MYSQL_PROTOCOL\r\n\r\n  2:VANALYTIC(271)\r\n  |  functions: [sum(volume[#65])]\r\n  |  partition by: mktcode[#62], tgtcode[#63]\r\n  |  order by: bizdate[#64] ASC NULLS FIRST\r\n  |  window: ROWS BETWEEN 19 PRECEDING AND CURRENT ROW\r\n  |  predicates: (bizdate[#64] = '2026-04-14'), (volume_sum_20[#66] > 10000000)\r\n  |  final projections: mktcode[#62], tgtcode[#63], bizdate[#64]\r\n  |  final project output tuple id: 4\r\n  |  distribute expr lists: mktcode[#62], tgtcode[#63]\r\n  |  \r\n  1:VSORT(267)\r\n  |  order by: mktcode[#62] ASC, tgtcode[#63] ASC, bizdate[#64] ASC\r\n  |  algorithm: full sort\r\n  |  offset: 0\r\n  |  distribute expr lists: mktcode[#58], tgtcode[#59]\r\n  |  \r\n  0:VOlapScanNode(255)\r\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\r\n     PREDICATES: (__DORIS_DELETE_SIGN__[#56] = 0)\r\n     partitions=1/1 (hsj_stock_hq_basic)\r\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\r\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#0], tgtcode[#1], bizdate[#2], volume[#9]\r\n     final project output tuple id: 1\r\n\r\n\r\n\r\n========== STATISTICS ==========\r\nplanned with unknown column statistics",
       "row_count": 5487,
       "execute_ms": [
-        810.8413,
-        887.0682,
-        841.9639
+        790.7972,
+        792.7329,
+        793.6726
       ],
-      "avg_ms": 846.624,
-      "p95_ms": 887.068,
+      "avg_ms": 792.401,
+      "p95_ms": 793.673,
       "plan_contains_prefix": false,
       "plan_contains_window": true
     },
@@ -108,12 +108,12 @@
       "explain": "Explain String(Nereids Planner)\r\nPLAN FRAGMENT 0\r\n  OUTPUT EXPRS:\r\n    mktcode[#14]\r\n    tgtcode[#15]\r\n    bizdate[#16]\r\n  PARTITION: HASH_PARTITIONED: mktcode[#1], tgtcode[#2]\r\n\r\n  HAS_COLO_PLAN_NODE: false\r\n\r\n  VRESULT SINK\r\n     MYSQL_PROTOCOL\r\n\r\n  0:VOlapScanNode(114)\r\n     TABLE: newzl.hsj_stock_hq_basic_rollup(hsj_stock_hq_basic_rollup), PREAGGREGATION: ON\r\n     PREDICATES: (((bizdate[#0] = '2026-04-14') AND (volume_sum_20[#10] > 10000000)) AND (__DORIS_DELETE_SIGN__[#12] = 0))\r\n     partitions=1/244 (p20260401000000)\r\n     tablets=16/16, tabletList=1786254383850,1786254383852,1786254383854 ...\r\n     cardinality=50446, avgRowSize=192.33081, numNodes=1\r\n     pushAggOp=NONE\r\n     final projections: mktcode[#1], tgtcode[#2], bizdate[#0]\r\n     final project output tuple id: 1\r\n\r\n\r\n\r\n========== STATISTICS ==========\r\nplanned with unknown column statistics",
       "row_count": 5487,
       "execute_ms": [
-        72.5404,
-        66.9887,
-        61.5605
+        61.246,
+        58.6102,
+        75.5589
       ],
-      "avg_ms": 67.03,
-      "p95_ms": 72.54,
+      "avg_ms": 65.138,
+      "p95_ms": 75.559,
       "plan_contains_prefix": true,
       "plan_contains_window": false
     }

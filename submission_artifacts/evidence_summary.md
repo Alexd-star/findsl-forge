@@ -9,24 +9,24 @@ This summary is generated from `evidence_metadata.json`. Use the snapshot files 
 | Evidence contract | PASS |
 | Blocking gates | PASS |
 | Warning count | 0 |
-| Pytest regression | 1147 passed in 210.02s |
+| Pytest regression | 1155 passed in 204.44s |
 | Official positive cases | 37/37 |
 | Official negative diagnostics | 37/37 |
 | Official slot coverage | 1830/5799 compiled |
 | ANTLR/IR legacy migration | 1044/1097 (95.17%) |
 | Formal SQL correctness | PASS, 240/240, Wilson lower 98.42% |
-| Official compile P95 | PASS, 44.1152 ms, 1440 samples |
-| Official per-query 10s target | PASS, 48 queries, max P95 2969.5207 ms |
+| Official compile P95 | PASS, 47.7078 ms, 144 samples |
+| Official per-query 10s target | PASS, 48 queries, max P95 3014.2747 ms |
 | Official Doris real data | AVAILABLE |
 | Official Doris feature tables | PASS |
-| Official Doris prefix speedup | 12.63x |
-| Official 20-year long-horizon speedup | PASS, 14.94x |
+| Official Doris prefix speedup | 12.16x |
+| Official 20-year long-horizon speedup | PASS, 13.18x |
 | Defense package checks | 13/13 |
 | Doris evidence | PASS |
-| Doris cluster speedup | 16.39x |
+| Doris cluster speedup | 27.78x |
 | Doris row parity | PASS |
-| Git HEAD at report generation | 5bde41c |
-| Git HEAD at export | 5bde41c |
+| Git HEAD at report generation | dd61d10 |
+| Git HEAD at export | dd61d10 |
 | Phase 6C set-prefix evidence | PASS, hash 14/14, faster 14/14, median 1.393x |
 | Phase 48 scope-policy evidence | PASS, 7/7 |
 | Latest phase new-success audit | PASS, 23/23, failed 0 |

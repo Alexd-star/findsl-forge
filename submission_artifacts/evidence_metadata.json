@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T13:11:31Z",
+  "generated_at": "2026-08-12T16:59:44Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "5bde41c",
-    "head_at_export": "5bde41c",
+    "head_at_report_generation": "dd61d10",
+    "head_at_export": "dd61d10",
     "branch": "feat/competition-finalization"
   },
   "readiness": {
-    "generated_at": "2026-08-12T12:51:14+00:00",
+    "generated_at": "2026-08-12T16:59:24+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 47.796,
+    "compile_p95_latency_ms": 47.708,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,19 +23,19 @@
       "total": 13
     },
     "pytest": {
-      "passed": 1147,
-      "elapsed_seconds": 210.02
+      "passed": 1155,
+      "elapsed_seconds": 204.44
     }
   },
   "official_compile_latency": {
     "available": true,
-    "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-    "catalog_snapshot_id": "38f5a3006e36ede358ba027ecc4137c9634b2d23ee0b4b315410c11b33183257",
+    "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+    "catalog_snapshot_id": "20d512c6ad746c913d456fdacfa0e79d7bf5d3a13cfbda457fb78245f0ffefc0",
     "case_count": 48,
-    "sample_count": 1440,
-    "p50_ms": 14.4937,
-    "p95_ms": 44.1152,
-    "p99_ms": 56.98,
+    "sample_count": 144,
+    "p50_ms": 16.0269,
+    "p95_ms": 47.7078,
+    "p99_ms": 54.4491,
     "target_p95_ms": 50.0,
     "target_met": true
   },
@@ -55,20 +55,20 @@
       "available": true,
       "feature_tables_available": true,
       "baseline_prefix_row_count_match": true,
-      "baseline_vs_prefix_speedup": 12.631,
-      "baseline_vs_prefix_speedup_display": "12.63x",
+      "baseline_vs_prefix_speedup": 12.165,
+      "baseline_vs_prefix_speedup_display": "12.16x",
       "row_counts": {
         "hsj_stock_code_info": 5686,
-        "hsj_stock_hq_ext": 6170822,
-        "hsj_stock_hq_basic": 13650347
+        "hsj_stock_hq_basic": 13650347,
+        "hsj_stock_hq_ext": 6170822
       },
       "feature_table_row_counts": {
         "hsj_stock_hq_basic_technical": 13650347,
-        "hsj_stock_hq_basic_prefix": 13650347,
         "hsj_stock_hq_ext_prefix": 13650347,
+        "hsj_stock_hq_basic_prefix": 13650347,
         "hsj_stock_hq_basic_rollup": 13650347
       },
-      "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
+      "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
       "snapshot_fingerprint": "9867fffd0f3514d3960679032e1152ec1265cf66f331598f14a26a835567fff6"
     },
     "slot_coverage": {
@@ -80,7 +80,7 @@
       "compile_failed": 3969,
       "compile_rate_on_all_rows": 0.315572,
       "compile_rate_on_parse_ok": 0.315572,
-      "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
+      "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
       "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623"
     },
     "performance_matrix": {
@@ -89,7 +89,7 @@
       "passed": 48,
       "all_matched_reference": true,
       "all_queries_under_10s": true,
-      "max_p95_ms": 2969.5207,
+      "max_p95_ms": 3014.2747,
       "mean_avg_ms": null,
       "prefix_query_count": null,
       "window_query_count": null,
@@ -98,16 +98,16 @@
       "baseline_vs_prefix_speedup_display": null,
       "warmups": 1,
       "repeats": 7,
-      "catalog_snapshot_id": "38f5a3006e36ede358ba027ecc4137c9634b2d23ee0b4b315410c11b33183257",
-      "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82"
+      "catalog_snapshot_id": "20d512c6ad746c913d456fdacfa0e79d7bf5d3a13cfbda457fb78245f0ffefc0",
+      "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25"
     },
     "long_horizon": {
       "available": true,
       "status": "PASS",
       "workload_count": 5,
-      "median_speedup": 15.133333,
-      "speedup": 14.941176,
-      "speedup_display": "14.94x",
+      "median_speedup": 15.933333,
+      "speedup": 13.176471,
+      "speedup_display": "13.18x",
       "target_speedup": 10.0,
       "target_met": true,
       "result_row_count": null,
@@ -115,12 +115,12 @@
       "baseline_median_ms": null,
       "optimized_median_ms": null,
       "rollup_partition_count": null,
-      "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82"
+      "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25"
     }
   },
   "official_migration": {
     "available": true,
-    "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
+    "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
     "row_count": 5799,
     "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
     "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
@@ -314,8 +314,8 @@
   },
   "formal_correctness": {
     "available": true,
-    "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-    "catalog_snapshot_id": "38f5a3006e36ede358ba027ecc4137c9634b2d23ee0b4b315410c11b33183257",
+    "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+    "catalog_snapshot_id": "20d512c6ad746c913d456fdacfa0e79d7bf5d3a13cfbda457fb78245f0ffefc0",
     "policy_id": "official-semantic-policy-v1",
     "eligible_total": 240,
     "matched": 240,
@@ -328,17 +328,17 @@
     "available": true,
     "passed": true,
     "row_counts_match": true,
-    "speedup": 16.39405086912693,
-    "speedup_display": "16.39x",
+    "speedup": 27.776799700972365,
+    "speedup_display": "27.78x",
     "speedup_target_met": true,
     "min_speedup": 10.0,
     "baseline_plan_contains_window": true,
     "optimized_plan_contains_prefix": true,
-    "baseline_avg_execute_ms": 4757.7617666666665,
-    "optimized_avg_execute_ms": 290.21269999999964,
-    "baseline_row_count": 4540562,
-    "optimized_row_count": 4540562,
-    "git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82"
+    "baseline_avg_execute_ms": 4724.777520000001,
+    "optimized_avg_execute_ms": 170.0979799999999,
+    "baseline_row_count": 96061,
+    "optimized_row_count": 96061,
+    "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25"
   },
   "warnings": [],
   "source_files": {
@@ -364,18 +364,18 @@
     "schema_version": 1,
     "contract_id": "competition-current-evidence-v2",
     "passed": true,
-    "expected_git_head": "5bde41c",
+    "expected_git_head": "dd61d10",
     "observed_git_heads": {
-      "git.head_at_report_generation": "5bde41c",
-      "git.head_at_export": "5bde41c",
-      "official_migration.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "official_real_data.slot_coverage.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "official_real_data.doris.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "official_real_data.performance_matrix.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "official_real_data.long_horizon.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "official_compile_latency.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "formal_correctness.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82",
-      "doris_cluster.git_head": "5bde41c87fa3769b73f4abc5188b0fc2a81f5e82"
+      "git.head_at_report_generation": "dd61d10",
+      "git.head_at_export": "dd61d10",
+      "official_migration.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "official_real_data.slot_coverage.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "official_real_data.doris.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "official_real_data.performance_matrix.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "official_real_data.long_horizon.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "official_compile_latency.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "formal_correctness.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+      "doris_cluster.git_head": "dd61d10a39adfaf720720254df0a9bb557255b25"
     },
     "datasets": {
       "official_dsl_workbook": {
@@ -465,7 +465,7 @@
         "does_not_prove": "所有官方复杂语句或并发负载下的尾延迟",
         "available": true,
         "value_path": "official_compile_latency.p95_ms",
-        "value": 44.1152
+        "value": 47.7078
       },
       "long_horizon_speedup_gate": {
         "metric_type": "performance",

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T12:52:27+00:00",
-  "catalog_snapshot_id": "38f5a3006e36ede358ba027ecc4137c9634b2d23ee0b4b315410c11b33183257",
+  "generated_at": "2026-08-12T16:45:15+00:00",
+  "catalog_snapshot_id": "20d512c6ad746c913d456fdacfa0e79d7bf5d3a13cfbda457fb78245f0ffefc0",
   "eligible_case_count": 240,
   "compiled_case_count": 240,
   "official_function_family_count": 12,
