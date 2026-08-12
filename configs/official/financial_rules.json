@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "catalog_id": "financial-rule-catalog-v1",
+  "rules": [
+    {
+      "rule_id": "FR-ADJUSTMENT-001",
+      "category": "adjustment",
+      "source_role": "semantic_policies",
+      "config_pointer": "/adjustment",
+      "applies_to": ["indicator", "queryData", "price_indicator"],
+      "preconditions": ["指标是价格序列", "复权参数已在语义策略中声明"],
+      "semantic_invariant": "同一查询内价格比较使用一致的复权口径，禁止混用未复权与复权序列。",
+      "fallback_code": "ADJUSTMENT_POLICY_UNAVAILABLE",
+      "fallback_behavior": "缺少复权因子或口径不明确时确定性拒绝，不生成猜测 SQL。",
+      "version": "1"
+    },
+    {
+      "rule_id": "FR-FIELD-MAPPING-001",
+      "category": "data_mapping",
+      "source_role": "physical_catalog",
+      "config_pointer": "/resources",
+      "applies_to": ["all"],
+      "preconditions": ["指标已通过 registry 绑定", "目标资源声明所需 domain 与 capability"],
+      "semantic_invariant": "逻辑指标只映射到目录显式声明的表、列和单位换算，禁止按名称猜列。",
+      "fallback_code": "PHYSICAL_RESOURCE_UNAVAILABLE",
+      "fallback_behavior": "没有完整物理绑定时返回带原因码的不可执行结果。",
+      "version": "1"
+    },
+    {
+      "rule_id": "FR-SCOPE-MEMBERSHIP-001",
+      "category": "scope_membership",
+      "source_role": "external_scope_runtime",
+      "config_pointer": "/entries",
+      "applies_to": ["has_scope", "belong_industry", "external_scope"],
+      "preconditions": ["范围名称可唯一解析", "成员关系具有来源、快照和有效期"],
+      "semantic_invariant": "行业、概念、指数和自定义板块按有效日期查询版本化成员关系。",
+      "fallback_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "fallback_behavior": "成员关系缺失或歧义时严格失败，并保留待补数据审计项。",
+      "version": "1"
+    },
+    {
+      "rule_id": "FR-MARKET-MAPPING-001",
+      "category": "scope_membership",
+      "source_role": "security_scopes",
+      "config_pointer": "/scopes",
+      "applies_to": ["market_scope"],
+      "preconditions": ["市场表达式可解析", "证券代码规则在目录中有显式定义"],
+      "semantic_invariant": "并、交、非遵循确定的集合优先级，市场限制只作用于所属子表达式。",
+      "fallback_code": "UNSUPPORTED_MARKET_SCOPE",
+      "fallback_behavior": "未知市场范围拒绝编译，不扩大为全市场。",
+      "version": "1"
+    },
+    {
+      "rule_id": "FR-RANK-001",
+      "category": "ranking",
+      "source_role": "semantic_policies",
+      "config_pointer": "/rank",
+      "applies_to": ["rank", "has_rank"],
+      "preconditions": ["排名方向与边界合法", "候选集和稳定次序可确定"],
+      "semantic_invariant": "排名只在当前阶段候选集内计算，并使用稳定证券键消除并列的不确定性。",
+      "fallback_code": "RANK_POLICY_UNAVAILABLE",
+      "fallback_behavior": "无法确定候选集或稳定顺序时拒绝生成排名 SQL。",
+      "version": "1"
+    },
+    {
+      "rule_id": "FR-TEMPORAL-001",
+      "category": "temporal",
+      "source_role": "semantic_policies",
+      "config_pointer": "/date_and_calendar",
+      "applies_to": ["has_temporal", "has_stage", "recent_sessions", "calendar_range"],
+      "preconditions": ["日期表达式已绑定为结构化约束", "交易日或自然日语义已明确"],
+      "semantic_invariant": "CONS、EXIST、区间和 then 阶段保持原始时间顺序及交易日口径。",
+      "fallback_code": "TEMPORAL_POLICY_UNAVAILABLE",
+      "fallback_behavior": "时间粒度或锚点缺失时严格失败，不以自然日替代交易日。",
+      "version": "1"
+    },
+    {
+      "rule_id": "FR-ROUTE-001",
+      "category": "optimization",
+      "source_role": "physical_strategies",
+      "config_pointer": "/strategies",
+      "applies_to": ["has_aggregate", "long_horizon", "moving_average"],
+      "preconditions": ["候选路径语义等价已证明", "资源可用且统计快照有效"],
+      "semantic_invariant": "RAW、Partition、MV 与 Prefix 之间的切换不改变完整结果集。",
+      "fallback_code": "ACCELERATION_INELIGIBLE",
+      "fallback_behavior": "加速路径不满足前置条件时自动退回可执行基线并记录原因。",
+      "version": "1"
+    }
+  ]
+}

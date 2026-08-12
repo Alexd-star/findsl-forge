@@ -296,6 +296,59 @@ def create_app(
         )
         return {"ok": True, **result}
 
+    @app.post("/v1/explain")
+    async def explain_endpoint(
+        payload: CompileRequest,
+        request: Request,
+        principal: str = Depends(authenticate),
+    ):
+        options = OfficialPipelineOptions(
+            use_statistics=payload.use_statistics,
+            strategy_mode=payload.strategy_mode,
+        )
+        result = await run_bounded(
+            lambda: service.compile(
+                payload.dsl,
+                options=options,
+                request_id=request.state.request_id,
+                principal=principal,
+            )
+        )
+        return {
+            "ok": True,
+            "request_id": result["request_id"],
+            "generated_at": result["generated_at"],
+            "explain": result["result"]["explain"],
+        }
+
+    @app.post("/v1/result")
+    async def result_endpoint(
+        payload: CompileRequest,
+        request: Request,
+        principal: str = Depends(authenticate),
+    ):
+        from .result_report import render_compilation_result_markdown
+
+        options = OfficialPipelineOptions(
+            use_statistics=payload.use_statistics,
+            strategy_mode=payload.strategy_mode,
+        )
+        result = await run_bounded(
+            lambda: service.compile(
+                payload.dsl,
+                options=options,
+                request_id=request.state.request_id,
+                principal=principal,
+            )
+        )
+        return {
+            "ok": True,
+            "request_id": result["request_id"],
+            "generated_at": result["generated_at"],
+            "filename": "findsl-result.md",
+            "markdown": render_compilation_result_markdown(result["result"]),
+        }
+
     @app.post("/v1/execute")
     async def execute_endpoint(
         payload: ExecuteRequest,

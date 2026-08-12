@@ -24,9 +24,15 @@ class RewriteEvent:
     node_path: str
     elapsed_ns: int
     proof_obligation: str
+    preconditions: Tuple[str, ...]
+    semantic_invariant: str
+    fallback: str
+    validation_strategy: str
 
     def to_dict(self):
-        return self.__dict__.copy()
+        payload = self.__dict__.copy()
+        payload["preconditions"] = list(self.preconditions)
+        return payload
 
 
 @dataclass(frozen=True)

@@ -17,6 +17,7 @@ from .external.runtime import (
     ExternalIndexQuoteCatalog,
     ExternalScopeRuntimeCatalog,
 )
+from .financial_rules import FinancialRuleCatalog
 from .physical.approximation import NumericApproximationPolicy
 from .physical.catalog import PhysicalCatalog
 from .physical.expressions import PhysicalExpressionRegistry
@@ -104,6 +105,7 @@ class CatalogSnapshot:
             "physical_expressions",
             "physical_statistics",
             "physical_strategies",
+            "financial_rules",
             "security_scopes",
             "external_scope_runtime",
             "scope_semantic_policies",
@@ -197,6 +199,7 @@ class CompileContext:
     physical_expressions: PhysicalExpressionRegistry
     physical_statistics: PhysicalStatisticsSnapshot
     physical_strategies: PhysicalStrategyRegistry
+    financial_rules: FinancialRuleCatalog
     physical_runtime: PhysicalRuntimeCatalogs
 
     @classmethod
@@ -233,6 +236,9 @@ class CompileContext:
         expressions = PhysicalExpressionRegistry.load(paths["physical_expressions"], catalog)
         statistics = PhysicalStatisticsSnapshot.load(paths["physical_statistics"], catalog)
         strategies = PhysicalStrategyRegistry.load(paths["physical_strategies"], catalog)
+        financial_rules = FinancialRuleCatalog.load(
+            paths["financial_rules"], available_roles=paths
+        )
         policies = ScopeSemanticPolicyCatalog.load(paths["scope_semantic_policies"])
         runtime_raw = json.loads(paths["external_scope_runtime"].read_text(encoding="utf-8"))
         if set(runtime_raw) != {"schema_version", "membership_resource_id", "entries"}:
@@ -266,6 +272,7 @@ class CompileContext:
             expressions,
             statistics,
             strategies,
+            financial_rules,
             runtime,
         )
 

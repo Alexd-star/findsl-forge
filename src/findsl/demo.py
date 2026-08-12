@@ -14,6 +14,7 @@ from .equivalence import verify_sql_equivalence
 from .evaluation import load_cases
 from .nl2dsl import suggest_dsl
 from .official.service import OfficialCompilerService
+from .official.result_report import render_compilation_result_markdown
 from .official_suite import DEFAULT_NEGATIVE_CASES, DEFAULT_POSITIVE_CASES
 
 
@@ -263,6 +264,10 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
             if self.path in {"/", "/index.html"}:
                 self._send_text(render_demo_html(), "text/html; charset=utf-8")
                 return
+            if self.path == "/health":
+                health = _official_service().health()
+                self._send_json({"ok": bool(health["ready"]), **health})
+                return
             if self.path == "/favicon.ico":
                 self.send_response(HTTPStatus.NO_CONTENT)
                 self.end_headers()
@@ -290,16 +295,30 @@ def make_demo_handler(data_dir: Path, cases_path: Path = Path("data/samples/quer
                 "/api/suggest",
                 "/api/official/analyze",
                 "/api/official/preview",
+                "/api/official/result",
             }:
                 self._send_json({"ok": False, "error": {"message": "Not found"}}, HTTPStatus.NOT_FOUND)
                 return
             try:
                 request = self._read_json()
-                if self.path in {"/api/official/analyze", "/api/official/preview"}:
+                if self.path in {
+                    "/api/official/analyze",
+                    "/api/official/preview",
+                    "/api/official/result",
+                }:
                     dsl = str(request.get("dsl", "")).strip()
                     if not dsl:
                         raise ValueError("Official DSL is required")
-                    if self.path == "/api/official/preview":
+                    if self.path == "/api/official/result":
+                        compiled = analyze_official_dsl(dsl)
+                        self._send_json(
+                            {
+                                "ok": True,
+                                "filename": "findsl-result.md",
+                                "markdown": render_compilation_result_markdown(compiled),
+                            }
+                        )
+                    elif self.path == "/api/official/preview":
                         try:
                             self._send_json(analyze_official_dsl(dsl))
                         except Exception as exc:  # noqa: BLE001 - preview returns diagnostics as content.
@@ -797,6 +816,18 @@ def render_demo_html() -> str:
       overflow-wrap: anywhere;
     }
     .data-table th { color: var(--muted); font-weight: 700; background: var(--panel-2); }
+    .route-table { font-size: 12px; }
+    .route-table th:nth-child(1), .route-table td:nth-child(1),
+    .route-table th:nth-child(3), .route-table td:nth-child(3),
+    .route-table th:nth-child(4), .route-table td:nth-child(4) {
+      white-space: nowrap;
+      word-break: normal;
+    }
+    .route-table td:nth-child(2), .route-table td:nth-child(5) {
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
     .rows {
       width: 100%;
       border-collapse: collapse;
@@ -871,6 +902,32 @@ def render_demo_html() -> str:
       .top-metrics .badge { white-space: nowrap; }
       .tab { padding: 0 10px; }
       .kv { grid-template-columns: 1fr; }
+      .route-table thead { display: none; }
+      .route-table, .route-table tbody, .route-table tr, .route-table td {
+        display: block;
+        width: 100%;
+      }
+      .route-table tr { padding: 10px 0; border-bottom: 1px solid var(--line); }
+      .route-table td,
+      .route-table td:nth-child(1), .route-table td:nth-child(2),
+      .route-table td:nth-child(3), .route-table td:nth-child(4),
+      .route-table td:nth-child(5) {
+        display: grid;
+        grid-template-columns: 88px minmax(0, 1fr);
+        gap: 8px;
+        padding: 3px 0;
+        border: 0;
+        white-space: normal;
+        word-break: normal;
+        overflow-wrap: anywhere;
+      }
+      .route-table td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+      }
     }
     @media (min-width: 961px) {
       .shell > .panel:first-child { position: sticky; top: 88px; }
@@ -954,6 +1011,7 @@ def render_demo_html() -> str:
             <p id="resultSubtitle">SQL、AST、优化说明、结果与证据统一展示。</p>
           </div>
           <div class="panel-actions">
+            <button class="ghost" id="exportButton" type="button" disabled title="导出当前编译结果">导出 Markdown</button>
             <button class="ghost" id="copyButton" type="button" disabled title="执行成功后可复制 SQL">复制 SQL</button>
             <span id="resultState" class="badge" role="status" aria-live="polite">等待执行</span>
           </div>
@@ -970,6 +1028,7 @@ def render_demo_html() -> str:
           <button class="tab" data-tab="ast" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1">AST</button>
           <button class="tab official-tab" data-tab="logical" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1" hidden>逻辑 IR</button>
           <button class="tab official-tab" data-tab="physical" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1" hidden>物理 IR</button>
+          <button class="tab official-tab" data-tab="route" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1" hidden>路由决策</button>
           <button class="tab" data-tab="explain" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1">编译轨迹</button>
           <button class="tab internal-tab" data-tab="rows" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1">结果行</button>
           <button class="tab" data-tab="evidence" role="tab" aria-selected="false" aria-controls="outputPane" tabindex="-1">交付证据</button>
@@ -990,6 +1049,7 @@ def render_demo_html() -> str:
     const runButton = document.getElementById("runButton");
     const outputPane = document.getElementById("outputPane");
     const copyButton = document.getElementById("copyButton");
+    const exportButton = document.getElementById("exportButton");
     const errorBox = document.getElementById("errorBox");
     const resultState = document.getElementById("resultState");
     const buildState = document.getElementById("buildState");
@@ -1024,6 +1084,7 @@ def render_demo_html() -> str:
       errorBox.hidden = true;
       const hasSql = Boolean(currentResult && currentResult.compile && currentResult.compile.sql);
       copyButton.disabled = !hasSql;
+      exportButton.disabled = !hasSql || currentMode !== "official";
       copyButton.title = hasSql ? "复制当前 Doris SQL" : "执行成功后可复制 SQL";
       if (!currentResult || !currentResult.ok) {
         if (currentTab === "diagnostic" && currentError) {
@@ -1046,6 +1107,7 @@ def render_demo_html() -> str:
         optimized: currentResult.official && currentResult.official.optimized
       }));
       if (currentTab === "physical") renderCode(pretty(currentResult.official && currentResult.official.physical));
+      if (currentTab === "route") renderOfficialRoute(currentResult.official);
       if (currentTab === "explain") {
         if (currentResult.official) renderOfficialStages(currentResult.official);
         else renderExplain(compiled.trace, compiled.explain);
@@ -1127,44 +1189,95 @@ def render_demo_html() -> str:
       wrap.className = "structured";
       const summary = document.createElement("div");
       summary.className = "stage-summary";
+      const explain = result.explain || {};
+      const stages = explain.stages || [];
       const timings = result.timings_ns || {};
-      const stages = [
-        ["ANTLR 前端", result.frontend && result.frontend.ok, timings.frontend || (result.frontend && result.frontend.elapsed_ns)],
-        ["Typed AST", Boolean(result.typed_ast), timings.typed],
-        ["Logical IR", Boolean(result.logical), timings.logical || (result.logical && result.logical.elapsed_ns)],
-        ["优化器", Boolean(result.optimized), timings.optimizer],
-        ["Physical IR", Boolean(result.physical), timings.physical],
-        ["SQLGlot 后端", result.backend && result.backend.validation_passed, timings.backend]
-      ];
-      stages.forEach(([name, passed, elapsed]) => {
+      const timingKeys = {
+        "Parser": "frontend",
+        "Semantic": "typed",
+        "Logical IR": "logical",
+        "Rewrite": "optimizer",
+        "Route": "physical",
+        "Doris SQL": "backend"
+      };
+      stages.forEach(stage => {
         const item = document.createElement("div");
         item.className = "metric";
         const strong = document.createElement("strong");
+        const passed = stage.status === "PASS";
         strong.className = passed ? "status-ok" : "status-fail";
         strong.textContent = passed ? "PASS" : "待核验";
         const label = document.createElement("span");
-        label.textContent = name + (elapsed ? " · " + (elapsed / 1000000).toFixed(3) + " ms" : "");
+        const elapsed = timings[timingKeys[stage.stage]];
+        label.textContent = stage.stage + (elapsed ? " · " + (elapsed / 1000000).toFixed(3) + " ms" : "");
         item.appendChild(strong);
         item.appendChild(label);
         summary.appendChild(item);
       });
       wrap.appendChild(summary);
-      const decisions = result.physical && result.physical.decisions ? result.physical.decisions : [];
-      if (decisions.length) {
-        decisions.forEach((decision, index) => {
+      if (stages.length) {
+        stages.forEach((stage, index) => {
           const card = document.createElement("article");
           card.className = "step-card";
           const title = document.createElement("h3");
-          title.textContent = (index + 1) + ". " + (decision.reason_code || decision.strategy_id || "物理决策");
+          title.textContent = (index + 1) + ". " + stage.stage;
           const body = document.createElement("p");
-          body.textContent = decision.reason || "";
+          body.textContent = stage.summary || "";
           card.appendChild(title);
           card.appendChild(body);
-          card.appendChild(kvList(decision));
+          card.appendChild(kvList({ status: stage.status, artifact_id: stage.artifact_id }));
           wrap.appendChild(card);
         });
       }
       outputPane.replaceChildren(wrap);
+    }
+
+    function renderOfficialRoute(result) {
+      const wrap = document.createElement("div");
+      wrap.className = "structured";
+      const route = result && result.explain && result.explain.adaptive_route;
+      if (!route) {
+        outputPane.replaceChildren(emptyState("本次结果没有路由审计信息。"));
+        return;
+      }
+      wrap.appendChild(kvList({
+        "选择路由": route.selected_route,
+        "选择策略": route.selected_strategy,
+        "回退顺序": (route.fallback_chain || []).join(" -> ") || "无"
+      }));
+      const table = document.createElement("table");
+      table.className = "data-table route-table";
+      table.innerHTML = "<thead><tr><th>路由</th><th>策略</th><th>状态</th><th>成本</th><th>原因</th></tr></thead>";
+      const tbody = document.createElement("tbody");
+      (route.candidates || []).forEach(candidate => {
+        const row = document.createElement("tr");
+        const state = candidate.selected ? "已选择" : candidate.eligible ? "可回退" : "不适用";
+        const cost = formatRouteCost(candidate.cost, candidate.cost_unit);
+        const values = [candidate.route_kind, candidate.strategy_id, state, cost, candidate.reason_code];
+        const labels = ["路由", "策略", "状态", "成本", "原因"];
+        values.forEach((value, index) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+          cell.dataset.label = labels[index];
+          row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+      outputPane.replaceChildren(wrap);
+    }
+
+    function formatRouteCost(value, unit) {
+      if (value === null || value === undefined) return "-";
+      const numeric = Number(value);
+      if (unit === "bytes" || unit === "effective_bytes" || unit === "composite_child_cost") {
+        if (numeric >= 1073741824) return (numeric / 1073741824).toFixed(2) + " GB";
+        if (numeric >= 1048576) return (numeric / 1048576).toFixed(2) + " MB";
+        if (numeric >= 1024) return (numeric / 1024).toFixed(2) + " KB";
+        return numeric.toFixed(0) + " B";
+      }
+      return numeric.toFixed(3) + " " + unit;
     }
 
     function renderRows(verification) {
@@ -1310,12 +1423,13 @@ def render_demo_html() -> str:
     function updateMetrics(result) {
       if (result.official) {
         const strategy = result.official.physical && result.official.physical.selected_strategy;
+        const route = result.official.explain && result.official.explain.adaptive_route;
         document.getElementById("metricStatus").textContent = "PASS";
         document.getElementById("metricStatus").className = "status-ok";
         document.getElementById("metricLatency").textContent = result.compile.elapsed_ms.toFixed(3) + " ms";
         document.getElementById("metricRows").textContent = "未执行";
         document.getElementById("metricRowsLabel").textContent = "浏览器执行边界";
-        document.getElementById("metricPrefix").textContent = strategy || "physical";
+        document.getElementById("metricPrefix").textContent = route ? route.selected_route + " · " + strategy : strategy || "physical";
         document.getElementById("metricPrefix").className = "status-ok";
         document.getElementById("metricDataset").textContent = "官方 Doris 表结构";
         return;
@@ -1355,7 +1469,7 @@ def render_demo_html() -> str:
           ast: result.frontend && result.frontend.ast,
           sql: result.backend && result.backend.sql || "",
           trace: [],
-          explain: []
+          explain: result.explain || {}
         },
         verification: null
       };
@@ -1718,6 +1832,33 @@ def render_demo_html() -> str:
       await navigator.clipboard.writeText(sql);
       copyButton.textContent = "已复制";
       setTimeout(() => { copyButton.textContent = "复制 SQL"; }, 1200);
+    });
+    exportButton.addEventListener("click", async () => {
+      if (!currentResult || !currentResult.official) return;
+      exportButton.disabled = true;
+      const previous = exportButton.textContent;
+      try {
+        const response = await fetch("/api/official/result", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dsl: dslInput.value })
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(formatError(data.error || { message: "导出失败" }));
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([data.markdown], { type: "text/markdown;charset=utf-8" }));
+        link.download = data.filename || "findsl-result.md";
+        link.click();
+        URL.revokeObjectURL(link.href);
+        exportButton.textContent = "已导出";
+      } catch (error) {
+        exportButton.textContent = "导出失败";
+      } finally {
+        setTimeout(() => {
+          exportButton.textContent = previous;
+          exportButton.disabled = false;
+        }, 1200);
+      }
     });
     sampleSelect.addEventListener("change", () => { selectExample(Number(sampleSelect.value)); });
     suggestButton.addEventListener("click", suggest);

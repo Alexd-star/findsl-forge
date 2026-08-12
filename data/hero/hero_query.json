@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "hero_id": "HERO-TEMPORAL-STAGE-RANK-001",
+  "title": "双时间量词筛选后分阶段稳定排名",
+  "dsl": "(indicator('沪|深', '', '成交量', '近10日', '', '', 'CONS>=3日') > 0 and indicator('沪&^科创板', '', '成交额', '近10日', '', '', 'EXIST>=2日') > 0) then rank('沪|深', '', '成交额', 'desc', '今日', '', '', '') between '[1,20]'",
+  "required_features": [
+    "has_rank",
+    "has_temporal",
+    "has_stage",
+    "has_interval",
+    "has_bitwise_alias"
+  ],
+  "required_temporal_modes": ["CONS", "EXIST"],
+  "required_boolean_operators": ["and", "then"],
+  "reference_sql_path": "reference.sql",
+  "semantic_note": "市场槽中的 & 是集合交运算符，不是数值按位运算；该查询要求沪深范围、排除科创板的沪市子范围、CONS/EXIST 双时间量词、then 阶段屏障以及闭区间排名。"
+}

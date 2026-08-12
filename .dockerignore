@@ -10,6 +10,8 @@ output
 outputs
 reports
 submission_artifacts
+data/generated
+data/external_catalog
 项目全流程导师文档
 **/__pycache__
 **/*.pyc

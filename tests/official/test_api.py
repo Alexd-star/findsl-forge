@@ -50,6 +50,24 @@ def test_api_rejects_unknown_fields_and_disables_execution_by_default():
     assert execution.json()["error"]["code"] == "EXECUTION_DISABLED"
 
 
+def test_api_exposes_structured_explain_and_markdown_result():
+    client = TestClient(
+        create_app(
+            service=OfficialCompilerService(),
+            settings=ApiSettings(environment="test"),
+        )
+    )
+
+    explain = client.post("/v1/explain", json={"dsl": DSL})
+    result = client.post("/v1/result", json={"dsl": DSL})
+
+    assert explain.status_code == 200
+    assert explain.json()["explain"]["adaptive_route"]["selected_route"]
+    assert result.status_code == 200
+    assert result.json()["filename"] == "findsl-result.md"
+    assert "## 自适应路由候选" in result.json()["markdown"]
+
+
 def test_api_accepts_valid_hs256_bearer_and_rejects_bad_signature():
     settings = ApiSettings(
         environment="test",

@@ -67,6 +67,24 @@ def main() -> None:
         default="auto",
     )
     canonical_compile_cmd.add_argument("--json", action="store_true")
+    explain_cmd = sub.add_parser(
+        "official-explain",
+        help="Show Parser -> Semantic -> IR -> Rewrite -> Route -> Doris SQL",
+    )
+    explain_cmd.add_argument("dsl")
+    explain_cmd.add_argument(
+        "--strategy-mode",
+        choices=("auto", "force_baseline", "force_candidate"),
+        default="auto",
+    )
+    explain_cmd.add_argument("--json", action="store_true")
+    explain_cmd.add_argument("--output", default=None)
+    result_cmd = sub.add_parser(
+        "official-result",
+        help="Compile official DSL and export a complete Markdown result",
+    )
+    result_cmd.add_argument("dsl")
+    result_cmd.add_argument("--output", required=True)
     official_parse_cmd = sub.add_parser("official-slot-parse", help="Parse official slot DSL into an AST")
     official_parse_cmd.add_argument("dsl", help="Official slot DSL expression")
     official_parse_cmd.add_argument("--mode", choices=("strict", "recovery"), default="recovery")
@@ -342,6 +360,41 @@ def main() -> None:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         else:
             print(result["result"]["backend"]["sql"])
+    elif args.command == "official-explain":
+        from .official.explain import render_explain_markdown
+        from .official.pipeline import OfficialPipelineOptions, compile_official
+
+        try:
+            compiled = compile_official(
+                args.dsl,
+                options=OfficialPipelineOptions(strategy_mode=args.strategy_mode),
+            )
+        except Exception as exc:  # noqa: BLE001 - CLI normalizes compiler diagnostics.
+            _exit_official_error(exc, args.json)
+        explain = compiled.explain
+        content = (
+            json.dumps(explain, ensure_ascii=False, indent=2) + "\n"
+            if args.json
+            else render_explain_markdown(explain)
+        )
+        if args.output:
+            Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+            Path(args.output).write_text(content, encoding="utf-8")
+        print(content, end="")
+    elif args.command == "official-result":
+        from .official.pipeline import compile_official
+        from .official.result_report import render_compilation_result_markdown
+
+        try:
+            compiled = compile_official(args.dsl)
+        except Exception as exc:  # noqa: BLE001 - CLI normalizes compiler diagnostics.
+            _exit_official_error(exc, False)
+        output = Path(args.output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(
+            render_compilation_result_markdown(compiled.to_dict()), encoding="utf-8"
+        )
+        print(str(output.resolve()))
     elif args.command == "official-slot-parse":
         from .official_slot import OfficialSlotError, parse_official_slot_with_diagnostics
 

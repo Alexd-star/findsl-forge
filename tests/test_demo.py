@@ -67,6 +67,14 @@ def test_official_demo_api_returns_grounded_t0_analysis_and_preview():
         )
         assert preview["ok"] is True
         assert "instrument_rule" in preview["backend"]["sql"]
+
+        exported = _post_json(
+            f"http://127.0.0.1:{server.server_port}/api/official/result",
+            {"dsl": "indicator('', '', '成交量', '今日', '', '', '') > 100"},
+        )
+        assert exported["ok"] is True
+        assert exported["filename"].endswith(".md")
+        assert "## 自适应路由候选" in exported["markdown"]
     finally:
         server.shutdown()
         server.server_close()
@@ -170,8 +178,10 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "/api/evidence" in html
     assert "/api/official/examples" in html
     assert "/api/official/preview" in html
+    assert "/api/official/result" in html
     assert "生成 DSL 候选" in html
     assert "复制 SQL" in html
+    assert "导出 Markdown" in html
     assert "data-tab=\"evidence\"" in html
     assert DEFAULT_NL_REQUEST in html
     assert "__DEFAULT_NL_REQUEST__" not in html
@@ -189,6 +199,7 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "官方赛题管线" in html
     assert "data-tab=\"logical\"" in html
     assert "data-tab=\"physical\"" in html
+    assert "data-tab=\"route\"" in html
     assert "normalizeOfficialResult" in html
     assert "正式编译总耗时" in html
     assert "result.timings_ns || {}" in html

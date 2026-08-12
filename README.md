@@ -18,7 +18,7 @@ FinDSL Forge 是第五届中国研究生金融科技创新大赛赛题 19“行�
 | SQL 执行 `<10s` | 分层性能矩阵 `48/48`，最大 P95 `3151.535ms` | 对已纳入矩阵的工作负载达标 |
 | 编译 P95 `<50ms` | 48 条分层语句、1440 个样本，P95 `29.420ms` | 达标 |
 | 新指标/新函数零核心改动 | 配置式指标与受类型约束表达式树；盲测保持核心树哈希不变 | `relative_gap` 真实 Doris `5573/5573` 行集一致 |
-| 回归质量 | `1136 passed`，官方正例/负例 `37/37 + 37/37`，warning `0` | 当前门禁通过 |
+| 回归质量 | `1147 passed`，官方正例/负例 `37/37 + 37/37`，warning `0` | 当前门禁通过 |
 
 机器可读口径见 [evidence_metadata.json](submission_artifacts/evidence_metadata.json)，详细评分映射见 [赛题要求与验收](docs/赛题要求与验收.md)。
 
@@ -39,6 +39,8 @@ FinDSL Forge 是第五届中国研究生金融科技创新大赛赛题 19“行�
 ```
 
 正式实现位于 `src/findsl/official/`。旧手写管道仅保留为兼容入口和差分基线，并被 import-linter 禁止反向进入正式编译器。ANTLR4 负责文法与错误位置，SQLGlot 负责 SQL AST 和 Doris 方言渲染，Apache Doris 负责数据库内执行优化；项目自研部分集中在金融 DSL 语义、关系 IR、候选规划、成本风险和证据合同。
+
+每次正式编译都会生成结构化 `FINDSL EXPLAIN`，按 Parser、Semantic、Logical IR、Rewrite、Route、Doris SQL 六个阶段记录产物标识。`AdaptiveRoutePlanner` 将实际物理决策统一投影为 `RAW / PARTITION / MV / PREFIX` 四类路由；未生成或不满足等价条件的候选仍会显示原因码，但不会被伪装成可执行路径。金融规则来自版本化 `FinancialRuleCatalog`，优化规则具有前置条件、语义不变量、回退和验证契约。
 
 架构细节见 [架构设计](docs/架构设计.md)，全部目录职责见 [PROJECT_INDEX.md](PROJECT_INDEX.md)。
 
@@ -62,6 +64,17 @@ python -m findsl.cli official-slot-backend `
   "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
 ```
 
+查看完整编译解释并导出 Markdown：
+
+```powershell
+python -m findsl.cli official-explain `
+  "indicator('', '', '成交量', '近5000日', '', 'SUM', '') > 10000000"
+
+python -m findsl.cli official-result `
+  "indicator('', '', '成交量', '今日', '', '', '') > 100" `
+  --output output/findsl-result.md
+```
+
 启动 Web 演示：
 
 ```powershell
@@ -69,6 +82,12 @@ python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 ```
 
 浏览器访问 `http://127.0.0.1:8765`。完整命令和 Doris 启动流程见 [运行测试与 Doris](docs/运行测试与Doris.md)。
+
+Windows 一键启动 Doris、样例数据和容器化 Demo：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\demo_stack.ps1
+```
 
 ## 数据模式
 
@@ -92,6 +111,7 @@ $env:FINDSL_DATA_PROFILE = "enriched_public"
 | `configs/official/` | 指标、函数、物理策略、数据源和证据合同 |
 | `data/official_correctness/` | 独立 reference SQL 正确率基准 |
 | `data/official_performance/` | 分层性能矩阵定义 |
+| `data/hero/` | 复杂 Hero Query 与独立 Reference SQL |
 | `deploy/` | API 与 Doris 部署资产 |
 | `scripts/` | 生成、同步、装载、评测和证据采集脚本 |
 | `tests/` | 单元、集成、架构边界和证据合同测试 |

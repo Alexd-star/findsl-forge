@@ -23,6 +23,13 @@ python -m findsl.cli official-slot-ir `
 
 python -m findsl.cli official-slot-backend `
   "indicator('', '', '成交量', '今日', '', '', '') > 100" --json
+
+python -m findsl.cli official-explain `
+  "indicator('', '', '成交量', '近5000日', '', 'SUM', '') > 10000000"
+
+python -m findsl.cli official-result `
+  "indicator('', '', '成交量', '今日', '', '', '') > 100" `
+  --output output/findsl-result.md
 ```
 
 正常输出应包含阶段状态、Typed/Logical/Physical 信息、Doris SQL 和结构校验结果。错误输入应返回稳定错误码、源位置和说明，不应输出可执行假 SQL。
@@ -34,6 +41,14 @@ python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 ```
 
 访问 `http://127.0.0.1:8765`。API 容器资产位于 `deploy/api/`；本地密钥和 `service.env` 不进入 Git。
+
+一键启动 Doris、样例数据和容器化 Demo：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\demo_stack.ps1
+```
+
+脚本在保留 Doris 命名卷的前提下完成健康等待、样例装载、Demo 构建与 `/health` 核验。只查看状态使用 `-Action Status`，停止使用 `-Action Stop`。
 
 ## 4. 代码质量门禁
 
@@ -81,6 +96,11 @@ python scripts\run_official_correctness_benchmark.py
 python scripts\run_official_full_performance_matrix.py
 python scripts\run_official_compile_latency_benchmark.py --repeats 30
 python scripts\run_official_long_horizon_matrix.py --repeats 5
+python scripts\generate_capability_matrix.py
+python scripts\generate_blind_extension_evidence.py `
+  --json-output reports\blind_extension_evidence.json `
+  --report-output reports\blind_extension_evidence.md
+python scripts\run_hero_query.py --execute-doris --timeout 30
 ```
 
 执行前先通过水位门禁。正确率比较完整结果集；性能矩阵至少包含一次预热和多次重复，并保存结果哈希、P95 和 Git HEAD。任何失败都应先判断是代码、数据水位、连接、缓存还是资源问题，不要直接改阈值。

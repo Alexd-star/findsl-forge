@@ -1,5 +1,6 @@
 from .base import OptimizedPlan, RewriteEvent
 from .engine import Optimizer
+from .contracts import RuleContract, contract_for, rule_contract_catalog, validate_rule_contracts
 from .rules import (
     BoolFlattenRule, ConstFoldRule, ConstraintMergeRule, FilterMergeRule,
     FilterPushDownRule, LimitNormalizeRule, PredicateDedupRule,

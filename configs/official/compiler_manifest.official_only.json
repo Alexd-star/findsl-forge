@@ -10,6 +10,7 @@
     {"role": "physical_expressions", "path": "configs/official/physical_expressions.json"},
     {"role": "physical_statistics", "path": "configs/official/physical_statistics.json"},
     {"role": "physical_strategies", "path": "configs/official/physical_strategies.json"},
+    {"role": "financial_rules", "path": "configs/official/financial_rules.json"},
     {"role": "security_scopes", "path": "configs/official/security_scopes.json"},
     {"role": "external_scope_runtime", "path": "configs/official/external_scope_runtime.official_only.json"},
     {"role": "scope_semantic_policies", "path": "configs/official/scope_semantic_policies.json"},

@@ -6,6 +6,7 @@ from typing import Any, Dict, Tuple
 
 from .backend.doris import render_doris
 from .context import CompileContext, default_compile_context
+from .explain import build_explain
 from .frontend.antlr_frontend import AntlrOfficialFrontend
 from .lowering import lower_official_ast
 from .optimizer import DEFAULT_RULES, Optimizer
@@ -65,6 +66,7 @@ class OfficialPipelineResult:
     optimized: Dict[str, Any]
     physical: Dict[str, Any]
     backend: Dict[str, Any]
+    explain: Dict[str, Any]
     compile_context: Dict[str, Any]
     timings_ns: Dict[str, int]
     elapsed_ns: int
@@ -83,6 +85,7 @@ class OfficialPipelineResult:
             "optimized": self.optimized,
             "physical": self.physical,
             "backend": self.backend,
+            "explain": self.explain,
             "compile_context": self.compile_context,
             "timings_ns": self.timings_ns,
             "elapsed_ms": self.elapsed_ms,
@@ -222,6 +225,18 @@ def compile_official(
     except Exception as exc:
         _raise_pipeline_error("context", exc, partial)
     timings["context_postflight"] = perf_counter_ns() - stage_started
+    stage_started = perf_counter_ns()
+    explain = build_explain(
+        source=source,
+        frontend=partial["frontend"],
+        typed_ast=partial["typed_ast"],
+        logical=partial["logical"],
+        optimized=partial["optimized"],
+        physical=partial["physical"],
+        backend=backend,
+        context=compile_context,
+    ).to_dict()
+    timings["explain"] = perf_counter_ns() - stage_started
     elapsed_ns = perf_counter_ns() - started
     timings["total"] = elapsed_ns
     return OfficialPipelineResult(
@@ -232,6 +247,7 @@ def compile_official(
         partial["optimized"],
         partial["physical"],
         backend,
+        explain,
         partial["compile_context"],
         dict(timings),
         elapsed_ns,
