@@ -201,7 +201,8 @@ def test_render_demo_html_contains_workbench_and_api_hooks():
     assert "data-tab=\"physical\"" in html
     assert "data-tab=\"route\"" in html
     assert "normalizeOfficialResult" in html
-    assert "正式编译总耗时" in html
+    assert "本次编译耗时" in html
+    assert "正式编译 P95" in html
     assert "result.timings_ns || {}" in html
     assert 'typeof result.elapsed_ms === "number"' in html
     assert "height: clamp(420px, 62vh, 760px)" in html
@@ -256,6 +257,10 @@ def test_delivery_evidence_summary_reads_versioned_metadata(tmp_path):
                     "migration_coverage": 0.67639,
                     "new_backend_success": 766,
                 },
+                "official_compile_latency": {
+                    "p95_ms": 42.1624,
+                    "target_met": True,
+                },
                 "git": {"head_at_report_generation": "6ef4412"},
                 "warnings": [],
             },
@@ -270,6 +275,8 @@ def test_delivery_evidence_summary_reads_versioned_metadata(tmp_path):
     assert summary["blocking_gates_passed"] is True
     assert summary["warning_count"] == 0
     assert summary["pytest_passed"] == 908
+    assert summary["compile_p95_ms"] == 42.1624
+    assert summary["compile_p95_target_met"] is True
     assert summary["legacy_to_new_migrated"] == 742
     assert summary["legacy_strict_success"] == 1097
     assert summary["git_head"] == "6ef4412"

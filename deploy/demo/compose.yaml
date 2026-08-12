@@ -5,6 +5,10 @@ services:
     build:
       context: ../..
       dockerfile: deploy/demo/Dockerfile
+      args:
+        HTTP_PROXY: ${FINDSL_DOCKER_HTTP_PROXY:-}
+        HTTPS_PROXY: ${FINDSL_DOCKER_HTTPS_PROXY:-}
+        NO_PROXY: ${FINDSL_DOCKER_NO_PROXY:-127.0.0.1,localhost}
     image: findsl-forge-demo:local
     restart: unless-stopped
     read_only: true

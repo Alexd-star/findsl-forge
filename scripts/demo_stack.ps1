@@ -2,13 +2,24 @@ param(
     [ValidateSet("Start", "Stop", "Status")]
     [string]$Action = "Start",
     [switch]$SkipDoris,
-    [switch]$SkipSampleLoad
+    [switch]$SkipSampleLoad,
+    [string]$ProxyUrl = ""
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $DorisCompose = Join-Path $RepoRoot "deploy\doris\docker-compose.quickstart.yaml"
 $DemoCompose = Join-Path $RepoRoot "deploy\demo\compose.yaml"
+
+if (-not $ProxyUrl) {
+    $ProxyUrl = $env:HTTPS_PROXY
+}
+if ($ProxyUrl) {
+    $dockerProxy = $ProxyUrl.Replace("127.0.0.1", "host.docker.internal").Replace("localhost", "host.docker.internal")
+    $env:FINDSL_DOCKER_HTTP_PROXY = $dockerProxy
+    $env:FINDSL_DOCKER_HTTPS_PROXY = $dockerProxy
+    $env:FINDSL_DOCKER_NO_PROXY = "127.0.0.1,localhost,host.docker.internal,172.20.80.0/24"
+}
 
 function Invoke-Compose([string]$File, [string[]]$Arguments) {
     & docker compose -f $File @Arguments

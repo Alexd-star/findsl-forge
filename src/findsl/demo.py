@@ -79,6 +79,7 @@ def delivery_evidence_summary(
         }
     readiness = payload.get("readiness") or {}
     migration = payload.get("official_migration") or {}
+    compile_latency = payload.get("official_compile_latency") or {}
     pytest = readiness.get("pytest") or {}
     git = payload.get("git") or {}
     return {
@@ -87,6 +88,8 @@ def delivery_evidence_summary(
         "blocking_gates_passed": readiness.get("blocking_gates_passed"),
         "warning_count": readiness.get("warning_count"),
         "pytest_passed": pytest.get("passed"),
+        "compile_p95_ms": compile_latency.get("p95_ms"),
+        "compile_p95_target_met": compile_latency.get("target_met"),
         "legacy_strict_success": migration.get("legacy_strict_success"),
         "legacy_to_new_migrated": migration.get("legacy_to_new_migrated"),
         "migration_coverage": migration.get("migration_coverage"),
@@ -525,7 +528,7 @@ def render_demo_html() -> str:
     }
     .brief h2 { margin: 0 0 6px; font-size: 16px; }
     .brief p { margin: 0; color: var(--muted); max-width: 84ch; overflow-wrap: anywhere; }
-    .evidence-ribbon { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .evidence-ribbon { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
     .shell {
       display: grid;
       grid-template-columns: minmax(360px, 0.82fr) minmax(520px, 1.18fr);
@@ -955,6 +958,7 @@ def render_demo_html() -> str:
       <div class="evidence-ribbon">
         <div class="metric"><strong id="metricMigration">-</strong><span>官方严格迁移</span></div>
         <div class="metric"><strong id="metricTests">-</strong><span>自动测试</span></div>
+        <div class="metric"><strong id="metricCompileP95">-</strong><span>正式编译 P95</span></div>
         <div class="metric"><strong id="metricSpeedup">-</strong><span>Doris 加速</span></div>
         <div class="metric"><strong id="metricParity">-</strong><span>结果集一致性</span></div>
       </div>
@@ -1018,7 +1022,7 @@ def render_demo_html() -> str:
         </div>
         <div class="section metrics">
           <div class="metric"><strong id="metricStatus">-</strong><span>验证状态</span></div>
-          <div class="metric"><strong id="metricLatency">-</strong><span>正式编译总耗时</span></div>
+          <div class="metric"><strong id="metricLatency">-</strong><span>本次编译耗时</span></div>
           <div class="metric"><strong id="metricRows">-</strong><span id="metricRowsLabel">结果行数</span></div>
           <div class="metric"><strong id="metricPrefix">-</strong><span>执行策略</span></div>
           <div class="metric"><strong id="metricDataset">-</strong><span>数据口径</span></div>
@@ -1322,6 +1326,7 @@ def render_demo_html() -> str:
           "Blocking gates": delivery.blocking_gates_passed ? "PASS" : "FAIL",
           "Warning count": delivery.warning_count,
           "Pytest": delivery.pytest_passed + " passed",
+          "正式编译 P95": delivery.compile_p95_ms + " ms",
           "官方严格迁移": delivery.legacy_to_new_migrated + "/" + delivery.legacy_strict_success,
           "新后端总成功": delivery.new_backend_success,
           "证据 Git HEAD": delivery.git_head,
@@ -1686,11 +1691,13 @@ def render_demo_html() -> str:
       if (currentDelivery && currentDelivery.available) {
         document.getElementById("metricMigration").textContent = currentDelivery.legacy_to_new_migrated + "/" + currentDelivery.legacy_strict_success;
         document.getElementById("metricTests").textContent = currentDelivery.pytest_passed + " passed";
+        document.getElementById("metricCompileP95").textContent = currentDelivery.compile_p95_ms !== null && currentDelivery.compile_p95_ms !== undefined ? Number(currentDelivery.compile_p95_ms).toFixed(3) + " ms" : "-";
         buildState.textContent = currentDelivery.blocking_gates_passed && currentDelivery.warning_count === 0 ? "交付门禁 PASS" : "交付状态待核验";
         buildState.className = "badge " + (currentDelivery.blocking_gates_passed && currentDelivery.warning_count === 0 ? "ok" : "warn");
       } else {
         document.getElementById("metricMigration").textContent = "未导出";
         document.getElementById("metricTests").textContent = "未导出";
+        document.getElementById("metricCompileP95").textContent = "未导出";
         buildState.textContent = "交付证据缺失";
         buildState.className = "badge warn";
       }
