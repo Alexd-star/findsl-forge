@@ -33,7 +33,12 @@ def main() -> int:
     root = args.root
     manifest = root / "manifest.jsonl"
     rows = [json.loads(line) for line in manifest.read_text(encoding="utf-8").splitlines() if line.strip()]
-    rows = [row for row in rows if not row["case_id"].startswith("CORR-ADVERSARIAL-")]
+    rows = [
+        row
+        for row in rows
+        if not row["case_id"].startswith("CORR-ADVERSARIAL-")
+        and row["case_id"] != "CORR-CONFIG-FUNCTION-RELATIVE-GAP-001"
+    ]
     by_id = {row["case_id"]: row for row in rows}
     missing = sorted(set(BASE_CASES.values()) - set(by_id))
     if missing:
@@ -87,8 +92,8 @@ def main() -> int:
 
 
 def _select_families(families: tuple[str, ...], ordinal: int, count: int) -> tuple[str, ...]:
-    if count == 3 and ordinal in {67, 79}:
-        return ("indicator", "rank", "queryData")
+    if ordinal in {53, 64, 67, 79}:
+        return ("indicator", "rank", "queryData")[:count]
     indexes = [ordinal % len(families), (ordinal * 5 + 3) % len(families), (ordinal * 7 + 5) % len(families)]
     selected = []
     for index in indexes:

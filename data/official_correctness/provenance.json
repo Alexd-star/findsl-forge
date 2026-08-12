@@ -1975,7 +1975,7 @@
       "reviewer": "independent-relational-oracle-composition-v2"
     },
     "CORR-ADVERSARIAL-053-UNION": {
-      "reference_sha256": "2717e408849314a186b890dc6e877d5dd6342e97888bb0bd7b201898d3b5a580",
+      "reference_sha256": "dfa2a8feb59f22627b8a46f77dda86d9e1d035234beba67eabe855ead74c00f6",
       "source_kind": "independent_relational_oracle_composition",
       "derivation_version": "v2",
       "plan_family": "adversarial_union",
@@ -2052,7 +2052,7 @@
       "reviewer": "independent-relational-oracle-composition-v2"
     },
     "CORR-ADVERSARIAL-064-AND-OR": {
-      "reference_sha256": "f8ed253dd4326531ba16705cbd47dd02df9d5eae9fb415154af468e9443f0c33",
+      "reference_sha256": "543504aa8add925bf758e49ba45832bf0dc56a14ef2ec2ec391f64ff74a96d5f",
       "source_kind": "independent_relational_oracle_composition",
       "derivation_version": "v2",
       "plan_family": "adversarial_and_or",
