@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T16:46:26+00:00",
-  "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+  "generated_at": "2026-08-12T19:36:29+00:00",
+  "git_head": "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
   "path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\\选股 DSL 规范文档\\选股提槽实例.xlsx",
   "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
   "mode": "recovery",

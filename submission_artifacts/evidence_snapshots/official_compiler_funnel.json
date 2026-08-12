@@ -2,9 +2,9 @@
   "schema_version": 1,
   "row_count": 5799,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+  "git_head": "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
   "legacy_strict_success": 1097,
-  "new_backend_success": 1083,
+  "new_backend_success": 1159,
   "legacy_to_new_migrated": 1044,
   "migration_coverage": 0.951686,
   "stage_success": {
@@ -12,24 +12,30 @@
     "typed": 3333,
     "logical": 1826,
     "optimizer": 1826,
-    "physical": 1083,
-    "backend": 1083
+    "physical": 1159,
+    "backend": 1159
   },
   "terminal_errors": {
     "OFFICIAL_TYPE_ERROR": 2459,
     "DOMAIN_DATA_UNAVAILABLE": 1504,
-    "PHYSICAL_CONSTRAINT_UNSUPPORTED": 282,
-    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 239,
-    "PHYSICAL_SCOPE_DATA_UNAVAILABLE": 119,
+    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED": 166,
+    "PHYSICAL_ENTITY_DATA_UNAVAILABLE": 153,
+    "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE": 139,
     "PHYSICAL_MARKET_DATA_UNAVAILABLE": 96,
+    "PHYSICAL_SCOPE_DATA_UNAVAILABLE": 78,
+    "PHYSICAL_ENTITY_TARGET_MISMATCH": 16,
+    "PHYSICAL_ENTITY_MARKET_UNSUPPORTED": 5,
     "OFFICIAL_ANTLR_LEX_ERROR": 5,
+    "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED": 4,
     "PHYSICAL_EVENT_PERIOD_UNSUPPORTED": 3,
+    "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED": 2,
     "PHYSICAL_PLAN_UNAVAILABLE": 2,
     "TEMPORAL_SCOPE_MISMATCH": 2,
     "OFFICIAL_ANTLR_PARSE_ERROR": 2,
     "PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE": 1,
     "PHYSICAL_RANK_EXPRESSION_UNSUPPORTED": 1,
-    "DOMAIN_DATE_INVALID": 1
+    "DOMAIN_DATE_INVALID": 1,
+    "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED": 1
   },
   "migration_gaps": [
     {
@@ -51,12 +57,12 @@
     "cross_above": {
       "rows": 132,
       "legacy_strict_success": 38,
-      "new_backend_success": 37
+      "new_backend_success": 42
     },
     "cross_down": {
       "rows": 57,
       "legacy_strict_success": 23,
-      "new_backend_success": 23
+      "new_backend_success": 24
     },
     "golden_cross": {
       "rows": 48,
@@ -66,7 +72,7 @@
     "indicator": {
       "rows": 5030,
       "legacy_strict_success": 867,
-      "new_backend_success": 858
+      "new_backend_success": 921
     },
     "position": {
       "rows": 131,
@@ -76,12 +82,12 @@
     "queryData": {
       "rows": 156,
       "legacy_strict_success": 33,
-      "new_backend_success": 27
+      "new_backend_success": 29
     },
     "rank": {
       "rows": 1743,
       "legacy_strict_success": 276,
-      "new_backend_success": 272
+      "new_backend_success": 294
     },
     "record_high": {
       "rows": 108,
@@ -91,7 +97,7 @@
     "record_low": {
       "rows": 72,
       "legacy_strict_success": 28,
-      "new_backend_success": 26
+      "new_backend_success": 28
     },
     "reset": {
       "rows": 45,
@@ -339,7 +345,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -642,7 +648,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -1014,7 +1020,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -2886,11 +2892,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 197,
@@ -4302,7 +4308,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -4344,7 +4350,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -4499,7 +4505,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5163,7 +5169,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5279,7 +5285,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5631,7 +5637,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5645,7 +5651,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5659,7 +5665,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -5673,7 +5679,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -6389,7 +6395,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -6530,7 +6536,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -7050,7 +7056,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -7092,7 +7098,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -7570,7 +7576,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -7598,7 +7604,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -8064,7 +8070,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -8416,7 +8422,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -9767,7 +9773,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10437,7 +10443,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10479,7 +10485,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10493,7 +10499,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10507,7 +10513,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10650,7 +10656,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10946,7 +10952,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -10960,7 +10966,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11002,7 +11008,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11100,7 +11106,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11273,7 +11279,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11360,7 +11366,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11559,11 +11565,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 811,
@@ -11824,7 +11830,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11881,7 +11887,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11896,7 +11902,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -11910,7 +11916,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12009,7 +12015,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12080,11 +12086,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 847,
@@ -12183,7 +12189,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12587,7 +12593,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12601,7 +12607,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12645,7 +12651,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12659,7 +12665,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12703,7 +12709,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12817,7 +12823,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12831,7 +12837,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12845,7 +12851,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12859,7 +12865,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12873,7 +12879,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12901,7 +12907,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12915,7 +12921,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -12943,7 +12949,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13083,7 +13089,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13097,7 +13103,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13109,11 +13115,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "external_index_quote_shape",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 919,
@@ -13125,7 +13131,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13153,7 +13159,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13167,7 +13173,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13181,7 +13187,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13195,7 +13201,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13209,7 +13215,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13223,7 +13229,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13237,7 +13243,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13251,7 +13257,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13321,7 +13327,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13349,7 +13355,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13503,7 +13509,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13517,7 +13523,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13531,7 +13537,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13573,7 +13579,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13601,7 +13607,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13615,7 +13621,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13659,7 +13665,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13687,7 +13693,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -13815,7 +13821,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14530,11 +14536,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1020,
@@ -14602,7 +14608,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14814,7 +14820,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14872,7 +14878,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -14913,11 +14919,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "limit_set_intersect"
     },
     {
       "excel_row": 1047,
@@ -15153,11 +15159,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 1064,
@@ -15280,11 +15286,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1073,
@@ -15489,7 +15495,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15504,7 +15510,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15682,7 +15688,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15711,7 +15717,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15769,7 +15775,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15799,7 +15805,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15813,7 +15819,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15827,7 +15833,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15883,7 +15889,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15897,7 +15903,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -15925,7 +15931,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16409,7 +16415,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16511,7 +16517,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16553,7 +16559,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16640,11 +16646,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 1166,
@@ -16657,7 +16663,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16671,7 +16677,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -16813,11 +16819,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 1178,
@@ -17553,11 +17559,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "grouped_aggregate"
     },
     {
       "excel_row": 1229,
@@ -17750,11 +17756,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "grouped_aggregate"
     },
     {
       "excel_row": 1243,
@@ -17834,11 +17840,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "grouped_aggregate"
     },
     {
       "excel_row": 1249,
@@ -17989,11 +17995,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 1260,
@@ -18004,11 +18010,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1261,
@@ -18090,11 +18096,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "grouped_aggregate"
     },
     {
       "excel_row": 1267,
@@ -18869,7 +18875,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -18923,11 +18929,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 1324,
@@ -18938,11 +18944,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1325,
@@ -19523,7 +19529,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -19834,11 +19840,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 1388,
@@ -19926,7 +19932,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20153,7 +20159,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20267,7 +20273,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20381,7 +20387,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20426,7 +20432,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20767,7 +20773,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20796,7 +20802,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -20811,7 +20817,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21073,11 +21079,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "stable_key_join"
     },
     {
       "excel_row": 1473,
@@ -21104,7 +21110,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21370,7 +21376,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21458,7 +21464,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21486,11 +21492,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security",
+      "selected_strategy": "crossing_window"
     },
     {
       "excel_row": 1501,
@@ -21590,7 +21596,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21677,7 +21683,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -21691,7 +21697,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -22418,7 +22424,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -22616,7 +22622,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -22631,7 +22637,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -22815,7 +22821,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -22829,7 +22835,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -22899,7 +22905,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23166,7 +23172,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23253,7 +23259,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23309,7 +23315,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23338,7 +23344,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23352,7 +23358,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23366,7 +23372,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23394,7 +23400,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -23422,7 +23428,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24317,7 +24323,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24401,7 +24407,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24474,7 +24480,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24503,7 +24509,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24531,7 +24537,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24546,7 +24552,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24776,7 +24782,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24863,7 +24869,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24905,7 +24911,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -24977,7 +24983,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25117,7 +25123,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25454,7 +25460,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25469,7 +25475,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25511,11 +25517,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 1784,
@@ -25541,7 +25547,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25642,7 +25648,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25671,7 +25677,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25685,7 +25691,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25699,7 +25705,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -25757,7 +25763,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26001,7 +26007,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26071,11 +26077,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 1823,
@@ -26101,7 +26107,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26115,7 +26121,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26214,7 +26220,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26458,7 +26464,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -26840,7 +26846,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -27080,7 +27086,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -28225,11 +28231,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "aggregate_rank"
     },
     {
       "excel_row": 1973,
@@ -28600,7 +28606,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -28696,11 +28702,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_union"
     },
     {
       "excel_row": 2006,
@@ -28711,11 +28717,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "set_union"
     },
     {
       "excel_row": 2007,
@@ -28802,7 +28808,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -28816,7 +28822,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -28830,7 +28836,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -28844,7 +28850,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -29102,7 +29108,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -29361,7 +29367,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -29655,7 +29661,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -29684,7 +29690,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -30089,7 +30095,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -30218,7 +30224,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -30230,11 +30236,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_technical",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 2112,
@@ -30579,7 +30585,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -30825,7 +30831,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -31130,7 +31136,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -31925,7 +31931,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -31998,7 +32004,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32228,7 +32234,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32242,7 +32248,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32486,7 +32492,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32808,7 +32814,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -32948,11 +32954,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 2300,
@@ -33169,7 +33175,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33227,7 +33233,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33257,7 +33263,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33528,7 +33534,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33542,7 +33548,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33556,7 +33562,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33570,7 +33576,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33685,7 +33691,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33699,7 +33705,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33756,7 +33762,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -33960,7 +33966,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34091,7 +34097,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34246,7 +34252,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34289,7 +34295,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34417,7 +34423,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34532,7 +34538,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34575,7 +34581,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34603,7 +34609,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34659,7 +34665,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34891,7 +34897,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34905,7 +34911,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -34950,7 +34956,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -35020,7 +35026,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -35192,7 +35198,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -35320,7 +35326,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -35874,7 +35880,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -36230,11 +36236,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 2529,
@@ -36634,11 +36640,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 2557,
@@ -37036,11 +37042,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_basic+official_technical",
+      "selected_strategy": "event_candidate_intersect"
     },
     {
       "excel_row": 2585,
@@ -38144,7 +38150,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38174,7 +38180,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38304,7 +38310,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38318,7 +38324,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38519,7 +38525,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38533,7 +38539,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38604,11 +38610,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 2695,
@@ -38620,7 +38626,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38847,7 +38853,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -38890,7 +38896,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -39234,7 +39240,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -39248,7 +39254,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -39292,7 +39298,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -40519,7 +40525,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -40589,11 +40595,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 2834,
@@ -41172,7 +41178,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -41186,7 +41192,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -41285,7 +41291,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -41400,7 +41406,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -41759,7 +41765,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -41802,7 +41808,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -42365,7 +42371,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -42577,11 +42583,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 2973,
@@ -42720,7 +42726,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -42861,7 +42867,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -43089,7 +43095,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -43423,11 +43429,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "event_candidate_intersect"
     },
     {
       "excel_row": 3032,
@@ -43813,7 +43819,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44172,7 +44178,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44198,11 +44204,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext+official_security",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 3086,
@@ -44214,7 +44220,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44872,7 +44878,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44886,7 +44892,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -44913,11 +44919,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_basic+official_technical+official_technical",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 3136,
@@ -45100,7 +45106,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -46172,11 +46178,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "temporal_grouped_aggregate"
     },
     {
       "excel_row": 3224,
@@ -46345,7 +46351,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -46516,7 +46522,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -47349,7 +47355,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -49036,7 +49042,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -49342,7 +49348,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -49601,7 +49607,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -50612,11 +50618,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical+official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 3533,
@@ -51277,11 +51283,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 3579,
@@ -51307,7 +51313,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -51362,11 +51368,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 3585,
@@ -51465,11 +51471,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 3592,
@@ -51929,11 +51935,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 3624,
@@ -52529,11 +52535,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "crossing_window"
     },
     {
       "excel_row": 3666,
@@ -52645,7 +52651,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -52834,7 +52840,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -52983,7 +52989,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -53404,11 +53410,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "stable_key_join"
     },
     {
       "excel_row": 3726,
@@ -53664,7 +53670,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -54408,7 +54414,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -54752,11 +54758,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "crossing_window_absence"
     },
     {
       "excel_row": 3817,
@@ -55174,11 +55180,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 3846,
@@ -55364,7 +55370,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56095,7 +56101,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56250,7 +56256,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56362,7 +56368,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56420,7 +56426,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56434,7 +56440,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -56535,7 +56541,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -57021,7 +57027,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -57236,7 +57242,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -57419,7 +57425,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -57431,11 +57437,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 4004,
@@ -57665,7 +57671,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -57994,7 +58000,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58022,7 +58028,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58150,7 +58156,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58235,7 +58241,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58279,7 +58285,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58351,7 +58357,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58481,7 +58487,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -58982,7 +58988,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59040,7 +59046,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59440,7 +59446,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -59853,7 +59859,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60106,7 +60112,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60192,7 +60198,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60206,7 +60212,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60262,11 +60268,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 4202,
@@ -60579,11 +60585,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 4224,
@@ -60623,7 +60629,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60934,7 +60940,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -60991,7 +60997,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61020,7 +61026,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61062,7 +61068,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61550,7 +61556,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61651,7 +61657,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61722,7 +61728,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61750,7 +61756,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61793,7 +61799,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -61849,7 +61855,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62006,7 +62012,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62020,7 +62026,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62049,7 +62055,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62106,7 +62112,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62149,7 +62155,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62421,7 +62427,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -62517,11 +62523,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "external_index_quote_shape",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 4360,
@@ -62776,7 +62782,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63049,7 +63055,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63104,11 +63110,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "crossing_window"
     },
     {
       "excel_row": 4401,
@@ -63590,7 +63596,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -63733,7 +63739,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -64277,7 +64283,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -64804,7 +64810,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -65335,7 +65341,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -65478,7 +65484,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -65761,7 +65767,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -66292,7 +66298,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -66647,7 +66653,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -66961,7 +66967,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -67387,7 +67393,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -67413,11 +67419,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "stable_key_join"
     },
     {
       "excel_row": 4703,
@@ -67558,11 +67564,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 4713,
@@ -68104,7 +68110,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -68203,11 +68209,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 4758,
@@ -68474,11 +68480,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 4777,
@@ -68490,7 +68496,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -69411,7 +69417,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -69926,7 +69932,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -70756,7 +70762,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -70885,7 +70891,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71248,7 +71254,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71335,7 +71341,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -71590,7 +71596,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -72217,7 +72223,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -72851,11 +72857,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 5082,
@@ -73325,7 +73331,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -73654,7 +73660,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -73996,7 +74002,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -74429,11 +74435,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "external_index_quote_shape",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 5192,
@@ -75022,7 +75028,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75050,7 +75056,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75092,7 +75098,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75293,7 +75299,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75321,7 +75327,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -75493,11 +75499,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 5266,
@@ -76521,11 +76527,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 5338,
@@ -77280,7 +77286,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77452,11 +77458,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 5403,
@@ -77511,7 +77517,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77840,7 +77846,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -77855,7 +77861,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -78300,11 +78306,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 5462,
@@ -78586,11 +78592,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_basic+official_technical",
+      "selected_strategy": "limit_set_intersect"
     },
     {
       "excel_row": 5482,
@@ -78946,7 +78952,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -79089,11 +79095,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "limit_set_intersect"
     },
     {
       "excel_row": 5517,
@@ -79217,7 +79223,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -79230,11 +79236,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 5527,
@@ -79330,11 +79336,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 5534,
@@ -79344,11 +79350,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 5535,
@@ -79358,11 +79364,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 5536,
@@ -79574,11 +79580,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "controlled_expression"
     },
     {
       "excel_row": 5551,
@@ -79792,7 +79798,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -80082,7 +80088,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -80108,11 +80114,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_ext",
+      "selected_strategy": "set_union"
     },
     {
       "excel_row": 5588,
@@ -80369,11 +80375,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_security",
+      "selected_strategy": "stable_key_join"
     },
     {
       "excel_row": 5606,
@@ -80626,7 +80632,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -80842,11 +80848,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "set_union"
     },
     {
       "excel_row": 5639,
@@ -80859,7 +80865,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -81231,11 +81237,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_technical+official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 5666,
@@ -82067,7 +82073,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -82355,7 +82361,7 @@
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
       "new_backend_success": false,
       "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
+      "terminal_code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "selected_resource": null,
       "selected_strategy": null
     },
@@ -82591,11 +82597,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "direct_column"
     },
     {
       "excel_row": 5762,
@@ -82872,11 +82878,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic+official_ext",
+      "selected_strategy": "set_intersect"
     },
     {
       "excel_row": 5782,
@@ -82886,11 +82892,11 @@
       ],
       "legacy_strict_success": false,
       "legacy_code": "OFFICIAL_DEGRADED_SEMANTICS",
-      "new_backend_success": false,
-      "terminal_stage": "physical",
-      "terminal_code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "selected_resource": null,
-      "selected_strategy": null
+      "new_backend_success": true,
+      "terminal_stage": "backend",
+      "terminal_code": "PASS",
+      "selected_resource": "official_basic",
+      "selected_strategy": "composite_grouped_aggregate"
     },
     {
       "excel_row": 5783,

@@ -1,7 +1,7 @@
 # 官方 SQL 正确率冻结基准
 
-- Git HEAD：`dd61d10a39adfaf720720254df0a9bb557255b25`
-- Catalog snapshot：`20d512c6ad746c913d456fdacfa0e79d7bf5d3a13cfbda457fb78245f0ffefc0`
+- Git HEAD：`a323d96ca63728b4ac9dbba3d5599c56a6cd135d`
+- Catalog snapshot：`e4d8cf9437d6cb71d82a80e6e10947fc7e9e82f6a3f9ebf2ce9a9666c0c7e89c`
 - Policy：`official-semantic-policy-v1`
 - Dataset snapshot：`official-doris-20260414-c36a993257a1e152`
 - Eligible：`240`

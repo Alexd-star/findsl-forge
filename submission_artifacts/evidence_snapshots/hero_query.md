@@ -1,8 +1,8 @@
 # Hero Query 端到端证据
 
 - 查询：`HERO-TEMPORAL-STAGE-RANK-001`
-- Git HEAD：`dd61d10a39adfaf720720254df0a9bb557255b25`
-- 编译耗时：`236.8214 ms`
+- Git HEAD：`a323d96ca63728b4ac9dbba3d5599c56a6cd135d`
+- 编译耗时：`253.3626 ms`
 - 选择路由：`PARTITION`
 - 选择策略：`stage_rank`
 - 编译/特征门禁：`PASS`
@@ -34,5 +34,5 @@
 
 - 完整结果集一致：`True`
 - Generated rows / Reference rows：`20 / 20`
-- Generated latency：`885.840 ms`
+- Generated latency：`1136.874 ms`
 - 执行时间不超过 10 秒：`True`

@@ -3,24 +3,24 @@
 ## Summary
 
 - Evidence source: Apache Doris MySQL-compatible query port
-- Generated at: 2026-08-12T16:50:53Z
-- Git HEAD: `dd61d10a39adfaf720720254df0a9bb557255b25`
+- Generated at: 2026-08-12T19:36:10Z
+- Git HEAD: `a323d96ca63728b4ac9dbba3d5599c56a6cd135d`
 - Database: `findsl_demo`
 - Iterations: 5
-- Client command template: `mysql -h 127.0.0.1 -P 9030 -u root --connect-timeout 10 --init-command 'SET enable_sql_cache=false' --batch --raw --skip-column-names findsl_demo -e 'SELECT 1'`
+- Client command template: `'C:\Program Files\MySQL\MySQL Workbench 8.0\mysql.exe' -h 127.0.0.1 -P 9030 -u root --connect-timeout 10 --init-command 'SET enable_sql_cache=false' --batch --raw --skip-column-names findsl_demo -e 'SELECT 1'`
 - Evidence passed: True
 - Baseline success: True
 - Optimized success: True
 - Row counts match: True
 - Baseline row count: 96061
 - Optimized row count: 96061
-- Doris cluster speedup: 27.78x
+- Doris cluster speedup: 28.90x
 - Minimum Doris speedup target: 10.00x
 - Doris speedup target met: True
-- Baseline avg execute ms: 4724.778
-- Optimized avg execute ms: 170.098
-- Baseline P95 execute ms: 4954.130
-- Optimized P95 execute ms: 181.493
+- Baseline avg execute ms: 4744.943
+- Optimized avg execute ms: 164.180
+- Baseline P95 execute ms: 4984.183
+- Optimized P95 execute ms: 183.985
 - Optimized plan contains prefix table: True
 - Baseline plan contains window: True
 
@@ -37,8 +37,8 @@ filter(SUM(indicator(volume), 120) > 1000000)
 
 | Variant | Success | Avg execute ms | P95 execute ms | Rows | Prefix plan | Window plan |
 |---|---:|---:|---:|---:|---:|---:|
-| baseline_window | True | 4724.778 | 4954.130 | 96061 | False | True |
-| optimized_prefix_sum | True | 170.098 | 181.493 | 96061 | True | False |
+| baseline_window | True | 4744.943 | 4984.183 | 96061 | False | True |
+| optimized_prefix_sum | True | 164.180 | 183.985 | 96061 | True | False |
 
 ## EXPLAIN Output
 
@@ -130,7 +130,7 @@ PLAN FRAGMENT 0
   |       TABLE: findsl_demo.dwd_stock_daily_quote_prefix(dwd_stock_daily_quote_prefix), PREAGGREGATION: ON
   |       PREDICATES: (volume_sum_120[#4] > 1000000)
   |       partitions=83/83 (p20220101000000,p20220201000000,p20220301000000,p20220401000000,p20220501000000,p20220601000000,p20220701000000,p20220801000000,p20220901000000,p20221001000000,p20221101000000,p20221201000000,p20230101000000,p20230201000000,p20230301000000,p20230401000000,p20230501000000,p20230601000000,p20230701000000,p20230801000000,p20230901000000,p20231001000000,p20231101000000,p20231201000000,p20240101000000,p20240201000000,p20240301000000,p20240401000000,p20240501000000,p20240601000000,p20240701000000,p20240801000000,p20240901000000,p20241001000000,p20241101000000,p20241201000000,p20250101000000,p20250201000000,p20250301000000,p20250401000000,p20250501000000,p20250601000000,p20250701000000,p20250801000000,p20250901000000,p20251001000000,p20251101000000,p20251201000000,p20260101000000,p20260201000000,p20260301000000,p20260401000000,p20260501000000,p20260601000000,p20260701000000,p20260801000000,p20260901000000,p20261001000000,p20261101000000,p20261201000000,p20270101000000,p20270201000000,p20270301000000,p20270401000000,p20270501000000,p20270601000000,p20270701000000,p20270801000000,p20270901000000,p20271001000000,p20271101000000,p20271201000000,p20280101000000,p20280201000000,p20280301000000,p20280401000000,p20280501000000,p20280601000000,p20280701000000,p20280801000000,p20280901000000,p20281001000000,p20281101000000)
-  |       tablets=664/664, tabletList=1786523101906,1786523101908,1786523101910 ...
+  |       tablets=664/664, tabletList=1786523104797,1786523104799,1786523104801 ...
   |       cardinality=1, avgRowSize=0.0, numNodes=1
   |       pushAggOp=NONE
   |       final projections: ts_code[#0], trade_date[#1], volume_sum_120[#4]

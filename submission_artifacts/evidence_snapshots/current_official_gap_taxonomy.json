@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "source_git_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+  "source_git_head": "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
   "row_count": 5799,
   "category_counts": {
-    "capability_gap": 530,
-    "data_unavailable": 1720,
+    "capability_gap": 495,
+    "data_unavailable": 1679,
     "invalid_input": 2466,
-    "passed": 1083
+    "passed": 1159
   },
   "migration_gap_count": 53,
   "migration_gap_codes": [
@@ -67,33 +67,9 @@
       ]
     },
     {
-      "code": "PHYSICAL_CONSTRAINT_UNSUPPORTED",
-      "category": "capability_gap",
-      "row_count": 282,
-      "function_families": [
-        "belong_industry",
-        "close_together",
-        "cross_above",
-        "cross_down",
-        "indicator",
-        "position",
-        "queryData",
-        "rank",
-        "record_high",
-        "record_low"
-      ],
-      "sample_rows": [
-        18,
-        39,
-        296,
-        299,
-        310
-      ]
-    },
-    {
       "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "category": "capability_gap",
-      "row_count": 239,
+      "row_count": 166,
       "function_families": [
         "belong_industry",
         "cross_above",
@@ -110,33 +86,50 @@
       "sample_rows": [
         112,
         183,
-        196,
         237,
-        271
+        271,
+        298
       ]
     },
     {
-      "code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
-      "category": "data_unavailable",
-      "row_count": 119,
+      "code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
+      "category": "capability_gap",
+      "row_count": 153,
       "function_families": [
-        "belong_industry",
         "close_together",
         "cross_above",
         "cross_down",
         "indicator",
-        "queryData",
+        "position",
         "rank",
         "record_high",
-        "record_low",
+        "record_low"
+      ],
+      "sample_rows": [
+        18,
+        39,
+        65,
+        296,
+        299
+      ]
+    },
+    {
+      "code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
+      "category": "capability_gap",
+      "row_count": 139,
+      "function_families": [
+        "indicator",
+        "position",
+        "rank",
+        "record_high",
         "reset"
       ],
       "sample_rows": [
-        65,
-        83,
-        177,
-        204,
-        208
+        365,
+        563,
+        778,
+        828,
+        833
       ]
     },
     {
@@ -164,6 +157,47 @@
       ]
     },
     {
+      "code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "category": "data_unavailable",
+      "row_count": 78,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "indicator",
+        "queryData",
+        "rank",
+        "record_high",
+        "record_low"
+      ],
+      "sample_rows": [
+        83,
+        177,
+        204,
+        208,
+        222
+      ]
+    },
+    {
+      "code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
+      "category": "capability_gap",
+      "row_count": 16,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "queryData",
+        "rank",
+        "record_high"
+      ],
+      "sample_rows": [
+        957,
+        1105,
+        1107,
+        1166,
+        1409
+      ]
+    },
+    {
       "code": "OFFICIAL_ANTLR_LEX_ERROR",
       "category": "invalid_input",
       "row_count": 5,
@@ -174,6 +208,39 @@
         2466,
         5328,
         5753
+      ]
+    },
+    {
+      "code": "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 5,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        899,
+        901,
+        1108,
+        4944,
+        5430
+      ]
+    },
+    {
+      "code": "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 4,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        897,
+        898,
+        3673,
+        3743
       ]
     },
     {
@@ -198,6 +265,19 @@
       "sample_rows": [
         3785,
         5521
+      ]
+    },
+    {
+      "code": "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 2,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        900,
+        4969
       ]
     },
     {
@@ -234,6 +314,17 @@
       ],
       "sample_rows": [
         3639
+      ]
+    },
+    {
+      "code": "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "position"
+      ],
+      "sample_rows": [
+        4482
       ]
     },
     {
@@ -286,7 +377,7 @@
     {
       "key": "declared_data_unavailable",
       "category": "data_unavailable",
-      "row_count": 1720,
+      "row_count": 1679,
       "terminal_codes": [
         "DOMAIN_DATA_UNAVAILABLE",
         "PHYSICAL_MARKET_DATA_UNAVAILABLE",
@@ -306,37 +397,18 @@
       ]
     },
     {
-      "key": "other_date_algebra",
+      "key": "physical_entity_data_unavailable",
       "category": "capability_gap",
-      "row_count": 165,
+      "row_count": 153,
       "terminal_codes": [
-        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
-      ],
-      "sample_rows": [
-        196,
-        271,
-        342,
-        361,
-        370
-      ],
-      "examples": [
-        "indicator('', '', '最新价', '', '', '', '') <= indicator('', '', '最新价', '22年', '', '', '') + 30.52 and indicator('', '', '最新价', '', '', '', '') < indicator('', '', '最新价', '22年后2年', '', '', '')",
-        "indicator('', '', '成交额', '上周五到0926', '', '', '') > 10000000 and indicator('', '', '成交额', '上周五到0926', '', '', '') <= 12000000"
-      ]
-    },
-    {
-      "key": "unsupported_asset_domain",
-      "category": "data_unavailable",
-      "row_count": 143,
-      "terminal_codes": [
-        "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+        "PHYSICAL_ENTITY_DATA_UNAVAILABLE"
       ],
       "sample_rows": [
         18,
         39,
+        65,
         296,
-        299,
-        310
+        299
       ],
       "examples": [
         "indicator('', '', '港股通标识', '2000年', '场外基金', '', '') = True and indicator('', '', '最高价', '2000年', '场外基金', '', '') < 200.7",
@@ -344,11 +416,11 @@
       ]
     },
     {
-      "key": "physical_constraint_unsupported",
+      "key": "physical_entity_semantics_unavailable",
       "category": "capability_gap",
       "row_count": 139,
       "terminal_codes": [
-        "PHYSICAL_CONSTRAINT_UNSUPPORTED"
+        "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE"
       ],
       "sample_rows": [
         365,
@@ -363,9 +435,28 @@
       ]
     },
     {
+      "key": "other_date_algebra",
+      "category": "capability_gap",
+      "row_count": 102,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        271,
+        342,
+        361,
+        370,
+        479
+      ],
+      "examples": [
+        "indicator('', '', '成交额', '上周五到0926', '', '', '') > 10000000 and indicator('', '', '成交额', '上周五到0926', '', '', '') <= 12000000",
+        "indicator('', 'msic', '涨幅', '本月十号的前18日', '', '', 'CONS=每日') > 0"
+      ]
+    },
+    {
       "key": "intraday_data_domain",
       "category": "data_unavailable",
-      "row_count": 27,
+      "row_count": 24,
       "terminal_codes": [
         "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
       ],
@@ -373,8 +464,8 @@
         237,
         505,
         1006,
-        1228,
-        1248
+        1434,
+        1443
       ],
       "examples": [
         "indicator('^京', '', '收盘价', '收盘后', '', '', '') between '[10,10.02]' limit 0,20",
@@ -382,9 +473,28 @@
       ]
     },
     {
+      "key": "ambiguous_recent_date",
+      "category": "invalid_input",
+      "row_count": 21,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        112,
+        183,
+        298,
+        413,
+        1017
+      ],
+      "examples": [
+        "indicator('', '', '涨幅', '最近', '', '', '') >= 8% and indicator('', '', '跌幅', '最近的第二天', '', '', 'CONS=3日') >= 0 and indicator('', '', '跌幅', '最近的第二天的后3日', '', 'SUM', '') > 8%",
+        "indicator('', '', '深港通标识', '近期', '', '', '') = True then rank('', '', '总市值', 'asc', '近期', '', '', '') <= 15"
+      ]
+    },
+    {
       "key": "fundamental_reporting_calendar",
       "category": "data_unavailable",
-      "row_count": 24,
+      "row_count": 19,
       "terminal_codes": [
         "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
       ],
@@ -401,22 +511,59 @@
       ]
     },
     {
-      "key": "ambiguous_recent_date",
-      "category": "invalid_input",
-      "row_count": 23,
+      "key": "physical_entity_target_mismatch",
+      "category": "capability_gap",
+      "row_count": 16,
       "terminal_codes": [
-        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+        "PHYSICAL_ENTITY_TARGET_MISMATCH"
       ],
       "sample_rows": [
-        112,
-        183,
-        298,
-        413,
-        1017
+        957,
+        1105,
+        1107,
+        1166,
+        1409
       ],
       "examples": [
-        "indicator('', '', '涨幅', '最近', '', '', '') >= 8% and indicator('', '', '跌幅', '最近的第二天', '', '', 'CONS=3日') >= 0 and indicator('', '', '跌幅', '最近的第二天的后3日', '', 'SUM', '') > 8%",
-        "indicator('', '', '深港通标识', '近期', '', '', '') = True then rank('', '', '总市值', 'asc', '近期', '', '', '') <= 15"
+        "indicator('', '', '最新价', '今日', '概念|指数', '', '') ~= queryData('', '中证A50', '最低价', '半年报', '')",
+        "indicator('', '', '市盈率', '18年-24年', '概念', 'AVG', '') < belong_industry('', '', '市盈率', '18年-24年', 'AVG')"
+      ]
+    },
+    {
+      "key": "physical_entity_market_unsupported",
+      "category": "capability_gap",
+      "row_count": 5,
+      "terminal_codes": [
+        "PHYSICAL_ENTITY_MARKET_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        899,
+        901,
+        1108,
+        4944,
+        5430
+      ],
+      "examples": [
+        "indicator('^创业板&^科创板', '白酒行业', '委比', '2022年', '指数', '', '') > 15% limit 0,5",
+        "indicator('创业板', '摩托车行业', '开盘价', '今天', '指数', '', '') > indicator('创业板', '摩托车行业', '收盘价', '昨天', '指数', '', '') limit 0,200"
+      ]
+    },
+    {
+      "key": "physical_entity_indicator_unsupported",
+      "category": "capability_gap",
+      "row_count": 4,
+      "terminal_codes": [
+        "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        897,
+        898,
+        3673,
+        3743
+      ],
+      "examples": [
+        "indicator('', '', '市盈率', '上周五到0926', '指数', '', '') between '(10000000,12000000]'",
+        "indicator('', '', '市盈率', '今日', '指数', '', '') > indicator('', '', '市盈率', '昨日', '指数', '', '') * 3 limit 0,50"
       ]
     },
     {
@@ -434,6 +581,22 @@
       "examples": [
         "position('', '', '', '阶段', '', '', '', '') = '低' and indicator('', '', '主力净流入', '近五天', '', '', 'CONS=每日') > 0",
         "position('', '', '成交量', '本周内', '', '', '', '') = '低' and indicator('', '', '放量', '盘前', '', '', 'CONS>1') = True"
+      ]
+    },
+    {
+      "key": "physical_entity_scope_unsupported",
+      "category": "capability_gap",
+      "row_count": 2,
+      "terminal_codes": [
+        "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        900,
+        4969
+      ],
+      "examples": [
+        "rank('', '通信服务行业|计算机行业', '最新价', 'desc', '', '指数', '', '') > 0 limit 0,100",
+        "indicator('', '特色ETF策略', '', '', '指数', '', '') = 'all'"
       ]
     },
     {
@@ -480,6 +643,20 @@
       ],
       "examples": [
         "indicator('沪', '', '主力买入手数', '上周五到本周一', 'ETF', 'AVG', '') > 5000"
+      ]
+    },
+    {
+      "key": "physical_event_composition_unsupported",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        4482
+      ],
+      "examples": [
+        "position('', '', '最新价', '过去两年', '现在', '指数', '', '') = '最低'"
       ]
     },
     {

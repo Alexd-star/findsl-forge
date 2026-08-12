@@ -1,7 +1,7 @@
 # Evidence Snapshot Manifest
 
-- Generated at: 2026-08-13 01:16:59 +08:00
-- Git HEAD at export: dd61d10
+- Generated at: 2026-08-13 03:42:10 +08:00
+- Git HEAD at export: a323d96
 - Core source status when exported, excluding this export script: clean
 - Source reports directory: reports
 - Snapshot directory: submission_artifacts\evidence_snapshots
@@ -14,29 +14,32 @@
 - `blind_extension_evidence.md` (947 bytes)
 - `current_external_data_inventory.json` (20797 bytes)
 - `current_external_data_inventory.md` (4016 bytes)
-- `current_official_gap_taxonomy.json` (14199 bytes)
-- `current_official_gap_taxonomy.md` (4390 bytes)
+- `current_official_gap_taxonomy.json` (18667 bytes)
+- `current_official_gap_taxonomy.md` (5657 bytes)
 - `current_scope_data_gap_audit.json` (42924 bytes)
 - `current_scope_data_gap_audit.md` (13022 bytes)
-- `doris_cluster_evidence.json` (9040 bytes)
-- `doris_cluster_evidence.md` (9446 bytes)
+- `doris_cluster_evidence.json` (9092 bytes)
+- `doris_cluster_evidence.md` (9495 bytes)
 - `external_catalog_doris_load.json` (888 bytes)
-- `hero_query.json` (30172 bytes)
-- `hero_query.md` (1218 bytes)
+- `hero_query.json` (30174 bytes)
+- `hero_query.md` (1219 bytes)
+- `index_quote_doris_load.json` (286 bytes)
 - `official_capability_matrix.json` (10556 bytes)
 - `official_capability_matrix.md` (4087 bytes)
-- `official_compile_latency.json` (38797 bytes)
-- `official_compile_latency.md` (8562 bytes)
-- `official_compiler_funnel.json` (3244917 bytes)
+- `official_compile_latency.json` (38717 bytes)
+- `official_compile_latency.md` (8547 bytes)
+- `official_compiler_funnel.json` (3246367 bytes)
 - `official_compiler_funnel.md` (1091 bytes)
-- `official_correctness_benchmark.json` (166820 bytes)
+- `official_correctness_benchmark.json` (166869 bytes)
 - `official_correctness_benchmark.md` (22637 bytes)
-- `official_doris_evidence.json` (22112 bytes)
-- `official_doris_evidence.md` (20017 bytes)
+- `official_doris_evidence.json` (22108 bytes)
+- `official_doris_evidence.md` (20015 bytes)
 - `official_doris_watermark.json` (2571 bytes)
 - `official_doris_watermark.md` (875 bytes)
-- `official_full_performance_matrix.json` (39079 bytes)
-- `official_full_performance_matrix.md` (8757 bytes)
+- `official_data_requirements.json` (39521 bytes)
+- `official_data_requirements.md` (2857 bytes)
+- `official_full_performance_matrix.json` (39052 bytes)
+- `official_full_performance_matrix.md` (8753 bytes)
 - `official_long_horizon_matrix.json` (3955 bytes)
 - `official_long_horizon_matrix.md` (1108 bytes)
 - `official_slot_coverage.json` (135874 bytes)
@@ -58,7 +61,10 @@
 - `phase48_true_remaining_scope_targets.json` (4324 bytes)
 - `phase6c_set_prefix_doris.json` (223385 bytes)
 - `phase6c_set_prefix_doris.md` (1625 bytes)
-- `submission_readiness.md` (13696 bytes)
+- `submission_readiness.md` (13699 bytes)
+- `product_screenshots/delivery-evidence-desktop.png` (159934 bytes)
+- `product_screenshots/hero-route-desktop.png` (135116 bytes)
+- `product_screenshots/hero-route-mobile.png` (113847 bytes)
 
 ## Excluded By Design
 

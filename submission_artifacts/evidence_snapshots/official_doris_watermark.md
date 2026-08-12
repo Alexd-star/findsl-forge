@@ -1,7 +1,7 @@
 # 官方 Doris 数据水位门禁
 
 - 状态：`PASS`
-- Git HEAD：`dd61d10a39adfaf720720254df0a9bb557255b25`
+- Git HEAD：`a323d96ca63728b4ac9dbba3d5599c56a6cd135d`
 - 各物化路径水位一致：`True`
 - 统计快照时间：`2026-08-09T15:04:56+08:00`
 

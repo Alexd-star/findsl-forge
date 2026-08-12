@@ -1,0 +1,10 @@
+﻿{
+    "schema_version":  1,
+    "generated_at":  "2026-08-12T19:22:20.5282412Z",
+    "git_head":  "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
+    "status":  "PASS",
+    "expected_rows":  23218,
+    "actual_rows":  23218,
+    "shape_rows":  23218,
+    "filtered_rows":  0
+}
