@@ -9,7 +9,8 @@ from scripts.build_curated_scope_alias_snapshot import (
 )
 
 
-def test_curated_composite_intersects_versioned_memberships():
+@pytest.fixture
+def membership_connection():
     connection = sqlite3.connect(":memory:")
     connection.row_factory = sqlite3.Row
     connection.execute(
@@ -19,6 +20,14 @@ def test_curated_composite_intersects_versioned_memberships():
              effective_to TEXT, weight REAL
         )"""
     )
+    try:
+        yield connection
+    finally:
+        connection.close()
+
+
+def test_curated_composite_intersects_versioned_memberships(membership_connection):
+    connection = membership_connection
     connection.executemany(
         "INSERT INTO scope_membership VALUES (?,?,?,?,?,?,?,?,?)",
         [
@@ -52,16 +61,8 @@ def test_curated_composite_intersects_versioned_memberships():
     assert audit[0]["component_member_counts"] == [2, 2]
 
 
-def test_curated_direct_mapping_rejects_abnormally_small_source():
-    connection = sqlite3.connect(":memory:")
-    connection.row_factory = sqlite3.Row
-    connection.execute(
-        """CREATE TABLE scope_membership (
-             snapshot_id TEXT, scope_type TEXT, scope_code TEXT, scope_name TEXT,
-             mktcode INTEGER, tgtcode TEXT, effective_from TEXT,
-             effective_to TEXT, weight REAL
-        )"""
-    )
+def test_curated_direct_mapping_rejects_abnormally_small_source(membership_connection):
+    connection = membership_connection
     connection.execute(
         "INSERT INTO scope_membership VALUES (?,?,?,?,?,?,?,?,?)",
         ("index-v1", "index", "000300", "沪深300", 0, "000001", None, None, None),
@@ -82,16 +83,8 @@ def test_curated_direct_mapping_rejects_abnormally_small_source():
         build_curated_rows(config, connection, "2026-07-30")
 
 
-def test_curated_composite_rejects_abnormally_small_component():
-    connection = sqlite3.connect(":memory:")
-    connection.row_factory = sqlite3.Row
-    connection.execute(
-        """CREATE TABLE scope_membership (
-             snapshot_id TEXT, scope_type TEXT, scope_code TEXT, scope_name TEXT,
-             mktcode INTEGER, tgtcode TEXT, effective_from TEXT,
-             effective_to TEXT, weight REAL
-        )"""
-    )
+def test_curated_composite_rejects_abnormally_small_component(membership_connection):
+    connection = membership_connection
     connection.executemany(
         "INSERT INTO scope_membership VALUES (?,?,?,?,?,?,?,?,?)",
         [
@@ -120,16 +113,8 @@ def test_curated_composite_rejects_abnormally_small_component():
         build_curated_rows(config, connection, "2026-07-30")
 
 
-def test_curated_composite_rejects_abnormally_small_result():
-    connection = sqlite3.connect(":memory:")
-    connection.row_factory = sqlite3.Row
-    connection.execute(
-        """CREATE TABLE scope_membership (
-             snapshot_id TEXT, scope_type TEXT, scope_code TEXT, scope_name TEXT,
-             mktcode INTEGER, tgtcode TEXT, effective_from TEXT,
-             effective_to TEXT, weight REAL
-        )"""
-    )
+def test_curated_composite_rejects_abnormally_small_result(membership_connection):
+    connection = membership_connection
     connection.executemany(
         "INSERT INTO scope_membership VALUES (?,?,?,?,?,?,?,?,?)",
         [
@@ -215,8 +200,17 @@ def _policy_connection():
     return connection
 
 
-def test_semantic_policy_builder_supports_exact_rule_and_set_operation():
+@pytest.fixture
+def policy_connection():
     connection = _policy_connection()
+    try:
+        yield connection
+    finally:
+        connection.close()
+
+
+def test_semantic_policy_builder_supports_exact_rule_and_set_operation(policy_connection):
+    connection = policy_connection
     catalog = _policy_catalog(
         _policy_entry(
             "exact-v1",
@@ -263,8 +257,8 @@ def test_semantic_policy_builder_supports_exact_rule_and_set_operation():
     }
 
 
-def test_semantic_policy_builder_rejects_result_above_maximum():
-    connection = _policy_connection()
+def test_semantic_policy_builder_rejects_result_above_maximum(policy_connection):
+    connection = policy_connection
     entry = _policy_entry(
         "exact-v1",
         "科技范围",

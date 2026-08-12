@@ -404,6 +404,70 @@ def test_composite_date_phrases_preserve_relative_session_semantics(
 
 
 @pytest.mark.parametrize(
+    ("date", "kind", "amount", "unit", "offset", "month", "day", "end_month"),
+    [
+        ("2025年5月6日的前1日", "before_date_sessions", 1, "session", 0, None, None, None),
+        ("昨天至今", "session_slice", 2, "session", 0, None, None, None),
+        ("近15个工作日", "recent_sessions", 15, "session", 0, None, None, None),
+        ("本月开始12日", "from_period_sessions", 12, "month", 0, None, None, None),
+        ("连续四季度", "rolling_periods", 4, "quarter", 0, None, None, None),
+        ("去年一季度", "year_month_range", None, "month", -1, 1, None, 3),
+        ("二三季度", "year_month_range", None, "month", 0, 4, None, 9),
+        ("本月13日", "anchor_calendar", None, "day", 0, None, 13, None),
+        ("9月10月", "year_month_range", None, "month", 0, 9, None, 10),
+        ("9月28号开始", "anchor_since", None, "day", 0, 9, 28, None),
+        ("今年年初", "from_period_sessions", 1, "year", 0, None, None, None),
+        ("4月30号的当月", "anchor_calendar", None, "month", 0, 4, None, None),
+        ("3年前", "shifted_calendar_session", 1, "year", -3, None, None, None),
+        ("一周前", "shifted_calendar_session", 1, "week", -1, None, None, None),
+        ("上周五最后一个交易日", "period_end_session", 1, "week", -1, None, None, None),
+        ("今年3月的后2月", "year_month_range", None, "month", 0, 4, None, 5),
+        ("周四周五", "dynamic_weekday_range", None, "week", 0, None, None, None),
+        ("大前天后3日", "session_slice", 3, "session", 0, None, None, None),
+        ("去年9月初", "from_anchor_sessions", 1, "session", -12, 9, 1, None),
+    ],
+)
+def test_generalized_calendar_algebra_preserves_typed_contracts(
+    date, kind, amount, unit, offset, month, day, end_month
+):
+    bound = bind_function(
+        _typed_call(f"indicator('', '', '涨幅', '{date}', '', '', '')"),
+        default_official_registry(),
+    )
+
+    constraint = bound.date_constraint
+    assert constraint.kind == kind
+    assert constraint.amount == amount
+    assert constraint.unit == unit
+    assert constraint.offset == offset
+    assert constraint.month == month
+    assert constraint.day == day
+    assert constraint.end_month == end_month
+
+
+def test_ambiguous_non_contiguous_quarter_shorthand_is_not_invented():
+    bound = bind_function(
+        _typed_call("indicator('', '', '涨幅', '一四季度', '', '', '')"),
+        default_official_registry(),
+    )
+
+    assert bound.date_constraint.kind == "expression"
+
+
+def test_weekday_session_algebra_keeps_week_anchor_and_direction():
+    bound = bind_function(
+        _typed_call("indicator('', '', '涨幅', '上周三开始4日', '', '', '')"),
+        default_official_registry(),
+    )
+
+    constraint = bound.date_constraint
+    assert constraint.kind == "from_weekday_sessions"
+    assert constraint.amount == 4
+    assert constraint.offset == -1
+    assert constraint.weekday_start == 3
+
+
+@pytest.mark.parametrize(
     "date,kind,start,end,offset,amount,month,day",
     [
         (

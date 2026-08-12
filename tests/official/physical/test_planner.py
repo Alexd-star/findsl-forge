@@ -1269,6 +1269,51 @@ def test_scalar_dynamic_dates_lower_to_typed_physical_range(
 
 
 @pytest.mark.parametrize(
+    ("date", "physical_kind", "signal"),
+    [
+        ("2025年5月6日的前1日", "PhysicalSessionBoundaryRange", '"direction":"before"'),
+        ("本月开始12日", "PhysicalSessionBoundaryRange", '"direction":"from"'),
+        ("上周三开始4日", "PhysicalSessionBoundaryRange", '"boundary_kind":"weekday"'),
+        ("连续四季度", "PhysicalDynamicDateRange", '"range_kind":"rolling_periods"'),
+        ("去年一季度", "PhysicalDynamicDateRange", '"offset":-1'),
+        ("3年前", "PhysicalSessionBoundaryRange", '"boundary_kind":"shifted_anchor"'),
+        ("上周五最后一个交易日", "PhysicalSessionBoundaryRange", '"boundary_kind":"period_end"'),
+    ],
+)
+def test_generalized_scalar_dates_lower_to_explicit_physical_contracts(
+    date, physical_kind, signal
+):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    payload = result.plan.canonical_json()
+    assert physical_kind in payload
+    assert signal in payload
+
+
+@pytest.mark.parametrize(
+    ("date", "window_kind"),
+    [
+        ("1月14日-6月24日", "month_day_range"),
+        ("今年4月份以来", "anchor_since"),
+        ("2024年10月1日至今", "calendar_since"),
+        ("连续三个月", "rolling_periods"),
+    ],
+)
+def test_generalized_temporal_dates_reach_typed_window_contract(
+    date, window_kind
+):
+    result = plan_physical(
+        _lower(f"indicator('', '', '成交量', '{date}', '', '', 'CONS=每日') > 100"),
+        default_physical_catalog(),
+    )
+
+    assert result.plan.window.kind == window_kind
+
+
+@pytest.mark.parametrize(
     "date,kind,offset",
     [("本季度", "dynamic_period", 0), ("上周", "dynamic_period", -1), ("昨日", "session_slice", 1)],
 )

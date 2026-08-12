@@ -2137,6 +2137,19 @@ def _render_temporal(
                 ),
             )
         )
+    elif plan.window.kind == "calendar_since":
+        source = source.where(
+            exp.and_(
+                exp.GTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=exp.convert(plan.window.start),
+                ),
+                exp.LTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=_latest_resource_anchor(catalog, stable_resource_id),
+                ),
+            )
+        )
     elif plan.window.kind == "boundary_sessions":
         source = source.where(
             _render_expr(
@@ -2151,6 +2164,7 @@ def _render_temporal(
                     boundary_date=plan.window.boundary_date,
                     month=plan.window.anchor_month,
                     day=plan.window.anchor_day,
+                    weekday=plan.window.weekday_start,
                 ),
                 catalog,
                 relation,
@@ -2186,7 +2200,16 @@ def _render_temporal(
                 ),
             )
         )
-    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range", "year_month_range"}:
+    elif plan.window.kind in {
+        "dynamic_period",
+        "anchor_calendar",
+        "dynamic_weekday_range",
+        "year_month_range",
+        "rolling_periods",
+        "period_since",
+        "anchor_since",
+        "month_day_range",
+    }:
         amount = plan.window.calendar_amount or 1
         unit = plan.window.calendar_unit
         if unit is None:
@@ -2204,6 +2227,14 @@ def _render_temporal(
                 if plan.window.kind == "dynamic_weekday_range"
                 else "year_month_range"
                 if plan.window.kind == "year_month_range"
+                else "rolling_periods"
+                if plan.window.kind == "rolling_periods"
+                else "period_since"
+                if plan.window.kind == "period_since"
+                else "anchor_since"
+                if plan.window.kind == "anchor_since"
+                else "month_day_range"
+                if plan.window.kind == "month_day_range"
                 else "anchor_calendar"
             ),
             unit,
@@ -2214,6 +2245,7 @@ def _render_temporal(
             plan.window.end_month,
             weekday_start=plan.window.weekday_start,
             weekday_end=plan.window.weekday_end,
+            end_day=plan.window.end_day,
         )
         bounds = exp.and_(
             exp.GTE(
@@ -2443,6 +2475,21 @@ def _render_temporal_aggregate(
                 ),
             )
         )
+    elif plan.window.kind == "calendar_since":
+        source = source.where(
+            exp.and_(
+                exp.GTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=exp.convert(plan.window.start),
+                ),
+                exp.LTE(
+                    this=exp.column("bizdate", table=stable_alias, quoted=True),
+                    expression=_latest_resource_anchor(
+                        catalog, scan.anchor_resource_id or scan.resource_id
+                    ),
+                ),
+            )
+        )
     elif plan.window.kind == "boundary_sessions":
         source = source.where(
             _render_expr(
@@ -2457,6 +2504,7 @@ def _render_temporal_aggregate(
                     boundary_date=plan.window.boundary_date,
                     month=plan.window.anchor_month,
                     day=plan.window.anchor_day,
+                    weekday=plan.window.weekday_start,
                 ),
                 catalog,
                 scan,
@@ -2485,7 +2533,16 @@ def _render_temporal_aggregate(
                 ),
             )
         )
-    elif plan.window.kind in {"dynamic_period", "anchor_calendar", "dynamic_weekday_range", "year_month_range"}:
+    elif plan.window.kind in {
+        "dynamic_period",
+        "anchor_calendar",
+        "dynamic_weekday_range",
+        "year_month_range",
+        "rolling_periods",
+        "period_since",
+        "anchor_since",
+        "month_day_range",
+    }:
         lower, upper, validity = _dynamic_date_bounds(
             catalog,
             scan.anchor_resource_id or scan.resource_id,
@@ -2496,6 +2553,14 @@ def _render_temporal_aggregate(
                 if plan.window.kind == "dynamic_weekday_range"
                 else "year_month_range"
                 if plan.window.kind == "year_month_range"
+                else "rolling_periods"
+                if plan.window.kind == "rolling_periods"
+                else "period_since"
+                if plan.window.kind == "period_since"
+                else "anchor_since"
+                if plan.window.kind == "anchor_since"
+                else "month_day_range"
+                if plan.window.kind == "month_day_range"
                 else "anchor_calendar"
             ),
             plan.window.calendar_unit,
@@ -2506,6 +2571,7 @@ def _render_temporal_aggregate(
             plan.window.end_month,
             weekday_start=plan.window.weekday_start,
             weekday_end=plan.window.weekday_end,
+            end_day=plan.window.end_day,
         )
         bounds = exp.and_(
             exp.GTE(
@@ -3251,10 +3317,49 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
                 expression.month,
                 expression.day,
             )
+        elif expression.boundary_kind == "weekday":
+            boundary, _, validity = _dynamic_date_bounds(
+                catalog,
+                calendar_resource_id,
+                "weekday_range",
+                "week",
+                1,
+                expression.offset,
+                None,
+                None,
+                weekday_start=expression.weekday,
+                weekday_end=expression.weekday,
+            )
+        elif expression.boundary_kind == "shifted_anchor":
+            boundary = _date_shift(
+                _latest_resource_anchor(catalog, calendar_resource_id),
+                expression.offset,
+                expression.unit,
+            )
+            validity = None
+        elif expression.boundary_kind == "period_end":
+            boundary = _date_shift(
+                _date_shift(
+                    _date_trunc(
+                        _latest_resource_anchor(catalog, calendar_resource_id),
+                        expression.unit,
+                    ),
+                    expression.offset + 1,
+                    expression.unit,
+                ),
+                -1,
+                "day",
+            )
+            validity = None
         else:
             boundary = exp.convert(expression.boundary_date)
             validity = None
-        comparator = exp.LT if expression.direction == "before" else exp.GT
+        comparator = {
+            "before": exp.LT,
+            "after": exp.GT,
+            "from": exp.GTE,
+            "through": exp.LTE,
+        }[expression.direction]
         query = (
             exp.select(calendar_column.copy())
             .from_(
@@ -3277,7 +3382,7 @@ def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPl
             .order_by(
                 exp.Ordered(
                     this=calendar_column.copy(),
-                    desc=expression.direction == "before",
+                    desc=expression.direction in {"before", "through"},
                 )
             )
             .limit(expression.amount)

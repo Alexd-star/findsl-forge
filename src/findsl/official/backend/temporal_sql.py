@@ -101,6 +101,15 @@ def dynamic_date_bounds(
                 f"unsupported recent calendar unit {unit}",
             )
         return lower, anchor.copy(), validity
+    if range_kind == "rolling_periods":
+        if unit not in {"month", "quarter", "year"}:
+            raise DorisBackendError(
+                "DORIS_DATE_RANGE_UNSUPPORTED",
+                f"unsupported rolling calendar unit {unit}",
+            )
+        current_start = date_trunc(anchor.copy(), unit)
+        lower = date_shift(current_start, -(amount - 1), unit)
+        return lower, anchor.copy(), validity
     if range_kind == "anchor_calendar":
         base = date_trunc(anchor.copy(), "month") if month is None else date_shift(
             date_trunc(anchor.copy(), "year"), month - 1 + offset, "month"
@@ -108,7 +117,7 @@ def dynamic_date_bounds(
         if day is not None:
             lower = date_shift(base.copy(), day - 1, "day")
             upper = lower.copy()
-            expected_month = exp.convert(month) if month is not None else exp.func("MONTH", anchor.copy())
+            expected_month = exp.func("MONTH", base.copy())
             validity = exp.EQ(this=exp.func("MONTH", lower.copy()), expression=expected_month)
         else:
             lower = base.copy()
@@ -120,7 +129,7 @@ def dynamic_date_bounds(
                 "DORIS_DATE_RANGE_UNSUPPORTED",
                 "year month range requires both month boundaries",
             )
-        year_start = date_trunc(anchor.copy(), "year")
+        year_start = date_shift(date_trunc(anchor.copy(), "year"), offset, "year")
         lower = date_shift(year_start.copy(), month - 1, "month")
         upper = date_shift(date_shift(year_start.copy(), end_month, "month"), -1, "day")
         return lower, upper, validity
@@ -136,12 +145,12 @@ def dynamic_date_bounds(
         base = (
             date_trunc(anchor.copy(), "month")
             if month is None
-            else date_shift(date_trunc(anchor.copy(), "year"), month - 1, "month")
+            else date_shift(
+                date_trunc(anchor.copy(), "year"), month - 1 + offset, "month"
+            )
         )
         lower = date_shift(base.copy(), day - 1, "day")
-        expected_month = (
-            exp.func("MONTH", anchor.copy()) if month is None else exp.convert(month)
-        )
+        expected_month = exp.func("MONTH", base.copy())
         validity = exp.EQ(
             this=exp.func("MONTH", lower.copy()), expression=expected_month
         )

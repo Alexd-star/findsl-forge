@@ -285,6 +285,7 @@ class PhysicalSessionBoundaryRange(PhysicalExpr):
     boundary_date: Optional[str] = None
     month: Optional[int] = None
     day: Optional[int] = None
+    weekday: Optional[int] = None
     type: OfficialType = BOOLEAN
     anchor_resource_id: Optional[str] = None
 
@@ -301,6 +302,7 @@ class PhysicalSessionBoundaryRange(PhysicalExpr):
             "boundary_date": self.boundary_date,
             "month": self.month,
             "day": self.day,
+            "weekday": self.weekday,
             "anchor_resource_id": self.anchor_resource_id,
             "type": self.type.to_dict(),
         }
@@ -344,6 +346,7 @@ class PhysicalTemporalWindow(CanonicalIr):
     anchor_month: Optional[int] = None
     anchor_day: Optional[int] = None
     end_month: Optional[int] = None
+    end_day: Optional[int] = None
     boundary_direction: Optional[str] = None
     boundary_kind: Optional[str] = None
     boundary_date: Optional[str] = None
@@ -351,7 +354,7 @@ class PhysicalTemporalWindow(CanonicalIr):
     weekday_end: Optional[int] = None
 
     def to_dict(self):
-        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit, "calendar_offset": self.calendar_offset, "session_offset": self.session_offset, "anchor_month": self.anchor_month, "anchor_day": self.anchor_day, "end_month": self.end_month, "boundary_direction": self.boundary_direction, "boundary_kind": self.boundary_kind, "boundary_date": self.boundary_date, "weekday_start": self.weekday_start, "weekday_end": self.weekday_end}
+        return {"kind": self.kind, "lookback_sessions": self.lookback_sessions, "start": self.start, "end": self.end, "calendar_amount": self.calendar_amount, "calendar_unit": self.calendar_unit, "calendar_offset": self.calendar_offset, "session_offset": self.session_offset, "anchor_month": self.anchor_month, "anchor_day": self.anchor_day, "end_month": self.end_month, "end_day": self.end_day, "boundary_direction": self.boundary_direction, "boundary_kind": self.boundary_kind, "boundary_date": self.boundary_date, "weekday_start": self.weekday_start, "weekday_end": self.weekday_end}
 
 
 @dataclass(frozen=True)

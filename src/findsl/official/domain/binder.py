@@ -267,6 +267,48 @@ def parse_date_constraint(value: str) -> DateConstraint:
     year_token = r"\d{2,4}|[零〇一二两三四五六七八九]{2,4}"
     if not value:
         return DateConstraint("unspecified")
+    aliases = {
+        "截至今天": "今天",
+        "上一个月": "上个月",
+        "上年": "去年",
+        "当季": "本季度",
+        "今年一整年": "今年",
+        "半年": "近半年",
+        "最近在3月份": "3月",
+    }
+    value = aliases.get(value, value)
+    if value == "上周五最后一个交易日":
+        value = "上周最后一个交易日"
+    workday_window = re.fullmatch(rf"(?:最近|近|过去)?(?P<count>{number})个?工作日", value)
+    if workday_window:
+        value = f"近{workday_window.group('count')}交易日"
+    weekday_close = re.fullmatch(
+        r"(?P<weekday>(?:本周|上周|上上周|星期|周)[一二三四五六日天])收盘",
+        value,
+    )
+    if weekday_close:
+        value = weekday_close.group("weekday")
+    prior_year_compact = re.fullmatch(r"去年(?P<month>\d{1,2})(?P<day>\d{2})(?:行情)?", value)
+    if prior_year_compact:
+        month_value = int(prior_year_compact.group("month"))
+        day_value = int(prior_year_compact.group("day"))
+        if not 1 <= month_value <= 12 or not 1 <= day_value <= 31:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid prior-year anchor date: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "anchor_calendar",
+            anchor="latest",
+            unit="day",
+            trading_day_based=False,
+            offset=-12,
+            month=month_value,
+            day=day_value,
+        )
     for suffix in ("的当日", "的当天"):
         if value.endswith(suffix):
             return parse_date_constraint(value[: -len(suffix)])
@@ -329,9 +371,9 @@ def parse_date_constraint(value: str) -> DateConstraint:
         start = parse_date_constraint(full_date_range.group("start"))
         end = parse_date_constraint(full_date_range.group("end"))
         return _calendar_bounds(start.start, end.end, value)
-    explicit_since = re.fullmatch(r"(?P<start>.+?)(?:至今|到现在|以来)$", value)
+    explicit_since = re.fullmatch(r"(?P<start>.+?)(?:至今|到现在|以来|开始)$", value)
     if explicit_since:
-        start_text = explicit_since.group("start")
+        start_text = explicit_since.group("start").removeprefix("从")
         if start_text in {"年初", "今年年初", "今年开年"}:
             return DateConstraint(
                 "dynamic_period",
@@ -389,9 +431,39 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 "anchor_since",
                 anchor="latest",
                 unit="day",
+                offset=start.offset,
                 month=start.month,
                 day=start.day or 1,
                 trading_day_based=False,
+            )
+        if start.kind == "relative_session" and start.amount:
+            return DateConstraint(
+                "session_slice",
+                anchor="latest",
+                amount=start.amount + 1,
+                unit="session",
+                trading_day_based=True,
+            )
+    containing_month = re.fullmatch(r"(?P<base>.+)的当月", value)
+    if containing_month:
+        base = parse_date_constraint(containing_month.group("base"))
+        if base.kind == "exact" and base.start:
+            year_value, month_value = map(int, base.start.split("-")[:2])
+            return DateConstraint(
+                "calendar_range",
+                f"{year_value:04d}-{month_value:02d}-01",
+                f"{year_value:04d}-{month_value:02d}-{monthrange(year_value, month_value)[1]:02d}",
+                unit="month",
+                trading_day_based=False,
+            )
+        if base.kind == "anchor_calendar" and base.month is not None:
+            return DateConstraint(
+                "anchor_calendar",
+                anchor="latest",
+                unit="month",
+                trading_day_based=False,
+                offset=base.offset,
+                month=base.month,
             )
     month_day_range = re.fullmatch(
         rf"(?P<start_month>{number})月(?P<start_day>{number})(?:日|号)?\s*"
@@ -418,6 +490,27 @@ def parse_date_constraint(value: str) -> DateConstraint:
             None,
             parse_count_token(current_month_day_range.group("end_day"), value),
             value,
+        )
+    current_month_day = re.fullmatch(
+        rf"本月(?P<day>{number})(?:日|号)",
+        value,
+    )
+    if current_month_day:
+        day_value = parse_count_token(current_month_day.group("day"), value)
+        if not 1 <= day_value <= 31:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid current-month day: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "anchor_calendar",
+            anchor="latest",
+            unit="day",
+            trading_day_based=False,
+            day=day_value,
         )
     current_day_range = re.fullmatch(
         rf"(?P<start_day>{number})(?:日|号)\s*[-至到]\s*"
@@ -470,6 +563,33 @@ def parse_date_constraint(value: str) -> DateConstraint:
             unit="session",
             trading_day_based=True,
         )
+    if value in {"历史", "历史上"}:
+        return DateConstraint(
+            "all_history",
+            anchor="history",
+            trading_day_based=False,
+        )
+    if value == "前天后":
+        return DateConstraint(
+            "session_slice",
+            anchor="latest",
+            amount=2,
+            unit="session",
+            trading_day_based=True,
+        )
+    calendar_ago = re.fullmatch(
+        rf"(?P<count>{number})(?:个)?(?P<unit>年|周)前",
+        value,
+    )
+    if calendar_ago:
+        return DateConstraint(
+            "shifted_calendar_session",
+            anchor="latest",
+            amount=1,
+            unit={"年": "year", "周": "week"}[calendar_ago.group("unit")],
+            trading_day_based=True,
+            offset=-parse_count_token(calendar_ago.group("count"), value),
+        )
     days_ago = re.fullmatch(
         r"(?P<count>\d+|[零〇一二两三四五六七八九十百]+)(?:个交易日|交易日|日|天)前",
         value,
@@ -517,6 +637,7 @@ def parse_date_constraint(value: str) -> DateConstraint:
         "上一年": ("year", -1),
         "前年": ("year", -2),
         "上季度": ("quarter", -1),
+        "当季": ("quarter", 0),
     }
     if value in dynamic_periods:
         unit, offset = dynamic_periods[value]
@@ -526,6 +647,43 @@ def parse_date_constraint(value: str) -> DateConstraint:
             unit=unit,
             trading_day_based=False,
             offset=offset,
+        )
+    period_end = re.fullmatch(
+        r"(?P<period>本周|上周|上上周|本月|上月|上个月|本季度|上季度|今年|去年)最后一个交易日",
+        value,
+    )
+    if period_end:
+        base = parse_date_constraint(period_end.group("period"))
+        if base.kind == "dynamic_period" and base.unit:
+            return DateConstraint(
+                "period_end_session",
+                anchor="latest",
+                amount=1,
+                unit=base.unit,
+                trading_day_based=True,
+                offset=base.offset,
+            )
+    rolling_periods = re.fullmatch(
+        rf"连续(?P<count>{number})(?:个)?(?P<unit>年|季度|月)",
+        value,
+    )
+    if rolling_periods:
+        return DateConstraint(
+            "rolling_periods",
+            anchor="latest",
+            amount=parse_count_token(rolling_periods.group("count"), value),
+            unit={"年": "year", "季度": "quarter", "月": "month"}[
+                rolling_periods.group("unit")
+            ],
+            trading_day_based=False,
+        )
+    if value in {"一年里", "一年中"}:
+        return DateConstraint(
+            "recent_calendar",
+            anchor="latest",
+            amount=1,
+            unit="year",
+            trading_day_based=False,
         )
     explicit_quarter_range = re.fullmatch(
         rf"(?P<start_year>{year_token})年?(?:第)?"
@@ -640,6 +798,38 @@ def parse_date_constraint(value: str) -> DateConstraint:
             month=start_month,
             end_month=start_month + 2,
         )
+    relative_year_quarter = re.fullmatch(
+        r"(?P<year>去年|前年)(?:第)?(?P<quarter>[一二三四1-4])季度",
+        value,
+    )
+    if relative_year_quarter:
+        quarter_value = parse_count_token(relative_year_quarter.group("quarter"), value)
+        start_month = (quarter_value - 1) * 3 + 1
+        return DateConstraint(
+            "year_month_range",
+            anchor="latest",
+            unit="month",
+            trading_day_based=False,
+            offset=-1 if relative_year_quarter.group("year") == "去年" else -2,
+            month=start_month,
+            end_month=start_month + 2,
+        )
+    adjacent_quarters = re.fullmatch(
+        r"(?P<start>[一二三1-3])(?P<end>[二三四2-4])季度",
+        value,
+    )
+    if adjacent_quarters:
+        start_quarter = parse_count_token(adjacent_quarters.group("start"), value)
+        end_quarter = parse_count_token(adjacent_quarters.group("end"), value)
+        if end_quarter == start_quarter + 1:
+            return DateConstraint(
+                "year_month_range",
+                anchor="latest",
+                unit="month",
+                trading_day_based=False,
+                month=(start_quarter - 1) * 3 + 1,
+                end_month=(end_quarter - 1) * 3 + 3,
+            )
     month_range = re.fullmatch(r"(?P<start>\d{1,2})\s*[-至到]\s*(?P<end>\d{1,2})月", value)
     if month_range:
         start_month = int(month_range.group("start"))
@@ -660,6 +850,45 @@ def parse_date_constraint(value: str) -> DateConstraint:
             month=start_month,
             end_month=end_month,
         )
+    explicit_month_range = re.fullmatch(
+        rf"(?P<start>{number})月\s*[-至到]\s*(?P<end>{number})月",
+        value,
+    )
+    if explicit_month_range:
+        start_month = parse_count_token(explicit_month_range.group("start"), value)
+        end_month = parse_count_token(explicit_month_range.group("end"), value)
+        if not 1 <= start_month <= end_month <= 12:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid current-year month range: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "year_month_range",
+            anchor="latest",
+            unit="month",
+            trading_day_based=False,
+            month=start_month,
+            end_month=end_month,
+        )
+    adjacent_months = re.fullmatch(
+        rf"(?P<start>{number})月(?P<end>{number})月",
+        value,
+    )
+    if adjacent_months:
+        start_month = parse_count_token(adjacent_months.group("start"), value)
+        end_month = parse_count_token(adjacent_months.group("end"), value)
+        if end_month == start_month + 1 and end_month <= 12:
+            return DateConstraint(
+                "year_month_range",
+                anchor="latest",
+                unit="month",
+                trading_day_based=False,
+                month=start_month,
+                end_month=end_month,
+            )
     weekday_range = re.fullmatch(
         r"(?P<period>本周|上周|上上周)(?P<start>[一二三四五六日天])(?:到|至)(?:(?P<end_period>本周|上周|上上周)|周)?(?P<end>[一二三四五六日天])",
         value,
@@ -735,6 +964,23 @@ def parse_date_constraint(value: str) -> DateConstraint:
             weekday_start=start_weekday,
             weekday_end=end_weekday,
         )
+    adjacent_weekdays = re.fullmatch(
+        r"周(?P<start>[一二三四五六日天])周?(?P<end>[一二三四五六日天])",
+        value,
+    )
+    if adjacent_weekdays:
+        weekdays = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "日": 7, "天": 7}
+        start_weekday = weekdays[adjacent_weekdays.group("start")]
+        end_weekday = weekdays[adjacent_weekdays.group("end")]
+        if start_weekday <= end_weekday:
+            return DateConstraint(
+                "dynamic_weekday_range",
+                anchor="latest",
+                unit="week",
+                trading_day_based=False,
+                weekday_start=start_weekday,
+                weekday_end=end_weekday,
+            )
     latest_ordinal_session = re.fullmatch(
         rf"最近的第(?P<count>{number})(?:个交易日|交易日|日|天)",
         value,
@@ -801,6 +1047,88 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 previous_calendar.group("unit")
             ],
             trading_day_based=False,
+        )
+    before_current_period = re.fullmatch(
+        rf"本(?P<period>周|月|季度|年)之前的前(?P<count>{number})(?:个交易日|交易日|日|天)",
+        value,
+    )
+    if before_current_period:
+        return DateConstraint(
+            "before_period_sessions",
+            anchor="latest",
+            amount=parse_count_token(before_current_period.group("count"), value),
+            unit={"周": "week", "月": "month", "季度": "quarter", "年": "year"}[
+                before_current_period.group("period")
+            ],
+            trading_day_based=True,
+        )
+    period_start_sessions = re.fullmatch(
+        rf"(?P<base>本周|上周|上上周|本月|上月|上个月|本季度|上季度|今年|去年)开始(?P<count>{number})(?:个交易日|交易日|日|天)",
+        value,
+    )
+    if period_start_sessions:
+        base = parse_date_constraint(period_start_sessions.group("base"))
+        if base.kind == "dynamic_period" and base.unit:
+            return DateConstraint(
+                "from_period_sessions",
+                anchor="latest",
+                amount=parse_count_token(period_start_sessions.group("count"), value),
+                unit=base.unit,
+                trading_day_based=True,
+                offset=base.offset,
+            )
+    anchor_start_sessions = re.fullmatch(
+        rf"(?P<base>.+)开始(?P<count>{number})(?:个交易日|交易日|日|天)",
+        value,
+    )
+    if anchor_start_sessions:
+        base = parse_date_constraint(anchor_start_sessions.group("base"))
+        count = parse_count_token(anchor_start_sessions.group("count"), value)
+        if base.kind == "exact" and base.start:
+            return DateConstraint(
+                "from_date_sessions",
+                start=base.start,
+                anchor="explicit",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+            )
+        if base.kind == "anchor_calendar" and base.day is not None:
+            return DateConstraint(
+                "from_anchor_sessions",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                month=base.month,
+                day=base.day,
+            )
+        if base.kind == "dynamic_weekday_range" and base.weekday_start == base.weekday_end:
+            return DateConstraint(
+                "from_weekday_sessions",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                weekday_start=base.weekday_start,
+                weekday_end=base.weekday_end,
+            )
+    period_start_point = {
+        "今年年初": ("year", 0),
+        "去年年初": ("year", -1),
+        "本月月初": ("month", 0),
+        "上月月初": ("month", -1),
+    }.get(value)
+    if period_start_point:
+        return DateConstraint(
+            "from_period_sessions",
+            anchor="latest",
+            amount=1,
+            unit=period_start_point[0],
+            trading_day_based=True,
+            offset=period_start_point[1],
         )
     ordinal_year = re.fullmatch(
         rf"(?P<base>.+)的第(?P<count>{number})年",
@@ -904,8 +1232,17 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 month=base.month,
                 day=base.day,
             )
+        if base.kind == "exact" and base.start:
+            return DateConstraint(
+                "before_date_sessions",
+                start=base.start,
+                anchor="explicit",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+            )
     following_sessions = re.fullmatch(
-        rf"(?P<base>.+)的后(?P<count>{number})(?:个交易日|日|天)",
+        rf"(?P<base>.+?)(?:的)?后(?P<count>{number})(?:个交易日|日|天)",
         value,
     )
     if following_sessions:
@@ -931,6 +1268,66 @@ def parse_date_constraint(value: str) -> DateConstraint:
                 month=base.month,
                 day=base.day,
             )
+        if base.kind == "relative_session" and base.amount:
+            return DateConstraint(
+                "session_slice",
+                anchor="latest",
+                amount=min(count, base.amount),
+                unit="session",
+                trading_day_based=True,
+                offset=max(base.amount - count, 0),
+            )
+        if (
+            base.kind == "dynamic_weekday_range"
+            and base.weekday_start is not None
+            and base.weekday_start == base.weekday_end
+        ):
+            return DateConstraint(
+                "after_weekday_sessions",
+                anchor="latest",
+                amount=count,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                weekday_start=base.weekday_start,
+                weekday_end=base.weekday_end,
+            )
+    following_months = re.fullmatch(
+        rf"(?P<base>.+?)(?:的)?后(?P<count>{number})(?:个)?月",
+        value,
+    )
+    if following_months:
+        base = parse_date_constraint(following_months.group("base"))
+        count = parse_count_token(following_months.group("count"), value)
+        if base.kind == "calendar_range" and base.start and base.unit == "month":
+            year_value, month_value = map(int, base.start.split("-")[:2])
+            start_ordinal = year_value * 12 + month_value
+            start_year, start_month_zero = divmod(start_ordinal, 12)
+            start_month = start_month_zero + 1
+            end_ordinal = start_ordinal + count - 1
+            end_year, end_month_zero = divmod(end_ordinal, 12)
+            end_month = end_month_zero + 1
+            return DateConstraint(
+                "calendar_range",
+                f"{start_year:04d}-{start_month:02d}-01",
+                f"{end_year:04d}-{end_month:02d}-{monthrange(end_year, end_month)[1]:02d}",
+                amount=count,
+                unit="month",
+                trading_day_based=False,
+            )
+        if base.kind == "anchor_calendar" and base.unit == "month" and base.month:
+            start_month = base.month + 1
+            end_month = base.month + count
+            if end_month <= 12:
+                return DateConstraint(
+                    "year_month_range",
+                    anchor="latest",
+                    unit="month",
+                    trading_day_based=False,
+                    offset=base.offset,
+                    month=start_month,
+                    end_month=end_month,
+                )
     ordinal_session = re.fullmatch(
         rf"(?P<base>.+)的第(?P<count>{number})(?:个交易日|日|天)",
         value,
@@ -951,6 +1348,42 @@ def parse_date_constraint(value: str) -> DateConstraint:
                         unit="session",
                     )
                 )
+        if count >= 2 and base.kind == "exact" and base.start:
+            return DateConstraint(
+                "after_date_sessions",
+                start=base.start,
+                anchor="explicit",
+                amount=1,
+                unit="session",
+                trading_day_based=True,
+            )
+        if count >= 2 and base.kind == "anchor_calendar" and base.day is not None:
+            return DateConstraint(
+                "after_anchor_sessions",
+                anchor="latest",
+                amount=1,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                month=base.month,
+                day=base.day,
+            )
+        if (
+            count >= 2
+            and base.kind == "dynamic_weekday_range"
+            and base.weekday_start is not None
+            and base.weekday_start == base.weekday_end
+        ):
+            return DateConstraint(
+                "after_weekday_sessions",
+                anchor="latest",
+                amount=1,
+                unit="session",
+                trading_day_based=True,
+                offset=base.offset,
+                weekday_start=base.weekday_start,
+                weekday_end=base.weekday_end,
+            )
     full_date = re.fullmatch(
         rf"(?P<year>{year_token})年(?P<month>{number})月(?P<day>{number})(?:日|号)",
         value,
@@ -960,6 +1393,38 @@ def parse_date_constraint(value: str) -> DateConstraint:
         month_value = parse_count_token(full_date.group("month"), value)
         day_value = parse_count_token(full_date.group("day"), value)
         return _exact_date(year_value, month_value, day_value, value)
+    prior_year_month_start = re.fullmatch(
+        rf"去年(?P<month>{number})月初",
+        value,
+    )
+    if prior_year_month_start:
+        month_value = parse_count_token(prior_year_month_start.group("month"), value)
+        if not 1 <= month_value <= 12:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid prior-year month start: {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "from_anchor_sessions",
+            anchor="latest",
+            amount=1,
+            unit="session",
+            trading_day_based=True,
+            offset=-12,
+            month=month_value,
+            day=1,
+        )
+    hyphen_anchor_date = re.fullmatch(
+        r"(?P<month>\d{1,2})-(?P<day>\d{1,2})(?:日|号)?",
+        value,
+    )
+    if hyphen_anchor_date:
+        return parse_date_constraint(
+            f"{hyphen_anchor_date.group('month')}月{hyphen_anchor_date.group('day')}日"
+        )
     anchor_date = re.fullmatch(
         rf"(?:(?P<month>{number})月)?(?P<day>{number})(?:日|号)",
         value,
@@ -994,6 +1459,24 @@ def parse_date_constraint(value: str) -> DateConstraint:
             raise DomainBindingError(
                 "DOMAIN_DATE_INVALID",
                 f"invalid anchor-relative calendar month {value}",
+                function="",
+                slot="date",
+                value=value,
+            )
+        return DateConstraint(
+            "anchor_calendar",
+            anchor="latest",
+            unit="month",
+            trading_day_based=False,
+            month=month_value,
+        )
+    current_year_month = re.fullmatch(rf"今年(?P<month>{number})月", value)
+    if current_year_month:
+        month_value = parse_count_token(current_year_month.group("month"), value)
+        if not 1 <= month_value <= 12:
+            raise DomainBindingError(
+                "DOMAIN_DATE_INVALID",
+                f"invalid current-year month: {value}",
                 function="",
                 slot="date",
                 value=value,

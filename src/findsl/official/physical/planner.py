@@ -4491,6 +4491,8 @@ def _normalize_external_exists_boolean(expression):
 def _lower_temporal_window(window) -> PhysicalTemporalWindow:
     if window.kind == "unspecified":
         return PhysicalTemporalWindow("all_history")
+    if window.kind == "all_history":
+        return PhysicalTemporalWindow("all_history")
     if window.kind == "relative" and window.anchor == "today":
         return PhysicalTemporalWindow("latest_session", lookback_sessions=1)
     if window.kind == "exact" and window.start and window.end:
@@ -4511,24 +4513,30 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             lookback_sessions=window.amount,
             session_offset=window.offset,
         )
-    if window.kind == "before_period_sessions" and window.amount and window.unit:
+    if window.kind in {"before_period_sessions", "from_period_sessions"} and window.amount and window.unit:
         return PhysicalTemporalWindow(
             "boundary_sessions",
             lookback_sessions=window.amount,
             calendar_unit=window.unit,
             calendar_offset=window.offset,
-            boundary_direction="before",
+            boundary_direction=(
+                "before" if window.kind == "before_period_sessions" else "from"
+            ),
             boundary_kind="period",
         )
-    if window.kind == "after_date_sessions" and window.amount and window.start:
+    if window.kind in {"before_date_sessions", "after_date_sessions", "from_date_sessions"} and window.amount and window.start:
         return PhysicalTemporalWindow(
             "boundary_sessions",
             lookback_sessions=window.amount,
-            boundary_direction="after",
+            boundary_direction={
+                "before_date_sessions": "before",
+                "after_date_sessions": "after",
+                "from_date_sessions": "from",
+            }[window.kind],
             boundary_kind="date",
             boundary_date=window.start,
         )
-    if window.kind in {"before_anchor_sessions", "after_anchor_sessions"} and window.amount:
+    if window.kind in {"before_anchor_sessions", "after_anchor_sessions", "from_anchor_sessions"} and window.amount:
         return PhysicalTemporalWindow(
             "boundary_sessions",
             lookback_sessions=window.amount,
@@ -4536,13 +4544,38 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             anchor_month=window.month,
             anchor_day=window.day,
             boundary_direction=(
-                "before" if window.kind == "before_anchor_sessions" else "after"
+                {
+                    "before_anchor_sessions": "before",
+                    "after_anchor_sessions": "after",
+                    "from_anchor_sessions": "from",
+                }[window.kind]
             ),
             boundary_kind="anchor",
+        )
+    if (
+        window.kind in {"after_weekday_sessions", "from_weekday_sessions"}
+        and window.amount
+        and window.weekday_start is not None
+    ):
+        return PhysicalTemporalWindow(
+            "boundary_sessions",
+            lookback_sessions=window.amount,
+            calendar_offset=window.offset,
+            boundary_direction=(
+                "after" if window.kind == "after_weekday_sessions" else "from"
+            ),
+            boundary_kind="weekday",
+            weekday_start=window.weekday_start,
         )
     if window.kind == "recent_calendar" and window.amount and window.unit:
         return PhysicalTemporalWindow(
             "recent_calendar",
+            calendar_amount=window.amount,
+            calendar_unit=window.unit,
+        )
+    if window.kind == "rolling_periods" and window.amount and window.unit:
+        return PhysicalTemporalWindow(
+            "rolling_periods",
             calendar_amount=window.amount,
             calendar_unit=window.unit,
         )
@@ -4571,6 +4604,7 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             "anchor_calendar",
             calendar_amount=1,
             calendar_unit=window.unit,
+            calendar_offset=window.offset,
             anchor_month=window.month,
             anchor_day=window.day,
         )
@@ -4583,8 +4617,44 @@ def _lower_temporal_window(window) -> PhysicalTemporalWindow:
             "year_month_range",
             calendar_amount=1,
             calendar_unit="month",
+            calendar_offset=window.offset,
             anchor_month=window.month,
             end_month=window.end_month,
+        )
+    if window.kind == "period_since" and window.unit:
+        return PhysicalTemporalWindow(
+            "period_since",
+            calendar_amount=1,
+            calendar_unit=window.unit,
+            calendar_offset=window.offset,
+        )
+    if window.kind == "anchor_since" and window.day is not None:
+        return PhysicalTemporalWindow(
+            "anchor_since",
+            calendar_amount=1,
+            calendar_unit="day",
+            calendar_offset=window.offset,
+            anchor_month=window.month,
+            anchor_day=window.day,
+        )
+    if (
+        window.kind == "month_day_range"
+        and window.day is not None
+        and window.end_day is not None
+    ):
+        return PhysicalTemporalWindow(
+            "month_day_range",
+            calendar_amount=1,
+            calendar_unit="day",
+            anchor_month=window.month,
+            anchor_day=window.day,
+            end_month=window.end_month,
+            end_day=window.end_day,
+        )
+    if window.kind == "calendar_since" and window.start:
+        return PhysicalTemporalWindow(
+            "calendar_since",
+            start=window.start,
         )
     if window.kind == "expression" and window.anchor:
         text = str(window.anchor).strip()
@@ -5094,40 +5164,80 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     offset=typed_date.offset,
                 )
             )
-        elif typed_date.kind == "before_period_sessions" and typed_date.amount and typed_date.unit:
+        elif typed_date.kind in {"before_period_sessions", "from_period_sessions"} and typed_date.amount and typed_date.unit:
             constraints.append(
                 PhysicalSessionBoundaryRange(
                     stable_resource_id,
                     partition_key,
-                    "before",
+                    "before" if typed_date.kind == "before_period_sessions" else "from",
                     "period",
                     typed_date.amount,
                     unit=typed_date.unit,
                     offset=typed_date.offset,
                 )
             )
-        elif typed_date.kind == "after_date_sessions" and typed_date.amount and typed_date.start:
+        elif typed_date.kind in {"shifted_calendar_session", "period_end_session"} and typed_date.amount and typed_date.unit:
             constraints.append(
                 PhysicalSessionBoundaryRange(
                     stable_resource_id,
                     partition_key,
-                    "after",
+                    "through",
+                    (
+                        "shifted_anchor"
+                        if typed_date.kind == "shifted_calendar_session"
+                        else "period_end"
+                    ),
+                    typed_date.amount,
+                    unit=typed_date.unit,
+                    offset=typed_date.offset,
+                )
+            )
+        elif typed_date.kind in {"before_date_sessions", "after_date_sessions", "from_date_sessions"} and typed_date.amount and typed_date.start:
+            constraints.append(
+                PhysicalSessionBoundaryRange(
+                    stable_resource_id,
+                    partition_key,
+                    {
+                        "before_date_sessions": "before",
+                        "after_date_sessions": "after",
+                        "from_date_sessions": "from",
+                    }[typed_date.kind],
                     "date",
                     typed_date.amount,
                     boundary_date=typed_date.start,
                 )
             )
-        elif typed_date.kind in {"before_anchor_sessions", "after_anchor_sessions"} and typed_date.amount:
+        elif typed_date.kind in {"before_anchor_sessions", "after_anchor_sessions", "from_anchor_sessions"} and typed_date.amount:
             constraints.append(
                 PhysicalSessionBoundaryRange(
                     stable_resource_id,
                     partition_key,
-                    "before" if typed_date.kind == "before_anchor_sessions" else "after",
+                    {
+                        "before_anchor_sessions": "before",
+                        "after_anchor_sessions": "after",
+                        "from_anchor_sessions": "from",
+                    }[typed_date.kind],
                     "anchor",
                     typed_date.amount,
                     offset=typed_date.offset,
                     month=typed_date.month,
                     day=typed_date.day,
+                )
+            )
+        elif (
+            typed_date.kind in {"after_weekday_sessions", "from_weekday_sessions"}
+            and typed_date.amount
+            and typed_date.weekday_start is not None
+        ):
+            constraints.append(
+                PhysicalSessionBoundaryRange(
+                    stable_resource_id,
+                    partition_key,
+                    "after" if typed_date.kind == "after_weekday_sessions" else "from",
+                    "weekday",
+                    typed_date.amount,
+                    offset=typed_date.offset,
+                    weekday=typed_date.weekday_start,
                 )
             )
         elif typed_date.kind == "dynamic_period" and typed_date.unit:
@@ -5166,6 +5276,16 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     amount=typed_date.amount,
                 )
             )
+        elif typed_date.kind == "rolling_periods" and typed_date.amount and typed_date.unit:
+            constraints.append(
+                PhysicalDynamicDateRange(
+                    stable_resource_id,
+                    partition_key,
+                    "rolling_periods",
+                    typed_date.unit,
+                    amount=typed_date.amount,
+                )
+            )
         elif typed_date.kind == "period_since" and typed_date.unit:
             constraints.append(
                 PhysicalDynamicDateRange(
@@ -5183,6 +5303,7 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     partition_key,
                     "anchor_since",
                     "day",
+                    offset=typed_date.offset,
                     month=typed_date.month,
                     day=typed_date.day,
                 )
@@ -5224,6 +5345,7 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     partition_key,
                     "year_month_range",
                     "month",
+                    offset=typed_date.offset,
                     month=typed_date.month,
                     end_month=typed_date.end_month,
                 )
@@ -5235,6 +5357,7 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     partition_key,
                     "anchor_calendar",
                     typed_date.unit,
+                    offset=typed_date.offset,
                     month=typed_date.month,
                     day=typed_date.day,
                 )
@@ -5248,6 +5371,15 @@ def _call_constraints(call: CallExpr, catalog: PhysicalCatalog, resource_id: str
                     BOOLEAN,
                 )
             )
+        elif typed_date.kind == "all_history":
+            if not (
+                str(call.binding.slots.get("agg_func", "")).strip()
+                or str(call.binding.slots.get("count_exp", "")).strip()
+            ):
+                raise PhysicalPlanningError(
+                    "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
+                    "an all-history scalar requires an explicit aggregate or temporal quantifier",
+                )
         else:
             raise PhysicalPlanningError(
                 "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",

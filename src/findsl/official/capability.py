@@ -145,9 +145,11 @@ def _remediation(status: str) -> str:
 
 
 _INTRADAY_DATE = re.compile(
-    r"(?:\d{1,2}:\d{2}|分钟|早盘|尾盘|盘前|盘后|开盘后|收盘后|集合竞价|刚刚|此时)"
+    r"(?:\d{1,2}[.:]\d{2}|分钟|早盘|尾盘|盘中|午盘|上午|下午|中午|日内|"
+    r"盘前|盘后|开盘后|收盘后|集合竞价|两点半|刚刚|此时)"
 )
 _REPORTING_DATE = re.compile(r"(?:年报|季报|半年报|一季报|三季报|报告期)")
+_LISTING_DATE = re.compile(r"(?:上市以来|上市后|上市的?第一个交易日)")
 _AMBIGUOUS_DATE = {"最近", "近期", "前期", "当前阶段"}
 _FUND_TYPES = re.compile(r"(?:ETF|LOF|基金|REITs|货币)", re.IGNORECASE)
 _CROSS_MARKET_TYPES = re.compile(r"(?:港股|美股|期货|债券|可转债)")
@@ -198,6 +200,8 @@ def _rejected_data_requirements(error, context):
             definitions.append(
                 context.data_domain_catalog.resolve("financial_statement")
             )
+        if _LISTING_DATE.search(date_value):
+            definitions.append(context.data_domain_catalog.resolve("corporate_event"))
     definitions.extend(_target_domain_definitions(error.partial.get("typed_ast"), context))
     source = str(error.partial.get("source", ""))
     if _PRIVATE_TERMS.search(source):

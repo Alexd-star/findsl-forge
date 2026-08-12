@@ -1352,3 +1352,67 @@ def test_every_calendar_bucket_requires_non_empty_gap_free_bucket_span():
     assert "MIN(`bucket_rows`.`bucket_ordinal`)" in result.sql
     assert "`temporal_metrics`.`total_buckets` > 0" in result.sql
     assert "`temporal_metrics`.`metric_value` = `temporal_metrics`.`total_buckets`" in result.sql
+
+
+@pytest.mark.parametrize(
+    ("date", "sql_signals"),
+    [
+        (
+            "2025年5月6日的前1日",
+            ("boundary_sessions", "< '2025-05-06'", "ORDER BY", "DESC", "LIMIT 1"),
+        ),
+        (
+            "本月开始12日",
+            ("boundary_sessions", ">= DATE_TRUNC", "'MONTH'", "LIMIT 12"),
+        ),
+        (
+            "上周三开始4日",
+            ("boundary_sessions", ">=", "'WEEK'", "INTERVAL '2' DAY", "LIMIT 4"),
+        ),
+        (
+            "去年一季度",
+            ("DATE_TRUNC", "'YEAR'", "INTERVAL '1' YEAR", "INTERVAL '3' MONTH"),
+        ),
+        (
+            "3年前",
+            ("boundary_sessions", "INTERVAL '3' YEAR", "<=", "DESC", "LIMIT 1"),
+        ),
+        (
+            "上周五最后一个交易日",
+            ("boundary_sessions", "DATE_TRUNC", "'WEEK'", "<=", "DESC", "LIMIT 1"),
+        ),
+    ],
+)
+def test_generalized_scalar_date_contracts_render_structural_doris_sql(
+    date, sql_signals
+):
+    result = render_doris(
+        _physical(f"indicator('', '', '成交量', '{date}', '', '', '') > 100"),
+        default_physical_catalog(),
+    )
+
+    for signal in sql_signals:
+        assert signal in result.sql
+    assert result.validation.passed is True
+
+
+@pytest.mark.parametrize(
+    ("date", "sql_signals"),
+    [
+        ("1月14日-6月24日", ("INTERVAL '13' DAY", "INTERVAL '5' MONTH", "INTERVAL '23' DAY")),
+        ("连续三个月", ("DATE_TRUNC", "'MONTH'", "INTERVAL '2' MONTH")),
+        ("今年4月份以来", ("INTERVAL '3' MONTH", "DATE_TRUNC", "'YEAR'")),
+        ("2024年10月1日至今", (">= '2024-10-01'", "MAX(")),
+    ],
+)
+def test_generalized_temporal_windows_render_explicit_bounds(date, sql_signals):
+    result = render_doris(
+        _physical(
+            f"indicator('', '', '成交量', '{date}', '', '', 'CONS=每日') > 100"
+        ),
+        default_physical_catalog(),
+    )
+
+    for signal in sql_signals:
+        assert signal in result.sql
+    assert result.validation.passed is True

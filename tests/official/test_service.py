@@ -138,3 +138,40 @@ def test_service_distinguishes_missing_intraday_data_from_ambiguous_date() -> No
         for item in intraday["data_requirements"]
     )
     assert ambiguous["status"] == "INVALID_INPUT"
+
+
+@pytest.mark.parametrize(
+    "date",
+    [
+        "盘中",
+        "今天上午",
+        "午盘",
+        "9月19日16.30",
+        "4月30日下午两点半后",
+    ],
+)
+def test_service_classifies_unloaded_intraday_phrases_as_data_requirements(date):
+    capability = OfficialCompilerService().negotiate(
+        f"indicator('', '', '成交量', '{date}', '', '', '') > 1"
+    )["capability"]
+
+    assert capability["status"] == "DATA_UNAVAILABLE"
+    assert any(
+        item["domain_id"] == "intraday_quote"
+        and item["profile"]["status"] == "not_loaded"
+        for item in capability["data_requirements"]
+    )
+
+
+@pytest.mark.parametrize("date", ["上市以来", "上市后", "上市的第一个交易日"])
+def test_service_classifies_listing_relative_dates_as_corporate_event_data(date):
+    capability = OfficialCompilerService().negotiate(
+        f"indicator('', '', '成交量', '{date}', '', '', '') > 1"
+    )["capability"]
+
+    assert capability["status"] == "DATA_UNAVAILABLE"
+    assert any(
+        item["domain_id"] == "corporate_event"
+        and item["profile"]["status"] == "not_loaded"
+        for item in capability["data_requirements"]
+    )
