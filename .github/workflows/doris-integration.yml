@@ -43,7 +43,9 @@ jobs:
       - name: Wait for Doris
         run: |
           for attempt in $(seq 1 120); do
-            if mysql --host 127.0.0.1 --port 9030 --user root --execute "SHOW BACKENDS"; then
+            backend_status="$(mysql --batch --skip-column-names --host 127.0.0.1 --port 9030 --user root --execute "SHOW BACKENDS" 2>/dev/null || true)"
+            if printf '%s\n' "$backend_status" | grep -qE '(^|[[:space:]])true([[:space:]]|$)'; then
+              printf '%s\n' "$backend_status"
               exit 0
             fi
             sleep 3
