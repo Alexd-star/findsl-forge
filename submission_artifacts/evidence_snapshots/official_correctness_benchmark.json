@@ -1,93 +1,91 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-09T12:49:38+00:00",
-  "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-  "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
+  "generated_at": "2026-08-12T11:07:35+00:00",
+  "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+  "catalog_snapshot_id": "9198d534b9430211f5d24cdf4700f95f761e9e077e5e1cf6bb03d8282b6c1dbd",
   "policy_id": "official-semantic-policy-v1",
   "dataset_snapshot_id": "official-doris-20260414-c36a993257a1e152",
-  "eligible_total": 157,
-  "matched": 157,
+  "eligible_total": 240,
+  "matched": 240,
   "mismatched": 0,
   "accuracy": 1.0,
   "wilson_95": {
-    "lower": 0.976116488566691,
-    "upper": 0.9999999999999999
+    "lower": 0.9842460800584412,
+    "upper": 1.0
   },
   "target_accuracy": 0.95,
   "internal_target_accuracy": 0.98,
   "all_12_function_families_covered": true,
   "function_family_target_met": true,
   "target_met": true,
-  "internal_target_met": false,
+  "internal_target_met": true,
   "contract": {
     "passed": true,
-    "eligible": 157,
+    "eligible": 240,
     "pending": 0,
     "errors": [],
-    "warnings": [
-      "formal benchmark has 157 eligible cases; target is at least 240"
-    ]
+    "warnings": []
   },
   "groups": {
     "function_family": {
       "belong_industry": {
-        "matched": 11,
-        "total": 11,
+        "matched": 25,
+        "total": 25,
         "accuracy": 1.0
       },
       "close_together": {
-        "matched": 11,
-        "total": 11,
+        "matched": 27,
+        "total": 27,
         "accuracy": 1.0
       },
       "cross_above": {
-        "matched": 10,
-        "total": 10,
+        "matched": 22,
+        "total": 22,
         "accuracy": 1.0
       },
       "cross_down": {
-        "matched": 11,
-        "total": 11,
+        "matched": 26,
+        "total": 26,
         "accuracy": 1.0
       },
       "golden_cross": {
-        "matched": 11,
-        "total": 11,
+        "matched": 28,
+        "total": 28,
         "accuracy": 1.0
       },
       "indicator": {
-        "matched": 121,
-        "total": 121,
+        "matched": 204,
+        "total": 204,
         "accuracy": 1.0
       },
       "position": {
-        "matched": 11,
-        "total": 11,
+        "matched": 25,
+        "total": 25,
         "accuracy": 1.0
       },
       "queryData": {
-        "matched": 11,
-        "total": 11,
+        "matched": 30,
+        "total": 30,
         "accuracy": 1.0
       },
       "rank": {
-        "matched": 21,
-        "total": 21,
+        "matched": 41,
+        "total": 41,
         "accuracy": 1.0
       },
       "record_high": {
-        "matched": 11,
-        "total": 11,
+        "matched": 26,
+        "total": 26,
         "accuracy": 1.0
       },
       "record_low": {
-        "matched": 10,
-        "total": 10,
+        "matched": 23,
+        "total": 23,
         "accuracy": 1.0
       },
       "reset": {
-        "matched": 10,
-        "total": 10,
+        "matched": 24,
+        "total": 24,
         "accuracy": 1.0
       }
     },
@@ -162,6 +160,26 @@
         "total": 3,
         "accuracy": 1.0
       },
+      "adversarial_and_or": {
+        "matched": 15,
+        "total": 15,
+        "accuracy": 1.0
+      },
+      "adversarial_intersection": {
+        "matched": 32,
+        "total": 32,
+        "accuracy": 1.0
+      },
+      "adversarial_or_and": {
+        "matched": 11,
+        "total": 11,
+        "accuracy": 1.0
+      },
+      "adversarial_union": {
+        "matched": 24,
+        "total": 24,
+        "accuracy": 1.0
+      },
       "balanced_cross_function_composition": {
         "matched": 30,
         "total": 30,
@@ -170,6 +188,11 @@
       "composite_grouped_aggregate": {
         "matched": 3,
         "total": 3,
+        "accuracy": 1.0
+      },
+      "configured_expression_template": {
+        "matched": 1,
+        "total": 1,
         "accuracy": 1.0
       },
       "controlled_expression": {
@@ -258,9 +281,9 @@
       "reference_row_count": 2247,
       "generated_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
       "reference_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
-      "compile_ms": 44.5795,
-      "generated_execute_ms": 296.69730000000015,
-      "reference_execute_ms": 83.30139999999986,
+      "compile_ms": 17.4445,
+      "generated_execute_ms": 366.01099999999985,
+      "reference_execute_ms": 98.5573999999998,
       "function_families": [
         "indicator"
       ],
@@ -275,9 +298,9 @@
       "reference_row_count": 5573,
       "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
       "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
-      "compile_ms": 30.8818,
-      "generated_execute_ms": 220.3222,
-      "reference_execute_ms": 72.37409999999977,
+      "compile_ms": 8.9033,
+      "generated_execute_ms": 226.1555999999998,
+      "reference_execute_ms": 74.73239999999981,
       "function_families": [
         "indicator"
       ],
@@ -292,9 +315,9 @@
       "reference_row_count": 2247,
       "generated_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
       "reference_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
-      "compile_ms": 33.8791,
-      "generated_execute_ms": 276.9396999999998,
-      "reference_execute_ms": 118.68480000000004,
+      "compile_ms": 9.3994,
+      "generated_execute_ms": 308.1860000000001,
+      "reference_execute_ms": 142.60930000000016,
       "function_families": [
         "indicator"
       ],
@@ -309,9 +332,9 @@
       "reference_row_count": 2247,
       "generated_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
       "reference_hash": "7cd6b76d72dcc78be4891704e6b69124064692b047be206925746c133e539d92",
-      "compile_ms": 34.5782,
-      "generated_execute_ms": 363.68089999999984,
-      "reference_execute_ms": 119.2546000000001,
+      "compile_ms": 23.6174,
+      "generated_execute_ms": 410.6421,
+      "reference_execute_ms": 112.67899999999997,
       "function_families": [
         "indicator"
       ],
@@ -326,9 +349,9 @@
       "reference_row_count": 5573,
       "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
       "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
-      "compile_ms": 35.6484,
-      "generated_execute_ms": 890.8756999999996,
-      "reference_execute_ms": 106.90379999999955,
+      "compile_ms": 16.0932,
+      "generated_execute_ms": 937.5323,
+      "reference_execute_ms": 143.42960000000016,
       "function_families": [
         "indicator"
       ],
@@ -343,9 +366,9 @@
       "reference_row_count": 16734,
       "generated_hash": "6ff347c840c26398ed2f5c7d6e889a53bf5cc9e97aed699f3502ba94ddb5b75a",
       "reference_hash": "6ff347c840c26398ed2f5c7d6e889a53bf5cc9e97aed699f3502ba94ddb5b75a",
-      "compile_ms": 34.1572,
-      "generated_execute_ms": 76.1377999999997,
-      "reference_execute_ms": 66.29949999999951,
+      "compile_ms": 19.7082,
+      "generated_execute_ms": 111.21929999999924,
+      "reference_execute_ms": 90.64629999999951,
       "function_families": [
         "indicator"
       ],
@@ -360,9 +383,9 @@
       "reference_row_count": 813,
       "generated_hash": "db6fcec21845096d71d9698667ab0f44bbba546fbf3547f2f9c1f20510b1d77d",
       "reference_hash": "db6fcec21845096d71d9698667ab0f44bbba546fbf3547f2f9c1f20510b1d77d",
-      "compile_ms": 28.4187,
-      "generated_execute_ms": 58.97379999999952,
-      "reference_execute_ms": 83.94749999999985,
+      "compile_ms": 11.735,
+      "generated_execute_ms": 64.42899999999963,
+      "reference_execute_ms": 70.97969999999964,
       "function_families": [
         "indicator"
       ],
@@ -377,9 +400,9 @@
       "reference_row_count": 55,
       "generated_hash": "14582001276a2409eaed01a059044678762c67b92b11cdc61ec0e0b195c1fbc1",
       "reference_hash": "14582001276a2409eaed01a059044678762c67b92b11cdc61ec0e0b195c1fbc1",
-      "compile_ms": 36.592,
-      "generated_execute_ms": 78.83170000000028,
-      "reference_execute_ms": 70.77320000000054,
+      "compile_ms": 12.3113,
+      "generated_execute_ms": 65.3883000000004,
+      "reference_execute_ms": 62.67669999999992,
       "function_families": [
         "indicator"
       ],
@@ -394,9 +417,9 @@
       "reference_row_count": 100,
       "generated_hash": "c6e0897952fcd65f150dbdc9d1ae2e45369ef01720768c4e2807eaf6f1cdd5a8",
       "reference_hash": "c6e0897952fcd65f150dbdc9d1ae2e45369ef01720768c4e2807eaf6f1cdd5a8",
-      "compile_ms": 38.881,
-      "generated_execute_ms": 82.70390000000027,
-      "reference_execute_ms": 54.557899999999826,
+      "compile_ms": 12.9653,
+      "generated_execute_ms": 115.99260000000022,
+      "reference_execute_ms": 82.23879999999983,
       "function_families": [
         "indicator"
       ],
@@ -411,9 +434,9 @@
       "reference_row_count": 109,
       "generated_hash": "276533e989da2f48f7a01602994a1b536845989877814e59a9254abf11020b98",
       "reference_hash": "276533e989da2f48f7a01602994a1b536845989877814e59a9254abf11020b98",
-      "compile_ms": 44.2017,
-      "generated_execute_ms": 77.8281999999999,
-      "reference_execute_ms": 51.42670000000038,
+      "compile_ms": 13.8475,
+      "generated_execute_ms": 109.62430000000012,
+      "reference_execute_ms": 65.81929999999936,
       "function_families": [
         "indicator"
       ],
@@ -428,9 +451,9 @@
       "reference_row_count": 467,
       "generated_hash": "48a1df64b5461c078574ba61c8b53f8f7dfb0fb640e735113cfdde517db5774b",
       "reference_hash": "48a1df64b5461c078574ba61c8b53f8f7dfb0fb640e735113cfdde517db5774b",
-      "compile_ms": 38.4872,
-      "generated_execute_ms": 89.45439999999927,
-      "reference_execute_ms": 53.060499999999955,
+      "compile_ms": 11.6799,
+      "generated_execute_ms": 104.20150000000028,
+      "reference_execute_ms": 70.70329999999991,
       "function_families": [
         "indicator"
       ],
@@ -445,9 +468,9 @@
       "reference_row_count": 993,
       "generated_hash": "9189933a169993e1e4b2c95b862d67d5fc16af011d1ccddac317aa55d75a826b",
       "reference_hash": "9189933a169993e1e4b2c95b862d67d5fc16af011d1ccddac317aa55d75a826b",
-      "compile_ms": 40.526,
-      "generated_execute_ms": 77.89560000000063,
-      "reference_execute_ms": 67.45529999999977,
+      "compile_ms": 13.811,
+      "generated_execute_ms": 87.53220000000006,
+      "reference_execute_ms": 65.73030000000024,
       "function_families": [
         "indicator"
       ],
@@ -462,9 +485,9 @@
       "reference_row_count": 3923,
       "generated_hash": "501848160dc184f7b9182a0b2f4e3db01c88dee1ca0d8421ae96a14118c4867a",
       "reference_hash": "501848160dc184f7b9182a0b2f4e3db01c88dee1ca0d8421ae96a14118c4867a",
-      "compile_ms": 40.0865,
-      "generated_execute_ms": 78.76499999999976,
-      "reference_execute_ms": 63.53140000000046,
+      "compile_ms": 10.9261,
+      "generated_execute_ms": 107.22109999999941,
+      "reference_execute_ms": 68.15460000000061,
       "function_families": [
         "indicator"
       ],
@@ -479,9 +502,9 @@
       "reference_row_count": 606,
       "generated_hash": "b9d756e45260118ac06dce0b614f08b54c94918b03f33b9857c9a157371956e8",
       "reference_hash": "b9d756e45260118ac06dce0b614f08b54c94918b03f33b9857c9a157371956e8",
-      "compile_ms": 35.0135,
-      "generated_execute_ms": 91.45829999999933,
-      "reference_execute_ms": 55.94840000000012,
+      "compile_ms": 14.2865,
+      "generated_execute_ms": 97.20179999999968,
+      "reference_execute_ms": 63.69049999999987,
       "function_families": [
         "indicator"
       ],
@@ -496,9 +519,9 @@
       "reference_row_count": 1392,
       "generated_hash": "1bc2f20b31f7eb7860b4d792189e3ad5821a21ee93d8c07398615ad85eada5c7",
       "reference_hash": "1bc2f20b31f7eb7860b4d792189e3ad5821a21ee93d8c07398615ad85eada5c7",
-      "compile_ms": 34.5895,
-      "generated_execute_ms": 88.48500000000037,
-      "reference_execute_ms": 60.379300000000136,
+      "compile_ms": 13.7098,
+      "generated_execute_ms": 110.65170000000002,
+      "reference_execute_ms": 60.424900000000115,
       "function_families": [
         "indicator"
       ],
@@ -513,9 +536,9 @@
       "reference_row_count": 3190,
       "generated_hash": "5135829793b8c71fb2efeafd1b93940445a7d3524a039a87a3c4335b229acad2",
       "reference_hash": "5135829793b8c71fb2efeafd1b93940445a7d3524a039a87a3c4335b229acad2",
-      "compile_ms": 35.7645,
-      "generated_execute_ms": 142.2334000000003,
-      "reference_execute_ms": 64.74279999999943,
+      "compile_ms": 16.9238,
+      "generated_execute_ms": 173.82339999999985,
+      "reference_execute_ms": 89.53130000000087,
       "function_families": [
         "indicator"
       ],
@@ -530,9 +553,9 @@
       "reference_row_count": 3875,
       "generated_hash": "28f814ec64cd273bd115abcd1530da09005ba3f305f58e83ae23d054d4d48515",
       "reference_hash": "28f814ec64cd273bd115abcd1530da09005ba3f305f58e83ae23d054d4d48515",
-      "compile_ms": 32.7894,
-      "generated_execute_ms": 112.63549999999967,
-      "reference_execute_ms": 58.798499999999976,
+      "compile_ms": 15.0968,
+      "generated_execute_ms": 133.57640000000083,
+      "reference_execute_ms": 74.90360000000074,
       "function_families": [
         "indicator"
       ],
@@ -547,9 +570,9 @@
       "reference_row_count": 306,
       "generated_hash": "8e46dd212c921e61c815b43ad5e88db1714d864dc0bb7ca21f8d045e61bb6157",
       "reference_hash": "8e46dd212c921e61c815b43ad5e88db1714d864dc0bb7ca21f8d045e61bb6157",
-      "compile_ms": 32.5659,
-      "generated_execute_ms": 83.40079999999972,
-      "reference_execute_ms": 62.11469999999952,
+      "compile_ms": 10.8409,
+      "generated_execute_ms": 96.10960000000013,
+      "reference_execute_ms": 62.83099999999919,
       "function_families": [
         "indicator"
       ],
@@ -564,9 +587,9 @@
       "reference_row_count": 574,
       "generated_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
       "reference_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
-      "compile_ms": 33.7042,
-      "generated_execute_ms": 109.96149999999983,
-      "reference_execute_ms": 77.06709999999984,
+      "compile_ms": 15.8801,
+      "generated_execute_ms": 127.16340000000059,
+      "reference_execute_ms": 91.15710000000021,
       "function_families": [
         "indicator"
       ],
@@ -581,9 +604,9 @@
       "reference_row_count": 574,
       "generated_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
       "reference_hash": "541094040213478477248957aff94e87570fadaa728a9cfb52d02ce50f1f0767",
-      "compile_ms": 35.3703,
-      "generated_execute_ms": 131.0715999999994,
-      "reference_execute_ms": 68.63609999999909,
+      "compile_ms": 15.0946,
+      "generated_execute_ms": 149.6530000000007,
+      "reference_execute_ms": 78.7785999999997,
       "function_families": [
         "indicator"
       ],
@@ -598,9 +621,9 @@
       "reference_row_count": 382,
       "generated_hash": "234aac30718805f2ffab1733cfd9971cbfbe84f4a1816353c88e7a0bfb0c486a",
       "reference_hash": "234aac30718805f2ffab1733cfd9971cbfbe84f4a1816353c88e7a0bfb0c486a",
-      "compile_ms": 36.8561,
-      "generated_execute_ms": 102.86160000000066,
-      "reference_execute_ms": 77.87189999999988,
+      "compile_ms": 14.8801,
+      "generated_execute_ms": 149.16140000000055,
+      "reference_execute_ms": 79.09000000000077,
       "function_families": [
         "indicator"
       ],
@@ -615,9 +638,9 @@
       "reference_row_count": 1478,
       "generated_hash": "31802d0d9d761f15dec93004cea87eca27775e2c07705a13bf218027cfeb21aa",
       "reference_hash": "31802d0d9d761f15dec93004cea87eca27775e2c07705a13bf218027cfeb21aa",
-      "compile_ms": 35.8583,
-      "generated_execute_ms": 130.60890000000035,
-      "reference_execute_ms": 82.84849999999899,
+      "compile_ms": 17.7703,
+      "generated_execute_ms": 155.7846000000005,
+      "reference_execute_ms": 83.15789999999978,
       "function_families": [
         "indicator"
       ],
@@ -632,9 +655,9 @@
       "reference_row_count": 5614,
       "generated_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
       "reference_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
-      "compile_ms": 32.6752,
-      "generated_execute_ms": 110.10450000000027,
-      "reference_execute_ms": 70.87200000000138,
+      "compile_ms": 11.0293,
+      "generated_execute_ms": 122.75649999999949,
+      "reference_execute_ms": 75.74870000000011,
       "function_families": [
         "indicator"
       ],
@@ -649,9 +672,9 @@
       "reference_row_count": 1718,
       "generated_hash": "44dcfcb26ac0d3e149c23de30a1f4cdafe9cc470e0df0c309271da6ca2ad72df",
       "reference_hash": "44dcfcb26ac0d3e149c23de30a1f4cdafe9cc470e0df0c309271da6ca2ad72df",
-      "compile_ms": 32.2651,
-      "generated_execute_ms": 101.67039999999972,
-      "reference_execute_ms": 61.18570000000112,
+      "compile_ms": 14.4295,
+      "generated_execute_ms": 109.67469999999935,
+      "reference_execute_ms": 62.17129999999926,
       "function_families": [
         "indicator"
       ],
@@ -666,9 +689,9 @@
       "reference_row_count": 4213,
       "generated_hash": "ba5d1dfdbb1f971607d7e7d15d310b6e089d73eb901ef409476710f8cb089805",
       "reference_hash": "ba5d1dfdbb1f971607d7e7d15d310b6e089d73eb901ef409476710f8cb089805",
-      "compile_ms": 35.791,
-      "generated_execute_ms": 121.2736999999997,
-      "reference_execute_ms": 69.36609999999988,
+      "compile_ms": 13.2132,
+      "generated_execute_ms": 130.91079999999877,
+      "reference_execute_ms": 76.39629999999897,
       "function_families": [
         "indicator"
       ],
@@ -683,9 +706,9 @@
       "reference_row_count": 28061,
       "generated_hash": "5e396e78a53a379a29137a88f536835d3650cb9fb0dc9e02f96f4c7f2b23d212",
       "reference_hash": "5e396e78a53a379a29137a88f536835d3650cb9fb0dc9e02f96f4c7f2b23d212",
-      "compile_ms": 34.3577,
-      "generated_execute_ms": 129.4499000000009,
-      "reference_execute_ms": 85.50190000000057,
+      "compile_ms": 11.3189,
+      "generated_execute_ms": 131.99760000000003,
+      "reference_execute_ms": 90.96719999999969,
       "function_families": [
         "indicator"
       ],
@@ -700,9 +723,9 @@
       "reference_row_count": 72,
       "generated_hash": "6bd5308494b9d240b42593740ec9e50d7c3e647a35345eb68f7901004de08154",
       "reference_hash": "6bd5308494b9d240b42593740ec9e50d7c3e647a35345eb68f7901004de08154",
-      "compile_ms": 32.5679,
-      "generated_execute_ms": 127.08310000000012,
-      "reference_execute_ms": 86.10499999999988,
+      "compile_ms": 16.8956,
+      "generated_execute_ms": 153.51539999999986,
+      "reference_execute_ms": 102.52570000000105,
       "function_families": [
         "indicator"
       ],
@@ -717,9 +740,9 @@
       "reference_row_count": 5269,
       "generated_hash": "e1495f490e00f4b501926c41b5dda058bd20083204c091919acc5e49b807c02c",
       "reference_hash": "e1495f490e00f4b501926c41b5dda058bd20083204c091919acc5e49b807c02c",
-      "compile_ms": 48.699,
-      "generated_execute_ms": 513.6021999999994,
-      "reference_execute_ms": 113.25800000000008,
+      "compile_ms": 25.8542,
+      "generated_execute_ms": 615.6024000000002,
+      "reference_execute_ms": 128.0178000000003,
       "function_families": [
         "indicator"
       ],
@@ -734,9 +757,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 48.9859,
-      "generated_execute_ms": 257.73940000000016,
-      "reference_execute_ms": 124.61219999999962,
+      "compile_ms": 22.7562,
+      "generated_execute_ms": 266.1106999999987,
+      "reference_execute_ms": 94.03810000000057,
       "function_families": [
         "indicator"
       ],
@@ -751,9 +774,9 @@
       "reference_row_count": 5539,
       "generated_hash": "c599c56702b3b2899c77cb45ea06815722007d374fc4d00348520cf4c25fdf25",
       "reference_hash": "c599c56702b3b2899c77cb45ea06815722007d374fc4d00348520cf4c25fdf25",
-      "compile_ms": 50.4974,
-      "generated_execute_ms": 329.5987999999994,
-      "reference_execute_ms": 85.26970000000134,
+      "compile_ms": 16.7335,
+      "generated_execute_ms": 360.6555,
+      "reference_execute_ms": 124.85299999999988,
       "function_families": [
         "indicator"
       ],
@@ -768,9 +791,9 @@
       "reference_row_count": 10,
       "generated_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
       "reference_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
-      "compile_ms": 28.4788,
-      "generated_execute_ms": 128.26570000000004,
-      "reference_execute_ms": 68.31120000000013,
+      "compile_ms": 11.6835,
+      "generated_execute_ms": 187.69920000000084,
+      "reference_execute_ms": 77.76570000000049,
       "function_families": [
         "rank"
       ],
@@ -785,9 +808,9 @@
       "reference_row_count": 562,
       "generated_hash": "a50c23ccd025569ea68cc1fa5ff0c94c04d7bc160dabbd8f7a500741e662d8c2",
       "reference_hash": "a50c23ccd025569ea68cc1fa5ff0c94c04d7bc160dabbd8f7a500741e662d8c2",
-      "compile_ms": 32.9775,
-      "generated_execute_ms": 139.46299999999923,
-      "reference_execute_ms": 76.45899999999983,
+      "compile_ms": 13.526,
+      "generated_execute_ms": 163.9628999999996,
+      "reference_execute_ms": 81.84880000000128,
       "function_families": [
         "rank"
       ],
@@ -802,9 +825,9 @@
       "reference_row_count": 10,
       "generated_hash": "b75424a2e44b3b29902e7ac80c30291cb667d392873d395929ab6ee9203dbe48",
       "reference_hash": "b75424a2e44b3b29902e7ac80c30291cb667d392873d395929ab6ee9203dbe48",
-      "compile_ms": 42.5242,
-      "generated_execute_ms": 120.4282999999986,
-      "reference_execute_ms": 77.20789999999944,
+      "compile_ms": 15.6476,
+      "generated_execute_ms": 132.01669999999945,
+      "reference_execute_ms": 86.20329999999932,
       "function_families": [
         "rank"
       ],
@@ -819,9 +842,9 @@
       "reference_row_count": 562,
       "generated_hash": "31381101f3244741355a836bdc3dda6bfd4bd4648498633571c23eabdb3adeb2",
       "reference_hash": "31381101f3244741355a836bdc3dda6bfd4bd4648498633571c23eabdb3adeb2",
-      "compile_ms": 42.0575,
-      "generated_execute_ms": 135.7739999999996,
-      "reference_execute_ms": 86.32060000000052,
+      "compile_ms": 17.2838,
+      "generated_execute_ms": 158.02720000000113,
+      "reference_execute_ms": 108.21220000000054,
       "function_families": [
         "rank"
       ],
@@ -836,9 +859,9 @@
       "reference_row_count": 10,
       "generated_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
       "reference_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
-      "compile_ms": 42.7578,
-      "generated_execute_ms": 250.6409000000005,
-      "reference_execute_ms": 89.12799999999876,
+      "compile_ms": 18.3799,
+      "generated_execute_ms": 280.95030000000065,
+      "reference_execute_ms": 91.94100000000027,
       "function_families": [
         "indicator",
         "rank"
@@ -854,9 +877,9 @@
       "reference_row_count": 867,
       "generated_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
       "reference_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
-      "compile_ms": 44.8383,
-      "generated_execute_ms": 102.93059999999876,
-      "reference_execute_ms": 65.96810000000097,
+      "compile_ms": 13.0084,
+      "generated_execute_ms": 112.21829999999855,
+      "reference_execute_ms": 80.00559999999979,
       "function_families": [
         "indicator"
       ],
@@ -871,9 +894,9 @@
       "reference_row_count": 346,
       "generated_hash": "39da3ccc95c7afaa945b58f268384b46f5c330cd19e66adb1addce92b6047933",
       "reference_hash": "39da3ccc95c7afaa945b58f268384b46f5c330cd19e66adb1addce92b6047933",
-      "compile_ms": 37.6065,
-      "generated_execute_ms": 92.73579999999981,
-      "reference_execute_ms": 54.09870000000083,
+      "compile_ms": 18.6175,
+      "generated_execute_ms": 153.52739999999977,
+      "reference_execute_ms": 74.06179999999907,
       "function_families": [
         "indicator"
       ],
@@ -888,9 +911,9 @@
       "reference_row_count": 22026,
       "generated_hash": "dae031d11f9ee69f320107b232655c9d7928b5891d60c49e1bc1cee33e32c1f0",
       "reference_hash": "dae031d11f9ee69f320107b232655c9d7928b5891d60c49e1bc1cee33e32c1f0",
-      "compile_ms": 40.721,
-      "generated_execute_ms": 103.32580000000036,
-      "reference_execute_ms": 74.64419999999983,
+      "compile_ms": 11.7153,
+      "generated_execute_ms": 128.36470000000054,
+      "reference_execute_ms": 102.40070000000046,
       "function_families": [
         "indicator"
       ],
@@ -905,9 +928,9 @@
       "reference_row_count": 4430,
       "generated_hash": "36da6416a6420e2998f8ca597538b790948ee281c1fbdeafefda6484df7c1b20",
       "reference_hash": "36da6416a6420e2998f8ca597538b790948ee281c1fbdeafefda6484df7c1b20",
-      "compile_ms": 32.0318,
-      "generated_execute_ms": 107.28510000000036,
-      "reference_execute_ms": 64.61410000000001,
+      "compile_ms": 15.6171,
+      "generated_execute_ms": 126.09870000000001,
+      "reference_execute_ms": 62.36649999999955,
       "function_families": [
         "indicator"
       ],
@@ -922,9 +945,9 @@
       "reference_row_count": 867,
       "generated_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
       "reference_hash": "25457e7fc6c207b00b73d54b93166eed89e015bab06af5adb27e789bf48ab14d",
-      "compile_ms": 30.9637,
-      "generated_execute_ms": 89.86800000000095,
-      "reference_execute_ms": 37.06539999999947,
+      "compile_ms": 11.7747,
+      "generated_execute_ms": 101.39090000000195,
+      "reference_execute_ms": 48.361100000001045,
       "function_families": [
         "indicator"
       ],
@@ -939,9 +962,9 @@
       "reference_row_count": 3,
       "generated_hash": "4652d10364c47c69b3fe91fe400bbad41a102e3b25956e3b72f4b32b882138fd",
       "reference_hash": "4652d10364c47c69b3fe91fe400bbad41a102e3b25956e3b72f4b32b882138fd",
-      "compile_ms": 32.6505,
-      "generated_execute_ms": 94.67210000000037,
-      "reference_execute_ms": 57.92369999999991,
+      "compile_ms": 13.2154,
+      "generated_execute_ms": 116.68780000000112,
+      "reference_execute_ms": 65.96130000000144,
       "function_families": [
         "indicator"
       ],
@@ -956,9 +979,9 @@
       "reference_row_count": 260,
       "generated_hash": "cf0d1895f2b2290e0af6949a36b0abca5d8e49d7efa98042de12386d2664e7af",
       "reference_hash": "cf0d1895f2b2290e0af6949a36b0abca5d8e49d7efa98042de12386d2664e7af",
-      "compile_ms": 37.0347,
-      "generated_execute_ms": 370.552,
-      "reference_execute_ms": 57.287099999999924,
+      "compile_ms": 13.9972,
+      "generated_execute_ms": 485.76509999999826,
+      "reference_execute_ms": 82.28070000000187,
       "function_families": [
         "indicator"
       ],
@@ -973,9 +996,9 @@
       "reference_row_count": 250,
       "generated_hash": "7012a08019ae5c598935417880a3ed42d6152988da92081ee5070f47d8de62cc",
       "reference_hash": "7012a08019ae5c598935417880a3ed42d6152988da92081ee5070f47d8de62cc",
-      "compile_ms": 34.7696,
-      "generated_execute_ms": 84.60589999999968,
-      "reference_execute_ms": 51.9141999999988,
+      "compile_ms": 6.9578,
+      "generated_execute_ms": 77.14899999999858,
+      "reference_execute_ms": 63.46089999999904,
       "function_families": [
         "indicator"
       ],
@@ -990,9 +1013,9 @@
       "reference_row_count": 237,
       "generated_hash": "a766e30f104c216daa0daaae5066c69a009ec01acdc10fec9aa5cba2ecebe9ec",
       "reference_hash": "a766e30f104c216daa0daaae5066c69a009ec01acdc10fec9aa5cba2ecebe9ec",
-      "compile_ms": 28.9554,
-      "generated_execute_ms": 71.79760000000002,
-      "reference_execute_ms": 54.75140000000067,
+      "compile_ms": 12.8284,
+      "generated_execute_ms": 92.59849999999759,
+      "reference_execute_ms": 63.89509999999987,
       "function_families": [
         "indicator"
       ],
@@ -1007,9 +1030,9 @@
       "reference_row_count": 1,
       "generated_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
       "reference_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
-      "compile_ms": 43.7043,
-      "generated_execute_ms": 77.41959999999892,
-      "reference_execute_ms": 66.62079999999904,
+      "compile_ms": 13.1051,
+      "generated_execute_ms": 124.42319999999896,
+      "reference_execute_ms": 73.87939999999915,
       "function_families": [
         "indicator"
       ],
@@ -1024,9 +1047,9 @@
       "reference_row_count": 1,
       "generated_hash": "d7808731798cf8c3a5d459bfeb50c8bba4191dc2425cccabe5a48c1787103a92",
       "reference_hash": "d7808731798cf8c3a5d459bfeb50c8bba4191dc2425cccabe5a48c1787103a92",
-      "compile_ms": 39.376,
-      "generated_execute_ms": 93.41169999999721,
-      "reference_execute_ms": 60.9737999999993,
+      "compile_ms": 13.8144,
+      "generated_execute_ms": 92.93810000000136,
+      "reference_execute_ms": 70.17959999999945,
       "function_families": [
         "indicator"
       ],
@@ -1041,9 +1064,9 @@
       "reference_row_count": 1,
       "generated_hash": "bbd367a14e513832c225019f900cd400de2ac42dbbda1d4972c68a3cc20e8901",
       "reference_hash": "bbd367a14e513832c225019f900cd400de2ac42dbbda1d4972c68a3cc20e8901",
-      "compile_ms": 36.0875,
-      "generated_execute_ms": 78.8977000000024,
-      "reference_execute_ms": 52.5979999999997,
+      "compile_ms": 12.5516,
+      "generated_execute_ms": 81.22330000000133,
+      "reference_execute_ms": 61.60410000000027,
       "function_families": [
         "indicator"
       ],
@@ -1058,9 +1081,9 @@
       "reference_row_count": 1896,
       "generated_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
       "reference_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
-      "compile_ms": 44.8703,
-      "generated_execute_ms": 123.41849999999965,
-      "reference_execute_ms": 68.71209999999905,
+      "compile_ms": 18.0569,
+      "generated_execute_ms": 130.99499999999864,
+      "reference_execute_ms": 109.0533000000029,
       "function_families": [
         "indicator",
         "queryData"
@@ -1076,9 +1099,9 @@
       "reference_row_count": 1872,
       "generated_hash": "0fe21b1b8c3864c6b64d8fc6ae04e54fd1a4372cbccb8b3229ca89181a85b66b",
       "reference_hash": "0fe21b1b8c3864c6b64d8fc6ae04e54fd1a4372cbccb8b3229ca89181a85b66b",
-      "compile_ms": 44.7503,
-      "generated_execute_ms": 192.6684000000023,
-      "reference_execute_ms": 95.03229999999974,
+      "compile_ms": 22.0975,
+      "generated_execute_ms": 232.88979999999881,
+      "reference_execute_ms": 128.39870000000175,
       "function_families": [
         "indicator",
         "queryData"
@@ -1094,9 +1117,9 @@
       "reference_row_count": 1,
       "generated_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
       "reference_hash": "af5adfafaa7ee4f3130d2e288d6cfbb5663fdb99c727cdb5c733f67a1a94dea0",
-      "compile_ms": 30.5628,
-      "generated_execute_ms": 97.59019999999907,
-      "reference_execute_ms": 63.99380000000221,
+      "compile_ms": 14.9011,
+      "generated_execute_ms": 89.26089999999931,
+      "reference_execute_ms": 71.35650000000027,
       "function_families": [
         "rank"
       ],
@@ -1111,9 +1134,9 @@
       "reference_row_count": 2,
       "generated_hash": "d3f20e612efc56133f28089abc3d3ec5a867c1819e1b8518d2e9e571770a5955",
       "reference_hash": "d3f20e612efc56133f28089abc3d3ec5a867c1819e1b8518d2e9e571770a5955",
-      "compile_ms": 30.3408,
-      "generated_execute_ms": 73.74770000000197,
-      "reference_execute_ms": 61.95770000000067,
+      "compile_ms": 12.6915,
+      "generated_execute_ms": 97.545199999999,
+      "reference_execute_ms": 74.93870000000058,
       "function_families": [
         "indicator"
       ],
@@ -1128,9 +1151,9 @@
       "reference_row_count": 3083,
       "generated_hash": "f0da3ff23447948581ddcf7462fed877182f365580e1efd5ebfdb7747cc06149",
       "reference_hash": "f0da3ff23447948581ddcf7462fed877182f365580e1efd5ebfdb7747cc06149",
-      "compile_ms": 41.8207,
-      "generated_execute_ms": 124.13510000000016,
-      "reference_execute_ms": 65.78030000000012,
+      "compile_ms": 12.8096,
+      "generated_execute_ms": 167.54010000000008,
+      "reference_execute_ms": 96.52699999999825,
       "function_families": [
         "indicator"
       ],
@@ -1145,9 +1168,9 @@
       "reference_row_count": 210,
       "generated_hash": "55b0dde76da407a1b3b44366e5d9f3be821102e8c07469f2ec0bfce1f454e30a",
       "reference_hash": "55b0dde76da407a1b3b44366e5d9f3be821102e8c07469f2ec0bfce1f454e30a",
-      "compile_ms": 26.8068,
-      "generated_execute_ms": 102.05219999999926,
-      "reference_execute_ms": 57.224000000001496,
+      "compile_ms": 13.448,
+      "generated_execute_ms": 143.9079999999997,
+      "reference_execute_ms": 79.932000000003,
       "function_families": [
         "indicator"
       ],
@@ -1162,9 +1185,9 @@
       "reference_row_count": 47,
       "generated_hash": "b3a12744a5b6557c5a8aadfee7c7b4ebd43fc8fbe36227694725abab146aca8d",
       "reference_hash": "b3a12744a5b6557c5a8aadfee7c7b4ebd43fc8fbe36227694725abab146aca8d",
-      "compile_ms": 35.7786,
-      "generated_execute_ms": 187.43149999999886,
-      "reference_execute_ms": 92.88789999999736,
+      "compile_ms": 16.6503,
+      "generated_execute_ms": 256.2949000000003,
+      "reference_execute_ms": 110.56890000000053,
       "function_families": [
         "indicator"
       ],
@@ -1179,9 +1202,9 @@
       "reference_row_count": 154,
       "generated_hash": "75504163331c44448757ea11bdca7802898c23864b9114919f3cbde3f667082c",
       "reference_hash": "75504163331c44448757ea11bdca7802898c23864b9114919f3cbde3f667082c",
-      "compile_ms": 31.1399,
-      "generated_execute_ms": 144.85720000000057,
-      "reference_execute_ms": 56.63720000000083,
+      "compile_ms": 9.4968,
+      "generated_execute_ms": 149.28839999999965,
+      "reference_execute_ms": 68.19989999999976,
       "function_families": [
         "indicator"
       ],
@@ -1196,9 +1219,9 @@
       "reference_row_count": 70,
       "generated_hash": "02380adfdbfb751992c14e203345c670ccc04b1be6a71410317fd231bf530088",
       "reference_hash": "02380adfdbfb751992c14e203345c670ccc04b1be6a71410317fd231bf530088",
-      "compile_ms": 33.0363,
-      "generated_execute_ms": 473.48790000000207,
-      "reference_execute_ms": 59.70139999999802,
+      "compile_ms": 12.3231,
+      "generated_execute_ms": 618.8441000000005,
+      "reference_execute_ms": 77.21599999999995,
       "function_families": [
         "indicator"
       ],
@@ -1213,9 +1236,9 @@
       "reference_row_count": 887,
       "generated_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
       "reference_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
-      "compile_ms": 46.2379,
-      "generated_execute_ms": 1768.4921000000031,
-      "reference_execute_ms": 1030.7648,
+      "compile_ms": 16.4659,
+      "generated_execute_ms": 2023.4422000000015,
+      "reference_execute_ms": 1232.185900000001,
       "function_families": [
         "cross_above"
       ],
@@ -1230,9 +1253,9 @@
       "reference_row_count": 94,
       "generated_hash": "113a0dce1459b55f77688a7fb6a5ece15646f380e2dfeaa56a32d972ce371036",
       "reference_hash": "113a0dce1459b55f77688a7fb6a5ece15646f380e2dfeaa56a32d972ce371036",
-      "compile_ms": 44.4316,
-      "generated_execute_ms": 1853.3617999999983,
-      "reference_execute_ms": 1711.5109000000004,
+      "compile_ms": 16.2957,
+      "generated_execute_ms": 2167.216,
+      "reference_execute_ms": 2001.4436000000019,
       "function_families": [
         "cross_down"
       ],
@@ -1247,9 +1270,9 @@
       "reference_row_count": 219,
       "generated_hash": "861a4978ced9629577bc221bb6dc44ac1f7990b3149787191f403096f535d241",
       "reference_hash": "861a4978ced9629577bc221bb6dc44ac1f7990b3149787191f403096f535d241",
-      "compile_ms": 30.3272,
-      "generated_execute_ms": 902.5924999999972,
-      "reference_execute_ms": 803.9918999999998,
+      "compile_ms": 15.5853,
+      "generated_execute_ms": 1165.2613999999985,
+      "reference_execute_ms": 948.3004000000008,
       "function_families": [
         "record_high"
       ],
@@ -1264,9 +1287,9 @@
       "reference_row_count": 4,
       "generated_hash": "de954d86c52cee504971a2653f3a4178ca3c78fd32d5014ed61fe45714c9244c",
       "reference_hash": "de954d86c52cee504971a2653f3a4178ca3c78fd32d5014ed61fe45714c9244c",
-      "compile_ms": 28.1626,
-      "generated_execute_ms": 1074.4450000000008,
-      "reference_execute_ms": 867.7637999999988,
+      "compile_ms": 11.9525,
+      "generated_execute_ms": 1024.6478000000004,
+      "reference_execute_ms": 914.9310000000028,
       "function_families": [
         "record_low"
       ],
@@ -1281,9 +1304,9 @@
       "reference_row_count": 887,
       "generated_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
       "reference_hash": "6f91e2687b8bac5f8f05794f24677280a9c183bdf512ad5d33cd0d73e0706f31",
-      "compile_ms": 33.9646,
-      "generated_execute_ms": 1739.1508000000008,
-      "reference_execute_ms": 1669.6304000000027,
+      "compile_ms": 18.8591,
+      "generated_execute_ms": 1969.8718,
+      "reference_execute_ms": 2071.5205999999994,
       "function_families": [
         "cross_above",
         "indicator"
@@ -1299,9 +1322,9 @@
       "reference_row_count": 3598,
       "generated_hash": "8f157d543c35a341412ca3ac8ee680e26f840bc36c27b17f2a480660f6286a70",
       "reference_hash": "8f157d543c35a341412ca3ac8ee680e26f840bc36c27b17f2a480660f6286a70",
-      "compile_ms": 38.6711,
-      "generated_execute_ms": 863.8909000000012,
-      "reference_execute_ms": 159.84630000000521,
+      "compile_ms": 14.6527,
+      "generated_execute_ms": 1051.6561999999965,
+      "reference_execute_ms": 79.73229999999631,
       "function_families": [
         "close_together"
       ],
@@ -1316,9 +1339,9 @@
       "reference_row_count": 1449,
       "generated_hash": "6ba108009783088947f56607a78e513e2086ea34e0b9db1cba78cbf16d35bfae",
       "reference_hash": "6ba108009783088947f56607a78e513e2086ea34e0b9db1cba78cbf16d35bfae",
-      "compile_ms": 32.1528,
-      "generated_execute_ms": 831.4068999999974,
-      "reference_execute_ms": 134.12459999999982,
+      "compile_ms": 14.9009,
+      "generated_execute_ms": 1013.9826999999997,
+      "reference_execute_ms": 150.9311000000011,
       "function_families": [
         "reset"
       ],
@@ -1333,9 +1356,9 @@
       "reference_row_count": 1720,
       "generated_hash": "6906846381edd2123691319979ac479b837f2167b1c323cfdfd9234777e824a8",
       "reference_hash": "6906846381edd2123691319979ac479b837f2167b1c323cfdfd9234777e824a8",
-      "compile_ms": 41.4384,
-      "generated_execute_ms": 969.721700000001,
-      "reference_execute_ms": 875.2382999999995,
+      "compile_ms": 9.921,
+      "generated_execute_ms": 1180.5731999999978,
+      "reference_execute_ms": 1056.6253000000004,
       "function_families": [
         "position"
       ],
@@ -1350,9 +1373,9 @@
       "reference_row_count": 38,
       "generated_hash": "6615b2a69472e11b218af080e82fe48f91e8d872a6832aa9d51a6ae96738ab01",
       "reference_hash": "6615b2a69472e11b218af080e82fe48f91e8d872a6832aa9d51a6ae96738ab01",
-      "compile_ms": 27.9047,
-      "generated_execute_ms": 214.1890999999987,
-      "reference_execute_ms": 57.057200000002695,
+      "compile_ms": 15.113,
+      "generated_execute_ms": 160.16720000000362,
+      "reference_execute_ms": 64.33420000000467,
       "function_families": [
         "indicator"
       ],
@@ -1367,9 +1390,9 @@
       "reference_row_count": 1663,
       "generated_hash": "bb9b06b2d8d5f252397310f8f23a38282e2c45f368b397727272531c2168c388",
       "reference_hash": "bb9b06b2d8d5f252397310f8f23a38282e2c45f368b397727272531c2168c388",
-      "compile_ms": 39.816,
-      "generated_execute_ms": 162.3330999999979,
-      "reference_execute_ms": 98.99509999999623,
+      "compile_ms": 14.9957,
+      "generated_execute_ms": 185.01769999999595,
+      "reference_execute_ms": 100.99849999999577,
       "function_families": [
         "indicator"
       ],
@@ -1384,9 +1407,9 @@
       "reference_row_count": 4854,
       "generated_hash": "229798a92bc9a5ed4d4b8707aafe6e4d2d60d350db0d44d2c3451aed02b03225",
       "reference_hash": "229798a92bc9a5ed4d4b8707aafe6e4d2d60d350db0d44d2c3451aed02b03225",
-      "compile_ms": 41.9113,
-      "generated_execute_ms": 474.57990000000194,
-      "reference_execute_ms": 350.7946000000004,
+      "compile_ms": 21.2253,
+      "generated_execute_ms": 536.8314999999982,
+      "reference_execute_ms": 437.8239999999991,
       "function_families": [
         "indicator"
       ],
@@ -1401,9 +1424,9 @@
       "reference_row_count": 5590,
       "generated_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
       "reference_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
-      "compile_ms": 48.2521,
-      "generated_execute_ms": 398.4812000000062,
-      "reference_execute_ms": 349.7869999999992,
+      "compile_ms": 27.7012,
+      "generated_execute_ms": 562.7125000000035,
+      "reference_execute_ms": 362.0659000000046,
       "function_families": [
         "indicator"
       ],
@@ -1418,9 +1441,9 @@
       "reference_row_count": 10,
       "generated_hash": "c960d7097b48efdb59142cf353f1cebd8716f82f85c2d2310ba2e12dc89b0109",
       "reference_hash": "c960d7097b48efdb59142cf353f1cebd8716f82f85c2d2310ba2e12dc89b0109",
-      "compile_ms": 35.3767,
-      "generated_execute_ms": 122.48579999999976,
-      "reference_execute_ms": 140.69429999999983,
+      "compile_ms": 16.0231,
+      "generated_execute_ms": 124.1200000000049,
+      "reference_execute_ms": 109.19540000000438,
       "function_families": [
         "rank"
       ],
@@ -1435,9 +1458,9 @@
       "reference_row_count": 5258,
       "generated_hash": "85f343a8dcfe60a2e7fa05dee278c29ec9eacd86ec6566545bfa3062932fcfe5",
       "reference_hash": "85f343a8dcfe60a2e7fa05dee278c29ec9eacd86ec6566545bfa3062932fcfe5",
-      "compile_ms": 62.8493,
-      "generated_execute_ms": 416.07490000000524,
-      "reference_execute_ms": 311.42030000000176,
+      "compile_ms": 25.3904,
+      "generated_execute_ms": 525.1548999999968,
+      "reference_execute_ms": 401.50679999999994,
       "function_families": [
         "rank"
       ],
@@ -1452,9 +1475,9 @@
       "reference_row_count": 2927,
       "generated_hash": "c78f5c968b7db273c7a641c1ffe6a40b93222b47de40f809f596029765e25302",
       "reference_hash": "c78f5c968b7db273c7a641c1ffe6a40b93222b47de40f809f596029765e25302",
-      "compile_ms": 41.7254,
-      "generated_execute_ms": 272.6341999999988,
-      "reference_execute_ms": 110.70010000000252,
+      "compile_ms": 22.7118,
+      "generated_execute_ms": 315.4205000000019,
+      "reference_execute_ms": 94.68650000000167,
       "function_families": [
         "rank"
       ],
@@ -1469,9 +1492,9 @@
       "reference_row_count": 2937,
       "generated_hash": "f25485c7ef9f464115f6474b5e0af45950f47a26b001033148825ed010a846df",
       "reference_hash": "f25485c7ef9f464115f6474b5e0af45950f47a26b001033148825ed010a846df",
-      "compile_ms": 45.1949,
-      "generated_execute_ms": 220.48909999999466,
-      "reference_execute_ms": 202.92870000000107,
+      "compile_ms": 24.3206,
+      "generated_execute_ms": 272.20290000000347,
+      "reference_execute_ms": 191.32050000000334,
       "function_families": [
         "rank"
       ],
@@ -1486,9 +1509,9 @@
       "reference_row_count": 5,
       "generated_hash": "3b6f41ae2d702cf2c71f272774f3628e881e5181788ca01460e1ce7652bd56b1",
       "reference_hash": "3b6f41ae2d702cf2c71f272774f3628e881e5181788ca01460e1ce7652bd56b1",
-      "compile_ms": 55.0535,
-      "generated_execute_ms": 270.6153000000029,
-      "reference_execute_ms": 222.62920000000008,
+      "compile_ms": 60.2062,
+      "generated_execute_ms": 247.37189999999742,
+      "reference_execute_ms": 162.94260000000094,
       "function_families": [
         "indicator",
         "rank"
@@ -1504,9 +1527,9 @@
       "reference_row_count": 80,
       "generated_hash": "be21bb2703b4522d61cf686bf2031ed1b01dc6ea4941f245cdb7457f7c38bd6b",
       "reference_hash": "be21bb2703b4522d61cf686bf2031ed1b01dc6ea4941f245cdb7457f7c38bd6b",
-      "compile_ms": 50.2865,
-      "generated_execute_ms": 209.4141000000036,
-      "reference_execute_ms": 120.60859999999707,
+      "compile_ms": 31.8289,
+      "generated_execute_ms": 230.93250000000154,
+      "reference_execute_ms": 103.9265999999941,
       "function_families": [
         "indicator",
         "rank"
@@ -1522,9 +1545,9 @@
       "reference_row_count": 278,
       "generated_hash": "229577864ffa800f62bdc15632cb47ae0a20402208948d99146cff15aadd8e25",
       "reference_hash": "229577864ffa800f62bdc15632cb47ae0a20402208948d99146cff15aadd8e25",
-      "compile_ms": 67.499,
-      "generated_execute_ms": 561.1023999999958,
-      "reference_execute_ms": 376.7697000000041,
+      "compile_ms": 37.0079,
+      "generated_execute_ms": 529.1169999999994,
+      "reference_execute_ms": 471.2773999999982,
       "function_families": [
         "indicator",
         "rank"
@@ -1540,9 +1563,9 @@
       "reference_row_count": 1,
       "generated_hash": "3f94a87a370c91b098cb00f17c9c5b1bb6d2b72056bc595248db33a4b1e20205",
       "reference_hash": "3f94a87a370c91b098cb00f17c9c5b1bb6d2b72056bc595248db33a4b1e20205",
-      "compile_ms": 69.7475,
-      "generated_execute_ms": 288.6428000000052,
-      "reference_execute_ms": 325.21900000000414,
+      "compile_ms": 58.6593,
+      "generated_execute_ms": 325.14559999999904,
+      "reference_execute_ms": 248.95349999999894,
       "function_families": [
         "indicator",
         "rank"
@@ -1558,9 +1581,9 @@
       "reference_row_count": 377,
       "generated_hash": "f4073c6375f08f073600ec541b9577143c90897268a5480c77b76bc6fd179d74",
       "reference_hash": "f4073c6375f08f073600ec541b9577143c90897268a5480c77b76bc6fd179d74",
-      "compile_ms": 49.3519,
-      "generated_execute_ms": 397.8817999999933,
-      "reference_execute_ms": 419.2928000000009,
+      "compile_ms": 35.6664,
+      "generated_execute_ms": 463.67649999999827,
+      "reference_execute_ms": 393.5208999999986,
       "function_families": [
         "rank"
       ],
@@ -1575,9 +1598,9 @@
       "reference_row_count": 48,
       "generated_hash": "03dd2001e2ce338ee1d5637d341deb5a8591b19ab919d49e91ace2abcb520382",
       "reference_hash": "03dd2001e2ce338ee1d5637d341deb5a8591b19ab919d49e91ace2abcb520382",
-      "compile_ms": 41.4588,
-      "generated_execute_ms": 364.5329000000004,
-      "reference_execute_ms": 346.16660000000365,
+      "compile_ms": 17.754,
+      "generated_execute_ms": 470.4916999999966,
+      "reference_execute_ms": 381.1751000000001,
       "function_families": [
         "indicator"
       ],
@@ -1592,9 +1615,9 @@
       "reference_row_count": 5590,
       "generated_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
       "reference_hash": "3e782de55d9ac14a78efd9987dc8368d6ca390783c2e6fd2c9e01fd8837d1171",
-      "compile_ms": 49.0198,
-      "generated_execute_ms": 488.2477000000023,
-      "reference_execute_ms": 424.28819999999945,
+      "compile_ms": 27.8329,
+      "generated_execute_ms": 558.9914999999976,
+      "reference_execute_ms": 442.6367000000013,
       "function_families": [
         "indicator"
       ],
@@ -1609,9 +1632,9 @@
       "reference_row_count": 2929,
       "generated_hash": "5ff5016c335f6ab90fab95412011490cc907faa2275a4301e632784982113850",
       "reference_hash": "5ff5016c335f6ab90fab95412011490cc907faa2275a4301e632784982113850",
-      "compile_ms": 42.9713,
-      "generated_execute_ms": 1064.6871000000006,
-      "reference_execute_ms": 984.9020999999993,
+      "compile_ms": 23.2637,
+      "generated_execute_ms": 1360.1214999999982,
+      "reference_execute_ms": 1195.3432999999975,
       "function_families": [
         "indicator"
       ],
@@ -1626,9 +1649,9 @@
       "reference_row_count": 282,
       "generated_hash": "7c95813a4b08e4d10bd8bffc290eb28c7f3e8f311ae055180235d462c8bd6954",
       "reference_hash": "7c95813a4b08e4d10bd8bffc290eb28c7f3e8f311ae055180235d462c8bd6954",
-      "compile_ms": 31.6913,
-      "generated_execute_ms": 139.7092999999998,
-      "reference_execute_ms": 77.42770000000121,
+      "compile_ms": 13.5997,
+      "generated_execute_ms": 171.64620000000497,
+      "reference_execute_ms": 75.71790000000078,
       "function_families": [
         "rank"
       ],
@@ -1643,9 +1666,9 @@
       "reference_row_count": 6,
       "generated_hash": "b4a0a57a0915546aa633ab1d2405ac6579e16c5da50beb27d33a19846bc54fd6",
       "reference_hash": "b4a0a57a0915546aa633ab1d2405ac6579e16c5da50beb27d33a19846bc54fd6",
-      "compile_ms": 59.2356,
-      "generated_execute_ms": 235.72019999999583,
-      "reference_execute_ms": 124.21959999999643,
+      "compile_ms": 26.1511,
+      "generated_execute_ms": 255.23580000000123,
+      "reference_execute_ms": 169.99870000000072,
       "function_families": [
         "indicator",
         "rank"
@@ -1661,9 +1684,9 @@
       "reference_row_count": 3,
       "generated_hash": "50cd01f4aa16457419409affee28e9ae51101772be70b1e779a3a8e41b73827f",
       "reference_hash": "50cd01f4aa16457419409affee28e9ae51101772be70b1e779a3a8e41b73827f",
-      "compile_ms": 54.5893,
-      "generated_execute_ms": 334.08810000000244,
-      "reference_execute_ms": 61.943299999995816,
+      "compile_ms": 40.3914,
+      "generated_execute_ms": 346.58480000000225,
+      "reference_execute_ms": 83.78539999999646,
       "function_families": [
         "indicator",
         "rank"
@@ -1679,9 +1702,9 @@
       "reference_row_count": 2633,
       "generated_hash": "e04ca8f13d03e8267aba75999596a898e7453800cb452da51c832d7e9d839ae5",
       "reference_hash": "e04ca8f13d03e8267aba75999596a898e7453800cb452da51c832d7e9d839ae5",
-      "compile_ms": 41.4242,
-      "generated_execute_ms": 323.3153999999985,
-      "reference_execute_ms": 100.51319999999464,
+      "compile_ms": 22.1423,
+      "generated_execute_ms": 354.50880000000495,
+      "reference_execute_ms": 130.773700000006,
       "function_families": [
         "indicator"
       ],
@@ -1696,9 +1719,9 @@
       "reference_row_count": 5575,
       "generated_hash": "57dd258d03cbfc5a17823c5fe44c40a4ff505ef547c94ea2a001212bad69043e",
       "reference_hash": "57dd258d03cbfc5a17823c5fe44c40a4ff505ef547c94ea2a001212bad69043e",
-      "compile_ms": 45.573,
-      "generated_execute_ms": 401.8250999999964,
-      "reference_execute_ms": 113.32509999999729,
+      "compile_ms": 31.1594,
+      "generated_execute_ms": 487.5496999999953,
+      "reference_execute_ms": 107.92819999999637,
       "function_families": [
         "indicator"
       ],
@@ -1713,9 +1736,9 @@
       "reference_row_count": 5115,
       "generated_hash": "f004caae55ec77763079be42b4e65c773b78942d863cae99807fc9dd12de286e",
       "reference_hash": "f004caae55ec77763079be42b4e65c773b78942d863cae99807fc9dd12de286e",
-      "compile_ms": 44.4679,
-      "generated_execute_ms": 232.96159999999588,
-      "reference_execute_ms": 129.4877999999997,
+      "compile_ms": 20.1777,
+      "generated_execute_ms": 349.20160000000067,
+      "reference_execute_ms": 187.31749999999892,
       "function_families": [
         "indicator",
         "queryData"
@@ -1731,9 +1754,9 @@
       "reference_row_count": 2888,
       "generated_hash": "6d8712ccf7e37d3bebc1e3705ea82489dc89b8adcb65fa06b958464ae9bde3f8",
       "reference_hash": "6d8712ccf7e37d3bebc1e3705ea82489dc89b8adcb65fa06b958464ae9bde3f8",
-      "compile_ms": 56.2042,
-      "generated_execute_ms": 297.8706000000031,
-      "reference_execute_ms": 150.55930000000473,
+      "compile_ms": 29.3243,
+      "generated_execute_ms": 404.7529000000054,
+      "reference_execute_ms": 228.276699999995,
       "function_families": [
         "indicator",
         "rank"
@@ -1749,9 +1772,9 @@
       "reference_row_count": 1196,
       "generated_hash": "0322cf020c7858f95aedac2944bb3230f400252af1c719408a7b11887807ee31",
       "reference_hash": "0322cf020c7858f95aedac2944bb3230f400252af1c719408a7b11887807ee31",
-      "compile_ms": 51.5848,
-      "generated_execute_ms": 940.3588999999997,
-      "reference_execute_ms": 826.2041999999994,
+      "compile_ms": 25.2294,
+      "generated_execute_ms": 1183.466899999999,
+      "reference_execute_ms": 963.9787999999996,
       "function_families": [
         "indicator",
         "record_high"
@@ -1767,9 +1790,9 @@
       "reference_row_count": 4453,
       "generated_hash": "73043bb242ec15faed7cb9424d1453fa1f151954223524366d392c93655c1cd0",
       "reference_hash": "73043bb242ec15faed7cb9424d1453fa1f151954223524366d392c93655c1cd0",
-      "compile_ms": 62.2996,
-      "generated_execute_ms": 2429.123000000004,
-      "reference_execute_ms": 1840.4148999999989,
+      "compile_ms": 37.3561,
+      "generated_execute_ms": 2857.2547999999997,
+      "reference_execute_ms": 2395.1020999999882,
       "function_families": [
         "cross_down",
         "indicator"
@@ -1785,9 +1808,9 @@
       "reference_row_count": 78,
       "generated_hash": "eac25d0dbcdbd8f6de793b32260b5d4e72656d796f493b10d925e09c12cfba62",
       "reference_hash": "eac25d0dbcdbd8f6de793b32260b5d4e72656d796f493b10d925e09c12cfba62",
-      "compile_ms": 71.366,
-      "generated_execute_ms": 1198.0707999999963,
-      "reference_execute_ms": 922.1379999999967,
+      "compile_ms": 36.2475,
+      "generated_execute_ms": 1514.7108999999973,
+      "reference_execute_ms": 1200.1475999999939,
       "function_families": [
         "indicator",
         "position",
@@ -1804,9 +1827,9 @@
       "reference_row_count": 442,
       "generated_hash": "cd2e75058f4712759976a9c9482c18e82bc723714984543d618103b8d2b77fb0",
       "reference_hash": "cd2e75058f4712759976a9c9482c18e82bc723714984543d618103b8d2b77fb0",
-      "compile_ms": 71.9298,
-      "generated_execute_ms": 1893.4227000000021,
-      "reference_execute_ms": 1764.8933000000113,
+      "compile_ms": 89.8124,
+      "generated_execute_ms": 2590.1912000000066,
+      "reference_execute_ms": 2149.4970000000108,
       "function_families": [
         "cross_above",
         "cross_down",
@@ -1823,9 +1846,9 @@
       "reference_row_count": 299,
       "generated_hash": "595165140ebc7f352d6f75fba126fcdad193d8ce1948de3db85055ed7aa9d46f",
       "reference_hash": "595165140ebc7f352d6f75fba126fcdad193d8ce1948de3db85055ed7aa9d46f",
-      "compile_ms": 40.4965,
-      "generated_execute_ms": 887.4239000000017,
-      "reference_execute_ms": 767.8611999999987,
+      "compile_ms": 23.6623,
+      "generated_execute_ms": 1062.6405999999947,
+      "reference_execute_ms": 861.6865000000047,
       "function_families": [
         "indicator",
         "record_high"
@@ -1841,9 +1864,9 @@
       "reference_row_count": 2933,
       "generated_hash": "96914e285eac12f4db6edbddaf3ea6b442150e54615997eeefe9f62c0128988d",
       "reference_hash": "96914e285eac12f4db6edbddaf3ea6b442150e54615997eeefe9f62c0128988d",
-      "compile_ms": 38.5055,
-      "generated_execute_ms": 187.64519999999152,
-      "reference_execute_ms": 85.55690000000027,
+      "compile_ms": 14.3837,
+      "generated_execute_ms": 227.4261000000024,
+      "reference_execute_ms": 98.20429999999192,
       "function_families": [
         "indicator"
       ],
@@ -1858,9 +1881,9 @@
       "reference_row_count": 5562,
       "generated_hash": "19e58437a311a96257687f8cc73e1c2f64b55b65e5f4b9dce89d2ade49c98f19",
       "reference_hash": "19e58437a311a96257687f8cc73e1c2f64b55b65e5f4b9dce89d2ade49c98f19",
-      "compile_ms": 34.7586,
-      "generated_execute_ms": 665.1542999999975,
-      "reference_execute_ms": 91.08410000000333,
+      "compile_ms": 14.5938,
+      "generated_execute_ms": 864.4807000000014,
+      "reference_execute_ms": 86.49810000000002,
       "function_families": [
         "indicator"
       ],
@@ -1875,9 +1898,9 @@
       "reference_row_count": 5556,
       "generated_hash": "ede4e1804c6d13953f95b5c7c2f973a15a7a5d740b14d9cd11ddea653f4cc2da",
       "reference_hash": "ede4e1804c6d13953f95b5c7c2f973a15a7a5d740b14d9cd11ddea653f4cc2da",
-      "compile_ms": 38.2173,
-      "generated_execute_ms": 212.44190000000174,
-      "reference_execute_ms": 102.54299999999716,
+      "compile_ms": 19.4435,
+      "generated_execute_ms": 258.0212000000017,
+      "reference_execute_ms": 94.57039999999495,
       "function_families": [
         "indicator"
       ],
@@ -1892,9 +1915,9 @@
       "reference_row_count": 5587,
       "generated_hash": "1c2794ce71a5ff25dc96983aef9b334ba6058c41b3c461f113be6ecd6415b6e5",
       "reference_hash": "1c2794ce71a5ff25dc96983aef9b334ba6058c41b3c461f113be6ecd6415b6e5",
-      "compile_ms": 31.5612,
-      "generated_execute_ms": 287.16350000000546,
-      "reference_execute_ms": 108.19309999999405,
+      "compile_ms": 15.7836,
+      "generated_execute_ms": 280.8830000000029,
+      "reference_execute_ms": 92.21389999999019,
       "function_families": [
         "indicator"
       ],
@@ -1909,9 +1932,9 @@
       "reference_row_count": 5537,
       "generated_hash": "96ee119012c01d59d77b975ac04c6051c92dc07817ca1c8af172d680798c7ab4",
       "reference_hash": "96ee119012c01d59d77b975ac04c6051c92dc07817ca1c8af172d680798c7ab4",
-      "compile_ms": 46.1882,
-      "generated_execute_ms": 341.0137999999989,
-      "reference_execute_ms": 136.77119999999832,
+      "compile_ms": 17.2029,
+      "generated_execute_ms": 403.23340000000485,
+      "reference_execute_ms": 115.19439999999292,
       "function_families": [
         "indicator"
       ],
@@ -1926,9 +1949,9 @@
       "reference_row_count": 5566,
       "generated_hash": "4c4bcec837d033308b56aa119507daa7ecc2e66f9b339cdfb68454225ebb552b",
       "reference_hash": "4c4bcec837d033308b56aa119507daa7ecc2e66f9b339cdfb68454225ebb552b",
-      "compile_ms": 44.2262,
-      "generated_execute_ms": 144.94999999999436,
-      "reference_execute_ms": 63.52859999999794,
+      "compile_ms": 8.522,
+      "generated_execute_ms": 128.5519999999991,
+      "reference_execute_ms": 96.66090000000338,
       "function_families": [
         "indicator"
       ],
@@ -1943,9 +1966,9 @@
       "reference_row_count": 4870,
       "generated_hash": "5d7b538b1d1e9dd18dc0275769c2d60b6b3a756249403dd23f12e9e2f3032637",
       "reference_hash": "5d7b538b1d1e9dd18dc0275769c2d60b6b3a756249403dd23f12e9e2f3032637",
-      "compile_ms": 40.6056,
-      "generated_execute_ms": 1988.0777999999991,
-      "reference_execute_ms": 1239.0443999999975,
+      "compile_ms": 13.5119,
+      "generated_execute_ms": 2491.7063000000044,
+      "reference_execute_ms": 1182.3529999999919,
       "function_families": [
         "golden_cross"
       ],
@@ -1960,9 +1983,9 @@
       "reference_row_count": 1659,
       "generated_hash": "960e8c0bb87c8a6183f413f41b41045594f629f933c95b7235eaf284839ce8fb",
       "reference_hash": "960e8c0bb87c8a6183f413f41b41045594f629f933c95b7235eaf284839ce8fb",
-      "compile_ms": 42.8466,
-      "generated_execute_ms": 2125.9766999999956,
-      "reference_execute_ms": 920.2037000000018,
+      "compile_ms": 23.7484,
+      "generated_execute_ms": 2339.1554000000096,
+      "reference_execute_ms": 988.1698000000085,
       "function_families": [
         "golden_cross"
       ],
@@ -1977,9 +2000,9 @@
       "reference_row_count": 5570,
       "generated_hash": "893382a3f7f85db9a9970d28203be0a0e017bc25effb2b8d4b5a3a493b5ee8cc",
       "reference_hash": "893382a3f7f85db9a9970d28203be0a0e017bc25effb2b8d4b5a3a493b5ee8cc",
-      "compile_ms": 43.5563,
-      "generated_execute_ms": 1894.0550000000087,
-      "reference_execute_ms": 94.42160000000399,
+      "compile_ms": 29.1952,
+      "generated_execute_ms": 2491.613300000012,
+      "reference_execute_ms": 90.20219999999313,
       "function_families": [
         "record_high"
       ],
@@ -1994,9 +2017,9 @@
       "reference_row_count": 57,
       "generated_hash": "318aac595662bce20c6ae78681b084a7612a5e1050ddb9dac14ceb65c69dac4f",
       "reference_hash": "318aac595662bce20c6ae78681b084a7612a5e1050ddb9dac14ceb65c69dac4f",
-      "compile_ms": 43.0886,
-      "generated_execute_ms": 1011.4360999999974,
-      "reference_execute_ms": 754.2938999999933,
+      "compile_ms": 16.3304,
+      "generated_execute_ms": 1372.0619999999997,
+      "reference_execute_ms": 934.0333000000101,
       "function_families": [
         "indicator",
         "record_high"
@@ -2012,9 +2035,9 @@
       "reference_row_count": 768,
       "generated_hash": "d43fd5596ac1bf18007e02381cfed6a9b9ce38788ebfa93ea792f7e1833d7866",
       "reference_hash": "d43fd5596ac1bf18007e02381cfed6a9b9ce38788ebfa93ea792f7e1833d7866",
-      "compile_ms": 40.2219,
-      "generated_execute_ms": 1798.1601000000041,
-      "reference_execute_ms": 1647.3505999999957,
+      "compile_ms": 17.856,
+      "generated_execute_ms": 2101.5792000000033,
+      "reference_execute_ms": 2098.2383999999997,
       "function_families": [
         "cross_above"
       ],
@@ -2029,9 +2052,9 @@
       "reference_row_count": 5547,
       "generated_hash": "3344053b2b2e61ccb3aee351a084403447c0466be72c0bf9df19a2ea9b96b584",
       "reference_hash": "3344053b2b2e61ccb3aee351a084403447c0466be72c0bf9df19a2ea9b96b584",
-      "compile_ms": 54.8159,
-      "generated_execute_ms": 2865.7635,
-      "reference_execute_ms": 1583.4501000000073,
+      "compile_ms": 21.479,
+      "generated_execute_ms": 3412.0486000000055,
+      "reference_execute_ms": 2014.3369999999977,
       "function_families": [
         "cross_down"
       ],
@@ -2046,9 +2069,9 @@
       "reference_row_count": 919,
       "generated_hash": "d21ffed1287c3dee0db45d36cb1a0679fa2206bd2391edd61c263537a1ebf88d",
       "reference_hash": "d21ffed1287c3dee0db45d36cb1a0679fa2206bd2391edd61c263537a1ebf88d",
-      "compile_ms": 29.6567,
-      "generated_execute_ms": 880.6272000000064,
-      "reference_execute_ms": 715.062599999996,
+      "compile_ms": 12.8267,
+      "generated_execute_ms": 978.0112000000116,
+      "reference_execute_ms": 883.2538999999997,
       "function_families": [
         "record_low"
       ],
@@ -2063,9 +2086,9 @@
       "reference_row_count": 797,
       "generated_hash": "e40dfc2f55eaf3bc48fa6a0d0286d313c6ceef735e0e6c641b4aa641d69c8af3",
       "reference_hash": "e40dfc2f55eaf3bc48fa6a0d0286d313c6ceef735e0e6c641b4aa641d69c8af3",
-      "compile_ms": 69.403,
-      "generated_execute_ms": 1005.5253000000022,
-      "reference_execute_ms": 810.9424999999959,
+      "compile_ms": 18.1901,
+      "generated_execute_ms": 1260.672800000009,
+      "reference_execute_ms": 992.9187000000042,
       "function_families": [
         "position"
       ],
@@ -2080,9 +2103,9 @@
       "reference_row_count": 3018,
       "generated_hash": "50e1cd08dd2a7f7c37723d40c0228bb7e62dc04c2a19e36cf46b6c86eb5b4787",
       "reference_hash": "50e1cd08dd2a7f7c37723d40c0228bb7e62dc04c2a19e36cf46b6c86eb5b4787",
-      "compile_ms": 47.9649,
-      "generated_execute_ms": 905.950599999997,
-      "reference_execute_ms": 123.15230000000099,
+      "compile_ms": 17.2739,
+      "generated_execute_ms": 1054.7123999999997,
+      "reference_execute_ms": 136.76610000000267,
       "function_families": [
         "close_together"
       ],
@@ -2097,9 +2120,9 @@
       "reference_row_count": 2855,
       "generated_hash": "37df470d0a4b99c35c3c84517f484f63eba5e2a8b9dbc65c7c170b3a93ff17d5",
       "reference_hash": "37df470d0a4b99c35c3c84517f484f63eba5e2a8b9dbc65c7c170b3a93ff17d5",
-      "compile_ms": 35.222,
-      "generated_execute_ms": 864.1724000000011,
-      "reference_execute_ms": 127.53620000000865,
+      "compile_ms": 14.4141,
+      "generated_execute_ms": 1086.3244999999893,
+      "reference_execute_ms": 108.91879999999787,
       "function_families": [
         "reset"
       ],
@@ -2114,9 +2137,9 @@
       "reference_row_count": 1071,
       "generated_hash": "0e7299981f51870b3351d55ef2b06e05aef5c7ce3c9649a91e81bfdbdf922770",
       "reference_hash": "0e7299981f51870b3351d55ef2b06e05aef5c7ce3c9649a91e81bfdbdf922770",
-      "compile_ms": 54.9576,
-      "generated_execute_ms": 1179.3229999999967,
-      "reference_execute_ms": 941.3384000000065,
+      "compile_ms": 42.4109,
+      "generated_execute_ms": 1571.9902999999958,
+      "reference_execute_ms": 1198.4156999999982,
       "function_families": [
         "position"
       ],
@@ -2131,9 +2154,9 @@
       "reference_row_count": 4551,
       "generated_hash": "3827954a63a9c058d7ad4f42eb3d00f98361fbf379e1d4746c41e00f28e93a77",
       "reference_hash": "3827954a63a9c058d7ad4f42eb3d00f98361fbf379e1d4746c41e00f28e93a77",
-      "compile_ms": 41.535,
-      "generated_execute_ms": 1035.6804000000038,
-      "reference_execute_ms": 867.4883000000051,
+      "compile_ms": 18.3765,
+      "generated_execute_ms": 1081.907700000002,
+      "reference_execute_ms": 997.2805000000022,
       "function_families": [
         "record_low"
       ],
@@ -2148,9 +2171,9 @@
       "reference_row_count": 5444,
       "generated_hash": "c4178a10ad81c701e5a8f9f4ea3c26ffa85f63855ddc3f16ca36ccec4305a643",
       "reference_hash": "c4178a10ad81c701e5a8f9f4ea3c26ffa85f63855ddc3f16ca36ccec4305a643",
-      "compile_ms": 47.8335,
-      "generated_execute_ms": 1055.052500000002,
-      "reference_execute_ms": 1057.5646000000063,
+      "compile_ms": 29.8213,
+      "generated_execute_ms": 1317.2235999999912,
+      "reference_execute_ms": 1130.4731000000033,
       "function_families": [
         "close_together"
       ],
@@ -2165,9 +2188,9 @@
       "reference_row_count": 3250,
       "generated_hash": "892ea0304355fa3bac444adeef724e234402dea25312328a61b022339f11fe62",
       "reference_hash": "892ea0304355fa3bac444adeef724e234402dea25312328a61b022339f11fe62",
-      "compile_ms": 45.9376,
-      "generated_execute_ms": 994.486699999996,
-      "reference_execute_ms": 1003.4596999999934,
+      "compile_ms": 49.0553,
+      "generated_execute_ms": 1163.1739000000039,
+      "reference_execute_ms": 1169.9086999999936,
       "function_families": [
         "reset"
       ],
@@ -2182,9 +2205,9 @@
       "reference_row_count": 304,
       "generated_hash": "6c80cd508d55732451354a3e44b1f14c6a1dfdb4528884949f71afaf7c6a57d4",
       "reference_hash": "6c80cd508d55732451354a3e44b1f14c6a1dfdb4528884949f71afaf7c6a57d4",
-      "compile_ms": 32.8923,
-      "generated_execute_ms": 787.6490999999959,
-      "reference_execute_ms": 811.8922000000026,
+      "compile_ms": 13.5436,
+      "generated_execute_ms": 942.2026000000017,
+      "reference_execute_ms": 934.445199999999,
       "function_families": [
         "record_low"
       ],
@@ -2199,9 +2222,9 @@
       "reference_row_count": 837,
       "generated_hash": "099f207b0d6fdd0041bfb629372a3cdbcc52711a0ed4b0158e51ed9b12e0b188",
       "reference_hash": "099f207b0d6fdd0041bfb629372a3cdbcc52711a0ed4b0158e51ed9b12e0b188",
-      "compile_ms": 42.3322,
-      "generated_execute_ms": 924.239600000007,
-      "reference_execute_ms": 764.1725000000008,
+      "compile_ms": 18.4654,
+      "generated_execute_ms": 1042.8442000000045,
+      "reference_execute_ms": 870.2158000000111,
       "function_families": [
         "record_high",
         "record_low"
@@ -2217,9 +2240,9 @@
       "reference_row_count": 1,
       "generated_hash": "a9fbcb50f1f05c6ee63751f1b65f37273008adc63c59a488efeec8b0c71854e3",
       "reference_hash": "a9fbcb50f1f05c6ee63751f1b65f37273008adc63c59a488efeec8b0c71854e3",
-      "compile_ms": 40.4121,
-      "generated_execute_ms": 475.6702999999902,
-      "reference_execute_ms": 472.95139999999947,
+      "compile_ms": 27.1905,
+      "generated_execute_ms": 548.0795,
+      "reference_execute_ms": 522.7074999999957,
       "function_families": [
         "cross_above"
       ],
@@ -2234,9 +2257,9 @@
       "reference_row_count": 85,
       "generated_hash": "552ebd2638b2d194b9622136909b19c1d2484327cd83c42081d4c7564ff06370",
       "reference_hash": "552ebd2638b2d194b9622136909b19c1d2484327cd83c42081d4c7564ff06370",
-      "compile_ms": 59.8763,
-      "generated_execute_ms": 1530.9562999999998,
-      "reference_execute_ms": 103.04330000001016,
+      "compile_ms": 43.3282,
+      "generated_execute_ms": 1943.280400000006,
+      "reference_execute_ms": 201.57389999999964,
       "function_families": [
         "cross_above",
         "cross_down",
@@ -2253,9 +2276,9 @@
       "reference_row_count": 35,
       "generated_hash": "b5c13cd01c4695cfbf7dc19e41eebbd07d61f035f0a0f49e6a14c71e7c2d5802",
       "reference_hash": "b5c13cd01c4695cfbf7dc19e41eebbd07d61f035f0a0f49e6a14c71e7c2d5802",
-      "compile_ms": 31.6102,
-      "generated_execute_ms": 95.71210000000008,
-      "reference_execute_ms": 57.38990000000399,
+      "compile_ms": 17.0973,
+      "generated_execute_ms": 149.2000999999874,
+      "reference_execute_ms": 65.74830000000986,
       "function_families": [
         "indicator"
       ],
@@ -2270,9 +2293,9 @@
       "reference_row_count": 3513,
       "generated_hash": "06757c03484a0ac8c2042c403e32882efcb38bfbb4d89d17cc87d460ba7fed5c",
       "reference_hash": "06757c03484a0ac8c2042c403e32882efcb38bfbb4d89d17cc87d460ba7fed5c",
-      "compile_ms": 43.9678,
-      "generated_execute_ms": 853.0899000000005,
-      "reference_execute_ms": 668.5733999999997,
+      "compile_ms": 21.4238,
+      "generated_execute_ms": 1034.2314000000101,
+      "reference_execute_ms": 818.2972999999834,
       "function_families": [
         "position"
       ],
@@ -2287,9 +2310,9 @@
       "reference_row_count": 34,
       "generated_hash": "23b6258334156bc4663ebf42237831d867b47cd35c2ccb1b004ddfe4ba2b5080",
       "reference_hash": "23b6258334156bc4663ebf42237831d867b47cd35c2ccb1b004ddfe4ba2b5080",
-      "compile_ms": 35.6461,
-      "generated_execute_ms": 135.88299999999265,
-      "reference_execute_ms": 106.6521999999992,
+      "compile_ms": 24.1287,
+      "generated_execute_ms": 144.50060000001486,
+      "reference_execute_ms": 106.49719999997842,
       "function_families": [
         "indicator",
         "record_high"
@@ -2305,9 +2328,9 @@
       "reference_row_count": 2,
       "generated_hash": "f0d5bae8142c78479fa542d1eb73b893c1cee62a7d07203b8988534dcf37e2e6",
       "reference_hash": "f0d5bae8142c78479fa542d1eb73b893c1cee62a7d07203b8988534dcf37e2e6",
-      "compile_ms": 73.2391,
-      "generated_execute_ms": 224.3601000000126,
-      "reference_execute_ms": 117.43579999999554,
+      "compile_ms": 46.5109,
+      "generated_execute_ms": 237.07780000000866,
+      "reference_execute_ms": 160.05910000001222,
       "function_families": [
         "indicator",
         "position",
@@ -2324,9 +2347,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 42.3227,
-      "generated_execute_ms": 73.73980000001268,
-      "reference_execute_ms": 62.97119999999268,
+      "compile_ms": 15.3255,
+      "generated_execute_ms": 98.39009999998893,
+      "reference_execute_ms": 87.10759999999595,
       "function_families": [
         "indicator"
       ],
@@ -2341,9 +2364,9 @@
       "reference_row_count": 61,
       "generated_hash": "d6577ce44e963ef53f90e43ca4be28b54a900a0e91fbb8f77cc505b4c1f340ff",
       "reference_hash": "d6577ce44e963ef53f90e43ca4be28b54a900a0e91fbb8f77cc505b4c1f340ff",
-      "compile_ms": 65.8316,
-      "generated_execute_ms": 209.75869999999475,
-      "reference_execute_ms": 120.00290000000291,
+      "compile_ms": 53.1304,
+      "generated_execute_ms": 222.37659999998982,
+      "reference_execute_ms": 119.05469999999241,
       "function_families": [
         "belong_industry",
         "indicator"
@@ -2359,9 +2382,9 @@
       "reference_row_count": 582,
       "generated_hash": "670e980d383ed5616fc518c84aecbb2319c195663c33ed92129b4abc3b06bc82",
       "reference_hash": "670e980d383ed5616fc518c84aecbb2319c195663c33ed92129b4abc3b06bc82",
-      "compile_ms": 60.8456,
-      "generated_execute_ms": 138.50909999999317,
-      "reference_execute_ms": 103.52780000000905,
+      "compile_ms": 24.8094,
+      "generated_execute_ms": 182.27289999998675,
+      "reference_execute_ms": 108.76669999998967,
       "function_families": [
         "belong_industry",
         "indicator"
@@ -2377,9 +2400,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 57.2378,
-      "generated_execute_ms": 282.38640000000714,
-      "reference_execute_ms": 102.03300000000581,
+      "compile_ms": 36.5645,
+      "generated_execute_ms": 342.8021999999942,
+      "reference_execute_ms": 83.28969999999458,
       "function_families": [
         "indicator",
         "queryData",
@@ -2396,9 +2419,9 @@
       "reference_row_count": 0,
       "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
       "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
-      "compile_ms": 45.4276,
-      "generated_execute_ms": 176.51449999999613,
-      "reference_execute_ms": 83.56709999999623,
+      "compile_ms": 22.5739,
+      "generated_execute_ms": 204.16720000000055,
+      "reference_execute_ms": 71.64320000001112,
       "function_families": [
         "indicator",
         "queryData"
@@ -2414,9 +2437,9 @@
       "reference_row_count": 786,
       "generated_hash": "350d0204e92eb5a7f9dcda9d3af6570b303a747a9644e588cf0b6b4225211647",
       "reference_hash": "350d0204e92eb5a7f9dcda9d3af6570b303a747a9644e588cf0b6b4225211647",
-      "compile_ms": 76.285,
-      "generated_execute_ms": 993.5059999999964,
-      "reference_execute_ms": 158.11109999999928,
+      "compile_ms": 31.8496,
+      "generated_execute_ms": 1071.0979000000123,
+      "reference_execute_ms": 169.71789999999487,
       "function_families": [
         "indicator",
         "queryData"
@@ -2432,9 +2455,9 @@
       "reference_row_count": 5614,
       "generated_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
       "reference_hash": "4718b045acc3dc6bddf7708b2691f8c10497492cdb453191bd38a7c7f08224f5",
-      "compile_ms": 27.5003,
-      "generated_execute_ms": 55.09699999998929,
-      "reference_execute_ms": 274.40099999999745,
+      "compile_ms": 12.1613,
+      "generated_execute_ms": 63.222500000023274,
+      "reference_execute_ms": 289.44000000001324,
       "function_families": [
         "indicator"
       ],
@@ -2449,9 +2472,9 @@
       "reference_row_count": 4930,
       "generated_hash": "fc9d2f771af4526a1b6b97ab99d647577b65f4813c41df81ffe234465496b376",
       "reference_hash": "fc9d2f771af4526a1b6b97ab99d647577b65f4813c41df81ffe234465496b376",
-      "compile_ms": 108.7364,
-      "generated_execute_ms": 2145.678799999999,
-      "reference_execute_ms": 1315.5594000000121,
+      "compile_ms": 115.5806,
+      "generated_execute_ms": 2647.0032999999944,
+      "reference_execute_ms": 1275.643300000013,
       "function_families": [
         "belong_industry",
         "golden_cross",
@@ -2468,9 +2491,9 @@
       "reference_row_count": 3354,
       "generated_hash": "8a27683262565bed4f009ca063129503e53990806b7f11ccf3d0a8f3a4aa707f",
       "reference_hash": "8a27683262565bed4f009ca063129503e53990806b7f11ccf3d0a8f3a4aa707f",
-      "compile_ms": 76.0076,
-      "generated_execute_ms": 1121.7048999999975,
-      "reference_execute_ms": 297.50149999999564,
+      "compile_ms": 51.3128,
+      "generated_execute_ms": 1043.565000000001,
+      "reference_execute_ms": 278.1219999999962,
       "function_families": [
         "belong_industry",
         "close_together",
@@ -2487,9 +2510,9 @@
       "reference_row_count": 4618,
       "generated_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
       "reference_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
-      "compile_ms": 78.5563,
-      "generated_execute_ms": 2321.5124000000033,
-      "reference_execute_ms": 1118.1986999999936,
+      "compile_ms": 53.0534,
+      "generated_execute_ms": 2525.5252999999984,
+      "reference_execute_ms": 1248.3047999999997,
       "function_families": [
         "belong_industry",
         "golden_cross",
@@ -2506,9 +2529,9 @@
       "reference_row_count": 4423,
       "generated_hash": "bf804e34dbae93a16808074e98a3fd7c957a72354160005c4db7a12ca57c5678",
       "reference_hash": "bf804e34dbae93a16808074e98a3fd7c957a72354160005c4db7a12ca57c5678",
-      "compile_ms": 69.9777,
-      "generated_execute_ms": 2143.9304999999963,
-      "reference_execute_ms": 615.9138000000013,
+      "compile_ms": 43.1823,
+      "generated_execute_ms": 2301.8735999999935,
+      "reference_execute_ms": 670.1501999999948,
       "function_families": [
         "close_together",
         "golden_cross",
@@ -2525,9 +2548,9 @@
       "reference_row_count": 1055,
       "generated_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
       "reference_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
-      "compile_ms": 63.2131,
-      "generated_execute_ms": 582.6872000000094,
-      "reference_execute_ms": 326.1481000000117,
+      "compile_ms": 37.7422,
+      "generated_execute_ms": 679.4052999999849,
+      "reference_execute_ms": 245.6776000000218,
       "function_families": [
         "belong_industry",
         "indicator",
@@ -2544,9 +2567,9 @@
       "reference_row_count": 1940,
       "generated_hash": "021636d354ddd54ac223c1ad02b6c97b3f5119086f593daced07b4d6b7fd6fb7",
       "reference_hash": "021636d354ddd54ac223c1ad02b6c97b3f5119086f593daced07b4d6b7fd6fb7",
-      "compile_ms": 45.3121,
-      "generated_execute_ms": 3752.72480000001,
-      "reference_execute_ms": 2022.6637000000096,
+      "compile_ms": 32.6505,
+      "generated_execute_ms": 4077.124699999985,
+      "reference_execute_ms": 2077.8138000000013,
       "function_families": [
         "close_together",
         "cross_down",
@@ -2563,9 +2586,9 @@
       "reference_row_count": 4618,
       "generated_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
       "reference_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
-      "compile_ms": 91.4698,
-      "generated_execute_ms": 2925.5110999999943,
-      "reference_execute_ms": 1354.3814999999881,
+      "compile_ms": 65.5667,
+      "generated_execute_ms": 3205.9783999999922,
+      "reference_execute_ms": 1568.8896999999997,
       "function_families": [
         "golden_cross",
         "indicator",
@@ -2582,9 +2605,9 @@
       "reference_row_count": 1919,
       "generated_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
       "reference_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
-      "compile_ms": 76.1835,
-      "generated_execute_ms": 1354.2525000000012,
-      "reference_execute_ms": 313.23150000000055,
+      "compile_ms": 51.1004,
+      "generated_execute_ms": 1236.0213000000044,
+      "reference_execute_ms": 307.803100000001,
       "function_families": [
         "belong_industry",
         "indicator",
@@ -2601,9 +2624,9 @@
       "reference_row_count": 2036,
       "generated_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
       "reference_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
-      "compile_ms": 43.4578,
-      "generated_execute_ms": 3294.8156999999865,
-      "reference_execute_ms": 1075.7400999999902,
+      "compile_ms": 22.8065,
+      "generated_execute_ms": 3648.2586999999853,
+      "reference_execute_ms": 1128.594899999996,
       "function_families": [
         "close_together",
         "cross_above",
@@ -2620,9 +2643,9 @@
       "reference_row_count": 4620,
       "generated_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
       "reference_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
-      "compile_ms": 66.3681,
-      "generated_execute_ms": 3356.9102000000157,
-      "reference_execute_ms": 1986.2555999999927,
+      "compile_ms": 52.0812,
+      "generated_execute_ms": 3631.108699999999,
+      "reference_execute_ms": 2115.4988000000117,
       "function_families": [
         "cross_down",
         "golden_cross",
@@ -2639,9 +2662,9 @@
       "reference_row_count": 1680,
       "generated_hash": "14c6faf262c9e2a775063fa7ef6f572e27d96d81f9a4d2595c4c43a4c3640e70",
       "reference_hash": "14c6faf262c9e2a775063fa7ef6f572e27d96d81f9a4d2595c4c43a4c3640e70",
-      "compile_ms": 62.8468,
-      "generated_execute_ms": 1977.2832000000164,
-      "reference_execute_ms": 1227.3156999999912,
+      "compile_ms": 34.4124,
+      "generated_execute_ms": 2107.4459999999817,
+      "reference_execute_ms": 1418.938799999978,
       "function_families": [
         "indicator",
         "position",
@@ -2658,9 +2681,9 @@
       "reference_row_count": 1919,
       "generated_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
       "reference_hash": "d89abb84a5a0ec06c8472008d83e2bcb3b06cc66063f769cdb180d7bc1e2cbc6",
-      "compile_ms": 71.8883,
-      "generated_execute_ms": 1120.1971000000128,
-      "reference_execute_ms": 345.28069999998934,
+      "compile_ms": 54.5974,
+      "generated_execute_ms": 1168.2691000000034,
+      "reference_execute_ms": 295.33720000000585,
       "function_families": [
         "belong_industry",
         "indicator",
@@ -2677,9 +2700,9 @@
       "reference_row_count": 2036,
       "generated_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
       "reference_hash": "e86a2c9c313947ed58e0ff04ca4a4a17dc8045c62ce7554bcb7c81c6a9c0feeb",
-      "compile_ms": 71.0226,
-      "generated_execute_ms": 3293.0549000000156,
-      "reference_execute_ms": 975.1525999999728,
+      "compile_ms": 30.8286,
+      "generated_execute_ms": 3657.224500000012,
+      "reference_execute_ms": 1057.171799999992,
       "function_families": [
         "close_together",
         "cross_above",
@@ -2696,9 +2719,9 @@
       "reference_row_count": 4620,
       "generated_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
       "reference_hash": "302767948b2f435989eb5862a084167767fb795cbd74a7c18cd6302ced014b58",
-      "compile_ms": 71.7691,
-      "generated_execute_ms": 3186.7124999999987,
-      "reference_execute_ms": 2024.7573999999986,
+      "compile_ms": 39.4406,
+      "generated_execute_ms": 3640.7456999999968,
+      "reference_execute_ms": 2232.24110000001,
       "function_families": [
         "cross_down",
         "golden_cross",
@@ -2715,9 +2738,9 @@
       "reference_row_count": 1678,
       "generated_hash": "0a1948492e8026ab1d7390042b9eab73edd1ddc35662a528e55c7ab0f7f34fc7",
       "reference_hash": "0a1948492e8026ab1d7390042b9eab73edd1ddc35662a528e55c7ab0f7f34fc7",
-      "compile_ms": 78.9703,
-      "generated_execute_ms": 1061.9918000000155,
-      "reference_execute_ms": 797.9448000000104,
+      "compile_ms": 52.3898,
+      "generated_execute_ms": 1255.0296999999944,
+      "reference_execute_ms": 1043.462500000004,
       "function_families": [
         "indicator",
         "position",
@@ -2734,9 +2757,9 @@
       "reference_row_count": 221,
       "generated_hash": "f53da04e195d8c3b4f5c017a68175d9d9fd8fda9e72d03b821c650f443147117",
       "reference_hash": "f53da04e195d8c3b4f5c017a68175d9d9fd8fda9e72d03b821c650f443147117",
-      "compile_ms": 47.0843,
-      "generated_execute_ms": 1945.031599999993,
-      "reference_execute_ms": 1221.1441000000036,
+      "compile_ms": 33.5035,
+      "generated_execute_ms": 2342.6087999999936,
+      "reference_execute_ms": 1436.2941999999919,
       "function_families": [
         "indicator",
         "record_high",
@@ -2753,9 +2776,9 @@
       "reference_row_count": 1055,
       "generated_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
       "reference_hash": "99891c03ba80d0210767ceab0ef9aca4e5a5c07d5327e9fba1b2ffa9567ad7f1",
-      "compile_ms": 63.2089,
-      "generated_execute_ms": 600.6339000000196,
-      "reference_execute_ms": 260.62900000002287,
+      "compile_ms": 57.5835,
+      "generated_execute_ms": 658.2434000000035,
+      "reference_execute_ms": 304.72800000001143,
       "function_families": [
         "belong_industry",
         "indicator",
@@ -2772,9 +2795,9 @@
       "reference_row_count": 2215,
       "generated_hash": "f6d813c89e8f368625d751d8358e793a9cf846d4d11aa9d500baf8cd5f1ee787",
       "reference_hash": "f6d813c89e8f368625d751d8358e793a9cf846d4d11aa9d500baf8cd5f1ee787",
-      "compile_ms": 47.3096,
-      "generated_execute_ms": 3538.5638999999856,
-      "reference_execute_ms": 972.0240999999987,
+      "compile_ms": 37.2169,
+      "generated_execute_ms": 3812.4384999999847,
+      "reference_execute_ms": 1109.6834999999885,
       "function_families": [
         "close_together",
         "cross_above",
@@ -2791,9 +2814,9 @@
       "reference_row_count": 2618,
       "generated_hash": "0326797a586c21b8f6ae324c4da895bfb48d2917a819728053a76744cac420e1",
       "reference_hash": "0326797a586c21b8f6ae324c4da895bfb48d2917a819728053a76744cac420e1",
-      "compile_ms": 102.8224,
-      "generated_execute_ms": 3168.3543000000045,
-      "reference_execute_ms": 2200.472399999995,
+      "compile_ms": 54.5826,
+      "generated_execute_ms": 3463.2317999999887,
+      "reference_execute_ms": 2568.7427999999954,
       "function_families": [
         "cross_down",
         "golden_cross",
@@ -2810,9 +2833,9 @@
       "reference_row_count": 3022,
       "generated_hash": "25d713b60725d371b05de380ab4b9b4b7b79dd004584b3474534054f4d142672",
       "reference_hash": "25d713b60725d371b05de380ab4b9b4b7b79dd004584b3474534054f4d142672",
-      "compile_ms": 70.8708,
-      "generated_execute_ms": 1502.6708000000042,
-      "reference_execute_ms": 950.2998000000105,
+      "compile_ms": 47.8521,
+      "generated_execute_ms": 1755.3008000000148,
+      "reference_execute_ms": 1052.7145000000075,
       "function_families": [
         "indicator",
         "position",
@@ -2829,9 +2852,9 @@
       "reference_row_count": 95,
       "generated_hash": "dd20becbb91969ec3f7a71efa52012db77815aff140ca6aa1fbcfa91f7d4493c",
       "reference_hash": "dd20becbb91969ec3f7a71efa52012db77815aff140ca6aa1fbcfa91f7d4493c",
-      "compile_ms": 44.1552,
-      "generated_execute_ms": 1912.6377000000048,
-      "reference_execute_ms": 1129.9987000000158,
+      "compile_ms": 27.3307,
+      "generated_execute_ms": 2101.959899999997,
+      "reference_execute_ms": 1300.101699999999,
       "function_families": [
         "indicator",
         "record_high",
@@ -2848,9 +2871,9 @@
       "reference_row_count": 1366,
       "generated_hash": "4b7e97511903ae49995a9325869c91226bf8c7181483963bcf4862fa8d456e26",
       "reference_hash": "4b7e97511903ae49995a9325869c91226bf8c7181483963bcf4862fa8d456e26",
-      "compile_ms": 73.5061,
-      "generated_execute_ms": 695.7563999999934,
-      "reference_execute_ms": 279.83950000000846,
+      "compile_ms": 81.9309,
+      "generated_execute_ms": 764.3348000000003,
+      "reference_execute_ms": 272.11070000001314,
       "function_families": [
         "belong_industry",
         "indicator",
@@ -2867,9 +2890,9 @@
       "reference_row_count": 3361,
       "generated_hash": "69501ec20f50109497a422a43dbc0fdb5b7d9c4ba343467776495b0f142957e2",
       "reference_hash": "69501ec20f50109497a422a43dbc0fdb5b7d9c4ba343467776495b0f142957e2",
-      "compile_ms": 49.0517,
-      "generated_execute_ms": 3383.7247999999818,
-      "reference_execute_ms": 635.8188000000098,
+      "compile_ms": 28.5287,
+      "generated_execute_ms": 3711.5959000000203,
+      "reference_execute_ms": 673.306000000025,
       "function_families": [
         "close_together",
         "cross_above",
@@ -2886,9 +2909,9 @@
       "reference_row_count": 2098,
       "generated_hash": "af9ca33743f733c4067e573285cb110c3a40fed31fce19ac472c636a0ec5387e",
       "reference_hash": "af9ca33743f733c4067e573285cb110c3a40fed31fce19ac472c636a0ec5387e",
-      "compile_ms": 68.4565,
-      "generated_execute_ms": 3379.61279999999,
-      "reference_execute_ms": 2183.3645000000106,
+      "compile_ms": 64.035,
+      "generated_execute_ms": 3270.393600000006,
+      "reference_execute_ms": 2320.7208999999975,
       "function_families": [
         "cross_down",
         "golden_cross",
@@ -2905,9 +2928,9 @@
       "reference_row_count": 2012,
       "generated_hash": "50184eff069289d127142fc9d2c94cf7b801e8a398860c146e5ded69acdb03b0",
       "reference_hash": "50184eff069289d127142fc9d2c94cf7b801e8a398860c146e5ded69acdb03b0",
-      "compile_ms": 61.1671,
-      "generated_execute_ms": 760.6571999999971,
-      "reference_execute_ms": 530.3439999999853,
+      "compile_ms": 49.7594,
+      "generated_execute_ms": 971.8294999999841,
+      "reference_execute_ms": 528.9116000000149,
       "function_families": [
         "indicator",
         "position",
@@ -2924,9 +2947,9 @@
       "reference_row_count": 129,
       "generated_hash": "fa120f5dc159a9d4ac8a8c9054739e0e60ba03523bf13d0821805888a9bc68b7",
       "reference_hash": "fa120f5dc159a9d4ac8a8c9054739e0e60ba03523bf13d0821805888a9bc68b7",
-      "compile_ms": 43.7493,
-      "generated_execute_ms": 2132.5022000000044,
-      "reference_execute_ms": 1227.0737000000054,
+      "compile_ms": 38.4573,
+      "generated_execute_ms": 2080.636399999975,
+      "reference_execute_ms": 1467.5330999999971,
       "function_families": [
         "indicator",
         "record_high",
@@ -2943,9 +2966,9 @@
       "reference_row_count": 1367,
       "generated_hash": "b0665fc4faf3fe8126e20b7268fee115412d4daea349b06264682e9bdd26448e",
       "reference_hash": "b0665fc4faf3fe8126e20b7268fee115412d4daea349b06264682e9bdd26448e",
-      "compile_ms": 71.2545,
-      "generated_execute_ms": 938.4340000000009,
-      "reference_execute_ms": 293.5034999999857,
+      "compile_ms": 66.0667,
+      "generated_execute_ms": 1055.3596000000027,
+      "reference_execute_ms": 336.1054000000081,
       "function_families": [
         "belong_industry",
         "indicator",
@@ -2962,9 +2985,9 @@
       "reference_row_count": 2285,
       "generated_hash": "fc5b21a8544a3b87ace0d2ff60bbfb50d479892d9d19730e46a8905cafe5c833",
       "reference_hash": "fc5b21a8544a3b87ace0d2ff60bbfb50d479892d9d19730e46a8905cafe5c833",
-      "compile_ms": 63.7162,
-      "generated_execute_ms": 1218.28450000001,
-      "reference_execute_ms": 555.6569000000025,
+      "compile_ms": 49.4981,
+      "generated_execute_ms": 1347.0310000000154,
+      "reference_execute_ms": 590.3115000000128,
       "function_families": [
         "golden_cross",
         "indicator",
@@ -2981,9 +3004,9 @@
       "reference_row_count": 3679,
       "generated_hash": "f071b8c9d13879d0f1fc77b1f10601e761afc01d2f506e71c872218bc4bed806",
       "reference_hash": "f071b8c9d13879d0f1fc77b1f10601e761afc01d2f506e71c872218bc4bed806",
-      "compile_ms": 57.4702,
-      "generated_execute_ms": 3605.9072000000187,
-      "reference_execute_ms": 523.8603000000239,
+      "compile_ms": 20.1597,
+      "generated_execute_ms": 4039.2483000000257,
+      "reference_execute_ms": 616.2244000000214,
       "function_families": [
         "close_together",
         "indicator",
@@ -3000,15 +3023,1595 @@
       "reference_row_count": 1063,
       "generated_hash": "db2ed3baa64b8d892f44db50117fd3a4d75eb066d2d084fc210b9b3306bc9dad",
       "reference_hash": "db2ed3baa64b8d892f44db50117fd3a4d75eb066d2d084fc210b9b3306bc9dad",
-      "compile_ms": 62.565,
-      "generated_execute_ms": 2442.314100000004,
-      "reference_execute_ms": 2056.3801999999782,
+      "compile_ms": 41.5479,
+      "generated_execute_ms": 2728.647999999993,
+      "reference_execute_ms": 2492.364500000008,
       "function_families": [
         "cross_down",
         "indicator",
         "position"
       ],
       "plan_family": "balanced_cross_function_composition",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-001-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 6,
+      "reference_row_count": 6,
+      "generated_hash": "ab83203592e8faaa8b4e5ce5a705ab0db8537c37360d41f75b4bb4e023e780cd",
+      "reference_hash": "ab83203592e8faaa8b4e5ce5a705ab0db8537c37360d41f75b4bb4e023e780cd",
+      "compile_ms": 53.3728,
+      "generated_execute_ms": 1233.7981999999954,
+      "reference_execute_ms": 536.7983000000152,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-002-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 41.5189,
+      "generated_execute_ms": 46.18909999999232,
+      "reference_execute_ms": 128.66410000000883,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-003-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1119,
+      "reference_row_count": 1119,
+      "generated_hash": "b0f3fc8a408b2689032c221871a95c0cce9dc3c2f0a20cea9cae03316e90d32d",
+      "reference_hash": "b0f3fc8a408b2689032c221871a95c0cce9dc3c2f0a20cea9cae03316e90d32d",
+      "compile_ms": 49.3836,
+      "generated_execute_ms": 689.4418999999914,
+      "reference_execute_ms": 157.07159999999476,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-004-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 259,
+      "reference_row_count": 259,
+      "generated_hash": "f0548c7decce582befd271b141c12efad2577d72097d33d6cc32ee466e3595d8",
+      "reference_hash": "f0548c7decce582befd271b141c12efad2577d72097d33d6cc32ee466e3595d8",
+      "compile_ms": 30.1342,
+      "generated_execute_ms": 1382.428400000009,
+      "reference_execute_ms": 747.9251999999974,
+      "function_families": [
+        "cross_above",
+        "indicator",
+        "position"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-005-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4,
+      "reference_row_count": 4,
+      "generated_hash": "29f61232bef67caca7672ace46f1a1706eb2185e1daba4f543272b8e0dc6f6fb",
+      "reference_hash": "29f61232bef67caca7672ace46f1a1706eb2185e1daba4f543272b8e0dc6f6fb",
+      "compile_ms": 38.1452,
+      "generated_execute_ms": 1238.4863999999993,
+      "reference_execute_ms": 719.6864000000005,
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-006-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 14,
+      "reference_row_count": 14,
+      "generated_hash": "2b1c6983e2f57dee16701e49d59af97f9a70fba6448d750f000f5b5399496668",
+      "reference_hash": "2b1c6983e2f57dee16701e49d59af97f9a70fba6448d750f000f5b5399496668",
+      "compile_ms": 38.6481,
+      "generated_execute_ms": 1322.8060000000141,
+      "reference_execute_ms": 620.5585999999812,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-007-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 110,
+      "reference_row_count": 110,
+      "generated_hash": "b8757fcb471c0113cec726144b2cf9d1076794406cd64a320e71e748797c3044",
+      "reference_hash": "b8757fcb471c0113cec726144b2cf9d1076794406cd64a320e71e748797c3044",
+      "compile_ms": 60.2688,
+      "generated_execute_ms": 307.0855999999935,
+      "reference_execute_ms": 181.90830000000346,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-008-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 651,
+      "reference_row_count": 651,
+      "generated_hash": "4a614458e27adb85265d5e758853e70efe5b0b9588015e94c602bb275c7c8fc3",
+      "reference_hash": "4a614458e27adb85265d5e758853e70efe5b0b9588015e94c602bb275c7c8fc3",
+      "compile_ms": 57.8834,
+      "generated_execute_ms": 1966.3152999999909,
+      "reference_execute_ms": 703.978300000017,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-009-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 91,
+      "reference_row_count": 91,
+      "generated_hash": "bbea3f1856c1947a35a8a3262059ee8a03465c34d3a6a04d8e615611cf73e45c",
+      "reference_hash": "bbea3f1856c1947a35a8a3262059ee8a03465c34d3a6a04d8e615611cf73e45c",
+      "compile_ms": 50.9611,
+      "generated_execute_ms": 600.9905000000231,
+      "reference_execute_ms": 501.7786999999885,
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-010-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 36.6931,
+      "generated_execute_ms": 1538.3377999999652,
+      "reference_execute_ms": 1708.2122000000481,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "record_low"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-011-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 71.788,
+      "generated_execute_ms": 749.6335999999815,
+      "reference_execute_ms": 471.85239999998885,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-012-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 46.6245,
+      "generated_execute_ms": 53.872299999966344,
+      "reference_execute_ms": 52.56650000001173,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-013-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 6,
+      "reference_row_count": 6,
+      "generated_hash": "ab83203592e8faaa8b4e5ce5a705ab0db8537c37360d41f75b4bb4e023e780cd",
+      "reference_hash": "ab83203592e8faaa8b4e5ce5a705ab0db8537c37360d41f75b4bb4e023e780cd",
+      "compile_ms": 46.7471,
+      "generated_execute_ms": 1323.7020999999913,
+      "reference_execute_ms": 574.4993999999792,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-014-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 49.9644,
+      "generated_execute_ms": 51.57120000001214,
+      "reference_execute_ms": 120.31469999999445,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-015-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1119,
+      "reference_row_count": 1119,
+      "generated_hash": "b0f3fc8a408b2689032c221871a95c0cce9dc3c2f0a20cea9cae03316e90d32d",
+      "reference_hash": "b0f3fc8a408b2689032c221871a95c0cce9dc3c2f0a20cea9cae03316e90d32d",
+      "compile_ms": 53.7402,
+      "generated_execute_ms": 687.0020000000068,
+      "reference_execute_ms": 152.60480000000598,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-016-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 259,
+      "reference_row_count": 259,
+      "generated_hash": "f0548c7decce582befd271b141c12efad2577d72097d33d6cc32ee466e3595d8",
+      "reference_hash": "f0548c7decce582befd271b141c12efad2577d72097d33d6cc32ee466e3595d8",
+      "compile_ms": 42.205,
+      "generated_execute_ms": 1414.99639999995,
+      "reference_execute_ms": 796.840799999984,
+      "function_families": [
+        "cross_above",
+        "indicator",
+        "position"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-017-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4,
+      "reference_row_count": 4,
+      "generated_hash": "29f61232bef67caca7672ace46f1a1706eb2185e1daba4f543272b8e0dc6f6fb",
+      "reference_hash": "29f61232bef67caca7672ace46f1a1706eb2185e1daba4f543272b8e0dc6f6fb",
+      "compile_ms": 37.5346,
+      "generated_execute_ms": 1262.7934999999866,
+      "reference_execute_ms": 742.4763000000212,
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-018-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 14,
+      "reference_row_count": 14,
+      "generated_hash": "2b1c6983e2f57dee16701e49d59af97f9a70fba6448d750f000f5b5399496668",
+      "reference_hash": "2b1c6983e2f57dee16701e49d59af97f9a70fba6448d750f000f5b5399496668",
+      "compile_ms": 38.8681,
+      "generated_execute_ms": 1235.5737999999974,
+      "reference_execute_ms": 622.1305999999913,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-019-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 110,
+      "reference_row_count": 110,
+      "generated_hash": "b8757fcb471c0113cec726144b2cf9d1076794406cd64a320e71e748797c3044",
+      "reference_hash": "b8757fcb471c0113cec726144b2cf9d1076794406cd64a320e71e748797c3044",
+      "compile_ms": 57.6836,
+      "generated_execute_ms": 303.2584999999699,
+      "reference_execute_ms": 195.73170000001028,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-020-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 651,
+      "reference_row_count": 651,
+      "generated_hash": "4a614458e27adb85265d5e758853e70efe5b0b9588015e94c602bb275c7c8fc3",
+      "reference_hash": "4a614458e27adb85265d5e758853e70efe5b0b9588015e94c602bb275c7c8fc3",
+      "compile_ms": 53.3153,
+      "generated_execute_ms": 1897.9266000000052,
+      "reference_execute_ms": 678.0957999999941,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-021-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 91,
+      "reference_row_count": 91,
+      "generated_hash": "bbea3f1856c1947a35a8a3262059ee8a03465c34d3a6a04d8e615611cf73e45c",
+      "reference_hash": "bbea3f1856c1947a35a8a3262059ee8a03465c34d3a6a04d8e615611cf73e45c",
+      "compile_ms": 38.2681,
+      "generated_execute_ms": 631.1155000000213,
+      "reference_execute_ms": 508.93530000001874,
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-022-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 59.7299,
+      "generated_execute_ms": 1382.6047000000017,
+      "reference_execute_ms": 1091.6882000000214,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "record_low"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-023-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 43.6665,
+      "generated_execute_ms": 789.934599999981,
+      "reference_execute_ms": 452.97060000001466,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-024-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 50.3945,
+      "generated_execute_ms": 52.96200000003637,
+      "reference_execute_ms": 51.799099999982445,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-025-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 6,
+      "reference_row_count": 6,
+      "generated_hash": "ab83203592e8faaa8b4e5ce5a705ab0db8537c37360d41f75b4bb4e023e780cd",
+      "reference_hash": "ab83203592e8faaa8b4e5ce5a705ab0db8537c37360d41f75b4bb4e023e780cd",
+      "compile_ms": 56.708,
+      "generated_execute_ms": 1214.8952000000008,
+      "reference_execute_ms": 522.299299999986,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-026-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 47.6456,
+      "generated_execute_ms": 45.67000000002963,
+      "reference_execute_ms": 134.4379000000231,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-027-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1119,
+      "reference_row_count": 1119,
+      "generated_hash": "b0f3fc8a408b2689032c221871a95c0cce9dc3c2f0a20cea9cae03316e90d32d",
+      "reference_hash": "b0f3fc8a408b2689032c221871a95c0cce9dc3c2f0a20cea9cae03316e90d32d",
+      "compile_ms": 39.15,
+      "generated_execute_ms": 646.5914999999995,
+      "reference_execute_ms": 120.1059999999643,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-028-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 259,
+      "reference_row_count": 259,
+      "generated_hash": "f0548c7decce582befd271b141c12efad2577d72097d33d6cc32ee466e3595d8",
+      "reference_hash": "f0548c7decce582befd271b141c12efad2577d72097d33d6cc32ee466e3595d8",
+      "compile_ms": 39.1157,
+      "generated_execute_ms": 1297.513399999957,
+      "reference_execute_ms": 738.129200000003,
+      "function_families": [
+        "cross_above",
+        "indicator",
+        "position"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-029-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4,
+      "reference_row_count": 4,
+      "generated_hash": "29f61232bef67caca7672ace46f1a1706eb2185e1daba4f543272b8e0dc6f6fb",
+      "reference_hash": "29f61232bef67caca7672ace46f1a1706eb2185e1daba4f543272b8e0dc6f6fb",
+      "compile_ms": 38.1702,
+      "generated_execute_ms": 1229.5349999999985,
+      "reference_execute_ms": 708.7342000000376,
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-030-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 14,
+      "reference_row_count": 14,
+      "generated_hash": "2b1c6983e2f57dee16701e49d59af97f9a70fba6448d750f000f5b5399496668",
+      "reference_hash": "2b1c6983e2f57dee16701e49d59af97f9a70fba6448d750f000f5b5399496668",
+      "compile_ms": 35.4786,
+      "generated_execute_ms": 1276.2471000000346,
+      "reference_execute_ms": 619.4365000000062,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-031-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 110,
+      "reference_row_count": 110,
+      "generated_hash": "b8757fcb471c0113cec726144b2cf9d1076794406cd64a320e71e748797c3044",
+      "reference_hash": "b8757fcb471c0113cec726144b2cf9d1076794406cd64a320e71e748797c3044",
+      "compile_ms": 67.3859,
+      "generated_execute_ms": 302.78809999998657,
+      "reference_execute_ms": 180.22419999999784,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-032-INTERSECTION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 651,
+      "reference_row_count": 651,
+      "generated_hash": "4a614458e27adb85265d5e758853e70efe5b0b9588015e94c602bb275c7c8fc3",
+      "reference_hash": "4a614458e27adb85265d5e758853e70efe5b0b9588015e94c602bb275c7c8fc3",
+      "compile_ms": 53.3915,
+      "generated_execute_ms": 1914.2721000000051,
+      "reference_execute_ms": 675.3936000000067,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_intersection",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-033-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5267,
+      "reference_row_count": 5267,
+      "generated_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "reference_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "compile_ms": 36.5724,
+      "generated_execute_ms": 6879.955300000006,
+      "reference_execute_ms": 548.1949999999642,
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-034-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 95,
+      "reference_row_count": 95,
+      "generated_hash": "f59f11d226b2fd6ed3d34756ddce9df98cd1c5c290d1ec6919121e00681b6cdf",
+      "reference_hash": "f59f11d226b2fd6ed3d34756ddce9df98cd1c5c290d1ec6919121e00681b6cdf",
+      "compile_ms": 26.1255,
+      "generated_execute_ms": 2887.4622999999815,
+      "reference_execute_ms": 2413.593399999968,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "record_low"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-035-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1680,
+      "reference_row_count": 1680,
+      "generated_hash": "f9e55c64b679fb07fb1a088c46ccc2f8ac5fa211eff47485511ac024917431d3",
+      "reference_hash": "f9e55c64b679fb07fb1a088c46ccc2f8ac5fa211eff47485511ac024917431d3",
+      "compile_ms": 43.9415,
+      "generated_execute_ms": 2103.2667999999717,
+      "reference_execute_ms": 1423.6300000000028,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-036-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5573,
+      "reference_row_count": 5573,
+      "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
+      "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
+      "compile_ms": 41.2199,
+      "generated_execute_ms": 333.9823000000024,
+      "reference_execute_ms": 139.2114999999876,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-037-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4618,
+      "reference_row_count": 4618,
+      "generated_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "reference_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "compile_ms": 41.8675,
+      "generated_execute_ms": 2868.103000000019,
+      "reference_execute_ms": 1168.7455,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-038-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 10,
+      "reference_row_count": 10,
+      "generated_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
+      "reference_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
+      "compile_ms": 50.0273,
+      "generated_execute_ms": 297.88100000001805,
+      "reference_execute_ms": 232.93749999999136,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-039-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2248,
+      "reference_row_count": 2248,
+      "generated_hash": "09d31cd05c0d604b75675806b3cf89489bcdd8aeb830aef515f72a310f0702c0",
+      "reference_hash": "09d31cd05c0d604b75675806b3cf89489bcdd8aeb830aef515f72a310f0702c0",
+      "compile_ms": 40.5658,
+      "generated_execute_ms": 797.9654000000096,
+      "reference_execute_ms": 169.97420000001284,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-040-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1600,
+      "reference_row_count": 1600,
+      "generated_hash": "96d196a6d06d2ccc9b91debb8ce49a5f7f37a5e6e5296ca27c2f1020ef52739f",
+      "reference_hash": "96d196a6d06d2ccc9b91debb8ce49a5f7f37a5e6e5296ca27c2f1020ef52739f",
+      "compile_ms": 40.084,
+      "generated_execute_ms": 2972.6995999999986,
+      "reference_execute_ms": 1710.7145999999602,
+      "function_families": [
+        "cross_above",
+        "indicator",
+        "position"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-041-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 875,
+      "reference_row_count": 875,
+      "generated_hash": "c6869559f44e31b19489ca9b880cfc26f7d1bb0de820c4697b953cdcc0c1b932",
+      "reference_hash": "c6869559f44e31b19489ca9b880cfc26f7d1bb0de820c4697b953cdcc0c1b932",
+      "compile_ms": 44.5091,
+      "generated_execute_ms": 3469.977099999994,
+      "reference_execute_ms": 2100.9908000000337,
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-042-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2088,
+      "reference_row_count": 2088,
+      "generated_hash": "da0bca424be6394586d83fc221080ecade554ca1cd42782f3079624e297e2008",
+      "reference_hash": "da0bca424be6394586d83fc221080ecade554ca1cd42782f3079624e297e2008",
+      "compile_ms": 37.721,
+      "generated_execute_ms": 4441.868899999974,
+      "reference_execute_ms": 1168.1451000000038,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-043-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1839,
+      "reference_row_count": 1839,
+      "generated_hash": "17df3ee826588c622903a46ad27558838839d994ad43d01e9d4c6f0f493ff433",
+      "reference_hash": "17df3ee826588c622903a46ad27558838839d994ad43d01e9d4c6f0f493ff433",
+      "compile_ms": 62.5818,
+      "generated_execute_ms": 1219.991900000025,
+      "reference_execute_ms": 339.64069999996127,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-044-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4996,
+      "reference_row_count": 4996,
+      "generated_hash": "320f31d251871f04920466c06330e74f7e2adbff0730388c20667cdb5803265c",
+      "reference_hash": "320f31d251871f04920466c06330e74f7e2adbff0730388c20667cdb5803265c",
+      "compile_ms": 64.1326,
+      "generated_execute_ms": 3475.0568000000044,
+      "reference_execute_ms": 1189.489299999991,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-045-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5267,
+      "reference_row_count": 5267,
+      "generated_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "reference_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "compile_ms": 30.0121,
+      "generated_execute_ms": 6867.870699999969,
+      "reference_execute_ms": 539.6860000000174,
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-046-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 95,
+      "reference_row_count": 95,
+      "generated_hash": "f59f11d226b2fd6ed3d34756ddce9df98cd1c5c290d1ec6919121e00681b6cdf",
+      "reference_hash": "f59f11d226b2fd6ed3d34756ddce9df98cd1c5c290d1ec6919121e00681b6cdf",
+      "compile_ms": 32.6635,
+      "generated_execute_ms": 2863.352499999962,
+      "reference_execute_ms": 2560.1249000000053,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "record_low"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-047-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1680,
+      "reference_row_count": 1680,
+      "generated_hash": "f9e55c64b679fb07fb1a088c46ccc2f8ac5fa211eff47485511ac024917431d3",
+      "reference_hash": "f9e55c64b679fb07fb1a088c46ccc2f8ac5fa211eff47485511ac024917431d3",
+      "compile_ms": 34.4837,
+      "generated_execute_ms": 2297.142000000008,
+      "reference_execute_ms": 1352.8880999999728,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-048-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5573,
+      "reference_row_count": 5573,
+      "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
+      "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
+      "compile_ms": 45.585,
+      "generated_execute_ms": 361.17419999999356,
+      "reference_execute_ms": 150.3471999999988,
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-049-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4618,
+      "reference_row_count": 4618,
+      "generated_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "reference_hash": "419e058350214bf4b543592160ac36a78e45d76d3bed985980672e85a45970e8",
+      "compile_ms": 54.0275,
+      "generated_execute_ms": 2493.7141999999994,
+      "reference_execute_ms": 1280.1552000000243,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-050-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 10,
+      "reference_row_count": 10,
+      "generated_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
+      "reference_hash": "29fe3b2559cb42abd398dfbd6be38c8d56ceafdbcdedf781f17edef9a4495025",
+      "compile_ms": 54.1313,
+      "generated_execute_ms": 280.9115999999676,
+      "reference_execute_ms": 267.3626999999783,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-051-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2248,
+      "reference_row_count": 2248,
+      "generated_hash": "09d31cd05c0d604b75675806b3cf89489bcdd8aeb830aef515f72a310f0702c0",
+      "reference_hash": "09d31cd05c0d604b75675806b3cf89489bcdd8aeb830aef515f72a310f0702c0",
+      "compile_ms": 48.3762,
+      "generated_execute_ms": 768.6940000000391,
+      "reference_execute_ms": 192.19160000000102,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-052-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1600,
+      "reference_row_count": 1600,
+      "generated_hash": "96d196a6d06d2ccc9b91debb8ce49a5f7f37a5e6e5296ca27c2f1020ef52739f",
+      "reference_hash": "96d196a6d06d2ccc9b91debb8ce49a5f7f37a5e6e5296ca27c2f1020ef52739f",
+      "compile_ms": 36.2939,
+      "generated_execute_ms": 2898.5382000000186,
+      "reference_execute_ms": 1558.0062999999882,
+      "function_families": [
+        "cross_above",
+        "indicator",
+        "position"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-053-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2352,
+      "reference_row_count": 2352,
+      "generated_hash": "c2065887ee925af6b016ee17cbf0af122c640a1ee48e265d91e1c7151ce2ea67",
+      "reference_hash": "c2065887ee925af6b016ee17cbf0af122c640a1ee48e265d91e1c7151ce2ea67",
+      "compile_ms": 44.799,
+      "generated_execute_ms": 385.4109999999764,
+      "reference_execute_ms": 185.54579999999987,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-054-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2088,
+      "reference_row_count": 2088,
+      "generated_hash": "da0bca424be6394586d83fc221080ecade554ca1cd42782f3079624e297e2008",
+      "reference_hash": "da0bca424be6394586d83fc221080ecade554ca1cd42782f3079624e297e2008",
+      "compile_ms": 32.5954,
+      "generated_execute_ms": 4603.2844999999725,
+      "reference_execute_ms": 1159.56749999998,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-055-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1839,
+      "reference_row_count": 1839,
+      "generated_hash": "17df3ee826588c622903a46ad27558838839d994ad43d01e9d4c6f0f493ff433",
+      "reference_hash": "17df3ee826588c622903a46ad27558838839d994ad43d01e9d4c6f0f493ff433",
+      "compile_ms": 72.6468,
+      "generated_execute_ms": 1231.960700000002,
+      "reference_execute_ms": 358.3087999999748,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-056-UNION",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 4996,
+      "reference_row_count": 4996,
+      "generated_hash": "320f31d251871f04920466c06330e74f7e2adbff0730388c20667cdb5803265c",
+      "reference_hash": "320f31d251871f04920466c06330e74f7e2adbff0730388c20667cdb5803265c",
+      "compile_ms": 51.64,
+      "generated_execute_ms": 3269.5099999999684,
+      "reference_execute_ms": 1238.2392999999752,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "reset"
+      ],
+      "plan_family": "adversarial_union",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-057-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2050,
+      "reference_row_count": 2050,
+      "generated_hash": "64ed278128f9d2f9acf15e97ed427c376ff4ec581e41b842dc3e5c9015fae7b6",
+      "reference_hash": "64ed278128f9d2f9acf15e97ed427c376ff4ec581e41b842dc3e5c9015fae7b6",
+      "compile_ms": 126.5172,
+      "generated_execute_ms": 2060.799799999984,
+      "reference_execute_ms": 1043.7484000000268,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-058-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 69.1595,
+      "generated_execute_ms": 1535.279600000024,
+      "reference_execute_ms": 1164.3743999999856,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "queryData",
+        "record_low"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-059-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5267,
+      "reference_row_count": 5267,
+      "generated_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "reference_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "compile_ms": 73.2928,
+      "generated_execute_ms": 11087.989900000026,
+      "reference_execute_ms": 571.9531000000302,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-060-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 93,
+      "reference_row_count": 93,
+      "generated_hash": "38617aaa15f1b22bbc618a6e0b0541404823a4f22656c34c5bcedc9f3e5ca440",
+      "reference_hash": "38617aaa15f1b22bbc618a6e0b0541404823a4f22656c34c5bcedc9f3e5ca440",
+      "compile_ms": 79.9374,
+      "generated_execute_ms": 2413.818200000037,
+      "reference_execute_ms": 1795.5240000000003,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-061-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2348,
+      "reference_row_count": 2348,
+      "generated_hash": "3be397a6f5415595e4890de93ac0fd713c119a0b286cefd0a9b847e837a7a9b3",
+      "reference_hash": "3be397a6f5415595e4890de93ac0fd713c119a0b286cefd0a9b847e837a7a9b3",
+      "compile_ms": 78.0927,
+      "generated_execute_ms": 1261.4239000000111,
+      "reference_execute_ms": 563.7224000000174,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-062-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 784,
+      "reference_row_count": 784,
+      "generated_hash": "2ebd0f023afb3a842b2dcdd93c4be71ca4ae477a2eb15c34180253e44939bd56",
+      "reference_hash": "2ebd0f023afb3a842b2dcdd93c4be71ca4ae477a2eb15c34180253e44939bd56",
+      "compile_ms": 70.4919,
+      "generated_execute_ms": 537.4027000000297,
+      "reference_execute_ms": 286.84899999996105,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank",
+        "reset"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-063-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1532,
+      "reference_row_count": 1532,
+      "generated_hash": "168effd06a98cfae8ac23a924caa3064bf44ec78c03c73309b40f04e6535f952",
+      "reference_hash": "168effd06a98cfae8ac23a924caa3064bf44ec78c03c73309b40f04e6535f952",
+      "compile_ms": 73.0178,
+      "generated_execute_ms": 858.41929999998,
+      "reference_execute_ms": 316.61009999999123,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-064-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1900,
+      "reference_row_count": 1900,
+      "generated_hash": "5c97ee8fc359ef7980e69f249820eb45284ee956fd3caf02e6dd7cd133177ea7",
+      "reference_hash": "5c97ee8fc359ef7980e69f249820eb45284ee956fd3caf02e6dd7cd133177ea7",
+      "compile_ms": 50.4339,
+      "generated_execute_ms": 317.7721000000133,
+      "reference_execute_ms": 194.23749999998563,
+      "function_families": [
+        "indicator",
+        "queryData",
+        "rank"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-065-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1471,
+      "reference_row_count": 1471,
+      "generated_hash": "5446f35a5825d13635e8144b11f3c39dfd99be4cd414a9dbe717c34aa8ffdfdd",
+      "reference_hash": "5446f35a5825d13635e8144b11f3c39dfd99be4cd414a9dbe717c34aa8ffdfdd",
+      "compile_ms": 68.7445,
+      "generated_execute_ms": 2521.9553999999675,
+      "reference_execute_ms": 702.2644999999557,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-066-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 973,
+      "reference_row_count": 973,
+      "generated_hash": "b1a9eccfe9a4622491a3adadf82b9a80d53eb75909cbc721bf2b71b6b1d16834",
+      "reference_hash": "b1a9eccfe9a4622491a3adadf82b9a80d53eb75909cbc721bf2b71b6b1d16834",
+      "compile_ms": 54.5301,
+      "generated_execute_ms": 1677.3854000000483,
+      "reference_execute_ms": 1010.9552999999778,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "position",
+        "record_high"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-067-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1896,
+      "reference_row_count": 1896,
+      "generated_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
+      "reference_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
+      "compile_ms": 59.403,
+      "generated_execute_ms": 338.7137999999936,
+      "reference_execute_ms": 193.9294000000018,
+      "function_families": [
+        "indicator",
+        "queryData",
+        "rank"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-068-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 661,
+      "reference_row_count": 661,
+      "generated_hash": "00e2d5336a0b9ad77ae2377190c9e0d66ce552521cb0b7dbe77f25e25b7b081e",
+      "reference_hash": "00e2d5336a0b9ad77ae2377190c9e0d66ce552521cb0b7dbe77f25e25b7b081e",
+      "compile_ms": 55.5639,
+      "generated_execute_ms": 2096.4468999999895,
+      "reference_execute_ms": 744.055899999978,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank",
+        "reset"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-069-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2050,
+      "reference_row_count": 2050,
+      "generated_hash": "64ed278128f9d2f9acf15e97ed427c376ff4ec581e41b842dc3e5c9015fae7b6",
+      "reference_hash": "64ed278128f9d2f9acf15e97ed427c376ff4ec581e41b842dc3e5c9015fae7b6",
+      "compile_ms": 61.2128,
+      "generated_execute_ms": 1564.3685000000005,
+      "reference_execute_ms": 955.9344000000465,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-070-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 89.2231,
+      "generated_execute_ms": 1348.2567000000358,
+      "reference_execute_ms": 1152.6898000000187,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "queryData",
+        "record_low"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-071-AND-OR",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5267,
+      "reference_row_count": 5267,
+      "generated_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "reference_hash": "76cd6f257da3045c50fa3ec11b7a5f4243cd78eb42a998fbe7c3f81e56aff9b7",
+      "compile_ms": 62.6746,
+      "generated_execute_ms": 10660.286999999982,
+      "reference_execute_ms": 555.160600000022,
+      "function_families": [
+        "indicator",
+        "position",
+        "record_low"
+      ],
+      "plan_family": "adversarial_and_or",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-072-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 93,
+      "reference_row_count": 93,
+      "generated_hash": "38617aaa15f1b22bbc618a6e0b0541404823a4f22656c34c5bcedc9f3e5ca440",
+      "reference_hash": "38617aaa15f1b22bbc618a6e0b0541404823a4f22656c34c5bcedc9f3e5ca440",
+      "compile_ms": 108.6101,
+      "generated_execute_ms": 1941.9414000000188,
+      "reference_execute_ms": 1775.8410999999796,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-073-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2045,
+      "reference_row_count": 2045,
+      "generated_hash": "7d8609f689e92a8bc342fcadb752e078d355645431945f61bcacd74db5f9d7db",
+      "reference_hash": "7d8609f689e92a8bc342fcadb752e078d355645431945f61bcacd74db5f9d7db",
+      "compile_ms": 81.0901,
+      "generated_execute_ms": 1431.5010999999913,
+      "reference_execute_ms": 618.2244999999966,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-074-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 64.749,
+      "generated_execute_ms": 665.6292999999778,
+      "reference_execute_ms": 328.0570999999668,
+      "function_families": [
+        "belong_industry",
+        "indicator",
+        "rank",
+        "reset"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-075-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 527,
+      "reference_row_count": 527,
+      "generated_hash": "94498e1a5ea4bde1d8d127f32b9fdcaa70737c827bdc854d000ba85aebc1a558",
+      "reference_hash": "94498e1a5ea4bde1d8d127f32b9fdcaa70737c827bdc854d000ba85aebc1a558",
+      "compile_ms": 105.4477,
+      "generated_execute_ms": 412.3542999999472,
+      "reference_execute_ms": 280.9701999999561,
+      "function_families": [
+        "belong_industry",
+        "close_together",
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-076-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 106,
+      "reference_row_count": 106,
+      "generated_hash": "31c8b2642d47f2aacf26fdad071bc392e0505c15a9fcf33be7b84710642ebdda",
+      "reference_hash": "31c8b2642d47f2aacf26fdad071bc392e0505c15a9fcf33be7b84710642ebdda",
+      "compile_ms": 60.5881,
+      "generated_execute_ms": 3090.0285999999824,
+      "reference_execute_ms": 2531.457899999964,
+      "function_families": [
+        "cross_above",
+        "indicator",
+        "position",
+        "record_high"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-077-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 354,
+      "reference_row_count": 354,
+      "generated_hash": "56a15cac72b1d7a80ce86e06708ec5606da874e281a4c45e04d41acaebd9bead",
+      "reference_hash": "56a15cac72b1d7a80ce86e06708ec5606da874e281a4c45e04d41acaebd9bead",
+      "compile_ms": 50.5932,
+      "generated_execute_ms": 1271.524100000022,
+      "reference_execute_ms": 1351.3011000000006,
+      "function_families": [
+        "close_together",
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-078-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 665,
+      "reference_row_count": 665,
+      "generated_hash": "276300315a6f4069d4cf7abbd2ab4695f75aca27c94e07bf452c731c834b20cb",
+      "reference_hash": "276300315a6f4069d4cf7abbd2ab4695f75aca27c94e07bf452c731c834b20cb",
+      "compile_ms": 46.9278,
+      "generated_execute_ms": 1562.7951000000166,
+      "reference_execute_ms": 1114.7065000000111,
+      "function_families": [
+        "close_together",
+        "indicator",
+        "position",
+        "record_high"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-079-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 1896,
+      "reference_row_count": 1896,
+      "generated_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
+      "reference_hash": "89b20cd074b88e634e3e110a6b5cd05f2748aced6aaa3875083c3f65ee8c1821",
+      "compile_ms": 58.6766,
+      "generated_execute_ms": 409.82109999998784,
+      "reference_execute_ms": 183.58180000001312,
+      "function_families": [
+        "indicator",
+        "queryData",
+        "rank"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-080-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 9,
+      "reference_row_count": 9,
+      "generated_hash": "da0d7fea4fa9ca3d3ef75de9ce19376a4e4b5f44e30e25094d9f6ed83f20bc81",
+      "reference_hash": "da0d7fea4fa9ca3d3ef75de9ce19376a4e4b5f44e30e25094d9f6ed83f20bc81",
+      "compile_ms": 58.6546,
+      "generated_execute_ms": 2983.149200000014,
+      "reference_execute_ms": 1034.6152000000188,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "rank",
+        "reset"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-081-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 2045,
+      "reference_row_count": 2045,
+      "generated_hash": "7d8609f689e92a8bc342fcadb752e078d355645431945f61bcacd74db5f9d7db",
+      "reference_hash": "7d8609f689e92a8bc342fcadb752e078d355645431945f61bcacd74db5f9d7db",
+      "compile_ms": 104.872,
+      "generated_execute_ms": 3957.9557999999793,
+      "reference_execute_ms": 912.4547999999777,
+      "function_families": [
+        "golden_cross",
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-ADVERSARIAL-082-OR-AND",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 0,
+      "reference_row_count": 0,
+      "generated_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "reference_hash": "10b09accfbf43d4bed7ef030400fdf0f9ed027200a0dc242413a89a63f030b58",
+      "compile_ms": 60.2222,
+      "generated_execute_ms": 56.80019999999786,
+      "reference_execute_ms": 79.57989999999882,
+      "function_families": [
+        "cross_down",
+        "indicator",
+        "queryData",
+        "record_low"
+      ],
+      "plan_family": "adversarial_or_and",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-CONFIG-FUNCTION-RELATIVE-GAP-001",
+      "status": "PASS",
+      "matched": true,
+      "generated_row_count": 5573,
+      "reference_row_count": 5573,
+      "generated_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
+      "reference_hash": "4a920d06fcbae3126b3eaf728624ac89c8760c74859229bf32410ee73c8ccf05",
+      "compile_ms": 26.1781,
+      "generated_execute_ms": 369.8540000000321,
+      "reference_execute_ms": 394.09809999995105,
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "configured_expression_template",
       "error": ""
     }
   ]

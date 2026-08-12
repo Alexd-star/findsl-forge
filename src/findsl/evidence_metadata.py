@@ -489,6 +489,8 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
     official_slot = _dict(official_real.get("slot_coverage"))
     official_perf = _dict(official_real.get("performance_matrix"))
     long_horizon = _dict(official_real.get("long_horizon"))
+    compile_latency = _dict(metadata.get("official_compile_latency"))
+    formal_correctness = _dict(metadata.get("formal_correctness"))
     official_migration = _dict(metadata.get("official_migration"))
     dynamic_date = _dict(official_migration.get("dynamic_date_evidence"))
     security_scope = _dict(official_migration.get("security_scope_evidence"))
@@ -543,6 +545,8 @@ def render_evidence_summary_markdown(metadata: dict[str, Any]) -> str:
         f"| Official negative diagnostics | {_ratio_display(_dict(official.get('negative')))} |",
         f"| Official slot coverage | {_official_slot_coverage_display(official_slot)} |",
         f"| ANTLR/IR legacy migration | {_official_migration_display(official_migration)} |",
+        f"| Formal SQL correctness | {_formal_correctness_display(formal_correctness)} |",
+        f"| Official compile P95 | {_official_compile_latency_display(compile_latency)} |",
         f"| Official per-query 10s target | {_official_performance_display(official_perf)} |",
         f"| Official Doris real data | {_official_doris_display(official_doris)} |",
         f"| Official Doris feature tables | {_pass_fail(official_doris.get('feature_tables_available'))} |",
@@ -1423,7 +1427,10 @@ def _formal_correctness_metadata(payload: dict[str, Any] | None) -> dict[str, An
             "matched": None,
             "accuracy": None,
             "target_met": None,
+            "internal_target_met": None,
+            "wilson_95_lower": None,
         }
+    wilson = payload.get("wilson_95") if isinstance(payload.get("wilson_95"), dict) else {}
     return {
         "available": True,
         "git_head": payload.get("git_head"),
@@ -1433,6 +1440,8 @@ def _formal_correctness_metadata(payload: dict[str, Any] | None) -> dict[str, An
         "matched": _int_or_none(payload.get("matched")),
         "accuracy": _number_or_none(payload.get("accuracy")),
         "target_met": _bool_or_none(payload.get("target_met")),
+        "internal_target_met": _bool_or_none(payload.get("internal_target_met")),
+        "wilson_95_lower": _number_or_none(wilson.get("lower")),
     }
 
 
@@ -1570,6 +1579,30 @@ def _official_migration_display(migration: dict[str, Any]) -> str:
     if migrated is None or denominator is None or coverage is None:
         return "<unknown>"
     return f"{migrated}/{denominator} ({coverage * 100:.2f}%)"
+
+
+def _formal_correctness_display(correctness: dict[str, Any]) -> str:
+    if correctness.get("available") is False:
+        return "UNAVAILABLE"
+    matched = correctness.get("matched")
+    total = correctness.get("eligible_total")
+    lower = correctness.get("wilson_95_lower")
+    status = _pass_fail(correctness.get("target_met"))
+    if matched is None or total is None:
+        return status
+    suffix = f", Wilson lower {lower * 100:.2f}%" if isinstance(lower, (int, float)) else ""
+    return f"{status}, {matched}/{total}{suffix}"
+
+
+def _official_compile_latency_display(latency: dict[str, Any]) -> str:
+    if latency.get("available") is False:
+        return "UNAVAILABLE"
+    status = _pass_fail(latency.get("target_met"))
+    p95 = latency.get("p95_ms")
+    samples = latency.get("sample_count")
+    if p95 is None or samples is None:
+        return status
+    return f"{status}, {p95:g} ms, {samples} samples"
 
 
 def _dynamic_date_display(evidence: dict[str, Any]) -> str:

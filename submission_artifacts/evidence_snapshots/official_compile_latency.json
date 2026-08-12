@@ -1,0 +1,1341 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-12T11:17:34+00:00",
+  "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+  "catalog_snapshot_id": "9198d534b9430211f5d24cdf4700f95f761e9e077e5e1cf6bb03d8282b6c1dbd",
+  "case_count": 48,
+  "sample_count": 1440,
+  "warmups": 1,
+  "repeats": 30,
+  "target_p95_ms": 50.0,
+  "p50_ms": 10.0795,
+  "p95_ms": 29.4199,
+  "p99_ms": 42.2271,
+  "max_ms": 56.6933,
+  "mean_ms": 12.826364,
+  "stage_p95_ms": {
+    "backend": 16.1199,
+    "context_postflight": 1.5116,
+    "context_preflight": 1.1916,
+    "frontend": 4.1148,
+    "logical": 0.3707,
+    "optimizer": 3.1175,
+    "physical": 3.0907,
+    "total": 29.4199,
+    "typed": 0.2024
+  },
+  "function_families": [
+    "belong_industry",
+    "close_together",
+    "cross_above",
+    "cross_down",
+    "golden_cross",
+    "indicator",
+    "position",
+    "queryData",
+    "rank",
+    "record_high",
+    "record_low",
+    "reset"
+  ],
+  "plan_families": [
+    "10_join_doris",
+    "11_date_doris",
+    "12_session_doris",
+    "13_market_doris",
+    "14_aggregate_doris",
+    "15_universe_doris",
+    "16_composite_doris",
+    "17_rank_doris",
+    "18_dynamic_date_doris",
+    "19_security_scope_doris",
+    "20_mapping_event_doris",
+    "21_aggregate_rank_doris",
+    "46_derived_scope_doris",
+    "47_benchmark_policy_doris",
+    "composite_grouped_aggregate",
+    "controlled_expression",
+    "crossing_window",
+    "crossing_window_absence",
+    "direct_column",
+    "event_candidate_intersect",
+    "grouped_aggregate",
+    "named_rank_expression",
+    "prefix_long_horizon",
+    "set_intersect",
+    "set_union",
+    "stable_temporal_join",
+    "stage_rank",
+    "temporal_event_projection",
+    "temporal_grouped_aggregate"
+  ],
+  "failed_cases": 0,
+  "target_met": true,
+  "results": [
+    {
+      "case_id": "CORR-ADAPTIVE-AGGREGATE-002",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "prefix_long_horizon",
+      "selected_strategy": "volume_prefix_aggregate",
+      "sample_count": 30,
+      "p50_ms": 5.5215,
+      "p95_ms": 7.7064,
+      "p99_ms": 8.2088,
+      "max_ms": 8.2088,
+      "stage_p95_ms": {
+        "backend": 1.1564,
+        "context_postflight": 1.3287,
+        "context_preflight": 1.2424,
+        "frontend": 2.2108,
+        "logical": 0.2193,
+        "optimizer": 1.2493,
+        "physical": 0.5398,
+        "total": 7.7064,
+        "typed": 0.0971
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE10-JOIN-DORIS-001-BASIC-EXT-LATEST",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "10_join_doris",
+      "selected_strategy": "stable_key_join",
+      "sample_count": 30,
+      "p50_ms": 9.5221,
+      "p95_ms": 10.7278,
+      "p99_ms": 11.6205,
+      "max_ms": 11.6205,
+      "stage_p95_ms": {
+        "backend": 3.056,
+        "context_postflight": 1.2596,
+        "context_preflight": 1.5034,
+        "frontend": 3.2417,
+        "logical": 0.3798,
+        "optimizer": 1.8596,
+        "physical": 1.1344,
+        "total": 10.7278,
+        "typed": 0.2136
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE10-JOIN-DORIS-002-BASIC-SECURITY-LATEST",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "10_join_doris",
+      "selected_strategy": "stable_key_join",
+      "sample_count": 30,
+      "p50_ms": 9.0297,
+      "p95_ms": 10.6435,
+      "p99_ms": 10.7613,
+      "max_ms": 10.7613,
+      "stage_p95_ms": {
+        "backend": 2.5077,
+        "context_postflight": 1.551,
+        "context_preflight": 1.1985,
+        "frontend": 3.5947,
+        "logical": 0.6332,
+        "optimizer": 1.8907,
+        "physical": 1.1142,
+        "total": 10.6435,
+        "typed": 0.1891
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE11-DATE-DORIS-001-CHINESE-YEAR-2024",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "11_date_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 6.3794,
+      "p95_ms": 8.6206,
+      "p99_ms": 9.3575,
+      "max_ms": 9.3575,
+      "stage_p95_ms": {
+        "backend": 1.81,
+        "context_postflight": 1.3615,
+        "context_preflight": 1.1418,
+        "frontend": 2.0375,
+        "logical": 0.2605,
+        "optimizer": 1.4908,
+        "physical": 0.9759,
+        "total": 8.6206,
+        "typed": 0.1021
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE12-SESSION-DORIS-001-RECENT-5-SESSIONS",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "12_session_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 6.8613,
+      "p95_ms": 8.3048,
+      "p99_ms": 8.6534,
+      "max_ms": 8.6534,
+      "stage_p95_ms": {
+        "backend": 2.3398,
+        "context_postflight": 1.6899,
+        "context_preflight": 1.1818,
+        "frontend": 1.9153,
+        "logical": 0.3014,
+        "optimizer": 1.3345,
+        "physical": 0.5883,
+        "total": 8.3048,
+        "typed": 0.1098
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE13-MARKET-DORIS-001-STAR-MARKET",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "13_market_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 6.7448,
+      "p95_ms": 7.8208,
+      "p99_ms": 8.1001,
+      "max_ms": 8.1001,
+      "stage_p95_ms": {
+        "backend": 2.6113,
+        "context_postflight": 1.375,
+        "context_preflight": 1.0203,
+        "frontend": 1.7073,
+        "logical": 0.2017,
+        "optimizer": 1.0667,
+        "physical": 0.8979,
+        "total": 7.8208,
+        "typed": 0.0947
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE14-AGGREGATE-DORIS-001-SUM-VOLUME-5",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "14_aggregate_doris",
+      "selected_strategy": "grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 8.8012,
+      "p95_ms": 9.6407,
+      "p99_ms": 9.7946,
+      "max_ms": 9.7946,
+      "stage_p95_ms": {
+        "backend": 4.5401,
+        "context_postflight": 1.3675,
+        "context_preflight": 1.2546,
+        "frontend": 1.7501,
+        "logical": 0.2079,
+        "optimizer": 1.1789,
+        "physical": 0.5962,
+        "total": 9.6407,
+        "typed": 0.0915
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE15-UNIVERSE-DORIS-001-FULL-LATEST-UNIVERSE",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "15_universe_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 5.5582,
+      "p95_ms": 6.6182,
+      "p99_ms": 7.6666,
+      "max_ms": 7.6666,
+      "stage_p95_ms": {
+        "backend": 1.3257,
+        "context_postflight": 1.7719,
+        "context_preflight": 1.2428,
+        "frontend": 1.4656,
+        "logical": 0.1147,
+        "optimizer": 1.0114,
+        "physical": 0.3847,
+        "total": 6.6182,
+        "typed": 0.1171
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE16-COMPOSITE-DORIS-001-LATEST-EQUALS-MIN-100-SESSIONS",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "16_composite_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 10.1921,
+      "p95_ms": 11.9747,
+      "p99_ms": 12.0451,
+      "max_ms": 12.0451,
+      "stage_p95_ms": {
+        "backend": 3.5632,
+        "context_postflight": 1.3581,
+        "context_preflight": 1.0751,
+        "frontend": 3.3093,
+        "logical": 0.9903,
+        "optimizer": 1.6082,
+        "physical": 1.3302,
+        "total": 11.9747,
+        "typed": 0.1487
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE17-RANK-DORIS-001-DIRECT-TOP-10",
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "17_rank_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 6.8964,
+      "p95_ms": 8.4881,
+      "p99_ms": 8.9471,
+      "max_ms": 8.9471,
+      "stage_p95_ms": {
+        "backend": 2.2999,
+        "context_postflight": 1.2919,
+        "context_preflight": 1.1754,
+        "frontend": 2.1789,
+        "logical": 0.352,
+        "optimizer": 1.136,
+        "physical": 0.5226,
+        "total": 8.4881,
+        "typed": 0.1258
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE17-RANK-DORIS-002-DIRECT-TOP-10-PERCENT",
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "17_rank_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 6.8619,
+      "p95_ms": 9.9744,
+      "p99_ms": 18.3287,
+      "max_ms": 18.3287,
+      "stage_p95_ms": {
+        "backend": 3.6383,
+        "context_postflight": 2.041,
+        "context_preflight": 0.8967,
+        "frontend": 1.8642,
+        "logical": 0.1321,
+        "optimizer": 1.3479,
+        "physical": 0.4117,
+        "total": 9.9744,
+        "typed": 0.0966
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE17-RANK-DORIS-003-AGGREGATE-AVG-TOP-10",
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "17_rank_doris",
+      "selected_strategy": "aggregate_rank",
+      "sample_count": 30,
+      "p50_ms": 9.425,
+      "p95_ms": 10.6047,
+      "p99_ms": 10.7606,
+      "max_ms": 10.7606,
+      "stage_p95_ms": {
+        "backend": 4.904,
+        "context_postflight": 1.9235,
+        "context_preflight": 1.0775,
+        "frontend": 1.9239,
+        "logical": 0.3236,
+        "optimizer": 1.1688,
+        "physical": 1.4897,
+        "total": 10.6047,
+        "typed": 0.0942
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE18-DYNAMIC-DATE-DORIS-001-CURRENT-MONTH",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "18_dynamic_date_doris",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 6.7012,
+      "p95_ms": 9.4041,
+      "p99_ms": 9.633,
+      "max_ms": 9.633,
+      "stage_p95_ms": {
+        "backend": 2.0787,
+        "context_postflight": 1.2751,
+        "context_preflight": 1.1813,
+        "frontend": 1.8118,
+        "logical": 0.1546,
+        "optimizer": 1.5988,
+        "physical": 0.5939,
+        "total": 9.4041,
+        "typed": 0.0906
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE19-SECURITY-SCOPE-DORIS-004-DIRECT-QUERYDATA-SCALAR",
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "19_security_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 10.89,
+      "p95_ms": 12.3965,
+      "p99_ms": 17.3427,
+      "max_ms": 17.3427,
+      "stage_p95_ms": {
+        "backend": 3.5632,
+        "context_postflight": 1.4051,
+        "context_preflight": 1.0088,
+        "frontend": 2.7369,
+        "logical": 0.2959,
+        "optimizer": 1.6602,
+        "physical": 1.9979,
+        "total": 12.3965,
+        "typed": 0.151
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE19-SECURITY-SCOPE-DORIS-005-GLOBAL-QUERYDATA-AGGREGATE",
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "19_security_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 12.9498,
+      "p95_ms": 15.7236,
+      "p99_ms": 33.0837,
+      "max_ms": 33.0837,
+      "stage_p95_ms": {
+        "backend": 7.4646,
+        "context_postflight": 1.312,
+        "context_preflight": 1.2623,
+        "frontend": 2.8213,
+        "logical": 0.3167,
+        "optimizer": 1.6514,
+        "physical": 2.1144,
+        "total": 15.7236,
+        "typed": 0.1208
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-006-TECHNICAL-CROSS-ABOVE",
+      "function_families": [
+        "cross_above"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 7.7853,
+      "p95_ms": 8.5856,
+      "p99_ms": 9.1196,
+      "max_ms": 9.1196,
+      "stage_p95_ms": {
+        "backend": 3.9936,
+        "context_postflight": 1.2111,
+        "context_preflight": 1.0416,
+        "frontend": 1.6984,
+        "logical": 0.1187,
+        "optimizer": 1.1417,
+        "physical": 0.5337,
+        "total": 8.5856,
+        "typed": 0.103
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-008-RECORD-HIGH-60-SESSIONS",
+      "function_families": [
+        "record_high"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 7.4487,
+      "p95_ms": 9.7323,
+      "p99_ms": 10.2929,
+      "max_ms": 10.2929,
+      "stage_p95_ms": {
+        "backend": 2.6432,
+        "context_postflight": 2.0437,
+        "context_preflight": 1.3314,
+        "frontend": 2.136,
+        "logical": 0.1678,
+        "optimizer": 1.5185,
+        "physical": 0.6537,
+        "total": 9.7323,
+        "typed": 0.1413
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-009-RECORD-LOW-HISTORY",
+      "function_families": [
+        "record_low"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 7.1038,
+      "p95_ms": 7.964,
+      "p99_ms": 8.3842,
+      "max_ms": 8.3842,
+      "stage_p95_ms": {
+        "backend": 2.3649,
+        "context_postflight": 1.8706,
+        "context_preflight": 1.2931,
+        "frontend": 1.8159,
+        "logical": 0.1691,
+        "optimizer": 1.3987,
+        "physical": 0.6357,
+        "total": 7.964,
+        "typed": 0.1191
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-011-CLOSE-TOGETHER-PATTERN",
+      "function_families": [
+        "close_together"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 7.5249,
+      "p95_ms": 8.9322,
+      "p99_ms": 9.0544,
+      "max_ms": 9.0544,
+      "stage_p95_ms": {
+        "backend": 3.8156,
+        "context_postflight": 1.3087,
+        "context_preflight": 1.0153,
+        "frontend": 1.7139,
+        "logical": 0.1744,
+        "optimizer": 1.2027,
+        "physical": 0.6818,
+        "total": 8.9322,
+        "typed": 0.0986
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE20-MAPPING-EVENT-DORIS-012-RESET-PATTERN",
+      "function_families": [
+        "reset"
+      ],
+      "plan_family": "20_mapping_event_doris",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 8.2095,
+      "p95_ms": 10.8705,
+      "p99_ms": 13.5081,
+      "max_ms": 13.5081,
+      "stage_p95_ms": {
+        "backend": 3.738,
+        "context_postflight": 1.5374,
+        "context_preflight": 1.4086,
+        "frontend": 2.3917,
+        "logical": 0.1449,
+        "optimizer": 0.9458,
+        "physical": 0.8314,
+        "total": 10.8705,
+        "typed": 0.1004
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE21-AGGREGATE-RANK-DORIS-001-CONFIGURED-RELATIVE-APPROXIMATIO",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "21_aggregate_rank_doris",
+      "selected_strategy": "controlled_expression",
+      "sample_count": 30,
+      "p50_ms": 6.2677,
+      "p95_ms": 7.618,
+      "p99_ms": 7.7351,
+      "max_ms": 7.7351,
+      "stage_p95_ms": {
+        "backend": 2.0277,
+        "context_postflight": 1.2703,
+        "context_preflight": 1.2807,
+        "frontend": 1.479,
+        "logical": 0.1167,
+        "optimizer": 1.2958,
+        "physical": 0.7252,
+        "total": 7.618,
+        "typed": 0.0913
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE22-STAGE-RANK-DORIS-001-NAMED-RANK-ARITHMETIC",
+      "function_families": [
+        "rank"
+      ],
+      "plan_family": "named_rank_expression",
+      "selected_strategy": "named_rank_expression",
+      "sample_count": 30,
+      "p50_ms": 12.9249,
+      "p95_ms": 13.968,
+      "p99_ms": 26.3554,
+      "max_ms": 26.3554,
+      "stage_p95_ms": {
+        "backend": 6.4043,
+        "context_postflight": 1.9643,
+        "context_preflight": 1.1431,
+        "frontend": 2.7527,
+        "logical": 1.0807,
+        "optimizer": 1.4473,
+        "physical": 1.4828,
+        "total": 13.968,
+        "typed": 0.1481
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE22-STAGE-RANK-DORIS-006-PARENTHESIZED-STAGE-UNION",
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "plan_family": "set_union",
+      "selected_strategy": "set_union",
+      "sample_count": 30,
+      "p50_ms": 27.3175,
+      "p95_ms": 38.3512,
+      "p99_ms": 42.2271,
+      "max_ms": 42.2271,
+      "stage_p95_ms": {
+        "backend": 23.8508,
+        "context_postflight": 1.2318,
+        "context_preflight": 1.1638,
+        "frontend": 6.6786,
+        "logical": 0.5125,
+        "optimizer": 5.931,
+        "physical": 3.8857,
+        "total": 38.3512,
+        "typed": 0.4137
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE23-RELATIONAL-DORIS-001-NOT-EVERY-RECENT-FIVE",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "direct_column",
+      "selected_strategy": "direct_column",
+      "sample_count": 30,
+      "p50_ms": 9.2143,
+      "p95_ms": 10.4925,
+      "p99_ms": 11.1973,
+      "max_ms": 11.1973,
+      "stage_p95_ms": {
+        "backend": 5.349,
+        "context_postflight": 1.2948,
+        "context_preflight": 1.0508,
+        "frontend": 2.0179,
+        "logical": 0.3335,
+        "optimizer": 1.1442,
+        "physical": 0.5983,
+        "total": 10.4925,
+        "typed": 0.1612
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE23-RELATIONAL-DORIS-003-MULTI-RESOURCE-TEMPORAL-JOIN",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "stable_temporal_join",
+      "selected_strategy": "stable_temporal_join",
+      "sample_count": 30,
+      "p50_ms": 16.1417,
+      "p95_ms": 17.2578,
+      "p99_ms": 32.7958,
+      "max_ms": 32.7958,
+      "stage_p95_ms": {
+        "backend": 10.5077,
+        "context_postflight": 1.2663,
+        "context_preflight": 1.1265,
+        "frontend": 3.047,
+        "logical": 0.3904,
+        "optimizer": 1.5297,
+        "physical": 0.9864,
+        "total": 17.2578,
+        "typed": 0.1309
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE24-PERIOD-SCALAR-DORIS-003-PERIOD-QUERYDATA-CROSS-SCALAR",
+      "function_families": [
+        "indicator",
+        "queryData"
+      ],
+      "plan_family": "composite_grouped_aggregate",
+      "selected_strategy": "composite_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 15.2734,
+      "p95_ms": 24.358,
+      "p99_ms": 32.8115,
+      "max_ms": 32.8115,
+      "stage_p95_ms": {
+        "backend": 9.6199,
+        "context_postflight": 1.6785,
+        "context_preflight": 2.0555,
+        "frontend": 3.9146,
+        "logical": 0.2953,
+        "optimizer": 2.2861,
+        "physical": 2.1769,
+        "total": 24.358,
+        "typed": 0.1791
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-001-PERIOD-RECORD-HIGH-AND-GROUPED-A",
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "sample_count": 30,
+      "p50_ms": 15.9755,
+      "p95_ms": 18.0772,
+      "p99_ms": 31.9323,
+      "max_ms": 31.9323,
+      "stage_p95_ms": {
+        "backend": 9.9203,
+        "context_postflight": 1.5146,
+        "context_preflight": 1.6111,
+        "frontend": 3.2802,
+        "logical": 0.4971,
+        "optimizer": 2.1966,
+        "physical": 1.1906,
+        "total": 18.0772,
+        "typed": 0.1321
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-002-PERIOD-EVENT-ABSENCE-USES-DECIDA",
+      "function_families": [
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "sample_count": 30,
+      "p50_ms": 19.1245,
+      "p95_ms": 33.2495,
+      "p99_ms": 36.5681,
+      "max_ms": 36.5681,
+      "stage_p95_ms": {
+        "backend": 12.19,
+        "context_postflight": 1.3305,
+        "context_preflight": 0.9041,
+        "frontend": 3.29,
+        "logical": 1.5481,
+        "optimizer": 1.9444,
+        "physical": 1.8445,
+        "total": 33.2495,
+        "typed": 0.2055
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-004-EVENT-UNION-AND-MULTI-GROWTH-REL",
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "indicator"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "sample_count": 30,
+      "p50_ms": 29.5077,
+      "p95_ms": 48.1426,
+      "p99_ms": 48.5022,
+      "max_ms": 48.5022,
+      "stage_p95_ms": {
+        "backend": 33.5485,
+        "context_postflight": 1.1521,
+        "context_preflight": 1.1721,
+        "frontend": 6.6262,
+        "logical": 17.1925,
+        "optimizer": 3.9158,
+        "physical": 2.7087,
+        "total": 48.1426,
+        "typed": 0.3581
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE25-EVENT-CANDIDATE-DORIS-005-DIFFERENT-EVENT-AND-INDICATOR-DA",
+      "function_families": [
+        "indicator",
+        "record_high"
+      ],
+      "plan_family": "event_candidate_intersect",
+      "selected_strategy": "event_candidate_intersect",
+      "sample_count": 30,
+      "p50_ms": 13.0015,
+      "p95_ms": 14.9409,
+      "p99_ms": 30.3838,
+      "max_ms": 30.3838,
+      "stage_p95_ms": {
+        "backend": 7.476,
+        "context_postflight": 1.2601,
+        "context_preflight": 1.1858,
+        "frontend": 2.9106,
+        "logical": 1.2905,
+        "optimizer": 1.7413,
+        "physical": 1.4644,
+        "total": 14.9409,
+        "typed": 0.1443
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE26-DATE-LIMIT-DORIS-001-FIXED-YEAR-FOLLOWING-RANGE",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "grouped_aggregate",
+      "selected_strategy": "grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 7.366,
+      "p95_ms": 8.7534,
+      "p99_ms": 11.2007,
+      "max_ms": 11.2007,
+      "stage_p95_ms": {
+        "backend": 4.213,
+        "context_postflight": 1.5057,
+        "context_preflight": 0.9655,
+        "frontend": 1.7664,
+        "logical": 0.2699,
+        "optimizer": 1.4704,
+        "physical": 0.5493,
+        "total": 8.7534,
+        "typed": 0.1278
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE26-DATE-LIMIT-DORIS-005-FRACTIONAL-YEAR-TO-SIX-MONTH-BUC",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "temporal_grouped_aggregate",
+      "selected_strategy": "temporal_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 16.1683,
+      "p95_ms": 33.9914,
+      "p99_ms": 34.4522,
+      "max_ms": 34.4522,
+      "stage_p95_ms": {
+        "backend": 28.5252,
+        "context_postflight": 1.537,
+        "context_preflight": 1.1004,
+        "frontend": 1.772,
+        "logical": 0.2773,
+        "optimizer": 1.2099,
+        "physical": 0.4181,
+        "total": 33.9914,
+        "typed": 0.1157
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE27-EVENT-SEMANTICS-DORIS-001-BOUNDED-CROSSING-EXISTENCE",
+      "function_families": [
+        "golden_cross"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "sample_count": 30,
+      "p50_ms": 12.0659,
+      "p95_ms": 14.3559,
+      "p99_ms": 30.9442,
+      "max_ms": 30.9442,
+      "stage_p95_ms": {
+        "backend": 8.9208,
+        "context_postflight": 1.4285,
+        "context_preflight": 1.2764,
+        "frontend": 1.9841,
+        "logical": 0.2789,
+        "optimizer": 1.2789,
+        "physical": 0.6058,
+        "total": 14.3559,
+        "typed": 0.0819
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE27-EVENT-SEMANTICS-DORIS-002-MONTHLY-CROSSING-BUCKET",
+      "function_families": [
+        "golden_cross"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "sample_count": 30,
+      "p50_ms": 14.257,
+      "p95_ms": 16.4813,
+      "p99_ms": 32.1284,
+      "max_ms": 32.1284,
+      "stage_p95_ms": {
+        "backend": 11.3195,
+        "context_postflight": 1.8186,
+        "context_preflight": 1.3737,
+        "frontend": 1.8168,
+        "logical": 0.1707,
+        "optimizer": 1.2277,
+        "physical": 0.6521,
+        "total": 16.4813,
+        "typed": 0.1137
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-002-PRICE-DOES-NOT-CROSS-BELOW-MA60",
+      "function_families": [
+        "cross_down"
+      ],
+      "plan_family": "crossing_window_absence",
+      "selected_strategy": "crossing_window_absence",
+      "sample_count": 30,
+      "p50_ms": 11.1943,
+      "p95_ms": 13.8963,
+      "p99_ms": 14.4511,
+      "max_ms": 14.4511,
+      "stage_p95_ms": {
+        "backend": 8.1252,
+        "context_postflight": 1.558,
+        "context_preflight": 1.3676,
+        "frontend": 1.6974,
+        "logical": 0.1269,
+        "optimizer": 1.2397,
+        "physical": 1.0414,
+        "total": 13.8963,
+        "typed": 0.076
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-003-PRICE-AT-FIVE-SESSION-LOW",
+      "function_families": [
+        "record_low"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 6.7964,
+      "p95_ms": 9.0873,
+      "p99_ms": 9.6339,
+      "max_ms": 9.6339,
+      "stage_p95_ms": {
+        "backend": 2.1755,
+        "context_postflight": 1.7767,
+        "context_preflight": 1.2007,
+        "frontend": 1.8739,
+        "logical": 0.2171,
+        "optimizer": 1.4888,
+        "physical": 0.7645,
+        "total": 9.0873,
+        "typed": 0.1029
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-004-PRICE-IN-LOW-HISTORICAL-QUARTILE",
+      "function_families": [
+        "position"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 10.8147,
+      "p95_ms": 14.1677,
+      "p99_ms": 27.8867,
+      "max_ms": 27.8867,
+      "stage_p95_ms": {
+        "backend": 8.7838,
+        "context_postflight": 1.4772,
+        "context_preflight": 1.1567,
+        "frontend": 1.6991,
+        "logical": 0.4776,
+        "optimizer": 1.201,
+        "physical": 0.509,
+        "total": 14.1677,
+        "typed": 0.0976
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-005-PRICE-CLOSE-TO-MA20",
+      "function_families": [
+        "close_together"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 8.7521,
+      "p95_ms": 10.2533,
+      "p99_ms": 11.2102,
+      "max_ms": 11.2102,
+      "stage_p95_ms": {
+        "backend": 4.8715,
+        "context_postflight": 1.3501,
+        "context_preflight": 1.4627,
+        "frontend": 1.7452,
+        "logical": 0.1852,
+        "optimizer": 1.5437,
+        "physical": 0.9724,
+        "total": 10.2533,
+        "typed": 0.0954
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE28-DEFAULT-PRICE-DORIS-006-PRICE-RESETS-TO-MA5",
+      "function_families": [
+        "reset"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 8.6432,
+      "p95_ms": 9.9763,
+      "p99_ms": 11.0309,
+      "max_ms": 11.0309,
+      "stage_p95_ms": {
+        "backend": 3.5751,
+        "context_postflight": 1.2039,
+        "context_preflight": 1.0059,
+        "frontend": 1.4958,
+        "logical": 0.1278,
+        "optimizer": 1.2518,
+        "physical": 1.0384,
+        "total": 9.9763,
+        "typed": 0.1067
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE29-EVENT-PROJECTION-DORIS-002-REPEATED-TWENTY-SESSION-LOW",
+      "function_families": [
+        "record_low"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "sample_count": 30,
+      "p50_ms": 10.8391,
+      "p95_ms": 14.6385,
+      "p99_ms": 29.0653,
+      "max_ms": 29.0653,
+      "stage_p95_ms": {
+        "backend": 8.3849,
+        "context_postflight": 1.2592,
+        "context_preflight": 1.2478,
+        "frontend": 1.7773,
+        "logical": 0.2558,
+        "optimizer": 1.4845,
+        "physical": 0.8138,
+        "total": 14.6385,
+        "typed": 0.0859
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE29-EVENT-PROJECTION-DORIS-003-THREE-SESSION-PRICE-MA5-CONVERGE",
+      "function_families": [
+        "close_together"
+      ],
+      "plan_family": "temporal_event_projection",
+      "selected_strategy": "temporal_event_projection",
+      "sample_count": 30,
+      "p50_ms": 17.4677,
+      "p95_ms": 20.7854,
+      "p99_ms": 39.3765,
+      "max_ms": 39.3765,
+      "stage_p95_ms": {
+        "backend": 13.4639,
+        "context_postflight": 1.5778,
+        "context_preflight": 1.3341,
+        "frontend": 2.0924,
+        "logical": 0.2885,
+        "optimizer": 1.1385,
+        "physical": 1.8387,
+        "total": 20.7854,
+        "typed": 0.1199
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE30-GROUNDED-EVENT-DORIS-004-SUPPORT-RESET-AND-PRESSURE-CROSS",
+      "function_families": [
+        "cross_above",
+        "cross_down",
+        "reset"
+      ],
+      "plan_family": "set_intersect",
+      "selected_strategy": "set_intersect",
+      "sample_count": 30,
+      "p50_ms": 25.6733,
+      "p95_ms": 42.2442,
+      "p99_ms": 43.5245,
+      "max_ms": 43.5245,
+      "stage_p95_ms": {
+        "backend": 28.9756,
+        "context_postflight": 1.443,
+        "context_preflight": 1.0421,
+        "frontend": 4.0356,
+        "logical": 0.3836,
+        "optimizer": 3.5046,
+        "physical": 4.4839,
+        "total": 42.2442,
+        "typed": 1.6056
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE30-GROUNDED-EVENT-DORIS-005-UNSEALED-LIMIT-EVENT",
+      "function_families": [
+        "indicator"
+      ],
+      "plan_family": "controlled_expression",
+      "selected_strategy": "controlled_expression",
+      "sample_count": 30,
+      "p50_ms": 7.8906,
+      "p95_ms": 9.3464,
+      "p99_ms": 9.5825,
+      "max_ms": 9.5825,
+      "stage_p95_ms": {
+        "backend": 3.7033,
+        "context_postflight": 1.217,
+        "context_preflight": 1.2233,
+        "frontend": 1.6588,
+        "logical": 0.2835,
+        "optimizer": 1.2306,
+        "physical": 0.9863,
+        "total": 9.3464,
+        "typed": 0.1855
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE30-GROUNDED-EVENT-DORIS-006-HALF-YEAR-HISTORICAL-LOW",
+      "function_families": [
+        "position"
+      ],
+      "plan_family": "crossing_window",
+      "selected_strategy": "crossing_window",
+      "sample_count": 30,
+      "p50_ms": 11.4413,
+      "p95_ms": 15.721,
+      "p99_ms": 28.7252,
+      "max_ms": 28.7252,
+      "stage_p95_ms": {
+        "backend": 8.7653,
+        "context_postflight": 1.7544,
+        "context_preflight": 1.0667,
+        "frontend": 2.7679,
+        "logical": 0.3706,
+        "optimizer": 1.6051,
+        "physical": 0.4655,
+        "total": 15.721,
+        "typed": 0.1615
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE31-FINAL-GROUNDED-DORIS-002-EVENT-CANDIDATE-THEN-RANK",
+      "function_families": [
+        "indicator",
+        "position",
+        "rank"
+      ],
+      "plan_family": "stage_rank",
+      "selected_strategy": "stage_rank",
+      "sample_count": 30,
+      "p50_ms": 32.2661,
+      "p95_ms": 55.7618,
+      "p99_ms": 56.6933,
+      "max_ms": 56.6933,
+      "stage_p95_ms": {
+        "backend": 40.1379,
+        "context_postflight": 1.7023,
+        "context_preflight": 1.6308,
+        "frontend": 4.8903,
+        "logical": 0.3951,
+        "optimizer": 4.8721,
+        "physical": 2.9765,
+        "total": 55.7618,
+        "typed": 0.2428
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE46-DERIVED-SCOPE-DORIS-002-CSI300-SSE-MAIN-BOARD-INDUSTRY-A",
+      "function_families": [
+        "belong_industry",
+        "indicator"
+      ],
+      "plan_family": "46_derived_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 25.8878,
+      "p95_ms": 44.4224,
+      "p99_ms": 46.248,
+      "max_ms": 46.248,
+      "stage_p95_ms": {
+        "backend": 33.041,
+        "context_postflight": 1.3224,
+        "context_preflight": 0.9503,
+        "frontend": 3.4202,
+        "logical": 0.3414,
+        "optimizer": 4.4269,
+        "physical": 5.7376,
+        "total": 44.4224,
+        "typed": 0.222
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE46-DERIVED-SCOPE-DORIS-003-STAR-REGISTRATION-INDUSTRY-MIN",
+      "function_families": [
+        "belong_industry",
+        "indicator"
+      ],
+      "plan_family": "46_derived_scope_doris",
+      "selected_strategy": "composite_grouped_aggregate",
+      "sample_count": 30,
+      "p50_ms": 15.2224,
+      "p95_ms": 16.3587,
+      "p99_ms": 17.322,
+      "max_ms": 17.322,
+      "stage_p95_ms": {
+        "backend": 8.6247,
+        "context_postflight": 1.3917,
+        "context_preflight": 1.0759,
+        "frontend": 2.7075,
+        "logical": 0.1726,
+        "optimizer": 2.2761,
+        "physical": 2.3728,
+        "total": 16.3587,
+        "typed": 0.123
+      },
+      "status": "PASS",
+      "error": ""
+    },
+    {
+      "case_id": "CORR-PHASE47-BENCHMARK-POLICY-DORIS-001-AI-TOP1-NOT-OUTPERFORM-BENCHMARK",
+      "function_families": [
+        "indicator",
+        "queryData",
+        "rank"
+      ],
+      "plan_family": "47_benchmark_policy_doris",
+      "selected_strategy": "set_intersect",
+      "sample_count": 30,
+      "p50_ms": 19.7492,
+      "p95_ms": 23.7326,
+      "p99_ms": 35.7974,
+      "max_ms": 35.7974,
+      "stage_p95_ms": {
+        "backend": 9.2843,
+        "context_postflight": 2.2613,
+        "context_preflight": 1.1628,
+        "frontend": 5.2537,
+        "logical": 0.3138,
+        "optimizer": 3.3264,
+        "physical": 3.7856,
+        "total": 23.7326,
+        "typed": 0.1727
+      },
+      "status": "PASS",
+      "error": ""
+    }
+  ]
+}

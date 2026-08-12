@@ -1,33 +1,33 @@
 # 官方 SQL 正确率冻结基准
 
-- Git HEAD：`414a9803964a61ffa1876b9d1bbda0fba0e6a298`
-- Catalog snapshot：`0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636`
+- Git HEAD：`a531f1c42169199bc958ffcbafbf122f0f4928d7`
+- Catalog snapshot：`9198d534b9430211f5d24cdf4700f95f761e9e077e5e1cf6bb03d8282b6c1dbd`
 - Policy：`official-semantic-policy-v1`
 - Dataset snapshot：`official-doris-20260414-c36a993257a1e152`
-- Eligible：`157`
-- 完整行集一致：`157`
+- Eligible：`240`
+- 完整行集一致：`240`
 - 正确率：`100.00%`
-- Wilson 95% 下界：`97.61%`
+- Wilson 95% 下界：`98.42%`
 - 95% 门禁：`PASS`
 - 十二类函数覆盖：`True`
-- 内部 240 条/98% 门禁：`FAIL`
+- 内部 240 条/98% 门禁：`PASS`
 
 ## 分层结果
 
 | 维度 | 分组 | 匹配 | 总数 | 正确率 |
 |---|---|---:|---:|---:|
-| function_family | belong_industry | 11 | 11 | 100.00% |
-| function_family | close_together | 11 | 11 | 100.00% |
-| function_family | cross_above | 10 | 10 | 100.00% |
-| function_family | cross_down | 11 | 11 | 100.00% |
-| function_family | golden_cross | 11 | 11 | 100.00% |
-| function_family | indicator | 121 | 121 | 100.00% |
-| function_family | position | 11 | 11 | 100.00% |
-| function_family | queryData | 11 | 11 | 100.00% |
-| function_family | rank | 21 | 21 | 100.00% |
-| function_family | record_high | 11 | 11 | 100.00% |
-| function_family | record_low | 10 | 10 | 100.00% |
-| function_family | reset | 10 | 10 | 100.00% |
+| function_family | belong_industry | 25 | 25 | 100.00% |
+| function_family | close_together | 27 | 27 | 100.00% |
+| function_family | cross_above | 22 | 22 | 100.00% |
+| function_family | cross_down | 26 | 26 | 100.00% |
+| function_family | golden_cross | 28 | 28 | 100.00% |
+| function_family | indicator | 204 | 204 | 100.00% |
+| function_family | position | 25 | 25 | 100.00% |
+| function_family | queryData | 30 | 30 | 100.00% |
+| function_family | rank | 41 | 41 | 100.00% |
+| function_family | record_high | 26 | 26 | 100.00% |
+| function_family | record_low | 23 | 23 | 100.00% |
+| function_family | reset | 24 | 24 | 100.00% |
 | plan_family | 10_join_doris | 5 | 5 | 100.00% |
 | plan_family | 11_date_doris | 5 | 5 | 100.00% |
 | plan_family | 12_session_doris | 3 | 3 | 100.00% |
@@ -42,8 +42,13 @@
 | plan_family | 21_aggregate_rank_doris | 6 | 6 | 100.00% |
 | plan_family | 46_derived_scope_doris | 3 | 3 | 100.00% |
 | plan_family | 47_benchmark_policy_doris | 3 | 3 | 100.00% |
+| plan_family | adversarial_and_or | 15 | 15 | 100.00% |
+| plan_family | adversarial_intersection | 32 | 32 | 100.00% |
+| plan_family | adversarial_or_and | 11 | 11 | 100.00% |
+| plan_family | adversarial_union | 24 | 24 | 100.00% |
 | plan_family | balanced_cross_function_composition | 30 | 30 | 100.00% |
 | plan_family | composite_grouped_aggregate | 3 | 3 | 100.00% |
+| plan_family | configured_expression_template | 1 | 1 | 100.00% |
 | plan_family | controlled_expression | 1 | 1 | 100.00% |
 | plan_family | crossing_window | 9 | 9 | 100.00% |
 | plan_family | crossing_window_absence | 1 | 1 | 100.00% |
@@ -221,3 +226,86 @@
 | CORR-BALANCED-COMPOSITION-028 | PASS | True | 2285 | 2285 |  |
 | CORR-BALANCED-COMPOSITION-029 | PASS | True | 3679 | 3679 |  |
 | CORR-BALANCED-COMPOSITION-030 | PASS | True | 1063 | 1063 |  |
+| CORR-ADVERSARIAL-001-INTERSECTION | PASS | True | 6 | 6 |  |
+| CORR-ADVERSARIAL-002-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-003-INTERSECTION | PASS | True | 1119 | 1119 |  |
+| CORR-ADVERSARIAL-004-INTERSECTION | PASS | True | 259 | 259 |  |
+| CORR-ADVERSARIAL-005-INTERSECTION | PASS | True | 4 | 4 |  |
+| CORR-ADVERSARIAL-006-INTERSECTION | PASS | True | 14 | 14 |  |
+| CORR-ADVERSARIAL-007-INTERSECTION | PASS | True | 110 | 110 |  |
+| CORR-ADVERSARIAL-008-INTERSECTION | PASS | True | 651 | 651 |  |
+| CORR-ADVERSARIAL-009-INTERSECTION | PASS | True | 91 | 91 |  |
+| CORR-ADVERSARIAL-010-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-011-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-012-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-013-INTERSECTION | PASS | True | 6 | 6 |  |
+| CORR-ADVERSARIAL-014-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-015-INTERSECTION | PASS | True | 1119 | 1119 |  |
+| CORR-ADVERSARIAL-016-INTERSECTION | PASS | True | 259 | 259 |  |
+| CORR-ADVERSARIAL-017-INTERSECTION | PASS | True | 4 | 4 |  |
+| CORR-ADVERSARIAL-018-INTERSECTION | PASS | True | 14 | 14 |  |
+| CORR-ADVERSARIAL-019-INTERSECTION | PASS | True | 110 | 110 |  |
+| CORR-ADVERSARIAL-020-INTERSECTION | PASS | True | 651 | 651 |  |
+| CORR-ADVERSARIAL-021-INTERSECTION | PASS | True | 91 | 91 |  |
+| CORR-ADVERSARIAL-022-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-023-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-024-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-025-INTERSECTION | PASS | True | 6 | 6 |  |
+| CORR-ADVERSARIAL-026-INTERSECTION | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-027-INTERSECTION | PASS | True | 1119 | 1119 |  |
+| CORR-ADVERSARIAL-028-INTERSECTION | PASS | True | 259 | 259 |  |
+| CORR-ADVERSARIAL-029-INTERSECTION | PASS | True | 4 | 4 |  |
+| CORR-ADVERSARIAL-030-INTERSECTION | PASS | True | 14 | 14 |  |
+| CORR-ADVERSARIAL-031-INTERSECTION | PASS | True | 110 | 110 |  |
+| CORR-ADVERSARIAL-032-INTERSECTION | PASS | True | 651 | 651 |  |
+| CORR-ADVERSARIAL-033-UNION | PASS | True | 5267 | 5267 |  |
+| CORR-ADVERSARIAL-034-UNION | PASS | True | 95 | 95 |  |
+| CORR-ADVERSARIAL-035-UNION | PASS | True | 1680 | 1680 |  |
+| CORR-ADVERSARIAL-036-UNION | PASS | True | 5573 | 5573 |  |
+| CORR-ADVERSARIAL-037-UNION | PASS | True | 4618 | 4618 |  |
+| CORR-ADVERSARIAL-038-UNION | PASS | True | 10 | 10 |  |
+| CORR-ADVERSARIAL-039-UNION | PASS | True | 2248 | 2248 |  |
+| CORR-ADVERSARIAL-040-UNION | PASS | True | 1600 | 1600 |  |
+| CORR-ADVERSARIAL-041-UNION | PASS | True | 875 | 875 |  |
+| CORR-ADVERSARIAL-042-UNION | PASS | True | 2088 | 2088 |  |
+| CORR-ADVERSARIAL-043-UNION | PASS | True | 1839 | 1839 |  |
+| CORR-ADVERSARIAL-044-UNION | PASS | True | 4996 | 4996 |  |
+| CORR-ADVERSARIAL-045-UNION | PASS | True | 5267 | 5267 |  |
+| CORR-ADVERSARIAL-046-UNION | PASS | True | 95 | 95 |  |
+| CORR-ADVERSARIAL-047-UNION | PASS | True | 1680 | 1680 |  |
+| CORR-ADVERSARIAL-048-UNION | PASS | True | 5573 | 5573 |  |
+| CORR-ADVERSARIAL-049-UNION | PASS | True | 4618 | 4618 |  |
+| CORR-ADVERSARIAL-050-UNION | PASS | True | 10 | 10 |  |
+| CORR-ADVERSARIAL-051-UNION | PASS | True | 2248 | 2248 |  |
+| CORR-ADVERSARIAL-052-UNION | PASS | True | 1600 | 1600 |  |
+| CORR-ADVERSARIAL-053-UNION | PASS | True | 2352 | 2352 |  |
+| CORR-ADVERSARIAL-054-UNION | PASS | True | 2088 | 2088 |  |
+| CORR-ADVERSARIAL-055-UNION | PASS | True | 1839 | 1839 |  |
+| CORR-ADVERSARIAL-056-UNION | PASS | True | 4996 | 4996 |  |
+| CORR-ADVERSARIAL-057-AND-OR | PASS | True | 2050 | 2050 |  |
+| CORR-ADVERSARIAL-058-AND-OR | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-059-AND-OR | PASS | True | 5267 | 5267 |  |
+| CORR-ADVERSARIAL-060-AND-OR | PASS | True | 93 | 93 |  |
+| CORR-ADVERSARIAL-061-AND-OR | PASS | True | 2348 | 2348 |  |
+| CORR-ADVERSARIAL-062-AND-OR | PASS | True | 784 | 784 |  |
+| CORR-ADVERSARIAL-063-AND-OR | PASS | True | 1532 | 1532 |  |
+| CORR-ADVERSARIAL-064-AND-OR | PASS | True | 1900 | 1900 |  |
+| CORR-ADVERSARIAL-065-AND-OR | PASS | True | 1471 | 1471 |  |
+| CORR-ADVERSARIAL-066-AND-OR | PASS | True | 973 | 973 |  |
+| CORR-ADVERSARIAL-067-AND-OR | PASS | True | 1896 | 1896 |  |
+| CORR-ADVERSARIAL-068-AND-OR | PASS | True | 661 | 661 |  |
+| CORR-ADVERSARIAL-069-AND-OR | PASS | True | 2050 | 2050 |  |
+| CORR-ADVERSARIAL-070-AND-OR | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-071-AND-OR | PASS | True | 5267 | 5267 |  |
+| CORR-ADVERSARIAL-072-OR-AND | PASS | True | 93 | 93 |  |
+| CORR-ADVERSARIAL-073-OR-AND | PASS | True | 2045 | 2045 |  |
+| CORR-ADVERSARIAL-074-OR-AND | PASS | True | 0 | 0 |  |
+| CORR-ADVERSARIAL-075-OR-AND | PASS | True | 527 | 527 |  |
+| CORR-ADVERSARIAL-076-OR-AND | PASS | True | 106 | 106 |  |
+| CORR-ADVERSARIAL-077-OR-AND | PASS | True | 354 | 354 |  |
+| CORR-ADVERSARIAL-078-OR-AND | PASS | True | 665 | 665 |  |
+| CORR-ADVERSARIAL-079-OR-AND | PASS | True | 1896 | 1896 |  |
+| CORR-ADVERSARIAL-080-OR-AND | PASS | True | 9 | 9 |  |
+| CORR-ADVERSARIAL-081-OR-AND | PASS | True | 2045 | 2045 |  |
+| CORR-ADVERSARIAL-082-OR-AND | PASS | True | 0 | 0 |  |
+| CORR-CONFIG-FUNCTION-RELATIVE-GAP-001 | PASS | True | 5573 | 5573 |  |

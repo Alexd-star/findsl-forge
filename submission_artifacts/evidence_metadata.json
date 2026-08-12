@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T09:27:23Z",
+  "generated_at": "2026-08-12T11:21:02Z",
   "snapshot_dir": "submission_artifacts\\evidence_snapshots",
   "git": {
-    "head_at_report_generation": "414a980",
-    "head_at_export": "414a980",
-    "branch": "feat/antlr-calcite-architecture"
+    "head_at_report_generation": "a531f1c",
+    "head_at_export": "a531f1c",
+    "branch": "feat/full-score-hardening"
   },
   "readiness": {
-    "generated_at": "2026-08-09T12:56:22+00:00",
+    "generated_at": "2026-08-12T11:17:10+00:00",
     "blocking_gates_passed": true,
     "warning_count": 0,
     "compile_success_rate_percent": 100.0,
     "sql_fragment_accuracy_percent": 100.0,
-    "compile_p95_latency_ms": 1.375,
+    "compile_p95_latency_ms": 30.577,
     "evaluation_cases": {
       "passed": 10,
       "total": 10
@@ -23,9 +23,21 @@
       "total": 13
     },
     "pytest": {
-      "passed": 1125,
-      "elapsed_seconds": 148.63
+      "passed": 1136,
+      "elapsed_seconds": 170.29
     }
+  },
+  "official_compile_latency": {
+    "available": true,
+    "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+    "catalog_snapshot_id": "9198d534b9430211f5d24cdf4700f95f761e9e077e5e1cf6bb03d8282b6c1dbd",
+    "case_count": 48,
+    "sample_count": 1440,
+    "p50_ms": 10.0795,
+    "p95_ms": 29.4199,
+    "p99_ms": 42.2271,
+    "target_p95_ms": 50.0,
+    "target_met": true
   },
   "official_suite": {
     "suite_passed": true,
@@ -43,20 +55,20 @@
       "available": true,
       "feature_tables_available": true,
       "baseline_prefix_row_count_match": true,
-      "baseline_vs_prefix_speedup": 12.107,
-      "baseline_vs_prefix_speedup_display": "12.11x",
+      "baseline_vs_prefix_speedup": 13.032,
+      "baseline_vs_prefix_speedup_display": "13.03x",
       "row_counts": {
         "hsj_stock_hq_basic": 13650347,
         "hsj_stock_code_info": 5686,
         "hsj_stock_hq_ext": 6170822
       },
       "feature_table_row_counts": {
-        "hsj_stock_hq_basic_prefix": 13650347,
-        "hsj_stock_hq_ext_prefix": 13650347,
         "hsj_stock_hq_basic_technical": 13650347,
-        "hsj_stock_hq_basic_rollup": 13650347
+        "hsj_stock_hq_basic_rollup": 13650347,
+        "hsj_stock_hq_basic_prefix": 13650347,
+        "hsj_stock_hq_ext_prefix": 13650347
       },
-      "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+      "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
       "snapshot_fingerprint": "9867fffd0f3514d3960679032e1152ec1265cf66f331598f14a26a835567fff6"
     },
     "slot_coverage": {
@@ -68,7 +80,7 @@
       "compile_failed": 3969,
       "compile_rate_on_all_rows": 0.315572,
       "compile_rate_on_parse_ok": 0.315572,
-      "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+      "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
       "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623"
     },
     "performance_matrix": {
@@ -77,7 +89,7 @@
       "passed": 48,
       "all_matched_reference": true,
       "all_queries_under_10s": true,
-      "max_p95_ms": 2945.0978,
+      "max_p95_ms": 3151.535,
       "mean_avg_ms": null,
       "prefix_query_count": null,
       "window_query_count": null,
@@ -86,27 +98,29 @@
       "baseline_vs_prefix_speedup_display": null,
       "warmups": 1,
       "repeats": 7,
-      "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
-      "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+      "catalog_snapshot_id": "9198d534b9430211f5d24cdf4700f95f761e9e077e5e1cf6bb03d8282b6c1dbd",
+      "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7"
     },
     "long_horizon": {
       "available": true,
       "status": "PASS",
-      "speedup": 14.625,
-      "speedup_display": "14.62x",
+      "workload_count": 5,
+      "median_speedup": 16.8,
+      "speedup": 14.842105,
+      "speedup_display": "14.84x",
       "target_speedup": 10.0,
       "target_met": true,
-      "result_row_count": 5614,
-      "complete_result_hash_match": true,
-      "baseline_median_ms": 234.0,
-      "optimized_median_ms": 16.0,
-      "rollup_partition_count": 244,
-      "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+      "result_row_count": null,
+      "complete_result_hash_match": null,
+      "baseline_median_ms": null,
+      "optimized_median_ms": null,
+      "rollup_partition_count": null,
+      "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7"
     }
   },
   "official_migration": {
     "available": true,
-    "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
+    "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
     "row_count": 5799,
     "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
     "input_sha256": "b5603a9bf9db60a76abe46ec6360c4ab09e26e5c10fac3c9dbccd92615963623",
@@ -300,29 +314,31 @@
   },
   "formal_correctness": {
     "available": true,
-    "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-    "catalog_snapshot_id": "0220ac16d8cdf779da910d7289bb979da84ea1328198ed7b7029bd09e6f1b636",
+    "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+    "catalog_snapshot_id": "9198d534b9430211f5d24cdf4700f95f761e9e077e5e1cf6bb03d8282b6c1dbd",
     "policy_id": "official-semantic-policy-v1",
-    "eligible_total": 157,
-    "matched": 157,
+    "eligible_total": 240,
+    "matched": 240,
     "accuracy": 1.0,
-    "target_met": true
+    "target_met": true,
+    "internal_target_met": true,
+    "wilson_95_lower": 0.9842460800584412
   },
   "doris_cluster": {
     "available": true,
     "passed": true,
     "row_counts_match": true,
-    "speedup": 17.775210720385996,
-    "speedup_display": "17.78x",
+    "speedup": 13.299866043631432,
+    "speedup_display": "13.30x",
     "speedup_target_met": true,
     "min_speedup": 10.0,
     "baseline_plan_contains_window": true,
     "optimized_plan_contains_prefix": true,
-    "baseline_avg_execute_ms": 4628.1091,
-    "optimized_avg_execute_ms": 260.3687333333339,
+    "baseline_avg_execute_ms": 4995.362300000001,
+    "optimized_avg_execute_ms": 375.5949333333325,
     "baseline_row_count": 4540562,
     "optimized_row_count": 4540562,
-    "git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+    "git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7"
   },
   "warnings": [],
   "source_files": {
@@ -333,6 +349,8 @@
     "official_full_performance_matrix_json": "submission_artifacts\\evidence_snapshots\\official_full_performance_matrix.json",
     "official_compiler_funnel_json": "submission_artifacts\\evidence_snapshots\\official_compiler_funnel.json",
     "official_correctness_benchmark_json": "submission_artifacts\\evidence_snapshots\\official_correctness_benchmark.json",
+    "official_compile_latency_json": "submission_artifacts\\evidence_snapshots\\official_compile_latency.json",
+    "official_long_horizon_matrix_json": "submission_artifacts\\evidence_snapshots\\official_long_horizon_matrix.json",
     "phase42_long_horizon_doris_json": "submission_artifacts\\evidence_snapshots\\phase42_long_horizon_doris.json",
     "phase48_scope_semantic_policy_funnel_json": "submission_artifacts\\evidence_snapshots\\phase48_scope_semantic_policy_funnel.json",
     "phase48_scope_semantic_policy_delta_doris_audit_json": "submission_artifacts\\evidence_snapshots\\phase48_scope_semantic_policy_delta_doris_audit.json",
@@ -344,19 +362,20 @@
   },
   "evidence_contract": {
     "schema_version": 1,
-    "contract_id": "competition-current-evidence-v1",
+    "contract_id": "competition-current-evidence-v2",
     "passed": true,
-    "expected_git_head": "414a980",
+    "expected_git_head": "a531f1c",
     "observed_git_heads": {
-      "git.head_at_report_generation": "414a980",
-      "git.head_at_export": "414a980",
-      "official_migration.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-      "official_real_data.slot_coverage.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-      "official_real_data.doris.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-      "official_real_data.performance_matrix.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-      "official_real_data.long_horizon.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-      "formal_correctness.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298",
-      "doris_cluster.git_head": "414a9803964a61ffa1876b9d1bbda0fba0e6a298"
+      "git.head_at_report_generation": "a531f1c",
+      "git.head_at_export": "a531f1c",
+      "official_migration.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "official_real_data.slot_coverage.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "official_real_data.doris.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "official_real_data.performance_matrix.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "official_real_data.long_horizon.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "official_compile_latency.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "formal_correctness.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7",
+      "doris_cluster.git_head": "a531f1c42169199bc958ffcbafbf122f0f4928d7"
     },
     "datasets": {
       "official_dsl_workbook": {
@@ -434,25 +453,25 @@
         "available": true,
         "numerator_path": "formal_correctness.matched",
         "denominator_path": "formal_correctness.eligible_total",
-        "numerator": 157,
-        "denominator": 157,
+        "numerator": 240,
+        "denominator": 240,
         "ratio": 1.0
       },
       "compile_p95_latency": {
         "metric_type": "latency",
         "required": true,
-        "denominator_set": "readiness 冻结编译基准用例",
-        "proves": "当前基准中的编译 P95 延迟",
+        "denominator_set": "48 条分层官方性能语句、每条固定重复次数的正式编译样本",
+        "proves": "覆盖 12 类函数和主要计划族的正式编译 P95 延迟",
         "does_not_prove": "所有官方复杂语句或并发负载下的尾延迟",
         "available": true,
-        "value_path": "readiness.compile_p95_latency_ms",
-        "value": 1.375
+        "value_path": "official_compile_latency.p95_ms",
+        "value": 29.4199
       },
       "long_horizon_speedup_gate": {
         "metric_type": "performance",
         "required": true,
-        "denominator_set": "冻结的官方长周期 baseline/optimized 等价查询",
-        "proves": "指定长周期工作负载达到不低于十倍的门禁",
+        "denominator_set": "五类冻结的官方长周期 baseline/optimized 等价工作负载",
+        "proves": "成交量、成交额和收盘价 SUM/AVG 长周期工作负载均达到不低于十倍的门禁",
         "does_not_prove": "所有查询均能获得相同加速或普通查询性能更快",
         "available": true,
         "value_path": "official_real_data.long_horizon.target_met",

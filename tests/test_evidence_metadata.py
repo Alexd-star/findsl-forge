@@ -1590,6 +1590,8 @@ def test_render_evidence_summary_markdown_highlights_auditable_metrics(tmp_path:
     assert "| Phase 19 security scope evidence | PASS, 7/7, catalog PASS, max P95 615.5937 ms |" in markdown
     assert "| Phase 20 mapping/event evidence | PASS, 13/13, non-empty 13/13, max P95 1612.9413 ms |" in markdown
     assert "| Official per-query 10s target | PASS, 6 queries, max P95 61.269 ms |" in markdown
+    assert "| Formal SQL correctness |" in markdown
+    assert "| Official compile P95 |" in markdown
     assert "| Official Doris real data | AVAILABLE |" in markdown
     assert "| Official Doris feature tables | PASS |" in markdown
     assert "| Official 20-year long-horizon speedup | PASS, 41.91x, median 964 -> 23 ms |" in markdown
