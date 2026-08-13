@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import threading
 import uuid
@@ -18,6 +19,7 @@ from .pipeline import (
     OfficialPipelineOptions,
     compile_official,
 )
+from .repair import OfficialRepairCatalog, default_repair_catalog
 
 
 class OfficialServiceError(RuntimeError):
@@ -118,12 +120,14 @@ class OfficialCompilerService:
         metrics: ServiceMetrics | None = None,
         audit_sink: JsonlAuditSink | None = None,
         executor: Callable = execute_doris_query,
+        repair_catalog: OfficialRepairCatalog | None = None,
     ):
         self.context = context or default_compile_context()
         self.limits = limits
         self.metrics = metrics or ServiceMetrics()
         self.audit_sink = audit_sink or JsonlAuditSink()
         self.executor = executor
+        self.repair_catalog = repair_catalog or default_repair_catalog()
 
     def health(self) -> Dict[str, Any]:
         try:
@@ -235,6 +239,90 @@ class OfficialCompilerService:
             "request_id": request_id,
             "generated_at": _utc_now(),
             "capability": report,
+        }
+
+    def repair(
+        self,
+        dsl: str,
+        *,
+        accept_candidate_sha256: str | None = None,
+        options: OfficialPipelineOptions = OfficialPipelineOptions(),
+        request_id: str | None = None,
+        principal: str = "local",
+    ) -> Dict[str, Any]:
+        request_id = request_id or uuid.uuid4().hex
+        source = self._validate_dsl(dsl)
+        started = perf_counter()
+        candidate = self.repair_catalog.suggest(source)
+        if candidate is None:
+            elapsed_ms = (perf_counter() - started) * 1000.0
+            self.metrics.record("repair", "no_safe_candidate", elapsed_ms)
+            self._audit(
+                request_id,
+                principal,
+                "repair",
+                "no_safe_candidate",
+                source,
+                elapsed_ms,
+                auto_execute=False,
+            )
+            return {
+                "request_id": request_id,
+                "generated_at": _utc_now(),
+                "repair": {
+                    "status": "NO_SAFE_CANDIDATE",
+                    "candidate": None,
+                    "accepted": False,
+                    "auto_execute": False,
+                    "message": (
+                        "No exact, ledger-backed repair exists; the original DSL was "
+                        "preserved and must be corrected manually."
+                    ),
+                },
+            }
+
+        accepted = bool(
+            accept_candidate_sha256
+            and hmac.compare_digest(
+                str(accept_candidate_sha256), candidate.candidate_sha256
+            )
+        )
+        capability = self.negotiate(
+            candidate.candidate_dsl,
+            options=options,
+            request_id=request_id,
+            principal=principal,
+        )["capability"]
+        elapsed_ms = (perf_counter() - started) * 1000.0
+        status = "accepted" if accepted else "confirmation_required"
+        self.metrics.record("repair", status, elapsed_ms)
+        self._audit(
+            request_id,
+            principal,
+            "repair",
+            status,
+            source,
+            elapsed_ms,
+            repair_code=candidate.repair_code,
+            candidate_sha256=candidate.candidate_sha256,
+            auto_execute=False,
+        )
+        return {
+            "request_id": request_id,
+            "generated_at": _utc_now(),
+            "repair": {
+                "status": "ACCEPTED" if accepted else "CONFIRMATION_REQUIRED",
+                "candidate": candidate.to_dict(),
+                "candidate_capability": capability,
+                "accepted": accepted,
+                "auto_execute": False,
+                "message": (
+                    "Candidate accepted for subsequent compilation; Doris execution "
+                    "was not started."
+                    if accepted
+                    else "Review the candidate and resubmit its SHA-256 to accept it."
+                ),
+            },
         }
 
     def execute(

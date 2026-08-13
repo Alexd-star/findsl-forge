@@ -2644,13 +2644,7 @@ def _render_temporal(
     relation = _find_relation(
         plan.input.input if event_projection else plan.input
     )
-    if isinstance(relation, PhysicalScan):
-        stable_resource_id = relation.anchor_resource_id or relation.resource_id
-    elif isinstance(relation, PhysicalTableScan):
-        stable_resource_id = relation.resource_id
-    else:
-        root, _ = _flatten_join(relation)
-        stable_resource_id = root.resource_id
+    stable_resource_id = _stable_resource_id(relation)
     stable_alias = "event_rows" if event_projection else _stable_alias(relation)
     keys = ("mktcode", "tgtcode")
     source_rows_name = f"{cte_prefix}source_rows"
@@ -3709,6 +3703,22 @@ def _stable_alias(relation) -> str:
     if isinstance(relation, PhysicalPrefixJoin):
         return "prefix_values"
     raise DorisBackendError("DORIS_RELATION_UNAVAILABLE", "plan has no stable output alias")
+
+
+def _stable_resource_id(relation) -> str:
+    if isinstance(relation, PhysicalScan):
+        return relation.anchor_resource_id or relation.resource_id
+    if isinstance(relation, PhysicalTableScan):
+        return relation.resource_id
+    if isinstance(relation, PhysicalJoin):
+        root, _ = _flatten_join(relation)
+        return root.resource_id
+    if isinstance(relation, PhysicalPrefixJoin):
+        return _stable_resource_id(_find_relation(relation.input))
+    raise DorisBackendError(
+        "DORIS_RELATION_UNAVAILABLE",
+        "plan has no stable resource",
+    )
 
 
 def _render_expr(expression, catalog: PhysicalCatalog, scan: Optional[PhysicalPlan] = None):

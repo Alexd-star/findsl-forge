@@ -15,6 +15,7 @@ from .admission import (
     audit_domain_snapshot,
 )
 from .data_domains import DataDomainCatalog
+from .contracts import DomainTableContractCatalog, default_domain_table_contracts
 from .source_registry import ExternalProvider, ExternalSourceRegistry
 
 
@@ -83,10 +84,12 @@ class DomainAdapterRunner:
         adapters: DomainAdapterRegistry,
         data_domains: DataDomainCatalog,
         sources: ExternalSourceRegistry,
+        contracts: DomainTableContractCatalog | None = None,
     ) -> None:
         self.adapters = adapters
         self.data_domains = data_domains
         self.sources = sources
+        self.contracts = contracts or default_domain_table_contracts()
 
     def fetch_and_audit(
         self,
@@ -118,6 +121,7 @@ class DomainAdapterRunner:
             artifact.manifest,
             data_domains=self.data_domains,
             sources=self.sources,
+            contracts=self.contracts,
         )
         if not report["passed"]:
             raise DomainSnapshotAdmissionError("; ".join(report["errors"]))

@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 
 from .data_domains import DataDomainCatalog
 from .source_registry import ExternalSourceRegistry
+from .contracts import DomainTableContractCatalog
 
 
 class DomainSnapshotAdmissionError(ValueError):
@@ -134,6 +135,7 @@ def audit_domain_snapshot(
     *,
     data_domains: DataDomainCatalog,
     sources: ExternalSourceRegistry,
+    contracts: DomainTableContractCatalog | None = None,
 ) -> Dict[str, Any]:
     errors = []
     warnings = []
@@ -166,13 +168,24 @@ def audit_domain_snapshot(
             "candidate snapshot passed structural admission but requires reviewed "
             "promotion before the compiler can select it"
         )
+    contract_report = None
+    if contracts is not None:
+        contract_report = dict(
+            contracts.audit(manifest.domain_id, manifest.columns)
+        )
+        if not contract_report["passed"]:
+            errors.append(
+                "snapshot columns do not match any admitted domain table variant"
+            )
     if provider.redistribution in {"not_redistributed", "review_required"}:
         warnings.append(
             f"redistribution policy is {provider.redistribution}; keep restricted raw "
             "data outside the repository and submission package"
         )
     status = "REJECTED" if errors else "CANDIDATE" if warnings else "ACTIVE_READY"
-    return _report(manifest, status, tuple(errors), tuple(warnings))
+    report = _report(manifest, status, tuple(errors), tuple(warnings))
+    report["table_contract"] = contract_report
+    return report
 
 
 def _report(manifest, status, errors, warnings):

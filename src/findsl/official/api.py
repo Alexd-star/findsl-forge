@@ -100,6 +100,15 @@ class ExecuteRequest(CompileRequest):
     pass
 
 
+class RepairRequest(CompileRequest):
+    accept_candidate_sha256: Optional[str] = Field(
+        default=None,
+        min_length=64,
+        max_length=64,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+
+
 class _RateLimiter:
     def __init__(self, requests_per_minute: int):
         self.limit = requests_per_minute
@@ -361,6 +370,27 @@ def create_app(
             "generated_at": result["generated_at"],
             "explain": result["result"]["explain"],
         }
+
+    @app.post("/v1/repair")
+    async def repair_endpoint(
+        payload: RepairRequest,
+        request: Request,
+        principal: str = Depends(authenticate),
+    ):
+        options = OfficialPipelineOptions(
+            use_statistics=payload.use_statistics,
+            strategy_mode=payload.strategy_mode,
+        )
+        result = await run_bounded(
+            lambda: service.repair(
+                payload.dsl,
+                accept_candidate_sha256=payload.accept_candidate_sha256,
+                options=options,
+                request_id=request.state.request_id,
+                principal=principal,
+            )
+        )
+        return {"ok": True, **result}
 
     @app.post("/v1/result")
     async def result_endpoint(

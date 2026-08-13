@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "domains": [
+    {
+      "domain_id": "financial_statement",
+      "variants": [
+        {
+          "variant_id": "point_in_time_statement",
+          "required_columns": ["mktcode", "tgtcode", "report_period", "announcement_date", "version", "currency", "unit"],
+          "any_of_columns": ["revenue", "net_profit", "basic_eps", "roe", "total_assets", "operating_cash_flow"],
+          "temporal_columns": ["report_period", "announcement_date", "version"],
+          "description": "财务指标必须带报告期、披露日期和修订版本，查询只能使用当时已经披露的数据。"
+        }
+      ]
+    },
+    {
+      "domain_id": "fund_reference",
+      "variants": [
+        {
+          "variant_id": "fund_identity",
+          "required_columns": ["fund_code", "fund_name", "fund_type", "effective_from"],
+          "any_of_columns": ["exchange", "tracking_index_code", "management_company"],
+          "temporal_columns": ["effective_from"],
+          "description": "基金身份和类别使用生效日期版本化。"
+        },
+        {
+          "variant_id": "fund_portfolio",
+          "required_columns": ["fund_code", "holding_code", "report_period", "announcement_date", "effective_from", "weight"],
+          "any_of_columns": ["holding_shares", "holding_market_value"],
+          "temporal_columns": ["report_period", "announcement_date", "effective_from"],
+          "description": "基金持仓必须保留报告期、披露日期和生效日期，防止使用未来披露信息。"
+        }
+      ]
+    },
+    {
+      "domain_id": "index_reference",
+      "variants": [
+        {
+          "variant_id": "index_identity",
+          "required_columns": ["index_code", "index_name", "publisher", "effective_from"],
+          "any_of_columns": ["market", "currency", "base_date"],
+          "temporal_columns": ["effective_from"],
+          "description": "指数身份由发布机构和生效日期确定。"
+        },
+        {
+          "variant_id": "index_membership",
+          "required_columns": ["index_code", "mktcode", "tgtcode", "effective_from", "weight"],
+          "any_of_columns": ["effective_to", "publisher"],
+          "temporal_columns": ["effective_from"],
+          "description": "指数成分和权重按生效期保存，不把当前成分倒推到历史。"
+        }
+      ]
+    },
+    {
+      "domain_id": "scope_membership",
+      "variants": [
+        {
+          "variant_id": "versioned_scope_membership",
+          "required_columns": ["snapshot_id", "scope_type", "scope_code", "mktcode", "tgtcode", "effective_from"],
+          "any_of_columns": ["effective_to", "source_snapshot_id", "scope_name"],
+          "temporal_columns": ["snapshot_id", "effective_from"],
+          "description": "行业、概念和板块成员关系必须绑定来源快照和生效时间。"
+        }
+      ]
+    }
+  ]
+}

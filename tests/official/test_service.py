@@ -121,6 +121,43 @@ def test_service_negotiates_supported_data_invalid_and_capability_cases():
     assert service.metrics.snapshot()["counters"]["negotiate:supported"] == 1
 
 
+def test_service_repair_requires_explicit_hash_confirmation_and_never_executes():
+    source = (
+        "rank('其他&法', '', '市盈率', 'desc', '', '', '', '') > 0\""
+    )
+    service = OfficialCompilerService()
+
+    proposed = service.repair(source, request_id="repair-1")["repair"]
+    accepted = service.repair(
+        source,
+        accept_candidate_sha256=proposed["candidate"]["candidate_sha256"],
+        request_id="repair-2",
+    )["repair"]
+
+    assert proposed["status"] == "CONFIRMATION_REQUIRED"
+    assert proposed["accepted"] is False
+    assert proposed["auto_execute"] is False
+    assert proposed["candidate"]["repair_code"] == "DANGLING_EDGE_QUOTE"
+    assert accepted["status"] == "ACCEPTED"
+    assert accepted["accepted"] is True
+    assert accepted["auto_execute"] is False
+
+
+def test_service_repair_does_not_guess_for_unregistered_invalid_dsl():
+    repair = OfficialCompilerService().repair("indicator(")["repair"]
+
+    assert repair == {
+        "status": "NO_SAFE_CANDIDATE",
+        "candidate": None,
+        "accepted": False,
+        "auto_execute": False,
+        "message": (
+            "No exact, ledger-backed repair exists; the original DSL was preserved "
+            "and must be corrected manually."
+        ),
+    }
+
+
 def test_service_distinguishes_missing_intraday_data_from_ambiguous_date() -> None:
     service = OfficialCompilerService()
 
@@ -138,6 +175,28 @@ def test_service_distinguishes_missing_intraday_data_from_ambiguous_date() -> No
         for item in intraday["data_requirements"]
     )
     assert ambiguous["status"] == "INVALID_INPUT"
+
+
+@pytest.mark.parametrize(
+    "date",
+    [
+        "曾经",
+        "以前",
+        "板块调整阶段后期",
+        "回落之后",
+        "今天前",
+        "一直以来",
+    ],
+)
+def test_service_requests_clarification_for_ungrounded_date_semantics(date):
+    capability = OfficialCompilerService().negotiate(
+        f"indicator('', '', '涨幅', '{date}', '', '', '') > 1"
+    )["capability"]
+
+    assert capability["status"] == "INVALID_INPUT"
+    assert capability["clarification"]["required"] is True
+    assert capability["clarification"]["field"] == "date"
+    assert date in capability["clarification"]["values"]
 
 
 @pytest.mark.parametrize(
@@ -174,4 +233,25 @@ def test_service_classifies_listing_relative_dates_as_corporate_event_data(date)
         item["domain_id"] == "corporate_event"
         and item["profile"]["status"] == "not_loaded"
         for item in capability["data_requirements"]
+    )
+
+
+def test_service_detects_intraday_indicator_and_cross_market_dependencies():
+    service = OfficialCompilerService()
+    intraday = service.negotiate(
+        "rank('', '', '10分钟涨速', 'desc', '', '板块', '', '') > 0"
+    )["capability"]
+    cross_market = service.negotiate(
+        "indicator('港', '', '收盘价', '', '概念', '', '') > 10"
+    )["capability"]
+
+    assert intraday["status"] == "DATA_UNAVAILABLE"
+    assert any(
+        item["domain_id"] == "intraday_quote"
+        for item in intraday["data_requirements"]
+    )
+    assert cross_market["status"] == "DATA_UNAVAILABLE"
+    assert any(
+        item["domain_id"] == "cross_market_quote"
+        for item in cross_market["data_requirements"]
     )

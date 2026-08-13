@@ -32,6 +32,12 @@ from .adapters import (
     LocalTabularDomainAdapter,
     inspect_tabular_artifact,
 )
+from .contracts import (
+    DomainTableContractCatalog,
+    DomainTableContractError,
+    DomainTableVariant,
+    default_domain_table_contracts,
+)
 
 __all__ = [
     "CatalogSnapshot",
@@ -59,4 +65,8 @@ __all__ = [
     "DomainSnapshotArtifact",
     "LocalTabularDomainAdapter",
     "inspect_tabular_artifact",
+    "DomainTableContractCatalog",
+    "DomainTableContractError",
+    "DomainTableVariant",
+    "default_domain_table_contracts",
 ]

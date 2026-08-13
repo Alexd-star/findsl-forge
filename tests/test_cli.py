@@ -148,6 +148,20 @@ def test_cli_official_coverage_funnel_writes_both_artifacts(tmp_path, monkeypatc
     assert json_output.exists() and report_output.exists()
 
 
+def test_cli_official_repair_prints_confirmation_hash(monkeypatch, capsys):
+    from findsl import cli
+
+    source = "rank('其他&法', '', '市盈率', 'desc', '', '', '', '') > 0\""
+    monkeypatch.setattr(sys, "argv", ["findsl", "official-repair", source])
+
+    cli.main()
+
+    output = capsys.readouterr().out
+    assert "Repair status: CONFIRMATION_REQUIRED" in output
+    assert "Candidate SHA-256:" in output
+    assert "Doris execution: disabled" in output
+
+
 def test_cli_evaluate_returns_nonzero_when_cases_fail(tmp_path):
     cases = tmp_path / "cases.jsonl"
     cases.write_text(

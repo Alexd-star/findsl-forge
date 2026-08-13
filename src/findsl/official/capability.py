@@ -47,6 +47,7 @@ def supported_capability_report(
         "required_resources": sorted(_physical_resources(physical["plan"])),
         "applied_financial_rule_ids": [item["rule_id"] for item in rules],
         "compile_elapsed_ms": result.elapsed_ms,
+        "clarification": None,
     }
 
 
@@ -74,6 +75,7 @@ def rejected_capability_report(
         "required_resources": [],
         "applied_financial_rule_ids": [],
         "compile_elapsed_ms": _partial_elapsed_ms(error.partial),
+        "clarification": _clarification(error, status),
     }
 
 
@@ -94,6 +96,8 @@ def classify_pipeline_error(
     ):
         return DATA_UNAVAILABLE
     if _has_ambiguous_date(error):
+        return INVALID_INPUT
+    if _needs_date_clarification(error):
         return INVALID_INPUT
     if error.stage == "frontend":
         return INVALID_INPUT
@@ -151,9 +155,25 @@ _INTRADAY_DATE = re.compile(
 _REPORTING_DATE = re.compile(r"(?:年报|季报|半年报|一季报|三季报|报告期)")
 _LISTING_DATE = re.compile(r"(?:上市以来|上市后|上市的?第一个交易日)")
 _AMBIGUOUS_DATE = {"最近", "近期", "前期", "当前阶段"}
+_UNRESOLVED_DATE = {
+    "上周五到0926",
+    "2023年2024年",
+    "一四季度",
+    "曾经",
+    "以前",
+    "板块调整阶段后期",
+    "Q3后",
+    "回落之后",
+    "涨停后",
+    "今天前",
+    "一直以来",
+}
 _FUND_TYPES = re.compile(r"(?:ETF|LOF|基金|REITs|货币)", re.IGNORECASE)
-_CROSS_MARKET_TYPES = re.compile(r"(?:港股|美股|期货|债券|可转债)")
+_CROSS_MARKET_TYPES = re.compile(r"(?:港股|美股|期货|债券|可转债|(?:^|[|&])港(?:$|[|&])|(?:^|[|&])美(?:$|[|&]))")
 _PRIVATE_TERMS = re.compile(r"(?:我的|自选股|持仓|账户|组合)")
+_INTRADAY_INDICATOR = re.compile(
+    r"(?:\d+分钟|分时|盘口|集合竞价|涨速|委比|委差|内盘|外盘)"
+)
 
 
 def _indicator_domain_definitions(indicator_ids, context):
@@ -193,6 +213,10 @@ def _rejected_data_requirements(error, context):
             )
             if domain is not None:
                 definitions.append(domain)
+            if _INTRADAY_INDICATOR.search(str(value)):
+                definitions.append(
+                    context.data_domain_catalog.resolve("intraday_quote")
+                )
         date_value = str(item.get("date", item.get("period", ""))).strip()
         if _INTRADAY_DATE.search(date_value):
             definitions.append(context.data_domain_catalog.resolve("intraday_quote"))
@@ -202,6 +226,14 @@ def _rejected_data_requirements(error, context):
             )
         if _LISTING_DATE.search(date_value):
             definitions.append(context.data_domain_catalog.resolve("corporate_event"))
+        market_value = str(item.get("market", "")).strip()
+        if _CROSS_MARKET_TYPES.search(market_value):
+            definitions.append(
+                context.data_domain_catalog.resolve("cross_market_quote")
+            )
+        select_type = str(item.get("select_type", "")).strip()
+        if _FUND_TYPES.search(select_type):
+            definitions.append(context.data_domain_catalog.resolve("fund_reference"))
     definitions.extend(_target_domain_definitions(error.partial.get("typed_ast"), context))
     source = str(error.partial.get("source", ""))
     if _PRIVATE_TERMS.search(source):
@@ -277,3 +309,39 @@ def _has_ambiguous_date(error):
         in _AMBIGUOUS_DATE
         for slots in _binding_slots(error.partial.get("typed_ast"))
     )
+
+
+def _needs_date_clarification(error):
+    if str(error.code).upper() != "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED":
+        return False
+    message = str(error)
+    if "all-history scalar requires an explicit aggregate" in message:
+        return True
+    return any(
+        str(slots.get("date", slots.get("period", ""))).strip()
+        in _UNRESOLVED_DATE
+        for slots in _binding_slots(error.partial.get("typed_ast"))
+    )
+
+
+def _clarification(error, status):
+    if status != INVALID_INPUT or not (
+        _has_ambiguous_date(error) or _needs_date_clarification(error)
+    ):
+        return None
+    values = sorted(
+        {
+            str(slots.get("date", slots.get("period", ""))).strip()
+            for slots in _binding_slots(error.partial.get("typed_ast"))
+            if str(slots.get("date", slots.get("period", ""))).strip()
+            in {*_AMBIGUOUS_DATE, *_UNRESOLVED_DATE}
+        }
+    )
+    return {
+        "required": True,
+        "field": "date",
+        "values": values,
+        "question": (
+            "请明确日期的起止边界、年份或事件锚点；系统不会自行猜测并执行。"
+        ),
+    }

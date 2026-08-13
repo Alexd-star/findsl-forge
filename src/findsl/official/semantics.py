@@ -158,6 +158,10 @@ class OfficialSemanticAnalyzer:
         meta = self._indicator_resolver(indicator_name)
         if meta is None:
             return "unknown"
+        if getattr(meta, "availability", None) == "missing":
+            if re.fullmatch(r"\d{1,4}日均(?:量)?线", str(indicator_name)):
+                return "numeric"
+            return "unknown"
         return str(getattr(meta, "value_type", getattr(meta, "kind", "unknown")))
 
     def _infer_comparison(self, node: Any) -> str:

@@ -188,6 +188,11 @@ def test_extended_date_algebra_reaches_structured_doris_ast(source, fragments):
     [
         ("indicator(", "frontend", "OFFICIAL_ANTLR_PARSE_ERROR"),
         ("indicator('', '', '营业收入', '', '', '', '') > 1", "logical", "DOMAIN_DATA_UNAVAILABLE"),
+        (
+            "indicator('', '', 'KDJ底背离', '', '', '', '') = True",
+            "logical",
+            "DOMAIN_DATA_UNAVAILABLE",
+        ),
     ],
 )
 def test_official_pipeline_preserves_terminal_stage_code_and_partial_evidence(source, stage, code):
@@ -716,6 +721,19 @@ def test_pipeline_projects_exact_security_scope_before_temporal_event():
     assert "`official_security`.`name` = '上海电力'" in sql
     assert "LAG(" in sql
     assert "`temporal_metrics`.`metric_value` > 1" in sql
+
+
+def test_pipeline_combines_prefix_average_crossing_with_temporal_quantifier():
+    result = compile_official(
+        "cross_above('', '', '', '7日均线', '八月一号开始4日', '', "
+        "'CONS=每日') = True"
+    ).to_dict()
+    sql = result["backend"]["sql"]
+
+    assert result["physical"]["selected_strategy"] == "temporal_event_projection"
+    assert "prefix_anchor_rows" in sql
+    assert "LAG(" in sql
+    assert "temporal_metrics" in sql
 
 
 def test_pipeline_materializes_pressure_events_without_placeholder_sql():

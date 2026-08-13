@@ -88,6 +88,32 @@ def test_api_exposes_query_capability_without_executing_doris():
     assert unavailable.json()["capability"]["status"] == "DATA_UNAVAILABLE"
 
 
+def test_api_exposes_confirmation_gated_official_repair():
+    client = TestClient(
+        create_app(
+            service=OfficialCompilerService(),
+            settings=ApiSettings(environment="test"),
+        )
+    )
+    source = "rank('其他&法', '', '市盈率', 'desc', '', '', '', '') > 0\""
+
+    proposed = client.post("/v1/repair", json={"dsl": source})
+    candidate = proposed.json()["repair"]["candidate"]
+    accepted = client.post(
+        "/v1/repair",
+        json={
+            "dsl": source,
+            "accept_candidate_sha256": candidate["candidate_sha256"],
+        },
+    )
+
+    assert proposed.status_code == 200
+    assert proposed.json()["repair"]["status"] == "CONFIRMATION_REQUIRED"
+    assert accepted.status_code == 200
+    assert accepted.json()["repair"]["status"] == "ACCEPTED"
+    assert accepted.json()["repair"]["auto_execute"] is False
+
+
 def test_api_accepts_valid_hs256_bearer_and_rejects_bad_signature():
     settings = ApiSettings(
         environment="test",

@@ -182,6 +182,17 @@ def main() -> None:
     official_funnel_cmd.add_argument("--json-output", required=True)
     official_funnel_cmd.add_argument("--report-output", required=True)
     official_funnel_cmd.add_argument("--json", action="store_true")
+    official_repair_cmd = sub.add_parser(
+        "official-repair",
+        help="Propose a ledger-backed DSL repair without executing it",
+    )
+    official_repair_cmd.add_argument("dsl")
+    official_repair_cmd.add_argument(
+        "--accept-sha256",
+        default=None,
+        help="Explicitly accept the exact candidate SHA-256",
+    )
+    official_repair_cmd.add_argument("--json", action="store_true")
     official_perf_cmd = sub.add_parser(
         "official-performance-matrix",
         help="Build a per-query performance matrix from official Doris evidence",
@@ -690,6 +701,26 @@ def main() -> None:
                 f"{report['legacy_to_new_migrated']}/{report['legacy_strict_success']} "
                 f"({report['migration_coverage'] * 100:.2f}%)"
             )
+    elif args.command == "official-repair":
+        from .official.service import OfficialCompilerService
+
+        result = OfficialCompilerService().repair(
+            args.dsl,
+            accept_candidate_sha256=args.accept_sha256,
+        )
+        repair = result["repair"]
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        elif repair["candidate"] is None:
+            print("No safe ledger-backed repair candidate.")
+        else:
+            print(f"Repair status: {repair['status']}")
+            print(f"Candidate: {repair['candidate']['candidate_dsl']}")
+            print(
+                "Candidate SHA-256: "
+                f"{repair['candidate']['candidate_sha256']}"
+            )
+            print("Doris execution: disabled")
     elif args.command == "diagnose":
         from .diagnostics import diagnose_exception
 

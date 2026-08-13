@@ -10,6 +10,7 @@ from findsl.official.external.admission import (
 )
 from findsl.official.external.data_domains import DataDomainCatalog
 from findsl.official.external.source_registry import ExternalSourceRegistry
+from findsl.official.external.contracts import DomainTableContractCatalog
 
 
 def main() -> None:
@@ -26,6 +27,11 @@ def main() -> None:
         default=Path("configs/official/external_source_registry.json"),
     )
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--table-contracts",
+        type=Path,
+        default=Path("configs/official/domain_table_contracts.json"),
+    )
     args = parser.parse_args()
 
     sources = ExternalSourceRegistry.load(args.source_registry)
@@ -37,6 +43,7 @@ def main() -> None:
         DomainSnapshotManifest.load(args.manifest),
         data_domains=domains,
         sources=sources,
+        contracts=DomainTableContractCatalog.load(args.table_contracts),
     )
     payload = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if args.output:
