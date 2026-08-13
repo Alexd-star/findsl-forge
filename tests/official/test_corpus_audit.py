@@ -89,3 +89,27 @@ def test_corpus_audit_infers_missing_indicator_type_without_enabling_it():
     assert row["indicator_type_evidence"]["基本每股收益"] == ["numeric"]
     assert contract["suggested_value_type"] == "numeric"
     assert row["must_reject_without_confirmation"] is True
+
+
+def test_corpus_audit_keeps_new_data_inference_out_of_historical_baseline():
+    source = "indicator('港', '', '收盘价', '', '概念', '', '') > 10"
+    report = build_corpus_audit(
+        {
+            "git_head": "a" * 40,
+            "source_sha256": "b" * 64,
+            "row_count": 1,
+            "rows": [
+                {
+                    "excel_row": 2,
+                    "source": source,
+                    "new_backend_success": False,
+                    "terminal_stage": "physical",
+                    "terminal_code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
+                }
+            ],
+        },
+        OfficialCompilerService(),
+    )
+
+    assert report["baseline_status_counts"] == {"CAPABILITY_GAP": 1}
+    assert report["current_status_counts"] == {"DATA_UNAVAILABLE": 1}

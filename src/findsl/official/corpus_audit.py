@@ -396,9 +396,15 @@ def _classify_baseline(row, capability, bindings, source: str) -> str:
     # so only source-level private-data detection was available at that point.
     if _PRIVATE_TERMS.search(source):
         return "DATA_UNAVAILABLE"
+    historical_requirements = [
+        item
+        for item in capability["data_requirements"]
+        if item["domain_id"]
+        not in {"intraday_quote", "cross_market_quote", "fund_reference"}
+    ]
     if stage not in {"frontend", "typed"} and any(
         item["profile"]["status"] in {"not_loaded", "private_required"}
-        for item in capability["data_requirements"]
+        for item in historical_requirements
     ):
         return "DATA_UNAVAILABLE"
     if any(
