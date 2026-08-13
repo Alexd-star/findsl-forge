@@ -125,7 +125,7 @@ Doris部署：FinDSL-Forge/deploy/doris/
 自动校验：见 PACKAGE_VERIFICATION.md 和 PACKAGE_VERIFICATION.json
 
 快速运行：
-1. 进入 01_可运行项目/FinDSL-Forge。
+1. Windows 建议将压缩包解压到 C:\findsl 或 D:\findsl 等短路径，再进入 01_可运行项目/FinDSL-Forge。
 2. 使用 Python 3.11 执行 python -m pip install -e ".[dev]"。
 3. 执行 python -m pytest -q。
 4. 执行 pwsh -File .\scripts\demo_stack.ps1 启动 Doris 与演示服务。

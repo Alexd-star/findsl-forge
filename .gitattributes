@@ -1,0 +1,3 @@
+src/findsl/official/frontend/generated/*.py text eol=lf
+src/findsl/official/frontend/generated/*.interp text eol=lf
+src/findsl/official/frontend/generated/*.tokens text eol=lf
