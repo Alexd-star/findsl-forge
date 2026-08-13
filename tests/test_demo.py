@@ -292,6 +292,64 @@ def test_delivery_evidence_summary_rejects_malformed_metadata(tmp_path):
     assert "could not be read" in summary["message"]
 
 
+def test_delivery_evidence_summary_reads_final_scorecard(tmp_path):
+    metadata = tmp_path / "final_submission_metadata.json"
+    metadata.write_text(
+        json.dumps(
+            {
+                "all_gates_passed": True,
+                "git_head": "abc123",
+                "scorecard": {
+                    "quality": {"pytest_passed": 1309, "warning_count": 0},
+                    "compile_latency": {"p95_ms": 30.1, "target_p95_ms": 50.0},
+                    "architecture_migration": {
+                        "legacy_strict_success": 1097,
+                        "legacy_to_new_migrated": 1044,
+                        "migration_coverage": 0.951686,
+                        "new_backend_success": 1276,
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    summary = delivery_evidence_summary(metadata)
+
+    assert summary["available"] is True
+    assert summary["blocking_gates_passed"] is True
+    assert summary["pytest_passed"] == 1309
+    assert summary["compile_p95_ms"] == 30.1
+    assert summary["legacy_to_new_migrated"] == 1044
+
+
+def test_doris_evidence_summary_reads_final_scorecard(tmp_path):
+    metadata = tmp_path / "final_submission_metadata.json"
+    metadata.write_text(
+        json.dumps(
+            {
+                "all_gates_passed": True,
+                "scorecard": {
+                    "long_horizon": {
+                        "workload_count": 5,
+                        "minimum_speedup": 12.68,
+                        "median_speedup": 14.33,
+                    },
+                    "execution": {"case_count": 48, "max_p95_ms": 2878.8},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    summary = doris_evidence_summary(metadata)
+
+    assert summary["available"] is True
+    assert summary["headline"]["passed"] == "PASS"
+    assert summary["headline"]["speedup"] == "12.68x"
+    assert summary["headline"]["row_counts_match"] == "True"
+
+
 def test_suggest_from_text_returns_validated_candidate_payload():
     result = suggest_from_text("筛选A股连续三天主力净流入为正并按换手率排名前一百", DATA_DIR)
 

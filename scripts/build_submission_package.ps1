@@ -72,15 +72,14 @@ if ($LASTEXITCODE -ne 0) { throw "git archive failed" }
 Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot -Force
 Remove-Item -LiteralPath $sourceArchive -Force
 
-foreach ($relative in @("docs", "submission_artifacts", "PROJECT_INDEX.md", "CHANGELOG.md")) {
+foreach ($relative in @("submission_artifacts", "CHANGELOG.md")) {
   $target = Join-Path $sourceRoot $relative
   if (Test-Path -LiteralPath $target) {
     Remove-Item -LiteralPath $target -Recurse -Force
   }
 }
-New-Item -ItemType Directory -Force -Path (Join-Path $sourceRoot "docs") | Out-Null
-Copy-Item -LiteralPath docs/架构设计.md -Destination (Join-Path $sourceRoot "docs\架构设计.md")
-Copy-Item -LiteralPath docs/运行测试与Doris.md -Destination (Join-Path $sourceRoot "docs\运行测试与Doris.md")
+New-Item -ItemType Directory -Force -Path (Join-Path $sourceRoot "reports") | Out-Null
+Copy-Item -LiteralPath reports/final_submission_metadata.json -Destination (Join-Path $sourceRoot "reports\final_submission_metadata.json")
 
 foreach ($file in $requiredEvidence) {
   Copy-Item -LiteralPath (Join-Path "reports" $file) -Destination (Join-Path $evidenceRoot $file)
@@ -142,7 +141,7 @@ if ($LASTEXITCODE -ne 0) { throw "Pre-archive package verification failed" }
 
 $manifestPath = Join-Path $notesRoot "FILE_MANIFEST.sha256"
 $manifestLines = Get-ChildItem -LiteralPath $packageRoot -Recurse -File |
-  Where-Object { $_.FullName -ne $manifestPath } |
+  Where-Object { $_.FullName -ne $manifestPath -and $_.Name -notlike 'PACKAGE_VERIFICATION.*' } |
   Sort-Object FullName |
   ForEach-Object {
     $relative = [System.IO.Path]::GetRelativePath($packageRoot, $_.FullName).Replace("\", "/")

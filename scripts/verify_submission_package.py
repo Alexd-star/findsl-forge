@@ -18,13 +18,13 @@ FORBIDDEN_PARTS = {
     ".ruff_cache",
     ".mypy_cache",
     ".playwright-cli",
-    "reports",
     "output",
     "outputs",
     "archive",
     ".worktrees",
 }
 FORBIDDEN_SUFFIXES = {".pyc", ".pyo", ".log", ".db", ".sqlite"}
+RUNTIME_REPORT = Path("01_可运行项目/FinDSL-Forge/reports/final_submission_metadata.json")
 TEXT_SUFFIXES = {
     ".py",
     ".md",
@@ -73,6 +73,8 @@ def verify(package_dir: Path, zip_path: Path | None = None) -> dict:
             errors.append(f"forbidden directory content: {relative}")
         if path.suffix.lower() in FORBIDDEN_SUFFIXES or path.name in {".env", "service.env"}:
             errors.append(f"forbidden runtime or secret file: {relative}")
+        if "reports" in relative.parts and relative != RUNTIME_REPORT:
+            errors.append(f"unexpected report inside runnable source: {relative}")
         if path.suffix.lower() in TEXT_SUFFIXES and path.stat().st_size <= 10_000_000:
             text = path.read_text(encoding="utf-8-sig", errors="replace")
             for pattern in FORBIDDEN_TEXT:

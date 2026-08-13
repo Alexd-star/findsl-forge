@@ -102,7 +102,7 @@ def run_hero_query(
         "adaptive_route": compiled.explain["adaptive_route"],
         "catalog_snapshot_id": compiled.compile_context["context_id"],
         "generated_sql": compiled.backend["sql"],
-        "reference_sql_path": str(reference_path),
+        "reference_sql_path": str(spec["reference_sql_path"]),
         "execution": execution,
         "gate": {
             "compile_and_feature_gate": compile_gate,

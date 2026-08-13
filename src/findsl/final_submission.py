@@ -33,6 +33,7 @@ def build_final_submission_metadata(
         key: _load_json(reports_dir / filename)
         for key, filename in REQUIRED_REPORTS.items()
     }
+    funnel = _load_json(reports_dir / "official_compiler_funnel.json")
 
     head_mismatches = {
         key: payload.get("git_head")
@@ -42,6 +43,10 @@ def build_final_submission_metadata(
     if head_mismatches:
         raise ValueError(
             f"evidence Git HEAD mismatch; expected {expected}: {head_mismatches}"
+        )
+    if funnel.get("git_head") != expected:
+        raise ValueError(
+            "official compiler funnel Git HEAD does not match the final release"
         )
 
     correctness = reports["correctness"]
@@ -134,6 +139,12 @@ def build_final_submission_metadata(
                 "pytest_passed": quality.get("pytest_passed"),
                 "warning_count": quality.get("warning_count"),
                 "command_count": len(quality.get("commands", [])),
+            },
+            "architecture_migration": {
+                "legacy_strict_success": funnel["legacy_strict_success"],
+                "legacy_to_new_migrated": funnel["legacy_to_new_migrated"],
+                "migration_coverage": funnel["migration_coverage"],
+                "new_backend_success": funnel["new_backend_success"],
             },
         },
         "artifacts": artifact_manifest,

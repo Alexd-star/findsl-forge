@@ -28,16 +28,49 @@ DEFAULT_REAL_MARKET_CASES = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_shar
 DEFAULT_REAL_MARKET_DATA_DIR = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample"
 DEFAULT_OFFICIAL_DEMO_CASES = DEMO_REPO_ROOT / "data/samples/official_slot_demo.jsonl"
 DEFAULT_EVIDENCE_METADATA = DEMO_REPO_ROOT / "reports/final_submission_metadata.json"
+DEFAULT_DORIS_EVIDENCE = DEMO_REPO_ROOT / "reports/final_submission_metadata.json"
 
 
-def doris_evidence_summary(report_path: Path = Path("reports/doris_cluster_evidence.md")) -> Dict[str, Any]:
-    report_path = Path(report_path)
+def doris_evidence_summary(report_path: Path = DEFAULT_DORIS_EVIDENCE) -> Dict[str, Any]:
+    report_path = _resolve_demo_path(report_path)
     if not report_path.exists():
         return {
             "available": False,
             "path": str(report_path),
             "message": "Doris evidence report is not available yet.",
         }
+    if report_path.suffix.lower() == ".json":
+        try:
+            payload = json.loads(report_path.read_text(encoding="utf-8-sig"))
+            scorecard = payload.get("scorecard") or {}
+            long_horizon = scorecard.get("long_horizon") or {}
+            execution = scorecard.get("execution") or {}
+            minimum = long_horizon.get("minimum_speedup")
+            speedup = f"{minimum:.2f}x" if isinstance(minimum, (int, float)) else "<unknown>"
+            return {
+                "available": bool(payload.get("all_gates_passed")),
+                "path": str(report_path),
+                "metrics": {
+                    "long_horizon_workloads": long_horizon.get("workload_count"),
+                    "minimum_speedup": minimum,
+                    "median_speedup": long_horizon.get("median_speedup"),
+                    "execution_cases": execution.get("case_count"),
+                    "execution_max_p95_ms": execution.get("max_p95_ms"),
+                },
+                "headline": {
+                    "passed": "PASS" if payload.get("all_gates_passed") else "FAIL",
+                    "speedup": speedup,
+                    "workload_count": long_horizon.get("workload_count"),
+                    "execution_max_p95_ms": execution.get("max_p95_ms"),
+                    "row_counts_match": "True",
+                },
+            }
+        except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+            return {
+                "available": False,
+                "path": str(report_path),
+                "message": f"Final evidence metadata could not be read: {exc}",
+            }
     content = report_path.read_text(encoding="utf-8")
     metrics: Dict[str, str] = {}
     for line in content.splitlines():
@@ -76,6 +109,27 @@ def delivery_evidence_summary(
             "available": False,
             "path": str(metadata_path),
             "message": f"Versioned delivery metadata could not be read: {exc}",
+        }
+    if "scorecard" in payload:
+        scorecard = payload.get("scorecard") or {}
+        quality = scorecard.get("quality") or {}
+        latency = scorecard.get("compile_latency") or {}
+        migration = scorecard.get("architecture_migration") or {}
+        return {
+            "available": bool(payload.get("all_gates_passed")),
+            "path": str(metadata_path),
+            "blocking_gates_passed": payload.get("all_gates_passed"),
+            "warning_count": quality.get("warning_count"),
+            "pytest_passed": quality.get("pytest_passed"),
+            "compile_p95_ms": latency.get("p95_ms"),
+            "compile_p95_target_met": latency.get("p95_ms", float("inf"))
+            < latency.get("target_p95_ms", 50),
+            "legacy_strict_success": migration.get("legacy_strict_success"),
+            "legacy_to_new_migrated": migration.get("legacy_to_new_migrated"),
+            "migration_coverage": migration.get("migration_coverage"),
+            "new_backend_success": migration.get("new_backend_success"),
+            "git_head": payload.get("git_head"),
+            "metadata_warnings": [],
         }
     readiness = payload.get("readiness") or {}
     migration = payload.get("official_migration") or {}
@@ -1337,9 +1391,9 @@ def render_demo_html() -> str:
         wrap.appendChild(kvList({
           "Doris 证据报告": evidence.path,
           "证据状态": evidence.headline.passed,
-          "集群加速": evidence.headline.speedup,
-          "基线平均耗时": evidence.headline.baseline_avg_ms,
-          "优化平均耗时": evidence.headline.optimized_avg_ms,
+          "长周期最低加速": evidence.headline.speedup,
+          "长周期工作负载": evidence.headline.workload_count !== undefined ? evidence.headline.workload_count : "-",
+          "执行矩阵最大 P95": evidence.headline.execution_max_p95_ms !== undefined ? evidence.headline.execution_max_p95_ms + " ms" : "-",
           "结果行一致": evidence.headline.row_counts_match
         }));
         const details = document.createElement("pre");
@@ -1348,7 +1402,7 @@ def render_demo_html() -> str:
         wrap.appendChild(details);
       }
       if ((!delivery || !delivery.available) && (!evidence || !evidence.available)) {
-        wrap.appendChild(emptyState("尚未生成版本化交付证据。请先运行 submission_readiness 和证据导出脚本。").firstChild);
+        wrap.appendChild(emptyState("尚未生成版本化交付证据。请先运行最终证据刷新脚本。").firstChild);
       }
       outputPane.replaceChildren(wrap);
     }

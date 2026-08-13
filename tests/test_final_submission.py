@@ -17,6 +17,7 @@ def test_final_submission_metadata_requires_every_gate_and_same_head(tmp_path: P
         (tmp_path / filename).write_text(
             json.dumps(payloads[key]), encoding="utf-8"
         )
+    _write_funnel(tmp_path)
 
     result = build_final_submission_metadata(tmp_path, expected_git_head=HEAD)
 
@@ -33,6 +34,7 @@ def test_final_submission_metadata_rejects_mixed_git_heads(tmp_path: Path) -> No
         (tmp_path / filename).write_text(
             json.dumps(payloads[key]), encoding="utf-8"
         )
+    _write_funnel(tmp_path)
 
     with pytest.raises(ValueError, match="Git HEAD mismatch"):
         build_final_submission_metadata(tmp_path, expected_git_head=HEAD)
@@ -91,3 +93,18 @@ def _payloads() -> dict:
         "hero_query": {**common, "gate": {"passed": True}},
         "group_semantics": {**common, "passed": True},
     }
+
+
+def _write_funnel(root: Path) -> None:
+    (root / "official_compiler_funnel.json").write_text(
+        json.dumps(
+            {
+                "git_head": HEAD,
+                "legacy_strict_success": 1097,
+                "legacy_to_new_migrated": 1044,
+                "migration_coverage": 0.951686,
+                "new_backend_success": 1276,
+            }
+        ),
+        encoding="utf-8",
+    )
