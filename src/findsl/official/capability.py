@@ -4,6 +4,7 @@ import re
 from typing import Any, Dict, Mapping, Set, Tuple
 
 from .context import CompileContext
+from .domain.binder import parse_date_constraint
 from .pipeline import OfficialPipelineError, OfficialPipelineResult
 
 
@@ -155,19 +156,6 @@ _INTRADAY_DATE = re.compile(
 _REPORTING_DATE = re.compile(r"(?:年报|季报|半年报|一季报|三季报|报告期)")
 _LISTING_DATE = re.compile(r"(?:上市以来|上市后|上市的?第一个交易日)")
 _AMBIGUOUS_DATE = {"最近", "近期", "前期", "当前阶段"}
-_UNRESOLVED_DATE = {
-    "上周五到0926",
-    "2023年2024年",
-    "一四季度",
-    "曾经",
-    "以前",
-    "板块调整阶段后期",
-    "Q3后",
-    "回落之后",
-    "涨停后",
-    "今天前",
-    "一直以来",
-}
 _FUND_TYPES = re.compile(r"(?:ETF|LOF|基金|REITs|货币)", re.IGNORECASE)
 _CROSS_MARKET_TYPES = re.compile(r"(?:港股|美股|期货|债券|可转债|(?:^|[|&])港(?:$|[|&])|(?:^|[|&])美(?:$|[|&]))")
 _PRIVATE_TERMS = re.compile(r"(?:我的|自选股|持仓|账户|组合)")
@@ -317,11 +305,17 @@ def _needs_date_clarification(error):
     message = str(error)
     if "all-history scalar requires an explicit aggregate" in message:
         return True
-    return any(
-        str(slots.get("date", slots.get("period", ""))).strip()
-        in _UNRESOLVED_DATE
-        for slots in _binding_slots(error.partial.get("typed_ast"))
-    )
+    for slots in _binding_slots(error.partial.get("typed_ast")):
+        value = str(slots.get("date", slots.get("period", ""))).strip()
+        if not value:
+            continue
+        try:
+            constraint = parse_date_constraint(value)
+        except ValueError:
+            return True
+        if constraint.kind == "expression":
+            return True
+    return False
 
 
 def _clarification(error, status):
@@ -329,14 +323,18 @@ def _clarification(error, status):
         _has_ambiguous_date(error) or _needs_date_clarification(error)
     ):
         return None
-    values = sorted(
-        {
-            str(slots.get("date", slots.get("period", ""))).strip()
-            for slots in _binding_slots(error.partial.get("typed_ast"))
-            if str(slots.get("date", slots.get("period", ""))).strip()
-            in {*_AMBIGUOUS_DATE, *_UNRESOLVED_DATE}
-        }
-    )
+    values = []
+    for slots in _binding_slots(error.partial.get("typed_ast")):
+        value = str(slots.get("date", slots.get("period", ""))).strip()
+        if not value:
+            continue
+        try:
+            unresolved = parse_date_constraint(value).kind == "expression"
+        except ValueError:
+            unresolved = True
+        if value in _AMBIGUOUS_DATE or unresolved:
+            values.append(value)
+    values = sorted(set(values))
     return {
         "required": True,
         "field": "date",

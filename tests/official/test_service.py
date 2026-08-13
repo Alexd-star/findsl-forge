@@ -186,6 +186,8 @@ def test_service_distinguishes_missing_intraday_data_from_ambiguous_date() -> No
         "回落之后",
         "今天前",
         "一直以来",
+        "2025年4月23号第二天开始",
+        "2月第一周开始3周",
     ],
 )
 def test_service_requests_clarification_for_ungrounded_date_semantics(date):
