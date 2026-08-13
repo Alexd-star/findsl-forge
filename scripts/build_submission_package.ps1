@@ -80,6 +80,7 @@ foreach ($relative in @("submission_artifacts", "CHANGELOG.md")) {
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $sourceRoot "reports") | Out-Null
 Copy-Item -LiteralPath reports/final_submission_metadata.json -Destination (Join-Path $sourceRoot "reports\final_submission_metadata.json")
+[System.IO.File]::WriteAllText((Join-Path $sourceRoot "RELEASE_COMMIT.txt"), "$head`n", $utf8NoBom)
 
 foreach ($file in $requiredEvidence) {
   Copy-Item -LiteralPath (Join-Path "reports" $file) -Destination (Join-Path $evidenceRoot $file)

@@ -1,8 +1,8 @@
 import json
-import subprocess
 from pathlib import Path
 
 from findsl.official.performance_evidence import validate_performance_evidence_registry
+from findsl.versioning import resolve_release_head
 
 
 def test_performance_evidence_metrics_are_separated_by_workload(tmp_path):
@@ -66,9 +66,7 @@ def _isolated_registry(tmp_path: Path, *, long_horizon_speedup: float) -> Path:
         "official_compile_p95": 49.9,
         "hero_query_execution": 1200.0,
     }
-    current_head = subprocess.run(
-        ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
-    ).stdout.strip()
+    current_head = resolve_release_head()
     for metric in registry["metrics"]:
         source = Path("evidence") / f"{metric['metric_id']}.json"
         metric["source"] = source.as_posix()

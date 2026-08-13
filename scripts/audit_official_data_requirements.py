@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
 from findsl.official.context import CompileContext
 from findsl.official.service import OfficialCompilerService
+from findsl.versioning import resolve_release_head
 
 
 def build_audit(funnel, service: OfficialCompilerService):
@@ -142,12 +142,7 @@ def main():
 
 
 def _git_head():
-    return subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    return resolve_release_head()
 
 
 if __name__ == "__main__":

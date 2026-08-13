@@ -59,6 +59,7 @@ def verify(package_dir: Path, zip_path: Path | None = None) -> dict:
         package_dir / "03_提交说明/readme.txt",
         package_dir / "01_可运行项目/FinDSL-Forge/README.md",
         package_dir / "01_可运行项目/FinDSL-Forge/pyproject.toml",
+        package_dir / "01_可运行项目/FinDSL-Forge/RELEASE_COMMIT.txt",
         package_dir / "02_测试与证据/final_submission_metadata.json",
         package_dir / "03_提交说明/RELEASE_COMMIT.txt",
     ]
@@ -86,10 +87,20 @@ def verify(package_dir: Path, zip_path: Path | None = None) -> dict:
     if metadata_path.is_file() and release_path.is_file():
         metadata = json.loads(metadata_path.read_text(encoding="utf-8-sig"))
         release_head = release_path.read_text(encoding="utf-8-sig").strip()
+        source_release = (
+            package_dir / "01_可运行项目/FinDSL-Forge/RELEASE_COMMIT.txt"
+        )
+        source_head = (
+            source_release.read_text(encoding="utf-8-sig").strip()
+            if source_release.is_file()
+            else ""
+        )
         if not metadata.get("all_gates_passed"):
             errors.append("final metadata does not report all gates PASS")
         if metadata.get("git_head") != release_head:
             errors.append("release commit and evidence Git HEAD differ")
+        if source_head != release_head:
+            errors.append("runnable source and release Git HEAD differ")
 
     manifest_path = package_dir / "03_提交说明/FILE_MANIFEST.sha256"
     if manifest_path.is_file():

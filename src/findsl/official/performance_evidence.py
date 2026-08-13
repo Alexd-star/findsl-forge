@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping
+
+from findsl.versioning import resolve_release_head
 
 
 class PerformanceEvidenceError(ValueError):
@@ -162,7 +163,4 @@ def _read_json(path: Path) -> Mapping[str, Any]:
 
 
 def _git_head() -> str:
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-    )
-    return result.stdout.strip() if result.returncode == 0 else "unavailable"
+    return resolve_release_head()
