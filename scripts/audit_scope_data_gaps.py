@@ -181,7 +181,9 @@ def _git_head() -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--funnel", required=True)
-    parser.add_argument("--targets", required=True)
+    parser.add_argument(
+        "--targets", default="configs/official/scope_gap_targets.json"
+    )
     parser.add_argument(
         "--adjudications",
         default="configs/official/scope_gap_adjudications.json",

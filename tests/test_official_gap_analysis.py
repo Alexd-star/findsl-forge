@@ -43,18 +43,18 @@ def test_gap_analysis_separates_pass_data_invalid_and_capability_rows():
     assert "按能力族统计" in gap_analysis_markdown(report)
 
 
-def test_current_phase48_funnel_has_expected_category_totals():
-    path = Path("submission_artifacts/evidence_snapshots/phase48_scope_semantic_policy_funnel.json")
+def test_current_canonical_funnel_has_expected_category_totals():
+    path = Path("submission_artifacts/evidence_snapshots/official_compiler_funnel.json")
     payload = json.loads(path.read_text(encoding="utf-8"))
 
     report = analyze_official_funnel(payload)
 
     assert report["row_count"] == 5799
     assert report["category_counts"] == {
-        "capability_gap": 537,
-        "data_unavailable": 4082,
-        "invalid_input": 104,
-        "passed": 1076,
+        "capability_gap": 371,
+        "data_unavailable": 1689,
+        "invalid_input": 2466,
+        "passed": 1273,
     }
     assert report["migration_gap_count"] == 53
     assert report["migration_gap_codes"] == ["PHYSICAL_SCOPE_DATA_UNAVAILABLE"]

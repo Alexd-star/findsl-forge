@@ -7,6 +7,7 @@ from scripts.audit_scope_data_gaps import build_audit, render_markdown
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE = REPO_ROOT / "submission_artifacts/evidence_snapshots"
+CONFIG = REPO_ROOT / "configs/official"
 
 
 def _load(path: Path):
@@ -15,11 +16,11 @@ def _load(path: Path):
 
 def test_scope_data_gap_audit_covers_every_current_migration_gap() -> None:
     audit = build_audit(
-        _load(EVIDENCE / "phase48_scope_semantic_policy_funnel.json"),
-        _load(EVIDENCE / "phase48_true_remaining_scope_targets.json"),
-        _load(REPO_ROOT / "configs/official/scope_gap_adjudications.json"),
+        _load(EVIDENCE / "official_compiler_funnel.json"),
+        _load(CONFIG / "scope_gap_targets.json"),
+        _load(CONFIG / "scope_gap_adjudications.json"),
         ExternalSourceRegistry.load(
-            REPO_ROOT / "configs/official/external_source_registry.json"
+            CONFIG / "external_source_registry.json"
         ),
         git_head="test-head",
     )
