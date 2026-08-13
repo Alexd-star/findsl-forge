@@ -1,5 +1,5 @@
 param(
-  [string]$OfficialRoot = "D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统",
+  [string]$OfficialRoot = $env:FINDSL_OFFICIAL_DATA_ROOT,
   [string]$DorisHost = "127.0.0.1",
   [int]$QueryPort = 9030,
   [int]$HttpPort = 8030,
@@ -332,7 +332,7 @@ function Write-EvidenceReport {
     git_head = $gitHead
     doris_version = $dorisVersion
     database = "newzl"
-    official_root = $OfficialRoot
+    official_root = Split-Path -Leaf $OfficialRoot
     doris_host = $DorisHost
     query_port = $QueryPort
     fe_http_port = $HttpPort
@@ -358,6 +358,10 @@ $env:NO_PROXY = "127.0.0.1,localhost,172.20.80.0/24"
 $env:no_proxy = $env:NO_PROXY
 
 Write-Step "prepare_official_doris_evidence: checking tools and official files"
+if (-not $OfficialRoot) {
+  throw "Set FINDSL_OFFICIAL_DATA_ROOT or pass -OfficialRoot with the extracted official data directory."
+}
+$OfficialRoot = [System.IO.Path]::GetFullPath($OfficialRoot)
 & python --version
 & $Client --version
 & docker --version

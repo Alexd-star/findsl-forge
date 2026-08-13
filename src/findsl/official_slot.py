@@ -3595,7 +3595,7 @@ def profile_training_workbook(path: str, sample_size: int = 100) -> Dict[str, An
         for _, row in df.head(sample_size).iterrows()
     ]
     return {
-        "path": path,
+        "path": Path(path).name,
         "row_count": int(len(df)),
         "sample_size": int(min(sample_size, len(df))),
         "parse_ok": parse_ok,
@@ -3791,7 +3791,7 @@ def compile_training_workbook(
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "git_head": _current_git_head(),
-        "path": str(workbook_path),
+        "path": workbook_path.name,
         "input_sha256": _file_sha256(workbook_path),
         "mode": compile_mode.value,
         "row_count": row_count,

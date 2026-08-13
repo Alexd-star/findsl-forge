@@ -131,14 +131,17 @@ python scripts\run_hero_query.py --execute-doris --timeout 30
 
 执行前先通过水位门禁。正确率比较完整结果集；性能矩阵至少包含一次预热和多次重复，并保存结果哈希、P95 和 Git HEAD。任何失败都应先判断是代码、数据水位、连接、缓存还是资源问题，不要直接改阈值。
 
-## 8. Readiness 与证据导出
+## 8. 最终证据与交付包
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\refresh_final_evidence.ps1 `
+  -OfficialWorkbook "<官方工作簿路径>" `
+  -OfficialDataRoot "<官方数据解压目录>"
+
+powershell -ExecutionPolicy Bypass -File .\scripts\build_submission_package.ps1
 ```
 
-导出脚本只复制当前白名单证据，并重建 `evidence_manifest.md`、`evidence_metadata.json` 和 `evidence_summary.md`。若合同失败，不得手工把状态改成 PASS；应修复 Git 身份、数据指纹或缺失报告后重跑。
+证据刷新脚本要求源码工作区无未提交改动，所有评分报告必须绑定同一 Git HEAD。打包脚本使用 `git archive` 生成纯净源码副本，只复制最终证据白名单，排除虚拟环境、缓存、日志、数据库运行文件和本机路径；随后生成 SHA-256 清单、匿名性检查结果和最终 ZIP。任一门禁失败都会终止，不产生可上传结论。
 
 ## 9. 常见问题
 

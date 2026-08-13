@@ -69,7 +69,7 @@ class DefensePackageResult:
             "9. Run `python -m findsl.cli validate-llm-candidates --response-file data\\samples\\llm_candidate_response.json --json` to prove the LLM path accepts only compiler-validated DSL.",
             "10. If a provider key is available, run `python -m findsl.cli llm-suggest-dsl \"近3日成交量累计大于300\" --model <model> --json`; otherwise show the offline provider-contract check in this package.",
             "11. Run the real-market quote sample verification from `data\\real_samples\\eastmoney_a_share_sample\\queries.jsonl` to show the same checker works on public A-share fields.",
-            "12. Run `scripts\\official_suite.ps1` and `scripts\\submission_readiness.ps1` to show repeatable report evidence.",
+            "12. Run `scripts\\refresh_final_evidence.ps1` to show repeatable report evidence.",
             "",
             "## Score Mapping",
             "",
@@ -720,7 +720,7 @@ def _check_evaluation_report(cases_path: Path, reports_dir: Path) -> DefenseChec
         return DefenseCheck(
             name="Compiler accuracy and latency",
             scoring_point="Correct SQL generation under compile P95 target",
-            demo_action="Run scripts\\evaluate.ps1 or submission_readiness.ps1.",
+            demo_action="Run scripts\\evaluate.ps1 or refresh_final_evidence.ps1.",
             expected_signal="100% compile/fragment accuracy and P95 below 50 ms.",
             passed=passed,
             evidence=[
@@ -733,7 +733,7 @@ def _check_evaluation_report(cases_path: Path, reports_dir: Path) -> DefenseChec
         return _failed_check(
             "Compiler accuracy and latency",
             "Correct SQL generation under compile P95 target",
-            "Run scripts\\evaluate.ps1 or submission_readiness.ps1.",
+            "Run scripts\\evaluate.ps1 or refresh_final_evidence.ps1.",
             "100% compile/fragment accuracy and P95 below 50 ms.",
             exc,
         )

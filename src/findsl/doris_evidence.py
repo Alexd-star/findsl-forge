@@ -165,7 +165,7 @@ class DorisEvidenceResult:
             f"- Optimized plan contains prefix table: {self.optimized.plan_contains_prefix}",
             f"- Baseline plan contains window: {self.baseline.plan_contains_window}",
             "",
-            "This is the Doris-scale evidence file consumed by `submission_readiness.ps1`.",
+            "This is the Doris-scale evidence file consumed by the final evidence pipeline.",
             "Only generate it after loading schema, sample or scale data, and prefix tables into a real Doris cluster.",
             "",
             "## DSL",

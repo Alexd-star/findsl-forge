@@ -35,12 +35,12 @@ DEFAULT_BENCHMARK_DSL = 'filter(SUM(indicator("volume"), 3) > 300)'
 DEFAULT_REAL_MARKET_SAMPLE_DIR = Path("data/real_samples/eastmoney_a_share_sample")
 GENERATED_EVIDENCE_PATHS = frozenset(
     {
-        "submission_artifacts/evidence_manifest.md",
-        "submission_artifacts/evidence_metadata.json",
-        "submission_artifacts/evidence_summary.md",
+        "reports/evidence_manifest.md",
+        "reports/evidence_metadata.json",
+        "reports/evidence_summary.md",
     }
 )
-GENERATED_EVIDENCE_PREFIXES = ("submission_artifacts/evidence_snapshots/",)
+GENERATED_EVIDENCE_PREFIXES = ("reports/evidence_snapshots/",)
 
 
 @dataclass(frozen=True)

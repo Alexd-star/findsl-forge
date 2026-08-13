@@ -13,7 +13,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Audit every Phase 21 newly successful query")
     parser.add_argument(
         "--baseline",
-        default="submission_artifacts/evidence_snapshots/phase20_capability_funnel.json",
+        default="reports/phase20_capability_funnel.json",
     )
     parser.add_argument("--current", default="reports/phase21_capability_funnel.json")
     parser.add_argument("--json-output", default="reports/phase21_new_success_audit.json")

@@ -11,7 +11,7 @@ def test_official_doris_assets_are_present_and_target_real_tables():
     feature = (OFFICIAL_DORIS_DIR / "04_feature_tables.sql").read_text(encoding="utf-8")
     technical_feature = (OFFICIAL_DORIS_DIR / "05_technical_features_by_market.sql").read_text(encoding="utf-8")
     official_evidence_script = Path("scripts/prepare_official_doris_evidence.ps1").read_text(encoding="utf-8")
-    export_script = Path("scripts/export_submission_artifacts.ps1").read_text(encoding="utf-8")
+    package_script = Path("scripts/build_submission_package.ps1").read_text(encoding="utf-8")
 
     assert "CREATE DATABASE IF NOT EXISTS newzl" in schema
     assert "CREATE TABLE IF NOT EXISTS newzl.hsj_stock_hq_basic" in schema
@@ -91,7 +91,7 @@ def test_official_doris_assets_are_present_and_target_real_tables():
     assert "Baseline/prefix row-count mismatch" in official_evidence_script
     assert "WHERE base.bizdate BETWEEN DATE_SUB(DATE '2026-04-14', INTERVAL 80 DAY)" not in official_evidence_script
 
-    assert "official_doris_evidence.md" in export_script
-    assert "official_doris_evidence.json" in export_script
-    assert "official_slot_coverage.md" in export_script
-    assert "official_slot_coverage.json" in export_script
+    assert "official_correctness_benchmark.md" in package_script
+    assert "official_full_performance_matrix.json" in package_script
+    assert "official_long_horizon_matrix.json" in package_script
+    assert "FILE_MANIFEST.sha256" in package_script

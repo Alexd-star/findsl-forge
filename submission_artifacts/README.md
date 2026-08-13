@@ -1,21 +1,12 @@
-# 当前证据包
+# 最终证据生成说明
 
-本目录只保存可随源码回溯的当前评分证据。`reports/` 是本地生成区，默认不进入 Git；PPT、长篇手册、截图和视频在功能封板后单独生成，也不进入日常源码版本。
-
-| 文件 | 作用 |
-| --- | --- |
-| `evidence_metadata.json` | 机器可读的门禁、正确率、性能、Git 和数据身份 |
-| `evidence_summary.md` | 从 metadata 自动生成的摘要 |
-| `evidence_manifest.md` | 当前快照文件和导出环境清单 |
-| `evidence_snapshots/` | 正确率、性能、Doris、水位、语料覆盖和数据缺口证据 |
-
-重新导出：
+动态评分证据不再提交进源码仓库，避免证据归档本身改变 Git HEAD，或历史快照与当前代码混用。最终交付采用冻结发布流程：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\export_submission_artifacts.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\refresh_final_evidence.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\build_submission_package.ps1
 ```
 
-导出脚本使用白名单，不再复制旧阶段的全部中间报告。证据合同失败时必须修复来源，不得手工篡改 PASS 状态。
+第一条命令在同一 Git HEAD 与同一 Doris 数据快照上重采源码质量、正确率、执行性能、长周期加速、编译延迟、12 类函数能力、配置式扩展和复杂查询证据。第二条命令通过 `git archive` 导出源码，只复制白名单证据和产品截图，排除依赖环境、缓存、日志、数据库文件、本机绝对路径及敏感配置，并生成逐文件 SHA-256 清单和最终 ZIP。
 
-当前快照绑定核心代码提交 Git `a531f1c`，证据合同、数据指纹、正确率和性能报告已统一重采并通过。其后的证据归档提交只包含文档与快照，不改变该核心代码树。
+生成结果位于 `final_submission/`，该目录默认不进入 Git。上传前以包内 `03_提交说明/PACKAGE_VERIFICATION.md` 的 `PASS` 为准。

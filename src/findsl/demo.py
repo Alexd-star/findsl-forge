@@ -27,7 +27,7 @@ DEMO_REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_REAL_MARKET_CASES = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample/queries.jsonl"
 DEFAULT_REAL_MARKET_DATA_DIR = DEMO_REPO_ROOT / "data/real_samples/eastmoney_a_share_sample"
 DEFAULT_OFFICIAL_DEMO_CASES = DEMO_REPO_ROOT / "data/samples/official_slot_demo.jsonl"
-DEFAULT_EVIDENCE_METADATA = DEMO_REPO_ROOT / "submission_artifacts/evidence_metadata.json"
+DEFAULT_EVIDENCE_METADATA = DEMO_REPO_ROOT / "reports/final_submission_metadata.json"
 
 
 def doris_evidence_summary(report_path: Path = Path("reports/doris_cluster_evidence.md")) -> Dict[str, Any]:

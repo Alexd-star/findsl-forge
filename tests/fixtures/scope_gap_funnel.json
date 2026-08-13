@@ -1,0 +1,770 @@
+{
+  "schema_version": 1,
+  "row_count": 5799,
+  "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
+  "migration_gaps": [
+    {
+      "code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "count": 53
+    }
+  ],
+  "rows": [
+    {
+      "excel_row": 177,
+      "source": "indicator('科创板', '石膏石材板块', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 208,
+      "source": "indicator('京', '沪深300能源&石膏石材板块', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 222,
+      "source": "indicator('深', '印花板', '成交额', '这六个月', '', '', '') > 100000000000 and indicator('深', '印花板', '流通市值', '', '', '', '') between '[1000000000,1500000000]'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 229,
+      "source": "indicator('深', '幕墙板块|沪深300能源', '', '', '', '', '') = 'all' limit 0,22",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 251,
+      "source": "rank('', '金属管件制品行业&能源技术服务', '开盘价', 'desc', '今天', '', '', '') > 0 limit 0,10",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 264,
+      "source": "indicator('^创业板&^科创板', '^混凝土概念', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 288,
+      "source": "indicator('', '白酒ETF', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 385,
+      "source": "indicator('', '大订单', '深股通标识', '', '', '', '') = True then rank('', '大订单', '', 'desc', '', '', '', '') <= 10",
+      "functions": [
+        "indicator",
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 386,
+      "source": "rank('', '大订单概念', '', 'desc', '', '', '', '') <= 10",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 406,
+      "source": "indicator('', '东方空间', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 411,
+      "source": "indicator('', '华为概念&AI应用&影子股', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 422,
+      "source": "indicator('创业板', 'SaaS产品', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 425,
+      "source": "rank('', '第十代火箭', '', 'desc', '', '', '', '') <= 5",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 430,
+      "source": "indicator('', '^深远光大', '成交额', '', '', '', '') < 10000000",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 445,
+      "source": "rank('', '第一代锂电池', '', 'desc', '', '', '', '') <= 3",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 451,
+      "source": "rank('', '第十代半导体', '', 'desc', '', '', '', '') <= 9",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 516,
+      "source": "indicator('', '国企重组&成都国资委&高薪华为链', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 519,
+      "source": "indicator('', '擒牛火箭', '首板涨停', '', '', '', '') = True",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 575,
+      "source": "indicator('', '高温超导带材&真空室内的第一壁&偏滤器', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 609,
+      "source": "indicator('', 'AI加行业板块', '主力净流入', '2024年12月23号', '', '', '') > 0",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 613,
+      "source": "indicator('', '光铜共进概念', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 615,
+      "source": "indicator('', '短线&算力', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 636,
+      "source": "indicator('', '腾讯蓝包概念', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 638,
+      "source": "rank('', '龙回头', '', 'desc', '', '', '', '') = 5",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 750,
+      "source": "indicator('', '火箭阳', '', '昨日', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 763,
+      "source": "indicator('', 'BLacKweLL', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 773,
+      "source": "indicator('', '二十几题财|腾讯霸主', '最低价', '', '', '', '') = 4",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 788,
+      "source": "indicator('', '深圳电信', '市盈率', '', '', '', '') > queryData('', '白酒行业', '市盈率', '', '')",
+      "functions": [
+        "indicator",
+        "queryData"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 847,
+      "source": "indicator('', '深证龙科&香港金科', '成交量', '本季度', '', '', '') > 1000000000 then rank('', '深证龙科&香港金科', '成交量', 'desc', '本季度', '', '', '') > 10%",
+      "functions": [
+        "indicator",
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 929,
+      "source": "indicator('', 'MATE70|s板', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1168,
+      "source": "indicator('', '美的科技', '成交额', '', '', '', '') < queryData('', '白酒行业', '成交额', '本周', 'MIN') then rank('', '美的科技', '成交额', 'desc', '本周', '', '', '') <= 10",
+      "functions": [
+        "indicator",
+        "queryData",
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1275,
+      "source": "indicator('', '', '市净率', '22年', '', 'AVG', '') < queryData('', '腾讯控股', '市净率', '22年', 'AVG')",
+      "functions": [
+        "indicator",
+        "queryData"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1292,
+      "source": "indicator('^沪主板', '智谱ai概念', '涨停', '', '', '', 'CONS=4') = True and indicator('^沪主板', '智谱ai概念', 'ST股票标识', '', '', '', '') = False and indicator('^沪主板', '智谱ai概念', '涨幅', '本月', '', 'AVG', '') > queryData('', '杨氏纸业', '涨幅', '本月', 'AVG')",
+      "functions": [
+        "indicator",
+        "queryData"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1297,
+      "source": "indicator('', '沪上阿姨', '市盈率', '', '', '', '') > queryData('', 'S板&贵金属&新能源', '市盈率', '', 'AVG')",
+      "functions": [
+        "indicator",
+        "queryData"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1385,
+      "source": "indicator('', '港湾经济', '主力成交量', '', '', '', '') > queryData('', '300084', '主力成交量', '近10天', 'SUM') limit 0,7",
+      "functions": [
+        "indicator",
+        "queryData"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1386,
+      "source": "indicator('', '英美贸易业', '成交量', '三月', '', 'SUM', '') > (indicator('', '英美贸易业', '成交量', '二月', '', '', '') + indicator('', '英美贸易业', '成交量', '一月', '', '', '')) * 4",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1459,
+      "source": "indicator('', '', '流通市值', '年初至今', '', '', '') between '[-500000000,284000000]' or rank('', '音频媒体行业&胎压监测', '流通市值', 'desc', '年初至今', '', '', 'CONS=5周') between '[10,15]'",
+      "functions": [
+        "indicator",
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1460,
+      "source": "indicator('', '', '流通市值', '', '', '', '') between '[-500000000,284000000]' or (rank('', '音频媒体行业&胎压监测', '流通市值', 'desc', '', '', '', '') < 10 or rank('', '音频媒体行业&胎压监测', '流通市值', 'desc', '', '', '', '') > 15)",
+      "functions": [
+        "indicator",
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1505,
+      "source": "record_high('', '994338', '', '2024年', '这个月', '', '', '') = True",
+      "functions": [
+        "record_high"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1508,
+      "source": "record_low('', '100429', '', '2024年11月', '本月', '', '', '') = True and indicator('', '100429', '涨停', '今天', '', '', '') = True then rank('', '100429', '涨停时间', 'desc', '今天', '', '', '') > 0",
+      "functions": [
+        "indicator",
+        "rank",
+        "record_low"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1540,
+      "source": "record_low('', 'cvpr', '', '十个月', '', '', '', '') = True and rank('', 'cvpr', '连跌天数', 'desc', '', '', '', '') <= 10",
+      "functions": [
+        "rank",
+        "record_low"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1647,
+      "source": "indicator('', '低空经济&低价&破镜', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1697,
+      "source": "indicator('', '推进', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1749,
+      "source": "indicator('', '连扳概念', '涨跌幅', '近10日', '', '', '') > 1%",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1752,
+      "source": "rank('', '能源|金属板块', '涨幅', 'desc', '', '', '', '') > 0",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1758,
+      "source": "indicator('', '深鱼子油|北京国投', '主力净流入', '本月', '', '', '') > 0 and indicator('', '深鱼子油|北京国投', '涨跌幅', '本月', '', '', '') ~= 0",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1759,
+      "source": "indicator('', 'aigc|深海鱼处理行业', '涨跌幅', '', '', '', '') ~= 0",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1773,
+      "source": "indicator('', '连扳概念', '涨跌幅', '昨日', '', '', '') > 1%",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 1802,
+      "source": "rank('', '上海中环概念', '最新价', 'desc', '', '', 'MIN', '') <= 5 and indicator('', '上海中环概念', '涨幅', '', '', '', '') = 15% and indicator('', '上海中环概念', '涨停', '', '', '', '') = True",
+      "functions": [
+        "indicator",
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 3382,
+      "source": "indicator('沪|深|京', '^运动用品', '主力成本', '', '', '', '') < 15",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 3702,
+      "source": "cross_above('^沪', '^指数基金', '', '一周均线', '', '', '') = True",
+      "functions": [
+        "cross_above"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 3981,
+      "source": "indicator('沪|深|京', '螃蟹', '', '', '', '', '') = 'all'",
+      "functions": [
+        "indicator"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    },
+    {
+      "excel_row": 5313,
+      "source": "rank('沪|科创板', '科技电池', '主力净流入', 'desc', '', '', '', '') / rank('沪|科创板', '科技电池', '主力净流出', 'desc', '', '', '', '') <= 3",
+      "functions": [
+        "rank"
+      ],
+      "legacy_strict_success": true,
+      "legacy_code": "PASS",
+      "new_backend_success": false,
+      "terminal_stage": "physical",
+      "terminal_code": "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
+      "selected_resource": null,
+      "selected_strategy": null
+    }
+  ]
+}

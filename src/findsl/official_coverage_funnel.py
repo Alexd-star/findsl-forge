@@ -105,7 +105,9 @@ def build_official_workbook_coverage_funnel(workbook: str) -> Dict[str, Any]:
     path = Path(workbook).resolve()
     frame = pd.read_excel(path, sheet_name="训练语料", usecols=["slot_dsl"])
     report = build_official_coverage_funnel(frame["slot_dsl"])
-    report["workbook"] = str(path)
+    # Evidence packages retain the official file identity without leaking the
+    # workstation-specific extraction path.
+    report["workbook"] = path.name
     report["input_sha256"] = _file_sha256(path)
     return report
 

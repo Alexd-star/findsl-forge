@@ -6,7 +6,7 @@
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\prepare_official_doris_evidence.ps1 `
-  -OfficialRoot "D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统"
+  -OfficialRoot "<官方数据解压目录>"
 ```
 
 脚本会启动/等待 Doris、重建官方表、Stream Load 三张 CSV、校验行数、构建 `04_feature_tables.sql`，并生成 `reports/official_doris_evidence.md` 与 JSON sidecar。下面的手工命令保留用于故障排查。
@@ -16,7 +16,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\prepare_official_doris_eviden
 官方资料根目录示例：
 
 ```powershell
-$OfficialRoot = "D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统\19-多模态技术与数据治理赛道-华泰证券-行情选股 DSL 到高性能 Doris SQL 的自动化编译系统"
+$OfficialRoot = "<官方数据解压目录>"
 ```
 
 连接参数：

@@ -9,10 +9,10 @@ def test_git_state_ignores_generated_evidence_but_not_source_changes(monkeypatch
         ("log", "-1", "--pretty=%s"): "test commit\n",
         ("status", "--short"): "\n".join(
             [
-                " M submission_artifacts/evidence_manifest.md",
-                " D submission_artifacts/evidence_metadata.json",
-                "?? submission_artifacts/evidence_summary.md",
-                "?? submission_artifacts/evidence_snapshots/new.json",
+                " M reports/evidence_manifest.md",
+                " D reports/evidence_metadata.json",
+                "?? reports/evidence_summary.md",
+                "?? reports/evidence_snapshots/new.json",
                 " M src/findsl/compiler.py",
             ]
         ),

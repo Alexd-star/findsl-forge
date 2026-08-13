@@ -29,5 +29,11 @@ submission_artifacts/demo_screenshots/
 submission_artifacts/defense_video/
 submission_artifacts/official_clarification/
 submission_artifacts/visual_evidence/
+submission_artifacts/evidence_manifest.md
+submission_artifacts/evidence_metadata.json
+submission_artifacts/evidence_summary.md
+submission_artifacts/evidence_snapshots/
+submission_artifacts/product_screenshots/
+final_submission/
 docs/*.docx
 docs/*.pdf

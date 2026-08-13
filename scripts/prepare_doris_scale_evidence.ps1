@@ -237,7 +237,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\collect_doris_evidence.ps1
 
 if (-not $SkipReadiness) {
   Write-Step "Running submission readiness report"
-  powershell -ExecutionPolicy Bypass -File .\scripts\submission_readiness.ps1
+  powershell -ExecutionPolicy Bypass -File .\scripts\refresh_final_evidence.ps1
 }
 
 Write-Step "Done"
