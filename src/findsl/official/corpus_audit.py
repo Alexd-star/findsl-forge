@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
@@ -153,7 +154,8 @@ def build_corpus_audit(
         "generated_at": datetime.now(timezone.utc)
         .replace(microsecond=0)
         .isoformat(),
-        "git_head": funnel.get("git_head"),
+        "git_head": _git_head(),
+        "baseline_git_head": funnel.get("git_head"),
         "profile_id": service.context.snapshot.profile_id,
         "source_sha256": funnel["source_sha256"],
         "row_count": funnel["row_count"],
@@ -175,6 +177,8 @@ def render_corpus_audit_markdown(report: Mapping[str, Any]) -> str:
         "# 官方 5799 条语料逐行根因审计",
         "",
         f"- 数据配置：`{report['profile_id']}`",
+        f"- 当前代码：`{report['git_head']}`",
+        f"- 历史基线代码：`{report['baseline_git_head']}`",
         f"- 语料指纹：`{report['source_sha256']}`",
         f"- 总行数：`{report['row_count']}`",
         "",
@@ -227,6 +231,16 @@ def render_corpus_audit_markdown(report: Mapping[str, Any]) -> str:
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def _git_head() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "<unknown>"
 
 
 def _slot_bindings(
