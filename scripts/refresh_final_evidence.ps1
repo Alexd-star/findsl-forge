@@ -71,7 +71,7 @@ Invoke-Step "Canonical compiler funnel" {
 Invoke-Step "Corpus root-cause audit" {
   python scripts/audit_official_corpus.py `
     --funnel reports/official_compiler_funnel.json `
-    --profile configs/official/compiler_manifest.json `
+    --profile enriched_public `
     --output-json reports/official_corpus_root_cause_audit.json `
     --output-md reports/official_corpus_root_cause_audit.md
 }
