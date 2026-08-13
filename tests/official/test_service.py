@@ -257,3 +257,25 @@ def test_service_detects_intraday_indicator_and_cross_market_dependencies():
         item["domain_id"] == "cross_market_quote"
         for item in cross_market["data_requirements"]
     )
+
+
+def test_service_separates_index_data_gaps_from_incompatible_entity_grains():
+    service = OfficialCompilerService()
+    index_field = service.negotiate(
+        "indicator('', '', '市盈率', '今日', '指数', '', '') > 1"
+    )["capability"]
+    mixed_grain = service.negotiate(
+        "indicator('', '', '涨幅', '今日', '板块', '', '') > 0 or "
+        "rank('', '', '涨幅', 'desc', '今日', '', '', '') > 0"
+    )["capability"]
+    empty_group_rank = service.negotiate(
+        "rank('', '', '', 'desc', '今天', '概念', '', '') <= 7"
+    )["capability"]
+
+    assert index_field["status"] == "DATA_UNAVAILABLE"
+    assert any(
+        item["domain_id"] == "index_reference"
+        for item in index_field["data_requirements"]
+    )
+    assert mixed_grain["status"] == "INVALID_INPUT"
+    assert empty_group_rank["status"] == "INVALID_INPUT"

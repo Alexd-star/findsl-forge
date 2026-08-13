@@ -86,6 +86,12 @@ def classify_pipeline_error(
     data_requirements: Tuple[Dict[str, Any], ...] = (),
 ) -> str:
     code = str(error.code).upper()
+    if code in {
+        "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
+        "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
+        "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
+    }:
+        return DATA_UNAVAILABLE
     if "DATA_UNAVAILABLE" in code or code in {
         "PHYSICAL_SCOPE_DATA_UNAVAILABLE",
         "PHYSICAL_RESOURCE_DATA_UNAVAILABLE",
@@ -99,6 +105,14 @@ def classify_pipeline_error(
     if _has_ambiguous_date(error):
         return INVALID_INPUT
     if _needs_date_clarification(error):
+        return INVALID_INPUT
+    if code == "PHYSICAL_ENTITY_TARGET_MISMATCH":
+        return INVALID_INPUT
+    if code == "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE" and _has_empty_indicator(
+        error
+    ):
+        return INVALID_INPUT
+    if code == "PHYSICAL_EVENT_PERIOD_UNSUPPORTED" and _has_unresolved_period(error):
         return INVALID_INPUT
     if error.stage == "frontend":
         return INVALID_INPUT
@@ -184,6 +198,12 @@ def _rejected_data_requirements(error, context):
         "PHYSICAL_INDUSTRY_DATA_UNAVAILABLE",
     }:
         definitions.append(context.data_domain_catalog.resolve("scope_membership"))
+    if code in {
+        "PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED",
+        "PHYSICAL_ENTITY_MARKET_UNSUPPORTED",
+        "PHYSICAL_ENTITY_SCOPE_UNSUPPORTED",
+    }:
+        definitions.append(context.data_domain_catalog.resolve("index_reference"))
     if code == "PHYSICAL_MARKET_DATA_UNAVAILABLE":
         definitions.append(
             context.data_domain_catalog.resolve("cross_market_quote")
@@ -297,6 +317,24 @@ def _has_ambiguous_date(error):
         in _AMBIGUOUS_DATE
         for slots in _binding_slots(error.partial.get("typed_ast"))
     )
+
+
+def _has_empty_indicator(error):
+    return any(
+        any(
+            key.startswith("indicator_name") and not str(value).strip()
+            for key, value in slots.items()
+        )
+        for slots in _binding_slots(error.partial.get("typed_ast"))
+    )
+
+
+def _has_unresolved_period(error):
+    for slots in _binding_slots(error.partial.get("typed_ast")):
+        value = str(slots.get("period", "")).strip()
+        if value and parse_date_constraint(value).kind == "expression":
+            return True
+    return False
 
 
 def _needs_date_clarification(error):
