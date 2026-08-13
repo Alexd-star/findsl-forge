@@ -454,8 +454,8 @@ class ReadinessReport:
                 "## Remaining High-Value Work",
                 "",
                 "- Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.",
-                "- Refresh the generated one-minute defense video when screenshots or evidence values change; add human voiceover only if the portal requires narrated media.",
-                "- Broaden the DSL corpus with more official-style questions and negative/error cases.",
+                "- Freeze the final Git HEAD before portal submission, then export evidence once and avoid mixing reports from different revisions.",
+                "- Add external data domains only from licensed, versioned snapshots; keep ambiguous or invalid DSL as deterministic rejections.",
                 "- Use the provider-backed LLM path only with stable credentials, timeout settings, and saved raw responses when preparing live demos.",
             ]
         )
@@ -486,7 +486,7 @@ def generate_readiness_report(
     official_compile_latency = run_compile_latency_benchmark(
         load_performance_manifest(repo_root / "data/official_performance/matrix.jsonl"),
         warmups=1,
-        repeats=3,
+        repeats=30,
         target_p95_ms=50.0,
     )
     write_compile_latency_report(

@@ -77,6 +77,8 @@ def test_generate_readiness_report_collects_submission_evidence(tmp_path):
     assert report.evaluation.failed == 0
     assert report.official_compile_latency["target_met"] is True
     assert report.official_compile_latency["case_count"] == 48
+    assert report.official_compile_latency["repeats"] == 30
+    assert report.official_compile_latency["sample_count"] == 1440
     assert report.equivalence.passed
     assert report.benchmark.optimized_matches_reference
     assert all(asset.passed for asset in report.doris_assets)
