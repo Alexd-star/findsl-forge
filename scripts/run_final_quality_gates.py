@@ -22,7 +22,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    lint_imports = _find_lint_imports()
+    lint_imports = _find_lint_imports(root)
     commands = [
         ("ANTLR generated sources", [sys.executable, "scripts/generate_antlr.py", "--check"]),
         ("Ruff", [sys.executable, "-m", "ruff", "check", "."]),
@@ -146,11 +146,15 @@ def _git_head(root: Path) -> str:
     ).stdout.strip()
 
 
-def _find_lint_imports() -> str:
+def _find_lint_imports(root: Path) -> str:
+    version_dir = f"Python{sys.version_info.major}{sys.version_info.minor}"
     candidates = (
         shutil.which("lint-imports"),
+        str(root / ".venv" / "Scripts" / "lint-imports.exe"),
+        str(root / ".venv" / "bin" / "lint-imports"),
         str(Path(sys.executable).parent / "lint-imports.exe"),
         str(Path(site.USER_BASE) / "Scripts" / "lint-imports.exe"),
+        str(Path(site.USER_BASE) / version_dir / "Scripts" / "lint-imports.exe"),
     )
     for candidate in candidates:
         if candidate and Path(candidate).is_file():
