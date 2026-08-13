@@ -112,3 +112,41 @@ def test_fund_index_and_scope_contracts_expose_versioned_variants():
         "snapshot_id",
         "effective_from",
     )
+
+
+def test_fund_identity_variant_is_not_rejected_by_portfolio_primary_keys(
+    tmp_path: Path,
+):
+    data = tmp_path / "fund_identity.csv"
+    data.write_text(
+        "fund_code,fund_name,fund_type,effective_from,exchange\n"
+        "510300,沪深300ETF,ETF,2026-08-13,SSE\n",
+        encoding="utf-8",
+    )
+    sources, domains, contracts = _catalogs()
+    adapter = LocalTabularDomainAdapter(
+        provider_id="tushare-optional",
+        domain_id="fund_reference",
+        source="tushare",
+        source_url="https://tushare.pro/",
+        license_note="Test fixture; production use requires a licensed snapshot.",
+        temporal_model="effective_dated",
+        data_path=data,
+        data_format="csv",
+        license_accepted=True,
+    )
+    runner = DomainAdapterRunner(
+        adapters=DomainAdapterRegistry((adapter,)),
+        data_domains=domains,
+        sources=sources,
+        contracts=contracts,
+    )
+
+    _, report = runner.fetch_and_audit(
+        "tushare-optional",
+        DomainAdapterRequest("fund_reference", "competition-v1", "2026-08-13"),
+    )
+
+    assert report["passed"] is True
+    assert report["status"] == "CANDIDATE"
+    assert report["table_contract"]["matched_variant"] == "fund_identity"

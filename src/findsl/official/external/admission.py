@@ -153,9 +153,13 @@ def audit_domain_snapshot(
         errors.append("provider does not declare the requested data-domain capability")
     if manifest.temporal_model != provider.temporal_model:
         errors.append("snapshot temporal_model differs from the provider registry")
-    missing_keys = sorted(set(domain.primary_keys) - set(manifest.columns))
-    if missing_keys:
-        errors.append(f"snapshot columns miss primary keys: {missing_keys}")
+    has_variant_contract = bool(
+        contracts is not None and contracts.resolve(manifest.domain_id)
+    )
+    if not has_variant_contract:
+        missing_keys = sorted(set(domain.primary_keys) - set(manifest.columns))
+        if missing_keys:
+            errors.append(f"snapshot columns miss primary keys: {missing_keys}")
     if manifest.provider_id not in {
         *profile.active_provider_ids,
         *profile.candidate_provider_ids,
