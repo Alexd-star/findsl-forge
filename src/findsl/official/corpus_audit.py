@@ -50,6 +50,7 @@ def build_corpus_audit(
     service: OfficialCompilerService,
     *,
     repair_catalog: Optional[OfficialRepairCatalog] = None,
+    baseline_status_by_row: Optional[Mapping[int, str]] = None,
 ) -> Dict[str, Any]:
     repair_catalog = repair_catalog or service.repair_catalog
     rows = []
@@ -78,7 +79,11 @@ def build_corpus_audit(
                 if len(examples) < 5:
                     examples.append(int(row["excel_row"]))
 
-        baseline_status = _classify_baseline(row, capability, bindings, source)
+        baseline_status = (
+            str(baseline_status_by_row[int(row["excel_row"])])
+            if baseline_status_by_row is not None
+            else _classify_baseline(row, capability, bindings, source)
+        )
         root_cause, resolution = _root_cause(
             row,
             capability,

@@ -113,3 +113,28 @@ def test_corpus_audit_keeps_new_data_inference_out_of_historical_baseline():
 
     assert report["baseline_status_counts"] == {"CAPABILITY_GAP": 1}
     assert report["current_status_counts"] == {"DATA_UNAVAILABLE": 1}
+
+
+def test_corpus_audit_accepts_frozen_historical_status_by_row():
+    source = "indicator('', '', '成交量', '今日', '', '', '') > 1"
+    report = build_corpus_audit(
+        {
+            "git_head": "a" * 40,
+            "source_sha256": "b" * 64,
+            "row_count": 1,
+            "rows": [
+                {
+                    "excel_row": 2,
+                    "source": source,
+                    "new_backend_success": True,
+                    "terminal_stage": "backend",
+                    "terminal_code": "PASS",
+                }
+            ],
+        },
+        OfficialCompilerService(),
+        baseline_status_by_row={2: "INVALID_INPUT"},
+    )
+
+    assert report["baseline_status_counts"] == {"INVALID_INPUT": 1}
+    assert report["current_status_counts"] == {"SUPPORTED": 1}
