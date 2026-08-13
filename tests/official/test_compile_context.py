@@ -26,7 +26,7 @@ def test_compile_context_freezes_every_manifest_catalog() -> None:
     assert len(context.snapshot.files) == 20
     assert len(context.data_domain_catalog.definitions()) == 21
     assert len(context.entity_target_catalog.definitions) == 15
-    assert len(context.group_metric_policy_catalog.metrics) == 17
+    assert len(context.group_metric_policy_catalog.metrics) == 20
     assert context.financial_rules.catalog_id == "financial-rule-catalog-v2"
     assert context.financial_rules.release.status == "active"
     assert len(context.context_id) == 64
