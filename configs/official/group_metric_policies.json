@@ -158,6 +158,30 @@
       "allowed_target_ids": ["industry", "concept", "board"],
       "null_policy": "ignore",
       "rationale": "成员占比不可加总；当前群组口径采用横截面均值并允许极值分析。"
+    },
+    {
+      "indicator_id": "主力主动买入占比",
+      "default_aggregation": "avg",
+      "allowed_aggregations": ["avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "主动买入占比是成员证券的比例指标，不允许求和；群组层默认采用横截面均值。"
+    },
+    {
+      "indicator_id": "主力主动卖出占比",
+      "default_aggregation": "avg",
+      "allowed_aggregations": ["avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "主动卖出占比是成员证券的比例指标，不允许求和；群组层默认采用横截面均值。"
+    },
+    {
+      "indicator_id": "市净率",
+      "default_aggregation": "avg",
+      "allowed_aggregations": ["avg", "max", "min"],
+      "allowed_target_ids": ["industry", "concept", "board"],
+      "null_policy": "ignore",
+      "rationale": "市净率不可加总；在缺少群组总市值与净资产重算口径时，仅允许横截面均值或极值。"
     }
   ]
 }

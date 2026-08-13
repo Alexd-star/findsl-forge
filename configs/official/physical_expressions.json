@@ -158,6 +158,10 @@
       "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainActBuyCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
     },
     {
+      "indicator_id": "主力主动卖出占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
+      "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainActSellCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
+    },
+    {
       "indicator_id": "主力买入占比", "resource_id": "official_ext", "value_type": "numeric", "nullable": true,
       "expression": {"op": "divide", "left": {"op": "column", "column": "ZJLXMainBuyCntPer", "type": "numeric"}, "right": {"op": "literal", "value": 10000.0, "type": "numeric"}}
     },

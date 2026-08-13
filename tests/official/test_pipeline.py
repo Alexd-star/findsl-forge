@@ -736,6 +736,33 @@ def test_pipeline_combines_prefix_average_crossing_with_temporal_quantifier():
     assert "temporal_metrics" in sql
 
 
+@pytest.mark.parametrize(
+    "source,sql_fragment",
+    [
+        (
+            "rank('', '', '市净率', 'asc', '', '行业', '', '') <= 5% "
+            "and indicator('', '', '跌幅', '', '行业', '', 'EXIST>0') > 0",
+            "AVG(",
+        ),
+        (
+            "rank('沪|深|京', '', '主力主动买入占比', 'asc', '今天', "
+            "'板块', '', '') = 1",
+            "ZJLXMainActBuyCntPer",
+        ),
+        (
+            "indicator('', '', '主力主动卖出占比', '近一月', '概念', '', "
+            "'EXIST>=7') > 10%",
+            "ZJLXMainActSellCntPer",
+        ),
+    ],
+)
+def test_pipeline_uses_declared_group_ratio_policies(source, sql_fragment):
+    result = compile_official(source).to_dict()
+
+    assert sql_fragment in result["backend"]["sql"]
+    assert result["physical"]["selected_strategy"].startswith("group_")
+
+
 def test_pipeline_materializes_pressure_events_without_placeholder_sql():
     result = compile_official(
         "reset('', '', '', '支撑位', '今天', '', '') = True and "
