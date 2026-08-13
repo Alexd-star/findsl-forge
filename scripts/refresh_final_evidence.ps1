@@ -75,18 +75,24 @@ Invoke-Step "Corpus root-cause audit" {
     --output-json reports/official_corpus_root_cause_audit.json `
     --output-md reports/official_corpus_root_cause_audit.md
 }
+$officialDorisArgs = @(
+  "-ExecutionPolicy", "Bypass",
+  "-File", "scripts/prepare_official_doris_evidence.ps1",
+  "-OfficialRoot", $OfficialDataRoot,
+  "-DorisHost", $DorisHost,
+  "-QueryPort", [string]$DorisPort,
+  "-HttpPort", [string]$DorisHttpPort,
+  "-User", $DorisUser,
+  "-Client", $MysqlClient,
+  "-SkipDockerStart",
+  "-SkipStreamLoad",
+  "-SkipFeatureTables"
+)
+if ($env:DORIS_PASSWORD) {
+  $officialDorisArgs += @("-Password", $env:DORIS_PASSWORD)
+}
 Invoke-Step "Official Doris deployment evidence" {
-  powershell -ExecutionPolicy Bypass -File scripts/prepare_official_doris_evidence.ps1 `
-    -OfficialRoot $OfficialDataRoot `
-    -DorisHost $DorisHost `
-    -QueryPort $DorisPort `
-    -HttpPort $DorisHttpPort `
-    -User $DorisUser `
-    -Password $env:DORIS_PASSWORD `
-    -Client $MysqlClient `
-    -SkipDockerStart `
-    -SkipStreamLoad `
-    -SkipFeatureTables
+  & powershell @officialDorisArgs
 }
 Invoke-Step "Official materialization watermark" {
   python scripts/check_official_watermarks.py `
