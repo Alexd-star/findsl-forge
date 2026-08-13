@@ -1,6 +1,6 @@
 # 官方语料数据域与能力需求审计
 
-- Git HEAD：`ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b`
+- Git HEAD：`10b7af790420e2727fa654e84128de24b1f8992f`
 - 数据配置：`competition-v1`
 - 语料行数：`5799`
 
@@ -8,18 +8,18 @@
 
 | 分类 | 条数 |
 |---|---:|
-| `CAPABILITY_GAP` | 88 |
+| `CAPABILITY_GAP` | 85 |
 | `DATA_UNAVAILABLE` | 2043 |
 | `INVALID_INPUT` | 2398 |
-| `SUPPORTED` | 1270 |
+| `SUPPORTED` | 1273 |
 
 ## 数据域需求
 
 | 能力分类 | 数据域 | 当前状态 | 涉及问句 |
 |---|---|---|---:|
-| `CAPABILITY_GAP` | `daily_market_quote` | `available` | 70 |
+| `CAPABILITY_GAP` | `daily_market_quote` | `available` | 67 |
 | `CAPABILITY_GAP` | `extended_daily_quote` | `available` | 15 |
-| `CAPABILITY_GAP` | `group_analytics` | `derived` | 48 |
+| `CAPABILITY_GAP` | `group_analytics` | `derived` | 45 |
 | `CAPABILITY_GAP` | `index_market_data` | `available` | 14 |
 | `CAPABILITY_GAP` | `security_identity` | `available` | 6 |
 | `CAPABILITY_GAP` | `technical_indicator` | `derived` | 14 |

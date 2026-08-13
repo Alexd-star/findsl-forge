@@ -1,10 +1,14 @@
 # Hero Query 端到端证据
 
 - 查询：`HERO-TEMPORAL-STAGE-RANK-001`
-- Git HEAD：`a323d96ca63728b4ac9dbba3d5599c56a6cd135d`
-- 编译耗时：`253.3626 ms`
+- Git HEAD：`10b7af790420e2727fa654e84128de24b1f8992f`
+- 编译耗时：`66.7783 ms`
+- 编译口径：`warmed_service_request`（warmups=1）
 - 选择路由：`PARTITION`
 - 选择策略：`stage_rank`
+- 选择候选：`partition:top:stage_rank`
+- 选择原因：`COMPOSITE_ROUTE_SELECTED`
+- 回退顺序：`RAW`
 - 编译/特征门禁：`PASS`
 - Doris 运行门禁：`PASS`
 
@@ -34,5 +38,5 @@
 
 - 完整结果集一致：`True`
 - Generated rows / Reference rows：`20 / 20`
-- Generated latency：`1136.874 ms`
+- Generated latency：`767.926 ms`
 - 执行时间不超过 10 秒：`True`

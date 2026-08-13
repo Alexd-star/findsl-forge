@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T22:44:25+00:00",
-  "git_head": "56430ca07c40e211bae9650c79be0e67ba125d11",
+  "generated_at": "2026-08-13T05:15:21+00:00",
+  "git_head": "10b7af790420e2727fa654e84128de24b1f8992f",
   "fixture_snapshot_id": "findsl-group-oracle-2026-04-14-v1",
   "fixture_groups": {
     "ORACLE_GROUP_001": [
@@ -60,8 +60,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 168.88020000000003,
-      "reference_elapsed_ms": 118.44480000000013,
+      "elapsed_ms": 88.1784,
+      "reference_elapsed_ms": 55.893599999999985,
       "explain_contains_membership_join": true
     },
     {
@@ -97,8 +97,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 220.71890000000005,
-      "reference_elapsed_ms": 91.56030000000004,
+      "elapsed_ms": 107.98739999999984,
+      "reference_elapsed_ms": 62.62809999999996,
       "explain_contains_membership_join": true
     },
     {
@@ -128,8 +128,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 240.13799999999998,
-      "reference_elapsed_ms": 104.38429999999977,
+      "elapsed_ms": 134.8292,
+      "reference_elapsed_ms": 63.422599999999996,
       "explain_contains_membership_join": true
     },
     {
@@ -165,8 +165,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 174.30639999999985,
-      "reference_elapsed_ms": 100.33700000000012,
+      "elapsed_ms": 116.66500000000002,
+      "reference_elapsed_ms": 64.06869999999998,
       "explain_contains_membership_join": true
     },
     {
@@ -198,8 +198,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 304.0795000000003,
-      "reference_elapsed_ms": 167.48940000000002,
+      "elapsed_ms": 165.04929999999996,
+      "reference_elapsed_ms": 126.05590000000034,
       "explain_contains_membership_join": true
     },
     {
@@ -231,8 +231,8 @@
       "row_count": 1,
       "expected_row_count": 1,
       "matched": true,
-      "elapsed_ms": 175.1996,
-      "reference_elapsed_ms": 132.36669999999995,
+      "elapsed_ms": 131.29199999999975,
+      "reference_elapsed_ms": 88.7791,
       "explain_contains_membership_join": true
     }
   ],

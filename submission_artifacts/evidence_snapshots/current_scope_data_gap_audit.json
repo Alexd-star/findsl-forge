@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_source_head": "dd61d10a39adfaf720720254df0a9bb557255b25",
+  "verified_source_head": "10b7af790420e2727fa654e84128de24b1f8992f",
   "official_source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
   "summary": {
     "migration_gap_rows": 53,
@@ -1335,9 +1335,9 @@
     }
   ],
   "input_sha256": {
-    "funnel": "6a54a89f130adf01a83be1e32b03e7b1c88aae49748b84117aceba8f4b48ad5c",
+    "funnel": "19687072ba624399ae0b49f1c0ef1477c26bd41b4a00e2e924dfad978508b2a2",
     "targets": "6008f012b0568c2006343c4878a65b76adbdd20cbe962da82222e589900d45cf",
     "adjudications": "d7144032c73de2be30036632989108e2c7fd98c98a3922afe8df325766634311",
-    "source_registry": "8952cb4a43189298331235bd40d3a6cadfc0297d5ce72310e62375ff9e2584f0"
+    "source_registry": "6e9eba97a51b6e1e8132e2bd61c1464894967666340e4362a1c3ff0ae95aa37f"
   }
 }

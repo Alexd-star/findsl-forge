@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-08-12T19:38:30+00:00",
-  "git_head": "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
+  "schema_version": 2,
+  "generated_at": "2026-08-13T05:15:18+00:00",
+  "git_head": "10b7af790420e2727fa654e84128de24b1f8992f",
   "hero_id": "HERO-TEMPORAL-STAGE-RANK-001",
-  "title": "双时间量词筛选后分阶段稳定排名",
+  "title": "双时间量词筛选后的分阶段稳定排名",
   "dsl": "(indicator('沪|深', '', '成交量', '近10日', '', '', 'CONS>=3日') > 0 and indicator('沪&^科创板', '', '成交额', '近10日', '', '', 'EXIST>=2日') > 0) then rank('沪|深', '', '成交额', 'desc', '今日', '', '', '') between '[1,20]'",
   "semantic_note": "市场槽中的 & 是集合交运算符，不是数值按位运算；该查询要求沪深范围、排除科创板的沪市子范围、CONS/EXIST 双时间量词、then 阶段屏障以及闭区间排名。",
   "feature_checks": {
@@ -56,10 +56,314 @@
     "long_horizon": false,
     "complexity_score": 100
   },
-  "compile_elapsed_ms": 253.3626,
+  "compile_elapsed_ms": 66.7783,
+  "compile_warmups": 1,
+  "compile_latency_scope": "warmed_service_request",
   "selected_route": "PARTITION",
   "selected_strategy": "stage_rank",
-  "generated_sql": "WITH stage_input_left_source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 0 AND `q`.`mktcode` IN (0, 1) THEN 1 ELSE 0 END AS `matched`, ROW_NUMBER() OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` DESC) AS `lookback_row` FROM `newzl`.`hsj_stock_hq_basic` AS q), stage_input_left_eligible_rows AS (SELECT * FROM `stage_input_left_source_rows` WHERE `stage_input_left_source_rows`.`lookback_row` <= 10), stage_input_left_sequenced_rows AS (SELECT `stage_input_left_eligible_rows`.`mktcode`, `stage_input_left_eligible_rows`.`tgtcode`, `stage_input_left_eligible_rows`.`bizdate`, `stage_input_left_eligible_rows`.`matched`, ROW_NUMBER() OVER (PARTITION BY `stage_input_left_eligible_rows`.`mktcode`, `stage_input_left_eligible_rows`.`tgtcode` ORDER BY CASE WHEN `stage_input_left_eligible_rows`.`bizdate` IS NULL THEN 1 ELSE 0 END, `stage_input_left_eligible_rows`.`bizdate` ASC) AS `all_seq` FROM `stage_input_left_eligible_rows`), stage_input_left_matched_rows AS (SELECT `stage_input_left_sequenced_rows`.`mktcode`, `stage_input_left_sequenced_rows`.`tgtcode`, `stage_input_left_sequenced_rows`.`bizdate`, `stage_input_left_sequenced_rows`.`all_seq`, ROW_NUMBER() OVER (PARTITION BY `stage_input_left_sequenced_rows`.`mktcode`, `stage_input_left_sequenced_rows`.`tgtcode` ORDER BY CASE WHEN `stage_input_left_sequenced_rows`.`bizdate` IS NULL THEN 1 ELSE 0 END, `stage_input_left_sequenced_rows`.`bizdate` ASC) AS `matched_seq` FROM `stage_input_left_sequenced_rows` WHERE `stage_input_left_sequenced_rows`.`matched` = 1), stage_input_left_runs AS (SELECT `stage_input_left_matched_rows`.`mktcode`, `stage_input_left_matched_rows`.`tgtcode`, `stage_input_left_matched_rows`.`all_seq` - `stage_input_left_matched_rows`.`matched_seq` AS `run_group`, COUNT(*) AS `run_length` FROM `stage_input_left_matched_rows` GROUP BY `stage_input_left_matched_rows`.`mktcode`, `stage_input_left_matched_rows`.`tgtcode`, `stage_input_left_matched_rows`.`all_seq` - `stage_input_left_matched_rows`.`matched_seq`), stage_input_left_temporal_metrics AS (SELECT `stage_input_left_runs`.`mktcode`, `stage_input_left_runs`.`tgtcode`, MAX(`stage_input_left_runs`.`run_length`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `stage_input_left_runs` GROUP BY `stage_input_left_runs`.`mktcode`, `stage_input_left_runs`.`tgtcode`), stage_input_left_qualified AS (SELECT `stage_input_left_temporal_metrics`.`mktcode`, `stage_input_left_temporal_metrics`.`tgtcode` FROM `stage_input_left_temporal_metrics` WHERE `stage_input_left_temporal_metrics`.`metric_value` >= 3), stage_input_right_source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`turnover` > 0 AND (`q`.`mktcode` IN (1) AND NOT (`q`.`mktcode` IN (1) AND (`q`.`tgtcode` >= '688000' AND `q`.`tgtcode` <= '688999'))) THEN 1 ELSE 0 END AS `matched`, ROW_NUMBER() OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` DESC) AS `lookback_row` FROM `newzl`.`hsj_stock_hq_basic` AS q), stage_input_right_eligible_rows AS (SELECT * FROM `stage_input_right_source_rows` WHERE `stage_input_right_source_rows`.`lookback_row` <= 10), stage_input_right_temporal_metrics AS (SELECT `stage_input_right_eligible_rows`.`mktcode`, `stage_input_right_eligible_rows`.`tgtcode`, SUM(`stage_input_right_eligible_rows`.`matched`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `stage_input_right_eligible_rows` GROUP BY `stage_input_right_eligible_rows`.`mktcode`, `stage_input_right_eligible_rows`.`tgtcode`), stage_input_right_qualified AS (SELECT `stage_input_right_temporal_metrics`.`mktcode`, `stage_input_right_temporal_metrics`.`tgtcode` FROM `stage_input_right_temporal_metrics` WHERE `stage_input_right_temporal_metrics`.`metric_value` >= 2) SELECT `stage_1_ranked`.`mktcode`, `stage_1_ranked`.`tgtcode`, `stage_1_ranked`.`bizdate` FROM (SELECT `stage_1_joined`.`mktcode`, `stage_1_joined`.`tgtcode`, `stage_1_joined`.`bizdate`, ROW_NUMBER() OVER (ORDER BY `stage_1_joined`.`metric_value` DESC, `stage_1_joined`.`mktcode` ASC, `stage_1_joined`.`tgtcode` ASC) AS `stage_rank` FROM (SELECT `stage_1_candidates`.`mktcode`, `stage_1_candidates`.`tgtcode`, `stage_1_candidates`.`bizdate`, `stage_1_metric`.`metric_value` FROM (SELECT `stage_1_candidates_raw`.`mktcode`, `stage_1_candidates_raw`.`tgtcode`, MAX(`stage_1_candidates_raw`.`bizdate`) AS `bizdate` FROM (SELECT `stage_input_set_rows`.`mktcode`, `stage_input_set_rows`.`tgtcode`, `stage_input_set_rows`.`bizdate` FROM (SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `stage_input_left_qualified` AS stage_input_left_qualified_result ON `anchor_out`.`mktcode` = `stage_input_left_qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `stage_input_left_qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor) INTERSECT SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `stage_input_right_qualified` AS stage_input_right_qualified_result ON `anchor_out`.`mktcode` = `stage_input_right_qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `stage_input_right_qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)) AS stage_input_set_rows) AS stage_1_candidates_raw GROUP BY `stage_1_candidates_raw`.`mktcode`, `stage_1_candidates_raw`.`tgtcode`) AS stage_1_candidates INNER JOIN (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, `q`.`turnover` AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`mktcode` IN (0, 1) AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AS stage_1_metric ON `stage_1_candidates`.`mktcode` = `stage_1_metric`.`mktcode` AND `stage_1_candidates`.`tgtcode` = `stage_1_metric`.`tgtcode`) AS stage_1_joined) AS stage_1_ranked WHERE `stage_1_ranked`.`stage_rank` >= 1 AND `stage_1_ranked`.`stage_rank` <= 20",
+  "adaptive_route": {
+    "planner": "AdaptiveRoutePlanner/v2",
+    "selected_route": "PARTITION",
+    "selected_strategy": "stage_rank",
+    "selected_candidate_id": "partition:top:stage_rank",
+    "selection_reason_code": "COMPOSITE_ROUTE_SELECTED",
+    "selection_reason": "top-level route composes the selected child plans; child selections remain visible as subplan decisions",
+    "candidates": [
+      {
+        "route_kind": "RAW",
+        "candidate_id": "raw:fallback:official_basic",
+        "executable": true,
+        "eligible": true,
+        "selected": false,
+        "cost": 409561203.0,
+        "cost_unit": "bytes",
+        "estimated": false,
+        "reason_code": "RAW_BASELINE_FALLBACK",
+        "reason": "semantically equivalent base-table scan retained as the final fallback",
+        "resource_id": "official_basic",
+        "strategy_id": "raw_scan_fallback",
+        "source": "derived_fallback_contract",
+        "fallback_to": null,
+        "cost_components": [
+          [
+            "table_bytes",
+            409561203.0
+          ]
+        ],
+        "eligibility_checks": [
+          {
+            "check_id": "physical_plan_generated",
+            "status": "PASS",
+            "detail": "RAW_BASELINE_FALLBACK"
+          },
+          {
+            "check_id": "semantic_equivalence",
+            "status": "PASS",
+            "detail": "baseline_reference"
+          },
+          {
+            "check_id": "freshness_watermark",
+            "status": "N/A",
+            "detail": "not_required"
+          },
+          {
+            "check_id": "selection_policy",
+            "status": "PASS",
+            "detail": "RAW_BASELINE_FALLBACK"
+          }
+        ],
+        "semantic_equivalence": "baseline_reference",
+        "watermark_status": "not_required",
+        "rejection_category": "final_fallback"
+      },
+      {
+        "route_kind": "PARTITION",
+        "candidate_id": "partition:left:direct_column:official_basic",
+        "executable": true,
+        "eligible": true,
+        "selected": false,
+        "cost": 409561203.0,
+        "cost_unit": "bytes",
+        "estimated": false,
+        "reason_code": "PHYSICAL_STATISTICS_CANDIDATE_SELECTED",
+        "reason": "cost is the catalog-declared primary and anchor resource scan bytes",
+        "resource_id": "official_basic",
+        "strategy_id": "left:direct_column",
+        "source": "physical_subplan_decision",
+        "fallback_to": "RAW",
+        "cost_components": [
+          [
+            "official_basic",
+            409561203.0
+          ]
+        ],
+        "eligibility_checks": [
+          {
+            "check_id": "physical_plan_generated",
+            "status": "PASS",
+            "detail": "PHYSICAL_STATISTICS_CANDIDATE_SELECTED"
+          },
+          {
+            "check_id": "semantic_equivalence",
+            "status": "PASS",
+            "detail": "planner_validated"
+          },
+          {
+            "check_id": "freshness_watermark",
+            "status": "N/A",
+            "detail": "not_required"
+          },
+          {
+            "check_id": "selection_policy",
+            "status": "PASS",
+            "detail": "PHYSICAL_STATISTICS_CANDIDATE_SELECTED"
+          }
+        ],
+        "semantic_equivalence": "planner_validated",
+        "watermark_status": "not_required",
+        "rejection_category": "subplan_component"
+      },
+      {
+        "route_kind": "PARTITION",
+        "candidate_id": "partition:right:direct_column:official_basic",
+        "executable": true,
+        "eligible": true,
+        "selected": false,
+        "cost": 409561203.0,
+        "cost_unit": "bytes",
+        "estimated": false,
+        "reason_code": "PHYSICAL_STATISTICS_CANDIDATE_SELECTED",
+        "reason": "cost is the catalog-declared primary and anchor resource scan bytes",
+        "resource_id": "official_basic",
+        "strategy_id": "right:direct_column",
+        "source": "physical_subplan_decision",
+        "fallback_to": "RAW",
+        "cost_components": [
+          [
+            "official_basic",
+            409561203.0
+          ]
+        ],
+        "eligibility_checks": [
+          {
+            "check_id": "physical_plan_generated",
+            "status": "PASS",
+            "detail": "PHYSICAL_STATISTICS_CANDIDATE_SELECTED"
+          },
+          {
+            "check_id": "semantic_equivalence",
+            "status": "PASS",
+            "detail": "planner_validated"
+          },
+          {
+            "check_id": "freshness_watermark",
+            "status": "N/A",
+            "detail": "not_required"
+          },
+          {
+            "check_id": "selection_policy",
+            "status": "PASS",
+            "detail": "PHYSICAL_STATISTICS_CANDIDATE_SELECTED"
+          }
+        ],
+        "semantic_equivalence": "planner_validated",
+        "watermark_status": "not_required",
+        "rejection_category": "subplan_component"
+      },
+      {
+        "route_kind": "PARTITION",
+        "candidate_id": "partition:top:stage_rank",
+        "executable": true,
+        "eligible": true,
+        "selected": true,
+        "cost": 819122406.0,
+        "cost_unit": "composite_child_cost",
+        "estimated": false,
+        "reason_code": "COMPOSITE_ROUTE_SELECTED",
+        "reason": "top-level route composes the selected child plans; child selections remain visible as subplan decisions",
+        "resource_id": "official_basic",
+        "strategy_id": "stage_rank",
+        "source": "physical_composite_decision",
+        "fallback_to": "RAW",
+        "cost_components": [
+          [
+            "partition:left:direct_column:official_basic",
+            409561203.0
+          ],
+          [
+            "partition:right:direct_column:official_basic",
+            409561203.0
+          ]
+        ],
+        "eligibility_checks": [
+          {
+            "check_id": "physical_plan_generated",
+            "status": "PASS",
+            "detail": "COMPOSITE_ROUTE_SELECTED"
+          },
+          {
+            "check_id": "semantic_equivalence",
+            "status": "PASS",
+            "detail": "composed_proven_subplans"
+          },
+          {
+            "check_id": "freshness_watermark",
+            "status": "PASS",
+            "detail": "inherited"
+          },
+          {
+            "check_id": "selection_policy",
+            "status": "PASS",
+            "detail": "COMPOSITE_ROUTE_SELECTED"
+          }
+        ],
+        "semantic_equivalence": "composed_proven_subplans",
+        "watermark_status": "inherited",
+        "rejection_category": null
+      },
+      {
+        "route_kind": "MV",
+        "candidate_id": "mv:unavailable",
+        "executable": false,
+        "eligible": false,
+        "selected": false,
+        "cost": null,
+        "cost_unit": "unavailable",
+        "estimated": false,
+        "reason_code": "MV_ROUTE_INELIGIBLE",
+        "reason": "no version-compatible materialized feature matches the query contract",
+        "resource_id": null,
+        "strategy_id": "mv_unavailable",
+        "source": "eligibility_audit",
+        "fallback_to": "RAW",
+        "cost_components": [],
+        "eligibility_checks": [
+          {
+            "check_id": "physical_plan_generated",
+            "status": "FAIL",
+            "detail": "MV_ROUTE_INELIGIBLE"
+          },
+          {
+            "check_id": "semantic_equivalence",
+            "status": "FAIL",
+            "detail": "unavailable"
+          },
+          {
+            "check_id": "freshness_watermark",
+            "status": "N/A",
+            "detail": "not_applicable"
+          },
+          {
+            "check_id": "selection_policy",
+            "status": "FAIL",
+            "detail": "MV_ROUTE_INELIGIBLE"
+          }
+        ],
+        "semantic_equivalence": "unavailable",
+        "watermark_status": "not_applicable",
+        "rejection_category": "route_not_generated"
+      },
+      {
+        "route_kind": "PREFIX",
+        "candidate_id": "prefix:unavailable",
+        "executable": false,
+        "eligible": false,
+        "selected": false,
+        "cost": null,
+        "cost_unit": "unavailable",
+        "estimated": false,
+        "reason_code": "PREFIX_ROUTE_INELIGIBLE",
+        "reason": "prefix algebra is unavailable for this function, window, or data resource",
+        "resource_id": null,
+        "strategy_id": "prefix_unavailable",
+        "source": "eligibility_audit",
+        "fallback_to": "RAW",
+        "cost_components": [],
+        "eligibility_checks": [
+          {
+            "check_id": "physical_plan_generated",
+            "status": "FAIL",
+            "detail": "PREFIX_ROUTE_INELIGIBLE"
+          },
+          {
+            "check_id": "semantic_equivalence",
+            "status": "FAIL",
+            "detail": "unavailable"
+          },
+          {
+            "check_id": "freshness_watermark",
+            "status": "N/A",
+            "detail": "not_applicable"
+          },
+          {
+            "check_id": "selection_policy",
+            "status": "FAIL",
+            "detail": "PREFIX_ROUTE_INELIGIBLE"
+          }
+        ],
+        "semantic_equivalence": "unavailable",
+        "watermark_status": "not_applicable",
+        "rejection_category": "route_not_generated"
+      }
+    ],
+    "fallback_chain": [
+      "RAW"
+    ],
+    "fallback_candidates": [
+      "raw:fallback:official_basic"
+    ],
+    "decision_basis": [
+      "query_complexity=100",
+      "long_horizon=false",
+      "date_constraints=recent_sessions,relative",
+      "selected_reason=COMPOSITE_ROUTE_SELECTED",
+      "only physical decisions with proven semantic equivalence may be selected",
+      "ineligible acceleration paths remain visible with deterministic reason codes",
+      "RAW is always the final executable fallback after proven accelerated alternatives"
+    ]
+  },
+  "catalog_snapshot_id": "333ed07bd783ed4135c42c6d1c3df85ce4832a51db9eea39dcfb93b8117b6d65",
+  "generated_sql": "WITH stage_input_left_source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`volume` > 0 AND `q`.`mktcode` IN (0, 1) THEN 1 ELSE 0 END AS `matched`, ROW_NUMBER() OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` DESC) AS `lookback_row` FROM `newzl`.`hsj_stock_hq_basic` AS q), stage_input_left_eligible_rows AS (SELECT * FROM `stage_input_left_source_rows` WHERE `stage_input_left_source_rows`.`lookback_row` <= 10), stage_input_left_sequenced_rows AS (SELECT `stage_input_left_eligible_rows`.`mktcode`, `stage_input_left_eligible_rows`.`tgtcode`, `stage_input_left_eligible_rows`.`bizdate`, `stage_input_left_eligible_rows`.`matched`, ROW_NUMBER() OVER (PARTITION BY `stage_input_left_eligible_rows`.`mktcode`, `stage_input_left_eligible_rows`.`tgtcode` ORDER BY CASE WHEN `stage_input_left_eligible_rows`.`bizdate` IS NULL THEN 1 ELSE 0 END, `stage_input_left_eligible_rows`.`bizdate` ASC) AS `all_seq` FROM `stage_input_left_eligible_rows`), stage_input_left_matched_rows AS (SELECT `stage_input_left_sequenced_rows`.`mktcode`, `stage_input_left_sequenced_rows`.`tgtcode`, `stage_input_left_sequenced_rows`.`bizdate`, `stage_input_left_sequenced_rows`.`all_seq`, ROW_NUMBER() OVER (PARTITION BY `stage_input_left_sequenced_rows`.`mktcode`, `stage_input_left_sequenced_rows`.`tgtcode` ORDER BY CASE WHEN `stage_input_left_sequenced_rows`.`bizdate` IS NULL THEN 1 ELSE 0 END, `stage_input_left_sequenced_rows`.`bizdate` ASC) AS `matched_seq` FROM `stage_input_left_sequenced_rows` WHERE `stage_input_left_sequenced_rows`.`matched` = 1), stage_input_left_runs AS (SELECT `stage_input_left_matched_rows`.`mktcode`, `stage_input_left_matched_rows`.`tgtcode`, `stage_input_left_matched_rows`.`all_seq` - `stage_input_left_matched_rows`.`matched_seq` AS `run_group`, COUNT(*) AS `run_length` FROM `stage_input_left_matched_rows` GROUP BY `stage_input_left_matched_rows`.`mktcode`, `stage_input_left_matched_rows`.`tgtcode`, `stage_input_left_matched_rows`.`all_seq` - `stage_input_left_matched_rows`.`matched_seq`), stage_input_left_temporal_metrics AS (SELECT `stage_input_left_runs`.`mktcode`, `stage_input_left_runs`.`tgtcode`, MAX(`stage_input_left_runs`.`run_length`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `stage_input_left_runs` GROUP BY `stage_input_left_runs`.`mktcode`, `stage_input_left_runs`.`tgtcode`), stage_input_left_qualified AS (SELECT `stage_input_left_temporal_metrics`.`mktcode`, `stage_input_left_temporal_metrics`.`tgtcode` FROM `stage_input_left_temporal_metrics` WHERE `stage_input_left_temporal_metrics`.`metric_value` >= 3), stage_input_right_source_rows AS (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, CASE WHEN `q`.`turnover` > 0 AND (`q`.`mktcode` IN (1) AND NOT (`q`.`mktcode` IN (1) AND (`q`.`tgtcode` >= '688000' AND `q`.`tgtcode` <= '688999'))) THEN 1 ELSE 0 END AS `matched`, ROW_NUMBER() OVER (PARTITION BY `q`.`mktcode`, `q`.`tgtcode` ORDER BY `q`.`bizdate` DESC) AS `lookback_row` FROM `newzl`.`hsj_stock_hq_basic` AS q), stage_input_right_eligible_rows AS (SELECT * FROM `stage_input_right_source_rows` WHERE `stage_input_right_source_rows`.`lookback_row` <= 10), stage_input_right_temporal_metrics AS (SELECT `stage_input_right_eligible_rows`.`mktcode`, `stage_input_right_eligible_rows`.`tgtcode`, SUM(`stage_input_right_eligible_rows`.`matched`) AS `metric_value`, COUNT(*) AS `total_buckets` FROM `stage_input_right_eligible_rows` GROUP BY `stage_input_right_eligible_rows`.`mktcode`, `stage_input_right_eligible_rows`.`tgtcode`), stage_input_right_qualified AS (SELECT `stage_input_right_temporal_metrics`.`mktcode`, `stage_input_right_temporal_metrics`.`tgtcode` FROM `stage_input_right_temporal_metrics` WHERE `stage_input_right_temporal_metrics`.`metric_value` >= 2) SELECT `stage_1_ranked`.`mktcode`, `stage_1_ranked`.`tgtcode`, `stage_1_ranked`.`bizdate` FROM (SELECT `stage_1_joined`.`mktcode`, `stage_1_joined`.`tgtcode`, `stage_1_joined`.`bizdate`, ROW_NUMBER() OVER (ORDER BY `stage_1_joined`.`metric_value` DESC, `stage_1_joined`.`mktcode` ASC, `stage_1_joined`.`tgtcode` ASC) AS `stage_rank` FROM (SELECT `stage_1_candidates`.`mktcode`, `stage_1_candidates`.`tgtcode`, `stage_1_candidates`.`bizdate`, `stage_1_metric`.`metric_value` FROM (SELECT `stage_1_candidates_raw`.`mktcode`, `stage_1_candidates_raw`.`tgtcode`, MAX(`stage_1_candidates_raw`.`bizdate`) AS `bizdate` FROM (SELECT `stage_input_set_rows`.`mktcode`, `stage_input_set_rows`.`tgtcode`, `stage_input_set_rows`.`bizdate` FROM (SELECT `stage_input_left_set_input`.`mktcode`, `stage_input_left_set_input`.`tgtcode`, `stage_input_left_set_input`.`bizdate` FROM (SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `stage_input_left_qualified` AS stage_input_left_qualified_result ON `anchor_out`.`mktcode` = `stage_input_left_qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `stage_input_left_qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)) AS stage_input_left_set_input INTERSECT SELECT `stage_input_right_set_input`.`mktcode`, `stage_input_right_set_input`.`tgtcode`, `stage_input_right_set_input`.`bizdate` FROM (SELECT `anchor_out`.`mktcode`, `anchor_out`.`tgtcode`, `anchor_out`.`bizdate` FROM `newzl`.`hsj_stock_hq_basic` AS anchor_out INNER JOIN `stage_input_right_qualified` AS stage_input_right_qualified_result ON `anchor_out`.`mktcode` = `stage_input_right_qualified_result`.`mktcode` AND `anchor_out`.`tgtcode` = `stage_input_right_qualified_result`.`tgtcode` WHERE `anchor_out`.`bizdate` = (SELECT MAX(`latest_anchor`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS latest_anchor)) AS stage_input_right_set_input) AS stage_input_set_rows) AS stage_1_candidates_raw GROUP BY `stage_1_candidates_raw`.`mktcode`, `stage_1_candidates_raw`.`tgtcode`) AS stage_1_candidates INNER JOIN (SELECT `q`.`mktcode`, `q`.`tgtcode`, `q`.`bizdate`, `q`.`turnover` AS `metric_value` FROM `newzl`.`hsj_stock_hq_basic` AS q WHERE `q`.`mktcode` IN (0, 1) AND `q`.`bizdate` = (SELECT MAX(`q_latest`.`bizdate`) FROM `newzl`.`hsj_stock_hq_basic` AS q_latest)) AS stage_1_metric ON `stage_1_candidates`.`mktcode` = `stage_1_metric`.`mktcode` AND `stage_1_candidates`.`tgtcode` = `stage_1_metric`.`tgtcode`) AS stage_1_joined) AS stage_1_ranked WHERE `stage_1_ranked`.`stage_rank` >= 1 AND `stage_1_ranked`.`stage_rank` <= 20",
   "reference_sql_path": "D:\\Luo_docs\\竞赛\\研创赛\\研究生金融科技创新大赛\\findsl-forge\\.worktrees\\architecture-hardening\\data\\hero\\reference.sql",
   "execution": {
     "status": "PASS",
@@ -68,11 +372,11 @@
     "generated_hash": "7817541fcb1b704749faefc7dba963a546bad1bf619a4755cda9ee242380bf5e",
     "reference_hash": "7817541fcb1b704749faefc7dba963a546bad1bf619a4755cda9ee242380bf5e",
     "result_equivalent": true,
-    "generated_elapsed_ms": 1136.8742,
-    "reference_elapsed_ms": 307.9608,
+    "generated_elapsed_ms": 767.9261,
+    "reference_elapsed_ms": 247.2834,
     "under_10_seconds": true,
-    "doris_explain_elapsed_ms": 127.4712,
-    "doris_explain": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#631]\n    tgtcode[#632]\n    bizdate[#633]\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  VRESULT SINK\n     MYSQL_PROTOCOL\n\n  56:VANALYTIC(13306)\n  |  functions: [row_number()]\n  |  order by: metric_value[#629] DESC NULLS LAST, mktcode[#626] ASC NULLS FIRST, tgtcode[#627] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (stage_rank[#630] >= 1), (stage_rank[#630] <= 20)\n  |  final projections: mktcode[#626], tgtcode[#627], bizdate[#628]\n  |  final project output tuple id: 64\n  |  distribute expr lists: \n  |  \n  55:VMERGING-EXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#626], tgtcode[#627]\n\nPLAN FRAGMENT 1\n\n  PARTITION: HASH_PARTITIONED: mktcode[#542], tgtcode[#543]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 55\n    UNPARTITIONED\nIS_MERGE: true\n\n  54:VSORT(13294)\n  |  order by: metric_value[#629] DESC, mktcode[#626] ASC, tgtcode[#627] ASC\n  |  algorithm: full sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  distribute expr lists: \n  |  \n  53:VPartitionTopN(13290)\n  |  functions: row_number\n  |  order by: metric_value[#625] DESC, mktcode[#622] ASC, tgtcode[#623] ASC\n  |  has global limit: false\n  |  partition limit: 20\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\n  |  distribute expr lists: mktcode[#618], tgtcode[#619]\n  |  \n  52:VHASH JOIN(13282)\n  |  join op: INNER JOIN(BUCKET_SHUFFLE)[]\n  |  equal join conjunct: (mktcode[#609] = mktcode[#478])\n  |  equal join conjunct: (tgtcode[#610] = tgtcode[#479])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 60\n  |  output tuple id: 60\n  |  vIntermediate tuple ids: 59 \n  |  hash output slot ids: 480 611 478 479 \n  |  runtime filters: RF014[min_max] <- mktcode[#478](505568/524288/1048576), RF015[in_or_bloom] <- mktcode[#478](505568/524288/1048576), RF016[min_max] <- tgtcode[#479](505568/524288/1048576), RF017[in_or_bloom] <- tgtcode[#479](505568/524288/1048576)\n  |  final projections: mktcode[#615], tgtcode[#616], bizdate[#617], metric_value[#614]\n  |  final project output tuple id: 60\n  |  distribute expr lists: mktcode[#609], tgtcode[#610]\n  |  distribute expr lists: mktcode[#478], tgtcode[#479]\n  |  \n  |----44:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#478]\n  |    \n  51:VHASH JOIN(13000)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#602] = MAX(`q_latest`.`bizdate`)[#541])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 58\n  |  output tuple id: 58\n  |  vIntermediate tuple ids: 57 \n  |  hash output slot ids: 600 601 603 \n  |  final projections: mktcode[#604], tgtcode[#605], metric_value[#607]\n  |  final project output tuple id: 58\n  |  distribute expr lists: mktcode[#600], tgtcode[#601]\n  |  distribute expr lists: \n  |  \n  |----49:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  50:VOlapScanNode(12963)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#542] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#598] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF014[min_max] -> mktcode[#542], RF015[in_or_bloom] -> mktcode[#542], RF016[min_max] -> tgtcode[#543], RF017[in_or_bloom] -> tgtcode[#543]\n     final projections: mktcode[#542], tgtcode[#543], bizdate[#544], turnover[#552]\n     final project output tuple id: 56\n\nPLAN FRAGMENT 2\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 49\n    UNPARTITIONED\n\n  48:VAGGREGATE (merge finalize)(12992)\n  |  output: max(partial_max(bizdate)[#540])[#541]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  47:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 3\n\n  PARTITION: HASH_PARTITIONED: mktcode[#481], tgtcode[#482]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 47\n    UNPARTITIONED\n\n  46:VAGGREGATE (update serialize)(12984)\n  |  output: partial_max(bizdate[#539])[#540]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  45:VOlapScanNode(12972)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#537] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#483]\n     final project output tuple id: 52\n\nPLAN FRAGMENT 4\n\n  PARTITION: HASH_PARTITIONED: mktcode[#475]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 44\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#478], tgtcode[#479]\n\n  43:VAGGREGATE (merge finalize)(13274)\n  |  output: max(partial_max(bizdate)[#477])[#480]\n  |  group by: mktcode[#475], tgtcode[#476]\n  |  sortByGroupKey:false\n  |  cardinality=505,568\n  |  distribute expr lists: mktcode[#475]\n  |  \n  42:VEXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#475], tgtcode[#476]\n\nPLAN FRAGMENT 5\n\n  PARTITION: HASH_PARTITIONED: mktcode[#469], tgtcode[#470], bizdate[#471]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 42\n    HASH_PARTITIONED: mktcode[#475]\n\n  41:VAGGREGATE (update serialize)(13266)\n  |  STREAMING\n  |  output: partial_max(bizdate[#474])[#477]\n  |  group by: mktcode[#472], tgtcode[#473]\n  |  sortByGroupKey:false\n  |  cardinality=505,568\n  |  distribute expr lists: mktcode[#472], tgtcode[#473], bizdate[#474]\n  |  \n  40:VINTERSECT(13262)\n  |  runtime filters: RF018[min_max] <- mktcode[#243](-1/2097152/2097152), RF019[in_or_bloom] <- mktcode[#243](-1/2097152/2097152)\n  |  distribute expr lists: mktcode[#243], tgtcode[#244], bizdate[#245]\n  |  distribute expr lists: mktcode[#469], tgtcode[#470], bizdate[#471]\n  |  \n  |----39:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#469], tgtcode[#470]\n  |    \n  21:VEXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#243], tgtcode[#244]\n\nPLAN FRAGMENT 6\n\n  PARTITION: HASH_PARTITIONED: mktcode[#393], tgtcode[#394]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 39\n    HASH_PARTITIONED: mktcode[#469], tgtcode[#470], bizdate[#471]\n\n  38:VAGGREGATE (merge finalize)(13254)\n  |  output: any_value(bizdate[#468])[#471]\n  |  group by: mktcode[#466], tgtcode[#467]\n  |  sortByGroupKey:false\n  |  cardinality=1,516,705\n  |  distribute expr lists: mktcode[#466], tgtcode[#467]\n  |  \n  37:VHASH JOIN(13246)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#461] = MAX(`latest_anchor`.`bizdate`)[#306])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 46\n  |  output tuple id: 46\n  |  vIntermediate tuple ids: 45 \n  |  hash output slot ids: 459 460 461 \n  |  final projections: mktcode[#462], tgtcode[#463], bizdate[#464]\n  |  final project output tuple id: 46\n  |  distribute expr lists: mktcode[#459], tgtcode[#460]\n  |  distribute expr lists: \n  |  \n  |----26:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  36:VHASH JOIN(13213)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (mktcode[#451] = mktcode[#391])\n  |  equal join conjunct: (tgtcode[#452] = tgtcode[#392])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 44\n  |  output tuple id: 44\n  |  vIntermediate tuple ids: 43 \n  |  hash output slot ids: 451 452 453 \n  |  runtime filters: RF006[min_max] <- mktcode[#391](189588/262144/1048576), RF007[in_or_bloom] <- mktcode[#391](189588/262144/1048576), RF008[min_max] <- tgtcode[#392](189588/262144/1048576), RF009[in_or_bloom] <- tgtcode[#392](189588/262144/1048576)\n  |  final projections: mktcode[#454], tgtcode[#455], bizdate[#456]\n  |  final project output tuple id: 44\n  |  distribute expr lists: mktcode[#451], tgtcode[#452]\n  |  distribute expr lists: \n  |  \n  |----34:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#391]\n  |    \n  35:VOlapScanNode(13148)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#393] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#449] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF006[min_max] -> mktcode[#393], RF007[in_or_bloom] -> mktcode[#393], RF008[min_max] -> tgtcode[#394], RF009[in_or_bloom] -> tgtcode[#394], RF018[min_max] -> mktcode[#393], RF019[in_or_bloom] -> mktcode[#393]\n     final projections: mktcode[#393], tgtcode[#394], bizdate[#395]\n     final project output tuple id: 42\n\nPLAN FRAGMENT 7\n\n  PARTITION: HASH_PARTITIONED: mktcode[#385]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 34\n    UNPARTITIONED\n\n  33:VAGGREGATE (merge finalize)(13197)\n  |  output: sum(partial_sum(matched)[#387])[#390]\n  |  group by: mktcode[#385], tgtcode[#386]\n  |  having: (metric_value[#390] >= 2)\n  |  sortByGroupKey:false\n  |  cardinality=379,176\n  |  final projections: mktcode[#388], tgtcode[#389]\n  |  final project output tuple id: 40\n  |  distribute expr lists: mktcode[#385]\n  |  \n  32:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 8\n\n  PARTITION: HASH_PARTITIONED: mktcode[#307], tgtcode[#308]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 32\n    HASH_PARTITIONED: mktcode[#385]\n\n  31:VAGGREGATE (update serialize)(13189)\n  |  STREAMING\n  |  output: partial_sum(matched[#384])[#387]\n  |  group by: mktcode[#382], tgtcode[#383]\n  |  sortByGroupKey:false\n  |  cardinality=379,176\n  |  distribute expr lists: \n  |  \n  30:VANALYTIC(13177)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#373], tgtcode[#374]\n  |  order by: bizdate[#375] DESC NULLS LAST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (lookback_row[#377] <= 10)\n  |  final projections: mktcode[#378], tgtcode[#379], if((((turnover[#380] > 0) AND (mktcode = 1)[#381]) AND (((NOT (mktcode = 1)[#381]) OR (tgtcode[#379] < '688000')) OR (tgtcode[#379] > '688999'))), 1, 0)\n  |  final project output tuple id: 37\n  |  intermediate projections: mktcode[#373], tgtcode[#374], turnover[#376], (mktcode[#373] = 1)\n  |  intermediate tuple id: 36\n  |  distribute expr lists: mktcode[#373], tgtcode[#374]\n  |  \n  29:VSORT(13173)\n  |  order by: mktcode[#373] ASC, tgtcode[#374] ASC, bizdate[#375] DESC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#369], tgtcode[#370]\n  |  \n  28:VPartitionTopN(13169)\n  |  functions: row_number\n  |  partition by: mktcode[#365], tgtcode[#366]\n  |  order by: bizdate[#371] DESC\n  |  has global limit: false\n  |  partition limit: 10\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\n  |  distribute expr lists: mktcode[#365], tgtcode[#366]\n  |  \n  27:VOlapScanNode(13157)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#307] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#363] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF018[min_max] -> mktcode[#307], RF019[in_or_bloom] -> mktcode[#307]\n     final projections: mktcode[#307], tgtcode[#308], bizdate[#309], turnover[#317]\n     final project output tuple id: 32\n\nPLAN FRAGMENT 9\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 26\n    UNPARTITIONED\n\n  25:VAGGREGATE (merge finalize)(13238)\n  |  output: max(partial_max(bizdate)[#305])[#306]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  24:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 10\n\n  PARTITION: HASH_PARTITIONED: mktcode[#246], tgtcode[#247]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 24\n    UNPARTITIONED\n\n  23:VAGGREGATE (update serialize)(13230)\n  |  output: partial_max(bizdate[#304])[#305]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  22:VOlapScanNode(13218)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#302] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#248]\n     final project output tuple id: 28\n\nPLAN FRAGMENT 11\n\n  PARTITION: HASH_PARTITIONED: mktcode[#167], tgtcode[#168]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 21\n    HASH_PARTITIONED: mktcode[#243], tgtcode[#244], bizdate[#245]\n\n  20:VAGGREGATE (merge finalize)(13143)\n  |  output: any_value(bizdate[#242])[#245]\n  |  group by: mktcode[#240], tgtcode[#241]\n  |  sortByGroupKey:false\n  |  cardinality=1,516,705\n  |  distribute expr lists: mktcode[#240], tgtcode[#241]\n  |  \n  19:VHASH JOIN(13135)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#235] = MAX(`latest_anchor`.`bizdate`)[#60])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 25\n  |  output tuple id: 25\n  |  vIntermediate tuple ids: 24 \n  |  hash output slot ids: 233 234 235 \n  |  final projections: mktcode[#236], tgtcode[#237], bizdate[#238]\n  |  final project output tuple id: 25\n  |  distribute expr lists: mktcode[#233], tgtcode[#234]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  18:VHASH JOIN(13102)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (mktcode[#225] = mktcode[#165])\n  |  equal join conjunct: (tgtcode[#226] = tgtcode[#166])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 23\n  |  output tuple id: 23\n  |  vIntermediate tuple ids: 22 \n  |  hash output slot ids: 225 226 227 \n  |  runtime filters: RF000[min_max] <- mktcode[#165](31598/32768/1048576), RF001[in_or_bloom] <- mktcode[#165](31598/32768/1048576), RF002[min_max] <- tgtcode[#166](31598/32768/1048576), RF003[in_or_bloom] <- tgtcode[#166](31598/32768/1048576)\n  |  final projections: mktcode[#228], tgtcode[#229], bizdate[#230]\n  |  final project output tuple id: 23\n  |  distribute expr lists: mktcode[#225], tgtcode[#226]\n  |  distribute expr lists: \n  |  \n  |----16:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#165], tgtcode[#166]\n  |    \n  17:VOlapScanNode(13005)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#167] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#223] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF000[min_max] -> mktcode[#167], RF001[in_or_bloom] -> mktcode[#167], RF002[min_max] -> tgtcode[#168], RF003[in_or_bloom] -> tgtcode[#168]\n     final projections: mktcode[#167], tgtcode[#168], bizdate[#169]\n     final project output tuple id: 21\n\nPLAN FRAGMENT 12\n\n  PARTITION: HASH_PARTITIONED: mktcode[#132], tgtcode[#133]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 16\n    UNPARTITIONED\n\n  15:VAGGREGATE (merge finalize)(13090)\n  |  group by: mktcode[#161], tgtcode[#162]\n  |  sortByGroupKey:false\n  |  cardinality=31,598\n  |  final projections: mktcode[#163], tgtcode[#164]\n  |  final project output tuple id: 19\n  |  distribute expr lists: mktcode[#161], tgtcode[#162]\n  |  \n  14:VAGGREGATE (merge finalize)(13078)\n  |  output: count(*)[#160]\n  |  group by: mktcode[#154], tgtcode[#155], run_group[#156]\n  |  having: (run_length[#160] >= 3)\n  |  sortByGroupKey:false\n  |  cardinality=189,588\n  |  final projections: mktcode[#157], tgtcode[#158]\n  |  final project output tuple id: 17\n  |  distribute expr lists: mktcode[#154], tgtcode[#155]\n  |  \n  13:VANALYTIC(13070)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#148], tgtcode[#149]\n  |  order by: if(bizdate IS NULL, 1, 0)[#150] ASC NULLS FIRST, bizdate[#151] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  final projections: mktcode[#148], tgtcode[#149], (all_seq[#152] - row_number() OVER(PARTITION BY mktcode, tgtcode ORDER BY if(bizdate IS NULL, 1, 0) asc null first, bizdate asc null first)[#153])\n  |  final project output tuple id: 15\n  |  distribute expr lists: mktcode[#148], tgtcode[#149]\n  |  \n  12:VSORT(13066)\n  |  order by: mktcode[#148] ASC, tgtcode[#149] ASC, if(bizdate IS NULL, 1, 0)[#150] ASC, bizdate[#151] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#143], tgtcode[#144]\n  |  \n  11:VANALYTIC(13054)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#137], tgtcode[#138]\n  |  order by: if(bizdate IS NULL, 1, 0)[#141] ASC NULLS FIRST, bizdate[#139] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (matched[#140] = 1)\n  |  final projections: mktcode[#137], tgtcode[#138], if(bizdate[#139] IS NULL, 1, 0), bizdate[#139], all_seq[#142]\n  |  final project output tuple id: 12\n  |  distribute expr lists: mktcode[#137], tgtcode[#138]\n  |  \n  10:VSORT(13050)\n  |  order by: mktcode[#137] ASC, tgtcode[#138] ASC, if(bizdate IS NULL, 1, 0)[#141] ASC, bizdate[#139] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#132], tgtcode[#133]\n  |  \n  9:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 13\n\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 09\n    HASH_PARTITIONED: mktcode[#132], tgtcode[#133]\n\n  8:VANALYTIC(13034)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#127], tgtcode[#128]\n  |  order by: bizdate[#129] DESC NULLS LAST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (lookback_row[#131] <= 10)\n  |  final projections: mktcode[#127], tgtcode[#128], bizdate[#129], if(((volume[#130] > 0) AND mktcode[#127] IN (0, 1)), 1, 0), if(bizdate[#129] IS NULL, 1, 0)\n  |  final project output tuple id: 9\n  |  distribute expr lists: mktcode[#127], tgtcode[#128]\n  |  \n  7:VSORT(13030)\n  |  order by: mktcode[#127] ASC, tgtcode[#128] ASC, bizdate[#129] DESC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#123], tgtcode[#124]\n  |  \n  6:VPartitionTopN(13026)\n  |  functions: row_number\n  |  partition by: mktcode[#119], tgtcode[#120]\n  |  order by: bizdate[#125] DESC\n  |  has global limit: false\n  |  partition limit: 10\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  5:VOlapScanNode(13014)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#61] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#117] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#61], tgtcode[#62], bizdate[#63], volume[#70]\n     final project output tuple id: 5\n\nPLAN FRAGMENT 14\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n\n  3:VAGGREGATE (merge finalize)(13127)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  2:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 15\n\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\n\n  1:VAGGREGATE (update serialize)(13119)\n  |  output: partial_max(bizdate[#58])[#59]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  0:VOlapScanNode(13107)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#56] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#2]\n     final project output tuple id: 1\n\n\n\n========== STATISTICS ==========\nplanned with unknown column statistics"
+    "doris_explain_elapsed_ms": 147.3965,
+    "doris_explain": "PLAN FRAGMENT 0\n  OUTPUT EXPRS:\n    mktcode[#631]\n    tgtcode[#632]\n    bizdate[#633]\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: false\n\n  VRESULT SINK\n     MYSQL_PROTOCOL\n\n  56:VANALYTIC(13664)\n  |  functions: [row_number()]\n  |  order by: metric_value[#629] DESC NULLS LAST, mktcode[#626] ASC NULLS FIRST, tgtcode[#627] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (stage_rank[#630] >= 1), (stage_rank[#630] <= 20)\n  |  final projections: mktcode[#626], tgtcode[#627], bizdate[#628]\n  |  final project output tuple id: 64\n  |  distribute expr lists: \n  |  \n  55:VMERGING-EXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#626], tgtcode[#627]\n\nPLAN FRAGMENT 1\n\n  PARTITION: HASH_PARTITIONED: mktcode[#542], tgtcode[#543]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 55\n    UNPARTITIONED\nIS_MERGE: true\n\n  54:VSORT(13652)\n  |  order by: metric_value[#629] DESC, mktcode[#626] ASC, tgtcode[#627] ASC\n  |  algorithm: full sort\n  |  local merge sort\n  |  merge by exchange\n  |  offset: 0\n  |  distribute expr lists: \n  |  \n  53:VPartitionTopN(13648)\n  |  functions: row_number\n  |  order by: metric_value[#625] DESC, mktcode[#622] ASC, tgtcode[#623] ASC\n  |  has global limit: false\n  |  partition limit: 20\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\n  |  distribute expr lists: mktcode[#618], tgtcode[#619]\n  |  \n  52:VHASH JOIN(13640)\n  |  join op: INNER JOIN(BUCKET_SHUFFLE)[]\n  |  equal join conjunct: (mktcode[#609] = mktcode[#478])\n  |  equal join conjunct: (tgtcode[#610] = tgtcode[#479])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 60\n  |  output tuple id: 60\n  |  vIntermediate tuple ids: 59 \n  |  hash output slot ids: 480 611 478 479 \n  |  runtime filters: RF014[min_max] <- mktcode[#478](505568/524288/1048576), RF015[in_or_bloom] <- mktcode[#478](505568/524288/1048576), RF016[min_max] <- tgtcode[#479](505568/524288/1048576), RF017[in_or_bloom] <- tgtcode[#479](505568/524288/1048576)\n  |  final projections: mktcode[#615], tgtcode[#616], bizdate[#617], metric_value[#614]\n  |  final project output tuple id: 60\n  |  distribute expr lists: mktcode[#609], tgtcode[#610]\n  |  distribute expr lists: mktcode[#478], tgtcode[#479]\n  |  \n  |----44:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#478]\n  |    \n  51:VHASH JOIN(13358)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#602] = MAX(`q_latest`.`bizdate`)[#541])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 58\n  |  output tuple id: 58\n  |  vIntermediate tuple ids: 57 \n  |  hash output slot ids: 600 601 603 \n  |  final projections: mktcode[#604], tgtcode[#605], metric_value[#607]\n  |  final project output tuple id: 58\n  |  distribute expr lists: mktcode[#600], tgtcode[#601]\n  |  distribute expr lists: \n  |  \n  |----49:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  50:VOlapScanNode(13321)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#542] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#598] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF014[min_max] -> mktcode[#542], RF015[in_or_bloom] -> mktcode[#542], RF016[min_max] -> tgtcode[#543], RF017[in_or_bloom] -> tgtcode[#543]\n     final projections: mktcode[#542], tgtcode[#543], bizdate[#544], turnover[#552]\n     final project output tuple id: 56\n\nPLAN FRAGMENT 2\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 49\n    UNPARTITIONED\n\n  48:VAGGREGATE (merge finalize)(13350)\n  |  output: max(partial_max(bizdate)[#540])[#541]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  47:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 3\n\n  PARTITION: HASH_PARTITIONED: mktcode[#481], tgtcode[#482]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 47\n    UNPARTITIONED\n\n  46:VAGGREGATE (update serialize)(13342)\n  |  output: partial_max(bizdate[#539])[#540]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  45:VOlapScanNode(13330)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#537] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#483]\n     final project output tuple id: 52\n\nPLAN FRAGMENT 4\n\n  PARTITION: HASH_PARTITIONED: mktcode[#475]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 44\n    BUCKET_SHFFULE_HASH_PARTITIONED: mktcode[#478], tgtcode[#479]\n\n  43:VAGGREGATE (merge finalize)(13632)\n  |  output: max(partial_max(bizdate)[#477])[#480]\n  |  group by: mktcode[#475], tgtcode[#476]\n  |  sortByGroupKey:false\n  |  cardinality=505,568\n  |  distribute expr lists: mktcode[#475]\n  |  \n  42:VEXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#475], tgtcode[#476]\n\nPLAN FRAGMENT 5\n\n  PARTITION: HASH_PARTITIONED: mktcode[#469], tgtcode[#470], bizdate[#471]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 42\n    HASH_PARTITIONED: mktcode[#475]\n\n  41:VAGGREGATE (update serialize)(13624)\n  |  STREAMING\n  |  output: partial_max(bizdate[#474])[#477]\n  |  group by: mktcode[#472], tgtcode[#473]\n  |  sortByGroupKey:false\n  |  cardinality=505,568\n  |  distribute expr lists: mktcode[#472], tgtcode[#473], bizdate[#474]\n  |  \n  40:VINTERSECT(13620)\n  |  runtime filters: RF018[min_max] <- mktcode[#243](-1/2097152/2097152), RF019[in_or_bloom] <- mktcode[#243](-1/2097152/2097152)\n  |  distribute expr lists: mktcode[#243], tgtcode[#244], bizdate[#245]\n  |  distribute expr lists: mktcode[#469], tgtcode[#470], bizdate[#471]\n  |  \n  |----39:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#469], tgtcode[#470]\n  |    \n  21:VEXCHANGE\n     offset: 0\n     distribute expr lists: mktcode[#243], tgtcode[#244]\n\nPLAN FRAGMENT 6\n\n  PARTITION: HASH_PARTITIONED: mktcode[#393], tgtcode[#394]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 39\n    HASH_PARTITIONED: mktcode[#469], tgtcode[#470], bizdate[#471]\n\n  38:VAGGREGATE (merge finalize)(13612)\n  |  output: any_value(bizdate[#468])[#471]\n  |  group by: mktcode[#466], tgtcode[#467]\n  |  sortByGroupKey:false\n  |  cardinality=1,516,705\n  |  distribute expr lists: mktcode[#466], tgtcode[#467]\n  |  \n  37:VHASH JOIN(13604)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#461] = MAX(`latest_anchor`.`bizdate`)[#306])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 46\n  |  output tuple id: 46\n  |  vIntermediate tuple ids: 45 \n  |  hash output slot ids: 459 460 461 \n  |  final projections: mktcode[#462], tgtcode[#463], bizdate[#464]\n  |  final project output tuple id: 46\n  |  distribute expr lists: mktcode[#459], tgtcode[#460]\n  |  distribute expr lists: \n  |  \n  |----26:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  36:VHASH JOIN(13571)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (mktcode[#451] = mktcode[#391])\n  |  equal join conjunct: (tgtcode[#452] = tgtcode[#392])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 44\n  |  output tuple id: 44\n  |  vIntermediate tuple ids: 43 \n  |  hash output slot ids: 451 452 453 \n  |  runtime filters: RF006[min_max] <- mktcode[#391](189588/262144/1048576), RF007[in_or_bloom] <- mktcode[#391](189588/262144/1048576), RF008[min_max] <- tgtcode[#392](189588/262144/1048576), RF009[in_or_bloom] <- tgtcode[#392](189588/262144/1048576)\n  |  final projections: mktcode[#454], tgtcode[#455], bizdate[#456]\n  |  final project output tuple id: 44\n  |  distribute expr lists: mktcode[#451], tgtcode[#452]\n  |  distribute expr lists: \n  |  \n  |----34:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#391]\n  |    \n  35:VOlapScanNode(13506)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#393] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#449] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF006[min_max] -> mktcode[#393], RF007[in_or_bloom] -> mktcode[#393], RF008[min_max] -> tgtcode[#394], RF009[in_or_bloom] -> tgtcode[#394], RF018[min_max] -> mktcode[#393], RF019[in_or_bloom] -> mktcode[#393]\n     final projections: mktcode[#393], tgtcode[#394], bizdate[#395]\n     final project output tuple id: 42\n\nPLAN FRAGMENT 7\n\n  PARTITION: HASH_PARTITIONED: mktcode[#385]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 34\n    UNPARTITIONED\n\n  33:VAGGREGATE (merge finalize)(13555)\n  |  output: sum(partial_sum(matched)[#387])[#390]\n  |  group by: mktcode[#385], tgtcode[#386]\n  |  having: (metric_value[#390] >= 2)\n  |  sortByGroupKey:false\n  |  cardinality=379,176\n  |  final projections: mktcode[#388], tgtcode[#389]\n  |  final project output tuple id: 40\n  |  distribute expr lists: mktcode[#385]\n  |  \n  32:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 8\n\n  PARTITION: HASH_PARTITIONED: mktcode[#307], tgtcode[#308]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 32\n    HASH_PARTITIONED: mktcode[#385]\n\n  31:VAGGREGATE (update serialize)(13547)\n  |  STREAMING\n  |  output: partial_sum(matched[#384])[#387]\n  |  group by: mktcode[#382], tgtcode[#383]\n  |  sortByGroupKey:false\n  |  cardinality=379,176\n  |  distribute expr lists: \n  |  \n  30:VANALYTIC(13535)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#373], tgtcode[#374]\n  |  order by: bizdate[#375] DESC NULLS LAST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (lookback_row[#377] <= 10)\n  |  final projections: mktcode[#378], tgtcode[#379], if((((turnover[#380] > 0) AND (mktcode = 1)[#381]) AND (((NOT (mktcode = 1)[#381]) OR (tgtcode[#379] < '688000')) OR (tgtcode[#379] > '688999'))), 1, 0)\n  |  final project output tuple id: 37\n  |  intermediate projections: mktcode[#373], tgtcode[#374], turnover[#376], (mktcode[#373] = 1)\n  |  intermediate tuple id: 36\n  |  distribute expr lists: mktcode[#373], tgtcode[#374]\n  |  \n  29:VSORT(13531)\n  |  order by: mktcode[#373] ASC, tgtcode[#374] ASC, bizdate[#375] DESC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#369], tgtcode[#370]\n  |  \n  28:VPartitionTopN(13527)\n  |  functions: row_number\n  |  partition by: mktcode[#365], tgtcode[#366]\n  |  order by: bizdate[#371] DESC\n  |  has global limit: false\n  |  partition limit: 10\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\n  |  distribute expr lists: mktcode[#365], tgtcode[#366]\n  |  \n  27:VOlapScanNode(13515)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#307] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#363] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF018[min_max] -> mktcode[#307], RF019[in_or_bloom] -> mktcode[#307]\n     final projections: mktcode[#307], tgtcode[#308], bizdate[#309], turnover[#317]\n     final project output tuple id: 32\n\nPLAN FRAGMENT 9\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 26\n    UNPARTITIONED\n\n  25:VAGGREGATE (merge finalize)(13596)\n  |  output: max(partial_max(bizdate)[#305])[#306]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  24:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 10\n\n  PARTITION: HASH_PARTITIONED: mktcode[#246], tgtcode[#247]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 24\n    UNPARTITIONED\n\n  23:VAGGREGATE (update serialize)(13588)\n  |  output: partial_max(bizdate[#304])[#305]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  22:VOlapScanNode(13576)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#302] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#248]\n     final project output tuple id: 28\n\nPLAN FRAGMENT 11\n\n  PARTITION: HASH_PARTITIONED: mktcode[#167], tgtcode[#168]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 21\n    HASH_PARTITIONED: mktcode[#243], tgtcode[#244], bizdate[#245]\n\n  20:VAGGREGATE (merge finalize)(13501)\n  |  output: any_value(bizdate[#242])[#245]\n  |  group by: mktcode[#240], tgtcode[#241]\n  |  sortByGroupKey:false\n  |  cardinality=1,516,705\n  |  distribute expr lists: mktcode[#240], tgtcode[#241]\n  |  \n  19:VHASH JOIN(13493)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (bizdate[#235] = MAX(`latest_anchor`.`bizdate`)[#60])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 25\n  |  output tuple id: 25\n  |  vIntermediate tuple ids: 24 \n  |  hash output slot ids: 233 234 235 \n  |  final projections: mktcode[#236], tgtcode[#237], bizdate[#238]\n  |  final project output tuple id: 25\n  |  distribute expr lists: mktcode[#233], tgtcode[#234]\n  |  distribute expr lists: \n  |  \n  |----4:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: \n  |    \n  18:VHASH JOIN(13460)\n  |  join op: INNER JOIN(BROADCAST)[]\n  |  equal join conjunct: (mktcode[#225] = mktcode[#165])\n  |  equal join conjunct: (tgtcode[#226] = tgtcode[#166])\n  |  cardinality=4,550,115\n  |  vec output tuple id: 23\n  |  output tuple id: 23\n  |  vIntermediate tuple ids: 22 \n  |  hash output slot ids: 225 226 227 \n  |  runtime filters: RF000[min_max] <- mktcode[#165](31598/32768/1048576), RF001[in_or_bloom] <- mktcode[#165](31598/32768/1048576), RF002[min_max] <- tgtcode[#166](31598/32768/1048576), RF003[in_or_bloom] <- tgtcode[#166](31598/32768/1048576)\n  |  final projections: mktcode[#228], tgtcode[#229], bizdate[#230]\n  |  final project output tuple id: 23\n  |  distribute expr lists: mktcode[#225], tgtcode[#226]\n  |  distribute expr lists: \n  |  \n  |----16:VEXCHANGE\n  |       offset: 0\n  |       distribute expr lists: mktcode[#165], tgtcode[#166]\n  |    \n  17:VOlapScanNode(13363)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#167] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#223] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     runtime filters: RF000[min_max] -> mktcode[#167], RF001[in_or_bloom] -> mktcode[#167], RF002[min_max] -> tgtcode[#168], RF003[in_or_bloom] -> tgtcode[#168]\n     final projections: mktcode[#167], tgtcode[#168], bizdate[#169]\n     final project output tuple id: 21\n\nPLAN FRAGMENT 12\n\n  PARTITION: HASH_PARTITIONED: mktcode[#132], tgtcode[#133]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 16\n    UNPARTITIONED\n\n  15:VAGGREGATE (merge finalize)(13448)\n  |  group by: mktcode[#161], tgtcode[#162]\n  |  sortByGroupKey:false\n  |  cardinality=31,598\n  |  final projections: mktcode[#163], tgtcode[#164]\n  |  final project output tuple id: 19\n  |  distribute expr lists: mktcode[#161], tgtcode[#162]\n  |  \n  14:VAGGREGATE (merge finalize)(13436)\n  |  output: count(*)[#160]\n  |  group by: mktcode[#154], tgtcode[#155], run_group[#156]\n  |  having: (run_length[#160] >= 3)\n  |  sortByGroupKey:false\n  |  cardinality=189,588\n  |  final projections: mktcode[#157], tgtcode[#158]\n  |  final project output tuple id: 17\n  |  distribute expr lists: mktcode[#154], tgtcode[#155]\n  |  \n  13:VANALYTIC(13428)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#148], tgtcode[#149]\n  |  order by: if(bizdate IS NULL, 1, 0)[#150] ASC NULLS FIRST, bizdate[#151] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  final projections: mktcode[#148], tgtcode[#149], (all_seq[#152] - row_number() OVER(PARTITION BY mktcode, tgtcode ORDER BY if(bizdate IS NULL, 1, 0) asc null first, bizdate asc null first)[#153])\n  |  final project output tuple id: 15\n  |  distribute expr lists: mktcode[#148], tgtcode[#149]\n  |  \n  12:VSORT(13424)\n  |  order by: mktcode[#148] ASC, tgtcode[#149] ASC, if(bizdate IS NULL, 1, 0)[#150] ASC, bizdate[#151] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#143], tgtcode[#144]\n  |  \n  11:VANALYTIC(13412)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#137], tgtcode[#138]\n  |  order by: if(bizdate IS NULL, 1, 0)[#141] ASC NULLS FIRST, bizdate[#139] ASC NULLS FIRST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (matched[#140] = 1)\n  |  final projections: mktcode[#137], tgtcode[#138], if(bizdate[#139] IS NULL, 1, 0), bizdate[#139], all_seq[#142]\n  |  final project output tuple id: 12\n  |  distribute expr lists: mktcode[#137], tgtcode[#138]\n  |  \n  10:VSORT(13408)\n  |  order by: mktcode[#137] ASC, tgtcode[#138] ASC, if(bizdate IS NULL, 1, 0)[#141] ASC, bizdate[#139] ASC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#132], tgtcode[#133]\n  |  \n  9:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 13\n\n  PARTITION: HASH_PARTITIONED: mktcode[#61], tgtcode[#62]\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 09\n    HASH_PARTITIONED: mktcode[#132], tgtcode[#133]\n\n  8:VANALYTIC(13392)\n  |  functions: [row_number()]\n  |  partition by: mktcode[#127], tgtcode[#128]\n  |  order by: bizdate[#129] DESC NULLS LAST\n  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  |  predicates: (lookback_row[#131] <= 10)\n  |  final projections: mktcode[#127], tgtcode[#128], bizdate[#129], if(((volume[#130] > 0) AND mktcode[#127] IN (0, 1)), 1, 0), if(bizdate[#129] IS NULL, 1, 0)\n  |  final project output tuple id: 9\n  |  distribute expr lists: mktcode[#127], tgtcode[#128]\n  |  \n  7:VSORT(13388)\n  |  order by: mktcode[#127] ASC, tgtcode[#128] ASC, bizdate[#129] DESC\n  |  algorithm: full sort\n  |  offset: 0\n  |  distribute expr lists: mktcode[#123], tgtcode[#124]\n  |  \n  6:VPartitionTopN(13384)\n  |  functions: row_number\n  |  partition by: mktcode[#119], tgtcode[#120]\n  |  order by: bizdate[#125] DESC\n  |  has global limit: false\n  |  partition limit: 10\n  |  partition topn phase: TWO_PHASE_LOCAL_PTOPN\n  |  distribute expr lists: mktcode[#119], tgtcode[#120]\n  |  \n  5:VOlapScanNode(13372)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (mktcode[#61] IN (0, 1) AND (__DORIS_DELETE_SIGN__[#117] = 0))\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008740,1785410008742,1785410008736 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: mktcode[#61], tgtcode[#62], bizdate[#63], volume[#70]\n     final project output tuple id: 5\n\nPLAN FRAGMENT 14\n\n  PARTITION: UNPARTITIONED\n\n  HAS_COLO_PLAN_NODE: true\n\n  STREAM DATA SINK\n    EXCHANGE ID: 04\n    UNPARTITIONED\n\n  3:VAGGREGATE (merge finalize)(13485)\n  |  output: max(partial_max(bizdate)[#59])[#60]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  2:VEXCHANGE\n     offset: 0\n     distribute expr lists: \n\nPLAN FRAGMENT 15\n\n  PARTITION: HASH_PARTITIONED: mktcode[#0], tgtcode[#1]\n\n  HAS_COLO_PLAN_NODE: false\n\n  STREAM DATA SINK\n    EXCHANGE ID: 02\n    UNPARTITIONED\n\n  1:VAGGREGATE (update serialize)(13477)\n  |  output: partial_max(bizdate[#58])[#59]\n  |  group by: \n  |  sortByGroupKey:false\n  |  cardinality=1\n  |  distribute expr lists: \n  |  \n  0:VOlapScanNode(13465)\n     TABLE: newzl.hsj_stock_hq_basic(hsj_stock_hq_basic), PREAGGREGATION: ON\n     PREDICATES: (__DORIS_DELETE_SIGN__[#56] = 0)\n     partitions=1/1 (hsj_stock_hq_basic)\n     tablets=16/16, tabletList=1785410008724,1785410008726,1785410008728 ...\n     cardinality=13650347, avgRowSize=150.01868, numNodes=1\n     pushAggOp=NONE\n     final projections: bizdate[#2]\n     final project output tuple id: 1\n\n\n\n========== STATISTICS ==========\nplanned with unknown column statistics"
   },
   "gate": {
     "compile_and_feature_gate": true,

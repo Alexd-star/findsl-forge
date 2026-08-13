@@ -1,7 +1,7 @@
 # 群组结果实体 Doris 真值证据
 
 - 状态：`PASS`
-- Git HEAD：`56430ca07c40e211bae9650c79be0e67ba125d11`
+- Git HEAD：`10b7af790420e2727fa654e84128de24b1f8992f`
 - 隔离快照：`findsl-group-oracle-2026-04-14-v1`
 - 实验后清理：`True`
 

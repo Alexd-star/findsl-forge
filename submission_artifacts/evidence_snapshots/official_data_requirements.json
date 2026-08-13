@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T21:24:01+00:00",
-  "git_head": "ac18a07d0d23f24e8231acee2f7186d7b4fc4c2b",
+  "generated_at": "2026-08-13T05:03:16+00:00",
+  "git_head": "10b7af790420e2727fa654e84128de24b1f8992f",
   "profile_id": "competition-v1",
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
   "row_count": 5799,
   "status_counts": {
-    "CAPABILITY_GAP": 88,
+    "CAPABILITY_GAP": 85,
     "DATA_UNAVAILABLE": 2043,
     "INVALID_INPUT": 2398,
-    "SUPPORTED": 1270
+    "SUPPORTED": 1273
   },
   "data_domain_counts": [
     {
       "capability_status": "CAPABILITY_GAP",
       "domain_id": "daily_market_quote",
       "profile_status": "available",
-      "query_count": 70
+      "query_count": 67
     },
     {
       "capability_status": "CAPABILITY_GAP",
@@ -28,7 +28,7 @@
       "capability_status": "CAPABILITY_GAP",
       "domain_id": "group_analytics",
       "profile_status": "derived",
-      "query_count": 48
+      "query_count": 45
     },
     {
       "capability_status": "CAPABILITY_GAP",
@@ -229,7 +229,7 @@
     {
       "domain_id": "daily_market_quote",
       "provider_id": "official-package",
-      "query_count": 1773
+      "query_count": 1770
     },
     {
       "domain_id": "derivative_market_data",
@@ -269,17 +269,17 @@
     {
       "domain_id": "group_analytics",
       "provider_id": "baostock-industry",
-      "query_count": 173
+      "query_count": 170
     },
     {
       "domain_id": "group_analytics",
       "provider_id": "eastmoney",
-      "query_count": 173
+      "query_count": 170
     },
     {
       "domain_id": "group_analytics",
       "provider_id": "sina-sector",
-      "query_count": 173
+      "query_count": 170
     },
     {
       "domain_id": "index_market_data",
@@ -734,12 +734,6 @@
     ],
     "group_analytics": [
       {
-        "excel_row": 365,
-        "status": "CAPABILITY_GAP",
-        "terminal_code": "PHYSICAL_GROUP_PLAN_UNSUPPORTED",
-        "source": "indicator('', '', '跌幅', '', '概念', '', 'CONS=6日') > 0 and rank('', '', '涨幅', 'desc', '本周', '概念', '', '') > 0"
-      },
-      {
         "excel_row": 563,
         "status": "CAPABILITY_GAP",
         "terminal_code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
@@ -762,6 +756,12 @@
         "status": "DATA_UNAVAILABLE",
         "terminal_code": "DOMAIN_DATA_UNAVAILABLE",
         "source": "indicator('', '', '社保基金净加仓', '', '', '', '') > 0 and indicator('', '', '主力净流入', '近一个月', '板块', '', '') > 100000000 then rank('', '', '主力净流入', 'desc', '近一个月', '板块', '', '') = 1"
+      },
+      {
+        "excel_row": 828,
+        "status": "CAPABILITY_GAP",
+        "terminal_code": "PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED",
+        "source": "indicator('', 'ai&消费', '主力净流入', '', '板块', '', '') > 0 then (rank('', 'ai&消费', '最新价', 'asc', '', '板块', '', '') <= 10% and rank('', 'ai&消费', '连板天数', 'desc', '', '板块', '', '') <= 10%) then rank('', 'ai&消费', '', 'desc', '', '板块', '', '') <= 10"
       }
     ],
     "index_market_data": [

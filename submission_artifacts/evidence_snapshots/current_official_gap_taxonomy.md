@@ -6,10 +6,10 @@
 
 | 分类 | 行数 | 处理原则 |
 |---|---:|---|
-| 已通过 | 1159 | 保持回归，不重复开发 |
-| 数据不可用 | 1679 | 通过版本化数据目录或结构化拒绝处理 |
+| 已通过 | 1273 | 保持回归，不重复开发 |
+| 数据不可用 | 1689 | 通过版本化数据目录或结构化拒绝处理 |
 | 非法输入 | 2466 | 严格模式继续拒绝 |
-| 能力缺口 | 495 | 按通用规则聚类开发 |
+| 能力缺口 | 371 | 按通用规则聚类开发 |
 
 旧成功集迁移缺口：**53 条**；错误码：PHYSICAL_SCOPE_DATA_UNAVAILABLE。
 
@@ -19,22 +19,31 @@
 |---|---|---:|---|---|
 | OFFICIAL_TYPE_ERROR | invalid_input | 2459 | belong_industry, close_together, cross_above, cross_down, golden_cross, indicator, position, queryData, rank, record_high, record_low, reset | 3, 5, 9, 10, 15 |
 | DOMAIN_DATA_UNAVAILABLE | data_unavailable | 1504 | belong_industry, close_together, cross_above, cross_down, golden_cross, indicator, position, queryData, rank, record_high, record_low, reset | 2, 4, 6, 7, 8 |
-| PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | capability_gap | 166 | belong_industry, cross_above, cross_down, golden_cross, indicator, position, queryData, rank, record_high, record_low, reset | 112, 183, 237, 271, 298 |
 | PHYSICAL_ENTITY_DATA_UNAVAILABLE | capability_gap | 153 | close_together, cross_above, cross_down, indicator, position, rank, record_high, record_low | 18, 39, 65, 296, 299 |
-| PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE | capability_gap | 139 | indicator, position, rank, record_high, reset | 365, 563, 778, 828, 833 |
-| PHYSICAL_MARKET_DATA_UNAVAILABLE | data_unavailable | 96 | belong_industry, close_together, cross_above, cross_down, indicator, position, queryData, rank, record_high, reset | 53, 242, 278, 285, 560 |
+| PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | capability_gap | 117 | belong_industry, cross_above, golden_cross, indicator, position, queryData, rank, record_high, record_low, reset | 112, 183, 237, 271, 298 |
+| PHYSICAL_MARKET_DATA_UNAVAILABLE | data_unavailable | 106 | belong_industry, close_together, cross_above, cross_down, indicator, position, queryData, rank, record_high, reset | 53, 242, 278, 285, 560 |
 | PHYSICAL_SCOPE_DATA_UNAVAILABLE | data_unavailable | 78 | close_together, cross_above, cross_down, indicator, queryData, rank, record_high, record_low | 83, 177, 204, 208, 222 |
+| PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE | capability_gap | 20 | indicator, rank | 841, 882, 903, 1714, 2339 |
+| PHYSICAL_GROUP_BOUND_UNSUPPORTED | capability_gap | 19 | indicator, rank, record_high, reset | 923, 925, 926, 927, 1451 |
 | PHYSICAL_ENTITY_TARGET_MISMATCH | capability_gap | 16 | belong_industry, indicator, queryData, rank, record_high | 957, 1105, 1107, 1166, 1409 |
+| PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE | capability_gap | 14 | indicator, rank | 563, 778, 889, 933, 2392 |
 | OFFICIAL_ANTLR_LEX_ERROR | invalid_input | 5 | 无 | 2122, 2194, 2466, 5328, 5753 |
 | PHYSICAL_ENTITY_MARKET_UNSUPPORTED | capability_gap | 5 | indicator, rank | 899, 901, 1108, 4944, 5430 |
 | PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED | capability_gap | 4 | close_together, cross_above, indicator, rank | 897, 898, 3673, 3743 |
 | PHYSICAL_EVENT_PERIOD_UNSUPPORTED | capability_gap | 3 | indicator, position | 3929, 3976, 5504 |
+| PHYSICAL_GROUP_TEMPORAL_BUCKET_UNSUPPORTED | capability_gap | 3 | indicator, rank | 886, 924, 2673 |
 | OFFICIAL_ANTLR_PARSE_ERROR | invalid_input | 2 | 无 | 3785, 5521 |
 | PHYSICAL_ENTITY_SCOPE_UNSUPPORTED | capability_gap | 2 | indicator, rank | 900, 4969 |
+| PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE | capability_gap | 2 | indicator, rank | 885, 906 |
+| PHYSICAL_GROUP_TEMPORAL_PREDICATE_UNSUPPORTED | capability_gap | 2 | indicator, position | 922, 3083 |
 | PHYSICAL_PLAN_UNAVAILABLE | capability_gap | 2 | indicator, rank | 2143, 4050 |
 | TEMPORAL_SCOPE_MISMATCH | capability_gap | 2 | indicator | 2439, 2509 |
 | DOMAIN_DATE_INVALID | capability_gap | 1 | indicator | 3639 |
+| DORIS_JOIN_SHAPE_UNSUPPORTED | capability_gap | 1 | cross_above | 3713 |
 | PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED | capability_gap | 1 | position | 4482 |
+| PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED | capability_gap | 1 | indicator, rank | 5565 |
+| PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED | capability_gap | 1 | indicator, rank | 828 |
+| PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED | capability_gap | 1 | rank | 5253 |
 | PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE | data_unavailable | 1 | indicator, queryData | 307 |
 | PHYSICAL_RANK_EXPRESSION_UNSUPPORTED | capability_gap | 1 | indicator, rank | 1198 |
 
@@ -43,22 +52,31 @@
 | 根因 | 分类 | 行数 | 错误码 | 代表行 |
 |---|---|---:|---|---|
 | invalid_dsl_or_type | invalid_input | 2466 | OFFICIAL_ANTLR_LEX_ERROR, OFFICIAL_ANTLR_PARSE_ERROR, OFFICIAL_TYPE_ERROR | 3, 5, 9, 10, 15 |
-| declared_data_unavailable | data_unavailable | 1679 | DOMAIN_DATA_UNAVAILABLE, PHYSICAL_MARKET_DATA_UNAVAILABLE, PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE, PHYSICAL_SCOPE_DATA_UNAVAILABLE | 2, 4, 6, 7, 8 |
+| declared_data_unavailable | data_unavailable | 1689 | DOMAIN_DATA_UNAVAILABLE, PHYSICAL_MARKET_DATA_UNAVAILABLE, PHYSICAL_QUERYDATA_SCALAR_DATA_UNAVAILABLE, PHYSICAL_SCOPE_DATA_UNAVAILABLE | 2, 4, 6, 7, 8 |
 | physical_entity_data_unavailable | capability_gap | 153 | PHYSICAL_ENTITY_DATA_UNAVAILABLE | 18, 39, 65, 296, 299 |
-| physical_entity_semantics_unavailable | capability_gap | 139 | PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE | 365, 563, 778, 828, 833 |
-| other_date_algebra | capability_gap | 102 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 271, 342, 361, 370, 479 |
-| intraday_data_domain | data_unavailable | 24 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 237, 505, 1006, 1434, 1443 |
-| ambiguous_recent_date | invalid_input | 21 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 112, 183, 298, 413, 1017 |
-| fundamental_reporting_calendar | data_unavailable | 19 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 308, 320, 529, 658, 752 |
+| other_date_algebra | capability_gap | 63 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 271, 526, 534, 1051, 1052 |
+| intraday_data_domain | data_unavailable | 22 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 237, 505, 1434, 1786, 2162 |
+| physical_group_taxonomy_data_unavailable | capability_gap | 20 | PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE | 841, 882, 903, 1714, 2339 |
+| ambiguous_recent_date | invalid_input | 19 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 112, 183, 298, 413, 1017 |
+| physical_group_bound_unsupported | capability_gap | 19 | PHYSICAL_GROUP_BOUND_UNSUPPORTED | 923, 925, 926, 927, 1451 |
 | physical_entity_target_mismatch | capability_gap | 16 | PHYSICAL_ENTITY_TARGET_MISMATCH | 957, 1105, 1107, 1166, 1409 |
+| physical_group_metric_policy_unavailable | capability_gap | 14 | PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE | 563, 778, 889, 933, 2392 |
+| fundamental_reporting_calendar | data_unavailable | 13 | PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED | 308, 320, 658, 752, 1234 |
 | physical_entity_market_unsupported | capability_gap | 5 | PHYSICAL_ENTITY_MARKET_UNSUPPORTED | 899, 901, 1108, 4944, 5430 |
 | physical_entity_indicator_unsupported | capability_gap | 4 | PHYSICAL_ENTITY_INDICATOR_UNSUPPORTED | 897, 898, 3673, 3743 |
 | physical_event_period_unsupported | capability_gap | 3 | PHYSICAL_EVENT_PERIOD_UNSUPPORTED | 3929, 3976, 5504 |
+| physical_group_temporal_bucket_unsupported | capability_gap | 3 | PHYSICAL_GROUP_TEMPORAL_BUCKET_UNSUPPORTED | 886, 924, 2673 |
 | physical_entity_scope_unsupported | capability_gap | 2 | PHYSICAL_ENTITY_SCOPE_UNSUPPORTED | 900, 4969 |
+| physical_group_scope_data_unavailable | capability_gap | 2 | PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE | 885, 906 |
+| physical_group_temporal_predicate_unsupported | capability_gap | 2 | PHYSICAL_GROUP_TEMPORAL_PREDICATE_UNSUPPORTED | 922, 3083 |
 | physical_plan_unavailable | capability_gap | 2 | PHYSICAL_PLAN_UNAVAILABLE | 2143, 4050 |
 | temporal_scope_mismatch | capability_gap | 2 | TEMPORAL_SCOPE_MISMATCH | 2439, 2509 |
 | domain_date_invalid | capability_gap | 1 | DOMAIN_DATE_INVALID | 3639 |
+| doris_join_shape_unsupported | capability_gap | 1 | DORIS_JOIN_SHAPE_UNSUPPORTED | 3713 |
 | physical_event_composition_unsupported | capability_gap | 1 | PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED | 4482 |
+| physical_group_aggregation_unsupported | capability_gap | 1 | PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED | 5565 |
+| physical_group_composite_scope_unsupported | capability_gap | 1 | PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED | 828 |
+| physical_group_expression_unsupported | capability_gap | 1 | PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED | 5253 |
 | physical_rank_expression_unsupported | capability_gap | 1 | PHYSICAL_RANK_EXPRESSION_UNSUPPORTED | 1198 |
 
 ## 开发门禁

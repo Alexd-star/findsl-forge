@@ -1,5 +1,6 @@
 # 十二类函数 Capability Matrix
 
+- Git HEAD：`10b7af790420e2727fa654e84128de24b1f8992f`
 - 正式样例：`240`
 - 编译成功：`240`
 - 十二类覆盖：`True`

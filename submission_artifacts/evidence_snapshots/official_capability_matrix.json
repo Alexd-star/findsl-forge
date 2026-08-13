@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T19:38:35+00:00",
-  "catalog_snapshot_id": "e4d8cf9437d6cb71d82a80e6e10947fc7e9e82f6a3f9ebf2ce9a9666c0c7e89c",
+  "generated_at": "2026-08-13T05:02:43+00:00",
+  "git_head": "10b7af790420e2727fa654e84128de24b1f8992f",
+  "catalog_snapshot_id": "333ed07bd783ed4135c42c6d1c3df85ce4832a51db9eea39dcfb93b8117b6d65",
   "eligible_case_count": 240,
   "compiled_case_count": 240,
   "official_function_family_count": 12,

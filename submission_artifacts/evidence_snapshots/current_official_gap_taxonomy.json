@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "source_sha256": "86034ba24f8ab7428a801ecb7dcba5ec53a8a2603c1fcc8c06af918a70a4ef45",
-  "source_git_head": "a323d96ca63728b4ac9dbba3d5599c56a6cd135d",
+  "source_git_head": "10b7af790420e2727fa654e84128de24b1f8992f",
   "row_count": 5799,
   "category_counts": {
-    "capability_gap": 495,
-    "data_unavailable": 1679,
+    "capability_gap": 371,
+    "data_unavailable": 1689,
     "invalid_input": 2466,
-    "passed": 1159
+    "passed": 1273
   },
   "migration_gap_count": 53,
   "migration_gap_codes": [
@@ -67,31 +67,6 @@
       ]
     },
     {
-      "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
-      "category": "capability_gap",
-      "row_count": 166,
-      "function_families": [
-        "belong_industry",
-        "cross_above",
-        "cross_down",
-        "golden_cross",
-        "indicator",
-        "position",
-        "queryData",
-        "rank",
-        "record_high",
-        "record_low",
-        "reset"
-      ],
-      "sample_rows": [
-        112,
-        183,
-        237,
-        271,
-        298
-      ]
-    },
-    {
       "code": "PHYSICAL_ENTITY_DATA_UNAVAILABLE",
       "category": "capability_gap",
       "row_count": 153,
@@ -114,28 +89,33 @@
       ]
     },
     {
-      "code": "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE",
+      "code": "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED",
       "category": "capability_gap",
-      "row_count": 139,
+      "row_count": 117,
       "function_families": [
+        "belong_industry",
+        "cross_above",
+        "golden_cross",
         "indicator",
         "position",
+        "queryData",
         "rank",
         "record_high",
+        "record_low",
         "reset"
       ],
       "sample_rows": [
-        365,
-        563,
-        778,
-        828,
-        833
+        112,
+        183,
+        237,
+        271,
+        298
       ]
     },
     {
       "code": "PHYSICAL_MARKET_DATA_UNAVAILABLE",
       "category": "data_unavailable",
-      "row_count": 96,
+      "row_count": 106,
       "function_families": [
         "belong_industry",
         "close_together",
@@ -179,6 +159,40 @@
       ]
     },
     {
+      "code": "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE",
+      "category": "capability_gap",
+      "row_count": 20,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        841,
+        882,
+        903,
+        1714,
+        2339
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_BOUND_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 19,
+      "function_families": [
+        "indicator",
+        "rank",
+        "record_high",
+        "reset"
+      ],
+      "sample_rows": [
+        923,
+        925,
+        926,
+        927,
+        1451
+      ]
+    },
+    {
       "code": "PHYSICAL_ENTITY_TARGET_MISMATCH",
       "category": "capability_gap",
       "row_count": 16,
@@ -195,6 +209,22 @@
         1107,
         1166,
         1409
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE",
+      "category": "capability_gap",
+      "row_count": 14,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        563,
+        778,
+        889,
+        933,
+        2392
       ]
     },
     {
@@ -258,6 +288,20 @@
       ]
     },
     {
+      "code": "PHYSICAL_GROUP_TEMPORAL_BUCKET_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 3,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        886,
+        924,
+        2673
+      ]
+    },
+    {
       "code": "OFFICIAL_ANTLR_PARSE_ERROR",
       "category": "invalid_input",
       "row_count": 2,
@@ -278,6 +322,32 @@
       "sample_rows": [
         900,
         4969
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE",
+      "category": "capability_gap",
+      "row_count": 2,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        885,
+        906
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_TEMPORAL_PREDICATE_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 2,
+      "function_families": [
+        "indicator",
+        "position"
+      ],
+      "sample_rows": [
+        922,
+        3083
       ]
     },
     {
@@ -317,6 +387,17 @@
       ]
     },
     {
+      "code": "DORIS_JOIN_SHAPE_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "cross_above"
+      ],
+      "sample_rows": [
+        3713
+      ]
+    },
+    {
       "code": "PHYSICAL_EVENT_COMPOSITION_UNSUPPORTED",
       "category": "capability_gap",
       "row_count": 1,
@@ -325,6 +406,41 @@
       ],
       "sample_rows": [
         4482
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        5565
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "indicator",
+        "rank"
+      ],
+      "sample_rows": [
+        828
+      ]
+    },
+    {
+      "code": "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED",
+      "category": "capability_gap",
+      "row_count": 1,
+      "function_families": [
+        "rank"
+      ],
+      "sample_rows": [
+        5253
       ]
     },
     {
@@ -377,7 +493,7 @@
     {
       "key": "declared_data_unavailable",
       "category": "data_unavailable",
-      "row_count": 1679,
+      "row_count": 1689,
       "terminal_codes": [
         "DOMAIN_DATA_UNAVAILABLE",
         "PHYSICAL_MARKET_DATA_UNAVAILABLE",
@@ -416,56 +532,37 @@
       ]
     },
     {
-      "key": "physical_entity_semantics_unavailable",
-      "category": "capability_gap",
-      "row_count": 139,
-      "terminal_codes": [
-        "PHYSICAL_ENTITY_SEMANTICS_UNAVAILABLE"
-      ],
-      "sample_rows": [
-        365,
-        563,
-        778,
-        828,
-        833
-      ],
-      "examples": [
-        "indicator('', '', '跌幅', '', '概念', '', 'CONS=6日') > 0 and rank('', '', '涨幅', 'desc', '本周', '概念', '', '') > 0",
-        "(indicator('港', '', '收盘价', '', '概念', '', '') < 10 or indicator('港', '', '收盘价', '', '概念', '', '') > 10.02) and indicator('港', '', '股票名称', '', '概念', '', '') != '%三十%' or indicator('港', '', '股票名称', '', '概念', '', '') = '%四十%'"
-      ]
-    },
-    {
       "key": "other_date_algebra",
       "category": "capability_gap",
-      "row_count": 102,
+      "row_count": 63,
       "terminal_codes": [
         "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
       ],
       "sample_rows": [
         271,
-        342,
-        361,
-        370,
-        479
+        526,
+        534,
+        1051,
+        1052
       ],
       "examples": [
         "indicator('', '', '成交额', '上周五到0926', '', '', '') > 10000000 and indicator('', '', '成交额', '上周五到0926', '', '', '') <= 12000000",
-        "indicator('', 'msic', '涨幅', '本月十号的前18日', '', '', 'CONS=每日') > 0"
+        "record_high('沪', '', '', '', '2023年2024年', '', '', '') = True"
       ]
     },
     {
       "key": "intraday_data_domain",
       "category": "data_unavailable",
-      "row_count": 24,
+      "row_count": 22,
       "terminal_codes": [
         "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
       ],
       "sample_rows": [
         237,
         505,
-        1006,
         1434,
-        1443
+        1786,
+        2162
       ],
       "examples": [
         "indicator('^京', '', '收盘价', '收盘后', '', '', '') between '[10,10.02]' limit 0,20",
@@ -473,9 +570,28 @@
       ]
     },
     {
+      "key": "physical_group_taxonomy_data_unavailable",
+      "category": "capability_gap",
+      "row_count": 20,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_TAXONOMY_DATA_UNAVAILABLE"
+      ],
+      "sample_rows": [
+        841,
+        882,
+        903,
+        1714,
+        2339
+      ],
+      "examples": [
+        "rank('', '申万行业', '主力净流入', 'desc', '3天', '行业', '', '') <= 50 and rank('', '申万行业', '主力净流入', 'desc', '5天', '行业', '', '') <= 50 and rank('', '申万行业', '主力净流入', 'desc', '7天', '行业', '', '') <= 50",
+        "indicator('深', '申万三级行业', '主力卖出占比', '5日内', '行业', '', '') > 5%"
+      ]
+    },
+    {
       "key": "ambiguous_recent_date",
       "category": "invalid_input",
-      "row_count": 21,
+      "row_count": 19,
       "terminal_codes": [
         "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
       ],
@@ -492,22 +608,22 @@
       ]
     },
     {
-      "key": "fundamental_reporting_calendar",
-      "category": "data_unavailable",
+      "key": "physical_group_bound_unsupported",
+      "category": "capability_gap",
       "row_count": 19,
       "terminal_codes": [
-        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+        "PHYSICAL_GROUP_BOUND_UNSUPPORTED"
       ],
       "sample_rows": [
-        308,
-        320,
-        529,
-        658,
-        752
+        923,
+        925,
+        926,
+        927,
+        1451
       ],
       "examples": [
-        "indicator('沪|深', '', '市盈率', '年报', '', '', '') > 0.9",
-        "record_low('', '', '最低价', '历史', '年报', '', '', '') = True"
+        "indicator('', '擒牛火箭', '首板涨停', '', '行业', '', '') = True",
+        "record_high('深主板', '', '', '', '9月', '板块', '', '') = True"
       ]
     },
     {
@@ -527,6 +643,44 @@
       "examples": [
         "indicator('', '', '最新价', '今日', '概念|指数', '', '') ~= queryData('', '中证A50', '最低价', '半年报', '')",
         "indicator('', '', '市盈率', '18年-24年', '概念', 'AVG', '') < belong_industry('', '', '市盈率', '18年-24年', 'AVG')"
+      ]
+    },
+    {
+      "key": "physical_group_metric_policy_unavailable",
+      "category": "capability_gap",
+      "row_count": 14,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE"
+      ],
+      "sample_rows": [
+        563,
+        778,
+        889,
+        933,
+        2392
+      ],
+      "examples": [
+        "(indicator('港', '', '收盘价', '', '概念', '', '') < 10 or indicator('港', '', '收盘价', '', '概念', '', '') > 10.02) and indicator('港', '', '股票名称', '', '概念', '', '') != '%三十%' or indicator('港', '', '股票名称', '', '概念', '', '') = '%四十%'",
+        "rank('', '', '涨停天数', 'desc', '3月19日', '行业', '', '') = 1"
+      ]
+    },
+    {
+      "key": "fundamental_reporting_calendar",
+      "category": "data_unavailable",
+      "row_count": 13,
+      "terminal_codes": [
+        "PHYSICAL_DATE_CONSTRAINT_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        308,
+        320,
+        658,
+        752,
+        1234
+      ],
+      "examples": [
+        "indicator('沪|深', '', '市盈率', '年报', '', '', '') > 0.9",
+        "record_low('', '', '最低价', '历史', '年报', '', '', '') = True"
       ]
     },
     {
@@ -584,6 +738,23 @@
       ]
     },
     {
+      "key": "physical_group_temporal_bucket_unsupported",
+      "category": "capability_gap",
+      "row_count": 3,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_TEMPORAL_BUCKET_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        886,
+        924,
+        2673
+      ],
+      "examples": [
+        "indicator('创业板', 'aigc相关', '涨停', '', '行业|概念', '', 'CONS=1周') = True limit 0,9",
+        "indicator('', '', '涨停', '过去4天', '概念|行业', '', 'CONS=每日') = True"
+      ]
+    },
+    {
       "key": "physical_entity_scope_unsupported",
       "category": "capability_gap",
       "row_count": 2,
@@ -597,6 +768,38 @@
       "examples": [
         "rank('', '通信服务行业|计算机行业', '最新价', 'desc', '', '指数', '', '') > 0 limit 0,100",
         "indicator('', '特色ETF策略', '', '', '指数', '', '') = 'all'"
+      ]
+    },
+    {
+      "key": "physical_group_scope_data_unavailable",
+      "category": "capability_gap",
+      "row_count": 2,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_SCOPE_DATA_UNAVAILABLE"
+      ],
+      "sample_rows": [
+        885,
+        906
+      ],
+      "examples": [
+        "indicator('', '医疗质量安全服务业务', '换手率', '近期', '行业', '', '') < 10% and rank('', '医疗质量安全服务业务', '换手率', 'desc', '近期', '行业', '', '') between '[4,82]'",
+        "indicator('', 'aigc关联', '成交额', '年报', '行业', '', '') > 50000000 and indicator('', 'aigc关联', '深股通标识', '年报', '行业', '', '') = True"
+      ]
+    },
+    {
+      "key": "physical_group_temporal_predicate_unsupported",
+      "category": "capability_gap",
+      "row_count": 2,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_TEMPORAL_PREDICATE_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        922,
+        3083
+      ],
+      "examples": [
+        "indicator('', '算力&新能源', '涨停', '', '板块', '', 'CONS<5') = True",
+        "indicator('', '', '主力净流入', '', '行业', '', '') > 0 and position('', '', '市盈率', '', '', '行业', '', 'CONS>1') = '高'"
       ]
     },
     {
@@ -646,6 +849,20 @@
       ]
     },
     {
+      "key": "doris_join_shape_unsupported",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "DORIS_JOIN_SHAPE_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        3713
+      ],
+      "examples": [
+        "cross_above('', '', '', '7日均线', '八月一号开始4日', '', 'CONS=每日') = True"
+      ]
+    },
+    {
       "key": "physical_event_composition_unsupported",
       "category": "capability_gap",
       "row_count": 1,
@@ -657,6 +874,48 @@
       ],
       "examples": [
         "position('', '', '最新价', '过去两年', '现在', '指数', '', '') = '最低'"
+      ]
+    },
+    {
+      "key": "physical_group_aggregation_unsupported",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_AGGREGATION_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        5565
+      ],
+      "examples": [
+        "rank('', '', '主力净流入', 'asc', '', '概念', 'GROWTH_FALL', '') = 1 and indicator('', '', '跌停', '近五天', '概念', '', '') = True"
+      ]
+    },
+    {
+      "key": "physical_group_composite_scope_unsupported",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_COMPOSITE_SCOPE_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        828
+      ],
+      "examples": [
+        "indicator('', 'ai&消费', '主力净流入', '', '板块', '', '') > 0 then (rank('', 'ai&消费', '最新价', 'asc', '', '板块', '', '') <= 10% and rank('', 'ai&消费', '连板天数', 'desc', '', '板块', '', '') <= 10%) then rank('', 'ai&消费', '', 'desc', '', '板块', '', '') <= 10"
+      ]
+    },
+    {
+      "key": "physical_group_expression_unsupported",
+      "category": "capability_gap",
+      "row_count": 1,
+      "terminal_codes": [
+        "PHYSICAL_GROUP_EXPRESSION_UNSUPPORTED"
+      ],
+      "sample_rows": [
+        5253
+      ],
+      "examples": [
+        "rank('', '申万三级行业', '市盈率', 'desc', '24年', '行业', '', '') + rank('', '申万三级行业', '市净率', 'desc', '25年', '行业', 'AVG', '') <= 10"
       ]
     },
     {

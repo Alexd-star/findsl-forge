@@ -2,9 +2,9 @@
 
 ## Decision Summary
 
-- Generated at: 2026-08-12T19:41:54+00:00
+- Generated at: 2026-08-13T05:19:24+00:00
 - Repository root: `D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening`
-- Git HEAD at report generation: `a323d96` feat: add typed entity domains and governed data admission
+- Git HEAD at report generation: `10b7af7` test: remove historical phase evidence coupling
 - Git branch: `feat/competition-finalization`
 - Blocking gates passed: True
 - Warning count: 0
@@ -13,12 +13,12 @@
 
 | Gate | Level | Status | Evidence |
 |---|---|---|---|
-| Pytest regression suite | required | PASS | exit 0, elapsed 162629.1 ms |
-| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, canonical 48 cases, P95 29.162 ms |
+| Pytest regression suite | required | PASS | exit 0, elapsed 211150.3 ms |
+| Compiler accuracy and latency | required | PASS | 10/10 cases, fragments 100.00%, canonical 48 cases, P95 29.903 ms |
 | SQL/reference equivalence | required | PASS | SQL rows 2, reference rows 2, missing 0, extra 0 |
 | Prefix optimizer correctness | required | PASS | matches reference True, matches baseline True |
 | Prefix optimizer plan shape | required | PASS | baseline window frames 1, optimized prefix references 4 |
-| Demo API smoke | required | PASS | verification True, compile 0.808 ms, rows 2 |
+| Demo API smoke | required | PASS | verification True, compile 0.828 ms, rows 2 |
 | NL2DSL validated candidate | required | PASS | candidates 1, validated True, verification True, rows 2 |
 | LLM candidate safety loop | required | PASS | accepted 1, rejected 2, codes UNKNOWN_INDICATOR, UNSAFE_DIRECT_SQL |
 | Structured diagnostics repair hints | required | PASS | diagnostics 1, first code UNKNOWN_INDICATOR, suggestions 2 |
@@ -35,7 +35,7 @@
 
 - Compile success rate: 100.00%
 - SQL fragment accuracy: 100.00%
-- Compile P95 latency: 29.162 ms
+- Compile P95 latency: 29.903 ms
 - Compile latency cases: 48
 - Evaluation cases passed: 10/10
 - SQL/reference equivalence: True
@@ -43,7 +43,7 @@
 - Equivalence reference rows: 2
 - Prefix optimized matches reference: True
 - Prefix optimized matches baseline: True
-- Local SQLite prefix benchmark speedup smoke: 1.26x
+- Local SQLite prefix benchmark speedup smoke: 1.29x
 - Baseline window frames: 1
 - Optimized prefix table references: 4
 - Local SQLite timing is not used as the Doris-scale performance claim.
@@ -97,7 +97,7 @@
 
 - Doris cluster report exists: True
 - Doris cluster marker check: True
-- Doris cluster report bytes: 9495
+- Doris cluster report bytes: 9511
 - Matched markers: Doris Cluster Evidence, Evidence source: Apache Doris MySQL-compatible query port, Evidence passed: True, Baseline success: True, Optimized success: True, Row counts match: True, Minimum Doris speedup target: 10.00x, Doris speedup target met: True, Optimized plan contains prefix table: True, Baseline plan contains window: True
 - Missing markers: <none>
 
@@ -105,7 +105,7 @@
 
 - Passed: True
 - Verification passed: True
-- Compile latency: 0.808 ms
+- Compile latency: 0.828 ms
 - SQL rows: 2
 - Error: <none>
 
@@ -179,27 +179,28 @@
 
 - Command: `C:\Program Files\Python39\python.exe -m pytest --basetemp D:\Luo_docs\竞赛\研创赛\研究生金融科技创新大赛\findsl-forge\.worktrees\architecture-hardening\.pytest_cache\readiness_tmp`
 - Exit code: 0
-- Elapsed: 162629.1 ms
+- Elapsed: 211150.3 ms
 
 ```text
 ........................................................................ [  5%]
 ........................................................................ [ 11%]
-........................................................................ [ 17%]
-........................................................................ [ 23%]
-........................................................................ [ 29%]
-........................................................................ [ 35%]
-........................................................................ [ 41%]
-........................................................................ [ 47%]
-........................................................................ [ 53%]
-........................................................................ [ 59%]
-........................................................................ [ 65%]
-........................................................................ [ 71%]
-........................................................................ [ 77%]
-........................................................................ [ 83%]
+........................................................................ [ 16%]
+........................................................................ [ 22%]
+........................................................................ [ 28%]
+........................................................................ [ 33%]
+........................................................................ [ 39%]
+........................................................................ [ 44%]
+........................................................................ [ 50%]
+........................................................................ [ 56%]
+........................................................................ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 72%]
+........................................................................ [ 78%]
+........................................................................ [ 84%]
 ........................................................................ [ 89%]
 ........................................................................ [ 95%]
-.........................................................                [100%]
-1209 passed in 161.52s (0:02:41)
+............................................................             [100%]
+1284 passed in 210.02s (0:03:30)
 ```
 
 ## Award-Readiness Differentiators
@@ -228,6 +229,6 @@
 ## Remaining High-Value Work
 
 - Re-run Doris-cluster EXPLAIN and latency evidence whenever scale data, table layout, or optimizer rules change.
-- Refresh the generated one-minute defense video when screenshots or evidence values change; add human voiceover only if the portal requires narrated media.
-- Broaden the DSL corpus with more official-style questions and negative/error cases.
+- Freeze the final Git HEAD before portal submission, then export evidence once and avoid mixing reports from different revisions.
+- Add external data domains only from licensed, versioned snapshots; keep ambiguous or invalid DSL as deterministic rejections.
 - Use the provider-backed LLM path only with stable credentials, timeout settings, and saved raw responses when preparing live demos.
