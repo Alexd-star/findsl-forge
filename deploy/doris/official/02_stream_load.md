@@ -5,7 +5,7 @@
 推荐优先使用自动脚本：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\prepare_official_doris_evidence.ps1 `
+pwsh -File .\scripts\prepare_official_doris_evidence.ps1 `
   -OfficialRoot "<官方数据解压目录>"
 ```
 

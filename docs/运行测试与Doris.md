@@ -58,7 +58,7 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8766/v1/capabilities/query 
 一键启动 Doris、样例数据和容器化 Demo：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\demo_stack.ps1
+pwsh -File .\scripts\demo_stack.ps1
 ```
 
 如 Docker 构建访问 PyPI 需要本机代理，使用 `-ProxyUrl http://127.0.0.1:7897`。脚本会将回环地址转换为容器可访问的 `host.docker.internal`，不会把代理固化进镜像运行环境。
@@ -95,7 +95,7 @@ python scripts/validate_financial_rule_release.py `
 ## 5. 启动 Doris
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\doris_quickstart.ps1 -Action Start
+pwsh -File .\scripts\doris_quickstart.ps1 -Action Start
 ```
 
 脚本使用命名卷保存 FE 元数据和 BE 数据。健康状态必须同时满足 FE HTTP、BE HTTP、查询端口可用且 backend alive。停止服务使用 `-Action Stop`；除非明确需要重建，不要删除命名卷。
@@ -109,7 +109,7 @@ mysql -h 127.0.0.1 -P 9030 -u root -e "SHOW FRONTENDS; SHOW BACKENDS;"
 ## 6. 官方数据装载与水位
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\prepare_official_doris_evidence.ps1
+pwsh -File .\scripts\prepare_official_doris_evidence.ps1
 python scripts\check_official_watermarks.py
 ```
 
@@ -134,11 +134,11 @@ python scripts\run_hero_query.py --execute-doris --timeout 30
 ## 8. 最终证据与交付包
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\refresh_final_evidence.ps1 `
+pwsh -File .\scripts\refresh_final_evidence.ps1 `
   -OfficialWorkbook "<官方工作簿路径>" `
   -OfficialDataRoot "<官方数据解压目录>"
 
-powershell -ExecutionPolicy Bypass -File .\scripts\build_submission_package.ps1
+pwsh -File .\scripts\build_submission_package.ps1
 ```
 
 证据刷新脚本要求源码工作区无未提交改动，所有评分报告必须绑定同一 Git HEAD。打包脚本使用 `git archive` 生成纯净源码副本，只复制最终证据白名单，排除虚拟环境、缓存、日志、数据库运行文件和本机路径；随后生成 SHA-256 清单、匿名性检查结果和最终 ZIP。任一门禁失败都会终止，不产生可上传结论。

@@ -88,7 +88,7 @@ python -m findsl.cli serve-demo --host 127.0.0.1 --port 8765
 Windows 一键启动 Doris、样例数据和容器化 Demo：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\demo_stack.ps1
+pwsh -File .\scripts\demo_stack.ps1
 ```
 
 网络需要本机代理时可追加 `-ProxyUrl http://127.0.0.1:7897`；脚本会自动换成 Docker Desktop 可访问的宿主机地址，代理只参与镜像构建。

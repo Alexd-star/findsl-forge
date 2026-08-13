@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$TeamName = "FinDSLForge",
   [string]$OutputRoot = "final_submission"
 )
@@ -129,7 +129,7 @@ Doris部署：FinDSL-Forge/deploy/doris/
 1. 进入 01_可运行项目/FinDSL-Forge。
 2. 使用 Python 3.11 执行 python -m pip install -e ".[dev]"。
 3. 执行 python -m pytest -q。
-4. 执行 powershell -ExecutionPolicy Bypass -File .\scripts\demo_stack.ps1 启动 Doris 与演示服务。
+4. 执行 pwsh -File .\scripts\demo_stack.ps1 启动 Doris 与演示服务。
 5. 浏览器访问 http://127.0.0.1:8765。
 "@, $utf8NoBom)
 [System.IO.File]::WriteAllText((Join-Path $notesRoot "RELEASE_COMMIT.txt"), "$head`n", $utf8NoBom)

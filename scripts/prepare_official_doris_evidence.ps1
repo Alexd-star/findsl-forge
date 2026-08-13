@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$OfficialRoot = $env:FINDSL_OFFICIAL_DATA_ROOT,
   [string]$DorisHost = "127.0.0.1",
   [int]$QueryPort = 9030,
