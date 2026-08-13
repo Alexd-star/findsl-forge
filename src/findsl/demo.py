@@ -49,7 +49,7 @@ def doris_evidence_summary(report_path: Path = DEFAULT_DORIS_EVIDENCE) -> Dict[s
             speedup = f"{minimum:.2f}x" if isinstance(minimum, (int, float)) else "<unknown>"
             return {
                 "available": bool(payload.get("all_gates_passed")),
-                "path": str(report_path),
+                "path": _display_demo_path(report_path),
                 "metrics": {
                     "long_horizon_workloads": long_horizon.get("workload_count"),
                     "minimum_speedup": minimum,
@@ -80,7 +80,7 @@ def doris_evidence_summary(report_path: Path = DEFAULT_DORIS_EVIDENCE) -> Dict[s
         metrics[_metric_key(key)] = value.strip()
     return {
         "available": True,
-        "path": str(report_path),
+        "path": _display_demo_path(report_path),
         "metrics": metrics,
         "headline": {
             "passed": metrics.get("evidence_passed", "<unknown>"),
@@ -115,6 +115,8 @@ def delivery_evidence_summary(
         quality = scorecard.get("quality") or {}
         latency = scorecard.get("compile_latency") or {}
         migration = scorecard.get("architecture_migration") or {}
+        correctness = scorecard.get("correctness") or {}
+        execution = scorecard.get("execution") or {}
         return {
             "available": bool(payload.get("all_gates_passed")),
             "path": str(metadata_path),
@@ -128,6 +130,13 @@ def delivery_evidence_summary(
             "legacy_to_new_migrated": migration.get("legacy_to_new_migrated"),
             "migration_coverage": migration.get("migration_coverage"),
             "new_backend_success": migration.get("new_backend_success"),
+            "correctness_matched": correctness.get("matched"),
+            "correctness_total": correctness.get("eligible_total"),
+            "all_function_families_covered": correctness.get(
+                "all_12_function_families_covered"
+            ),
+            "execution_passed": execution.get("passed"),
+            "execution_total": execution.get("case_count"),
             "git_head": payload.get("git_head"),
             "metadata_warnings": [],
         }
@@ -484,6 +493,13 @@ def _resolve_demo_path(path: Path) -> Path:
     if repo_candidate.exists():
         return repo_candidate
     return candidate
+
+
+def _display_demo_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(DEMO_REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.name
 
 
 def _resolve_demo_dataset(dataset: str, dataset_paths: Dict[str, Path]) -> Path:
@@ -1381,8 +1397,10 @@ def render_demo_html() -> str:
           "Warning count": delivery.warning_count,
           "Pytest": delivery.pytest_passed + " passed",
           "正式编译 P95": delivery.compile_p95_ms + " ms",
+          "独立 SQL 正确率": delivery.correctness_matched + "/" + delivery.correctness_total,
+          "真实 Doris 执行矩阵": delivery.execution_passed + "/" + delivery.execution_total,
+          "官方函数族覆盖": delivery.all_function_families_covered ? "12/12" : "待核验",
           "官方严格迁移": delivery.legacy_to_new_migrated + "/" + delivery.legacy_strict_success,
-          "新后端总成功": delivery.new_backend_success,
           "证据 Git HEAD": delivery.git_head,
           "Metadata warnings": (delivery.metadata_warnings || []).length
         }));

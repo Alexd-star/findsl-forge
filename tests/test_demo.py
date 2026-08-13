@@ -302,6 +302,12 @@ def test_delivery_evidence_summary_reads_final_scorecard(tmp_path):
                 "scorecard": {
                     "quality": {"pytest_passed": 1309, "warning_count": 0},
                     "compile_latency": {"p95_ms": 30.1, "target_p95_ms": 50.0},
+                    "correctness": {
+                        "matched": 240,
+                        "eligible_total": 240,
+                        "all_12_function_families_covered": True,
+                    },
+                    "execution": {"passed": 48, "case_count": 48},
                     "architecture_migration": {
                         "legacy_strict_success": 1097,
                         "legacy_to_new_migrated": 1044,
@@ -321,6 +327,9 @@ def test_delivery_evidence_summary_reads_final_scorecard(tmp_path):
     assert summary["pytest_passed"] == 1309
     assert summary["compile_p95_ms"] == 30.1
     assert summary["legacy_to_new_migrated"] == 1044
+    assert summary["correctness_matched"] == 240
+    assert summary["execution_passed"] == 48
+    assert summary["all_function_families_covered"] is True
 
 
 def test_doris_evidence_summary_reads_final_scorecard(tmp_path):
