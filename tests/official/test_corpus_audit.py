@@ -58,6 +58,7 @@ def test_corpus_audit_separates_data_invalid_and_ledger_repair():
     assert by_row[5328]["root_cause"] == "registered_syntax_anomaly"
     assert by_row[5328]["safe_repair"]["requires_confirmation"] is True
     assert "不能为了覆盖率" in render_corpus_audit_markdown(report)
+    assert report["current_capability_family_counts"] == {}
 
 
 def test_corpus_audit_infers_missing_indicator_type_without_enabling_it():
@@ -113,6 +114,7 @@ def test_corpus_audit_keeps_new_data_inference_out_of_historical_baseline():
 
     assert report["baseline_status_counts"] == {"CAPABILITY_GAP": 1}
     assert report["current_status_counts"] == {"DATA_UNAVAILABLE": 1}
+    assert report["rows"][0]["root_cause"] == "dataset_snapshot_required"
 
 
 def test_corpus_audit_accepts_frozen_historical_status_by_row():

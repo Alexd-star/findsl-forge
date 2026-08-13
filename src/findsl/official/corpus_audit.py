@@ -59,6 +59,7 @@ def build_corpus_audit(
     baseline_statuses: Counter[str] = Counter()
     roots: Counter[str] = Counter()
     capability_families: Counter[str] = Counter()
+    current_capability_families: Counter[str] = Counter()
     type_evidence: Dict[str, Counter[str]] = defaultdict(Counter)
     type_examples: Dict[str, Dict[str, list[int]]] = defaultdict(
         lambda: defaultdict(list)
@@ -96,6 +97,9 @@ def build_corpus_audit(
         family = _CAPABILITY_FAMILIES.get(str(row.get("terminal_code", "")))
         if baseline_status == "CAPABILITY_GAP" and family:
             capability_families[family] += 1
+        current_family = _CAPABILITY_FAMILIES.get(str(capability["code"]))
+        if capability["status"] == "CAPABILITY_GAP" and current_family:
+            current_capability_families[current_family] += 1
         current_statuses[capability["status"]] += 1
         baseline_statuses[baseline_status] += 1
         roots[root_cause] += 1
@@ -171,6 +175,9 @@ def build_corpus_audit(
         "baseline_capability_family_counts": dict(
             sorted(capability_families.items())
         ),
+        "current_capability_family_counts": dict(
+            sorted(current_capability_families.items())
+        ),
         "indicator_contracts": indicator_contracts,
         "rows": rows,
     }
@@ -222,6 +229,17 @@ def render_corpus_audit_markdown(report: Mapping[str, Any]) -> str:
         ]
     )
     for family, count in report["baseline_capability_family_counts"].items():
+        lines.append(f"| `{family}` | {count} |")
+    lines.extend(
+        [
+            "",
+            "## 当前剩余能力族",
+            "",
+            "| 能力族 | 问句数 |",
+            "|---|---:|",
+        ]
+    )
+    for family, count in report["current_capability_family_counts"].items():
         lines.append(f"| `{family}` | {count} |")
     lines.extend(
         [
@@ -449,6 +467,38 @@ def _root_cause(
         return "private_data_required", "inject_authorized_private_snapshot"
     if "not_loaded" in profiles:
         return "dataset_snapshot_required", "admit_versioned_external_snapshot"
+    if capability["status"] == "DATA_UNAVAILABLE":
+        if missing:
+            inferred = {
+                kind for name in missing for kind in constraints.get(name, ())
+            }
+            if any(len(constraints.get(name, ())) > 1 for name in missing):
+                return "ambiguous_indicator_contract", "business_review_required"
+            if inferred:
+                return (
+                    "missing_indicator_contract",
+                    "define_lineage_type_and_reference",
+                )
+            return "undefined_business_semantics", "business_definition_required"
+        return "dataset_field_unavailable", "admit_extended_versioned_snapshot"
+    if capability["status"] == "INVALID_INPUT":
+        if capability.get("clarification"):
+            return "ambiguous_date", "manual_date_disambiguation"
+        if capability["code"] == "PHYSICAL_ENTITY_TARGET_MISMATCH":
+            return "incompatible_entity_grain", "rewrite_query_with_explicit_stage"
+        if (
+            capability["code"] == "PHYSICAL_GROUP_METRIC_POLICY_UNAVAILABLE"
+            and any(
+                not str(value).strip()
+                for item in bindings
+                for key, value in item["slots"].items()
+                if key.startswith("indicator_name")
+            )
+        ):
+            return "missing_required_indicator", "supply_group_metric"
+        if capability["code"] == "OFFICIAL_TYPE_ERROR":
+            return "incompatible_known_types", "reject_invalid_input"
+        return "invalid_input", "manual_correction_required"
     if missing:
         inferred = {kind for name in missing for kind in constraints.get(name, ())}
         if any(len(constraints.get(name, ())) > 1 for name in missing):
@@ -456,15 +506,7 @@ def _root_cause(
         if inferred:
             return "missing_indicator_contract", "define_lineage_type_and_reference"
         return "undefined_business_semantics", "business_definition_required"
-    if any(
-        str(item["slots"].get("date", item["slots"].get("period", ""))).strip()
-        in _AMBIGUOUS_DATES
-        for item in bindings
-    ):
-        return "ambiguous_date", "manual_date_disambiguation"
-    if capability["code"] == "OFFICIAL_TYPE_ERROR":
-        return "incompatible_known_types", "reject_invalid_input"
-    family = _CAPABILITY_FAMILIES.get(str(row.get("terminal_code", "")))
+    family = _CAPABILITY_FAMILIES.get(str(capability.get("code", "")))
     if family:
         return f"capability_{family}", "implement_family_or_keep_safe_rejection"
     if "unsupported" in profiles:
