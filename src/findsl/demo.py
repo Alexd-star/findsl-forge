@@ -1477,7 +1477,9 @@ def render_demo_html() -> str:
       if (currentExample && currentExample.expected_code) {
         const card = document.createElement("article");
         card.className = "step-card";
-        const actualCodes = [error.code, ...diagnostics.map(item => item.code)].filter(Boolean);
+        const actualCodes = Array.from(
+          new Set([error.code, ...diagnostics.map(item => item.code)].filter(Boolean))
+        );
         card.appendChild(kvList({
           "预期诊断码": currentExample.expected_code,
           "实际诊断码": actualCodes.join(", ") || "<none>"

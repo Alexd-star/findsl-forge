@@ -3,7 +3,8 @@ FROM python:3.11-slim-bookworm@sha256:d29f48a31a8b408ed19272ca1e7b10ebae13b240a2
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    FINDSL_REPO_ROOT=/app
+    FINDSL_REPO_ROOT=/app \
+    PYTHONPATH=/app/src
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends default-mysql-client ca-certificates \

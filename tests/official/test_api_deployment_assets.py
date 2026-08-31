@@ -10,6 +10,7 @@ def test_api_container_is_non_root_read_only_and_health_checked():
     constraints = (ROOT / "deploy/api/constraints.txt").read_text(encoding="utf-8")
 
     assert "python:3.11-slim-bookworm@sha256:" in dockerfile
+    assert "PYTHONPATH=/app/src" in dockerfile
     assert "-c /tmp/constraints.txt" in dockerfile
     assert "USER 10001:10001" in dockerfile
     assert "HEALTHCHECK" in dockerfile

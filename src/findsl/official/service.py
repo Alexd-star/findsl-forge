@@ -23,10 +23,40 @@ from .repair import OfficialRepairCatalog, default_repair_catalog
 
 
 class OfficialServiceError(RuntimeError):
-    def __init__(self, code: str, message: str, *, status_code: int = 400):
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        *,
+        status_code: int = 400,
+        stage: str | None = None,
+        diagnostics: tuple[Mapping[str, Any], ...] = (),
+    ):
         super().__init__(message)
         self.code = code
         self.status_code = status_code
+        self.stage = stage
+        self.diagnostics = diagnostics
+
+    def to_dict(self) -> Dict[str, Any]:
+        diagnostics = [dict(item) for item in self.diagnostics]
+        if not diagnostics:
+            diagnostics = [
+                {
+                    "code": self.code,
+                    "severity": "error",
+                    "message": str(self),
+                    "suggestions": _service_error_suggestions(self.code),
+                }
+            ]
+        return {
+            "ok": False,
+            "code": self.code,
+            "message": str(self),
+            "status_code": self.status_code,
+            "stage": self.stage,
+            "diagnostics": diagnostics,
+        }
 
 
 @dataclass(frozen=True)
@@ -177,6 +207,8 @@ class OfficialCompilerService:
                 exc.code,
                 str(exc),
                 status_code=422,
+                stage=exc.stage,
+                diagnostics=exc.diagnostics,
             ) from exc
         elapsed_ms = (perf_counter() - started) * 1000.0
         self.metrics.record("compile", "ok", elapsed_ms)
@@ -454,6 +486,19 @@ def _limit_result(sql: str, count: int) -> str:
         ") AS service_result\n"
         f"LIMIT {int(count)}"
     )
+
+
+def _service_error_suggestions(code: str) -> list[str]:
+    if code == "DOMAIN_DATA_UNAVAILABLE":
+        return [
+            "执行前请加载包含所需财务数据域、且已通过质量校验的数据配置。",
+            "当前配置缺少对应表或字段，系统将保持安全拒绝，不生成不可执行的伪 SQL。",
+        ]
+    if code in {"DSL_REQUIRED", "DSL_TOO_LARGE", "DSL_INVALID_CHARACTER"}:
+        return ["请修正请求中的 DSL 文本后重新提交。"]
+    return [
+        "请根据失败阶段和稳定诊断码检查 DSL 或当前数据配置。"
+    ]
 
 
 def _duration_summary(values):

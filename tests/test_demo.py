@@ -75,6 +75,15 @@ def test_official_demo_api_returns_grounded_t0_analysis_and_preview():
         assert exported["ok"] is True
         assert exported["filename"].endswith(".md")
         assert "## 自适应路由候选" in exported["markdown"]
+
+        unavailable = _post_json(
+            f"http://127.0.0.1:{server.server_port}/api/official/preview",
+            {"dsl": "indicator('', '', '营业收入', '', '', '', '') > 1"},
+        )
+        assert unavailable["ok"] is False
+        assert unavailable["error"]["code"] == "DOMAIN_DATA_UNAVAILABLE"
+        assert unavailable["error"]["stage"] == "logical"
+        assert unavailable["error"]["diagnostics"][0]["code"] == "DOMAIN_DATA_UNAVAILABLE"
     finally:
         server.shutdown()
         server.server_close()
